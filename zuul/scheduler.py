@@ -98,7 +98,6 @@ class Scheduler(object):
             self.projects[config_project['name']] = project
             for qname in self.queue_managers.keys():
                 if config_project.has_key(qname):
-                    print project, qname
                     job_tree = project.addQueue(qname)
                     config_jobs = config_project[qname]
                     add_jobs(job_tree, config_jobs)
@@ -219,7 +218,6 @@ class BaseQueueManager(object):
 
     def eventMatches(self, event):
         for ef in self.event_filters:
-            print ef
             if ef.matches(event):
                 return True
         return False
@@ -290,7 +288,6 @@ class BaseQueueManager(object):
             if ret:
                 self.log.error("Reporting change %s received: %s" % (
                         change, ret))
-                print ret
         except:
             self.log.exception("Exception while reporting:")
         return ret
