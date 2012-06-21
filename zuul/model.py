@@ -193,7 +193,8 @@ class Change(object):
                                              self._id())
         for job in self.project.getJobs(self.queue_name):
             result = self.jobs.get(job.name)
-            ret += '%s  %s: %s\n' % (indent_str, job.name, result)
+            ret += '%s  %s: %s %s\n' % (indent_str, job.name, result,
+                                        self.job_urls.get(job.name, None))
         if self.change_ahead:
             ret += '%sWaiting on:\n' % (indent_str)
             ret += self.change_ahead.formatStatus(indent + 2)
