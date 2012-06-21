@@ -185,7 +185,7 @@ class Change(object):
     def __repr__(self):
         return '<Change 0x%x %s>' % (id(self), self._id())
 
-    def formatStatus(self, indent=0):
+    def formatStatus(self, indent=0, html=False):
         indent_str = ' ' * indent
         ret = ''
         ret += '%sProject %s change %s\n' % (indent_str,
@@ -193,10 +193,15 @@ class Change(object):
                                              self._id())
         for job in self.project.getJobs(self.queue_name):
             result = self.jobs.get(job.name)
-            ret += '%s  %s: %s\n' % (indent_str, job.name, result)
+            ret += '%s  %s: %s' % (indent_str, job.name, result)
+            if html:
+                url = self.job_urls.get(job.name, None)
+                if url is not None:
+                    ret += ' <a href="%s">Job Page</a>' % url
+            ret += '\n'
         if self.change_ahead:
             ret += '%sWaiting on:\n' % (indent_str)
-            ret += self.change_ahead.formatStatus(indent + 2)
+            ret += self.change_ahead.formatStatus(indent + 2, html)
         return ret
 
     def formatReport(self):
