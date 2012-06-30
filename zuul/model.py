@@ -323,13 +323,15 @@ class TriggerEvent(object):
 
 
 class EventFilter(object):
-    def __init__(self, types=[], branches=[], refs=[], approvals=[]):
+    def __init__(self, types=[], branches=[], refs=[], approvals=[],
+                                                comment_filters = []):
         self._types = types
         self._branches = branches
         self._refs = refs
         self.types = [re.compile(x) for x in types]
         self.branches = [re.compile(x) for x in branches]
         self.refs = [re.compile(x) for x in refs]
+        self.comment_filters = [re.compile(x) for x in comment_filters]
         self.approvals = approvals
 
     def __repr__(self):
@@ -375,6 +377,14 @@ class EventFilter(object):
             if ref.match(event.ref):
                 matches_ref = True
         if self.refs and not matches_ref:
+            return False
+
+        # comment_filters are ORed
+        matches_comment_filter = False
+        for comment_filter in self.comment_filters:
+            if comment_filter.search(event.comment):
+                matches_comment_filter = True
+        if self.comment_filters and not matches_comment_filter:
             return False
 
         # approvals are ANDed
