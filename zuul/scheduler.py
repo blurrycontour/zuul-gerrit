@@ -654,9 +654,15 @@ behind failed change %s" % (
                             change.change_behind, change))
                     self.cancelJobs(change.change_behind)
                     self.launchJobs(change.change_behind)
+        # Reached change whose jobs failed. Everything after that change will
+        # need to be retested. Stop burning resources on those jobs.
+        if (change.change_behind and not change.change_behind.change_ahead and
+            change.change_behind.areAllJobsComplete()
+            and not change.didAllJobsSucceed()):
+            self.cancelJobs(change.change_behind)
         # If the change behind this is ready, notify
-        if (change.change_behind and
-            change.change_behind.areAllJobsComplete()):
+        elif (change.change_behind and
+              change.change_behind.areAllJobsComplete()):
             self.log.info("Change %s behind change %s is ready, \
 possibly reporting" % (change.change_behind, change))
             self.possiblyReportChange(change.change_behind)
