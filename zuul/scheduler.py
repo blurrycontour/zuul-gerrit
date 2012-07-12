@@ -467,6 +467,11 @@ for change %s:" % (job, change))
         if change.areAllJobsComplete():
             self.log.debug("All jobs for change %s are complete" % change)
             self.possiblyReportChange(change)
+        elif change.didAnyJobFail():
+            # This or some other build failed. All changes behind this change
+            # will need to be retested. To free up resources cancel the builds
+            # behind this one as they will be rerun anyways.
+            self.cancelJobs(change.change_behind, prime=False)
         else:
             # There may be jobs that depended on jobs that are now complete
             self.log.debug("All jobs for change %s are not yet complete" % (
@@ -609,10 +614,11 @@ for change %s:" % (job, change))
                     change.change_behind, change))
             self.launchJobs(change.change_behind)
 
-    def cancelJobs(self, change):
+    def cancelJobs(self, change, prime=True):
         self.log.debug("Cancel jobs for change %s" % change)
         to_remove = []
-        change.resetAllBuilds()
+        if prime:
+            change.resetAllBuilds()
         for build, build_change in self.building_jobs.items():
             if build_change == change:
                 self.log.debug("Found build %s for change %s to cancel" % (
@@ -630,7 +636,7 @@ for change %s" % (build, change))
         if change.change_behind:
             self.log.debug("Canceling jobs for change %s, \
 behind change %s" % (change.change_behind, change))
-            self.cancelJobs(change.change_behind)
+            self.cancelJobs(change.change_behind, prime=prime)
 
     def possiblyReportChange(self, change):
         self.log.debug("Possibly reporting change %s" % change)
@@ -659,8 +665,8 @@ behind failed change %s" % (
                     self.cancelJobs(change.change_behind)
                     self.launchJobs(change.change_behind)
         # If the change behind this is ready, notify
-        if (change.change_behind and
-            change.change_behind.areAllJobsComplete()):
+        elif (change.change_behind and
+                change.change_behind.areAllJobsComplete()):
             self.log.info("Change %s behind change %s is ready, \
 possibly reporting" % (change.change_behind, change))
             self.possiblyReportChange(change.change_behind)
