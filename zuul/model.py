@@ -449,6 +449,16 @@ class Change(object):
                 return False
         return True
 
+    def didAnyJobFail(self):
+        tree = self.project.getJobTreeForQueue(self.queue_name)
+        for job in self._filterJobs(tree.getJobs()):
+            build = self.current_build_set.getBuild(job.name)
+            if (build and build.result != 'SUCCESS'
+                    and build.result != 'SKIPPED'
+                    and build.result != 'CANCELED'):
+                return True
+        return False
+
     def delete(self):
         if self.change_behind:
             self.change_behind.change_ahead = None
