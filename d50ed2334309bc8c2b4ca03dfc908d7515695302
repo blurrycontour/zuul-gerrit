@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAKX//6bs\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 638,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2012-07-16T23:44:18Z",
+      "side": 1,
+      "message": "I think you mean \"onBuildCompleted\".\nAlso, i think this should be \"if not ...\" return False.",
+      "revId": "d50ed2334309bc8c2b4ca03dfc908d7515695302",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAKX//6bo\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 645,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2012-07-16T23:44:18Z",
+      "side": 1,
+      "message": "Spelling: \"Canceling\".",
+      "revId": "d50ed2334309bc8c2b4ca03dfc908d7515695302",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
