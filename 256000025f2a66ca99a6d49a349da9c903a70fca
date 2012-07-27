@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "AAAALH//+yk\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2012-07-26T21:15:57Z",
+      "side": 1,
+      "message": "There is a job.branches member too. Do we need both branches members and should this external access use the public branches instead of the \u0027private\u0027 _branches?",
+      "revId": "256000025f2a66ca99a6d49a349da9c903a70fca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAALH//+yI\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 1
@@ -20,6 +37,23 @@
     },
     {
       "key": {
+        "uuid": "AAAALH//+zs\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 656,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2012-07-26T21:15:57Z",
+      "side": 1,
+      "message": "I think the to_enqueue assignment might be better off on line 669 as to_enqueue isn\u0027t needed until then.",
+      "revId": "256000025f2a66ca99a6d49a349da9c903a70fca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAALH//+uw\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 1
@@ -32,6 +66,23 @@
       "side": 1,
       "message": "I think you\u0027re right, and we might even be able to reorder a few other things to make it slightly more efficient.  Since you mentioned that you don\u0027t think these are \"blocking\" changes, I\u0027m not sure I want to do that and run through all the tests manually again, so I\u0027d like to defer that for a bit.  I\u0027ll add a TODO.",
       "parentUuid": "AAAALH//+zs\u003d",
+      "revId": "256000025f2a66ca99a6d49a349da9c903a70fca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAALH//+y8\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2012-07-26T21:15:57Z",
+      "side": 1,
+      "message": "If the label is not in the allow needs wouldn\u0027t you ignore it instead of returning false? Seems like if it isn\u0027t \"OK\" and allow needs it then you would return false. I could be misunderstanding though.",
       "revId": "256000025f2a66ca99a6d49a349da9c903a70fca",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
