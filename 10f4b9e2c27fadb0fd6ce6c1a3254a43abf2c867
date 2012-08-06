@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAALH//5CU\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2012-08-04T00:06:01Z",
+      "side": 1,
+      "message": "Yes.  In practice, only the root job tree has a null job, and that\u0027s factored out in the public findJobsToRun method, so that\u0027s why this hasn\u0027t come up in practice.  However, the data model allows for other null jobs, and my intent was to handle that safely if a use case ever came up, so we definitely should correct this.",
+      "parentUuid": "AAAALH//5bM\u003d",
+      "revId": "10f4b9e2c27fadb0fd6ce6c1a3254a43abf2c867",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
