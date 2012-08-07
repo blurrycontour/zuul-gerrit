@@ -523,7 +523,7 @@ class Ref(Changeish):
     is_reportable = False
 
     def __init__(self, project):
-        super(Change, self).__init__(project)
+        super(Changeish, self).__init__(project)
         self.ref = None
         self.oldrev = None
         self.newrev = None
