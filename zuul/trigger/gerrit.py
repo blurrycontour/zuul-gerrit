@@ -137,16 +137,6 @@ class Gerrit(object):
         sha = refs.get(ref, '')
         return sha
 
-    def waitForRefSha(self, project, ref, old_sha=''):
-        # Wait for the ref to show up in the repo
-        start = time.time()
-        while time.time() - start < self.replication_timeout:
-            sha = self.getRefSha(project.name, ref)
-            if old_sha != sha:
-                return True
-            time.sleep(self.replication_retry_interval)
-        return False
-
     def isMerged(self, change, head=None):
         self.log.debug("Checking if change %s is merged" % change)
         if not change.number:
@@ -162,13 +152,17 @@ class Gerrit(object):
             return change.is_merged
         if not change.is_merged:
             return False
-
+        # Wait for the ref to show up in the repo
         ref = 'refs/heads/' + change.branch
         self.log.debug("Waiting for %s to appear in git repo" % (change))
-        if self.waitForRefSha(change.project, ref, change._ref_sha):
-            self.log.debug("Change %s is in the git repo" %
-                           (change))
-            return True
+        start = time.time()
+        while time.time() - start < self.replication_timeout:
+            sha = self.getRefSha(change.project.name, ref)
+            if change._ref_sha != sha:
+                self.log.debug("Change %s is in the git repo" %
+                               (change))
+                return True
+            time.sleep(self.replication_retry_interval)
         self.log.debug("Change %s did not appear in the git repo" %
                        (change))
         return False
