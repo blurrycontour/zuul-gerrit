@@ -42,7 +42,6 @@ jobs:
 
 projects:
   - name: org/project
-    merge-mode: cherry-pick
     check:
       - project-merge:
         - project-test1
