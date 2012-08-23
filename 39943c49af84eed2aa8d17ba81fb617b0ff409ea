@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAALH//o04\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1308,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2012-08-23T22:42:18Z",
+      "side": 1,
+      "message": "I think this is the doc string for the previous test.",
+      "revId": "39943c49af84eed2aa8d17ba81fb617b0ff409ea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
