@@ -95,6 +95,8 @@ class Pipeline(object):
 
     def didAllJobsSucceed(self, changeish):
         for job in self.getJobs(changeish):
+            if not job.voting:
+                continue
             build = changeish.current_build_set.getBuild(job.name)
             if not build:
                 return False
@@ -104,6 +106,8 @@ class Pipeline(object):
 
     def didAnyJobFail(self, changeish):
         for job in self.getJobs(changeish):
+            if not job.voting:
+                continue
             build = changeish.current_build_set.getBuild(job.name)
             if build and build.result == 'FAILURE':
                 return True
@@ -181,7 +185,11 @@ class Pipeline(object):
                 url = build.url
                 if not url:
                     url = job.name
-                ret += '- %s : %s\n' % (url, result)
+                if not job.voting:
+                    voting = ' (non-voting)'
+                else:
+                    voting = ''
+                ret += '- %s : %s%s\n' % (url, result, voting)
         return ret
 
     def formatDescription(self, build):
@@ -374,6 +382,7 @@ class Job(object):
         self.success_message = None
         self.parameter_function = None
         self.hold_following_changes = False
+        self.voting = True
         self.branches = []
         self._branches = []
 
@@ -388,6 +397,7 @@ class Job(object):
         self.success_message = other.success_message
         self.parameter_function = other.parameter_function
         self.hold_following_changes = other.hold_following_changes
+        self.voting = other.voting
         self.branches = other.branches[:]
         self._branches = other._branches[:]
 
