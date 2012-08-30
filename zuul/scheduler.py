@@ -463,25 +463,61 @@ class BasePipelineManager(object):
                 return True
         return False
 
+    def reportStart(self, change):
+        try:
+            self.log.info("Reporting start, action %s change %s" %
+                          (self.start_action, change))
+            msg = "Starting %s jobs." % self.pipeline.name
+            ret = self.sched.trigger.report(change, msg, self.start_action)
+            if ret:
+                self.log.error("Reporting change start %s received: %s" %
+                               (change, ret))
+        except:
+            self.log.exception("Exception while reporting start:")
+
+    def isChangeReadyToBeEnqueued(self, change):
+        return True
+
+    def enqueueChangesAhead(self, change):
+        return True
+
+    def enqueueChangesBehind(self, change):
+        return True
+
     def addChange(self, change):
         if self.isChangeAlreadyInQueue(change):
             self.log.debug("Change %s is already in queue, ignoring" % change)
-            return
+            return True
         self.log.debug("Adding change %s" % change)
-        self._addChange(change)
 
-    def _addChange(self, change):
+        if not self.isChangeReadyToBeEnqueued(change):
+            self.log.debug("Change %s is not ready to be enqueued, ignoring" %
+                           change)
+            return False
+
+        if not self.enqueueChangesAhead(change):
+            return False
+
+        if self.isChangeAlreadyInQueue(change):
+            self.log.debug("Change %s is already in queue, ignoring" % change)
+            return True
+
+        self.log.debug("Adding change %s" % change)
+
         if self.start_action:
-            try:
-                self.log.info("Reporting start, action %s change %s" %
-                              (self.start_action, change))
-                msg = "Starting %s jobs." % self.pipeline.name
-                ret = self.sched.trigger.report(change, msg, self.start_action)
-                if ret:
-                    self.log.error("Reporting change start %s received: %s" %
-                                   (change, ret))
-            except:
-                self.log.exception("Exception while reporting start:")
+            self.reportStart(change)
+
+        self.log.debug("Adding change %s" % change)
+        change_queue = self.pipeline.getQueue(change.project)
+        if change_queue:
+            self.log.debug("Adding change %s to queue %s" %
+                           (change, change_queue))
+            change_queue.enqueueChange(change)
+            self.enqueueChangesBehind(change)
+        else:
+            self.log.error("Unable to find change queue for project %s" %
+                           change.project)
+            return False
         self.launchJobs(change)
 
     def _launchJobs(self, change, jobs):
@@ -845,7 +881,40 @@ class DependentPipelineManager(BasePipelineManager):
             self.pipeline.addQueue(queue)
             self.log.info("    %s" % queue)
 
-    def _checkForChangesNeededBy(self, change, enqueue=True):
+    def isChangeReadyToBeEnqueued(self, change):
+        if not self.sched.trigger.canMerge(change,
+                                           self.getSubmitAllowNeeds()):
+            self.log.debug("Change %s can not merge, ignoring" % change)
+            return False
+        return True
+
+    def enqueChangesBehind(self, change):
+        to_enqueue = []
+        self.log.debug("Checking for changes needing %s:" % change)
+        if not hasattr(change, 'needed_by_changes'):
+            self.log.debug("  Changeish does not support dependencies")
+            return
+        for needs in change.needed_by_changes:
+            if self.sched.trigger.canMerge(needs,
+                                           self.getSubmitAllowNeeds()):
+                self.log.debug("  Change %s needs %s and is ready to merge" %
+                               (needs, change))
+                to_enqueue.append(needs)
+        if not to_enqueue:
+            self.log.debug("  No changes need %s" % change)
+
+        for other_change in to_enqueue:
+            self.addChange(other_change)
+
+    def enqueueChangesAhead(self, change):
+        ret = self.checkForChangesNeededBy(change)
+        if ret in [True, False]:
+            return ret
+        self.log.debug("  Change %s must be merged ahead of %s" %
+                       (ret, change))
+        return self.addChange(ret)
+
+    def checkForChangesNeededBy(self, change):
         self.log.debug("Checking for changes needed by %s:" % change)
         # Return true if okay to proceed enqueing this change,
         # false if the change should not be enqueued.
@@ -864,70 +933,14 @@ class DependentPipelineManager(BasePipelineManager):
         if self.isChangeAlreadyInQueue(change.needs_change):
             self.log.debug("  Needed change is already ahead in the queue")
             return True
-        if enqueue and self.sched.trigger.canMerge(change.needs_change,
-                                                   self.getSubmitAllowNeeds()):
-            # It can merge, so attempt to enqueue it _ahead_ of this change.
-            # If that works we can enqueue this change, otherwise, we can't.
-            self.log.debug("  Change %s must be merged ahead of %s" %
-                           (change.needs_change, change))
-            return self.addChange(change.needs_change)
+        if self.sched.trigger.canMerge(change.needs_change,
+                                       self.getSubmitAllowNeeds()):
+            self.log.debug("  Change %s is needed" %
+                           change.needs_change)
+            return change.needs_change
         # The needed change can't be merged.
         self.log.debug("  Change %s is needed but can not be merged" %
                        change.needs_change)
-        return False
-
-    def _checkForChangesNeeding(self, change):
-        to_enqueue = []
-        self.log.debug("Checking for changes needing %s:" % change)
-        if not hasattr(change, 'needed_by_changes'):
-            self.log.debug("  Changeish does not support dependencies")
-            return to_enqueue
-        for needs in change.needed_by_changes:
-            if self.sched.trigger.canMerge(needs,
-                                           self.getSubmitAllowNeeds()):
-                self.log.debug("  Change %s needs %s and is ready to merge" %
-                               (needs, change))
-                to_enqueue.append(needs)
-        if not to_enqueue:
-            self.log.debug("  No changes need %s" % change)
-        return to_enqueue
-
-    def addChange(self, change):
-        # Returns true if added (or not needed), false if failed to add
-        if self.isChangeAlreadyInQueue(change):
-            self.log.debug("Change %s is already in queue, ignoring" % change)
-            return True
-
-        if not self.sched.trigger.canMerge(change,
-                                           self.getSubmitAllowNeeds()):
-            self.log.debug("Change %s can not merge, ignoring" % change)
-            return False
-
-        if not self._checkForChangesNeededBy(change):
-            return False
-
-        to_enqueue = self._checkForChangesNeeding(change)
-        # TODO(jeblair): Consider re-ordering this so that the dependent
-        # changes aren't checked until closer when they are needed.
-
-        if self.isChangeAlreadyInQueue(change):
-            self.log.debug("Change %s has been added to queue, ignoring" %
-                           change)
-            return True
-
-        self.log.debug("Adding change %s" % change)
-        change_queue = self.pipeline.getQueue(change.project)
-        if change_queue:
-            self.log.debug("Adding change %s to queue %s" %
-                           (change, change_queue))
-            change_queue.enqueueChange(change)
-            self._addChange(change)
-            for needs in to_enqueue:
-                self.addChange(needs)
-            return True
-        else:
-            self.log.error("Unable to find change queue for project %s" %
-                           change.project)
         return False
 
     def _getDependentChanges(self, change):
@@ -1059,7 +1072,7 @@ class DependentPipelineManager(BasePipelineManager):
         # depend on it.
         while change:
             change_behind = change.change_behind
-            if not self._checkForChangesNeededBy(change, enqueue=False):
+            if not self.checkForChangesNeededBy(change):
                 # It's not okay to enqueue this change, we should remove it.
                 self.log.info("Dequeuing change %s because "
                               "it can no longer merge" % change)
