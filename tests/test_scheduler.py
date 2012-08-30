@@ -1418,7 +1418,7 @@ class testScheduler(unittest.TestCase):
         assert F.reported == 2
 
         # Make sure there are no orphaned jobs
-        for queue in self.sched.pipelines['gate'].manager.change_queues:
+        for queue in self.sched.pipelines['gate'].queues:
             assert len(queue.queue) == 0
 
         assert self.countJobResults(finished_jobs, 'ABORTED') == 15

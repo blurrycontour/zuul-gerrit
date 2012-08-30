@@ -647,8 +647,7 @@ class BasePipelineManager(object):
             ret += '\n'
         if changeish.change_ahead:
             ret += '%sWaiting on:\n' % (indent_str)
-            ret += self.formatStatus(changeish.change_ahead,
-                                     indent + 2, html)
+            ret += self.formatStatus(changeish.change_ahead, indent + 2, html)
         return ret
 
     def formatReport(self, changeish):
@@ -797,13 +796,21 @@ class BasePipelineManager(object):
 class IndependentPipelineManager(BasePipelineManager):
     log = logging.getLogger("zuul.IndependentPipelineManager")
 
+    def _postConfig(self):
+        super(IndependentPipelineManager, self)._postConfig()
+
+        change_queue = ChangeQueue(self.pipeline, dependent=False)
+        for project in self.pipeline.getProjects():
+            change_queue.addProject(project)
+
+        self.pipeline.addQueue(change_queue)
+
 
 class DependentPipelineManager(BasePipelineManager):
     log = logging.getLogger("zuul.DependentPipelineManager")
 
     def __init__(self, *args, **kwargs):
         super(DependentPipelineManager, self).__init__(*args, **kwargs)
-        self.change_queues = []
 
     def _postConfig(self):
         super(DependentPipelineManager, self)._postConfig()
@@ -833,16 +840,10 @@ class DependentPipelineManager(BasePipelineManager):
                 self.log.debug("Keeping queue %s" % (a))
                 new_change_queues.append(a)
 
-        self.change_queues = new_change_queues
         self.log.info("  Shared change queues:")
-        for x in self.change_queues:
-            self.log.info("    %s" % x)
-
-    def getQueue(self, project):
-        for queue in self.change_queues:
-            if project in queue.projects:
-                return queue
-        self.log.error("Unable to find change queue for project %s" % project)
+        for queue in new_change_queues:
+            self.pipeline.addQueue(queue)
+            self.log.info("    %s" % queue)
 
     def _checkForChangesNeededBy(self, change, enqueue=True):
         self.log.debug("Checking for changes needed by %s:" % change)
@@ -915,7 +916,7 @@ class DependentPipelineManager(BasePipelineManager):
             return True
 
         self.log.debug("Adding change %s" % change)
-        change_queue = self.getQueue(change.project)
+        change_queue = self.pipeline.getQueue(change.project)
         if change_queue:
             self.log.debug("Adding change %s to queue %s" %
                            (change, change_queue))
@@ -924,6 +925,9 @@ class DependentPipelineManager(BasePipelineManager):
             for needs in to_enqueue:
                 self.addChange(needs)
             return True
+        else:
+            self.log.error("Unable to find change queue for project %s" %
+                           change.project)
         return False
 
     def _getDependentChanges(self, change):
@@ -951,7 +955,6 @@ class DependentPipelineManager(BasePipelineManager):
                 self.pipeline.setUnableToMerge(change)
                 self.possiblyReportChange(change)
                 return
-
         #TODO: remove this line after GERRIT_CHANGES is gone
         dependent_changes = self._getDependentChanges(change)
         for job in jobs:
@@ -968,7 +971,15 @@ class DependentPipelineManager(BasePipelineManager):
                 self.log.exception("Exception while launching job %s "
                                    "for change %s:" % (job, change))
 
-    def launchJobs(self, change):
+    def launchJobs(self, change=None):
+        if not change:
+            for queue in self.pipeline.queues:
+                head = queue.getHead()
+                if head:
+                    self.launchJobs(head)
+                for change in queue.severed_heads:
+                    self.launchJobs(change)
+            return
         jobs = self.pipeline.findJobsToRun(change)
         if jobs:
             self._launchJobs(change, jobs)
@@ -1005,40 +1016,73 @@ class DependentPipelineManager(BasePipelineManager):
         change = self.building_jobs.get(build)
         if not super(DependentPipelineManager, self).onBuildCompleted(build):
             return False
-        if (change and change.change_behind and
-            self.pipeline.didAnyJobFail(change)):
-            # This or some other build failed. All changes behind this change
-            # will need to be retested. To free up resources cancel the builds
-            # behind this one as they will be rerun anyways.
-            if not change.change_ahead:
-                change_behind = change.change_behind
-                self.log.debug("Removing failed change %s from queue" % change)
-                change.delete()
+        if change:
+            if (self.pipeline.didAnyJobFail(change)):
+                self.handleFailedChange(change)
+        self.log.debug("Launching any jobs found")
+        self.launchJobs()
+        return True
+
+    def handleFailedChange(self, change):
+        # A build failed. All changes behind this change will need to
+        # be retested. To free up resources cancel the builds behind
+        # this one as they will be rerun anyways.
+        change_ahead = change.change_ahead
+        change_behind = change.change_behind
+        if not change_ahead:
+            # If we're at the head of the queue, allow changes to relaunch
+            if change_behind:
                 self.log.info("Canceling/relaunching jobs for change %s "
                               "behind failed change %s" %
                               (change_behind, change))
                 self.cancelJobs(change_behind)
-                change_behind = self._dequeueDependentChanges(change_behind)
-                if change_behind:
-                    self.launchJobs(change_behind)
-            else:
-                self.cancelJobs(change.change_behind, prime=False)
-                self.log.debug("Canceling builds behind change: %s due to "
-                               "failure." % change)
-        return True
+            self.dequeueChange(change)
+        elif change_behind:
+            self.log.debug("Canceling builds behind change: %s due to "
+                           "failure." % change)
+            self.cancelJobs(change_behind, prime=False)
+
+    def dequeueChange(self, change):
+        self.log.debug("Removing change %s from queue" % change)
+        change_ahead = change.change_ahead
+        change_behind = change.change_behind
+        change_queue = self.pipeline.getQueue(change.project)
+        change_queue.dequeueChange(change)
+        if ((not change_ahead) and
+            (not self.pipeline.areAllJobsComplete(change))):
+            self.log.debug("Adding %s as a severed head" % change)
+            change_queue.addSeveredHead(change)
+        self.dequeueDependentChanges(change_behind)
+
+    def dequeueDependentChanges(self, change):
+        # When a change is dequeued after failing, dequeue any changes that
+        # depend on it.
+        while change:
+            change_behind = change.change_behind
+            if not self._checkForChangesNeededBy(change, enqueue=False):
+                # It's not okay to enqueue this change, we should remove it.
+                self.log.info("Dequeuing change %s because "
+                              "it can no longer merge" % change)
+                change_queue = self.pipeline.getQueue(change.project)
+                change_queue.dequeueChange(change)
+                self.pipeline.setDequeuedNeedingChange(change)
+                self.reportChange(change)
+                # We don't need to recurse, because any changes that might
+                # be affected by the removal of this change are behind us
+                # in the queue, so we can continue walking backwards.
+            change = change_behind
 
     def possiblyReportChange(self, change):
         self.log.debug("Possibly reporting change %s" % change)
         if change.reported:
             self.log.debug("Change %s already reported" % change)
             return
+        change_ahead = change.change_ahead
         change_behind = change.change_behind
-        if not change.change_ahead:
+        if not change_ahead:
             self.log.debug("Change %s is at the front of the queue, "
                            "reporting" % (change))
             ret = self.reportChange(change)
-            self.log.debug("Removing reported change %s from queue" % change)
-            change.delete()
             merged = (not ret)
             if merged:
                 merged = self.sched.trigger.isMerged(change, change.branch)
@@ -1049,58 +1093,28 @@ class DependentPipelineManager(BasePipelineManager):
             if not (succeeded and merged):
                 self.log.debug("Reported change %s failed tests or failed "
                                "to merge" % (change))
-                # The merge or test failed, re-run all jobs behind this one
-                if change_behind:
-                    self.log.info("Canceling/relaunching jobs for change %s "
-                                  "behind failed change %s" %
-                                  (change_behind, change))
-                    self.cancelJobs(change_behind)
-                    change_behind = self._dequeueDependentChanges(
-                        change_behind)
-                    if change_behind:
-                        self.launchJobs(change_behind)
+                self.handleFailedChange(change)
+            else:
+                self.log.debug("Removing reported change %s from queue" %
+                               change)
+                change_queue = self.pipeline.getQueue(change.project)
+                change_queue.dequeueChange(change)
         # If the change behind this is ready, notify
         if change_behind and self.pipeline.areAllJobsComplete(change_behind):
             self.log.info("Change %s behind change %s is ready, "
                           "possibly reporting" % (change_behind, change))
             self.possiblyReportChange(change_behind)
-        # There may be jobs behind that were dependent on all of these builds
-        # completing.
-        elif change_behind:
-            self.launchJobs(change_behind)
-
-    def _dequeueDependentChanges(self, change, failed=[]):
-        # When a change is dequeued after failing, dequeue any changes that
-        # depend on it.
-        # Keep track of the most recent non-deleted change
-        head = change
-        while change:
-            change_behind = change.change_behind
-            if not self._checkForChangesNeededBy(change, enqueue=False):
-                # It's not okay to enqueue this change, we should remove it.
-                if change == head:
-                    head = change_behind
-                self.log.info("Dequeuing change %s because "
-                              "it can no longer merge" % change)
-                change.delete()
-                self.pipeline.setDequeuedNeedingChange(change)
-                self.reportChange(change)
-                # We don't need to recurse, because any changes that might
-                # be affected by the removal of this change are behind us
-                # in the queue, so we can continue walking backwards.
-            change = change_behind
-        return head
 
     def getChangesInQueue(self):
         changes = []
-        for shared_queue in self.change_queues:
+        for shared_queue in self.pipeline.queues:
             changes.extend(shared_queue.queue)
         return changes
 
     def formatStatusHTML(self):
         ret = ''
         ret += '\n'
-        for queue in self.change_queues:
+        for queue in self.pipeline.queues:
             s = 'Shared queue: %s' % queue.name
             ret += s + '\n'
             ret += '-' * len(s) + '\n'
