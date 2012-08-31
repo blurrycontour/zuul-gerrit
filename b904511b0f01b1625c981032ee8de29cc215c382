@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAALH//kQg\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 806,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2012-08-30T18:42:58Z",
+      "side": 1,
+      "message": "I think this line should be self.pipeline.addQueue(change_queue).",
+      "revId": "b904511b0f01b1625c981032ee8de29cc215c382",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAALH//kQc\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 846,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2012-08-30T18:42:58Z",
+      "side": 1,
+      "message": "I would rewrite this section to be:\n\nself.log.info(\"  Shared change queues:\")\nfor x in new_change_queues:\n    self.pipelines.addQueue(x)\n    self.log.info(\"    %s\" % x)\n\nThis would be consistent with the pipeline class definition. Less magic assignment.",
+      "revId": "b904511b0f01b1625c981032ee8de29cc215c382",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAALH//kP0\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1039,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2012-08-30T18:42:58Z",
+      "side": 1,
+      "message": "Can this be an elif? It would remove a level of indentation.",
+      "revId": "b904511b0f01b1625c981032ee8de29cc215c382",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
