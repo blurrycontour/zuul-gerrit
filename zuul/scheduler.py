@@ -293,6 +293,7 @@ class Scheduler(threading.Thread):
             self._init()
             self._parseConfig(self.config.get('zuul', 'layout_config'))
             self._pause = False
+            self._reconfigure = False
             self.reconfigure_complete_event.set()
 
     def _areAllBuildsComplete(self):
@@ -372,6 +373,15 @@ class Scheduler(threading.Thread):
 
     def formatStatusHTML(self):
         ret = '<html><pre>'
+        if self._pause:
+            ret += '<p><b>Queue only mode:</b> preparing to '
+            if self._reconfigure:
+                ret += 'reconfigure'
+            if self._exit:
+                ret += 'exit'
+            ret += ', queue length: %s' % self.trigger_event_queue.qsize()
+            ret += '</p>'
+
         keys = self.pipelines.keys()
         keys.sort()
         for key in keys:
@@ -379,7 +389,7 @@ class Scheduler(threading.Thread):
             s = 'Pipeline: %s' % pipeline.name
             ret += s + '\n'
             ret += '-' * len(s) + '\n'
-            ret += pipeline.manager.formatStatusHTML()
+            ret += pipeline.formatStatusHTML()
             ret += '\n'
         ret += '</pre></html>'
         return ret
@@ -458,7 +468,7 @@ class BasePipelineManager(object):
         return False
 
     def isChangeAlreadyInQueue(self, change):
-        for c in self.getChangesInQueue():
+        for c in self.pipeline.getChangesInQueue():
             if change.equals(c):
                 return True
         return False
@@ -485,10 +495,10 @@ class BasePipelineManager(object):
         return True
 
     def addChange(self, change):
+        self.log.debug("Considering adding change %s" % change)
         if self.isChangeAlreadyInQueue(change):
             self.log.debug("Change %s is already in queue, ignoring" % change)
             return True
-        self.log.debug("Adding change %s" % change)
 
         if not self.isChangeReadyToBeEnqueued(change):
             self.log.debug("Change %s is not ready to be enqueued, ignoring" %
@@ -496,29 +506,26 @@ class BasePipelineManager(object):
             return False
 
         if not self.enqueueChangesAhead(change):
+            self.log.debug("Falied to enqueue changes ahead of" % change)
             return False
 
         if self.isChangeAlreadyInQueue(change):
             self.log.debug("Change %s is already in queue, ignoring" % change)
             return True
 
-        self.log.debug("Adding change %s" % change)
-
-        if self.start_action:
-            self.reportStart(change)
-
-        self.log.debug("Adding change %s" % change)
         change_queue = self.pipeline.getQueue(change.project)
         if change_queue:
             self.log.debug("Adding change %s to queue %s" %
                            (change, change_queue))
+            if self.start_action:
+                self.reportStart(change)
             change_queue.enqueueChange(change)
             self.enqueueChangesBehind(change)
         else:
             self.log.error("Unable to find change queue for project %s" %
                            change.project)
             return False
-        self.launchJobs(change)
+        self.launchJobs()
 
     def _launchJobs(self, change, jobs):
         self.log.debug("Launching jobs for change %s" % change)
@@ -546,7 +553,11 @@ class BasePipelineManager(object):
                 self.log.exception("Exception while launching job %s "
                                    "for change %s:" % (job, change))
 
-    def launchJobs(self, change):
+    def launchJobs(self, change=None):
+        if not change:
+            for change in self.pipeline.getAllChanges():
+                self.launchJobs(change)
+            return
         jobs = self.pipeline.findJobsToRun(change)
         if jobs:
             self._launchJobs(change, jobs)
@@ -572,6 +583,9 @@ class BasePipelineManager(object):
         self.updateBuildDescriptions(build.build_set)
         return True
 
+    def handleFailedChange(self, change):
+        pass
+
     def onBuildCompleted(self, build):
         self.log.debug("Build %s completed" % build)
         if build not in self.building_jobs:
@@ -587,23 +601,58 @@ class BasePipelineManager(object):
 
         self.pipeline.setResult(change, build)
         self.log.info("Change %s status is now:\n %s" %
-                      (change, self.formatStatus(change)))
+                      (change, self.pipeline.formatStatus(change)))
 
-        if self.pipeline.areAllJobsComplete(change):
-            self.log.debug("All jobs for change %s are complete" % change)
-            self.possiblyReportChange(change)
-        else:
-            # There may be jobs that depended on jobs that are now complete
-            self.log.debug("All jobs for change %s are not yet complete" %
-                           (change))
-            self.launchJobs(change)
+        if self.pipeline.didAnyJobFail(change):
+            self.handleFailedChange(change)
 
+        self.reportChanges()
+        self.launchJobs()
         self.updateBuildDescriptions(build.build_set)
         return True
 
+    def reportChanges(self):
+        self.log.debug("Searching for changes to report")
+        reported = False
+        for change in self.pipeline.getAllChanges():
+            self.log.debug("  checking %s" % change)
+            if self.pipeline.areAllJobsComplete(change):
+                self.log.debug("  possibly reporting %s" % change)
+                if self.possiblyReportChange(change):
+                    reported = True
+        if reported:
+            self.reportChanges()
+        self.log.debug("Done searching for changes to report")
+
     def possiblyReportChange(self, change):
         self.log.debug("Possibly reporting change %s" % change)
-        self.reportChange(change)
+        # Even if a change isn't reportable, keep going so that it
+        # gets dequeued in the normal manner.
+        if change.is_reportable and change.reported:
+            self.log.debug("Change %s already reported" % change)
+            return False
+        change_ahead = change.change_ahead
+        if not change_ahead:
+            self.log.debug("Change %s is at the front of the queue, "
+                           "reporting" % (change))
+            ret = self.reportChange(change)
+            if self.changes_merge:
+                succeeded = self.pipeline.didAllJobsSucceed(change)
+                merged = (not ret)
+                if merged:
+                    merged = self.sched.trigger.isMerged(change, change.branch)
+                self.log.info("Reported change %s status: all-succeeded: %s, "
+                              "merged: %s" % (change, succeeded, merged))
+                if not (succeeded and merged):
+                    self.log.debug("Reported change %s failed tests or failed "
+                                   "to merge" % (change))
+                    self.handleFailedChange(change)
+                    return True
+            self.log.debug("Removing reported change %s from queue" %
+                           change)
+            change_queue = self.pipeline.getQueue(change.project)
+            change_queue.dequeueChange(change)
+            return True
 
     def reportChange(self, change):
         if not change.is_reportable:
@@ -619,6 +668,7 @@ class BasePipelineManager(object):
             action = self.failure_action
             change.setReportedResult('FAILURE')
         report = self.formatReport(change)
+        change.reported = True
         try:
             self.log.info("Reporting change %s, action: %s" %
                           (change, action))
@@ -626,64 +676,10 @@ class BasePipelineManager(object):
             if ret:
                 self.log.error("Reporting change %s received: %s" %
                                (change, ret))
-            else:
-                change.reported = True
         except:
             self.log.exception("Exception while reporting:")
             change.setReportedResult('ERROR')
         self.updateBuildDescriptions(change.current_build_set)
-        return ret
-
-    def getChangesInQueue(self):
-        changes = []
-        for build, change in self.building_jobs.items():
-            if change not in changes:
-                changes.append(change)
-        return changes
-
-    def formatStatusHTML(self):
-        changes = self.getChangesInQueue()
-        ret = ''
-        for change in changes:
-            ret += self.formatStatus(change, html=True)
-        return ret
-
-    def formatStatus(self, changeish, indent=0, html=False):
-        indent_str = ' ' * indent
-        ret = ''
-        if html and hasattr(changeish, 'url') and changeish.url is not None:
-            ret += '%sProject %s change <a href="%s">%s</a>\n' % (
-                indent_str,
-                changeish.project.name,
-                changeish.url,
-                changeish._id())
-        else:
-            ret += '%sProject %s change %s\n' % (indent_str,
-                                                 changeish.project.name,
-                                                 changeish._id())
-        for job in self.pipeline.getJobs(changeish):
-            build = changeish.current_build_set.getBuild(job.name)
-            if build:
-                result = build.result
-            else:
-                result = None
-            job_name = job.name
-            if not job.voting:
-                voting = ' (non-voting)'
-            else:
-                voting = ''
-            if html:
-                if build:
-                    url = build.url
-                else:
-                    url = None
-                if url is not None:
-                    job_name = '<a href="%s">%s</a>' % (url, job_name)
-            ret += '%s  %s: %s%s' % (indent_str, job_name, result, voting)
-            ret += '\n'
-        if changeish.change_ahead:
-            ret += '%sWaiting on:\n' % (indent_str)
-            ret += self.formatStatus(changeish.change_ahead, indent + 2, html)
         return ret
 
     def formatReport(self, changeish):
@@ -831,6 +827,7 @@ class BasePipelineManager(object):
 
 class IndependentPipelineManager(BasePipelineManager):
     log = logging.getLogger("zuul.IndependentPipelineManager")
+    changes_merge = False
 
     def _postConfig(self):
         super(IndependentPipelineManager, self)._postConfig()
@@ -844,6 +841,7 @@ class IndependentPipelineManager(BasePipelineManager):
 
 class DependentPipelineManager(BasePipelineManager):
     log = logging.getLogger("zuul.DependentPipelineManager")
+    changes_merge = True
 
     def __init__(self, *args, **kwargs):
         super(DependentPipelineManager, self).__init__(*args, **kwargs)
@@ -888,7 +886,7 @@ class DependentPipelineManager(BasePipelineManager):
             return False
         return True
 
-    def enqueChangesBehind(self, change):
+    def enqueueChangesBehind(self, change):
         to_enqueue = []
         self.log.debug("Checking for changes needing %s:" % change)
         if not hasattr(change, 'needed_by_changes'):
@@ -984,23 +982,6 @@ class DependentPipelineManager(BasePipelineManager):
                 self.log.exception("Exception while launching job %s "
                                    "for change %s:" % (job, change))
 
-    def launchJobs(self, change=None):
-        if not change:
-            for queue in self.pipeline.queues:
-                head = queue.getHead()
-                if head:
-                    self.launchJobs(head)
-                for change in queue.severed_heads:
-                    self.launchJobs(change)
-            return
-        jobs = self.pipeline.findJobsToRun(change)
-        if jobs:
-            self._launchJobs(change, jobs)
-        if change.change_behind:
-            self.log.debug("Launching jobs for change %s, behind change %s" %
-                           (change.change_behind, change))
-            self.launchJobs(change.change_behind)
-
     def cancelJobs(self, change, prime=True):
         self.log.debug("Cancel jobs for change %s" % change)
         to_remove = []
@@ -1024,17 +1005,6 @@ class DependentPipelineManager(BasePipelineManager):
             self.log.debug("Canceling jobs for change %s, behind change %s" %
                            (change.change_behind, change))
             self.cancelJobs(change.change_behind, prime=prime)
-
-    def onBuildCompleted(self, build):
-        change = self.building_jobs.get(build)
-        if not super(DependentPipelineManager, self).onBuildCompleted(build):
-            return False
-        if change:
-            if (self.pipeline.didAnyJobFail(change)):
-                self.handleFailedChange(change)
-        self.log.debug("Launching any jobs found")
-        self.launchJobs()
-        return True
 
     def handleFailedChange(self, change):
         # A build failed. All changes behind this change will need to
@@ -1061,8 +1031,7 @@ class DependentPipelineManager(BasePipelineManager):
         change_behind = change.change_behind
         change_queue = self.pipeline.getQueue(change.project)
         change_queue.dequeueChange(change)
-        if ((not change_ahead) and
-            (not self.pipeline.areAllJobsComplete(change))):
+        if not change_ahead and not change.reported:
             self.log.debug("Adding %s as a severed head" % change)
             change_queue.addSeveredHead(change)
         self.dequeueDependentChanges(change_behind)
@@ -1072,7 +1041,7 @@ class DependentPipelineManager(BasePipelineManager):
         # depend on it.
         while change:
             change_behind = change.change_behind
-            if not self.checkForChangesNeededBy(change):
+            if self.checkForChangesNeededBy(change) is not True:
                 # It's not okay to enqueue this change, we should remove it.
                 self.log.info("Dequeuing change %s because "
                               "it can no longer merge" % change)
@@ -1084,53 +1053,3 @@ class DependentPipelineManager(BasePipelineManager):
                 # be affected by the removal of this change are behind us
                 # in the queue, so we can continue walking backwards.
             change = change_behind
-
-    def possiblyReportChange(self, change):
-        self.log.debug("Possibly reporting change %s" % change)
-        if change.reported:
-            self.log.debug("Change %s already reported" % change)
-            return
-        change_ahead = change.change_ahead
-        change_behind = change.change_behind
-        if not change_ahead:
-            self.log.debug("Change %s is at the front of the queue, "
-                           "reporting" % (change))
-            ret = self.reportChange(change)
-            merged = (not ret)
-            if merged:
-                merged = self.sched.trigger.isMerged(change, change.branch)
-            succeeded = self.pipeline.didAllJobsSucceed(change)
-            self.log.info("Reported change %s status: all-succeeded: %s, "
-                          "merged: %s" % (change, succeeded, merged))
-
-            if not (succeeded and merged):
-                self.log.debug("Reported change %s failed tests or failed "
-                               "to merge" % (change))
-                self.handleFailedChange(change)
-            else:
-                self.log.debug("Removing reported change %s from queue" %
-                               change)
-                change_queue = self.pipeline.getQueue(change.project)
-                change_queue.dequeueChange(change)
-        # If the change behind this is ready, notify
-        if change_behind and self.pipeline.areAllJobsComplete(change_behind):
-            self.log.info("Change %s behind change %s is ready, "
-                          "possibly reporting" % (change_behind, change))
-            self.possiblyReportChange(change_behind)
-
-    def getChangesInQueue(self):
-        changes = []
-        for shared_queue in self.pipeline.queues:
-            changes.extend(shared_queue.queue)
-        return changes
-
-    def formatStatusHTML(self):
-        ret = ''
-        ret += '\n'
-        for queue in self.pipeline.queues:
-            s = 'Shared queue: %s' % queue.name
-            ret += s + '\n'
-            ret += '-' * len(s) + '\n'
-            if queue.queue:
-                ret += self.formatStatus(queue.queue[-1], html=True)
-        return ret

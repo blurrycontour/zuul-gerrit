@@ -162,6 +162,68 @@ class Pipeline(object):
             fakebuild.result = 'SKIPPED'
             changeish.addBuild(fakebuild)
 
+    def getChangesInQueue(self):
+        changes = []
+        for shared_queue in self.queues:
+            changes.extend(shared_queue.queue)
+        return changes
+
+    def getAllChanges(self):
+        changes = []
+        for shared_queue in self.queues:
+            changes.extend(shared_queue.queue)
+            changes.extend(shared_queue.severed_heads)
+        return changes
+
+    def formatStatusHTML(self):
+        ret = ''
+        for queue in self.queues:
+            if len(self.queues) > 1:
+                s = 'Change queue: %s' % queue.name
+                ret += s + '\n'
+                ret += '-' * len(s) + '\n'
+            for head in queue.getHeads():
+                ret += self.formatStatus(head, html=True)
+        return ret
+
+    def formatStatus(self, changeish, indent=0, html=False):
+        indent_str = ' ' * indent
+        ret = ''
+        if html and hasattr(changeish, 'url') and changeish.url is not None:
+            ret += '%sProject %s change <a href="%s">%s</a>\n' % (
+                indent_str,
+                changeish.project.name,
+                changeish.url,
+                changeish._id())
+        else:
+            ret += '%sProject %s change %s\n' % (indent_str,
+                                                 changeish.project.name,
+                                                 changeish._id())
+        for job in self.getJobs(changeish):
+            build = changeish.current_build_set.getBuild(job.name)
+            if build:
+                result = build.result
+            else:
+                result = None
+            job_name = job.name
+            if not job.voting:
+                voting = ' (non-voting)'
+            else:
+                voting = ''
+            if html:
+                if build:
+                    url = build.url
+                else:
+                    url = None
+                if url is not None:
+                    job_name = '<a href="%s">%s</a>' % (url, job_name)
+            ret += '%s  %s: %s%s' % (indent_str, job_name, result, voting)
+            ret += '\n'
+        if changeish.change_behind:
+            ret += '%sFollowed by:\n' % (indent_str)
+            ret += self.formatStatus(changeish.change_behind, indent + 2, html)
+        return ret
+
 
 class ChangeQueue(object):
     """DependentPipelines have multiple parallel queues shared by
@@ -198,9 +260,6 @@ class ChangeQueue(object):
             change.change_ahead.change_behind = change
         self.queue.append(change)
 
-    def addSeveredHead(self, change):
-        self.severed_heads.append(change)
-
     def dequeueChange(self, change):
         if change in self.queue:
             self.queue.remove(change)
@@ -213,6 +272,9 @@ class ChangeQueue(object):
         change.change_ahead = None
         change.change_behind = None
 
+    def addSeveredHead(self, change):
+        self.severed_heads.append(change)
+
     def mergeChangeQueue(self, other):
         for project in other.projects:
             self.addProject(project)
@@ -222,6 +284,16 @@ class ChangeQueue(object):
             return None
         return self.queue[0]
 
+    def getHeads(self):
+        heads = []
+        if self.dependent:
+            h = self.getHead()
+            if h:
+                heads.append(h)
+        else:
+            heads.extend(self.queue)
+        heads.extend(self.severed_heads)
+        return heads
 
 class Project(object):
     def __init__(self, name):
