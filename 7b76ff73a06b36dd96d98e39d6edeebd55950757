@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAALH//kCc\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 510,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2012-08-30T21:25:41Z",
+      "side": 1,
+      "message": "This is a redundant log message.",
+      "revId": "7b76ff73a06b36dd96d98e39d6edeebd55950757",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
