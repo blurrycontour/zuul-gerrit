@@ -45,7 +45,7 @@ class Repo(object):
         for ref in origin.refs:
             if ref.remote_head == 'HEAD':
                 continue
-            self.repo.create_head(ref.remote_head, ref, force=True)
+            self.repo.git.branch('-f', ref.remote_head, ref)
 
         self.repo.head.reference = self.repo.heads.master
         self.repo.head.reset(index=True, working_tree=True)
