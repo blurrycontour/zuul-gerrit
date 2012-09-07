@@ -42,6 +42,10 @@ class Repo(object):
         self.log.debug("Resetting repository %s" % self.local_path)
         origin = self.repo.remotes.origin
         origin.update()
+        # If the remote repository is repacked, the repo object's cache may
+        # be out of date.  Specifically, it caches whether to check the loose
+        # or packed DB for a given SHA.  Clear the cache.
+        self.repo.odb.update_cache()
         for ref in origin.refs:
             if ref.remote_head == 'HEAD':
                 continue
