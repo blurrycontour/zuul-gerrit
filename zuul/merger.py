@@ -42,6 +42,7 @@ class Repo(object):
         self.log.debug("Resetting repository %s" % self.local_path)
         origin = self.repo.remotes.origin
         origin.update()
+        self.repo = git.Repo(self.local_path)
         for ref in origin.refs:
             if ref.remote_head == 'HEAD':
                 continue
