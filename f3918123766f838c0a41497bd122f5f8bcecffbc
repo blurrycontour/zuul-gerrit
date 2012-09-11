@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "AAAALH//eKo\u003d",
+        "filename": "zuul/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2012-09-07T21:10:52Z",
+      "side": 1,
+      "message": "I think this should be moved to line 43 (so that you change self.repo before grabbing origin and updating.",
+      "revId": "f3918123766f838c0a41497bd122f5f8bcecffbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAALH//deE\u003d",
         "filename": "zuul/merger.py",
         "patchSetId": 1
