@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAALH//deE\u003d",
+        "filename": "zuul/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2012-09-09T09:47:50Z",
+      "side": 1,
+      "message": "Wasn\u0027t the error that we saw because we had updated the repo, and the newest commit was in a packfile, which was not what was expected based on the state of the repo when the Repo object was initialized?  The state of the repo can only change three ways:\n\n* update from origin\n* fetch change patchset from origin\n* zuul creates a commit and ref\n\nSince we saw an error when trying to _reset_ the repo, that suggests that the first case is what caused the discrepancy, so this patch recreates the Repo object after each update.",
+      "parentUuid": "AAAALH//eKo\u003d",
+      "revId": "f3918123766f838c0a41497bd122f5f8bcecffbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
