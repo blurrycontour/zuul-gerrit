@@ -39,7 +39,7 @@ projects, it may take hours to test changes, and it is easy for
 developers to create changes at a rate faster than they can be tested
 and merged.
 
-Zuul's DependentQueueManager allows for parallel execution of test
+Zuul's DependentPipelineManager allows for parallel execution of test
 jobs for gating while ensuring changes are tested correctly, exactly
 as if they had been tested one at a time.  It does this by performing
 speculative execution of test jobs; it assumes that all jobs will
@@ -57,7 +57,7 @@ succession::
 
   A, B, C, D, E
 
-Zuul queues those changes in the order they were approved, and notes
+Zuul pipelines those changes in the order they were approved, and notes
 that each subsequent change depends on the one ahead of it merging::
 
   A <-- B <-- C <-- D <-- E
@@ -78,7 +78,7 @@ If changes *A* and *B* pass tests, and *C*, *D*, and *E* fail::
 
   A[pass] <-- B[pass] <-- C[fail] <-- D[fail] <-- E[fail]
 
-Zuul will merge change *A* followed by change *B*, leaving this queue::
+Zuul will merge change *A* followed by change *B*, leaving this pipeline::
 
   C[fail] <-- D[fail] <-- E[fail]
 
@@ -87,10 +87,10 @@ result of a defect in *D* or *C*::
 
   C[fail] <-- D[unknown] <-- E[unknown]
 
-Since *C* failed, it will report the failure and drop *C* from the queue::
+Since *C* failed, it will report the failure and drop *C* from the pipeline::
 
   D[unknown] <-- E[unknown]
 
-This queue is the same as if two new changes had just arrived, so Zuul
+This pipeline is the same as if two new changes had just arrived, so Zuul
 starts the process again testing *D* against the tip of the branch, and
 *E* against *D*.
