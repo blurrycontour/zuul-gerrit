@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAALH//YFU\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2012-09-17T20:24:47Z",
+      "side": 1,
+      "message": "Would the logic here and in the test be simple if you used a python struct to read the data?",
+      "revId": "465709ac4adb2691ef53a8787c38aa740c7a06c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
