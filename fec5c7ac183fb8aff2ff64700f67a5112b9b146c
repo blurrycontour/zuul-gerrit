@@ -1,0 +1,8 @@
+Approved+1: Monty Taylor <mordred@inaugust.com>
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Sat, 22 Sep 2012 17:35:32 +0000
+Reviewed-on: https://review.openstack.org/13519
+Project: openstack-ci/zuul
+Branch: refs/heads/dev
