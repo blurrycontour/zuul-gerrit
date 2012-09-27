@@ -119,7 +119,10 @@ class Gerrit(object):
     def _getInfoRefs(self, project):
         url = "https://%s/p/%s/info/refs?service=git-upload-pack" % (
             self.server, project)
-        data = urllib2.urlopen(url).read()
+        try:
+            data = urllib2.urlopen(url).read()
+        except:
+            raise Exception("Cannot get references from %s" % url)
         ret = {}
         read_headers = False
         read_advertisement = False
