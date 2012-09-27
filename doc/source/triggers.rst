@@ -35,3 +35,8 @@ want Zuul to gate.  For instance, you may want to grant ``Verified
 +/-1`` and ``Submit`` to the user.  Additional categories or values may
 be added to Gerrit.  Zuul is very flexible and can take advantage of
 those.
+
+Zuul merges the change to the latest master in the remote repository
+then create a new reference for it under ``refs/zuul/*`` and push
+it to the remote Gerrit server. Thus you will need to grant jenkins
+user the *Create Reference* right on ``refs/zuul/*``.
