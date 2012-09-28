@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAALH//Q+Q\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2012-09-27T16:52:03Z",
+      "side": 1,
+      "message": "I\u0027d rather not raise a new exception here, but instead log the URL and raise the original exception.  That way we don\u0027t lose potentially useful error information from urllib2.",
+      "revId": "ac66b09b25f08a1b3a7144214e0748a0527fbbb9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
