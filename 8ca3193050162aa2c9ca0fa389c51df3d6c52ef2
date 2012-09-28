@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAALH//Q/A\u003d",
+        "filename": "zuul/launcher/jenkins.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2012-09-27T16:47:27Z",
+      "side": 1,
+      "message": "I think this should probably \"raise\" after logging the exception, so that the wsgi handler can do what it normally does.\n\n(Otherwise, it will continue, and then hit a new exception because data is undefined.)",
+      "revId": "8ca3193050162aa2c9ca0fa389c51df3d6c52ef2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
