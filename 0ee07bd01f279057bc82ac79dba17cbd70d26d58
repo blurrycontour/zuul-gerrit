@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAALH//P2M\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 482,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2012-09-28T21:31:21Z",
+      "side": 1,
+      "message": "Should document this option.",
+      "revId": "0ee07bd01f279057bc82ac79dba17cbd70d26d58",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
