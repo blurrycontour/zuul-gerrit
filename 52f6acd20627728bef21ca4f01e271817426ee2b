@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAALH//OGY\u003d",
+        "filename": "doc/source/triggers.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2012-10-03T16:46:13Z",
+      "side": 1,
+      "message": "This last line is not clear to me. \"changed by a checkout of a revision specified by Zuul.\" might work better.",
+      "revId": "52f6acd20627728bef21ca4f01e271817426ee2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
