@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAALH//OLc\u003d",
+        "filename": "doc/source/triggers.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2012-10-03T14:20:55Z",
+      "side": 1,
+      "message": "rifs -\u003e refs  in the reference example.",
+      "revId": "5ebb91e6287a44a2e817c85709813bfe38401451",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAALH//OLY\u003d",
+        "filename": "doc/source/triggers.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2012-10-03T14:20:55Z",
+      "side": 1,
+      "message": "\"is is\" -\u003e \"is\"",
+      "revId": "5ebb91e6287a44a2e817c85709813bfe38401451",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAALH//OLU\u003d",
+        "filename": "doc/source/triggers.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2012-10-03T14:20:55Z",
+      "side": 1,
+      "message": "You might want to state where the zuul git repositories are. Aka localhost /var/lib/zuul/git or as determined in zuul.conf, [zuul] git_dir setting.\n\nMight add a reference to the \"Serving Zuul git repos\" below.",
+      "revId": "5ebb91e6287a44a2e817c85709813bfe38401451",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
