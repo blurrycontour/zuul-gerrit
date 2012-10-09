@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAALH//P3o\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2012-09-28T21:22:07Z",
+      "side": 1,
+      "message": "I\u0027d do self.log.error here, since we\u0027re raising the exception; the traceback will get logged where the exception is handled (in getRefSha in this case).\n\nOtherwise, because self.log.exception logs the traceback, we end up logging the traceback twice.",
+      "revId": "6e431b62445f8f2ec16ffb7f095ac6626e1d2b1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
