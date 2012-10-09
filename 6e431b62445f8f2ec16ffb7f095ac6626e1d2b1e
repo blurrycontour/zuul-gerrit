@@ -16,6 +16,24 @@
       "revId": "6e431b62445f8f2ec16ffb7f095ac6626e1d2b1e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAALH//MFg\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2012-10-08T07:39:15Z",
+      "side": 1,
+      "message": "Done in PS3. Also tweaked commit message.",
+      "parentUuid": "AAAALH//P3o\u003d",
+      "revId": "6e431b62445f8f2ec16ffb7f095ac6626e1d2b1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
