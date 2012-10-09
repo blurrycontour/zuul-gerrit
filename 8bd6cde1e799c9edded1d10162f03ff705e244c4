@@ -1,0 +1,39 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAALH//QXw\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2012-09-28T09:48:42Z",
+      "side": 1,
+      "message": "James E. Blair wrote on I0465f8ec (which was against dev branch):\n\nI\u0027d rather not raise a new exception here, but instead log the URL and raise the original exception. That way we don\u0027t lose potentially useful error information from urllib2.",
+      "revId": "8bd6cde1e799c9edded1d10162f03ff705e244c4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAALH//QXg\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2012-09-28T09:52:45Z",
+      "side": 1,
+      "message": "Done in patchset 2 by using self.log.exception() and then \u0027raise\u0027",
+      "parentUuid": "AAAALH//QXw\u003d",
+      "revId": "8bd6cde1e799c9edded1d10162f03ff705e244c4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
