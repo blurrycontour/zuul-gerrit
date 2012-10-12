@@ -283,6 +283,11 @@ class Jenkins(object):
             self.log.debug("Custom parameter function used for job %s, "
                            "change: %s, params: %s" % (job, change, params))
 
+        if job.parameters:
+            self.log.debug("Applying parameters from layout.yaml: %s" %
+                           job.parameters)
+            params = params + job.parameters
+
         build = Build(job, uuid)
         # We can get the started notification on another thread before
         # this is done so we add the build even before we trigger the

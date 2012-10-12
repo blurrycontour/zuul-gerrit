@@ -379,6 +379,22 @@ each job as it builds a list from the project specification.
      :param parameters: parameters to be passed to the job
      :type parameters: dict
 
+**parameters (optional)**
+  Additional parameters to pass to the Job. They will override any
+  parameter set using a parameter-function. The format is simply
+  a parameter name as key followed by its value.
+
+  The parameter names are passed as is.
+
+  Example::
+
+    jobs:
+      - name: job-with-parameters
+        parameters:
+          JOB_PARAM1: "value for job_param1"
+          JOB_PARAM2: "value for job_param2"
+
+
 Here is an example of setting the failure message for jobs that check
 whether a change merges cleanly::
 

@@ -124,6 +124,8 @@ class Scheduler(threading.Thread):
                 if not func:
                     raise Exception("Unable to find function %s" % fname)
                 job.parameter_function = func
+            # Inject parameters from the layout.yaml definition:
+            job.parameters = config_job.get('parameters', None)
             branches = toList(config_job.get('branch'))
             if branches:
                 job._branches = branches

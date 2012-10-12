@@ -315,6 +315,7 @@ class Job(object):
         self.failure_message = None
         self.success_message = None
         self.parameter_function = None
+        self.parameters = None
         self.hold_following_changes = False
         self.voting = True
         self.branches = []
@@ -330,6 +331,7 @@ class Job(object):
         self.failure_message = other.failure_message
         self.success_message = other.success_message
         self.parameter_function = other.parameter_function
+        self.parameters = other.parameters
         self.hold_following_changes = other.hold_following_changes
         self.voting = other.voting
         self.branches = other.branches[:]
