@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAALH//In0\u003d",
+        "filename": "zuul/launcher/jenkins.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2012-10-12T15:30:32Z",
+      "side": 1,
+      "message": "both should be a dictionary, so it should be:\n  params.update(job.parameters)",
+      "revId": "17c5249bc68bb0ca94901cb22a23757c503e3423",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAALH//Ins\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2012-10-12T15:30:32Z",
+      "side": 1,
+      "message": "should initialize to \u0027{}\u0027 to make it easy to use with the update method later on.",
+      "revId": "17c5249bc68bb0ca94901cb22a23757c503e3423",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAALH//Ink\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2012-10-12T15:30:32Z",
+      "side": 1,
+      "message": "Should probably test to make sure this is a dictionary, for safety.",
+      "revId": "17c5249bc68bb0ca94901cb22a23757c503e3423",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
