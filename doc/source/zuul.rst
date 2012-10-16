@@ -323,7 +323,25 @@ useful for side effects such as creating per-commit tarballs. ::
 
 This also triggers jobs when changes are uploaded to Gerrit, but no
 results are reported to Gerrit.  This is useful for jobs that are in
-development and not yet ready to be presented to developers.
+development and not yet ready to be presented to developers. ::
+
+  pipelines:
+    - name: post-merge
+      manager: IndependentPipelineManager
+      trigger:
+        - event: change-merged
+      success:
+        force-message: True
+      failure:
+        force-message: True
+
+This is when a change has been merged, which also mean the change
+in Gerrit has been closed and can not receive any review scoring
+(such as ``code-review`` or ``verified``).
+The ``force-message: True`` will pass ``--force-message`` to the
+``gerrit review`` command, thus making sure the message is actually
+sended back to Gerrit regardless of approval scores.
+That kind of pipeline is nice to run regression or performance tests.
 
 Jobs
 """"
