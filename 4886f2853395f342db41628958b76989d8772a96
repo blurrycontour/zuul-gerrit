@@ -1,0 +1,9 @@
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Verified+2: Jenkins
+Approved+1: Clark Boylan <clark.boylan@gmail.com>
+Code-Review+2: Clark Boylan <clark.boylan@gmail.com>
+Submitted-by: Jenkins
+Submitted-at: Fri, 16 Nov 2012 00:41:41 +0000
+Reviewed-on: https://review.openstack.org/16199
+Project: openstack-ci/zuul
+Branch: refs/heads/master
