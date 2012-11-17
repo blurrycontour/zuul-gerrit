@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAMH//5YU\u003d",
+        "filename": ".gitignore",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2012-11-16T17:32:36Z",
+      "side": 1,
+      "message": "I don\u0027t think we want git to ignore documents in doc/source.",
+      "revId": "bcd77d20191020ddea97f8b8779c0a8a1878d456",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
