@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAMH//1vU\u003d",
+        "filename": "doc/source/launchers.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2012-11-20T16:54:40Z",
+      "side": 1,
+      "message": "\"user is properly\" what?",
+      "revId": "6b995c8ef1def70e65cac12049eab9bb369456fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
