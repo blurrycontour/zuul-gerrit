@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Copyright 2012 Hewlett-Packard Development Company, L.P.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -107,7 +106,8 @@ class Server(object):
                 print "Ctrl + C: asking scheduler to exit nicely...\n"
                 self.exit_handler( signal.SIGINT, None )
 
-if __name__ == '__main__':
+
+def main():
     server = Server()
     server.parse_arguments()
     server.read_config()
