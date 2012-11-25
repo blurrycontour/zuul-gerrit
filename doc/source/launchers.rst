@@ -1,5 +1,6 @@
-.. _launchers:
 :title: Launchers
+
+.. _launchers:
 
 Launchers
 =========
