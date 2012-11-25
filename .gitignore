@@ -7,4 +7,5 @@ build/*
 ChangeLog
 config
 doc/build/*
+doc/source/api/*
 zuul/versioninfo
