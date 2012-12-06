@@ -59,6 +59,19 @@ class GerritEventConnector(threading.Thread):
             event.ref = refupdate.get('refName')
             event.oldrev = refupdate.get('oldRev')
             event.newrev = refupdate.get('newRev')
+        # Map the event types to a field name holding a Gerrit
+        # account attribute. See Gerrit stream-event documentation
+        # in cmd-stream-events.html
+        accountfield_from_type = {
+            'patchset-created': 'uploader',
+            'change-abandoned': 'abandoner',
+            'change-restored': 'restorer',
+            'change-merged': 'submitter',
+            'comment-added': 'author',
+            'ref-updated': 'submitter',
+        }
+        event.account = data.get(accountfield_from_type[event.type])
+
         self.sched.addEvent(event)
         self.gerrit.eventDone()
 
