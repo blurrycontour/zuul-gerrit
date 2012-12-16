@@ -89,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAMX//7OA\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2012-12-06T18:26:09Z",
+      "side": 1,
+      "message": "I think the example where ref-updated has no \"submitter\" is handled by the data.get call. data.get(\"submitter\") on a dict/json object without a submitter should return None right? Handling unknown events is definitely necessary as I think this will result in an unhandled exception otherwise.",
+      "parentUuid": "AAAAMX//7Qg\u003d",
+      "revId": "81cd6714802ead6652a27cb11db034c2b5a8ad50",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAMX//6WM\u003d",
         "filename": "zuul/trigger/gerrit.py",
         "patchSetId": 1
