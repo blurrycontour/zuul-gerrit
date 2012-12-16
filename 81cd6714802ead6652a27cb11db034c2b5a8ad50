@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAMX//7RM\u003d",
+        "filename": "etc/layout.yaml-sample",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2012-12-06T18:10:13Z",
+      "side": 1,
+      "message": "tabs",
+      "revId": "81cd6714802ead6652a27cb11db034c2b5a8ad50",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAMX//7QY\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 638,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2012-12-06T18:10:13Z",
+      "side": 1,
+      "message": "You should handle account being None.",
+      "revId": "81cd6714802ead6652a27cb11db034c2b5a8ad50",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAMX//7Qg\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2012-12-06T18:10:13Z",
+      "side": 1,
+      "message": "There are two error conditions I think we should handle:\n\nif the event.type is not one of the ones in the list (ie, gerrit adds a new event type), and if the specified field is not present (ie, a ref-updated has no \"submitter\").  In that case, event.account should probably be None.",
+      "revId": "81cd6714802ead6652a27cb11db034c2b5a8ad50",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
