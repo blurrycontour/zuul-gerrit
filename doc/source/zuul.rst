@@ -248,7 +248,10 @@ explanation of each of the parameters::
 
   *email_filter*
   This is used for any event.  It takes a regex applied on the performer
-  email. Example: ``email_filter: .*@example.org$``.
+  email. Make sure to use non greedy matchers and to escapes dots!
+  Example: ``email_filter: ^.*?@example\.org$``.  If you want to specify
+  several email filters, you should use a YAML list.  Your Gerrit repository
+  should not allow random people to forge the committer identity.
 
   *comment_filter*
   This is only used for ``comment-added`` events.  It accepts a list of
