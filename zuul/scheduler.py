@@ -25,6 +25,12 @@ import model
 from model import Pipeline, Job, Project, ChangeQueue, EventFilter
 import merger
 
+try:
+    from statsd import statsd
+    STATSD_ENABLED = True
+except:
+    STATSD_ENABLED = False
+
 
 class Scheduler(threading.Thread):
     log = logging.getLogger("zuul.Scheduler")
@@ -214,6 +220,8 @@ class Scheduler(threading.Thread):
 
     def addEvent(self, event):
         self.log.debug("Adding trigger event: %s" % event)
+        if STATSD_ENABLED:
+            statsd.incr('gerrit.%s' % event.type)
         self.queue_lock.acquire()
         self.trigger_event_queue.put(event)
         self.queue_lock.release()
@@ -221,6 +229,7 @@ class Scheduler(threading.Thread):
 
     def onBuildStarted(self, build):
         self.log.debug("Adding start event for build: %s" % build)
+        build.start_time = time.time()
         self.queue_lock.acquire()
         self.result_event_queue.put(('started', build))
         self.queue_lock.release()
@@ -228,6 +237,12 @@ class Scheduler(threading.Thread):
 
     def onBuildCompleted(self, build):
         self.log.debug("Adding complete event for build: %s" % build)
+        build.end_time = time.time()
+        if STATSD_ENABLED:
+            dt = int((build.end_time - build.start_time) * 1000)
+            key = 'jenkins.job.%s' % build.job.name
+            statsd.timing(key, dt)
+            statsd.incr(key)
         self.queue_lock.acquire()
         self.result_event_queue.put(('completed', build))
         self.queue_lock.release()
@@ -325,6 +340,11 @@ class Scheduler(threading.Thread):
         return False
 
     def run(self):
+        if STATSD_ENABLED:
+            self.log.debug("Statsd enabled")
+        else:
+            self.log.debug("Statsd disabled because python statsd "
+                           "package not found")
         while True:
             self.log.debug("Run handler sleeping")
             self.wake_event.wait()
