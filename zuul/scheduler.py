@@ -43,6 +43,7 @@ class Scheduler(threading.Thread):
         self._reconfigure = False
         self._exit = False
         self._stopped = False
+        self._queue_only_threshold = 3
         self.launcher = None
         self.trigger = None
 
@@ -356,6 +357,12 @@ class Scheduler(threading.Thread):
         self.log.debug("All builds are not complete")
         return False
 
+    def _inQueueOnlyMode(self):
+        return ((self._reconfigure and
+                 (self.trigger_event_queue.qsize()
+                  < self._queue_only_threshold)) or
+                (self._pause and not self._reconfigure))
+
     def run(self):
         if statsd:
             self.log.debug("Statsd enabled")
@@ -370,7 +377,7 @@ class Scheduler(threading.Thread):
                 return
             self.log.debug("Run handler awake")
             try:
-                if not self._pause:
+                if not self._inQueueOnlyMode():
                     if not self.trigger_event_queue.empty():
                         self.process_event_queue()
 
@@ -380,7 +387,7 @@ class Scheduler(threading.Thread):
                 if self._pause and self._areAllBuildsComplete():
                     self._doPauseEvent()
 
-                if not self._pause:
+                if self._inQueueOnlyMode():
                     if not (self.trigger_event_queue.empty() and
                             self.result_event_queue.empty()):
                         self.wake_event.set()
