@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAM3//i0o\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 941,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-01-16T17:04:05Z",
+      "side": 1,
+      "message": "Is changes the correct value here? I think it will always be the same as the changes length reported above, but this particular stat appears to be specific to a gerrit project.",
+      "revId": "c4d9f2a3b1a52cb69018bf22c98c12b163870499",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
