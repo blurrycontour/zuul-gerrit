@@ -105,6 +105,11 @@ class Repo(object):
                                                  self.remote_url))
         self.repo.remotes.origin.push('%s:%s' % (local, remote))
 
+    def update(self):
+        self.log.debug("Updating repository %s" % self.local_path)
+        origin = self.repo.remotes.origin
+        origin.update()
+
 
 class Merger(object):
     log = logging.getLogger("zuul.Merger")
