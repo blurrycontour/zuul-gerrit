@@ -620,6 +620,10 @@ class BasePipelineManager(object):
                 self.possiblyReportChange(change)
                 return
             change.current_build_set.commit = commit
+        else:
+            self.log.info("Updating local repo to fetch possible tags updates")
+            repo = self.sched.merger.getRepo(change.project)
+            repo.update()
         for job in self.pipeline.findJobsToRun(change):
             self.log.debug("Found job %s for change %s" % (job, change))
             try:
