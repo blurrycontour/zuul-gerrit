@@ -144,6 +144,14 @@ class Merger(object):
     def getRepo(self, project):
         return self.repos.get(project, None)
 
+    def updateRepo(self, project):
+        repo = self.getRepo(project)
+        try:
+            self.log.info("Updating local repository %s", project)
+            repo.update()
+        except:
+            self.log.exception("Unable to update %s", project)
+
     def mergeChanges(self, changes, target_ref=None, mode=None):
         projects = {}
         commit = None

@@ -400,6 +400,15 @@ class Scheduler(threading.Thread):
             self.trigger_event_queue.task_done()
             return
 
+        # Preprocessing for ref-update events
+        if hasattr(event, 'refspec'):
+            # Make sure the local git repo is up-to-date with the remote one.
+            # We better have the new ref before enqueuing the changes.
+            # This is done before enqueuing the changes to avoid calling an
+            # update per pipeline accepting the change.
+            self.log.info("Fetching references for %s" % project)
+            self.merger.updateRepo(project)
+
         for pipeline in self.pipelines.values():
             if not pipeline.manager.eventMatches(event):
                 self.log.debug("Event %s ignored by %s" % (event, pipeline))
