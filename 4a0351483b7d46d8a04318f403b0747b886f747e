@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAM3//gfM\u003d",
+        "filename": "zuul/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-01-18T00:00:37Z",
+      "side": 1,
+      "message": "After the origin.update() I think you will need to do\n  self.repo \u003d git.Repo(self.local_path)\n\nto make sure that GitPython is aware of the changes that may happen after fetching. See the comment on line 45 of this file for more info.",
+      "revId": "4a0351483b7d46d8a04318f403b0747b886f747e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
