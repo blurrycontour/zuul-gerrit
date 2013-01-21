@@ -9,3 +9,4 @@ python-daemon
 extras
 statsd==1.0.0
 voluptuous>=0.5
+pyzmq

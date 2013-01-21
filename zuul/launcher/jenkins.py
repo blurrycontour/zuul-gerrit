@@ -31,6 +31,7 @@ from paste import httpserver
 from webob import Request
 
 from zuul.model import Build
+from zuul.lib.eventproxy import EventProxy
 
 # The amount of time we tolerate a change in build status without
 # receiving a notification
@@ -40,9 +41,10 @@ JENKINS_GRACE_TIME = 60
 class JenkinsCallback(threading.Thread):
     log = logging.getLogger("zuul.JenkinsCallback")
 
-    def __init__(self, jenkins):
+    def __init__(self, jenkins, event_proxy=None):
         threading.Thread.__init__(self)
         self.jenkins = jenkins
+        self.event_proxy = event_proxy
 
     def run(self):
         httpserver.serve(self.app, host='0.0.0.0', port='8001')
@@ -101,6 +103,8 @@ class JenkinsCallback(threading.Thread):
                                                       number)
                     if (phase and phase == 'STARTED'):
                         self.jenkins.onBuildStarted(uuid, url, number)
+                if self.event_proxy:
+                    self.event_proxy.addEvent(data)
 
 
 class JenkinsCleanup(threading.Thread):
@@ -214,8 +218,19 @@ class Jenkins(object):
         server = config.get('jenkins', 'server')
         user = config.get('jenkins', 'user')
         apikey = config.get('jenkins', 'apikey')
+
+        event_proxy = None
+        if (config.has_option('jenkins', 'proxy_events') and
+            config.getboolean('jenkins', 'proxy_events')):
+            if config.has_option('jenkins', 'proxy_port'):
+                proxy_port = config.get('jenkins', 'proxy_port')
+            else:
+                proxy_port = '8002'
+            event_proxy = EventProxy(proxy_port)
+            event_proxy.start()
+
         self.jenkins = ExtendedJenkins(server, user, apikey)
-        self.callback_thread = JenkinsCallback(self)
+        self.callback_thread = JenkinsCallback(self, event_proxy)
         self.callback_thread.start()
         self.cleanup_thread = JenkinsCleanup(self)
         self.cleanup_thread.start()
