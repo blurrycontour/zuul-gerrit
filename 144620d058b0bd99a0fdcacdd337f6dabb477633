@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAM3/++WU\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1160,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-02-12T19:37:52Z",
+      "side": 1,
+      "message": "Setting severed heads here to True is insufficient to force reporting to happen as the servered heads logic only runs if there are no changes ahead of this change. Will need a different way to report unmergability.",
+      "revId": "144620d058b0bd99a0fdcacdd337f6dabb477633",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
