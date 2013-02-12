@@ -1122,6 +1122,17 @@ class DependentPipelineManager(BasePipelineManager):
                                                            changes))
         return changes
 
+    def _getMerges(self, dependent_changes, change):
+        merges = []
+        # merge change in order against their respective branches.
+        # Return the list of these potential merges.
+        for x in xrange(len(dependent_changes)):
+            merges.append(self.sched.merger.mergeChanges(
+                dependent_changes[:x] + [change]))
+        merges.append(self.sched.merger.mergeChanges(
+            dependent_changes + [change]))
+        return merges
+
     def _launchJobs(self, change, jobs):
         self.log.debug("Launching jobs for change %s" % change)
         ref = change.current_build_set.ref
@@ -1130,7 +1141,16 @@ class DependentPipelineManager(BasePipelineManager):
             ref = change.current_build_set.ref
             dependent_changes = self._getDependentChanges(change)
             dependent_changes.reverse()
+            # Merges all potential merges for this change and its
+            # dependencies. If all cannot merge remove the change from
+            # the queue.
             all_changes = dependent_changes + [change]
+            commits = self._getMerges(dependent_changes, change)
+            if not filter(None, commits):
+                self.log.info("Unable to merge changes %s" % all_changes)
+                self.pipeline.setUnableToMerge(change)
+                self.removeChange(change)
+                return
             commit = self.sched.merger.mergeChanges(all_changes, ref)
             if not commit:
                 self.log.info("Unable to merge changes %s" % all_changes)
