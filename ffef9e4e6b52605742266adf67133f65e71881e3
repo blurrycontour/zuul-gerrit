@@ -1,0 +1,9 @@
+Verified+2: Jenkins
+Approved+1: Jeremy Stanley <fungi@yuggoth.org>
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Code-Review+1: Elizabeth Krumbach <lyz@princessleia.com>
+Submitted-by: Jenkins
+Submitted-at: Tue, 12 Feb 2013 03:29:45 +0000
+Reviewed-on: https://review.openstack.org/21730
+Project: openstack-infra/zuul
+Branch: refs/heads/master
