@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAM3/+97s\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1146,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2013-02-12T23:03:11Z",
+      "side": 1,
+      "message": "typo: remove",
+      "revId": "9d6dbbeab4ff78b41b6b7d198290f57fd475b0ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
