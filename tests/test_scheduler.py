@@ -1154,6 +1154,50 @@ class testScheduler(unittest.TestCase):
         assert C.reported == 2
         self.assertEmptyQueues()
 
+    def test_merge_conflict_dequeing(self):
+        "Test that unmergable changes are dequeued ASAP"
+        # C -> B (conflict) -> A -> M (conflict)
+        M = self.fake_gerrit.addFakeChange('org/project', 'master', 'M')
+        M.addPatchset(['conflict'])
+        M.setMerged()
+        self.fake_jenkins.hold_jobs_in_queue = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        B.addPatchset(['conflict'])
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+        A.addApproval('CRVW', 2)
+        B.addApproval('CRVW', 2)
+        C.addApproval('CRVW', 2)
+        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
+        self.waitUntilSettled()
+
+        jobs = self.fake_jenkins.all_jobs
+
+        self.fake_jenkins.fakeRelease('.*-merge')
+        self.waitUntilSettled()
+        self.fake_jenkins.fakeRelease('.*-merge')
+        self.waitUntilSettled()
+        # Conflict should be detected at this point in time resulting
+        # in change B being dequeued and reported.
+        assert B.data['status'] == 'NEW'
+        assert B.reported == 2
+        self.fake_jenkins.fakeRelease('.*-merge')
+        self.waitUntilSettled()
+        ref = jobs[-1].parameters['ZUUL_REF']
+        self.fake_jenkins.hold_jobs_in_queue = False
+        self.fake_jenkins.fakeRelease()
+        self.waitUntilSettled()
+
+        assert A.data['status'] == 'MERGED'
+        assert B.data['status'] == 'NEW'
+        assert C.data['status'] == 'MERGED'
+        assert A.reported == 2
+        assert B.reported == 2
+        assert C.reported == 2
+        self.assertEmptyQueues()
+
     def test_post(self):
         "Test that post jobs run"
         e = {
