@@ -1,0 +1,17 @@
+pipelines:
+  - name: 'check'
+    manager: IndependentPipelineManager
+    trigger:
+     - event: patchset-created
+
+project-templates:
+  - name: template-generic
+    template:
+      check:
+       - '{project}-merge'
+
+projects:
+  - name: organization/project
+    template:
+      - name: template-generic
+        project: 'myproject'

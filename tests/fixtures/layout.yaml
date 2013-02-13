@@ -47,6 +47,13 @@ jobs:
     files:
       - '.*-requires'
 
+project-templates:
+  - name: test-one-and-two
+    template:
+      check:
+       - '{projectname}-test1'
+       - '{projectname}-test2'
+
 projects:
   - name: org/project
     merge-mode: cherry-pick
@@ -124,3 +131,8 @@ projects:
         - nonvoting-project-test2
     post:
       - nonvoting-project-post
+
+  - name: org/templated-project
+    template:
+     - name: test-one-and-two
+       projectname: project
