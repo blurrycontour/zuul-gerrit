@@ -1,4 +1,6 @@
 # Copyright 2013 OpenStack Foundation
+# Copyright 2013 Antoine "hashar" Musso
+# Copyright 2013 Wikimedia Foundation Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -55,6 +57,12 @@ class LayoutSchema(object):
                 }
     pipelines = [pipeline]
 
+    project_template = {
+        v.Required('name'): str,
+        v.Required('template'): dict,
+    }
+    project_templates = [project_template]
+
     job = {v.Required('name'): str,
            'failure-message': str,
            'success-message': str,
@@ -84,16 +92,36 @@ class LayoutSchema(object):
         if not pipelines:
             pipelines = []
         pipelines = [p['name'] for p in pipelines if 'name' in p]
+
+        # Whenever a project use a template, it better have to exist
+        template_names = [t['name'] for t in data.get('project-templates')
+                          if 'name' in t]
+        template_call = v.Schema({
+            v.Required('name'): v.Any(*template_names),
+            }, extra=True )
         project = {'name': str,
                    'merge-mode': v.Any('cherry-pick'),
+                   'template': [template_call],
                    }
+        # And project should refers to existing pipelines
         for p in pipelines:
             project[p] = self.validateJob
         projects = [project]
 
+        # Sub schema to validate a project template has existing
+        # pipelines and jobs.
+        project_template = { 'name': str,
+                             'template': {},
+                           }
+        for p in pipelines:
+            project_template['template'][p] = self.validateJob
+        project_templates = [project_template]
+
+        # Gather our sub schemas
         schema = v.Schema({'includes': self.includes,
                            v.Required('pipelines'): self.pipelines,
                            'jobs': self.jobs,
+                           'project-templates': project_templates,
                            v.Required('projects'): projects,
                            })
         return schema
@@ -115,3 +143,5 @@ class LayoutValidator(object):
         if 'jobs' in data:
             self.checkDuplicateNames(data['jobs'], ['jobs'])
         self.checkDuplicateNames(data['projects'], ['projects'])
+        if 'project-templates' in data:
+            self.checkDuplicateNames(data['project-templates'], ['project-templates'])
