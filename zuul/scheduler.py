@@ -1,5 +1,7 @@
 # Copyright 2012 Hewlett-Packard Development Company, L.P.
 # Copyright 2013 OpenStack Foundation
+# Copyright 2013 Antoine "hashar" Musso
+# Copyright 2013 Wikimedia Foundation Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -32,6 +34,28 @@ import merger
 statsd = extras.try_import('statsd.statsd')
 
 
+def deep_format(obj, paramdict):
+    """Apply the paramdict via str.format() to all string objects found within
+       the supplied obj. Lists and dicts are traversed recursively.
+
+       Borrowed from Jenkins Job Builder project"""
+    if isinstance(obj, str):
+        ret = obj.format(**paramdict)
+    elif isinstance(obj, list):
+        ret = []
+        for item in obj:
+            ret.append(deep_format(item, paramdict))
+    elif isinstance(obj, dict):
+        ret = {}
+        for item in obj:
+            exp_item = item.format(**paramdict)
+
+            ret[exp_item] = deep_format(obj[item], paramdict)
+    else:
+        ret = obj
+    return ret
+
+
 class Scheduler(threading.Thread):
     log = logging.getLogger("zuul.Scheduler")
 
@@ -54,6 +78,7 @@ class Scheduler(threading.Thread):
         self.pipelines = {}
         self.jobs = {}
         self.projects = {}
+        self.project_templates = {}
         self.metajobs = {}
 
     def stop(self):
@@ -125,6 +150,10 @@ class Scheduler(threading.Thread):
                                 toList(trigger.get('email_filter')))
                 manager.event_filters.append(f)
 
+        for conf_project_template in data.get('project-templates', []):
+            self.project_templates[conf_project_template.get('name')] \
+                = conf_project_template.get('template')
+
         for config_job in data.get('jobs', []):
             job = self.getJob(config_job['name'])
             # Be careful to only set attributes explicitly present on
@@ -172,10 +201,22 @@ class Scheduler(threading.Thread):
 
         for config_project in data.get('projects', []):
             project = Project(config_project['name'])
+
+            for requested_template in config_project.get('template', []):
+                # Fetch the template from 'project-templates'
+                tpl = self.project_templates.get(
+                    requested_template.get('name'))
+                # Expand it with the project context
+                expanded = deep_format(tpl, requested_template)
+                # Finally merge the expansion with whatever has been already
+                # defined for this project
+                config_project.update(expanded)
+
             self.projects[config_project['name']] = project
             mode = config_project.get('merge-mode')
             if mode and mode == 'cherry-pick':
                 project.merge_mode = model.CHERRY_PICK
+
             for pipeline in self.pipelines.values():
                 if pipeline.name in config_project:
                     job_tree = pipeline.addProject(project)
