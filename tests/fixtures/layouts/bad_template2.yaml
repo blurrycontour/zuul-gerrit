@@ -1,0 +1,21 @@
+# Template is going to be called with an extra parameter
+
+pipelines:
+  - name: 'check'
+    manager: IndependentPipelineManager
+    trigger:
+     - event: patchset-created
+
+project-templates:
+  - name: template-generic
+    template:
+      check:
+       # Template only uses the 'project' parameter'
+       - '{project}-merge'
+
+projects:
+  - name: organization/project
+    template:
+      - name: template-generic
+        project: 'MyProjectName'
+        extraparam: 'IShouldNotBeSet'
