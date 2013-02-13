@@ -1,4 +1,6 @@
 # Copyright 2013 OpenStack Foundation
+# Copyright 2013 Antoine "hashar" Musso
+# Copyright 2013 Wikimedia Foundation Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -54,6 +56,13 @@ class LayoutSchema(object):
                 }
     pipelines = [pipeline]
 
+    projecttemplate = {
+        v.required('name'): str,
+        v.required('template'): dict,
+    }
+
+    projecttemplates = [projecttemplate]
+
     job = {v.required('name'): str,
            'failure-message': str,
            'success-message': str,
@@ -85,6 +94,7 @@ class LayoutSchema(object):
         pipelines = [p['name'] for p in pipelines if 'name' in p]
         project = {'name': str,
                    'merge-mode': v.any('cherry-pick'),
+                   'template': list,
                    }
         for p in pipelines:
             project[p] = self.validateJob
@@ -93,6 +103,7 @@ class LayoutSchema(object):
         schema = v.Schema({'includes': self.includes,
                            v.required('pipelines'): self.pipelines,
                            'jobs': self.jobs,
+                           'projecttemplates': self.projecttemplates,
                            v.required('projects'): projects,
                            })
         return schema
