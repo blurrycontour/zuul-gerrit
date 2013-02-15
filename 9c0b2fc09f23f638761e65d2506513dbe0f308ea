@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAM3/+31s\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1246,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-02-15T21:07:47Z",
+      "side": 1,
+      "message": "Why is this value 4 here? I don\u0027t quite understand it but think that I must\u0027ve set up this test wrong for it to report back to Gerrit 4 times.",
+      "revId": "9c0b2fc09f23f638761e65d2506513dbe0f308ea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAM3/+31o\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1262,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-02-15T21:07:47Z",
+      "side": 1,
+      "message": "Same comment as above.",
+      "revId": "9c0b2fc09f23f638761e65d2506513dbe0f308ea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAM3/+31k\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1264,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-02-15T21:07:47Z",
+      "side": 1,
+      "message": "Same comment as above.",
+      "revId": "9c0b2fc09f23f638761e65d2506513dbe0f308ea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
