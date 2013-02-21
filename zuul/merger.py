@@ -59,10 +59,14 @@ class Repo(object):
         self.repo.head.reset(index=True, working_tree=True)
         self.repo.git.clean('-x', '-f', '-d')
 
-    def checkout(self, branch):
-        self.log.debug("Checking out %s" % branch)
-        self.repo.head.reference = self.repo.heads[branch]
-        self.repo.head.reset(index=True, working_tree=True)
+    def checkout(self, checkout, branch=True):
+        self.log.debug("Checking out %s" % checkout)
+        if branch:
+            self.repo.head.reference = self.repo.heads[checkout]
+            self.repo.head.reset(index=True, working_tree=True)
+        else:
+            self.repo.head.reference = checkout
+            self.repo.head.reset(index=True, working_tree=True)
 
     def cherryPick(self, ref):
         self.log.debug("Cherry-picking %s" % ref)
@@ -139,6 +143,39 @@ class Merger(object):
     def getRepo(self, project):
         return self.repos.get(project, None)
 
+    def _mergeChange(self, change, checkout, target_ref, mode, branch=True):
+        repo = self.getRepo(change.project)
+        try:
+            repo.checkout(checkout, branch)
+        except:
+            self.log.exception("Unable to checkout %s" % checkout)
+            return False
+
+        try:
+            if not mode:
+                mode = change.project.merge_mode
+            if mode == model.MERGE_IF_NECESSARY:
+                repo.merge(change.refspec)
+            elif mode == model.CHERRY_PICK:
+                repo.cherryPick(change.refspec)
+        except:
+            # Log exceptions at debug level because they are
+            # usually benign merge conflicts
+            self.log.debug("Unable to merge %s" % change, exc_info=True)
+            return False
+
+        try:
+            # Keep track of the last commit, it's the commit that
+            # will be passed to jenkins because it's the commit
+            # for the triggering change
+            zuul_ref = change.branch + '/' + target_ref
+            commit = repo.setZuulRef(zuul_ref, 'HEAD').hexsha
+        except:
+            self.log.exception("Unable to set zuul ref %s for change %s" %
+                               (zuul_ref, change))
+            return False
+        return commit
+
     def mergeChanges(self, changes, target_ref=None, mode=None):
         projects = {}
         commit = None
@@ -163,38 +200,25 @@ class Merger(object):
                 branches.append(change.branch)
                 projects[change.project] = branches
 
-        # Merge all the changes
-        for change in changes:
-            repo = self.getRepo(change.project)
-            try:
-                repo.checkout(change.branch)
-            except:
-                self.log.exception("Unable to checkout %s" % change.branch)
-                return False
-
-            try:
-                if not mode:
-                    mode = change.project.merge_mode
-                if mode == model.MERGE_IF_NECESSARY:
-                    repo.merge(change.refspec)
-                elif mode == model.CHERRY_PICK:
-                    repo.cherryPick(change.refspec)
-            except:
-                # Log exceptions at debug level because they are
-                # usually benign merge conflicts
-                self.log.debug("Unable to merge %s" % change, exc_info=True)
-                return False
-
-            try:
-                # Keep track of the last commit, it's the commit that
-                # will be passed to jenkins because it's the commit
-                # for the triggering change
-                zuul_ref = change.branch + '/' + target_ref
-                commit = repo.setZuulRef(zuul_ref, 'HEAD').hexsha
-            except:
-                self.log.exception("Unable to set zuul ref %s for change %s" %
-                                   (zuul_ref, change))
-                return False
+        # Merge shortcuts:
+        # if this is the only change just merge it against its branch.
+        # elif there are changes ahead of us that are from the same project and
+        # branch we can merge against the commit associated with that change
+        # instead of going back up the tree.
+        #
+        # Shortcuts assume some external entity is checking whether or not
+        # changes from other projects can merge.
+        commit = False
+        previous_changes = filter(lambda c: (c.project == change.project and
+            c.branch == change.branch), changes)
+        if len(previous_changes) == 1:
+            commit = self._mergeChange(changes[-1], change.branch, target_ref=target_ref, mode=mode)
+        elif (len(previous_changes) >= 2 and
+            previous_changes[-2].current_build_set.commit):
+            last_change = previous_changes[-2].current_build_set.commit
+            commit = self._mergeChange(changes[-1], last_change, target_ref=target_ref, mode=mode, branch=False)
+        if not commit:
+            return commit
 
         if self.push_refs:
             # Push the results upstream to the zuul ref
