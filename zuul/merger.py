@@ -38,6 +38,9 @@ class Repo(object):
                                                       self.local_path))
             git.Repo.clone_from(self.remote_url, self.local_path)
 
+    def recreateRepoObject(self):
+        self.repo = git.Repo(self.local_path)
+
     def reset(self):
         self.log.debug("Resetting repository %s" % self.local_path)
         origin = self.repo.remotes.origin
@@ -59,9 +62,12 @@ class Repo(object):
         self.repo.head.reset(index=True, working_tree=True)
         self.repo.git.clean('-x', '-f', '-d')
 
-    def checkout(self, branch):
-        self.log.debug("Checking out %s" % branch)
-        self.repo.head.reference = self.repo.heads[branch]
+    def getBranchHead(self, branch):
+        return self.repo.heads[branch]
+
+    def checkout(self, ref):
+        self.log.debug("Checking out %s" % ref)
+        self.repo.head.reference = ref
         self.repo.head.reset(index=True, working_tree=True)
 
     def cherryPick(self, ref):
@@ -139,6 +145,39 @@ class Merger(object):
     def getRepo(self, project):
         return self.repos.get(project, None)
 
+    def _mergeChange(self, change, ref, target_ref, mode):
+        repo = self.getRepo(change.project)
+        try:
+            repo.checkout(ref)
+        except:
+            self.log.exception("Unable to checkout %s" % ref)
+            return False
+
+        try:
+            if not mode:
+                mode = change.project.merge_mode
+            if mode == model.MERGE_IF_NECESSARY:
+                repo.merge(change.refspec)
+            elif mode == model.CHERRY_PICK:
+                repo.cherryPick(change.refspec)
+        except:
+            # Log exceptions at debug level because they are
+            # usually benign merge conflicts
+            self.log.debug("Unable to merge %s" % change, exc_info=True)
+            return False
+
+        try:
+            # Keep track of the last commit, it's the commit that
+            # will be passed to jenkins because it's the commit
+            # for the triggering change
+            zuul_ref = change.branch + '/' + target_ref
+            commit = repo.setZuulRef(zuul_ref, 'HEAD').hexsha
+        except:
+            self.log.exception("Unable to set zuul ref %s for change %s" %
+                               (zuul_ref, change))
+            return False
+        return commit
+
     def mergeChanges(self, changes, target_ref=None, mode=None):
         projects = {}
         commit = None
@@ -152,64 +191,80 @@ class Merger(object):
                 return False
             if not branches:
                 # First time this repo has come up in this change list
-                try:
-                    repo.reset()
-                except:
-                    self.log.exception("Unable to reset repo %s" % repo)
-                    return False
+                repo.recreateRepoObject()
             if change.branch not in branches:
                 if target_ref:
                     repo.createZuulRef(change.branch + '/' + target_ref)
                 branches.append(change.branch)
                 projects[change.project] = branches
 
-        # Merge all the changes
-        for change in changes:
+        # Merge shortcuts:
+        # if this is the only change just merge it against its branch.
+        # elif there are changes ahead of us that are from the same project and
+        # branch we can merge against the commit associated with that change
+        # instead of going back up the tree.
+        #
+        # Shortcuts assume some external entity is checking whether or not
+        # changes from other projects can merge.
+        commit = False
+        change = changes[-1]
+        sibling_filter = lambda c: (c.project == change.project and
+                                    c.branch == change.branch)
+        sibling_changes = filter(sibling_filter, changes)
+        # Only current change to merge against tip of change.branch
+        if len(sibling_changes) == 1:
             repo = self.getRepo(change.project)
             try:
-                repo.checkout(change.branch)
+                repo.reset()
             except:
-                self.log.exception("Unable to checkout %s" % change.branch)
+                self.log.exception("Unable to reset repo %s" % repo)
                 return False
+            commit = self._mergeChange(change,
+                                       repo.getBranchHead(change.branch),
+                                       target_ref=target_ref, mode=mode)
+        # Sibling changes exist. Merge current change against newest sibling.
+        elif (len(sibling_changes) >= 2 and
+            sibling_changes[-2].current_build_set.commit):
+            last_change = sibling_changes[-2].current_build_set.commit
+            commit = self._mergeChange(change, last_change,
+                                       target_ref=target_ref, mode=mode)
+        # Either change did not merge or we did not need to merge as there were
+        # previous merge conflicts.
+        if not commit:
+            return commit
 
-            try:
-                if not mode:
-                    mode = change.project.merge_mode
-                if mode == model.MERGE_IF_NECESSARY:
-                    repo.merge(change.refspec)
-                elif mode == model.CHERRY_PICK:
-                    repo.cherryPick(change.refspec)
-            except:
-                # Log exceptions at debug level because they are
-                # usually benign merge conflicts
-                self.log.debug("Unable to merge %s" % change, exc_info=True)
-                return False
-
-            try:
-                # Keep track of the last commit, it's the commit that
-                # will be passed to jenkins because it's the commit
-                # for the triggering change
-                zuul_ref = change.branch + '/' + target_ref
-                commit = repo.setZuulRef(zuul_ref, 'HEAD').hexsha
-            except:
-                self.log.exception("Unable to set zuul ref %s for change %s" %
-                                   (zuul_ref, change))
-                return False
-
-        if self.push_refs:
-            # Push the results upstream to the zuul ref
-            for project, branches in projects.items():
-                repo = self.getRepo(project)
-                for branch in branches:
-                    ref = 'refs/zuul/' + branch + '/' + target_ref
-                    try:
-                        repo.push(ref, ref)
-                        complete = self.trigger.waitForRefSha(project, ref)
-                    except:
-                        self.log.exception("Unable to push %s" % ref)
-                        return False
-                    if not complete:
-                        self.log.error("Ref %s did not show up in repo" % ref)
-                        return False
+        project_branches = []
+        for c in reversed(changes):
+            # Here we create all of the necessary zuul refs and potentially
+            # push them back to Gerrit.
+            if (c.project, c.branch) in project_branches:
+                continue
+            repo = self.getRepo(c.project)
+            if c.project != change.project and c.branch != change.branch:
+                # Create a zuul ref for all dependent changes project
+                # branch combinations as this is the ref that jenkins will
+                # use to test. The ref for change has already been set so
+                # we skip it here.
+                try:
+                    zuul_ref = c.branch + '/' + target_ref
+                    repo.setZuulRef(zuul_ref, c.current_build_set.commit)
+                except:
+                    self.log.exception("Unable to set zuul ref %s for "
+                                       "change %s" % (zuul_ref, c))
+                    return False
+            if self.push_refs:
+                # Push the results upstream to the zuul ref after
+                # they are created.
+                ref = 'refs/zuul/' + c.branch + '/' + target_ref
+                try:
+                    repo.push(ref, ref)
+                    complete = self.trigger.waitForRefSha(c.project, ref)
+                except:
+                    self.log.exception("Unable to push %s" % ref)
+                    return False
+                if not complete:
+                    self.log.error("Ref %s did not show up in repo" % ref)
+                    return False
+            project_branches.append((c.project, c.branch))
 
         return commit
