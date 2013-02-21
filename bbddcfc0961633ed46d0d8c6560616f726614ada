@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAM3/+tKw\u003d",
+        "filename": "zuul/merger.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-02-21T02:05:28Z",
+      "side": 1,
+      "message": "I think we should require that the changes list be the sibling_changes list below. Then we can simplify this loop by turning it into a single execution for the current change\u0027s project and branch.",
+      "revId": "bbddcfc0961633ed46d0d8c6560616f726614ada",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
