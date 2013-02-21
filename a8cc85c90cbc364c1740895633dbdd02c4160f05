@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAM3/+tN8\u003d",
+        "filename": "zuul/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-02-21T01:39:26Z",
+      "side": 1,
+      "message": "That makes sense to me. I will update.",
+      "parentUuid": "AAAAM3/+tPQ\u003d",
+      "revId": "a8cc85c90cbc364c1740895633dbdd02c4160f05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAM3/+tP4\u003d",
         "filename": "zuul/merger.py",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAM3/+tOI\u003d",
+        "filename": "zuul/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-02-21T01:39:26Z",
+      "side": 1,
+      "message": "Not having a previous build set commit implies that a change before the current change failed to merge. In that case we simply return false so that we properly check that this change cannot merge either.\n\nI will update the name of that list to something better.",
+      "parentUuid": "AAAAM3/+tP4\u003d",
+      "revId": "a8cc85c90cbc364c1740895633dbdd02c4160f05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAM3/+tO8\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2013-02-21T01:33:48Z",
       "side": 1,
       "message": "Is this expected to happen?  if not, an error message would be nice.",
+      "revId": "a8cc85c90cbc364c1740895633dbdd02c4160f05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAM3/+tN4\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1140,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-02-21T01:39:26Z",
+      "side": 1,
+      "message": "The print messages here have been removed. I had them for debugging.\n\nYes, this is expected to happen. This is how you know that you are currently in an unmergable state. Rather than try and merge simply do the unmergable state steps and move on.",
+      "parentUuid": "AAAAM3/+tO8\u003d",
       "revId": "a8cc85c90cbc364c1740895633dbdd02c4160f05",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
