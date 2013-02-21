@@ -145,8 +145,8 @@ class ExtendedJenkins(jenkins.Jenkins):
                 req.add_header('Authorization', self.auth)
             return urllib2.urlopen(req).read()
         except urllib2.HTTPError, e:
-            print e.msg
-            print e.fp.read()
+            #print e.msg
+            #print e.fp.read()
             raise
 
     def stop_build(self, name, number):
@@ -171,6 +171,7 @@ class ExtendedJenkins(jenkins.Jenkins):
         # Jenkins returns a 302 from this URL, unless Referer is not set,
         # then you get a 404.
         request = urllib2.Request(self.server + CANCEL_QUEUE % locals(),
+                                  urllib.urlencode({}),
                                   headers={'Referer': self.server})
         self.jenkins_open(request)
 
