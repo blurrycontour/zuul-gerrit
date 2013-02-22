@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAM3/+qBY\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 489,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-02-22T17:23:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAM3/+rPg\u003d",
+      "revId": "5a68ec80590d3e8d539edfd9d67e36da3dae862f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAM3/+rPY\u003d",
         "filename": "doc/source/zuul.rst",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2013-02-21T23:27:14Z",
       "side": 1,
       "message": "The projecttemplates/Project templates",
+      "revId": "5a68ec80590d3e8d539edfd9d67e36da3dae862f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAM3/+qBQ\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 494,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-02-22T17:23:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAM3/+rPY\u003d",
       "revId": "5a68ec80590d3e8d539edfd9d67e36da3dae862f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAM3/+qBI\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 498,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-02-22T17:23:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAM3/+rPU\u003d",
+      "revId": "5a68ec80590d3e8d539edfd9d67e36da3dae862f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAM3/+rPM\u003d",
         "filename": "doc/source/zuul.rst",
         "patchSetId": 1
@@ -64,6 +118,24 @@
       "writtenOn": "2013-02-21T23:27:14Z",
       "side": 1,
       "message": "each of the non-merge jobs is missing a closing quote",
+      "revId": "5a68ec80590d3e8d539edfd9d67e36da3dae862f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAM3/+qBE\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 511,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-02-22T17:23:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAM3/+rPM\u003d",
       "revId": "5a68ec80590d3e8d539edfd9d67e36da3dae862f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAM3/+qA0\u003d",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-02-22T17:23:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAM3/+rO0\u003d",
+      "revId": "5a68ec80590d3e8d539edfd9d67e36da3dae862f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAM3/+rOk\u003d",
         "filename": "zuul/layoutvalidator.py",
         "patchSetId": 1
@@ -98,6 +188,41 @@
       "writtenOn": "2013-02-21T23:27:14Z",
       "side": 1,
       "message": "project_templates",
+      "revId": "5a68ec80590d3e8d539edfd9d67e36da3dae862f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAM3/+qAs\u003d",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-02-22T17:23:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAM3/+rOk\u003d",
+      "revId": "5a68ec80590d3e8d539edfd9d67e36da3dae862f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAM3/+qAk\u003d",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-02-22T17:23:15Z",
+      "side": 1,
+      "message": "Updated those to use dash / underscore.",
       "revId": "5a68ec80590d3e8d539edfd9d67e36da3dae862f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -121,6 +246,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAM3/+qAc\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-02-22T17:23:15Z",
+      "side": 1,
+      "message": "moved to /dev/null",
+      "parentUuid": "AAAAM3/+rOE\u003d",
+      "revId": "5a68ec80590d3e8d539edfd9d67e36da3dae862f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAM3/+rOA\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 1
@@ -132,6 +275,24 @@
       "writtenOn": "2013-02-21T23:27:14Z",
       "side": 1,
       "message": "I don\u0027t think you have to mention that it diverges.  also, s/dictionnary/dictionary/.",
+      "revId": "5a68ec80590d3e8d539edfd9d67e36da3dae862f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAM3/+qAM\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-02-22T17:23:15Z",
+      "side": 1,
+      "message": "I have added that comment in case someone want to resynchronize it with the JJB one.  I guess that is not useful after-all :-)\n\nRemoved, instead I have added a note in the commit message.",
+      "parentUuid": "AAAAM3/+rOA\u003d",
       "revId": "5a68ec80590d3e8d539edfd9d67e36da3dae862f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -155,6 +316,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAM3/+p/4\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-02-22T17:23:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAM3/+rN0\u003d",
+      "revId": "5a68ec80590d3e8d539edfd9d67e36da3dae862f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAM3/+rMY\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 1
@@ -166,6 +345,24 @@
       "writtenOn": "2013-02-21T23:27:14Z",
       "side": 1,
       "message": "start a new dictionary here with a copy of config_project so you don\u0027t have to modify config_project.  call it new_config_project, or something.",
+      "revId": "5a68ec80590d3e8d539edfd9d67e36da3dae862f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAM3/+p/Y\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-02-22T17:23:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAM3/+rMY\u003d",
       "revId": "5a68ec80590d3e8d539edfd9d67e36da3dae862f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -189,6 +386,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAM3/+p/0\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-02-22T17:23:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAM3/+rNg\u003d",
+      "revId": "5a68ec80590d3e8d539edfd9d67e36da3dae862f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAM3/+rMc\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 1
@@ -206,6 +421,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAM3/+p+k\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-02-22T17:23:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAM3/+rMc\u003d",
+      "revId": "5a68ec80590d3e8d539edfd9d67e36da3dae862f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAM3/+rMU\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 1
@@ -217,6 +450,24 @@
       "writtenOn": "2013-02-21T23:27:14Z",
       "side": 1,
       "message": "then be sure to change this to new_config_project.",
+      "revId": "5a68ec80590d3e8d539edfd9d67e36da3dae862f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAM3/+p+g\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-02-22T17:23:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAM3/+rMU\u003d",
       "revId": "5a68ec80590d3e8d539edfd9d67e36da3dae862f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
