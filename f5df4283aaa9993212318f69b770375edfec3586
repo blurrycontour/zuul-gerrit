@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAM3/+nno\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1904,
+      "author": {
+        "id": 6316
+      },
+      "writtenOn": "2013-02-25T17:19:14Z",
+      "side": 1,
+      "message": "a_zref, b_zref and c_zref are set to value None (line 1894) and then assigned a value in the iteration loop. Shouldn\u0027t d_zref also be set to value None since it is assigned a value in the iteration loop?",
+      "revId": "f5df4283aaa9993212318f69b770375edfec3586",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
