@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAM3/+kYU\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1142,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-02-27T03:47:52Z",
+      "side": 1,
+      "message": "Before we return here do we need to set change.current_build_set.commit to False or None? I think this is reset for us so this is a noop but may be nice to make it explicit.",
+      "revId": "0dae80c181c63ad4cc9ed12ca88dbed29bb55839",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
