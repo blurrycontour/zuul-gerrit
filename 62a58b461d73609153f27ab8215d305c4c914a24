@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAANH///9k\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 504,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-02-27T22:55:44Z",
+      "side": 1,
+      "message": "magic",
+      "revId": "62a58b461d73609153f27ab8215d305c4c914a24",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
