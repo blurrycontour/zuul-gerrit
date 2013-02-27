@@ -16,6 +16,24 @@
       "revId": "0dae80c181c63ad4cc9ed12ca88dbed29bb55839",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAM3/+jjU\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1142,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-02-27T15:55:33Z",
+      "side": 1,
+      "message": "I think I\u0027d like to just leave it counting on it being unset.  It\u0027s only set in this place (and the mirror place in the other class), so I think it\u0027s pretty well understood.",
+      "parentUuid": "AAAAM3/+kYU\u003d",
+      "revId": "0dae80c181c63ad4cc9ed12ca88dbed29bb55839",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
