@@ -52,6 +52,24 @@
       "revId": "d22077b4c6831a4a97789a8a6a9192ca896b2b4e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAN3//6Wk\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-03-06T19:43:40Z",
+      "side": 1,
+      "message": "I generally treat dict and list parameters as read only, unless there\u0027s an explicit contract that they should be read-write (for example, a recursive function).  This pattern exists in several other places in Zuul, and in the one case where I needed to modify the passed in list, I did this at the top of the function:\n\n        dependent_changes \u003d dependent_changes[:]\n\n(Which makes a copy of the list.)  That\u0027s in launcher/jenkins.py.\n\nIn short, I think it\u0027s safer to be conservative about modifying passed values, and I don\u0027t think it needs a comment.",
+      "parentUuid": "AAAAN3//6Xw\u003d",
+      "revId": "d22077b4c6831a4a97789a8a6a9192ca896b2b4e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
