@@ -34,6 +34,24 @@
       "revId": "d22077b4c6831a4a97789a8a6a9192ca896b2b4e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAN3//6Xw\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-03-06T19:28:16Z",
+      "side": 1,
+      "message": "Ok, I can live with this. Do you think it deserves a comment? or is knowledge of the language what we will rely on here (this is a reasonable thing to do as well).",
+      "parentUuid": "AAAAN3//6a8\u003d",
+      "revId": "d22077b4c6831a4a97789a8a6a9192ca896b2b4e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
