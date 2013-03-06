@@ -16,6 +16,24 @@
       "revId": "d22077b4c6831a4a97789a8a6a9192ca896b2b4e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAN3//6a8\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-03-06T19:09:29Z",
+      "side": 1,
+      "message": "files is not modified, it is treated as a read-only, or input, parameter.  So the fact that the default value is a singleton is fine.",
+      "parentUuid": "AAAAN3//6eU\u003d",
+      "revId": "d22077b4c6831a4a97789a8a6a9192ca896b2b4e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
