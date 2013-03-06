@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAN3//6eU\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-03-06T18:39:43Z",
+      "side": 1,
+      "message": "Having a list as the default value here is often not what you want because files will always refer to the same list on subsequent calls. The default values are evaluated when the function is parsed not when it is called.\n\nA common way around this is to set it to None then have a quick if not files: files \u003d [] at the start of the function.",
+      "revId": "d22077b4c6831a4a97789a8a6a9192ca896b2b4e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
