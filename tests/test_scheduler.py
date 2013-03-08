@@ -441,10 +441,12 @@ class FakeJenkinsJob(threading.Thread):
         if self.canceled:
             self.jenkins.all_jobs.remove(self)
             return
+        self.jenkins.lock.acquire()
         self.callback.jenkins_endpoint(FakeJenkinsEvent(self.name,
                                                         self.number,
                                                         self.parameters,
                                                         'STARTED'))
+        self.jenkins.lock.release()
         if self.jenkins.hold_jobs_in_build:
             self._wait()
         self.log.debug("Job %s continuing" % (self.parameters['UUID']))
