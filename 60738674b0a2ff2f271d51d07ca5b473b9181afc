@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAOH//5cA\u003d",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-03-21T19:18:19Z",
+      "side": 1,
+      "message": "I think this works because zuul.version doesn\u0027t actually import anything that imports paramiko, but to keep things simple, maybe we should do what the comment says and import zuul.version only when needed below.",
+      "revId": "60738674b0a2ff2f271d51d07ca5b473b9181afc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAOH//5b8\u003d",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-03-21T19:18:19Z",
+      "side": 1,
+      "message": "import zuul.version here",
+      "revId": "60738674b0a2ff2f271d51d07ca5b473b9181afc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
