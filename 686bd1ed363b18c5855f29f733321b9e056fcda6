@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAOX//9WM\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-04-04T15:35:47Z",
+      "side": 1,
+      "message": "Since this doesn\u0027t actually create a copy, I don\u0027t think this is really doing anything.  I think it\u0027s safe to just keep using config_project and drop new_config project.",
+      "revId": "686bd1ed363b18c5855f29f733321b9e056fcda6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
