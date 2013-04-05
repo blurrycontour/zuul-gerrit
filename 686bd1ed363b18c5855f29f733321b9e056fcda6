@@ -16,6 +16,24 @@
       "revId": "686bd1ed363b18c5855f29f733321b9e056fcda6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAOX//7J8\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-04-05T19:56:44Z",
+      "side": 1,
+      "message": "Ah python assign by reference ...   Patchset 1 was directly changing config_project, you then requested to do a copy to avoid changing config_project directly.  But I am a newbie and did not actually do a copy :-]\n\nRef: line 208 of:\nhttps://review.openstack.org/#/c/21881/1/zuul/scheduler.py,unified\n\nJames wrote:\n------\nstart a new dictionary here with a copy of config_project so you don\u0027t have to modify config_project. call it new_config_project, or something.\n------\n\nI guess I should:\n\n  new_config_project \u003d config_project.copy()",
+      "parentUuid": "AAAAOX//9WM\u003d",
+      "revId": "686bd1ed363b18c5855f29f733321b9e056fcda6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
