@@ -34,6 +34,24 @@
       "revId": "686bd1ed363b18c5855f29f733321b9e056fcda6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAOn///nU\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-04-08T21:30:34Z",
+      "side": 1,
+      "message": "Heh, I guess you caught me in a contradiction.  Sorry.\n\nBut you actually have convinced me (with code and tests) that it\u0027s okay to modify the existing dictionary in this case, so I think I\u0027m going to stick with my latest comment and say just modify it; don\u0027t try to copy.\n\n(But for reference, see the deepcopy python module for how to get a \u0027deep\u0027 copy of a nested python data structure.)",
+      "parentUuid": "AAAAOX//7J8\u003d",
+      "revId": "686bd1ed363b18c5855f29f733321b9e056fcda6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
