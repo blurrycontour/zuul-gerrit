@@ -52,6 +52,24 @@
       "revId": "686bd1ed363b18c5855f29f733321b9e056fcda6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAOn///lM\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-04-08T21:40:01Z",
+      "side": 1,
+      "message": "Or to rephrase it: my python noobiness proven that there is no need to use a copy :-]\n\nTo copy a dict can\u0027t we:\n\n dict_copy \u003d dict.copy() ? :-D\n\nWill amend and phase out the new_config_project variable.",
+      "parentUuid": "AAAAOn///nU\u003d",
+      "revId": "686bd1ed363b18c5855f29f733321b9e056fcda6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
