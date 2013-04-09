@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAOn///Rs\u003d",
+        "filename": "etc/status.html",
+        "patchSetId": 2
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-04-09T00:27:58Z",
+      "side": 1,
+      "message": "Is relying on code.jquery.com for jquery.min.js the preferred way to host jquery.min.js? Previously we were using a local copy.",
+      "revId": "f9fb37178e4708de5c285e202a9729b920a993bf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
