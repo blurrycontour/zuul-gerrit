@@ -16,6 +16,24 @@
       "revId": "f9fb37178e4708de5c285e202a9729b920a993bf",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAOn///K0\u003d",
+        "filename": "etc/status.html",
+        "patchSetId": 2
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 6808
+      },
+      "writtenOn": "2013-04-09T02:01:15Z",
+      "side": 1,
+      "message": "I expect that both Wikimedia and OpenStack will customise this to their needs.\n\nIn my opinion you should use a local version indeed.\n\nHowever it is untrue that this repo was using a local version before. Before it wasn\u0027t using any version, it was pointing to a resource that didn\u0027t exist. I didn\u0027t want to put the burdon of maintenance here to keep jquery up to date here as well so I figured a sensible default is to use it from the CDN. Then any local configuration can do as they please.",
+      "parentUuid": "AAAAOn///Rs\u003d",
+      "revId": "f9fb37178e4708de5c285e202a9729b920a993bf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
