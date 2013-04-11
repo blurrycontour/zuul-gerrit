@@ -33,6 +33,9 @@ setuptools.setup(
     include_package_data=True,
     cmdclass=setup.get_cmdclass(),
     install_requires=requires,
+    extra_requires={
+        'statsd': ['statsd==1.0.0'],
+    },
     dependency_links=depend_links,
     zip_safe=False,
     classifiers=[
