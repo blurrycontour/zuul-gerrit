@@ -29,7 +29,10 @@ import model
 from model import Pipeline, Job, Project, ChangeQueue, EventFilter
 import merger
 
-statsd = extras.try_import('statsd.statsd')
+# Will skip statsd import whenever it is not configured
+statsd_host = os.environ.get('STATSD_HOST')
+if statsd_host:
+    statsd = extras.try_import('statsd.statsd')
 
 
 class Scheduler(threading.Thread):
@@ -366,6 +369,9 @@ class Scheduler(threading.Thread):
     def run(self):
         if statsd:
             self.log.debug("Statsd enabled")
+        elif statsd_host is None:
+            self.log.debug("Statsd disabled since no host has been "
+                           " set in STATSD_HOST env variable")
         else:
             self.log.debug("Statsd disabled because python statsd "
                            "package not found")
