@@ -7,5 +7,5 @@ GitPython>=0.3.2.RC1
 lockfile
 python-daemon
 extras
-statsd==1.0.0
+statsd>=2.0.1
 voluptuous>=0.6,<0.7
