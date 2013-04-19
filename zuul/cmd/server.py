@@ -113,6 +113,7 @@ class Server(object):
 
         jenkins = zuul.launcher.jenkins.Jenkins(self.config, self.sched)
         gerrit = zuul.trigger.gerrit.Gerrit(self.config, self.sched)
+        gerrit.start()
 
         self.sched.setLauncher(jenkins)
         self.sched.setTrigger(gerrit)

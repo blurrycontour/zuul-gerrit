@@ -99,6 +99,7 @@ class Gerrit(object):
     replication_retry_interval = 5
 
     def __init__(self, config, sched):
+        """Prepare a Gerrit connection. Use start() to actually uses it."""
         self.sched = sched
         self.config = config
         self.server = config.get('gerrit', 'server')
@@ -116,9 +117,11 @@ class Gerrit(object):
         else:
             port = 29418
         self.gerrit = gerrit.Gerrit(self.server, user, port, sshkey)
+
+    def start(self):
         self.gerrit.startWatching()
         self.gerrit_connector = GerritEventConnector(
-            self.gerrit, sched)
+            self.gerrit, self.sched)
         self.gerrit_connector.start()
 
     def stop(self):

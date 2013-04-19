@@ -685,6 +685,7 @@ class testScheduler(unittest.TestCase):
         self.gerrit = FakeGerritTrigger(self.config, self.sched)
         self.gerrit.replication_timeout = 1.5
         self.gerrit.replication_retry_interval = 0.5
+        self.gerrit.start()
         self.fake_gerrit = self.gerrit.gerrit
 
         self.sched.setLauncher(self.jenkins)
