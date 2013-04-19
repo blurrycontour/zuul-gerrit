@@ -49,6 +49,9 @@ class Server(object):
                             help='validate layout file syntax')
         parser.add_argument('--version', dest='version', action='store_true',
                             help='show zuul version')
+        parser.add_argument('--gerrit-projects', dest='gerrit_projects',
+                            action='store_true',
+                            help='List projects on targetted Gerrit')
         parser.add_argument('--layout-projects', dest='layout_projects',
                             action='store_true',
                             help='List projects defined by layout file')
@@ -103,6 +106,14 @@ class Server(object):
         self.test_config()
         return sorted(self.sched.projects.keys())
 
+    def gerrit_projects(self):
+        logging.basicConfig(level=logging.WARN)
+        import zuul.scheduler
+        import zuul.trigger.gerrit
+        sched = zuul.scheduler.Scheduler()
+        gerrit = zuul.trigger.gerrit.Gerrit(self.config, sched)
+        return gerrit.getProjects()
+
     def main(self):
         # See comment at top of file about zuul imports
         import zuul.scheduler
@@ -151,6 +162,10 @@ def main():
 
     if server.args.layout_projects:
         print "\n".join(server.layout_projects())
+        sys.exit(0)
+
+    if server.args.gerrit_projects:
+        print "\n".join(server.gerrit_projects())
         sys.exit(0)
 
     if server.config.has_option('zuul', 'state_dir'):
