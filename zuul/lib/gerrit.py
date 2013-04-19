@@ -125,6 +125,13 @@ class Gerrit(object):
         out, err = self._ssh(cmd)
         return err
 
+    def lsprojects(self):
+        cmd = 'gerrit ls-projects'
+        out, err = self._ssh(cmd)
+        if err:
+            return False
+        return out.split('\n')
+
     def query(self, query):
         args = '--all-approvals --comments --commit-message'
         args += ' --current-patch-set --dependencies --files'

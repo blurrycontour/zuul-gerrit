@@ -341,6 +341,9 @@ class Gerrit(object):
 
         return change
 
+    def getProjects(self):
+        return self.gerrit.lsprojects()
+
     def getGitUrl(self, project):
         server = self.config.get('gerrit', 'server')
         user = self.config.get('gerrit', 'user')

@@ -512,7 +512,7 @@ Starting Zuul
 To start Zuul, run **zuul-server**::
 
   usage: zuul-server [-h] [-c CONFIG] [-l LAYOUT] [-d] [-t] [--version]
-                     [--layout-projects]
+                     [--gerrit-projects] [--layout-projects]
 
   Project gating system.
 
@@ -523,6 +523,7 @@ To start Zuul, run **zuul-server**::
     -d                 do not run as a daemon
     -t                 validate layout file syntax
     --version          show zuul version
+    --gerrit-projects  List projects on targetted Gerrit
     --layout-projects  List projects defined by layout file
 
 
