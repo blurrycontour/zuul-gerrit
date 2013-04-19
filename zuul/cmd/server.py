@@ -49,6 +49,9 @@ class Server(object):
                             help='validate layout file syntax')
         parser.add_argument('--version', dest='version', action='store_true',
                             help='show zuul version')
+        parser.add_argument('--layout-projects', dest='layout_projects',
+                            action='store_true',
+                            help='List projects defined by layout file')
         self.args = parser.parse_args()
 
     def read_config(self):
@@ -95,6 +98,11 @@ class Server(object):
         self.sched = zuul.scheduler.Scheduler()
         self.sched.testConfig(self.config.get('zuul', 'layout_config'))
 
+    def layout_projects(self):
+        logging.basicConfig(level=logging.WARN)
+        self.test_config()
+        return sorted(self.sched.projects.keys())
+
     def main(self):
         # See comment at top of file about zuul imports
         import zuul.scheduler
@@ -138,6 +146,10 @@ def main():
 
     if server.args.validate:
         server.test_config()
+        sys.exit(0)
+
+    if server.args.layout_projects:
+        print "\n".join(server.layout_projects())
         sys.exit(0)
 
     if server.config.has_option('zuul', 'state_dir'):
