@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAOn//yRs\u003d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2013-04-23T14:38:08Z",
+      "side": 1,
+      "message": "The regex for bug linking looks for \"lp\" or \"bug\" here, so try \"Fix bug #1169599\" instead. Or just manually update the bug if you don\u0027t feel like doing another patchset.",
+      "revId": "21291ba1acf27250f870193351ad64e2f06bba4a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
