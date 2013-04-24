@@ -2047,6 +2047,29 @@ class testScheduler(unittest.TestCase):
         self.assertReportedStat('test-timing', '3|ms')
         self.assertReportedStat('test-guage', '12|g')
 
+    def test_status_json(self):
+        log = logging.getLogger(__name__)
+        status = json.loads(self.sched.formatStatusJSON())
+        log.info("JSON STATUS: %s" % status)
+
+        assert set(status.keys()) == set([
+            'result_event_queue', 'trigger_event_queue', 'pipelines'])
+
+        log.info("EVENTS: %s" % status['result_event_queue'])
+        log.info("TRIGGERS: %s" % status['trigger_event_queue'])
+        log.info("PIPELINES: %s" % status['pipelines'])
+
+        assert status['trigger_event_queue'] == {'length': 0}
+        assert status['trigger_event_queue'] == {'length': 0}
+
+        pipelines = status['pipelines']
+        assert len(pipelines) == 4
+
+        a_pipe = pipelines[0]
+        assert set(a_pipe.keys()) == set([
+            'description', 'change_queues', 'name'])
+        assert a_pipe['name'] == 'check'
+
     def test_file_jobs(self):
         "Test that file jobs run only when appropriate"
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
