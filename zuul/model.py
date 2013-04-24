@@ -83,6 +83,7 @@ class Pipeline(object):
                     continue
                 build = changeish.current_build_set.getBuild(job.name)
                 if build:
+                    print "FOUND A BUILD %s for %s" % (self, changeish)
                     result = build.result
                 else:
                     # There is no build for the root of this job tree,

@@ -850,6 +850,8 @@ class testScheduler(unittest.TestCase):
         self.waitUntilSettled()
         jobs = self.fake_jenkins.job_history
 
+        self.assertEmptyQueues()
+
         print jobs
         print A.messages
 
