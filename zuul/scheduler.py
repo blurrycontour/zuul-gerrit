@@ -417,8 +417,8 @@ class Scheduler(threading.Thread):
             self.log.info("Fetching references for %s" % project)
             self.merger.updateRepo(project)
 
+        change = event.getChange(project, self.trigger)
         for pipeline in self.pipelines.values():
-            change = event.getChange(project, self.trigger)
             if event.type == 'patchset-created':
                 pipeline.manager.removeOldVersionsOfChange(change)
             if not pipeline.manager.eventMatches(event):
