@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAOn//ucc\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2052,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-04-25T23:48:22Z",
+      "side": 1,
+      "message": "self.log exists for this purpose.",
+      "revId": "14711581d088d0877dd44883627e05e449a47142",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAOn//ucM\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2054,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-04-25T23:48:22Z",
+      "side": 1,
+      "message": "self.log.info(...)",
+      "revId": "14711581d088d0877dd44883627e05e449a47142",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
