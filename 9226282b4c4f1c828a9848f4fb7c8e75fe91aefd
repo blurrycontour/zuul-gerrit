@@ -52,6 +52,24 @@
       "revId": "9226282b4c4f1c828a9848f4fb7c8e75fe91aefd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAOn//tig\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 899,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-04-26T16:22:22Z",
+      "side": 1,
+      "message": "strftime takes a 9-tuple as input which means it would look exactly the same, except instead of saying:\n\n  elapsed \u003d \u0027 in %d:%02d:%02d\u0027 % (h, m, s)\n\nit would say:\n\n  elapsed \u003d time.strftime(\" in %H:%M:%S\", (0, 0, 0, h, m, s, 0, 0, 0))\n\nWhich is longer and harder to read and I would have wasted all that time counting where to put the zeroes.",
+      "parentUuid": "AAAAOn//tkU\u003d",
+      "revId": "9226282b4c4f1c828a9848f4fb7c8e75fe91aefd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
