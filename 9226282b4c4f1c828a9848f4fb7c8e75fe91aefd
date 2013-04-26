@@ -34,6 +34,24 @@
       "revId": "9226282b4c4f1c828a9848f4fb7c8e75fe91aefd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAOn//th0\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 899,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-04-26T16:21:13Z",
+      "side": 1,
+      "message": "Assuming no test runs for more than 24 hours (maybe this is a bad assumption. You could set the format string to \"%H:%M:%S\" then you would get the time delta as time since the epoch. It should work given my assumption.\n\nAlso, as I think about it I don\u0027t like variable time formats. I am afraid it will confuse our users and they won\u0027t know if the MM:SS is hours and minutes or minutes and seconds. If we stick to HH:MM:SS it will be consistent and help prevent confusion.",
+      "parentUuid": "AAAAOn//tjQ\u003d",
+      "revId": "9226282b4c4f1c828a9848f4fb7c8e75fe91aefd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
