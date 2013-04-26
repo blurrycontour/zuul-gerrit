@@ -16,6 +16,24 @@
       "revId": "9226282b4c4f1c828a9848f4fb7c8e75fe91aefd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAOn//tjQ\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 899,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2013-04-26T16:17:52Z",
+      "side": 1,
+      "message": "Is that really doable with time.strftime() in a sane way? You\u0027d have to get fancy with a datetime.timedelta object instead I think...?",
+      "parentUuid": "AAAAOn//tkU\u003d",
+      "revId": "9226282b4c4f1c828a9848f4fb7c8e75fe91aefd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
