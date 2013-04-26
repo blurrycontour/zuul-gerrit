@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAOn//tkU\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 899,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-04-26T16:11:40Z",
+      "side": 1,
+      "message": "Why not use time.strftime() on the dt to format the output string?",
+      "revId": "9226282b4c4f1c828a9848f4fb7c8e75fe91aefd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
