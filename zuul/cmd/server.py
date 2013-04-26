@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Copyright 2012 Hewlett-Packard Development Company, L.P.
 # Copyright 2013 OpenStack Foundation
 #
@@ -88,7 +89,7 @@ class Server(object):
     def test_config(self):
         # See comment at top of file about zuul imports
         import zuul.scheduler
-        import zuul.launcher.jenkins
+        import zuul.launcher.gearman
         import zuul.trigger.gerrit
 
         logging.basicConfig(level=logging.DEBUG)
@@ -98,15 +99,15 @@ class Server(object):
     def main(self):
         # See comment at top of file about zuul imports
         import zuul.scheduler
-        import zuul.launcher.jenkins
+        import zuul.launcher.gearman
         import zuul.trigger.gerrit
 
         self.sched = zuul.scheduler.Scheduler()
 
-        jenkins = zuul.launcher.jenkins.Jenkins(self.config, self.sched)
+        gearman = zuul.launcher.gearman.Gearman(self.config, self.sched)
         gerrit = zuul.trigger.gerrit.Gerrit(self.config, self.sched)
 
-        self.sched.setLauncher(jenkins)
+        self.sched.setLauncher(gearman)
         self.sched.setTrigger(gerrit)
 
         self.sched.start()
@@ -168,3 +169,8 @@ def main():
         with daemon.DaemonContext(pidfile=pid):
             server.setup_logging()
             server.main()
+
+
+if __name__ == "__main__":
+    sys.path.insert(0, '.')
+    main()
