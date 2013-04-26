@@ -1,0 +1,9 @@
+Verified+2: Jenkins
+Code-Review+2: Clark Boylan <clark.boylan@gmail.com>
+Approved+1: Jeremy Stanley <fungi@yuggoth.org>
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Submitted-by: Jenkins
+Submitted-at: Fri, 26 Apr 2013 16:38:19 +0000
+Reviewed-on: https://review.openstack.org/27570
+Project: openstack-infra/zuul
+Branch: refs/heads/master
