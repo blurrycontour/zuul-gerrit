@@ -28,6 +28,7 @@ import layoutvalidator
 import model
 from model import Pipeline, Job, Project, ChangeQueue, EventFilter
 import merger
+import webapp
 
 statsd = extras.try_import('statsd.statsd')
 
@@ -49,6 +50,8 @@ class Scheduler(threading.Thread):
         self.trigger_event_queue = Queue.Queue()
         self.result_event_queue = Queue.Queue()
         self._init()
+        self.webapp = webapp.WebApp(self)
+        self.webapp.start()
 
     def _init(self):
         self.pipelines = {}
@@ -59,6 +62,8 @@ class Scheduler(threading.Thread):
     def stop(self):
         self._stopped = True
         self.wake_event.set()
+        self.webapp.stop()
+        self.webapp.join()
 
     def testConfig(self, config_path):
         self._init()
