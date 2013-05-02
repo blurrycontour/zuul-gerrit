@@ -144,6 +144,9 @@ class Gerrit(object):
     def _getInfoRefs(self, project):
         url = "%s/p/%s/info/refs?service=git-upload-pack" % (
             self.baseurl, project)
+        if self.config.has_option('gerrit', 'http_password'):
+            # HTTP password is configured, so install HTTP authentication
+            self._installHttpAuthentication(url)
         try:
             data = urllib2.urlopen(url).read()
         except:
@@ -184,6 +187,19 @@ class Gerrit(object):
             revision, ref = line.split()
             ret[ref] = revision
         return ret
+
+    def _installHttpAuthentication(self, url):
+        """Installs HTTP Digest authentication for future urlopen() calls"""
+        user = self.config.get('gerrit', 'user')
+        http_password = self.config.get('gerrit', 'http_password')
+        auth_handler = urllib2.HTTPDigestAuthHandler()
+        auth_handler.add_password(
+            realm='Gerrit Code Review',
+            uri=url,
+            user=user,
+            passwd=http_password)
+        opener = urllib2.build_opener(auth_handler)
+        urllib2.install_opener(opener)
 
     def getRefSha(self, project, ref):
         refs = {}
