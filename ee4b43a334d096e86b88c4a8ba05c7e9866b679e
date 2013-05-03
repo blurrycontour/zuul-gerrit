@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAOn//lHM\u003d",
+        "filename": "zuul/launcher/jenkins.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 400,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-05-03T02:41:11Z",
+      "side": 1,
+      "message": "On line 412 we set build.url \u003d url as well. I think we can just completely remove the if block here as the value set in onBuildStarted should be the same as the one we eventually set here.",
+      "revId": "ee4b43a334d096e86b88c4a8ba05c7e9866b679e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
