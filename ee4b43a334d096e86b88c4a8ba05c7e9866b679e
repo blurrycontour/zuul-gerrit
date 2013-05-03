@@ -16,6 +16,24 @@
       "revId": "ee4b43a334d096e86b88c4a8ba05c7e9866b679e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAOn//lE8\u003d",
+        "filename": "zuul/launcher/jenkins.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 400,
+      "author": {
+        "id": 7456
+      },
+      "writtenOn": "2013-05-03T02:57:44Z",
+      "side": 1,
+      "message": "Per jeblair, it\u0027s possible for onBuildStarted to fire out-of-order or not at all.",
+      "parentUuid": "AAAAOn//lHM\u003d",
+      "revId": "ee4b43a334d096e86b88c4a8ba05c7e9866b679e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
