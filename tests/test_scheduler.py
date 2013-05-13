@@ -74,6 +74,13 @@ def init_repo(project):
     path = os.path.join(UPSTREAM_ROOT, project)
     repo = git.Repo.init(path)
 
+    fn = os.path.join(path, '.git/config')
+    f = open(fn, 'a')
+    f.write("[user]\n")
+    f.write("\tname = User Name\n")
+    f.write("\temail = user@example.org")
+    f.close()
+
     fn = os.path.join(path, 'README')
     f = open(fn, 'w')
     f.write("test\n")
