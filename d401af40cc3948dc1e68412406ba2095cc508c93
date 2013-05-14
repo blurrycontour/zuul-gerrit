@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAOn//WFE\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-05-14T02:52:23Z",
+      "side": 1,
+      "message": "I\u0027m personally a fan of the old way this call was formatted. Did not realize this particular format was pep8 compliant. Either way lgtm.",
+      "revId": "d401af40cc3948dc1e68412406ba2095cc508c93",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
