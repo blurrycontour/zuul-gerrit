@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAOn//UGY\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 450,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-05-14T23:12:34Z",
+      "side": 1,
+      "message": "IIRC this change back to using poll is acceptable because gear uses poll.",
+      "revId": "1f4c2bb1046d428e67cdb089942f687ae78ad0e1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAOn//UEw\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 932,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-05-14T23:12:34Z",
+      "side": 1,
+      "message": "These two assignments seem to be a common pattern. You can probably just put them in setUp.",
+      "revId": "1f4c2bb1046d428e67cdb089942f687ae78ad0e1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAOn//UDw\u003d",
+        "filename": "zuul/launcher/gearman.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-05-14T23:12:34Z",
+      "side": 1,
+      "message": "Should this be updated in onBuildCompleted as well?",
+      "revId": "1f4c2bb1046d428e67cdb089942f687ae78ad0e1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
