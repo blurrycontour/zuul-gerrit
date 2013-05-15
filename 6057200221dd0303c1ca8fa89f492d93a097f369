@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAO3///h4\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 852,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-05-15T11:19:06Z",
+      "side": 1,
+      "message": "Could use:\n\n self.assertEmptyQueues()\n\nI did so in patchset8 of https://review.openstack.org/#/c/27411/ . That highlight the fact that the second change is still in the dup2 queue (because both changes points to the same build object, the second job is never triggered). See my comment on the other change :-]",
+      "revId": "6057200221dd0303c1ca8fa89f492d93a097f369",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
