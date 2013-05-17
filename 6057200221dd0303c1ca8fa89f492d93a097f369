@@ -16,6 +16,24 @@
       "revId": "6057200221dd0303c1ca8fa89f492d93a097f369",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAPH//+uY\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 852,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-05-17T08:52:21Z",
+      "side": 1,
+      "message": "I have inserted the self.assertEmptyQueues() in PS3",
+      "parentUuid": "AAAAO3///h4\u003d",
+      "revId": "6057200221dd0303c1ca8fa89f492d93a097f369",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
