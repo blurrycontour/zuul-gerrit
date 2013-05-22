@@ -28,6 +28,8 @@ import os
 import sys
 import signal
 
+import gear
+
 # No zuul imports here because they pull in paramiko which must not be
 # imported until after the daemonization.
 # https://github.com/paramiko/paramiko/issues/59
@@ -37,6 +39,7 @@ class Server(object):
     def __init__(self):
         self.args = None
         self.config = None
+        self.gear_server_pid = None
 
     def parse_arguments(self):
         parser = argparse.ArgumentParser(description='Project gating system.')
@@ -84,7 +87,12 @@ class Server(object):
 
     def exit_handler(self, signum, frame):
         signal.signal(signal.SIGUSR1, signal.SIG_IGN)
+        self.stop_gear_server()
         self.sched.exit()
+
+    def term_handler(self, signum, frame):
+        self.stop_gear_server()
+        os._exit(0)
 
     def test_config(self):
         # See comment at top of file about zuul imports
@@ -96,12 +104,32 @@ class Server(object):
         self.sched = zuul.scheduler.Scheduler()
         self.sched.testConfig(self.config.get('zuul', 'layout_config'))
 
+    def start_gear_server(self):
+        child_pid = os.fork()
+        if child_pid == 0:
+            gear.Server(4730)
+            while True:
+                try:
+                    signal.pause()
+                except KeyboardInterrupt:
+                    pass
+        else:
+            self.gear_server_pid = child_pid
+
+    def stop_gear_server(self):
+        if self.gear_server_pid:
+            os.kill(self.gear_server_pid, signal.SIGKILL)
+
     def main(self):
         # See comment at top of file about zuul imports
         import zuul.scheduler
         import zuul.launcher.gearman
         import zuul.trigger.gerrit
         import zuul.webapp
+
+        if (self.config.has_option('gearman', 'internal_server') and
+            self.config.getboolean('gearman', 'internal_server')):
+            self.start_gear_server()
 
         self.sched = zuul.scheduler.Scheduler()
 
@@ -119,6 +147,7 @@ class Server(object):
 
         signal.signal(signal.SIGHUP, self.reconfigure_handler)
         signal.signal(signal.SIGUSR1, self.exit_handler)
+        signal.signal(signal.SIGTERM, self.term_handler)
         while True:
             try:
                 signal.pause()
