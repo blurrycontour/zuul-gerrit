@@ -17,7 +17,7 @@ import setuptools
 from zuul.openstack.common import setup
 
 requires = setup.parse_requirements()
-test_requires = setup.parse_requirements(['tools/test-requires'])
+test_requires = setup.parse_requirements(['test-requirements.txt'])
 depend_links = setup.parse_dependency_links()
 project = 'zuul'
 
