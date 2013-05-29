@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAPH//n7w\u003d",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 7456
+      },
+      "writtenOn": "2013-05-29T01:34:14Z",
+      "side": 1,
+      "message": "Better to ask for forgiveness than to ask for permission. Just assume both the option and the file it references are there, and catch the KeyError (if option does not exist) or IOError (if file does not exist). In fact, you could eschew try / except entirely and let the exception bubble up. It\u0027s sufficiently informative in both cases.",
+      "revId": "5e4cd63afb33126443689bcacce37d9074cc33ac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
