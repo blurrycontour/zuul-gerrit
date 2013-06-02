@@ -1267,15 +1267,12 @@ class testScheduler(unittest.TestCase):
         self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
         self.waitUntilSettled()
 
-        jobs = self.fake_jenkins.all_jobs
-
         self.fake_jenkins.fakeRelease('.*-merge')
         self.waitUntilSettled()
         self.fake_jenkins.fakeRelease('.*-merge')
         self.waitUntilSettled()
         self.fake_jenkins.fakeRelease('.*-merge')
         self.waitUntilSettled()
-        ref = jobs[-1].parameters['ZUUL_REF']
         self.fake_jenkins.hold_jobs_in_queue = False
         self.fake_jenkins.fakeRelease()
         self.waitUntilSettled()
@@ -1412,9 +1409,6 @@ class testScheduler(unittest.TestCase):
         self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
         self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
         self.waitUntilSettled()
-
-        jobs = self.fake_jenkins.all_jobs
-        finished_jobs = self.fake_jenkins.job_history
 
         assert A.data['status'] == 'MERGED'
         assert A.reported == 2
@@ -1556,7 +1550,6 @@ class testScheduler(unittest.TestCase):
         self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
 
         self.waitUntilSettled()
-        jobs = self.fake_jenkins.all_jobs
         finished_jobs = self.fake_jenkins.job_history
 
         assert A.data['status'] == 'MERGED'
@@ -1572,7 +1565,6 @@ class testScheduler(unittest.TestCase):
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
 
         self.waitUntilSettled()
-        jobs = self.fake_jenkins.all_jobs
         finished_jobs = self.fake_jenkins.job_history
 
         assert A.data['status'] == 'NEW'
@@ -1589,7 +1581,6 @@ class testScheduler(unittest.TestCase):
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
 
         self.waitUntilSettled()
-        jobs = self.fake_jenkins.all_jobs
         finished_jobs = self.fake_jenkins.job_history
 
         assert A.data['status'] == 'NEW'
@@ -2037,7 +2028,6 @@ class testScheduler(unittest.TestCase):
         self.waitUntilSettled()
 
         jobs = self.fake_jenkins.all_jobs
-        finished_jobs = self.fake_jenkins.job_history
 
         a_zref = b_zref = c_zref = d_zref = None
         for x in jobs:
@@ -2118,7 +2108,6 @@ class testScheduler(unittest.TestCase):
         self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
         self.waitUntilSettled()
 
-        jobs = self.fake_jenkins.all_jobs
         finished_jobs = self.fake_jenkins.job_history
 
         testfile_jobs = [x for x in finished_jobs
