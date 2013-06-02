@@ -1,5 +1,7 @@
 coverage
-nose
-nosehtmloutput
 sphinx
 docutils==0.9.1
+fixtures>=0.3.12
+python-subunit
+testrepository>=0.0.13
+testtools>=0.9.27
