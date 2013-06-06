@@ -33,6 +33,24 @@
       "revId": "d29d7f13fc291da07ec0f95be637eae9a5524afe",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAPX//4nM\u003d",
+        "filename": "zuul/launcher/gearman.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-06-06T18:38:00Z",
+      "side": 1,
+      "message": "From the gearman protocol doc \"the list is terminated with a line containing a single \u0027.\u0027 (period).\" parts[0] containing only \u0027.\u0027 doesn\u0027t contain any data and instead terminates the listing.",
+      "parentUuid": "AAAAPX//5H0\u003d",
+      "revId": "d29d7f13fc291da07ec0f95be637eae9a5524afe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
