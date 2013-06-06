@@ -16,6 +16,24 @@
       "revId": "5e4cd63afb33126443689bcacce37d9074cc33ac",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAPX//5T0\u003d",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2013-06-06T15:30:15Z",
+      "side": 1,
+      "message": "That\u0027s really more of a coding style recommendation. While I agree that just letting exceptions fly is slightly more efficient in tight loops (and absolutely more Pythonic), my years of abuse by lower-level languages also makes me lean on conditionals when there\u0027s no real need. There are plenty of similar conditional checks throughout this program, so I don\u0027t think one more is worth debating.",
+      "parentUuid": "AAAAPH//n7w\u003d",
+      "revId": "5e4cd63afb33126443689bcacce37d9074cc33ac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
