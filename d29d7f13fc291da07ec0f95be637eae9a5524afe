@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAPX//5JI\u003d",
+        "filename": "zuul/launcher/gearman.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2013-06-06T16:21:36Z",
+      "side": 1,
+      "message": "Calling time() twice in the loop start here, though I suppose it\u0027s inexpensive and you\u0027re only iterating once a second.",
+      "revId": "d29d7f13fc291da07ec0f95be637eae9a5524afe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAPX//5H0\u003d",
+        "filename": "zuul/launcher/gearman.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2013-06-06T16:21:36Z",
+      "side": 1,
+      "message": "Out of curiosity, under what conditions can response contain a line with only \u0027.\u0027 in it? Is that just a no-op, or some sort of data terminator (a la SMTP)?",
+      "revId": "d29d7f13fc291da07ec0f95be637eae9a5524afe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
