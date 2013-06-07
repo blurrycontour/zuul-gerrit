@@ -555,6 +555,7 @@ class Change(Changeish):
         self.is_current_patchset = True
         self.can_merge = False
         self.is_merged = False
+        self.failed_to_merge = False
 
     def _id(self):
         return '%s,%s' % (self.number, self.patchset)
