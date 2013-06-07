@@ -681,6 +681,8 @@ class FakeGearmanServer(gear.Server):
                 if job.name in connection.functions:
                     if not peek:
                         queue.remove(job)
+                        connection.related_jobs[job.handle] = job
+                        job.worker_connection = connection
                     return job
         return None
 
