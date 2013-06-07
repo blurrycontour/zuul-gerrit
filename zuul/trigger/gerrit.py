@@ -287,6 +287,9 @@ class Gerrit(object):
         change = Change(project)
         change._data = data
 
+        if patchset is None:
+            patchset = data['currentPatchSet']['number']
+
         change.number = number
         change.patchset = patchset
         change.project = project

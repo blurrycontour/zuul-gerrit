@@ -309,7 +309,7 @@ class Gearman(object):
     def cancel(self, build):
         self.log.info("Cancel build %s for job %s" % (build, build.job))
 
-        if build.number:
+        if build.number is not None:
             self.log.debug("Build %s has already started" % build)
             self.cancelRunningBuild(build)
             self.log.debug("Canceled running build %s" % build)
@@ -356,11 +356,11 @@ class Gearman(object):
 
     def onWorkStatus(self, job):
         data = getJobData(job)
-        self.log.info("Build %s update" % job)
+        self.log.info("Build %s update %s " % (job, data))
         build = self.builds.get(job.unique)
         if build:
             self.log.debug("Found build %s" % build)
-            if not build.number:
+            if build.number is None:
                 self.log.info("Build %s started" % job)
                 build.url = data.get('url')
                 build.number = data.get('number')
