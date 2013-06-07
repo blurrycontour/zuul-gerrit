@@ -681,6 +681,8 @@ class FakeGearmanServer(gear.Server):
                 if job.name in connection.functions:
                     if not peek:
                         queue.remove(job)
+                        connection.related_jobs[job.handle] = job
+                        job.worker_connection = connection
                     return job
         return None
 
@@ -985,6 +987,9 @@ class testScheduler(unittest.TestCase):
             'zuul.pipeline.gate.org.project.resident_time')
         self.assertReportedStat(
             'zuul.pipeline.gate.org.project.total_changes', '1|c')
+
+        # Make sure that the change cache is cleared
+        assert len(self.sched.trigger._change_cache.keys()) == 0
 
     def test_duplicate_pipelines(self):
         "Test that a change matching multiple pipelines works"
@@ -1336,11 +1341,11 @@ class testScheduler(unittest.TestCase):
         assert not self.sched.trigger.canMerge(a, mgr.getSubmitAllowNeeds())
 
         A.addApproval('CRVW', 2)
-        a = self.sched.trigger.getChange(1, 2)
+        a = self.sched.trigger.getChange(1, 2, refresh=True)
         assert not self.sched.trigger.canMerge(a, mgr.getSubmitAllowNeeds())
 
         A.addApproval('APRV', 1)
-        a = self.sched.trigger.getChange(1, 2)
+        a = self.sched.trigger.getChange(1, 2, refresh=True)
         assert self.sched.trigger.canMerge(a, mgr.getSubmitAllowNeeds())
         self.assertEmptyQueues()
 
