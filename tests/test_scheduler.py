@@ -1338,11 +1338,11 @@ class testScheduler(unittest.TestCase):
         assert not self.sched.trigger.canMerge(a, mgr.getSubmitAllowNeeds())
 
         A.addApproval('CRVW', 2)
-        a = self.sched.trigger.getChange(1, 2)
+        a = self.sched.trigger.getChange(1, 2, refresh=True)
         assert not self.sched.trigger.canMerge(a, mgr.getSubmitAllowNeeds())
 
         A.addApproval('APRV', 1)
-        a = self.sched.trigger.getChange(1, 2)
+        a = self.sched.trigger.getChange(1, 2, refresh=True)
         assert self.sched.trigger.canMerge(a, mgr.getSubmitAllowNeeds())
         self.assertEmptyQueues()
 
