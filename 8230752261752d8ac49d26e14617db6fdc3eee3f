@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAPn//pmo\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 558,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-06-25T23:25:46Z",
+      "side": 1,
+      "message": "Is this value not equivalent to (not self.is_merged) ?",
+      "revId": "8230752261752d8ac49d26e14617db6fdc3eee3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAPn//plI\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 735,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-06-25T23:25:46Z",
+      "side": 1,
+      "message": "change_behind is not used. I think change_queue.dequeueChange(change) will update change_behind.change_ahead to be None so we can probably just get rid of the assignment here.",
+      "revId": "8230752261752d8ac49d26e14617db6fdc3eee3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAPn//pk8\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 753,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-06-25T23:25:46Z",
+      "side": 1,
+      "message": "Does there need to be an elif ref: block that returns True?\n\nLooks like no because True indicates the ref changed and we must use the existing ref and return False otherwise.",
+      "revId": "8230752261752d8ac49d26e14617db6fdc3eee3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
