@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAPn//oAE\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 558,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-06-26T14:34:57Z",
+      "side": 1,
+      "message": "is_merged is \"has the change been merged into the repo\" (gerrit status:merged)\n\nfailed_to_merge is \"zuul was unable to merge this change while trying to test it\"\n\nOf course, the second one gets moved to a QueueItem in the next change, because it\u0027s not a property of the change, but rather the change\u0027s current state in the queue.  I think that will make things a little more clear.",
+      "parentUuid": "AAAAPn//pmo\u003d",
+      "revId": "8230752261752d8ac49d26e14617db6fdc3eee3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAPn//plI\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 3
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAPn//n/E\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 735,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-06-26T14:34:57Z",
+      "side": 1,
+      "message": "Removed locally; should be corrected in next version of the QueueItem change.",
+      "parentUuid": "AAAAPn//plI\u003d",
+      "revId": "8230752261752d8ac49d26e14617db6fdc3eee3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAPn//pk8\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 3
@@ -47,6 +83,24 @@
       "writtenOn": "2013-06-25T23:25:46Z",
       "side": 1,
       "message": "Does there need to be an elif ref: block that returns True?\n\nLooks like no because True indicates the ref changed and we must use the existing ref and return False otherwise.",
+      "revId": "8230752261752d8ac49d26e14617db6fdc3eee3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAPn//n+Q\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 753,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-06-26T14:34:57Z",
+      "side": 1,
+      "message": "Added the following clarification locally:\n\n        # Returns False on success.\n        # Returns True if we were unable to prepare the ref.\n\nThe return value of true is really used to indicate to the queue processor that something has changed, and it should re-evaluate.",
+      "parentUuid": "AAAAPn//pk8\u003d",
       "revId": "8230752261752d8ac49d26e14617db6fdc3eee3f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
