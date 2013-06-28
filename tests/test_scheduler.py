@@ -684,7 +684,8 @@ class TestScheduler(testtools.TestCase):
         self.useFixture(fixtures.NestedTempfile())
         self.log_fixture = self.useFixture(fixtures.FakeLogger())
 
-        tmp_root = os.environ.get("ZUUL_TEST_ROOT", tempfile.mkdtemp())
+        tmp_root = tempfile.mkdtemp(dir=os.environ.get("ZUUL_TEST_ROOT",
+                                                       '/tmp'))
         self.test_root = os.path.join(tmp_root, "zuul-test")
         self.upstream_root = os.path.join(self.test_root, "upstream")
         self.git_root = os.path.join(self.test_root, "git")
