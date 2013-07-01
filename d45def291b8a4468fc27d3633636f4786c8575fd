@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAPn//cSc\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1031,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-07-01T21:17:55Z",
+      "side": 1,
+      "message": "Maybe this should be in a tearDown for the test class so that it is checked after every test?",
+      "revId": "d45def291b8a4468fc27d3633636f4786c8575fd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAPn//cRM\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-07-01T21:17:55Z",
+      "side": 1,
+      "message": "This is updating the change within the change cache?",
+      "revId": "d45def291b8a4468fc27d3633636f4786c8575fd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
