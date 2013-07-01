@@ -982,7 +982,7 @@ class TestScheduler(testtools.TestCase):
 
     def assertEmptyQueues(self):
         # Make sure there are no orphaned jobs
-        for pipeline in self.sched.pipelines.values():
+        for pipeline in self.sched.layout.pipelines.values():
             for queue in pipeline.queues:
                 if len(queue.queue) != 0:
                     print 'pipeline %s queue %s contents %s' % (
@@ -1013,6 +1013,7 @@ class TestScheduler(testtools.TestCase):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         A.addApproval('CRVW', 2)
         self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        raise Exception("stop")
         self.waitUntilSettled()
         assert self.getJobFromHistory('project-merge').result == 'SUCCESS'
         assert self.getJobFromHistory('project-test1').result == 'SUCCESS'
@@ -1380,7 +1381,7 @@ class TestScheduler(testtools.TestCase):
         # TODO: move to test_gerrit (this is a unit test!)
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         a = self.sched.trigger.getChange(1, 2)
-        mgr = self.sched.pipelines['gate'].manager
+        mgr = self.sched.layout.pipelines['gate'].manager
         assert not self.sched.trigger.canMerge(a, mgr.getSubmitAllowNeeds())
 
         A.addApproval('CRVW', 2)
