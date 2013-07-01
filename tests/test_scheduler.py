@@ -14,32 +14,28 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import unittest
 import ConfigParser
-from cStringIO import StringIO
-import hashlib
-import json
-import logging
 import os
-import pprint
 import Queue
+import hashlib
+import logging
 import random
+import json
+import threading
+import time
+import pprint
 import re
+import urllib2
+import urlparse
 import select
+import statsd
 import shutil
 import socket
 import string
-import subprocess
-import tempfile
-import threading
-import time
-import urllib2
-import urlparse
-
+from cStringIO import StringIO
 import git
 import gear
-import fixtures
-import statsd
-import testtools
 
 import zuul.scheduler
 import zuul.launcher.gearman
@@ -53,19 +49,16 @@ CONFIG.read(os.path.join(FIXTURE_DIR, "zuul.conf"))
 CONFIG.set('zuul', 'layout_config',
            os.path.join(FIXTURE_DIR, "layout.yaml"))
 
+TMP_ROOT = os.environ.get("ZUUL_TEST_ROOT", "/tmp")
+TEST_ROOT = os.path.join(TMP_ROOT, "zuul-test")
+UPSTREAM_ROOT = os.path.join(TEST_ROOT, "upstream")
+GIT_ROOT = os.path.join(TEST_ROOT, "git")
+
+CONFIG.set('zuul', 'git_dir', GIT_ROOT)
+
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(name)-32s '
                     '%(levelname)-8s %(message)s')
-
-
-def repack_repo(path):
-    output = subprocess.Popen(
-        ['git', '--git-dir=%s/.git' % path, 'repack', '-afd'],
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out = output.communicate()
-    if output.returncode:
-        raise Exception("git repack returned %d" % output.returncode)
-    return out
 
 
 def random_sha1():
@@ -77,13 +70,108 @@ class ChangeReference(git.Reference):
     _points_to_commits_only = True
 
 
+def init_repo(project):
+    parts = project.split('/')
+    path = os.path.join(UPSTREAM_ROOT, *parts[:-1])
+    if not os.path.exists(path):
+        os.makedirs(path)
+    path = os.path.join(UPSTREAM_ROOT, project)
+    repo = git.Repo.init(path)
+
+    repo.config_writer().set_value('user', 'email', 'user@example.com')
+    repo.config_writer().set_value('user', 'name', 'User Name')
+    repo.config_writer().write()
+
+    fn = os.path.join(path, 'README')
+    f = open(fn, 'w')
+    f.write("test\n")
+    f.close()
+    repo.index.add([fn])
+    repo.index.commit('initial commit')
+    master = repo.create_head('master')
+    repo.create_tag('init')
+
+    mp = repo.create_head('mp')
+    repo.head.reference = mp
+    f = open(fn, 'a')
+    f.write("test mp\n")
+    f.close()
+    repo.index.add([fn])
+    repo.index.commit('mp commit')
+
+    repo.head.reference = master
+    repo.head.reset(index=True, working_tree=True)
+    repo.git.clean('-x', '-f', '-d')
+
+
+def add_fake_change_to_repo(project, branch, change_num, patchset, msg, fn,
+                            large):
+    path = os.path.join(UPSTREAM_ROOT, project)
+    repo = git.Repo(path)
+    ref = ChangeReference.create(repo, '1/%s/%s' % (change_num,
+                                                    patchset),
+                                 'refs/tags/init')
+    repo.head.reference = ref
+    repo.head.reset(index=True, working_tree=True)
+    repo.git.clean('-x', '-f', '-d')
+
+    path = os.path.join(UPSTREAM_ROOT, project)
+    if not large:
+        fn = os.path.join(path, fn)
+        f = open(fn, 'w')
+        f.write("test %s %s %s\n" % (branch, change_num, patchset))
+        f.close()
+        repo.index.add([fn])
+    else:
+        for fni in range(100):
+            fn = os.path.join(path, str(fni))
+            f = open(fn, 'w')
+            for ci in range(4096):
+                f.write(random.choice(string.printable))
+            f.close()
+            repo.index.add([fn])
+
+    return repo.index.commit(msg)
+
+
+def ref_has_change(ref, change):
+    path = os.path.join(GIT_ROOT, change.project)
+    repo = git.Repo(path)
+    for commit in repo.iter_commits(ref):
+        if commit.message.strip() == ('%s-1' % change.subject):
+            return True
+    return False
+
+
+def job_has_changes(*args):
+    job = args[0]
+    commits = args[1:]
+    if isinstance(job, FakeBuild):
+        parameters = job.parameters
+    else:
+        parameters = json.loads(job.arguments)
+    project = parameters['ZUUL_PROJECT']
+    path = os.path.join(GIT_ROOT, project)
+    repo = git.Repo(path)
+    ref = parameters['ZUUL_REF']
+    sha = parameters['ZUUL_COMMIT']
+    repo_messages = [c.message.strip() for c in repo.iter_commits(ref)]
+    repo_shas = [c.hexsha for c in repo.iter_commits(ref)]
+    commit_messages = ['%s-1' % commit.subject for commit in commits]
+    for msg in commit_messages:
+        if msg not in repo_messages:
+            return False
+    if repo_shas[0] != sha:
+        return False
+    return True
+
+
 class FakeChange(object):
     categories = {'APRV': ('Approved', -1, 1),
                   'CRVW': ('Code-Review', -2, 2),
                   'VRFY': ('Verified', -2, 2)}
 
-    def __init__(self, gerrit, number, project, branch, subject,
-                 status='NEW', upstream_root=None):
+    def __init__(self, gerrit, number, project, branch, subject, status='NEW'):
         self.gerrit = gerrit
         self.reported = 0
         self.queried = 0
@@ -116,38 +204,8 @@ class FakeChange(object):
             'submitRecords': [],
             'url': 'https://hostname/%s' % number}
 
-        self.upstream_root = upstream_root
         self.addPatchset()
         self.data['submitRecords'] = self.getSubmitRecords()
-
-    def add_fake_change_to_repo(self, msg, fn, large):
-        path = os.path.join(self.upstream_root, self.project)
-        repo = git.Repo(path)
-        ref = ChangeReference.create(repo, '1/%s/%s' % (self.number,
-                                                        self.latest_patchset),
-                                     'refs/tags/init')
-        repo.head.reference = ref
-        repo.head.reset(index=True, working_tree=True)
-        repo.git.clean('-x', '-f', '-d')
-
-        path = os.path.join(self.upstream_root, self.project)
-        if not large:
-            fn = os.path.join(path, fn)
-            f = open(fn, 'w')
-            f.write("test %s %s %s\n" %
-                    (self.branch, self.number, self.latest_patchset))
-            f.close()
-            repo.index.add([fn])
-        else:
-            for fni in range(100):
-                fn = os.path.join(path, str(fni))
-                f = open(fn, 'w')
-                for ci in range(4096):
-                    f.write(random.choice(string.printable))
-                f.close()
-                repo.index.add([fn])
-
-        return repo.index.commit(msg)
 
     def addPatchset(self, files=[], large=False):
         self.latest_patchset += 1
@@ -156,7 +214,9 @@ class FakeChange(object):
         else:
             fn = '%s-%s' % (self.branch, self.number)
         msg = self.subject + '-' + str(self.latest_patchset)
-        c = self.add_fake_change_to_repo(msg, fn, large)
+        c = add_fake_change_to_repo(self.project, self.branch,
+                                    self.number, self.latest_patchset,
+                                    msg, fn, large)
         ps_files = [{'file': '/COMMIT_MSG',
                      'type': 'ADDED'},
                     {'file': 'README',
@@ -300,7 +360,7 @@ class FakeChange(object):
         self.data['status'] = 'MERGED'
         self.open = False
 
-        path = os.path.join(self.upstream_root, self.project)
+        path = os.path.join(UPSTREAM_ROOT, self.project)
         repo = git.Repo(path)
         repo.heads[self.branch].commit = \
             repo.commit(self.patchsets[-1]['revision'])
@@ -318,8 +378,7 @@ class FakeGerrit(object):
 
     def addFakeChange(self, project, branch, subject):
         self.change_number += 1
-        c = FakeChange(self, self.change_number, project, branch, subject,
-                       upstream_root=self.upstream_root)
+        c = FakeChange(self, self.change_number, project, branch, subject)
         self.changes[self.change_number] = c
         return c
 
@@ -359,8 +418,7 @@ class BuildHistory(object):
 
 
 class FakeURLOpener(object):
-    def __init__(self, upstream_root, fake_gerrit, url):
-        self.upstream_root = upstream_root
+    def __init__(self, fake_gerrit, url):
         self.fake_gerrit = fake_gerrit
         self.url = url
 
@@ -372,7 +430,7 @@ class FakeURLOpener(object):
         ret += ('000000a31270149696713ba7e06f1beb760f20d359c4abed HEAD\x00'
                 'multi_ack thin-pack side-band side-band-64k ofs-delta '
                 'shallow no-progress include-tag multi_ack_detailed no-done\n')
-        path = os.path.join(self.upstream_root, project)
+        path = os.path.join(UPSTREAM_ROOT, project)
         repo = git.Repo(path)
         for ref in repo.refs:
             r = ref.object.hexsha + ' ' + ref.path + '\n'
@@ -382,12 +440,8 @@ class FakeURLOpener(object):
 
 
 class FakeGerritTrigger(zuul.trigger.gerrit.Gerrit):
-    def __init__(self, upstream_root, *args):
-        super(FakeGerritTrigger, self).__init__(*args)
-        self.upstream_root = upstream_root
-
     def getGitUrl(self, project):
-        return os.path.join(self.upstream_root, project.name)
+        return os.path.join(UPSTREAM_ROOT, project.name)
 
 
 class FakeStatsd(threading.Thread):
@@ -504,14 +558,13 @@ class FakeBuild(threading.Thread):
 
 
 class FakeWorker(gear.Worker):
-    def __init__(self, worker_id, test):
+    def __init__(self, worker_id):
         super(FakeWorker, self).__init__(worker_id)
         self.gearman_jobs = {}
         self.build_history = []
         self.running_builds = []
         self.build_counter = 0
         self.fail_tests = {}
-        self.test = test
 
         self.hold_jobs_in_build = False
         self.lock = threading.Lock()
@@ -593,7 +646,7 @@ class FakeWorker(gear.Worker):
     def shouldFailTest(self, name, ref):
         l = self.fail_tests.get(name, [])
         for change in l:
-            if self.test.ref_has_change(ref, change):
+            if ref_has_change(ref, change):
                 return True
         return False
 
@@ -662,53 +715,25 @@ class FakeGearmanServer(gear.Server):
         self.log.debug("done releasing queued jobs %s (%s)" % (regex, qlen))
 
 
-class TestScheduler(testtools.TestCase):
+class testScheduler(unittest.TestCase):
     log = logging.getLogger("zuul.test")
 
     def setUp(self):
-        super(TestScheduler, self).setUp()
-        test_timeout = os.environ.get('OS_TEST_TIMEOUT', 0)
-        try:
-            test_timeout = int(test_timeout)
-        except ValueError:
-            # If timeout value is invalid do not set a timeout.
-            test_timeout = 0
-        if test_timeout > 0:
-            self.useFixture(fixtures.Timeout(test_timeout, gentle=True))
-
-        if (os.environ.get('OS_STDOUT_CAPTURE') == 'True' or
-            os.environ.get('OS_STDOUT_CAPTURE') == '1'):
-            stdout = self.useFixture(fixtures.StringStream('stdout')).stream
-            self.useFixture(fixtures.MonkeyPatch('sys.stdout', stdout))
-        if (os.environ.get('OS_STDERR_CAPTURE') == 'True' or
-            os.environ.get('OS_STDERR_CAPTURE') == '1'):
-            stderr = self.useFixture(fixtures.StringStream('stderr')).stream
-            self.useFixture(fixtures.MonkeyPatch('sys.stderr', stderr))
-        self.useFixture(fixtures.NestedTempfile())
-        self.log_fixture = self.useFixture(fixtures.FakeLogger())
-
-        tmp_root = tempfile.mkdtemp(dir=os.environ.get("ZUUL_TEST_ROOT",
-                                                       '/tmp'))
-        self.test_root = os.path.join(tmp_root, "zuul-test")
-        self.upstream_root = os.path.join(self.test_root, "upstream")
-        self.git_root = os.path.join(self.test_root, "git")
-
-        CONFIG.set('zuul', 'git_dir', self.git_root)
-        if os.path.exists(self.test_root):
-            shutil.rmtree(self.test_root)
-        os.makedirs(self.test_root)
-        os.makedirs(self.upstream_root)
-        os.makedirs(self.git_root)
+        if os.path.exists(TEST_ROOT):
+            shutil.rmtree(TEST_ROOT)
+        os.makedirs(TEST_ROOT)
+        os.makedirs(UPSTREAM_ROOT)
+        os.makedirs(GIT_ROOT)
 
         # For each project in config:
-        self.init_repo("org/project")
-        self.init_repo("org/project1")
-        self.init_repo("org/project2")
-        self.init_repo("org/project3")
-        self.init_repo("org/one-job-project")
-        self.init_repo("org/nonvoting-project")
-        self.init_repo("org/templated-project")
-        self.init_repo("org/node-project")
+        init_repo("org/project")
+        init_repo("org/project1")
+        init_repo("org/project2")
+        init_repo("org/project3")
+        init_repo("org/one-job-project")
+        init_repo("org/nonvoting-project")
+        init_repo("org/templated-project")
+        init_repo("org/node-project")
 
         self.statsd = FakeStatsd()
         os.environ['STATSD_HOST'] = 'localhost'
@@ -727,7 +752,7 @@ class TestScheduler(testtools.TestCase):
         self.config.readfp(cfg)
         self.config.set('gearman', 'port', str(self.gearman_server.port))
 
-        self.worker = FakeWorker('fake_worker', self)
+        self.worker = FakeWorker('fake_worker')
         self.worker.addServer('127.0.0.1', self.gearman_server.port)
         self.gearman_server.worker = self.worker
 
@@ -735,19 +760,17 @@ class TestScheduler(testtools.TestCase):
 
         def URLOpenerFactory(*args, **kw):
             args = [self.fake_gerrit] + list(args)
-            return FakeURLOpener(self.upstream_root, *args, **kw)
+            return FakeURLOpener(*args, **kw)
 
         urllib2.urlopen = URLOpenerFactory
         self.launcher = zuul.launcher.gearman.Gearman(self.config, self.sched)
 
         zuul.lib.gerrit.Gerrit = FakeGerrit
 
-        self.gerrit = FakeGerritTrigger(
-            self.upstream_root, self.config, self.sched)
+        self.gerrit = FakeGerritTrigger(self.config, self.sched)
         self.gerrit.replication_timeout = 1.5
         self.gerrit.replication_retry_interval = 0.5
         self.fake_gerrit = self.gerrit.gerrit
-        self.fake_gerrit.upstream_root = self.upstream_root
 
         self.sched.setLauncher(self.launcher)
         self.sched.setTrigger(self.gerrit)
@@ -772,70 +795,7 @@ class TestScheduler(testtools.TestCase):
         threads = threading.enumerate()
         if len(threads) > 1:
             self.log.error("More than one thread is running: %s" % threads)
-        super(TestScheduler, self).tearDown()
-
-    def init_repo(self, project):
-        parts = project.split('/')
-        path = os.path.join(self.upstream_root, *parts[:-1])
-        if not os.path.exists(path):
-            os.makedirs(path)
-        path = os.path.join(self.upstream_root, project)
-        repo = git.Repo.init(path)
-
-        repo.config_writer().set_value('user', 'email', 'user@example.com')
-        repo.config_writer().set_value('user', 'name', 'User Name')
-        repo.config_writer().write()
-
-        fn = os.path.join(path, 'README')
-        f = open(fn, 'w')
-        f.write("test\n")
-        f.close()
-        repo.index.add([fn])
-        repo.index.commit('initial commit')
-        master = repo.create_head('master')
-        repo.create_tag('init')
-
-        mp = repo.create_head('mp')
-        repo.head.reference = mp
-        f = open(fn, 'a')
-        f.write("test mp\n")
-        f.close()
-        repo.index.add([fn])
-        repo.index.commit('mp commit')
-
-        repo.head.reference = master
-        repo.head.reset(index=True, working_tree=True)
-        repo.git.clean('-x', '-f', '-d')
-
-    def ref_has_change(self, ref, change):
-        path = os.path.join(self.git_root, change.project)
-        repo = git.Repo(path)
-        for commit in repo.iter_commits(ref):
-            if commit.message.strip() == ('%s-1' % change.subject):
-                return True
-        return False
-
-    def job_has_changes(self, *args):
-        job = args[0]
-        commits = args[1:]
-        if isinstance(job, FakeBuild):
-            parameters = job.parameters
-        else:
-            parameters = json.loads(job.arguments)
-        project = parameters['ZUUL_PROJECT']
-        path = os.path.join(self.git_root, project)
-        repo = git.Repo(path)
-        ref = parameters['ZUUL_REF']
-        sha = parameters['ZUUL_COMMIT']
-        repo_messages = [c.message.strip() for c in repo.iter_commits(ref)]
-        repo_shas = [c.hexsha for c in repo.iter_commits(ref)]
-        commit_messages = ['%s-1' % commit.subject for commit in commits]
-        for msg in commit_messages:
-            if msg not in repo_messages:
-                return False
-        if repo_shas[0] != sha:
-            return False
-        return True
+        #shutil.rmtree(TEST_ROOT)
 
     def registerJobs(self):
         count = 0
@@ -1080,51 +1040,51 @@ class TestScheduler(testtools.TestCase):
         self.waitUntilSettled()
         assert len(self.builds) == 1
         assert self.builds[0].name == 'project-merge'
-        assert self.job_has_changes(self.builds[0], A)
+        assert job_has_changes(self.builds[0], A)
 
         self.worker.release('.*-merge')
         self.waitUntilSettled()
         assert len(self.builds) == 3
         assert self.builds[0].name == 'project-test1'
-        assert self.job_has_changes(self.builds[0], A)
+        assert job_has_changes(self.builds[0], A)
         assert self.builds[1].name == 'project-test2'
-        assert self.job_has_changes(self.builds[1], A)
+        assert job_has_changes(self.builds[1], A)
         assert self.builds[2].name == 'project-merge'
-        assert self.job_has_changes(self.builds[2], A, B)
+        assert job_has_changes(self.builds[2], A, B)
 
         self.worker.release('.*-merge')
         self.waitUntilSettled()
         assert len(self.builds) == 5
         assert self.builds[0].name == 'project-test1'
-        assert self.job_has_changes(self.builds[0], A)
+        assert job_has_changes(self.builds[0], A)
         assert self.builds[1].name == 'project-test2'
-        assert self.job_has_changes(self.builds[1], A)
+        assert job_has_changes(self.builds[1], A)
 
         assert self.builds[2].name == 'project-test1'
-        assert self.job_has_changes(self.builds[2], A, B)
+        assert job_has_changes(self.builds[2], A, B)
         assert self.builds[3].name == 'project-test2'
-        assert self.job_has_changes(self.builds[3], A, B)
+        assert job_has_changes(self.builds[3], A, B)
 
         assert self.builds[4].name == 'project-merge'
-        assert self.job_has_changes(self.builds[4], A, B, C)
+        assert job_has_changes(self.builds[4], A, B, C)
 
         self.worker.release('.*-merge')
         self.waitUntilSettled()
         assert len(self.builds) == 6
         assert self.builds[0].name == 'project-test1'
-        assert self.job_has_changes(self.builds[0], A)
+        assert job_has_changes(self.builds[0], A)
         assert self.builds[1].name == 'project-test2'
-        assert self.job_has_changes(self.builds[1], A)
+        assert job_has_changes(self.builds[1], A)
 
         assert self.builds[2].name == 'project-test1'
-        assert self.job_has_changes(self.builds[2], A, B)
+        assert job_has_changes(self.builds[2], A, B)
         assert self.builds[3].name == 'project-test2'
-        assert self.job_has_changes(self.builds[3], A, B)
+        assert job_has_changes(self.builds[3], A, B)
 
         assert self.builds[4].name == 'project-test1'
-        assert self.job_has_changes(self.builds[4], A, B, C)
+        assert job_has_changes(self.builds[4], A, B, C)
         assert self.builds[5].name == 'project-test2'
-        assert self.job_has_changes(self.builds[5], A, B, C)
+        assert job_has_changes(self.builds[5], A, B, C)
 
         self.worker.hold_jobs_in_build = False
         self.worker.release()
@@ -1181,9 +1141,9 @@ class TestScheduler(testtools.TestCase):
         # There should be one merge job at the head of each queue running
         assert len(self.builds) == 2
         assert self.builds[0].name == 'project-merge'
-        assert self.job_has_changes(self.builds[0], A)
+        assert job_has_changes(self.builds[0], A)
         assert self.builds[1].name == 'project1-merge'
-        assert self.job_has_changes(self.builds[1], B)
+        assert job_has_changes(self.builds[1], B)
 
         # Release the current merge builds
         self.worker.release('.*-merge')
@@ -1230,7 +1190,7 @@ class TestScheduler(testtools.TestCase):
 
         assert len(self.builds) == 1
         assert self.builds[0].name == 'project-merge'
-        assert self.job_has_changes(self.builds[0], A)
+        assert job_has_changes(self.builds[0], A)
 
         self.worker.release('.*-merge')
         self.waitUntilSettled()
@@ -1289,7 +1249,7 @@ class TestScheduler(testtools.TestCase):
         assert len(self.builds) == 0
         assert len(queue) == 1
         assert queue[0].name == 'build:project-merge'
-        assert self.job_has_changes(queue[0], A)
+        assert job_has_changes(queue[0], A)
 
         self.gearman_server.release('.*-merge')
         self.waitUntilSettled()
@@ -1419,7 +1379,7 @@ class TestScheduler(testtools.TestCase):
         self.gearman_server.release()
         self.waitUntilSettled()
 
-        path = os.path.join(self.git_root, "org/project")
+        path = os.path.join(GIT_ROOT, "org/project")
         repo = git.Repo(path)
         repo_messages = [c.message.strip() for c in repo.iter_commits(ref)]
         repo_messages.reverse()
@@ -1514,7 +1474,7 @@ class TestScheduler(testtools.TestCase):
         self.gearman_server.release()
         self.waitUntilSettled()
 
-        path = os.path.join(self.git_root, "org/project")
+        path = os.path.join(GIT_ROOT, "org/project")
         repo = git.Repo(path)
         repo_messages = [c.message.strip() for c in repo.iter_commits(ref)]
         repo_messages.reverse()
@@ -1527,7 +1487,7 @@ class TestScheduler(testtools.TestCase):
         self.test_build_configuration()
         self.test_build_configuration_branch()
         # C has been merged, undo that
-        path = os.path.join(self.upstream_root, "org/project")
+        path = os.path.join(UPSTREAM_ROOT, "org/project")
         repo = git.Repo(path)
         repo.heads.master.commit = repo.commit('init')
         self.test_build_configuration()
@@ -1562,7 +1522,7 @@ class TestScheduler(testtools.TestCase):
         self.gearman_server.release()
         self.waitUntilSettled()
 
-        path = os.path.join(self.git_root, "org/project")
+        path = os.path.join(GIT_ROOT, "org/project")
         repo = git.Repo(path)
 
         repo_messages = [c.message.strip()
@@ -1668,7 +1628,7 @@ class TestScheduler(testtools.TestCase):
 
         assert len(self.builds) == 1
         assert self.builds[0].name == 'project1-merge'
-        assert self.job_has_changes(self.builds[0], A)
+        assert job_has_changes(self.builds[0], A)
 
         self.worker.release('.*-merge')
         self.waitUntilSettled()
@@ -1863,8 +1823,8 @@ class TestScheduler(testtools.TestCase):
         self.assertEmptyQueues()
         self.worker.build_history = []
 
-        path = os.path.join(self.git_root, "org/project")
-        print repack_repo(path)
+        path = os.path.join(GIT_ROOT, "org/project")
+        os.system('git --git-dir=%s/.git repack -afd' % path)
 
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         A.addApproval('CRVW', 2)
@@ -1882,10 +1842,10 @@ class TestScheduler(testtools.TestCase):
         # https://bugs.launchpad.net/zuul/+bug/1078946
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
         A.addPatchset(large=True)
-        path = os.path.join(self.upstream_root, "org/project1")
-        print repack_repo(path)
-        path = os.path.join(self.git_root, "org/project1")
-        print repack_repo(path)
+        path = os.path.join(UPSTREAM_ROOT, "org/project1")
+        os.system('git --git-dir=%s/.git repack -afd' % path)
+        path = os.path.join(GIT_ROOT, "org/project1")
+        os.system('git --git-dir=%s/.git repack -afd' % path)
 
         A.addApproval('CRVW', 2)
         self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
@@ -2155,26 +2115,26 @@ class TestScheduler(testtools.TestCase):
         assert len(refs) == 4
 
         # a ref should have a, not b, and should not be in project2
-        assert self.ref_has_change(a_zref, A)
-        assert not self.ref_has_change(a_zref, B)
-        assert not self.ref_has_change(a_zref, M2)
+        assert ref_has_change(a_zref, A)
+        assert not ref_has_change(a_zref, B)
+        assert not ref_has_change(a_zref, M2)
 
         # b ref should have a and b, and should not be in project2
-        assert self.ref_has_change(b_zref, A)
-        assert self.ref_has_change(b_zref, B)
-        assert not self.ref_has_change(b_zref, M2)
+        assert ref_has_change(b_zref, A)
+        assert ref_has_change(b_zref, B)
+        assert not ref_has_change(b_zref, M2)
 
         # c ref should have a and b in 1, c in 2
-        assert self.ref_has_change(c_zref, A)
-        assert self.ref_has_change(c_zref, B)
-        assert self.ref_has_change(c_zref, C)
-        assert not self.ref_has_change(c_zref, D)
+        assert ref_has_change(c_zref, A)
+        assert ref_has_change(c_zref, B)
+        assert ref_has_change(c_zref, C)
+        assert not ref_has_change(c_zref, D)
 
         # d ref should have a and b in 1, c and d in 2
-        assert self.ref_has_change(d_zref, A)
-        assert self.ref_has_change(d_zref, B)
-        assert self.ref_has_change(d_zref, C)
-        assert self.ref_has_change(d_zref, D)
+        assert ref_has_change(d_zref, A)
+        assert ref_has_change(d_zref, B)
+        assert ref_has_change(d_zref, C)
+        assert ref_has_change(d_zref, D)
 
         self.worker.hold_jobs_in_build = False
         self.worker.release()
