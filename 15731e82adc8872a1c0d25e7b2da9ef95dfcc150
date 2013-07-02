@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAPn//ZeQ\u003d",
+        "filename": "zuul/launcher/gearman.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-07-02T18:28:52Z",
+      "side": 1,
+      "message": "Is this redundant? The daemon value is also set in GearmanCleanup.__init__().",
+      "revId": "15731e82adc8872a1c0d25e7b2da9ef95dfcc150",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
