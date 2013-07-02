@@ -1135,19 +1135,27 @@ class TestScheduler(testtools.TestCase):
 
     def test_failed_changes(self):
         "Test that a change behind a failed change is retested"
+        self.worker.hold_jobs_in_build = True
 
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
         A.addApproval('CRVW', 2)
         B.addApproval('CRVW', 2)
 
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
-
         self.worker.addFailTest('project-test1', A)
 
+        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
         self.waitUntilSettled()
-        assert len(self.history) > 6
+
+        self.worker.release('.*-merge')
+        self.waitUntilSettled()
+
+        self.worker.hold_jobs_in_build = False
+        self.worker.release()
+
+        self.waitUntilSettled()
+        assert len(self.history) == 7
         assert A.data['status'] == 'NEW'
         assert B.data['status'] == 'MERGED'
         assert A.reported == 2
