@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAPn//VTQ\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 691,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-07-03T20:41:14Z",
+      "side": 1,
+      "message": "rootdir\u003dos.environ.get(\"ZUUL_TEST_ROOT\")))\n\n(hardcoding /tmp is wrong).",
+      "revId": "548c6e58230758ae0b9c610f660ee1bb143abcf4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
