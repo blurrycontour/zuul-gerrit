@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAP3///8w\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-07-06T16:55:41Z",
+      "side": 1,
+      "message": "This calls parseConfig() but does not assign the returned value. I think we want to assign the returned value to self.layout otherwise this should be a noop.",
+      "revId": "9c2bcf9ed30f11a381ff44a83ba36a146ecbc4e8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
