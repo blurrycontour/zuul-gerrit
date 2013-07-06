@@ -16,6 +16,24 @@
       "revId": "9c2bcf9ed30f11a381ff44a83ba36a146ecbc4e8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAP3///70\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-07-06T16:59:48Z",
+      "side": 1,
+      "message": "This is just being called for the side effect of raising an exception on error.  The next line of code that is executed is sys.exit(0).",
+      "parentUuid": "AAAAP3///8w\u003d",
+      "revId": "9c2bcf9ed30f11a381ff44a83ba36a146ecbc4e8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
