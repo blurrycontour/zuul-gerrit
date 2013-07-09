@@ -601,7 +601,7 @@ class FakeWorker(gear.Worker):
     def release(self, regex=None):
         builds = self.running_builds[:]
         self.log.debug("releasing build %s (%s)" % (regex,
-                                                   len(self.running_builds)))
+                                                    len(self.running_builds)))
         for build in builds:
             if not regex or re.match(regex, build.name):
                 self.log.debug("releasing build %s" %
