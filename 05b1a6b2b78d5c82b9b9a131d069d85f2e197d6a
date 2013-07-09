@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAP3//4mE\u003d",
+        "filename": "NEWS.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2013-07-09T20:23:05Z",
+      "side": 1,
+      "message": "Typo \"aheand\" here.",
+      "revId": "05b1a6b2b78d5c82b9b9a131d069d85f2e197d6a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
