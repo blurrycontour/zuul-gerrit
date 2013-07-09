@@ -274,7 +274,7 @@ class Gearman(object):
         # ZUUL_SHORT_OLDREV
 
         if callable(job.parameter_function):
-            job.parameter_function(item.change, params)
+            job.parameter_function(item, params)
             self.log.debug("Custom parameter function used for job %s, "
                            "change: %s, params: %s" % (job, item.change,
                                                        params))
