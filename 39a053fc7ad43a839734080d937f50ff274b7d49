@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAP3//0sI\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 469,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-07-10T21:32:05Z",
+      "side": 1,
+      "message": "s/change/item/",
+      "revId": "39a053fc7ad43a839734080d937f50ff274b7d49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAP3//0sE\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 470,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-07-10T21:32:05Z",
+      "side": 1,
+      "message": "s/change/item/",
+      "revId": "39a053fc7ad43a839734080d937f50ff274b7d49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
