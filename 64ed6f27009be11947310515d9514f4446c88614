@@ -1,0 +1,9 @@
+Approved+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Jenkins
+Code-Review+2: Clark Boylan <clark.boylan@gmail.com>
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Submitted-by: Jenkins
+Submitted-at: Thu, 11 Jul 2013 21:54:01 +0000
+Reviewed-on: https://review.openstack.org/36552
+Project: openstack-infra/zuul
+Branch: refs/heads/feature/gearman
