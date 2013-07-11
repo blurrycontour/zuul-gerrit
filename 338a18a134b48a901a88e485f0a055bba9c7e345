@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAP3//wU8\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-07-11T22:45:35Z",
+      "side": 1,
+      "message": "s/dueo/due/.",
+      "revId": "338a18a134b48a901a88e485f0a055bba9c7e345",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAP3//wU4\u003d",
+        "filename": "tests/fixtures/layout.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-07-11T22:45:35Z",
+      "side": 1,
+      "message": "Whitespace...",
+      "revId": "338a18a134b48a901a88e485f0a055bba9c7e345",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAP3//wRI\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 836,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-07-11T22:45:35Z",
+      "side": 1,
+      "message": "dependent_str is only needed in the if block below. Maybe calculate it there instead?",
+      "revId": "338a18a134b48a901a88e485f0a055bba9c7e345",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAP3//wRY\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 847,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-07-11T22:45:35Z",
+      "side": 1,
+      "message": "It feels like this should be a configurable set of messages, but this is a good first pass.",
+      "revId": "338a18a134b48a901a88e485f0a055bba9c7e345",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAP3//wPE\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1031,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-07-11T22:45:35Z",
+      "side": 1,
+      "message": "The MergeFailure here seems clunky, but that isn\u0027t directly related to this change.\n\nSeems clunky because the inabilty to merge seems like something that you can report without exception.",
+      "revId": "338a18a134b48a901a88e485f0a055bba9c7e345",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
