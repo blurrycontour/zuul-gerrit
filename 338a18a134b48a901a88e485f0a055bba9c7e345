@@ -84,6 +84,24 @@
       "revId": "338a18a134b48a901a88e485f0a055bba9c7e345",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAP3//wMQ\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1031,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-07-11T22:57:07Z",
+      "side": 1,
+      "message": "Hrm.  It\u0027s an exceptional situation.  We are instructing gerrit to merge a change, which we expect to merge.  For some reason, that didn\u0027t happen.  Seems like it warrants an exception.  Further, there are cases where even if that happens, it\u0027s okay, so it makes sense to be able to act on that case explicitly.",
+      "parentUuid": "AAAAP3//wPE\u003d",
+      "revId": "338a18a134b48a901a88e485f0a055bba9c7e345",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
