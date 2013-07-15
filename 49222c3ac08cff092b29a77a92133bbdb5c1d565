@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAP3//mpc\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-07-15T23:07:14Z",
+      "side": 1,
+      "message": "At first glance this looks wrong. We are changing j_changes[-1] from a change dict type to a float (remaining_time). I believe this should be:\n\n  j_changes[-1][\u0027remaining_time\u0027] \u003d max(...)",
+      "revId": "49222c3ac08cff092b29a77a92133bbdb5c1d565",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
