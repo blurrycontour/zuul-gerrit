@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAP3//nRk\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-07-15T20:38:01Z",
+      "side": 1,
+      "message": "My english is not on par to properly understand that comment on first parse. Maybe a quick example would help there.   Per our IRC discussion the idea seems to be.\n\nGiven A -\u003e B -\u003e C, if the merge of C and (master + A + B) fails, then C is reported back without waiting for A / B to start being processing.   But then C might be fine and the conflict be caused by B.  I guess that is the main difference, enabling this feature might confuse people about C having a merge conflict when it is really B.\n\nAs for Wikimedia, we do not use DependentPipeline (yet?) so I dont think we will get any impact there.",
+      "revId": "3b9896e6ebc829f14b53e3e0ebacb5f316830a6a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
