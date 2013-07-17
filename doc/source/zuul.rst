@@ -71,6 +71,31 @@ gerrit
   Path to SSH key to use when logging into above server.
   ``sshkey=/home/jenkins/.ssh/id_rsa``
 
+**giturl**
+  A string template representing the URL Zuul will use to clone a repository
+  and fetch git references from. The string is passed via python string format
+  system with some of the parameters described previously (user, server, port
+  and projectname). This let you finely tune from where Zuul will clone.
+
+  The default is to git clone using the Gerrit ssh service:
+
+    ``giturl=ssh://%(user)s@%(server)s:%(port)s/%(projectname)s``
+
+  Since the ssh service might be slow or cause too much stress on Gerrit, one
+  can have the git repositories replicated directly on the Zuul server. The
+  cloning process will thus be achieved locally and would saves up the ssh and
+  Gerrit overhead.
+  Given the bare git repositories are replicated under
+  ``/srv/gerrit/replicated``, one would use:
+
+    ``giturl=/srv/gerrit/replicated/%(projectname)s``
+
+  .. warning::
+
+    When changing ``gerrit.giturl``, Zuul will NOT change the git remote
+    configured in already cloned repositories (under ``zuul.git_dir``. It is
+    your responsability to change the remote URL manually.
+
 zuul
 """"
 

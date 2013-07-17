@@ -1,4 +1,6 @@
 # Copyright 2012 Hewlett-Packard Development Company, L.P.
+# Copyright 2013 Antoine Musso
+# Copyright 2013 Wikimedia Foundation Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -345,7 +347,21 @@ class Gerrit(object):
             port = int(self.config.get('gerrit', 'port'))
         else:
             port = 29418
-        url = 'ssh://%s@%s:%s/%s' % (user, server, port, project.name)
+        if self.config.has_option('gerrit', 'giturl'):
+            url_template = self.config.get('gerrit', 'giturl')
+        else:
+            url_template = 'ssh://%(user)s@%(server)s:%(port)s/%(projectname)s'
+
+        try:
+            url = url_template % {'user': user, 'server': server, 'port': port,
+                                  'projectname': project.name}
+        except TypeError:
+            self.log.exception(
+                "zuul.conf gerrit.giturl is missing required parameters: user,"
+                "server and/or projectname.")
+            raise
+
+        self.log.debug("Git URL for project %s is: %s" % (project.name, url))
         return url
 
     def getGitwebUrl(self, project, sha=None):

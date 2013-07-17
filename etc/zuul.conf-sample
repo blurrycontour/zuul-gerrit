@@ -8,6 +8,7 @@ server=review.example.com
 ;baseurl=https://review.example.com/r
 user=jenkins
 sshkey=/home/jenkins/.ssh/id_rsa
+;giturl=ssh://%(user)s@%(server)s:%(port)s/%(projectname)s
 
 [zuul]
 layout_config=/etc/zuul/layout.yaml
