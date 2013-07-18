@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAQn//+jI\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-07-18T05:12:51Z",
+      "side": 1,
+      "message": "\"This lets you finely tune where Zuul will clone from.\" is slightly more readable.",
+      "revId": "e660ea30fc6e2436260b4f478efcd4ca59f9c1fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAQn//+jM\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 361,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-07-18T05:12:51Z",
+      "side": 1,
+      "message": "I don\u0027t understand this error. I get a KeyError if I provide a template string that uses variables not in [user, server, port, projectname]. Are we trying to account for that error? If so I think you should catch KeyError and the error message should be something like \"zuul.conf gerrit.giturl uses paramters not in [users, ...]\".",
+      "revId": "e660ea30fc6e2436260b4f478efcd4ca59f9c1fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
