@@ -433,7 +433,7 @@ class Scheduler(threading.Thread):
                         item.change.project = project
                         severed = item in shared_queue.severed_heads
                         if not new_pipeline.manager.reEnqueueItem(
-                            item, severed=severed):
+                                item, severed=severed):
                             items_to_remove.append(item)
                 builds_to_remove = []
                 for build, item in old_pipeline.manager.building_jobs.items():
@@ -626,7 +626,7 @@ class BasePipelineManager(object):
         self.failure_action = {}
         self.start_action = {}
         if self.sched.config and self.sched.config.has_option(
-            'zuul', 'report_times'):
+                'zuul', 'report_times'):
             self.report_times = self.sched.config.getboolean(
                 'zuul', 'report_times')
         else:
@@ -807,7 +807,7 @@ class BasePipelineManager(object):
         change_queue = self.pipeline.getQueue(item.change.project)
         change_queue.dequeueItem(item)
         if (keep_severed_heads and not item_ahead and
-            (item.change.is_reportable and not item.reported)):
+                (item.change.is_reportable and not item.reported)):
             self.log.debug("Adding %s as a severed head" % item.change)
             change_queue.addSeveredHead(item)
         self.sched._maintain_trigger_cache = True
@@ -848,7 +848,7 @@ class BasePipelineManager(object):
                     "rebase your change and upload a new patchset."
             all_items = dependent_items + [item]
             if (dependent_items and
-                not dependent_items[-1].current_build_set.commit):
+                    not dependent_items[-1].current_build_set.commit):
                 self.pipeline.setUnableToMerge(item, msg)
                 return True
             commit = self.sched.merger.mergeChanges(all_items, ref)

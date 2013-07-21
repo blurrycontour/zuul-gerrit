@@ -244,7 +244,7 @@ class Merger(object):
                 continue
             repo = self.getRepo(i.change.project)
             if (i.change.project != item.change.project or
-                i.change.branch != item.change.branch):
+                    i.change.branch != item.change.branch):
                 # Create a zuul ref for all dependent changes project
                 # branch combinations as this is the ref that jenkins will
                 # use to test. The ref for change has already been set so

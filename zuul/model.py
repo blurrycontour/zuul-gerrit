@@ -227,7 +227,7 @@ class Pipeline(object):
                     j_changes.append(self.formatItemJSON(e))
                     if (len(j_changes) > 1 and
                         (j_changes[-2]['remaining_time'] is not None) and
-                        (j_changes[-1]['remaining_time'] is not None)):
+                            (j_changes[-1]['remaining_time'] is not None)):
                         j_changes[-1]['remaining_time'] = max(
                             j_changes[-2]['remaining_time'],
                             j_changes[-1]['remaining_time'])
@@ -696,7 +696,7 @@ class Ref(Changeish):
     def equals(self, other):
         if (self.project == other.project
             and self.ref == other.ref
-            and self.newrev == other.newrev):
+                and self.newrev == other.newrev):
             return True
         return False
 
@@ -820,7 +820,7 @@ class EventFilter(object):
         matches_comment_filter = False
         for comment_filter in self.comment_filters:
             if (event.comment is not None and
-                comment_filter.search(event.comment)):
+                    comment_filter.search(event.comment)):
                 matches_comment_filter = True
         if self.comment_filters and not matches_comment_filter:
             return False
@@ -833,7 +833,7 @@ class EventFilter(object):
             matches_email_filter = False
             for email_filter in self.email_filters:
                 if (account_email is not None and
-                    email_filter.search(account_email)):
+                        email_filter.search(account_email)):
                     matches_email_filter = True
             if self.email_filters and not matches_email_filter:
                 return False
@@ -843,7 +843,7 @@ class EventFilter(object):
             matches_approval = False
             for eapproval in event.approvals:
                 if (normalizeCategory(eapproval['description']) == category and
-                    int(eapproval['value']) == int(value)):
+                        int(eapproval['value']) == int(value)):
                     matches_approval = True
             if not matches_approval:
                 return False

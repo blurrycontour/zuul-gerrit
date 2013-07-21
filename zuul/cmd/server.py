@@ -132,7 +132,7 @@ class Server(object):
         import zuul.webapp
 
         if (self.config.has_option('gearman_server', 'start') and
-            self.config.getboolean('gearman_server', 'start')):
+                self.config.getboolean('gearman_server', 'start')):
             self.start_gear_server()
 
         self.setup_logging('zuul', 'log_config')

@@ -294,7 +294,7 @@ class FakeChange(object):
 
     def setMerged(self):
         if (self.depends_on_change and
-            self.depends_on_change.data['status'] != 'MERGED'):
+                self.depends_on_change.data['status'] != 'MERGED'):
             return
         if self.fail_merge:
             return
@@ -680,15 +680,15 @@ class TestScheduler(testtools.TestCase):
             self.useFixture(fixtures.Timeout(test_timeout, gentle=True))
 
         if (os.environ.get('OS_STDOUT_CAPTURE') == 'True' or
-            os.environ.get('OS_STDOUT_CAPTURE') == '1'):
+                os.environ.get('OS_STDOUT_CAPTURE') == '1'):
             stdout = self.useFixture(fixtures.StringStream('stdout')).stream
             self.useFixture(fixtures.MonkeyPatch('sys.stdout', stdout))
         if (os.environ.get('OS_STDERR_CAPTURE') == 'True' or
-            os.environ.get('OS_STDERR_CAPTURE') == '1'):
+                os.environ.get('OS_STDERR_CAPTURE') == '1'):
             stderr = self.useFixture(fixtures.StringStream('stderr')).stream
             self.useFixture(fixtures.MonkeyPatch('sys.stderr', stderr))
         if (os.environ.get('OS_LOG_CAPTURE') == 'True' or
-            os.environ.get('OS_LOG_CAPTURE') == '1'):
+                os.environ.get('OS_LOG_CAPTURE') == '1'):
             self.useFixture(fixtures.FakeLogger(
                 level=logging.DEBUG,
                 format='%(asctime)s %(name)-32s '
@@ -981,9 +981,9 @@ class TestScheduler(testtools.TestCase):
                 self.sched.trigger_event_queue.join()
                 self.sched.result_event_queue.join()
                 if (self.sched.trigger_event_queue.empty() and
-                    self.sched.result_event_queue.empty() and
-                    self.fake_gerrit.event_queue.empty() and
-                    self.areAllBuildsWaiting()):
+                        self.sched.result_event_queue.empty() and
+                        self.fake_gerrit.event_queue.empty() and
+                        self.areAllBuildsWaiting()):
                     self.worker.lock.release()
                     self.log.debug("...settled.")
                     return
