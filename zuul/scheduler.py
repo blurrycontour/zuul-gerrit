@@ -316,10 +316,12 @@ class Scheduler(threading.Thread):
         build.end_time = time.time()
         try:
             if statsd:
-                key = 'zuul.job.%s' % build.job.name
+                jobname = build.job.name.replace('.', '_')
                 if build.result in ['SUCCESS', 'FAILURE'] and build.start_time:
                     dt = int((build.end_time - build.start_time) * 1000)
+                    key = 'zuul.job.%s.%s' % (jobname, build.result)
                     statsd.timing(key, dt)
+                key = 'zuul.job.%s.%s' % (jobname, build.result)
                 statsd.incr(key)
         except:
             self.log.exception("Exception reporting runtime stats")
