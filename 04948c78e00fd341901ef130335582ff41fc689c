@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAQn//iPo\u003d",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-07-29T16:33:11Z",
+      "side": 1,
+      "message": "I really want to read this False as meaning the test failed, but this is being coerced into a bourne return code value.",
+      "revId": "04948c78e00fd341901ef130335582ff41fc689c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
