@@ -159,6 +159,11 @@ class Scheduler(threading.Thread):
                                     email_filters=
                                     toList(trigger.get('email_filter')))
                     manager.event_filters.append(f)
+            elif 'timer' in conf_pipeline['trigger']:
+                pipeline.trigger = self.triggers['timer']
+                for trigger in toList(conf_pipeline['trigger']['timer']):
+                    f = EventFilter(types=['timer'])
+                    manager.event_filters.append(f)
 
         for project_template in data.get('project-templates', []):
             # Make sure the template only contains valid pipelines

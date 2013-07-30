@@ -106,7 +106,10 @@ class Server(object):
             pass
         gerrit = Dummy()
         gerrit.name = 'gerrit'
+        timer = Dummy()
+        timer.name = 'timer'
         sched.registerTrigger(gerrit)
+        sched.registerTrigger(timer)
         self.sched.testConfig(self.config.get('zuul', 'layout_config'))
 
     def start_gear_server(self):
@@ -134,6 +137,7 @@ class Server(object):
         import zuul.scheduler
         import zuul.launcher.gearman
         import zuul.trigger.gerrit
+        import zuul.trigger.timer
         import zuul.webapp
 
         if (self.config.has_option('gearman_server', 'start') and
@@ -146,10 +150,12 @@ class Server(object):
 
         gearman = zuul.launcher.gearman.Gearman(self.config, self.sched)
         gerrit = zuul.trigger.gerrit.Gerrit(self.config, self.sched)
+        timer = zuul.trigger.timer.Timer(self.config, self.sched)
         webapp = zuul.webapp.WebApp(self.sched)
 
         self.sched.setLauncher(gearman)
         self.sched.registerTrigger(gerrit)
+        self.sched.registerTrigger(timer)
 
         self.sched.start()
         self.sched.reconfigure(self.config)

@@ -45,6 +45,7 @@ import zuul.scheduler
 import zuul.webapp
 import zuul.launcher.gearman
 import zuul.trigger.gerrit
+import zuul.trigger.timer
 
 FIXTURE_DIR = os.path.join(os.path.dirname(__file__),
                            'fixtures')
@@ -764,6 +765,8 @@ class TestScheduler(testtools.TestCase):
 
         self.sched.setLauncher(self.launcher)
         self.sched.registerTrigger(self.gerrit)
+        self.timer = zuul.trigger.timer.Timer(self.config, self.sched)
+        self.sched.registerTrigger(self.timer)
 
         self.sched.start()
         self.sched.reconfigure(self.config)
@@ -2336,7 +2339,10 @@ class TestScheduler(testtools.TestCase):
             pass
         gerrit = Dummy()
         gerrit.name = 'gerrit'
+        timer = Dummy()
+        timer.name = 'timer'
         sched.registerTrigger(gerrit)
+        sched.registerTrigger(timer)
         sched.testConfig(CONFIG.get('zuul', 'layout_config'))
 
     def test_build_description(self):

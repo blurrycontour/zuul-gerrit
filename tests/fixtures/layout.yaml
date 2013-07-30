@@ -36,6 +36,12 @@ pipelines:
       verified: 0
     precedence: high
 
+  - name: periodic
+    manager: IndependentPipelineManager
+    trigger:
+      timer:
+        - time: 0 0 * * *
+
   - name: unused
     manager: IndependentPipelineManager
     dequeue-on-new-patchset: false
