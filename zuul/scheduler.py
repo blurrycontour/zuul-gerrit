@@ -74,7 +74,7 @@ class Scheduler(threading.Thread):
         self._exit = False
         self._stopped = False
         self.launcher = None
-        self.trigger = None
+        self.triggers = dict()
         self.config = None
         self._maintain_trigger_cache = False
 
@@ -141,20 +141,24 @@ class Scheduler(threading.Thread):
             manager.success_action = conf_pipeline.get('success')
             manager.failure_action = conf_pipeline.get('failure')
             manager.start_action = conf_pipeline.get('start')
-            for trigger in toList(conf_pipeline['trigger']):
-                approvals = {}
-                for approval_dict in toList(trigger.get('approval')):
-                    for k, v in approval_dict.items():
-                        approvals[k] = v
-                f = EventFilter(types=toList(trigger['event']),
-                                branches=toList(trigger.get('branch')),
-                                refs=toList(trigger.get('ref')),
-                                approvals=approvals,
-                                comment_filters=
-                                toList(trigger.get('comment_filter')),
-                                email_filters=
-                                toList(trigger.get('email_filter')))
-                manager.event_filters.append(f)
+            # TODO: move this into triggers (may require pluggable
+            # configuration)
+            if 'gerrit' in conf_pipeline['trigger']:
+                pipeline.trigger = self.triggers['gerrit']
+                for trigger in toList(conf_pipeline['trigger']['gerrit']):
+                    approvals = {}
+                    for approval_dict in toList(trigger.get('approval')):
+                        for k, v in approval_dict.items():
+                            approvals[k] = v
+                    f = EventFilter(types=toList(trigger['event']),
+                                    branches=toList(trigger.get('branch')),
+                                    refs=toList(trigger.get('ref')),
+                                    approvals=approvals,
+                                    comment_filters=
+                                    toList(trigger.get('comment_filter')),
+                                    email_filters=
+                                    toList(trigger.get('email_filter')))
+                    manager.event_filters.append(f)
 
         for project_template in data.get('project-templates', []):
             # Make sure the template only contains valid pipelines
@@ -272,17 +276,21 @@ class Scheduler(threading.Thread):
         else:
             sshkey = None
 
-        self.merger = merger.Merger(self.trigger, merge_root, push_refs,
+        # TODO: The merger should have an upstream repo independent of
+        # triggers, and then each trigger should provide a fetch
+        # location.
+        self.merger = merger.Merger(self.triggers['gerrit'],
+                                    merge_root, push_refs,
                                     sshkey, merge_email, merge_name)
         for project in self.layout.projects.values():
-            url = self.trigger.getGitUrl(project)
+            url = self.triggers['gerrit'].getGitUrl(project)
             self.merger.addProject(project, url)
 
     def setLauncher(self, launcher):
         self.launcher = launcher
 
-    def setTrigger(self, trigger):
-        self.trigger = trigger
+    def registerTrigger(self, trigger):
+        self.triggers[trigger.name] = trigger
 
     def getProject(self, name):
         self.layout_lock.acquire()
@@ -516,7 +524,8 @@ class Scheduler(threading.Thread):
                 relevant.add(item.change)
                 relevant.update(item.change.getRelatedChanges())
         self.log.debug("Trigger cache size: %s" % len(relevant))
-        self.trigger.maintainCache(relevant)
+        for trigger in self.triggers.values():
+            trigger.maintainCache(relevant)
 
     def process_event_queue(self):
         self.log.debug("Fetching trigger event")
@@ -538,7 +547,8 @@ class Scheduler(threading.Thread):
             self.merger.updateRepo(project)
 
         for pipeline in self.layout.pipelines.values():
-            change = event.getChange(project, self.trigger)
+            change = event.getChange(project,
+                                     self.triggers.get(event.trigger_name))
             if event.type == 'patchset-created':
                 pipeline.manager.removeOldVersionsOfChange(change)
             if pipeline.manager.eventMatches(event):
@@ -700,14 +710,14 @@ class BasePipelineManager(object):
                 return True
         return False
 
-    def reportStart(self, change):
+    def reportStart(self, item, change):
         try:
             self.log.info("Reporting start, action %s change %s" %
                           (self.start_action, change))
             msg = "Starting %s jobs." % self.pipeline.name
             if self.sched.config.has_option('zuul', 'status_url'):
                 msg += "\n" + self.sched.config.get('zuul', 'status_url')
-            ret = self.sched.trigger.report(change, msg, self.start_action)
+            ret = self.pipeline.trigger.report(change, msg, self.start_action)
             if ret:
                 self.log.error("Reporting change start %s received: %s" %
                                (change, ret))
@@ -791,9 +801,9 @@ class BasePipelineManager(object):
         if change_queue:
             self.log.debug("Adding change %s to queue %s" %
                            (change, change_queue))
-            if self.start_action:
-                self.reportStart(change)
             item = change_queue.enqueueChange(change)
+            if self.start_action:
+                self.reportStart(item, change)
             self.reportStats(item)
             self.enqueueChangesBehind(change)
         else:
@@ -1023,8 +1033,8 @@ class BasePipelineManager(object):
             succeeded = self.pipeline.didAllJobsSucceed(item)
             merged = (not ret)
             if merged:
-                merged = self.sched.trigger.isMerged(item.change,
-                                                     item.change.branch)
+                merged = self.pipeline.trigger.isMerged(item.change,
+                                                        item.change.branch)
             self.log.info("Reported change %s status: all-succeeded: %s, "
                           "merged: %s" % (item.change, succeeded, merged))
             if not (succeeded and merged):
@@ -1052,7 +1062,7 @@ class BasePipelineManager(object):
         try:
             self.log.info("Reporting change %s, action: %s" %
                           (item.change, action))
-            ret = self.sched.trigger.report(item.change, report, action)
+            ret = self.pipeline.trigger.report(item.change, report, action)
             if ret:
                 self.log.error("Reporting change %s received: %s" %
                                (item.change, ret))
@@ -1305,8 +1315,8 @@ class DependentPipelineManager(BasePipelineManager):
             self.log.info("    %s" % queue)
 
     def isChangeReadyToBeEnqueued(self, change):
-        if not self.sched.trigger.canMerge(change,
-                                           self.getSubmitAllowNeeds()):
+        if not self.pipeline.trigger.canMerge(change,
+                                              self.getSubmitAllowNeeds()):
             self.log.debug("Change %s can not merge, ignoring" % change)
             return False
         return True
@@ -1318,8 +1328,8 @@ class DependentPipelineManager(BasePipelineManager):
             self.log.debug("  Changeish does not support dependencies")
             return
         for needs in change.needed_by_changes:
-            if self.sched.trigger.canMerge(needs,
-                                           self.getSubmitAllowNeeds()):
+            if self.pipeline.trigger.canMerge(needs,
+                                              self.getSubmitAllowNeeds()):
                 self.log.debug("  Change %s needs %s and is ready to merge" %
                                (needs, change))
                 to_enqueue.append(needs)
@@ -1356,8 +1366,8 @@ class DependentPipelineManager(BasePipelineManager):
         if self.isChangeAlreadyInQueue(change.needs_change):
             self.log.debug("  Needed change is already ahead in the queue")
             return True
-        if self.sched.trigger.canMerge(change.needs_change,
-                                       self.getSubmitAllowNeeds()):
+        if self.pipeline.trigger.canMerge(change.needs_change,
+                                          self.getSubmitAllowNeeds()):
             self.log.debug("  Change %s is needed" %
                            change.needs_change)
             return change.needs_change

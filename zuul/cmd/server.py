@@ -102,6 +102,11 @@ class Server(object):
 
         logging.basicConfig(level=logging.DEBUG)
         self.sched = zuul.scheduler.Scheduler()
+        class Dummy(object):
+            pass
+        gerrit = Dummy()
+        gerrit.name = 'gerrit'
+        sched.registerTrigger(gerrit)
         self.sched.testConfig(self.config.get('zuul', 'layout_config'))
 
     def start_gear_server(self):
@@ -144,7 +149,7 @@ class Server(object):
         webapp = zuul.webapp.WebApp(self.sched)
 
         self.sched.setLauncher(gearman)
-        self.sched.setTrigger(gerrit)
+        self.sched.registerTrigger(gerrit)
 
         self.sched.start()
         self.sched.reconfigure(self.config)
