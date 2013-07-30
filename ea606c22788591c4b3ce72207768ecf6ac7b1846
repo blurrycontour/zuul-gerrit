@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "AAAAQn//c9Y\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2013-07-30T23:53:28Z",
+      "side": 1,
+      "message": "Mentioning the field order (for those nor familiar with the crontab manpage) and also the existence of a sixth seconds field would be great too.",
+      "revId": "ea606c22788591c4b3ce72207768ecf6ac7b1846",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAQn//dEI\u003d",
         "filename": "zuul/layoutvalidator.py",
         "patchSetId": 4
@@ -13,6 +30,23 @@
       "writtenOn": "2013-07-30T23:22:29Z",
       "side": 1,
       "message": "Would be cool to check that the str is in valid accepted cron format. But that can happen in the future.",
+      "revId": "ea606c22788591c4b3ce72207768ecf6ac7b1846",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAQn//c9E\u003d",
+        "filename": "zuul/trigger/timer.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2013-07-30T23:53:28Z",
+      "side": 1,
+      "message": "Month is just a dummy field then? Might also be worth documenting.",
       "revId": "ea606c22788591c4b3ce72207768ecf6ac7b1846",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
