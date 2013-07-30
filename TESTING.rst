@@ -61,6 +61,20 @@ to set up the virtualenv)::
 
   .tox/py27/bin/python -m testtools.run tests.test_scheduler.TestScheduler.test_jobs_launched
 
+
+Hanging Tests
+-------------
+
+The following will run each test in turn and print the name of the
+test as it is run::
+
+  . .tox/py27/bin/activate
+  testr run --subunit | subunit2pyunit
+
+You can compare the output of that to::
+
+  python -m testtools.run discover --list
+
 Need More Info?
 ---------------
 
