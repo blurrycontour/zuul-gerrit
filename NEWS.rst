@@ -6,11 +6,12 @@ Since 1.2.0:
   straightforward.  See the Launchers section of the documentation for
   details.
 
-* Multiple triggers are now supported, in principle (though only
-  Gerrit is defined currently).  Your layout.yaml file will need to
+* Multiple triggers are now supported (currently Gerrit and a simple
+  Timer trigger ar supported).  Your layout.yaml file will need to
   change to add the key "gerrit:" inside of the "triggers:" list to
   specify a Gerrit trigger (and facilitate adding other kinds of
-  triggers later).  See the sample layout.yaml.
+  triggers later).  See the sample layout.yaml and Zuul section of the
+  documentation.
 
 * The custom parameter function signature now takes a QueueItem as the
   first argument, rather than the Change.  The QueueItem has the full
