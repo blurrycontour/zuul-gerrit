@@ -2,7 +2,8 @@ pipelines:
   - name: check
     manager: IndependentPipelineManager
     trigger:
-      - event: patchset-created
+      gerrit:
+        - event: patchset-created
     success:
       verified: 1
     failure:
@@ -11,8 +12,9 @@ pipelines:
   - name: tests
     manager: IndependentPipelineManager
     trigger:
-     - event: patchset-created
-       email_filter: ^.*@example.org$
+      gerrit:
+        - event: patchset-created
+          email_filter: ^.*@example.org$
     success:
       verified: 1
     failure:
@@ -21,8 +23,9 @@ pipelines:
   - name: post
     manager: IndependentPipelineManager
     trigger:
-      - event: ref-updated
-        ref: ^(?!refs/).*$
+      gerrit:
+        - event: ref-updated
+          ref: ^(?!refs/).*$
 
   - name: gate
     manager: DependentPipelineManager
