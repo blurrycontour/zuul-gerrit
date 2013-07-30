@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAQn//dEI\u003d",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-07-30T23:22:29Z",
+      "side": 1,
+      "message": "Would be cool to check that the str is in valid accepted cron format. But that can happen in the future.",
+      "revId": "ea606c22788591c4b3ce72207768ecf6ac7b1846",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
