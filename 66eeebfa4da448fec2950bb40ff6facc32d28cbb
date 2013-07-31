@@ -1,0 +1,10 @@
+Approved+1: James E. Blair <corvus@inaugust.com>
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Verified+2: Jenkins
+Code-Review+2: Clark Boylan <clark.boylan@gmail.com>
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Submitted-by: Jenkins
+Submitted-at: Wed, 31 Jul 2013 21:12:22 +0000
+Reviewed-on: https://review.openstack.org/38942
+Project: openstack-infra/zuul
+Branch: refs/heads/master
