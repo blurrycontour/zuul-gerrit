@@ -375,12 +375,23 @@ class Gearman(object):
         build = self.builds.get(job.unique)
         if build:
             self.log.debug("Found build %s" % build)
+
             if build.number is None:
                 self.log.info("Build %s started" % job)
+                build.name = data.get('name')
                 build.url = data.get('url')
                 build.number = data.get('number')
                 build.__gearman_manager = data.get('manager')
                 self.sched.onBuildStarted(build)
+            else:
+                # check to see if we should update any values
+                for attr, field in [('__gearman_manager', 'manager'),
+                                    ('name', 'name')
+                                    ('number', 'number'),
+                                    ('url', 'url')]:
+                    if data.get(field) not in [None, '']:
+                        setattr(build, attr, data.get(field))
+
             if job.denominator:
                 build.estimated_time = float(job.denominator) / 1000
         else:
