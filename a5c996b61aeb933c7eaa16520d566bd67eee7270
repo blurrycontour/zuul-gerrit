@@ -33,6 +33,23 @@
       "revId": "a5c996b61aeb933c7eaa16520d566bd67eee7270",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAQn/++Bw\u003d",
+        "filename": "zuul/launcher/gearman.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-08-09T06:05:20Z",
+      "side": 1,
+      "message": "A more succinct way to write this would be (completely untested):\n\n  old_number \u003d build.number\n  build.name \u003d data.get(\u0027name\u0027) or build.name\n  .\n  .\n  .\n  build.__gearman_manager \u003d data.get(\u0027manager\u0027) or build.__gearman_manager\n  if not old_number:\n    self.sched.onBuildStarted(build)\n\nThis takes advantage of the fact that python boolean operations short circuit and return the value of the last item evaluated. They do not coerce into True and False (with the exception of not which will).",
+      "revId": "a5c996b61aeb933c7eaa16520d566bd67eee7270",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
