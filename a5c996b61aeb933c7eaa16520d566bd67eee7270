@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAQn/++Cc\u003d",
+        "filename": "zuul/launcher/gearman.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 388,
+      "author": {
+        "id": 7680
+      },
+      "writtenOn": "2013-08-09T05:55:50Z",
+      "side": 1,
+      "message": "Any reason not to write these as `if data.get(\u0027name\u0027)`?",
+      "revId": "a5c996b61aeb933c7eaa16520d566bd67eee7270",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAQn/++CA\u003d",
+        "filename": "zuul/launcher/gearman.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 7680
+      },
+      "writtenOn": "2013-08-09T05:55:50Z",
+      "side": 1,
+      "message": "This almost certainly doesn\u0027t do what you want because of the way `__` attributes work in Python: http://docs.python.org/3/tutorial/classes.html?highlight\u003dname%20mangling#private-variables",
+      "revId": "a5c996b61aeb933c7eaa16520d566bd67eee7270",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
