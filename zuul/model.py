@@ -436,6 +436,8 @@ class Job(object):
         self.failure_pattern = None
         self.success_pattern = None
         self.parameter_function = None
+        self.start_function = None
+        self.complete_function = None
         self.hold_following_changes = False
         self.voting = True
         self.branches = []
@@ -537,6 +539,7 @@ class Build(object):
         self.estimated_time = None
         self.pipeline = None
         self.parameters = {}
+        self.result_data = {}
 
     def __repr__(self):
         return '<Build %s of %s>' % (self.uuid, self.job.name)

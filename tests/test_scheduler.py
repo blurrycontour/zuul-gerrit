@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 # Copyright 2012 Hewlett-Packard Development Company, L.P.
+# Copyright 2013 OpenStack Foundation
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -473,6 +474,7 @@ class FakeBuild(threading.Thread):
             'name': self.name,
             'number': self.number,
             'manager': self.worker.worker_id,
+            'worker': self.worker.worker_id,
         }
 
         self.job.sendWorkData(json.dumps(data))
@@ -519,6 +521,7 @@ class FakeWorker(gear.Worker):
         self.build_counter = 0
         self.fail_tests = {}
         self.test = test
+        self.other_jobs = []
 
         self.hold_jobs_in_build = False
         self.lock = threading.Lock()
@@ -540,6 +543,8 @@ class FakeWorker(gear.Worker):
             self.handleStop(job, name)
         elif cmd == 'set_description':
             self.handleSetDescription(job, name)
+        elif cmd == 'other':
+            self.handleOther(job, name)
 
     def handleBuild(self, job, name, node):
         build = FakeBuild(self, job, self.build_counter, node)
@@ -580,6 +585,12 @@ class FakeWorker(gear.Worker):
                 job.sendWorkComplete()
                 return
         job.sendWorkFail()
+
+    def handleOther(self, job, name):
+        self.log.debug("handle other")
+        parameters = json.loads(job.arguments)
+        self.other_jobs.append(parameters)
+        job.sendWorkComplete()
 
     def work(self):
         while self.running:
@@ -2434,6 +2445,8 @@ class TestScheduler(testtools.TestCase):
     def test_node_label(self):
         "Test that a job runs on a specific node label"
         self.worker.registerFunction('build:node-project-test1:debian')
+        self.worker.registerFunction('other:start-function')
+        self.worker.registerFunction('other:complete-function')
 
         A = self.fake_gerrit.addFakeChange('org/node-project', 'master', 'A')
         A.addApproval('CRVW', 2)
@@ -2444,6 +2457,12 @@ class TestScheduler(testtools.TestCase):
         self.assertEqual(self.getJobFromHistory('node-project-test1').node,
                          'debian')
         self.assertIsNone(self.getJobFromHistory('node-project-test2').node)
+
+        self.assertEqual(len(self.worker.other_jobs), 2)
+        self.assertEqual(self.worker.other_jobs[0]['phase'], 'start')
+        self.assertEqual(self.worker.other_jobs[0]['worker'], 'fake_worker')
+        self.assertEqual(self.worker.other_jobs[1]['phase'], 'complete')
+        self.assertEqual(self.worker.other_jobs[1]['worker'], 'fake_worker')
 
     def test_live_reconfiguration(self):
         "Test that live reconfiguration works"

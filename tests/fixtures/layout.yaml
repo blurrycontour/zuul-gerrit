@@ -93,6 +93,8 @@ jobs:
       - '.*-requires'
   - name: node-project-test1
     parameter-function: select_debian_node
+    start-function: start_function
+    complete-function: complete_function
 
 project-templates:
   - name: test-one-and-two

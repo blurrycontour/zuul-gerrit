@@ -156,8 +156,8 @@ include, and currently supports one type of inclusion, a python file::
 **python-file**
   The path to a python file.  The file will be loaded and objects that
   it defines will be placed in a special environment which can be
-  referenced in the Zuul configuration.  Currently only the
-  parameter-function attribute of a Job uses this feature.
+  referenced in the Zuul configuration.
+
 
 Pipelines
 """""""""
@@ -519,6 +519,30 @@ each job as it builds a list from the project specification.
   If the parameter **ZUUL_NODE** is set by this function, then it will
   be used to specify on what node (or class of node) the job should be
   run.
+
+**start-function (optional)**
+  Specifies a function that should be run when a build starts:
+
+  .. function:: start_function(scheduler, build)
+
+     Called when a build is started.
+
+     :param scheduler: the Zuul Scheduler
+     :type item: zuul.Scheduler
+     :param job: the build that is starting
+     :type job: zuul.model.Build
+
+**complete-function (optional)**
+  Specifies a function that should be run when a build completes:
+
+  .. function:: complete_function(scheduler, build)
+
+     Called when a build is completed.
+
+     :param scheduler: the Zuul Scheduler
+     :type item: zuul.Scheduler
+     :param job: the build that completed
+     :type job: zuul.model.Build
 
 Here is an example of setting the failure message for jobs that check
 whether a change merges cleanly::

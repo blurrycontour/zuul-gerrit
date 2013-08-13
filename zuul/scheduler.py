@@ -197,12 +197,16 @@ class Scheduler(threading.Thread):
             m = config_job.get('voting', None)
             if m is not None:
                 job.voting = m
-            fname = config_job.get('parameter-function', None)
-            if fname:
-                func = config_env.get(fname, None)
-                if not func:
-                    raise Exception("Unable to find function %s" % fname)
-                job.parameter_function = func
+            for yaml_name, python_name in [
+                ('parameter-function', 'parameter_function'),
+                ('start-function', 'start_function'),
+                ('complete-function', 'complete_function')]:
+                fname = config_job.get(yaml_name, None)
+                if fname:
+                    func = config_env.get(fname, None)
+                    if not func:
+                        raise Exception("Unable to find function %s" % fname)
+                    setattr(job, python_name, func)
             branches = toList(config_job.get('branch'))
             if branches:
                 job._branches = branches
@@ -1014,6 +1018,15 @@ class BasePipelineManager(object):
         self.updateBuildDescriptions(build.build_set)
         while self.processQueue():
             pass
+
+        try:
+            if callable(build.job.start_function):
+                build.job.start_function(self.sched, build)
+                self.log.debug("Custom start function used for build %s"
+                               % build)
+        except Exception:
+            self.log.exception("Exception calling start function for build %s"
+                               % build)
         return True
 
     def onBuildCompleted(self, build):
@@ -1035,6 +1048,15 @@ class BasePipelineManager(object):
         self.updateBuildDescriptions(build.build_set)
         while self.processQueue():
             pass
+
+        try:
+            if callable(build.job.complete_function):
+                build.job.complete_function(self.sched, build)
+                self.log.debug("Custom complete function used for build %s"
+                               % build)
+        except Exception:
+            self.log.exception("Exception calling complete function for "
+                               "build %s" % build)
         return True
 
     def reportItem(self, item):
