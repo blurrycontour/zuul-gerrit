@@ -80,6 +80,8 @@ class LayoutSchema(object):
            'hold-following-changes': bool,
            'voting': bool,
            'parameter-function': str,
+           'start-function': str,
+           'complete-function': str,
            'branch': toList(str),
            'files': toList(str),
            }

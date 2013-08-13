@@ -375,16 +375,14 @@ class Gearman(object):
         build = self.builds.get(job.unique)
         if build:
             self.log.debug("Found build %s" % build)
-
             # Allow URL to be updated
             build.url = data.get('url') or build.url
-
+            build.result_data.update(data)
             if build.number is None:
                 self.log.info("Build %s started" % job)
                 build.number = data.get('number')
                 build.__gearman_manager = data.get('manager')
                 self.sched.onBuildStarted(build)
-
             if job.denominator:
                 build.estimated_time = float(job.denominator) / 1000
         else:
