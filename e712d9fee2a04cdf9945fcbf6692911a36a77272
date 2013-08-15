@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "AAAARH//4TE\u003d",
+        "filename": "tests/fixtures/custom_functions_live_reconfiguration_functions.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-15T20:12:51Z",
+      "side": 1,
+      "message": "Yes, I get that, but *this piece of code* is test code. The helper I\u0027m pointing you at can make that exist as an importable module just-in-time; keeping the test all together rather than split out into multiple files, which makes reading and reasoning about the test easier.",
+      "parentUuid": "AAAARH//5Js\u003d",
+      "revId": "e712d9fee2a04cdf9945fcbf6692911a36a77272",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAARH//7Kw\u003d",
         "filename": "tests/test_scheduler.py",
         "patchSetId": 3
