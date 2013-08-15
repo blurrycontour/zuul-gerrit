@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAARH//7LQ\u003d",
+        "filename": "tests/fixtures/custom_functions_live_reconfiguration_functions.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-15T04:30:51Z",
+      "side": 1,
+      "message": "I\u0027m going to assume this is following an existing pattern for testing these things, but fixtures.PythonPackage and friends will let you create arbitrary python modules on the fly, and not have them sit in your namespace as static/global state for tests. If you haven\u0027t looked at that, you might like to do so.",
+      "revId": "e712d9fee2a04cdf9945fcbf6692911a36a77272",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARH//7Kw\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2486,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-15T04:30:51Z",
+      "side": 1,
+      "message": "This line break is awkward for readability, may I suggest you format it as\n\n        self.config.set(\n            \u0027zuul\u0027, \u0027layout_config\u0027,\n            \u0027tests/fixtures/layout-live-reconfiguration-functions.yaml\u0027)\n\nWhich I think will fit in 79 chars. And if that won\u0027t, consider a variable binding instead.",
+      "revId": "e712d9fee2a04cdf9945fcbf6692911a36a77272",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
