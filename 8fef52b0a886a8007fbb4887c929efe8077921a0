@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAARX///XM\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1143,
+      "author": {
+        "id": 7680
+      },
+      "writtenOn": "2013-08-18T19:47:25Z",
+      "side": 1,
+      "message": "It seems like this will result in an UnboundLocalError if there exists a zuul, job_name_in_report option, but it\u0027s set to false.",
+      "revId": "8fef52b0a886a8007fbb4887c929efe8077921a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
