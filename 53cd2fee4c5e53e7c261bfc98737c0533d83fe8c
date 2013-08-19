@@ -1,0 +1,191 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAARn//8ZU\u003d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T21:57:12Z",
+      "side": 1,
+      "message": "This is missing any explanation of /why/ this change is a good thing, why it\u0027s needed. See https://wiki.openstack.org/wiki/GitCommitMessages#Information_in_commit_messages ;)",
+      "revId": "53cd2fee4c5e53e7c261bfc98737c0533d83fe8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//8d8\u003d",
+        "filename": "doc/source/reporters.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T21:57:12Z",
+      "side": 1,
+      "message": "What settings are relevant for the email reporter? What does a minimum config look like? When would default_to and default_from be overridden by zuul? What are the available keys in the pipeline config? Just to?",
+      "revId": "53cd2fee4c5e53e7c261bfc98737c0533d83fe8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//8b0\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T21:57:12Z",
+      "side": 1,
+      "message": "There doesn\u0027t seem to be any need for this to be a global; please use an instance variable instead - it\u0027s a lot safer and cleaner.",
+      "revId": "53cd2fee4c5e53e7c261bfc98737c0533d83fe8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//8bs\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 677,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T21:57:12Z",
+      "side": 1,
+      "message": "log should be assigned during __init__, as logging infrastructure can often be reset during test suites.",
+      "revId": "53cd2fee4c5e53e7c261bfc98737c0533d83fe8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//8bE\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 782,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T21:57:12Z",
+      "side": 1,
+      "message": "This leaves smptlib broken indefinitely - use a fixtures.MonkeyPatch or a mock - either will reset itself at the end of the test.\n\nI suspect one reason you\u0027ve done this is that you\u0027ve modified all the test fixtures to all have smtp reporters glued in. This is bad:\n - it means we\u0027re not testing w/out smtp\n - it means all tests have more work to do\n - and it means there is more binding to global state\n\nI strongly suggest that you setup targeted cases for what you need to test and don\u0027t modify the global / suite wide test setup. It will be faster and easier to reason about.",
+      "revId": "53cd2fee4c5e53e7c261bfc98737c0533d83fe8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//8a0\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2598,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T21:57:12Z",
+      "side": 1,
+      "message": "This VWS line is not needed - and PEP8 actively encourages minimal use of VWS - this isn\u0027t separating logical sections.",
+      "revId": "53cd2fee4c5e53e7c261bfc98737c0533d83fe8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//8ao\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2606,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T21:57:12Z",
+      "side": 1,
+      "message": "This makes no assertion about how many messages are sent. We might be spamming and the test wouldn\u0027t tell us. Can we be a bit more precise about what is meant to happen?",
+      "revId": "53cd2fee4c5e53e7c261bfc98737c0533d83fe8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//8aY\u003d",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T21:57:12Z",
+      "side": 1,
+      "message": "I don\u0027t know enough about the validator language to comment here; would like a zuul core to do so.",
+      "revId": "53cd2fee4c5e53e7c261bfc98737c0533d83fe8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//8Z4\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T21:57:12Z",
+      "side": 1,
+      "message": "- you\u0027re poking into a private attribute of change.\n - this looks like it really belongs in the patchset below as it has nothing to do with SMTP per se.",
+      "revId": "53cd2fee4c5e53e7c261bfc98737c0533d83fe8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//8Zs\u003d",
+        "filename": "zuul/reporter/smtp.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T21:57:12Z",
+      "side": 1,
+      "message": "Docstring!",
+      "revId": "53cd2fee4c5e53e7c261bfc98737c0533d83fe8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//8Zg\u003d",
+        "filename": "zuul/reporter/smtp.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T21:57:12Z",
+      "side": 1,
+      "message": "These guards are the same as the guards on the gerrit reporter - lets factor that out from that reporter and avoid this duplication.",
+      "revId": "53cd2fee4c5e53e7c261bfc98737c0533d83fe8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
