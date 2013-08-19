@@ -54,6 +54,8 @@ class LayoutSchema(object):
     trigger = v.Required(v.Any({'gerrit': toList(gerrit_trigger)},
                                {'timer': toList(timer_trigger)}))
 
+    reporter = toList(v.Any('gerrit'))
+
     pipeline = {v.Required('name'): str,
                 v.Required('manager'): manager,
                 'precedence': precedence,
@@ -63,6 +65,7 @@ class LayoutSchema(object):
                 'dequeue-on-new-patchset': bool,
                 'dequeue-on-conflict': bool,
                 'trigger': trigger,
+                'reporter': reporter,
                 'success': variable_dict,
                 'failure': variable_dict,
                 'start': variable_dict,
@@ -194,6 +197,17 @@ class LayoutValidator(object):
                 raise v.Invalid("Duplicate name: %s" % item['name'],
                                 path + [i])
             items.append(item['name'])
+
+    def legacy_reporter(self, data):
+        """Fixes the data structure for any legacy layout options."""
+
+        # If the pipeline has no reporter set the default to the legacy
+        # behaviour of reporting back to gerrit for gerrit triggers.
+        for i, pipeline in enumerate(data['pipelines']):
+            if ('repoter' not in pipeline
+                and 'gerrit' in pipeline['trigger'].keys()):
+                data['pipelines'][i]['reporter'] = ['gerrit']
+        return data
 
     def validate(self, data):
         schema = LayoutSchema().getSchema(data)

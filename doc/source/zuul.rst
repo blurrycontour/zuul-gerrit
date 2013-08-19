@@ -139,6 +139,18 @@ zuul
   is included).  Defaults to ``false``.
   ``job_name_in_report=true``
 
+legacy
+""""""
+
+**use_gerrit_reporter_by_default**
+  defaults to true when omitted to support legacy configurations.
+  When true any job triggered by gerrit will also be reported back to
+  gerrit.
+  Set to false to be able to disable reporters completely by omitting
+  the reporters dictionary from the pipeline layout.
+  ``use_gerrit_reporter_by_default=true``
+
+
 layout.yaml
 ~~~~~~~~~~~
 

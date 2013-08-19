@@ -84,11 +84,20 @@ class GerritWatcher(threading.Thread):
 class Gerrit(object):
     log = logging.getLogger("gerrit.Gerrit")
 
-    def __init__(self, hostname, username, port=29418, keyfile=None):
-        self.username = username
-        self.hostname = hostname
-        self.port = port
-        self.keyfile = keyfile
+    def __init__(self, config):
+        self.config = config
+
+        self.hostname = config.get('gerrit', 'server')
+        self.username = config.get('gerrit', 'user')
+        if config.has_option('gerrit', 'sshkey'):
+            self.keyfile = config.get('gerrit', 'sshkey')
+        else:
+            self.keyfile = None
+        if config.has_option('gerrit', 'port'):
+            self.port = int(config.get('gerrit', 'port'))
+        else:
+            self.port = 29418
+
         self.watcher_thread = None
         self.event_queue = None
         self.client = None
