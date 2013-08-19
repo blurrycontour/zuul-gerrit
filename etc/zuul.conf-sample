@@ -20,5 +20,10 @@ git_dir=/var/lib/zuul/git
 ;git_user_name=zuul
 status_url=https://jenkins.example.com/zuul/status
 
+[smtp]
+server=localhost
+default_from=zuul@example.com
+default_to=you@example.com
+
 [legacy]
 use_gerrit_reporter_by_default=true
