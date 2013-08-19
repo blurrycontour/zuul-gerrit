@@ -57,6 +57,9 @@ class Pipeline(object):
         self.queues = []
         self.precedence = PRECEDENCE_NORMAL
         self.trigger = None
+        self.start_action = None
+        self.success_action = None
+        self.failure_action = None
 
     def __repr__(self):
         return '<Pipeline %s>' % self.name
@@ -346,6 +349,27 @@ class Pipeline(object):
         else:
             ret['remaining_time'] = None
         return ret
+
+
+class ActionReporter(object):
+    """Pipelines have an ActionReporter for each action they are
+    configured to report on (typically start, success, failure).
+    ActionReporters send the pre-built message to all of the
+    reporters for handling.
+    """
+
+    def __repr__(self):
+        return '<ActionReporter %s>' % self.reporters
+
+    def __init__(self):
+        self.reporters = []
+
+    def addReporter(self, reporter, params):
+        """Add a Reporter to this Action"""
+        self.reporters.append(dict(reporter=reporter, params=params))
+
+    def getReporters(self):
+        return self.reporters
 
 
 class ChangeQueue(object):
