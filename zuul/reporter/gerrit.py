@@ -52,14 +52,12 @@ class Reporter(object):
 
         self.log.debug("Report change %s, action %s, message: %s" %
                        (change, action, message))
-        if not change.number:
-            self.log.debug("Not reporting change %s: No number present." %
-                           change)
-            return
+
         if not action:
             self.log.debug("Not reporting change %s: No action specified." %
                            change)
             return
+
         changeid = '%s,%s' % (change.number, change.patchset)
         ref = 'refs/heads/' + change.branch
         change._ref_sha = self.trigger.getRefSha(change.project.name, ref)

@@ -172,8 +172,6 @@ class Scheduler(threading.Thread):
                                     timespecs=toList(trigger['time']))
                     manager.event_filters.append(f)
 
-            pipeline.setup_reporters(conf_pipeline.get('reporter'))
-
         for project_template in data.get('project-templates', []):
             # Make sure the template only contains valid pipelines
             tpl = dict(
@@ -713,10 +711,10 @@ class BasePipelineManager(object):
         # "needed" in the submit records for a change, with respect
         # to this queue.  In other words, the list of review labels
         # this queue itself is likely to set before submitting.
-        if self.success_action:
-            return self.success_action.keys()
-        else:
-            return {}
+        allow_needs = set()
+        for (reporter_name, action) in self.success_action.items():
+            allow_needs.update(action)
+        return list(allow_needs)
 
     def eventMatches(self, event):
         for ef in self.event_filters:
