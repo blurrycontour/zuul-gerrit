@@ -48,7 +48,6 @@ class Pipeline(object):
         self.queues = []
         self.precedence = PRECEDENCE_NORMAL
         self.trigger = None
-        self.reporters = []
         self.config = config
 
     def __repr__(self):
@@ -338,34 +337,30 @@ class Pipeline(object):
             ret['remaining_time'] = None
         return ret
 
-    def setup_reporters(self, reporters):
-        """Configures the plugins to report to for this pipeline.
-
-        Each plugin is passed the dictionary assigned to it in the
-        layout.yaml configuration.
-
-        """
-        if reporters:
-            for reporter_name in reporters:
-                reporter_module = __import__('zuul.reporter.' + reporter_name,
-                                             fromlist='zuul.reporter')
-
-                self.reporters.append(
-                    reporter_module.Reporter(self.config, self.trigger)
-                )
-
-    def report(self, change, message, action):
+    def report(self, change, message, actions):
         """Sends the built message off to configured reporters.
 
         Takes the change, message and extra options and sends them
         to the pluggable reporters.
 
         """
-        report_success = True
-        for reporter in self.reporters:
-            ret = reporter.report(change, message, action)
-            report_success = False if not report_success else ret
-        return report_success
+        report_errors = []
+        if actions:
+            if not change.number:
+                self.log.debug("Not reporting change %s: No number present."
+                               % change)
+                return
+            for reporter_name, action in actions.items():
+                reporter_module = __import__('zuul.reporter.' + reporter_name,
+                                             fromlist='zuul.reporter')
+
+                reporter = reporter_module.Reporter(self.config, self.trigger)
+                ret = reporter.report(change, message, action)
+                if ret:
+                    report_errors.append(ret)
+        if len(report_errors) == 0:
+            return
+        return report_errors
 
 
 class ChangeQueue(object):

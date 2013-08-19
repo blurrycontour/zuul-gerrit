@@ -54,7 +54,7 @@ class LayoutSchema(object):
     trigger = v.Required(v.Any({'gerrit': toList(gerrit_trigger)},
                                {'timer': toList(timer_trigger)}))
 
-    reporter = toList(v.Any('gerrit'))
+    report_actions = {'gerrit': variable_dict}
 
     pipeline = {v.Required('name'): str,
                 v.Required('manager'): manager,
@@ -65,10 +65,9 @@ class LayoutSchema(object):
                 'dequeue-on-new-patchset': bool,
                 'dequeue-on-conflict': bool,
                 'trigger': trigger,
-                'reporter': reporter,
-                'success': variable_dict,
-                'failure': variable_dict,
-                'start': variable_dict,
+                'success': report_actions,
+                'failure': report_actions,
+                'start': report_actions,
                 }
     pipelines = [pipeline]
 
@@ -201,12 +200,24 @@ class LayoutValidator(object):
     def legacy_reporter(self, data):
         """Fixes the data structure for any legacy layout options."""
 
-        # If the pipeline has no reporter set the default to the legacy
-        # behaviour of reporting back to gerrit for gerrit triggers.
-        for i, pipeline in enumerate(data['pipelines']):
-            if ('repoter' not in pipeline
-                and 'gerrit' in pipeline['trigger'].keys()):
-                data['pipelines'][i]['reporter'] = ['gerrit']
+        if 'pipelines' in data and data['pipelines']:
+            # If the start/success/failure actions don't contain a valid
+            # LayoutSchema().report_actions then we can assume the
+            # configuration is legacy and that items under each action
+            # are paramaters for gerrit.
+            action_schema = v.Schema(LayoutSchema().report_actions)
+
+            for i, pipeline in enumerate(data['pipelines']):
+                for action in ['start', 'success', 'failure']:
+                    if action in pipeline:
+                        try:
+                            action_schema(pipeline[action])
+                        except v.Invalid:
+                            # No valid reporters found so we'll assume
+                            # the action parameters are intended for
+                            # gerrit.
+                            data['pipelines'][i][action] = {
+                                'gerrit': pipeline[action]}
         return data
 
     def validate(self, data):
