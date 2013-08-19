@@ -109,6 +109,12 @@ class Scheduler(threading.Thread):
         data = yaml.load(config_file)
 
         validator = layoutvalidator.LayoutValidator()
+        if (not self.config
+            or not self.config.has_option('legacy',
+                                          'use_gerrit_reporter_by_default')
+            or self.config.getboolean('legacy',
+                                      'use_gerrit_reporter_by_default')):
+            data = validator.legacy_reporter(data)
         validator.validate(data)
 
         config_env = {}
@@ -122,7 +128,7 @@ class Scheduler(threading.Thread):
                 execfile(fn, config_env)
 
         for conf_pipeline in data.get('pipelines', []):
-            pipeline = Pipeline(conf_pipeline['name'])
+            pipeline = Pipeline(conf_pipeline['name'], self.config)
             pipeline.description = conf_pipeline.get('description')
             precedence = model.PRECEDENCE_MAP[conf_pipeline.get('precedence')]
             pipeline.precedence = precedence
@@ -165,6 +171,8 @@ class Scheduler(threading.Thread):
                     f = EventFilter(types=['timer'],
                                     timespecs=toList(trigger['time']))
                     manager.event_filters.append(f)
+
+            pipeline.setup_reporters(conf_pipeline.get('reporter'))
 
         for project_template in data.get('project-templates', []):
             # Make sure the template only contains valid pipelines
@@ -729,7 +737,7 @@ class BasePipelineManager(object):
             msg = "Starting %s jobs." % self.pipeline.name
             if self.sched.config.has_option('zuul', 'status_url'):
                 msg += "\n" + self.sched.config.get('zuul', 'status_url')
-            ret = self.pipeline.trigger.report(change, msg, self.start_action)
+            ret = self.pipeline.report(change, msg, self.start_action)
             if ret:
                 self.log.error("Reporting change start %s received: %s" %
                                (change, ret))
@@ -1074,7 +1082,7 @@ class BasePipelineManager(object):
         try:
             self.log.info("Reporting change %s, action: %s" %
                           (item.change, action))
-            ret = self.pipeline.trigger.report(item.change, report, action)
+            ret = self.pipeline.report(item.change, report, action)
             if ret:
                 self.log.error("Reporting change %s received: %s" %
                                (item.change, ret))

@@ -119,16 +119,7 @@ class Gerrit(object):
             self.baseurl = config.get('gerrit', 'baseurl')
         else:
             self.baseurl = 'https://%s' % self.server
-        user = config.get('gerrit', 'user')
-        if config.has_option('gerrit', 'sshkey'):
-            sshkey = config.get('gerrit', 'sshkey')
-        else:
-            sshkey = None
-        if config.has_option('gerrit', 'port'):
-            port = int(config.get('gerrit', 'port'))
-        else:
-            port = 29418
-        self.gerrit = gerrit.Gerrit(self.server, user, port, sshkey)
+        self.gerrit = gerrit.Gerrit(self.config)
         self.gerrit.startWatching()
         self.gerrit_connector = GerritEventConnector(
             self.gerrit, sched, self)
@@ -137,22 +128,6 @@ class Gerrit(object):
     def stop(self):
         self.gerrit_connector.stop()
         self.gerrit_connector.join()
-
-    def report(self, change, message, action):
-        self.log.debug("Report change %s, action %s, message: %s" %
-                       (change, action, message))
-        if not change.number:
-            self.log.debug("Change has no number; not reporting")
-            return
-        if not action:
-            self.log.debug("No action specified; not reporting")
-            return
-        changeid = '%s,%s' % (change.number, change.patchset)
-        ref = 'refs/heads/' + change.branch
-        change._ref_sha = self.getRefSha(change.project.name,
-                                         ref)
-        return self.gerrit.review(change.project.name, changeid,
-                                  message, action)
 
     def _getInfoRefs(self, project):
         url = "%s/p/%s/info/refs?service=git-upload-pack" % (
