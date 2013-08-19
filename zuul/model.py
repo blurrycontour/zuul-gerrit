@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import logging
 import re
 import time
 from uuid import uuid4
@@ -57,6 +58,9 @@ class Pipeline(object):
         self.queues = []
         self.precedence = PRECEDENCE_NORMAL
         self.trigger = None
+        self.start_action = None
+        self.success_action = None
+        self.failure_action = None
 
     def __repr__(self):
         return '<Pipeline %s>' % self.name
@@ -346,6 +350,56 @@ class Pipeline(object):
         else:
             ret['remaining_time'] = None
         return ret
+
+
+class ActionReporter(object):
+    """Pipelines have an ActionReporter for each action they are
+    configured to report on (typically start, success, failure).
+    ActionReporters send the pre-built message to all of the
+    reporters for handling.
+    """
+    log = logging.getLogger('zuul.ActionReporter')
+
+    def __repr__(self):
+        return '<ActionReporter %s>' % self.reporters
+
+    def __init__(self):
+        self.reporters = []
+
+    def add_reporter(self, reporter, params):
+        """Add a Reporter to this Action"""
+        self.reporters.append((reporter, params))
+
+    def report(self, change, message):
+        """Sends the built message off to configured reporters.
+
+        Takes the change, message and extra options and sends them
+        to the pluggable reporters.
+        """
+        report_errors = []
+        if len(self.reporters) > 0:
+            if not change.number:
+                self.log.debug("Not reporting change %s: No number present."
+                               % change)
+                return
+            for reporter, params in self.reporters:
+                ret = reporter.report(change, message, params)
+                if ret:
+                    report_errors.append(ret)
+            if len(report_errors) == 0:
+                return
+        return report_errors
+
+    def get_submit_allow_needs(self):
+        """Get a list of code review labels that are allowed to be
+        "needed" in the submit records for a change, with respect
+        to this queue.  In other words, the list of review labels
+        this action itself is likely to set before submitting.
+        """
+        allow_needs = set()
+        for reporter, params in self.reporters:
+            allow_needs.update(reporter.get_submit_allow_needs(params))
+        return allow_needs
 
 
 class ChangeQueue(object):
