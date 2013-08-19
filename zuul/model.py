@@ -50,7 +50,6 @@ class Pipeline(object):
         self.queues = []
         self.precedence = PRECEDENCE_NORMAL
         self.trigger = None
-        self.reporters = []
         self.config = config
 
     def __repr__(self):
@@ -340,22 +339,20 @@ class Pipeline(object):
             ret['remaining_time'] = None
         return ret
 
-    def setup_reporters(self, reporters):
-        if reporters:
-            for reporter_name in reporters:
+    def report(self, change, message, actions):
+        if actions:
+            for reporter_name, action in actions.items():
                 module_info = imp.find_module(reporter_name,
                                               [(os.path.dirname(
                                                 os.path.realpath(__file__)) +
                                                 '/reporter')])
 
-                self.reporters.append(
-                    imp.load_module(reporter_name, *module_info).Reporter(
-                        self.config, self.trigger)
-                )
+                reporter =\
+                    imp.load_module(reporter_name,
+                                    *module_info).Reporter(self.config,
+                                                           self.trigger)
 
-    def report(self, change, message, action):
-        for reporter in self.reporters:
-            reporter.report(change, message, action)
+                reporter.report(change, message, action)
 
 
 class ChangeQueue(object):

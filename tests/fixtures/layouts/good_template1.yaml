@@ -4,8 +4,6 @@ pipelines:
     trigger:
       gerrit:
         - event: patchset-created
-    reporter:
-      - gerrit
 
 project-templates:
   - name: template-generic

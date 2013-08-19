@@ -10,13 +10,16 @@ pipelines:
         - event: comment-added
           approval:
             - approved: 1
-    success:
-      verified: 2
-      submit: true
-    failure:
-      verified: -2
     start:
-      verified: 0
+      gerrit:
+        verified: 0
+    success:
+      gerrit:
+        verified: 2
+        submit: true
+    failure:
+      gerrit:
+        verified: -2
     precedence: high
 
 jobs:

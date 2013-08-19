@@ -338,16 +338,18 @@ explanation of each of the parameters::
   the change, set this to ``false``.  Default: ``true``.
 
 **success**
-  Describes what Zuul should do if all the jobs complete successfully.
+  Describes who Zuul should report to if all the jobs complete
+  successfully.
   This section is optional; if it is omitted, Zuul will run jobs and
   do nothing on success; it will not even report a message to Gerrit.
-  If the section is present, it will leave a message on the Gerrit
-  review.  Each additional argument is assumed to be an argument to
-  ``gerrit review``, with the boolean value of ``true`` simply
-  indicating that the argument should be present without following it
-  with a value.  For example, ``verified: 1`` becomes ``gerrit
-  review --verified 1`` and ``submit: true`` becomes ``gerrit review
-  --submit``.
+  If the section is present, it will leave a message on the listed
+  reporter plugins.
+  Each additional argument is handled by the reporter. For example,
+  The gerrit reporter assumes to be arguments to ``gerrit review``,\
+  with the boolean value of ``true`` simply indicating that the
+  argument should be present without following it with a value.
+  For example, ``verified: 1`` becomes ``gerrit review --verified 1``
+  and ``submit: true`` becomes ``gerrit review --submit``.
 
 **failure**
   Uses the same syntax as **success**, but describes what Zuul should

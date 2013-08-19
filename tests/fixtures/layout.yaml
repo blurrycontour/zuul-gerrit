@@ -7,12 +7,12 @@ pipelines:
     trigger:
       gerrit:
         - event: patchset-created
-    reporter:
-      - gerrit
     success:
-      verified: 1
+      gerrit:
+        verified: 1
     failure:
-      verified: -1
+      gerrit:
+        verified: -1
 
   - name: post
     manager: IndependentPipelineManager
@@ -29,15 +29,16 @@ pipelines:
         - event: comment-added
           approval:
             - approved: 1
-    reporter:
-      - gerrit
-    success:
-      verified: 2
-      submit: true
-    failure:
-      verified: -2
     start:
-      verified: 0
+      gerrit:
+        verified: 0
+    success:
+      gerrit:
+        verified: 2
+        submit: true
+    failure:
+      gerrit:
+        verified: -2
     precedence: high
 
   - name: unused
@@ -48,32 +49,30 @@ pipelines:
         - event: comment-added
           approval:
             - approved: 1
-    reporter:
-      - gerrit
 
   - name: dup1
     manager: IndependentPipelineManager
     trigger:
       gerrit:
         - event: change-restored
-    reporter:
-      - gerrit
     success:
-      verified: 1
+      gerrit:
+        verified: 1
     failure:
-      verified: -1
+      gerrit:
+        verified: -1
 
   - name: dup2
     manager: IndependentPipelineManager
     trigger:
       gerrit:
         - event: change-restored
-    reporter:
-      - gerrit
     success:
-      verified: 1
+      gerrit:
+        verified: 1
     failure:
-      verified: -1
+      gerrit:
+        verified: -1
 
   - name: conflict
     dequeue-on-conflict: false
@@ -84,16 +83,16 @@ pipelines:
         - event: comment-added
           approval:
             - approved: 1
-    reporter:
-      - gerrit
-    success:
-      verified: 2
-      submit: true
-    failure:
-      verified: -2
     start:
-      verified: 0
-
+      gerrit:
+        verified: 0
+    success:
+      gerrit:
+        verified: 2
+        submit: true
+    failure:
+      gerrit:
+        verified: -2
 jobs:
   - name: ^.*-merge$
     failure-message: Unable to merge change
