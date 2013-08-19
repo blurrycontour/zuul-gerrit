@@ -10,6 +10,9 @@ pipelines:
     success:
       gerrit:
         verified: 1
+      smtp:
+        to: different_me@example.com
+        from: different_zuul@example.com
     failure:
       gerrit:
         verified: -1

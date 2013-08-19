@@ -26,6 +26,7 @@ import random
 import re
 import select
 import shutil
+import smtplib
 import socket
 import string
 import subprocess
@@ -58,6 +59,8 @@ CONFIG.set('zuul', 'layout_config',
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(name)-32s '
                     '%(levelname)-8s %(message)s')
+
+FAKE_SMTP_POOL = []
 
 
 def repack_repo(path):
@@ -670,6 +673,29 @@ class FakeGearmanServer(gear.Server):
         self.log.debug("done releasing queued jobs %s (%s)" % (regex, qlen))
 
 
+class FakeSMTP(object):
+    log = logging.getLogger('zuul.FakeSMTP')
+
+    def __init__(self, server):
+        self.server = server
+
+    def sendmail(self, from_email, to_email, msg):
+        global FAKE_SMTP_POOL
+        self.log.info("Sending email from %s, to %s, with msg %s" % (
+                      from_email, to_email, msg))
+
+        FAKE_SMTP_POOL.append(dict(
+            from_email=from_email,
+            to_email=to_email,
+            msg=msg
+        ))
+
+        return True
+
+    def quit(self):
+        return True
+
+
 class TestScheduler(testtools.TestCase):
     log = logging.getLogger("zuul.test")
 
@@ -753,6 +779,7 @@ class TestScheduler(testtools.TestCase):
         self.launcher = zuul.launcher.gearman.Gearman(self.config, self.sched)
 
         zuul.lib.gerrit.Gerrit = FakeGerrit
+        smtplib.SMTP = FakeSMTP
 
         self.gerrit = FakeGerritTrigger(
             self.upstream_root, self.config, self.sched)
@@ -2565,3 +2592,15 @@ class TestScheduler(testtools.TestCase):
                             status_jobs.add(job['name'])
         self.assertIn('project-bitrot-stable-old', status_jobs)
         self.assertIn('project-bitrot-stable-older', status_jobs)
+
+    def test_check_smtp_pool(self):
+        "Test messages are sent to SMTP pool."
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+
+        self.waitUntilSettled()
+
+        # Split off the header of the message
+        self.assertIn(A.messages, [a['msg'].split('\n\n', 1)[-1:]
+                                   for a in FAKE_SMTP_POOL])

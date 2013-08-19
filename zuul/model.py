@@ -340,6 +340,8 @@ class Pipeline(object):
         return ret
 
     def report(self, change, message, actions):
+        change._ref_sha = self.trigger.getRefSha(change.project.name,
+                                                 'refs/heads/' + change.branch)
         if actions:
             for reporter_name, action in actions.items():
                 module_info = imp.find_module(reporter_name,

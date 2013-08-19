@@ -23,3 +23,9 @@ Gerrit Configuration
 
 The configuration for posting back to gerrit is shared with the gerrit
 trigger documentation.
+
+SMTP
+-----
+
+A simple email reporter is also available. The defaults can be set in
+the zuul.conf file or overwritten in the pipeline.
