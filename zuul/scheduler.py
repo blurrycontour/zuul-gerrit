@@ -109,6 +109,12 @@ class Scheduler(threading.Thread):
         data = yaml.load(config_file)
 
         validator = layoutvalidator.LayoutValidator()
+        if (not self.config
+            or not self.config.has_option('legacy',
+                                          'use_gerrit_reporter_by_default')
+            or self.config.getboolean('legacy',
+                                      'use_gerrit_reporter_by_default')):
+            data = validator.legacy_reporter(data)
         validator.validate(data)
 
         config_env = {}
@@ -122,7 +128,7 @@ class Scheduler(threading.Thread):
                 execfile(fn, config_env)
 
         for conf_pipeline in data.get('pipelines', []):
-            pipeline = Pipeline(conf_pipeline['name'])
+            pipeline = Pipeline(conf_pipeline['name'], self.config)
             pipeline.description = conf_pipeline.get('description')
             precedence = model.PRECEDENCE_MAP[conf_pipeline.get('precedence')]
             pipeline.precedence = precedence
@@ -705,10 +711,10 @@ class BasePipelineManager(object):
         # "needed" in the submit records for a change, with respect
         # to this queue.  In other words, the list of review labels
         # this queue itself is likely to set before submitting.
-        if self.success_action:
-            return self.success_action.keys()
-        else:
-            return {}
+        allow_needs = set()
+        for (reporter_name, action) in self.success_action.items():
+            allow_needs.update(action)
+        return list(allow_needs)
 
     def eventMatches(self, event):
         for ef in self.event_filters:
@@ -729,7 +735,7 @@ class BasePipelineManager(object):
             msg = "Starting %s jobs." % self.pipeline.name
             if self.sched.config.has_option('zuul', 'status_url'):
                 msg += "\n" + self.sched.config.get('zuul', 'status_url')
-            ret = self.pipeline.trigger.report(change, msg, self.start_action)
+            ret = self.pipeline.report(change, msg, self.start_action)
             if ret:
                 self.log.error("Reporting change start %s received: %s" %
                                (change, ret))
@@ -1074,7 +1080,7 @@ class BasePipelineManager(object):
         try:
             self.log.info("Reporting change %s, action: %s" %
                           (item.change, action))
-            ret = self.pipeline.trigger.report(item.change, report, action)
+            ret = self.pipeline.report(item.change, report, action)
             if ret:
                 self.log.error("Reporting change %s received: %s" %
                                (item.change, ret))

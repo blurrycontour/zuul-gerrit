@@ -388,6 +388,8 @@ class FakeURLOpener(object):
 
 
 class FakeGerritTrigger(zuul.trigger.gerrit.Gerrit):
+    name = 'gerrit'
+
     def __init__(self, upstream_root, *args):
         super(FakeGerritTrigger, self).__init__(*args)
         self.upstream_root = upstream_root

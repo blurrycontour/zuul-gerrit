@@ -36,7 +36,7 @@ PRECEDENCE_MAP = {
 
 class Pipeline(object):
     """A top-level pipeline such as check, gate, post, etc."""
-    def __init__(self, name):
+    def __init__(self, name, config):
         self.name = name
         self.description = None
         self.failure_message = None
@@ -48,6 +48,7 @@ class Pipeline(object):
         self.queues = []
         self.precedence = PRECEDENCE_NORMAL
         self.trigger = None
+        self.config = config
 
     def __repr__(self):
         return '<Pipeline %s>' % self.name
@@ -335,6 +336,31 @@ class Pipeline(object):
         else:
             ret['remaining_time'] = None
         return ret
+
+    def report(self, change, message, actions):
+        """Sends the built message off to configured reporters.
+
+        Takes the change, message and extra options and sends them
+        to the pluggable reporters.
+
+        """
+        report_errors = []
+        if actions:
+            if not change.number:
+                self.log.debug("Not reporting change %s: No number present."
+                               % change)
+                return
+            for reporter_name, action in actions.items():
+                reporter_module = __import__('zuul.reporter.' + reporter_name,
+                                             fromlist='zuul.reporter')
+
+                reporter = reporter_module.Reporter(self.config, self.trigger)
+                ret = reporter.report(change, message, action)
+                if ret:
+                    report_errors.append(ret)
+        if len(report_errors) == 0:
+            return
+        return report_errors
 
 
 class ChangeQueue(object):
