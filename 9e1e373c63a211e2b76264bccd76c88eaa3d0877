@@ -1,0 +1,174 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAARn//8Yw\u003d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T22:15:38Z",
+      "side": 1,
+      "message": "Again - I know, broken record - this is missing the /why/, though it has the what just fine :)",
+      "revId": "9e1e373c63a211e2b76264bccd76c88eaa3d0877",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//8Yo\u003d",
+        "filename": "doc/source/reporters.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T22:15:38Z",
+      "side": 1,
+      "message": "What happens if a reporter fails? Thats possibly something the SMTP reporter needs to take special care about, for instance.",
+      "revId": "9e1e373c63a211e2b76264bccd76c88eaa3d0877",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//8YE\u003d",
+        "filename": "doc/source/reporters.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T22:15:38Z",
+      "side": 1,
+      "message": "This sentence broke my brain; I think you mean that the configuration is shared and the trigger documentation should be consulted.",
+      "revId": "9e1e373c63a211e2b76264bccd76c88eaa3d0877",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//8Xk\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 346,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T22:15:38Z",
+      "side": 1,
+      "message": "I think \u0027If the section is present, the listed reporter plugins will be asked to report on the jobs.\u0027 Or something like that. Gerrit doesn\u0027t leave a message on the plugins...",
+      "revId": "9e1e373c63a211e2b76264bccd76c88eaa3d0877",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//8Xc\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T22:15:38Z",
+      "side": 1,
+      "message": "This whole paragraph needs reworking.",
+      "revId": "9e1e373c63a211e2b76264bccd76c88eaa3d0877",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//8XE\u003d",
+        "filename": "etc/layout.yaml-sample",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T22:15:38Z",
+      "side": 1,
+      "message": "These changes highlight that the stack of changes you\u0027re working on isn\u0027t backwards compatible. While we\u0027re the primary users of zuul, there are other orgs using it: we should put some backwards compat code in place, so that folk can upgrade to a new zuul, then migrate their configuration separately.",
+      "revId": "9e1e373c63a211e2b76264bccd76c88eaa3d0877",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//8Ww\u003d",
+        "filename": "tests/fixtures/layouts/good_layout.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T22:15:38Z",
+      "side": 1,
+      "message": "So all these test changes could be avoided if there was backwards compat code (except one, as you will need to test that the new codepath works too). That would shrink this changeset; then in a couple releases we can delete the compat code.",
+      "revId": "9e1e373c63a211e2b76264bccd76c88eaa3d0877",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//8WM\u003d",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T22:15:38Z",
+      "side": 1,
+      "message": "Perhaps this refactoring should happen before the change to pluggable reporters?",
+      "revId": "9e1e373c63a211e2b76264bccd76c88eaa3d0877",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//8Vc\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 709,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T22:15:38Z",
+      "side": 1,
+      "message": "isn\u0027t self.success_action an empty dict when not supplied? So we can skip this line.",
+      "revId": "9e1e373c63a211e2b76264bccd76c88eaa3d0877",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//8VY\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 713,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T22:15:38Z",
+      "side": 1,
+      "message": "This can be more pithy - \nallow_needs \u003d set()\nfor (reporter_name, action) in self.success_action.items():\n    allow_needs.update(action)\nreturn list(allow_needs)",
+      "revId": "9e1e373c63a211e2b76264bccd76c88eaa3d0877",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}

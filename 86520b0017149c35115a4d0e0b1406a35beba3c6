@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAARn//8Wo\u003d",
+        "filename": "tests/fixtures/layouts/good_template1.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T22:15:38Z",
+      "side": 0,
+      "message": "This was added in your earlier patch; was it wrong there?",
+      "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
