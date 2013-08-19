@@ -12,6 +12,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import imp
+import os
 import re
 import time
 from uuid import uuid4
@@ -36,7 +38,7 @@ PRECEDENCE_MAP = {
 
 class Pipeline(object):
     """A top-level pipeline such as check, gate, post, etc."""
-    def __init__(self, name):
+    def __init__(self, name, config):
         self.name = name
         self.description = None
         self.failure_message = None
@@ -48,6 +50,8 @@ class Pipeline(object):
         self.queues = []
         self.precedence = PRECEDENCE_NORMAL
         self.trigger = None
+        self.reporters = []
+        self.config = config
 
     def __repr__(self):
         return '<Pipeline %s>' % self.name
@@ -335,6 +339,23 @@ class Pipeline(object):
         else:
             ret['remaining_time'] = None
         return ret
+
+    def setup_reporters(self, reporters):
+        if reporters:
+            for reporter_name in reporters:
+                module_info = imp.find_module(reporter_name,
+                                              [(os.path.dirname(
+                                                os.path.realpath(__file__)) +
+                                                '/reporter')])
+
+                self.reporters.append(
+                    imp.load_module(reporter_name, *module_info).Reporter(
+                        self.config, self.trigger)
+                )
+
+    def report(self, change, message, action):
+        for reporter in self.reporters:
+            reporter.report(change, message, action)
 
 
 class ChangeQueue(object):

@@ -54,6 +54,8 @@ class LayoutSchema(object):
     trigger = v.Required(v.Any({'gerrit': toList(gerrit_trigger)},
                                {'timer': toList(timer_trigger)}))
 
+    reporter = toList(v.Any('gerrit'))
+
     pipeline = {v.Required('name'): str,
                 v.Required('manager'): manager,
                 'precedence': precedence,
@@ -63,6 +65,7 @@ class LayoutSchema(object):
                 'dequeue-on-new-patchset': bool,
                 'dequeue-on-conflict': bool,
                 'trigger': trigger,
+                'reporter': reporter,
                 'success': variable_dict,
                 'failure': variable_dict,
                 'start': variable_dict,

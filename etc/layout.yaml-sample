@@ -4,6 +4,8 @@ pipelines:
     trigger:
       gerrit:
         - event: patchset-created
+    reporter:
+      - gerrit
     success:
       verified: 1
     failure:
@@ -15,6 +17,8 @@ pipelines:
       gerrit:
         - event: patchset-created
           email_filter: ^.*@example.org$
+    reporter:
+      - gerrit
     success:
       verified: 1
     failure:
@@ -34,6 +38,8 @@ pipelines:
         - event: comment-added
           approval:
             - approved: 1
+    reporter:
+      - gerrit
     start:
       verified: 0
     success:

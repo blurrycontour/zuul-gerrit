@@ -4,6 +4,8 @@ pipelines:
     trigger:
       gerrit:
         - event: patchset-created
+    reporter:
+      - gerrit
     success:
       verified: 1
     failure:
@@ -24,6 +26,8 @@ pipelines:
         - event: comment-added
           approval:
             - approved: 1
+    reporter:
+      - gerrit
     success:
       verified: 2
       submit: true

@@ -7,6 +7,8 @@ pipelines:
     trigger:
       gerrit:
         - event: patchset-created
+    reporter:
+      - gerrit
     success:
       verified: 1
     failure:
@@ -27,6 +29,8 @@ pipelines:
         - event: comment-added
           approval:
             - approved: 1
+    reporter:
+      - gerrit
     success:
       verified: 2
       submit: true
@@ -44,12 +48,16 @@ pipelines:
         - event: comment-added
           approval:
             - approved: 1
+    reporter:
+      - gerrit
 
   - name: dup1
     manager: IndependentPipelineManager
     trigger:
       gerrit:
         - event: change-restored
+    reporter:
+      - gerrit
     success:
       verified: 1
     failure:
@@ -60,6 +68,8 @@ pipelines:
     trigger:
       gerrit:
         - event: change-restored
+    reporter:
+      - gerrit
     success:
       verified: 1
     failure:
@@ -74,6 +84,8 @@ pipelines:
         - event: comment-added
           approval:
             - approved: 1
+    reporter:
+      - gerrit
     success:
       verified: 2
       submit: true

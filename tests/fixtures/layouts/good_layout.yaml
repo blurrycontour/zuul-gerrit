@@ -7,6 +7,8 @@ pipelines:
     trigger:
       gerrit:
         - event: patchset-created
+    reporter:
+      - gerrit
     success:
       verified: 1
     failure:
