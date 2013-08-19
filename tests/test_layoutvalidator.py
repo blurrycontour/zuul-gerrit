@@ -41,6 +41,7 @@ class TestLayoutValidator(testtools.TestCase):
             layout = os.path.join(FIXTURE_DIR, 'layouts', fn)
             data = yaml.load(open(layout))
             validator = zuul.layoutvalidator.LayoutValidator()
+
             # NOTE(jhesketh): We will validate the layouts with legacy support
             # for reports. We need to make sure the layout has a trigger as
             # that used to be the reporting method.
@@ -48,6 +49,7 @@ class TestLayoutValidator(testtools.TestCase):
                 all(['trigger' in pipeline
                      for pipeline in data['pipelines']])):
                 data = validator.legacy_reporter(data)
+
             if m.group(1) == 'good':
                 try:
                     validator.validate(data)
