@@ -1,0 +1,225 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAARn//87w\u003d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T20:02:54Z",
+      "side": 1,
+      "message": "A little more verbosity here would be useful - https://wiki.openstack.org/wiki/GitCommitMessages#Information_in_commit_messages is the gold reference for commit messages in OpenStack.",
+      "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//82w\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 343,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T20:02:54Z",
+      "side": 1,
+      "message": "New public method - please include a docstring.",
+      "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//84A\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T20:02:54Z",
+      "side": 1,
+      "message": "imp is now deprecated; we\u0027re aiming for 2.7 and 3.3+ compat - could you use importlib here instead please, or take the simpler approach of just doing an __import__ call - you don\u0027t seem to use any of the imp plumbing features.",
+      "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//820\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T20:02:54Z",
+      "side": 1,
+      "message": "New public method - please include a docstring.",
+      "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//82Y\u003d",
+        "filename": "zuul/reporter/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T20:02:54Z",
+      "side": 1,
+      "message": "Public class - please include a docstring.",
+      "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//82U\u003d",
+        "filename": "zuul/reporter/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T20:02:54Z",
+      "side": 1,
+      "message": "And here.",
+      "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//814\u003d",
+        "filename": "zuul/reporter/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T20:02:54Z",
+      "side": 1,
+      "message": "http://www.python.org/dev/peps/pep-0257/ - this should be a single line + additional paragraphs as needed.",
+      "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//81c\u003d",
+        "filename": "zuul/reporter/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T20:02:54Z",
+      "side": 1,
+      "message": "How can self.trigger be falsey, given it\u0027s assigned during construction?",
+      "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//81Q\u003d",
+        "filename": "zuul/reporter/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T20:02:54Z",
+      "side": 1,
+      "message": "The preceeding logic seems entirely unrelated to reporting; which makes me suspect it\u0027s copied from elsewhere in the codebase; whether copied or not it fairly clearly shouldn\u0027t be part of the reporting logic - can you find or make a good home for it - as a separate patch probably, so we can review it in isolation.",
+      "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//81I\u003d",
+        "filename": "zuul/reporter/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T20:02:54Z",
+      "side": 1,
+      "message": "Docstring!",
+      "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//808\u003d",
+        "filename": "zuul/reporter/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T20:02:54Z",
+      "side": 1,
+      "message": "This is a stylistic preference, not a must-do: I\u0027d prefer \"Not reporting change %s: no number present.\" or something like that, rather than the subordinate clause.",
+      "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//80s\u003d",
+        "filename": "zuul/reporter/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T20:02:54Z",
+      "side": 1,
+      "message": "I\u0027m surprised that that doesn\u0027t all fit on one line.",
+      "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//80c\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-19T20:02:54Z",
+      "side": 1,
+      "message": "Pipeline seems to have a very explicit configuration today; I\u0027m a little worried about passing such a broad configuration object into it - I\u0027d like one of the zuul long-time maintainers to comment on that.",
+      "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
