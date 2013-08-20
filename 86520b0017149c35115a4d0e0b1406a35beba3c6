@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAARn//70k\u003d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:50:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAARn//87w\u003d",
+      "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAARn//82w\u003d",
         "filename": "zuul/model.py",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2013-08-19T20:02:54Z",
       "side": 1,
       "message": "New public method - please include a docstring.",
+      "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//70g\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 343,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:50:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAARn//82w\u003d",
       "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "AAAARn//70c\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:50:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAARn//84A\u003d",
+      "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAARn//820\u003d",
         "filename": "zuul/model.py",
         "patchSetId": 1
@@ -64,6 +118,24 @@
       "writtenOn": "2013-08-19T20:02:54Z",
       "side": 1,
       "message": "New public method - please include a docstring.",
+      "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//70Y\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:50:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAARn//820\u003d",
       "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "AAAARn//70U\u003d",
+        "filename": "zuul/reporter/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:50:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAARn//82Y\u003d",
+      "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAARn//82U\u003d",
         "filename": "zuul/reporter/gerrit.py",
         "patchSetId": 1
@@ -98,6 +188,24 @@
       "writtenOn": "2013-08-19T20:02:54Z",
       "side": 1,
       "message": "And here.",
+      "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//7zo\u003d",
+        "filename": "zuul/reporter/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:50:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAARn//82U\u003d",
       "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "AAAARn//7zk\u003d",
+        "filename": "zuul/reporter/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:50:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAARn//814\u003d",
+      "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAARn//81c\u003d",
         "filename": "zuul/reporter/gerrit.py",
         "patchSetId": 1
@@ -132,6 +258,24 @@
       "writtenOn": "2013-08-19T20:02:54Z",
       "side": 1,
       "message": "How can self.trigger be falsey, given it\u0027s assigned during construction?",
+      "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//7rQ\u003d",
+        "filename": "zuul/reporter/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:50:56Z",
+      "side": 1,
+      "message": "The test tests.test_scheduler.TestScheduler.test_test_config doesn\u0027t configure a trigger before being passed through. Not sure if this would actually ever happen so perhaps the test needs to change but there is also no reason why a reporter couldn\u0027t work without a trigger (assuming there was some alternative means to get zuul to report).",
+      "parentUuid": "AAAARn//81c\u003d",
       "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "AAAARn//7qo\u003d",
+        "filename": "zuul/reporter/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:50:56Z",
+      "side": 1,
+      "message": "Done in this patch",
+      "parentUuid": "AAAARn//81Q\u003d",
+      "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAARn//81I\u003d",
         "filename": "zuul/reporter/gerrit.py",
         "patchSetId": 1
@@ -166,6 +328,24 @@
       "writtenOn": "2013-08-19T20:02:54Z",
       "side": 1,
       "message": "Docstring!",
+      "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//7qg\u003d",
+        "filename": "zuul/reporter/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:50:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAARn//81I\u003d",
       "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -189,6 +369,24 @@
     },
     {
       "key": {
+        "uuid": "AAAARn//7v8\u003d",
+        "filename": "zuul/reporter/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:50:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAARn//808\u003d",
+      "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAARn//80s\u003d",
         "filename": "zuul/reporter/gerrit.py",
         "patchSetId": 1
@@ -206,6 +404,24 @@
     },
     {
       "key": {
+        "uuid": "AAAARn//7vs\u003d",
+        "filename": "zuul/reporter/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:50:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAARn//80s\u003d",
+      "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAARn//80c\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 1
@@ -217,6 +433,40 @@
       "writtenOn": "2013-08-19T20:02:54Z",
       "side": 1,
       "message": "Pipeline seems to have a very explicit configuration today; I\u0027m a little worried about passing such a broad configuration object into it - I\u0027d like one of the zuul long-time maintainers to comment on that.",
+      "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//7Yk\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 734,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:50:56Z",
+      "side": 1,
+      "message": "Here is where the reporting part is moved from a trigger to a pipeline.",
+      "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//7Yg\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1079,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:50:56Z",
+      "side": 1,
+      "message": "And again here",
       "revId": "86520b0017149c35115a4d0e0b1406a35beba3c6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
