@@ -23,10 +23,12 @@ import extras
 # instead it depends on lockfile-0.9.1 which uses pidfile.
 pid_file_module = extras.try_imports(['daemon.pidlockfile', 'daemon.pidfile'])
 
+import logging
 import logging.config
 import os
 import sys
 import signal
+import traceback
 
 import gear
 
@@ -92,6 +94,15 @@ class Server(object):
         signal.signal(signal.SIGUSR1, signal.SIG_IGN)
         self.stop_gear_server()
         self.sched.exit()
+
+    def stack_dump_handler(self, signum, frame):
+        signal.signal(signal.SIGUSR2, signal.SIG_IGN)
+        log_str = ""
+        for thread_id, stack_frame in sys._current_frames().items():
+            log_str += "Thread: %s\n" % thread_id
+            log_str += "".join(traceback.format_stack(stack_frame))
+        self.log.debug(log_str)
+        signal.signal(signal.SIGUSR2, self.stack_dump_handler)
 
     def term_handler(self, signum, frame):
         self.stop_gear_server()
@@ -160,6 +171,7 @@ class Server(object):
             self.start_gear_server()
 
         self.setup_logging('zuul', 'log_config')
+        self.log = logging.getLogger("zuul.server")
 
         self.sched = zuul.scheduler.Scheduler()
 
@@ -179,6 +191,7 @@ class Server(object):
 
         signal.signal(signal.SIGHUP, self.reconfigure_handler)
         signal.signal(signal.SIGUSR1, self.exit_handler)
+        signal.signal(signal.SIGUSR2, self.stack_dump_handler)
         signal.signal(signal.SIGTERM, self.term_handler)
         while True:
             try:
