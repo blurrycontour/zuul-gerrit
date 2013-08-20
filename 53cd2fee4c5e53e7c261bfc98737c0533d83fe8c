@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAARn//7Oo\u003d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:51:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAARn//8ZU\u003d",
+      "revId": "53cd2fee4c5e53e7c261bfc98737c0533d83fe8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAARn//8d8\u003d",
         "filename": "doc/source/reporters.rst",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2013-08-19T21:57:12Z",
       "side": 1,
       "message": "What settings are relevant for the email reporter? What does a minimum config look like? When would default_to and default_from be overridden by zuul? What are the available keys in the pipeline config? Just to?",
+      "revId": "53cd2fee4c5e53e7c261bfc98737c0533d83fe8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//7Ms\u003d",
+        "filename": "doc/source/reporters.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:51:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAARn//8d8\u003d",
       "revId": "53cd2fee4c5e53e7c261bfc98737c0533d83fe8c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "AAAARn//684\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:51:08Z",
+      "side": 1,
+      "message": "This is used by the FakeSMTP and the test to check the results. Using a MonkeyPatch, what is the best way to move this into an instance? (see new patchset)",
+      "parentUuid": "AAAARn//8b0\u003d",
+      "revId": "53cd2fee4c5e53e7c261bfc98737c0533d83fe8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAARn//8bs\u003d",
         "filename": "tests/test_scheduler.py",
         "patchSetId": 1
@@ -64,6 +118,24 @@
       "writtenOn": "2013-08-19T21:57:12Z",
       "side": 1,
       "message": "log should be assigned during __init__, as logging infrastructure can often be reset during test suites.",
+      "revId": "53cd2fee4c5e53e7c261bfc98737c0533d83fe8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//7KQ\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 677,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:51:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAARn//8bs\u003d",
       "revId": "53cd2fee4c5e53e7c261bfc98737c0533d83fe8c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "AAAARn//680\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 782,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:51:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAARn//8bE\u003d",
+      "revId": "53cd2fee4c5e53e7c261bfc98737c0533d83fe8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAARn//8a0\u003d",
         "filename": "tests/test_scheduler.py",
         "patchSetId": 1
@@ -104,6 +194,24 @@
     },
     {
       "key": {
+        "uuid": "AAAARn//7E4\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2598,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:51:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAARn//8a0\u003d",
+      "revId": "53cd2fee4c5e53e7c261bfc98737c0533d83fe8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAARn//8ao\u003d",
         "filename": "tests/test_scheduler.py",
         "patchSetId": 1
@@ -115,6 +223,24 @@
       "writtenOn": "2013-08-19T21:57:12Z",
       "side": 1,
       "message": "This makes no assertion about how many messages are sent. We might be spamming and the test wouldn\u0027t tell us. Can we be a bit more precise about what is meant to happen?",
+      "revId": "53cd2fee4c5e53e7c261bfc98737c0533d83fe8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//6/0\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2606,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:51:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAARn//8ao\u003d",
       "revId": "53cd2fee4c5e53e7c261bfc98737c0533d83fe8c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -155,6 +281,24 @@
     },
     {
       "key": {
+        "uuid": "AAAARn//68w\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:51:08Z",
+      "side": 1,
+      "message": "This is a mistake. Removed.",
+      "parentUuid": "AAAARn//8Z4\u003d",
+      "revId": "53cd2fee4c5e53e7c261bfc98737c0533d83fe8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAARn//8Zs\u003d",
         "filename": "zuul/reporter/smtp.py",
         "patchSetId": 1
@@ -172,6 +316,24 @@
     },
     {
       "key": {
+        "uuid": "AAAARn//68k\u003d",
+        "filename": "zuul/reporter/smtp.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:51:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAARn//8Zs\u003d",
+      "revId": "53cd2fee4c5e53e7c261bfc98737c0533d83fe8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAARn//8Zg\u003d",
         "filename": "zuul/reporter/smtp.py",
         "patchSetId": 1
@@ -183,6 +345,24 @@
       "writtenOn": "2013-08-19T21:57:12Z",
       "side": 1,
       "message": "These guards are the same as the guards on the gerrit reporter - lets factor that out from that reporter and avoid this duplication.",
+      "revId": "53cd2fee4c5e53e7c261bfc98737c0533d83fe8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//68U\u003d",
+        "filename": "zuul/reporter/smtp.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:51:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAARn//8Zg\u003d",
       "revId": "53cd2fee4c5e53e7c261bfc98737c0533d83fe8c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
