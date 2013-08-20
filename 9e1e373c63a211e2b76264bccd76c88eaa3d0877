@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAARn//7do\u003d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:51:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAARn//8Yw\u003d",
+      "revId": "9e1e373c63a211e2b76264bccd76c88eaa3d0877",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAARn//8Yo\u003d",
         "filename": "doc/source/reporters.rst",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2013-08-19T22:15:38Z",
       "side": 1,
       "message": "What happens if a reporter fails? Thats possibly something the SMTP reporter needs to take special care about, for instance.",
+      "revId": "9e1e373c63a211e2b76264bccd76c88eaa3d0877",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//7YA\u003d",
+        "filename": "doc/source/reporters.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:51:14Z",
+      "side": 1,
+      "message": "I have fixed it so reporters return a success boolean which will raise an error like it used to.",
+      "parentUuid": "AAAARn//8Yo\u003d",
       "revId": "9e1e373c63a211e2b76264bccd76c88eaa3d0877",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "AAAARn//7ZA\u003d",
+        "filename": "doc/source/reporters.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:51:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAARn//8YE\u003d",
+      "revId": "9e1e373c63a211e2b76264bccd76c88eaa3d0877",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAARn//8Xk\u003d",
         "filename": "doc/source/zuul.rst",
         "patchSetId": 1
@@ -64,6 +118,24 @@
       "writtenOn": "2013-08-19T22:15:38Z",
       "side": 1,
       "message": "I think \u0027If the section is present, the listed reporter plugins will be asked to report on the jobs.\u0027 Or something like that. Gerrit doesn\u0027t leave a message on the plugins...",
+      "revId": "9e1e373c63a211e2b76264bccd76c88eaa3d0877",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//7Wg\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 346,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:51:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAARn//8Xk\u003d",
       "revId": "9e1e373c63a211e2b76264bccd76c88eaa3d0877",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "AAAARn//7Wk\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:51:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAARn//8Xc\u003d",
+      "revId": "9e1e373c63a211e2b76264bccd76c88eaa3d0877",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAARn//8XE\u003d",
         "filename": "etc/layout.yaml-sample",
         "patchSetId": 1
@@ -98,6 +188,24 @@
       "writtenOn": "2013-08-19T22:15:38Z",
       "side": 1,
       "message": "These changes highlight that the stack of changes you\u0027re working on isn\u0027t backwards compatible. While we\u0027re the primary users of zuul, there are other orgs using it: we should put some backwards compat code in place, so that folk can upgrade to a new zuul, then migrate their configuration separately.",
+      "revId": "9e1e373c63a211e2b76264bccd76c88eaa3d0877",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//7dY\u003d",
+        "filename": "etc/layout.yaml-sample",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:51:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAARn//8XE\u003d",
       "revId": "9e1e373c63a211e2b76264bccd76c88eaa3d0877",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "AAAARn//7cU\u003d",
+        "filename": "tests/fixtures/layouts/good_layout.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:51:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAARn//8Ww\u003d",
+      "revId": "9e1e373c63a211e2b76264bccd76c88eaa3d0877",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAARn//8WM\u003d",
         "filename": "zuul/layoutvalidator.py",
         "patchSetId": 1
@@ -132,6 +258,24 @@
       "writtenOn": "2013-08-19T22:15:38Z",
       "side": 1,
       "message": "Perhaps this refactoring should happen before the change to pluggable reporters?",
+      "revId": "9e1e373c63a211e2b76264bccd76c88eaa3d0877",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//7dM\u003d",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:51:14Z",
+      "side": 1,
+      "message": "It could. I did it in two steps for two reasons.\n\n1) I was hoping it\u0027d be easier to review in smaller changes\n2) If this refactor doesn\u0027t get in I still get my desired functionality of pluggable reporters allowing me to email results as I need.",
+      "parentUuid": "AAAARn//8WM\u003d",
       "revId": "9e1e373c63a211e2b76264bccd76c88eaa3d0877",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "AAAARn//7dA\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 709,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:51:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAARn//8Vc\u003d",
+      "revId": "9e1e373c63a211e2b76264bccd76c88eaa3d0877",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAARn//8VY\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 1
@@ -166,6 +328,24 @@
       "writtenOn": "2013-08-19T22:15:38Z",
       "side": 1,
       "message": "This can be more pithy - \nallow_needs \u003d set()\nfor (reporter_name, action) in self.success_action.items():\n    allow_needs.update(action)\nreturn list(allow_needs)",
+      "revId": "9e1e373c63a211e2b76264bccd76c88eaa3d0877",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//7dE\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 713,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-20T23:51:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAARn//8VY\u003d",
       "revId": "9e1e373c63a211e2b76264bccd76c88eaa3d0877",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
