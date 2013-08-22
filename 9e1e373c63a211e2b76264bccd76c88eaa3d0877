@@ -300,6 +300,24 @@
     },
     {
       "key": {
+        "uuid": "AAAARn//v4o\u003d",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-22T10:57:44Z",
+      "side": 1,
+      "message": "So I had initially set up the configuration differently the success/failure/start actions ended up under each reporter. Then I realised that these actions only exist for reporting and decided there was less duplication having the active reporters listed under each.\n\nSo looking at it now this patch is smaller than I realised and I will join with the first one.",
+      "parentUuid": "AAAARn//v8Q\u003d",
+      "revId": "9e1e373c63a211e2b76264bccd76c88eaa3d0877",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAARn//8Vc\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 1
