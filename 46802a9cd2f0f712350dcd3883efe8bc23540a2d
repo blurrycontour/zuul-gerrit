@@ -1,0 +1,174 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAARn//wAo\u003d",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-22T10:36:54Z",
+      "side": 1,
+      "message": "spurious VWS here. if your editor is suggesting it, it\u0027s wrong ;).",
+      "revId": "46802a9cd2f0f712350dcd3883efe8bc23540a2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//wAc\u003d",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-22T10:36:54Z",
+      "side": 1,
+      "message": "Grammar in this comment is a little off. Suggest:\nDefault to the legacy behaviour of reporting to gerrit for gerrit triggers when the pipeline has no reporter set. Or s/the/then/.",
+      "revId": "46802a9cd2f0f712350dcd3883efe8bc23540a2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//wAM\u003d",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-22T10:36:54Z",
+      "side": 1,
+      "message": "Typo - \u0027reporter\u0027 ? I suspect you have a missing test as a result.",
+      "revId": "46802a9cd2f0f712350dcd3883efe8bc23540a2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//wAA\u003d",
+        "filename": "zuul/lib/gerrit.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-22T10:36:54Z",
+      "side": 1,
+      "message": "Whats this VWS separating out? Whats the logical difference you\u0027re highlighting?",
+      "revId": "46802a9cd2f0f712350dcd3883efe8bc23540a2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//v/8\u003d",
+        "filename": "zuul/lib/gerrit.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-22T10:36:54Z",
+      "side": 1,
+      "message": "Ditto.",
+      "revId": "46802a9cd2f0f712350dcd3883efe8bc23540a2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//v/4\u003d",
+        "filename": "zuul/reporter/gerrit.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-22T10:36:54Z",
+      "side": 1,
+      "message": "Spurious VWS.",
+      "revId": "46802a9cd2f0f712350dcd3883efe8bc23540a2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//v/0\u003d",
+        "filename": "zuul/reporter/gerrit.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-22T10:36:54Z",
+      "side": 1,
+      "message": "Ditto.",
+      "revId": "46802a9cd2f0f712350dcd3883efe8bc23540a2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//v/s\u003d",
+        "filename": "zuul/reporter/gerrit.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-22T10:36:54Z",
+      "side": 1,
+      "message": "Ditto.",
+      "revId": "46802a9cd2f0f712350dcd3883efe8bc23540a2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//v/w\u003d",
+        "filename": "zuul/reporter/gerrit.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-22T10:36:54Z",
+      "side": 1,
+      "message": "Ditto.",
+      "revId": "46802a9cd2f0f712350dcd3883efe8bc23540a2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARn//v/A\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-22T10:36:54Z",
+      "side": 1,
+      "message": "I\u0027m torn on this VWS - in some ways I think it\u0027s harder to spot that it\u0027s part of the indented for loop, with that stubby gap. Up to you, but have a look both ways and see what you think.",
+      "revId": "46802a9cd2f0f712350dcd3883efe8bc23540a2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
