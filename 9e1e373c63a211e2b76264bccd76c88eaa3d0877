@@ -282,6 +282,24 @@
     },
     {
       "key": {
+        "uuid": "AAAARn//v8Q\u003d",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-22T10:48:53Z",
+      "side": 1,
+      "message": "+1 on smaller changes. I\u0027m mainly looking at the way reporter is being added and removed. Doing the reconfiguration change earlier would avoid configuration churn for people tracking trunk. Is it possible to do this reconfiguration before the pluggable reporters are added?",
+      "parentUuid": "AAAARn//7dM\u003d",
+      "revId": "9e1e373c63a211e2b76264bccd76c88eaa3d0877",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAARn//8Vc\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 1
