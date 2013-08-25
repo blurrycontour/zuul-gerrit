@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX//3uk\u003d",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-25T22:10:02Z",
+      "side": 1,
+      "message": "Typo - parameters.",
+      "revId": "772da65567e2527fa8e349a381395214369e4bbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//3ug\u003d",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-25T22:10:02Z",
+      "side": 1,
+      "message": "It would almost be worth factoring this out into a method of it\u0027s own - either the body of the inner for loop, or the inner for loop itself. Up to you.",
+      "revId": "772da65567e2527fa8e349a381395214369e4bbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//3t4\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 345,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-25T22:10:02Z",
+      "side": 1,
+      "message": "Trailing VWS here; it\u0027s less of an issue than in functions, but if there are other things in the patch that need fixing, it would be nice to remove it.",
+      "revId": "772da65567e2527fa8e349a381395214369e4bbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//3uU\u003d",
+        "filename": "zuul/reporter/gerrit.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-25T22:10:02Z",
+      "side": 1,
+      "message": "More spurious VWS snuck in :). I should explain, that I\u0027m tough on VWS because it breaks my brain reading code: When I see a blank line in a function I look for the pseudo-function it is meant to highlight : and if there isn\u0027t one, I get an internal exception. Similarly, when I use folds in vim, things get folded assuming VWS in functions is semantic, not accidental.",
+      "revId": "772da65567e2527fa8e349a381395214369e4bbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
