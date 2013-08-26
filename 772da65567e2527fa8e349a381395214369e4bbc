@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "AAAASX//3oM\u003d",
+        "filename": "doc/source/reporters.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-08-26T00:21:29Z",
+      "side": 1,
+      "message": "I think the stream-events bit is not applicable here.",
+      "revId": "772da65567e2527fa8e349a381395214369e4bbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//3lw\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-08-26T00:21:29Z",
+      "side": 1,
+      "message": "Most of the time we try to handle upgrades fairly seamlessly in Zuul (and we run it in a mostly CD fashion for openstack).  But we\u0027re still in a period between releases where we\u0027ve made significant changes that have no possibility of being backwards compatible.  We\u0027ve taken advantage of that to make some other backwards incompatible changes such as the multiple-trigger support (which is similar in scope to this change).\n\nI believe that the config file changes needed for the current change are so minor and mechanical, that we should go ahead and include this in with the other backwards-incompatible changes.  So instead of carrying around conversion code, how about we drop it and add a section to the NEWS file instead?",
+      "revId": "772da65567e2527fa8e349a381395214369e4bbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASX//3uk\u003d",
         "filename": "zuul/layoutvalidator.py",
         "patchSetId": 4
@@ -36,6 +70,40 @@
     },
     {
       "key": {
+        "uuid": "AAAASX//3n8\u003d",
+        "filename": "zuul/lib/gerrit.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-08-26T00:21:29Z",
+      "side": 1,
+      "message": "This class is very similar to that provided by gerritlib; I\u0027d actually like to remove this and switch to using gerritlib instead, so I don\u0027t really want to change the signature here.",
+      "revId": "772da65567e2527fa8e349a381395214369e4bbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//3m0\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-08-26T00:21:29Z",
+      "side": 1,
+      "message": "Instead of passing in the config, it would be better to fully articulate the actions.  Due to the additional complexity, you may need some more classes (perhaps one that represents an action; it may have a reporter attribute (as pipeline has a trigger), and it may also contain information that the reporter will need (messages, addresses, etc).  And perhaps the pipeline would have a list of those classes for each of start, failure, success.",
+      "revId": "772da65567e2527fa8e349a381395214369e4bbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASX//3t4\u003d",
         "filename": "zuul/model.py",
         "patchSetId": 4
@@ -47,6 +115,23 @@
       "writtenOn": "2013-08-25T22:10:02Z",
       "side": 1,
       "message": "Trailing VWS here; it\u0027s less of an issue than in functions, but if there are other things in the patch that need fixing, it would be nice to remove it.",
+      "revId": "772da65567e2527fa8e349a381395214369e4bbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//3nI\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 364,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-08-26T00:21:29Z",
+      "side": 1,
+      "message": "This module is intended to hold (relatively) simple data structures that only interact with each other, but don\u0027t have any logic about how Zuul operates.  [The notable exception to that is the Event.getChange method which should be refactored to conform with the rest of the file.]  Keeping this file somewhat abstract and focusing all of the logic and decision-making in the scheduler helps reason about how Zuul behaves.\n\nAt any rate, I think this can somewhat mirror the way triggers are supported.  Add a \u0027reporters\u0027 dict to the Scheduler that holds all of the implemented reporters, and add start, failure, success information to the Pipeline class as mentioned above.\n\nThe reporters themselves should be instantiated in the server startup code, with the triggers.",
       "revId": "772da65567e2527fa8e349a381395214369e4bbc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
