@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX//2Xo\u003d",
+        "filename": "zuul/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-26T11:12:52Z",
+      "side": 1,
+      "message": "If these had the same signature, you could avoid the if/else and just dispatch to a strategy object.",
+      "revId": "714ec95a668e10b08babc21899c507cd914d2736",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
