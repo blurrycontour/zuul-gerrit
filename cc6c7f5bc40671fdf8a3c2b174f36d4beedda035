@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX//z+k\u003d",
+        "filename": "zuul/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-08-26T22:06:02Z",
+      "side": 1,
+      "message": "This comment appears to be out of date with the removal of reset(). Should be updated so that we don\u0027t lose track of why some of this code is a little silly.",
+      "revId": "cc6c7f5bc40671fdf8a3c2b174f36d4beedda035",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
