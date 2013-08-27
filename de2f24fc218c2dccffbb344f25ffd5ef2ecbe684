@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASn//7OQ\u003d",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-08-27T22:45:07Z",
+      "side": 1,
+      "message": "Instead of special casing here and in the test, can we tell voluptuous to accept either a gerrit report action or a varialble_dict? This will make the code simple as we can rely on the voluptuous DSL.",
+      "revId": "de2f24fc218c2dccffbb344f25ffd5ef2ecbe684",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//7N8\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 371,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-08-27T22:45:07Z",
+      "side": 1,
+      "message": "This restricts us to only reporting things in a change context. I can see possibly emailing folks when a post merge job runs. Can we relax this check here?",
+      "revId": "de2f24fc218c2dccffbb344f25ffd5ef2ecbe684",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//7Ng\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 392,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-08-27T22:45:07Z",
+      "side": 1,
+      "message": "Do we need to coerce this to a list? set() is iterable and should be usable where allow_needs are used.",
+      "revId": "de2f24fc218c2dccffbb344f25ffd5ef2ecbe684",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//7NA\u003d",
+        "filename": "zuul/reporter/gerrit.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-08-27T22:45:07Z",
+      "side": 1,
+      "message": "Perhaps we should just pass in gerrit and not gerrit_trigger if that is all that is needed? Or is the larger trigger context potentially important for future changes?",
+      "revId": "de2f24fc218c2dccffbb344f25ffd5ef2ecbe684",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//7Ms\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-08-27T22:45:07Z",
+      "side": 1,
+      "message": "Is this why we are not relying on voluptuous to accept either form of layout? Instead we modify the data before feeding it into zuul?",
+      "revId": "de2f24fc218c2dccffbb344f25ffd5ef2ecbe684",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//7Ls\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-08-27T22:45:07Z",
+      "side": 1,
+      "message": "Else log invalid reporter_name.",
+      "revId": "de2f24fc218c2dccffbb344f25ffd5ef2ecbe684",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//7K0\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 721,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-08-27T22:45:07Z",
+      "side": 1,
+      "message": "The three ifs here will always evaluate to true because they will be valid ActionReporter objects.",
+      "revId": "de2f24fc218c2dccffbb344f25ffd5ef2ecbe684",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//7Go\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1099,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-08-27T22:45:07Z",
+      "side": 1,
+      "message": "Is setting the _ref_sha needed here to handle reports for things that were not triggered by gerrit?",
+      "revId": "de2f24fc218c2dccffbb344f25ffd5ef2ecbe684",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
