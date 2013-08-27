@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAASX//3bQ\u003d",
+        "filename": "doc/source/reporters.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-27T03:21:25Z",
+      "side": 1,
+      "message": "Correct. Copy and paste fail.",
+      "parentUuid": "AAAASX//3oM\u003d",
+      "revId": "772da65567e2527fa8e349a381395214369e4bbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASX//3lw\u003d",
         "filename": "doc/source/zuul.rst",
         "patchSetId": 4
@@ -53,6 +71,24 @@
     },
     {
       "key": {
+        "uuid": "AAAASX//3bA\u003d",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-27T03:21:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAASX//3uk\u003d",
+      "revId": "772da65567e2527fa8e349a381395214369e4bbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASX//3ug\u003d",
         "filename": "zuul/layoutvalidator.py",
         "patchSetId": 4
@@ -64,6 +100,24 @@
       "writtenOn": "2013-08-25T22:10:02Z",
       "side": 1,
       "message": "It would almost be worth factoring this out into a method of it\u0027s own - either the body of the inner for loop, or the inner for loop itself. Up to you.",
+      "revId": "772da65567e2527fa8e349a381395214369e4bbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//3ag\u003d",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-27T03:21:25Z",
+      "side": 1,
+      "message": "I want this method to disappear eventually so I don\u0027t see the point in separating it out. The LayoutSchema can be used to validate actions in a similar method.",
+      "parentUuid": "AAAASX//3ug\u003d",
       "revId": "772da65567e2527fa8e349a381395214369e4bbc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -87,6 +141,24 @@
     },
     {
       "key": {
+        "uuid": "AAAASX//3Z0\u003d",
+        "filename": "zuul/lib/gerrit.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-27T03:21:25Z",
+      "side": 1,
+      "message": "Do you mean refactor all of zuul to use gerritlib? I think that could be done in a separate patchset.",
+      "parentUuid": "AAAASX//3n8\u003d",
+      "revId": "772da65567e2527fa8e349a381395214369e4bbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASX//3m0\u003d",
         "filename": "zuul/model.py",
         "patchSetId": 4
@@ -98,6 +170,24 @@
       "writtenOn": "2013-08-26T00:21:29Z",
       "side": 1,
       "message": "Instead of passing in the config, it would be better to fully articulate the actions.  Due to the additional complexity, you may need some more classes (perhaps one that represents an action; it may have a reporter attribute (as pipeline has a trigger), and it may also contain information that the reporter will need (messages, addresses, etc).  And perhaps the pipeline would have a list of those classes for each of start, failure, success.",
+      "revId": "772da65567e2527fa8e349a381395214369e4bbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn///mw\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-27T03:21:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAASX//3m0\u003d",
       "revId": "772da65567e2527fa8e349a381395214369e4bbc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -121,6 +211,24 @@
     },
     {
       "key": {
+        "uuid": "AAAASX//3Zs\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 345,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-27T03:21:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAASX//3t4\u003d",
+      "revId": "772da65567e2527fa8e349a381395214369e4bbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASX//3nI\u003d",
         "filename": "zuul/model.py",
         "patchSetId": 4
@@ -138,6 +246,24 @@
     },
     {
       "key": {
+        "uuid": "AAAASn///ms\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 364,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-27T03:21:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAASX//3nI\u003d",
+      "revId": "772da65567e2527fa8e349a381395214369e4bbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASX//3uU\u003d",
         "filename": "zuul/reporter/gerrit.py",
         "patchSetId": 4
@@ -149,6 +275,24 @@
       "writtenOn": "2013-08-25T22:10:02Z",
       "side": 1,
       "message": "More spurious VWS snuck in :). I should explain, that I\u0027m tough on VWS because it breaks my brain reading code: When I see a blank line in a function I look for the pseudo-function it is meant to highlight : and if there isn\u0027t one, I get an internal exception. Similarly, when I use folds in vim, things get folded assuming VWS in functions is semantic, not accidental.",
+      "revId": "772da65567e2527fa8e349a381395214369e4bbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//3ZY\u003d",
+        "filename": "zuul/reporter/gerrit.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-27T03:21:25Z",
+      "side": 1,
+      "message": "Done. Fair points. My brain tends to like whitespace apparently ;-).",
+      "parentUuid": "AAAASX//3uU\u003d",
       "revId": "772da65567e2527fa8e349a381395214369e4bbc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
