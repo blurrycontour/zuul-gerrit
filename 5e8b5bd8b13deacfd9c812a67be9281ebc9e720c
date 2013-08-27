@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASn//7CI\u003d",
+        "filename": "zuul/reporter/smtp.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-08-27T23:02:51Z",
+      "side": 1,
+      "message": "from_email \u003d params.get(\u0027from\u0027, self.smtp_default_from)\nto_email \u003d params.get(\u0027to\u0027, self.smtp_default_to)\n\nIs a bit cleaner.",
+      "revId": "5e8b5bd8b13deacfd9c812a67be9281ebc9e720c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//7Bw\u003d",
+        "filename": "zuul/reporter/smtp.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-08-27T23:02:51Z",
+      "side": 1,
+      "message": "I left a comment in the previous review about possibly relaxing that this be a change. This will probably need updating if we do that.",
+      "revId": "5e8b5bd8b13deacfd9c812a67be9281ebc9e720c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//6/s\u003d",
+        "filename": "zuul/reporter/smtp.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-08-27T23:02:51Z",
+      "side": 1,
+      "message": "In the previous change the ActionReporter class checks if the return value is True and if so adds it to a list of errors. I think returning True here will cause the SMTP reporter to always error from Zuul\u0027s perspective. return False or throw an exception and catch that exception in ActionReporter?",
+      "revId": "5e8b5bd8b13deacfd9c812a67be9281ebc9e720c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
