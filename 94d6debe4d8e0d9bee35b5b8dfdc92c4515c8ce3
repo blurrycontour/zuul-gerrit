@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASn//3nc\u003d",
+        "filename": "zuul/lib/gerrit.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-08-28T17:23:40Z",
+      "side": 1,
+      "message": "See comments in ps4; this needs to stay the same.",
+      "revId": "94d6debe4d8e0d9bee35b5b8dfdc92c4515c8ce3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//3ig\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-08-28T17:23:40Z",
+      "side": 1,
+      "message": "When I read the code, I\u0027m personally a bit confused about why an ActionReporter actually has several reporters.\n\nMaybe it would make more sense for this to hold a single reporter with parameters, and then for the pipeline action attributes to be lists.  So you would use it like:\n\n  for action in pipeline.start_actions:\n    action.reporter.report(action.params)\n\nAnd the lists on the pipeline object could be empty.",
+      "revId": "94d6debe4d8e0d9bee35b5b8dfdc92c4515c8ce3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//3Zs\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1130,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-08-28T17:23:40Z",
+      "side": 1,
+      "message": "I think this bit about the _ref_sha all actually belongs in the gerrit reporter.  It\u0027s in service of making sure that the change has replicated to any mirrors that might be in front of the gerrit server.",
+      "revId": "94d6debe4d8e0d9bee35b5b8dfdc92c4515c8ce3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
