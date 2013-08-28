@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAASn//68k\u003d",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-28T00:38:18Z",
+      "side": 1,
+      "message": "This isn\u0027t just for validation, it actually puts the legacy configuration into a schema compatible with these changes. That is:\n\nsuccess:\n  verified: 1\n\nWill become:\n\nsuccess:\n  gerrit:\n    verified: 1\n\n\nThis may, however, be removed. James thinks that we can make backwards incompatible changes so we it may be better to not support legacy configs.",
+      "parentUuid": "AAAASn//7OQ\u003d",
+      "revId": "de2f24fc218c2dccffbb344f25ffd5ef2ecbe684",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASn//7N8\u003d",
         "filename": "zuul/model.py",
         "patchSetId": 5
@@ -30,6 +48,24 @@
       "writtenOn": "2013-08-27T22:45:07Z",
       "side": 1,
       "message": "This restricts us to only reporting things in a change context. I can see possibly emailing folks when a post merge job runs. Can we relax this check here?",
+      "revId": "de2f24fc218c2dccffbb344f25ffd5ef2ecbe684",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//67c\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 371,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-28T00:38:18Z",
+      "side": 1,
+      "message": "Perhaps we need report_change() and a generic report().\n\nI think this could be done in a separate patchset. This, for the moment, matches the functionality that did exist. The goal here is to just separate out the reporters to start with.",
+      "parentUuid": "AAAASn//7N8\u003d",
       "revId": "de2f24fc218c2dccffbb344f25ffd5ef2ecbe684",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "AAAASn//66k\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 392,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-28T00:38:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAASn//7Ng\u003d",
+      "revId": "de2f24fc218c2dccffbb344f25ffd5ef2ecbe684",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASn//7NA\u003d",
         "filename": "zuul/reporter/gerrit.py",
         "patchSetId": 5
@@ -64,6 +118,24 @@
       "writtenOn": "2013-08-27T22:45:07Z",
       "side": 1,
       "message": "Perhaps we should just pass in gerrit and not gerrit_trigger if that is all that is needed? Or is the larger trigger context potentially important for future changes?",
+      "revId": "de2f24fc218c2dccffbb344f25ffd5ef2ecbe684",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//66A\u003d",
+        "filename": "zuul/reporter/gerrit.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-28T00:38:18Z",
+      "side": 1,
+      "message": "Done.\n\nThis isn\u0027t generic across all reporters. The cmd.server sets up all the reporters and choose what to pass to them. As such it\u0027ll be easy to change back if we do need a trigger later.",
+      "parentUuid": "AAAASn//7NA\u003d",
       "revId": "de2f24fc218c2dccffbb344f25ffd5ef2ecbe684",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "AAAASn//64w\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-28T00:38:18Z",
+      "side": 1,
+      "message": "Correct.",
+      "parentUuid": "AAAASn//7Ms\u003d",
+      "revId": "de2f24fc218c2dccffbb344f25ffd5ef2ecbe684",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASn//7Ls\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 5
@@ -98,6 +188,24 @@
       "writtenOn": "2013-08-27T22:45:07Z",
       "side": 1,
       "message": "Else log invalid reporter_name.",
+      "revId": "de2f24fc218c2dccffbb344f25ffd5ef2ecbe684",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//64o\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-28T00:38:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAASn//7Ls\u003d",
       "revId": "de2f24fc218c2dccffbb344f25ffd5ef2ecbe684",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "AAAASn//64I\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 721,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-28T00:38:18Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "AAAASn//7K0\u003d",
+      "revId": "de2f24fc218c2dccffbb344f25ffd5ef2ecbe684",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASn//7Go\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 5
@@ -132,6 +258,24 @@
       "writtenOn": "2013-08-27T22:45:07Z",
       "side": 1,
       "message": "Is setting the _ref_sha needed here to handle reports for things that were not triggered by gerrit?",
+      "revId": "de2f24fc218c2dccffbb344f25ffd5ef2ecbe684",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//6oI\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1099,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-28T00:38:18Z",
+      "side": 1,
+      "message": "The isMerged method in the trigger needs to know the ref that the reporter was going to tell gerrit to process. I\u0027m not sure where else to place this.",
+      "parentUuid": "AAAASn//7Go\u003d",
       "revId": "de2f24fc218c2dccffbb344f25ffd5ef2ecbe684",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
