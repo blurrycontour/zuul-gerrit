@@ -300,6 +300,24 @@
     },
     {
       "key": {
+        "uuid": "AAAASn//3o4\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1090,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-08-28T16:30:39Z",
+      "side": 1,
+      "message": "Something like:\n\n* action \u003d pipeline.getActionForItem(item)\n* action.reporter.report(item)\n\nwould be fine.  It\u0027s not \u0027no logic\u0027 so much as \u0027no action\u0027.  The classes in model.py have logic around interacting with each other, but other than that, all of the real actions that affect external systems (fetching, launching, reporting, etc) happen outside of that file, mostly in scheduler.py.  I have found that it makes it easier to reason about the system by having a data model that is separate from the decision making engines that use that model.  It allows for things such as the two kinds of pipeline managers (dependent and independent) that treat changes very differently.",
+      "parentUuid": "AAAASn//51Y\u003d",
+      "revId": "9f25d0e022947318dfcb3bb53054d2fb413ca8ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASn//6EE\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 6
