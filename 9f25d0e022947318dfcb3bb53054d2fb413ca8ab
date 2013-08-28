@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASn//6TE\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 341,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-28T04:00:33Z",
+      "side": 1,
+      "message": "How about \"where Zuul should report if\" rather than who, as other services are not people.",
+      "revId": "9f25d0e022947318dfcb3bb53054d2fb413ca8ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//6SY\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 361,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-28T04:00:33Z",
+      "side": 1,
+      "message": "This should be done in __init__.",
+      "revId": "9f25d0e022947318dfcb3bb53054d2fb413ca8ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//6SM\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1090,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-08-28T04:00:33Z",
+      "side": 1,
+      "message": "This if block should really move into the pipeline I suspect... but lets do that refactoring in a separate patch.",
+      "revId": "9f25d0e022947318dfcb3bb53054d2fb413ca8ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
