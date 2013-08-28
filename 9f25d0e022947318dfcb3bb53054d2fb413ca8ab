@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "AAAASn//56g\u003d",
+        "filename": "zuul/lib/gerrit.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-08-28T06:28:35Z",
+      "side": 1,
+      "message": "see comments in patchset 4",
+      "revId": "9f25d0e022947318dfcb3bb53054d2fb413ca8ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASn//6SY\u003d",
         "filename": "zuul/model.py",
         "patchSetId": 6
@@ -36,6 +53,92 @@
     },
     {
       "key": {
+        "uuid": "AAAASn//6D0\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 361,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-08-28T06:28:35Z",
+      "side": 1,
+      "message": "Well, the entire rest of the program sets up loggers this way, so I\u0027d be in favor of consistency.\n\nBut there shouldn\u0027t actually be a logger here because this class shouldn\u0027t perform any actions worth logging.",
+      "parentUuid": "AAAASn//6SY\u003d",
+      "revId": "9f25d0e022947318dfcb3bb53054d2fb413ca8ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//55E\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 369,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-08-28T06:28:35Z",
+      "side": 1,
+      "message": "camelCase method name for consistency",
+      "revId": "9f25d0e022947318dfcb3bb53054d2fb413ca8ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//55c\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 391,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-08-28T06:28:35Z",
+      "side": 1,
+      "message": "This kind of logic (report) should be in the basepipelinemanager in the scheduler. See comments in patchset 4 about the purpose of this file (short version: these are just data structures, they don\u0027t act).",
+      "revId": "9f25d0e022947318dfcb3bb53054d2fb413ca8ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//55A\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 393,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-08-28T06:28:35Z",
+      "side": 1,
+      "message": "camelCase",
+      "revId": "9f25d0e022947318dfcb3bb53054d2fb413ca8ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//554\u003d",
+        "filename": "zuul/reporter/gerrit.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-08-28T06:28:35Z",
+      "side": 1,
+      "message": "New methods should be camelCase.",
+      "revId": "9f25d0e022947318dfcb3bb53054d2fb413ca8ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASn//6SM\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 6
@@ -47,6 +150,41 @@
       "writtenOn": "2013-08-28T04:00:33Z",
       "side": 1,
       "message": "This if block should really move into the pipeline I suspect... but lets do that refactoring in a separate patch.",
+      "revId": "9f25d0e022947318dfcb3bb53054d2fb413ca8ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//6Ek\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1090,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-08-28T06:28:35Z",
+      "side": 1,
+      "message": "I\u0027m not sure what you have in mind, lifeless, but keep in mind that the pipeline is a data structure that should not actually do anything.  It could be pushed into the reporter, perhaps.",
+      "parentUuid": "AAAASn//6SM\u003d",
+      "revId": "9f25d0e022947318dfcb3bb53054d2fb413ca8ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//6EE\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1105,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-08-28T06:28:35Z",
+      "side": 1,
+      "message": "Keep the actions happening here, as before; don\u0027t push them into the data model.\n\nThis should be reporter.report(...)",
       "revId": "9f25d0e022947318dfcb3bb53054d2fb413ca8ab",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
