@@ -16,6 +16,24 @@
       "revId": "1879cf721c4c59d11451e434a79eeafdae3ac9a3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//wcI\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-29T23:44:24Z",
+      "side": 1,
+      "message": "Yeah so I did initially keep it in the scheduler probably as you were thinking. But I found it a bit odd and cumbersome to use ActionReporter to just store the reporter and the params. It meant triggering the report looked like:\n\naction_reporter.reporter(change, msg, action_reporter.params)\n\nRather than having to continually pass back the params the action_reporter itself can just implement some helper options. I felt this was still keeping it in a model type state without adding in logic.",
+      "parentUuid": "AAAASn//yXw\u003d",
+      "revId": "1879cf721c4c59d11451e434a79eeafdae3ac9a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
