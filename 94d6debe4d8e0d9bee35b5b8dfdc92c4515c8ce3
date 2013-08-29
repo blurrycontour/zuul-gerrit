@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAASn//1M0\u003d",
+        "filename": "zuul/lib/gerrit.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-29T03:18:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAASn//3nc\u003d",
+      "revId": "94d6debe4d8e0d9bee35b5b8dfdc92c4515c8ce3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASn//3ig\u003d",
         "filename": "zuul/model.py",
         "patchSetId": 7
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "AAAASn//1Gw\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-29T03:18:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAASn//3ig\u003d",
+      "revId": "94d6debe4d8e0d9bee35b5b8dfdc92c4515c8ce3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASn//3Zs\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 7
@@ -47,6 +83,24 @@
       "writtenOn": "2013-08-28T17:23:40Z",
       "side": 1,
       "message": "I think this bit about the _ref_sha all actually belongs in the gerrit reporter.  It\u0027s in service of making sure that the change has replicated to any mirrors that might be in front of the gerrit server.",
+      "revId": "94d6debe4d8e0d9bee35b5b8dfdc92c4515c8ce3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//1A8\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1130,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-08-29T03:18:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAASn//3Zs\u003d",
       "revId": "94d6debe4d8e0d9bee35b5b8dfdc92c4515c8ce3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
