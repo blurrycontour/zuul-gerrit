@@ -132,8 +132,6 @@ class Scheduler(threading.Thread):
                                                          "Build succeeded.")
             pipeline.dequeue_on_new_patchset = conf_pipeline.get(
                 'dequeue-on-new-patchset', True)
-            pipeline.dequeue_on_conflict = conf_pipeline.get(
-                'dequeue-on-conflict', True)
             manager = globals()[conf_pipeline['manager']](self, pipeline)
             pipeline.setManager(manager)
 
@@ -436,8 +434,7 @@ class Scheduler(threading.Thread):
                                name)
                 items_to_remove = []
                 for shared_queue in old_pipeline.queues:
-                    for item in (shared_queue.queue +
-                                 shared_queue.severed_heads):
+                    for item in (shared_queue.queue):
                         item.item_ahead = None
                         item.item_behind = None
                         item.pipeline = None
@@ -450,9 +447,7 @@ class Scheduler(threading.Thread):
                             items_to_remove.append(item)
                             continue
                         item.change.project = project
-                        severed = item in shared_queue.severed_heads
-                        if not new_pipeline.manager.reEnqueueItem(
-                            item, severed=severed):
+                        if not new_pipeline.manager.reEnqueueItem(item):
                             items_to_remove.append(item)
                 builds_to_remove = []
                 for build, item in old_pipeline.manager.building_jobs.items():
@@ -759,17 +754,6 @@ class BasePipelineManager(object):
     def checkForChangesNeededBy(self, change):
         return True
 
-    def getDependentItems(self, item):
-        orig_item = item
-        items = []
-        while item.item_ahead:
-            items.append(item.item_ahead)
-            item = item.item_ahead
-        self.log.info("Change %s depends on changes %s" %
-                      (orig_item.change,
-                       [x.change for x in items]))
-        return items
-
     def findOldVersionOfChangeAlreadyInQueue(self, change):
         for c in self.pipeline.getChangesInQueue():
             if change.isUpdateOf(c):
@@ -785,15 +769,12 @@ class BasePipelineManager(object):
                            (change, old_change, old_change))
             self.removeChange(old_change)
 
-    def reEnqueueItem(self, item, severed=False):
+    def reEnqueueItem(self, item):
         change_queue = self.pipeline.getQueue(item.change.project)
         if change_queue:
             self.log.debug("Re-enqueing change %s in queue %s" %
                            (item.change, change_queue))
-            if severed:
-                change_queue.addSeveredHead(item)
-            else:
-                change_queue.enqueueItem(item)
+            change_queue.enqueueItem(item)
             self.reportStats(item)
             return True
         else:
@@ -834,15 +815,11 @@ class BasePipelineManager(object):
                            change.project)
             return False
 
-    def dequeueItem(self, item, keep_severed_heads=True):
+    def dequeueItem(self, item):
         self.log.debug("Removing change %s from queue" % item.change)
         item_ahead = item.item_ahead
         change_queue = self.pipeline.getQueue(item.change.project)
         change_queue.dequeueItem(item)
-        if (keep_severed_heads and not item_ahead and
-            (item.change.is_reportable and not item.reported)):
-            self.log.debug("Adding %s as a severed head" % item.change)
-            change_queue.addSeveredHead(item)
         self.sched._maintain_trigger_cache = True
 
     def removeChange(self, change):
@@ -853,55 +830,36 @@ class BasePipelineManager(object):
                 self.log.debug("Canceling builds behind change: %s "
                                "because it is being removed." % item.change)
                 self.cancelJobs(item)
-                self.dequeueItem(item, keep_severed_heads=False)
+                self.dequeueItem(item)
                 self.reportStats(item)
 
-    def prepareRef(self, item):
+    def prepareRef(self, item, base_items):
         # Returns False on success.
         # Returns True if we were unable to prepare the ref.
         ref = item.current_build_set.ref
         if hasattr(item.change, 'refspec') and not ref:
             self.log.debug("Preparing ref for: %s" % item.change)
-            item.current_build_set.setConfiguration()
+            item.current_build_set.setConfiguration(base_items)
             ref = item.current_build_set.ref
-            dependent_items = self.getDependentItems(item)
-            dependent_items.reverse()
-            dependent_str = ', '.join(
-                ['%s' % i.change.number for i in dependent_items
-                 if i.change.project == item.change.project])
-            if dependent_str:
-                msg = \
-                    "This change was unable to be automatically merged "\
-                    "with the current state of the repository and the "\
-                    "following changes which were enqueued ahead of it: "\
-                    "%s. Please rebase your change and upload a new "\
-                    "patchset." % dependent_str
-            else:
-                msg = "This change was unable to be automatically merged "\
-                    "with the current state of the repository. Please "\
-                    "rebase your change and upload a new patchset."
-            all_items = dependent_items + [item]
-            if (dependent_items and
-                not dependent_items[-1].current_build_set.commit):
-                self.pipeline.setUnableToMerge(item, msg)
-                return True
-            commit = self.sched.merger.mergeChanges(all_items, ref)
+            commit = self.sched.merger.mergeChanges([item] + base_items, ref)
             item.current_build_set.commit = commit
             if not commit:
                 self.log.info("Unable to merge change %s" % item.change)
+                msg = ("This change was unable to be automatically merged "
+                       "with the current state of the repository. Please "
+                       "rebase your change and upload a new patchset.")
                 self.pipeline.setUnableToMerge(item, msg)
                 return True
         return False
 
-    def _launchJobs(self, item, jobs):
+    def _launchJobs(self, item, base_items, jobs):
         self.log.debug("Launching jobs for change %s" % item.change)
-        dependent_items = self.getDependentItems(item)
         for job in jobs:
             self.log.debug("Found job %s for change %s" % (job, item.change))
             try:
                 build = self.sched.launcher.launch(job, item,
                                                    self.pipeline,
-                                                   dependent_items)
+                                                   base_items)
                 self.building_jobs[build] = item
                 self.log.debug("Adding build %s of job %s to item %s" %
                                (build, job, item))
@@ -910,17 +868,16 @@ class BasePipelineManager(object):
                 self.log.exception("Exception while launching job %s "
                                    "for change %s:" % (job, item.change))
 
-    def launchJobs(self, item):
+    def launchJobs(self, item, base_items):
         jobs = self.pipeline.findJobsToRun(item)
         if jobs:
-            self._launchJobs(item, jobs)
+            self._launchJobs(item, base_items, jobs)
 
-    def cancelJobs(self, item, prime=True):
+    def cancelJobs(self, item):
         self.log.debug("Cancel jobs for change %s" % item.change)
         canceled = False
         to_remove = []
-        if prime and item.current_build_set.builds:
-            item.resetAllBuilds()
+        item.resetAllBuilds()
         for build, build_item in self.building_jobs.items():
             if build_item == item:
                 self.log.debug("Found build %s for change %s to cancel" %
@@ -936,72 +893,56 @@ class BasePipelineManager(object):
             self.log.debug("Removing build %s from running builds" % build)
             build.result = 'CANCELED'
             del self.building_jobs[build]
-        if item.item_behind:
-            self.log.debug("Canceling jobs for change %s, behind change %s" %
-                           (item.item_behind.change, item.change))
-            if self.cancelJobs(item.item_behind, prime=prime):
-                canceled = True
         return canceled
 
-    def _processOneItem(self, item):
+    def _processOneItem(self, item, base_items):
         changed = False
         item_ahead = item.item_ahead
         item_behind = item.item_behind
-        if self.prepareRef(item):
-            changed = True
-            if self.pipeline.dequeue_on_conflict:
-                self.log.info("Dequeuing change %s because "
-                              "of a git merge error" % item.change)
-                self.dequeueItem(item, keep_severed_heads=False)
-                try:
-                    self.reportItem(item)
-                except MergeFailure:
-                    pass
-                return changed
         if self.checkForChangesNeededBy(item.change) is not True:
             # It's not okay to enqueue this change, we should remove it.
             self.log.info("Dequeuing change %s because "
                           "it can no longer merge" % item.change)
             self.cancelJobs(item)
-            self.dequeueItem(item, keep_severed_heads=False)
+            self.dequeueItem(item)
             self.pipeline.setDequeuedNeedingChange(item)
             try:
                 self.reportItem(item)
             except MergeFailure:
                 pass
-            changed = True
-            return changed
-        if not item_ahead:
-            merge_failed = False
-            if self.pipeline.areAllJobsComplete(item):
-                try:
-                    self.reportItem(item)
-                except MergeFailure:
-                    merge_failed = True
-                self.dequeueItem(item)
+            return True
+        merge_conflict = False
+        if item.current_build_set.base_items:
+            current_base_item = item.current_build_set.base_items[-1]
+            if (current_base_item != base_items[-1] and
+                not current_base_item.change.is_merged):
+                # Our current base is different than what we expected,
+                # and it's not because our current base merged.  Something
+                # ahead must have failed.
                 changed = True
-            if merge_failed or self.pipeline.didAnyJobFail(item):
-                if item_behind:
-                    self.cancelJobs(item_behind)
-                    changed = True
-                    self.dequeueItem(item)
-        else:
-            if self.pipeline.didAnyJobFail(item):
-                if item_behind:
-                    if self.cancelJobs(item_behind, prime=False):
-                        changed = True
-                # don't restart yet; this change will eventually become
-                # the head
-        if self.launchJobs(item):
+                self.cancelJobs(item)
+                merge_conflict = self.prepareRef(item, base_items)
+        merge_failed = False
+        if (not item_ahead) and self.pipeline.areAllJobsComplete(item):
+            try:
+                self.reportItem(item)
+            except MergeFailure:
+                merge_failed = True
+            self.dequeueItem(item)
             changed = True
+        self.launchJobs(item, base_items)
+        if not (merge_failed or merge_conflict or
+                self.pipeline.didAnyJobFail(item)):
+            base_items.append(item)
         return changed
 
     def processQueue(self):
         # Do whatever needs to be done for each change in the queue
         self.log.debug("Starting queue processor: %s" % self.pipeline.name)
         changed = False
+        base_items = []  # List of non-failing items ahead
         for item in self.pipeline.getAllItems():
-            if self._processOneItem(item):
+            if self._processOneItem(item, base_items):
                 changed = True
             self.reportStats(item)
         self.log.debug("Finished queue processor: %s (changed: %s)" %
@@ -1165,9 +1106,9 @@ class BasePipelineManager(object):
         concurrent_builds = ''
         other_builds = ''
 
-        for change in build.build_set.other_changes:
-            concurrent_changes += '<li><a href="{change.url}">\
-              {change.number},{change.patchset}</a></li>'.format(
+        for item in build.build_set.base_items:
+            concurrent_changes += '<li><a href="{item.change.url}">\
+              {item.change.number},{item.change.patchset}</a></li>'.format(
                 change=change)
 
         change = build.build_set.item.change
