@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASn//yXw\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-08-29T16:01:33Z",
+      "side": 1,
+      "message": "I actually didn\u0027t mean to say that this should have a report method, I meant that this should still be done in the scheduler (action.reporter.report).  But this is fine, we can move it later.",
+      "revId": "1879cf721c4c59d11451e434a79eeafdae3ac9a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
