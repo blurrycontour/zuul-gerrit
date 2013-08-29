@@ -219,7 +219,6 @@ class Gearman(object):
                       (job, item.change,
                        [x.change for x in dependent_items]))
         dependent_items = dependent_items[:]
-        dependent_items.reverse()
         uuid = str(uuid4().hex)
         params = dict(ZUUL_UUID=uuid,
                       ZUUL_PROJECT=item.change.project.name)
