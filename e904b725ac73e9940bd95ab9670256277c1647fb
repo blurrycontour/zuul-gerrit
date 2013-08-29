@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASn//yUs\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-08-29T16:15:36Z",
+      "side": 1,
+      "message": "If you make this an attribute of FakeSMTP...",
+      "revId": "e904b725ac73e9940bd95ab9670256277c1647fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//yUI\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 815,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-08-29T16:15:36Z",
+      "side": 1,
+      "message": "...and keep the reporter object around with:\n\n self.smtp_reporter \u003d zuul....Reporter()\n self.sched.registerReporter(self.smtp_reporter)\n\n...",
+      "revId": "e904b725ac73e9940bd95ab9670256277c1647fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//yTo\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 2725,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-08-29T16:15:36Z",
+      "side": 1,
+      "message": "...you can use self.smtp_reporter.messages[0]  here.",
+      "revId": "e904b725ac73e9940bd95ab9670256277c1647fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
