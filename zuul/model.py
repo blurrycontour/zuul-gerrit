@@ -51,7 +51,6 @@ class Pipeline(object):
         self.failure_message = None
         self.success_message = None
         self.dequeue_on_new_patchset = True
-        self.dequeue_on_conflict = True
         self.job_trees = {}  # project -> JobTree
         self.manager = None
         self.queues = []
@@ -209,7 +208,6 @@ class Pipeline(object):
         items = []
         for shared_queue in self.queues:
             items.extend(shared_queue.queue)
-            items.extend(shared_queue.severed_heads)
         return items
 
     def formatStatusHTML(self):
@@ -360,7 +358,6 @@ class ChangeQueue(object):
         self.projects = []
         self._jobs = set()
         self.queue = []
-        self.severed_heads = []
         self.dependent = dependent
 
     def __repr__(self):
@@ -392,8 +389,6 @@ class ChangeQueue(object):
     def dequeueItem(self, item):
         if item in self.queue:
             self.queue.remove(item)
-        if item in self.severed_heads:
-            self.severed_heads.remove(item)
         if item.item_ahead:
             item.item_ahead.item_behind = item.item_behind
         if item.item_behind:
@@ -401,9 +396,6 @@ class ChangeQueue(object):
         item.item_ahead = None
         item.item_behind = None
         item.dequeue_time = time.time()
-
-    def addSeveredHead(self, item):
-        self.severed_heads.append(item)
 
     def mergeChangeQueue(self, other):
         for project in other.projects:
@@ -422,7 +414,6 @@ class ChangeQueue(object):
                 heads.append(h)
         else:
             heads.extend(self.queue)
-        heads.extend(self.severed_heads)
         return heads
 
 
@@ -558,7 +549,7 @@ class Build(object):
 class BuildSet(object):
     def __init__(self, item):
         self.item = item
-        self.other_changes = []
+        self.base_items = []
         self.builds = {}
         self.result = None
         self.next_build_set = None
@@ -568,17 +559,12 @@ class BuildSet(object):
         self.unable_to_merge = False
         self.unable_to_merge_message = None
 
-    def setConfiguration(self):
+    def setConfiguration(self, base_items):
         # The change isn't enqueued until after it's created
         # so we don't know what the other changes ahead will be
         # until jobs start.
-        if not self.other_changes:
-            next_item = self.item.item_ahead
-            while next_item:
-                self.other_changes.append(next_item.change)
-                next_item = next_item.item_ahead
-        if not self.ref:
-            self.ref = 'Z' + uuid4().hex
+        self.base_items = base_items[:]
+        self.ref = 'Z' + uuid4().hex
 
     def addBuild(self, build):
         self.builds[build.job.name] = build
