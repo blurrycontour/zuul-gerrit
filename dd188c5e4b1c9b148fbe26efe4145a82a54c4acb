@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASn//xZw\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 945,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-08-29T19:22:26Z",
+      "side": 1,
+      "message": "I think you can make this changed \u003d self._processOneItem(item, base_items).",
+      "revId": "dd188c5e4b1c9b148fbe26efe4145a82a54c4acb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
