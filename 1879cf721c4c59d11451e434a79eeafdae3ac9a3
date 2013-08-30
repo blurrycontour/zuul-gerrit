@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "AAAASn//sv4\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 392,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-08-30T18:18:18Z",
+      "side": 1,
+      "message": "Is the name still required? zuul.report.gerrit.Reporter sets name within that class and I think that is the name that is needed.",
+      "revId": "1879cf721c4c59d11451e434a79eeafdae3ac9a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASn//yXw\u003d",
         "filename": "zuul/model.py",
         "patchSetId": 8
@@ -31,6 +48,40 @@
       "side": 1,
       "message": "Yeah so I did initially keep it in the scheduler probably as you were thinking. But I found it a bit odd and cumbersome to use ActionReporter to just store the reporter and the params. It meant triggering the report looked like:\n\naction_reporter.reporter(change, msg, action_reporter.params)\n\nRather than having to continually pass back the params the action_reporter itself can just implement some helper options. I felt this was still keeping it in a model type state without adding in logic.",
       "parentUuid": "AAAASn//yXw\u003d",
+      "revId": "1879cf721c4c59d11451e434a79eeafdae3ac9a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//sxA\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 726,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-08-30T18:18:18Z",
+      "side": 1,
+      "message": "Since going back to lists these actions may be empty... I don\u0027t think we need to check this as we will log an empty list which is fine. Just noting that the old behavior isn\u0027t a noop anymore.",
+      "revId": "1879cf721c4c59d11451e434a79eeafdae3ac9a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//swM\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 772,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-08-30T18:18:18Z",
+      "side": 1,
+      "message": "I have a slight preference for relying on an empty list evaluating to false. eg if action_reports: But this is fine.",
       "revId": "1879cf721c4c59d11451e434a79eeafdae3ac9a3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
