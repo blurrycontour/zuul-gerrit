@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASn//smQ\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 2723,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-08-30T18:52:32Z",
+      "side": 1,
+      "message": "FakeGerrit or FakeSMTP?",
+      "revId": "e089c725d82288288ce14b3c48defe62c91d1b68",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//slw\u003d",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-08-30T18:52:32Z",
+      "side": 1,
+      "message": "Does this make the SMTP section required? It would be nice to not need to configure smtp if the smtp reporter isn\u0027t used. I am pretty sure ConfigParser.get will throw an exception if these values are not included.",
+      "revId": "e089c725d82288288ce14b3c48defe62c91d1b68",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
