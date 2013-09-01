@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAASn//pBA\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 2723,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-09-01T23:56:37Z",
+      "side": 1,
+      "message": "It is FakeGerrit.\n\nFakeGerrit stores the messages it was going to send back. This compares what was sent back via SMTP to Gerrit (as they should be the same).\n\nHowever because the pipeline for this test doesn\u0027t send anything to Gerrit for \u0027start\u0027 action I\u0027ve just included the body inline (ie \u0027Starting check jobs.\u0027).",
+      "parentUuid": "AAAASn//smQ\u003d",
+      "revId": "e089c725d82288288ce14b3c48defe62c91d1b68",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASn//slw\u003d",
         "filename": "zuul/cmd/server.py",
         "patchSetId": 10
@@ -30,6 +48,24 @@
       "writtenOn": "2013-08-30T18:52:32Z",
       "side": 1,
       "message": "Does this make the SMTP section required? It would be nice to not need to configure smtp if the smtp reporter isn\u0027t used. I am pretty sure ConfigParser.get will throw an exception if these values are not included.",
+      "revId": "e089c725d82288288ce14b3c48defe62c91d1b68",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//pA4\u003d",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-09-01T23:56:37Z",
+      "side": 1,
+      "message": "Made optional",
+      "parentUuid": "AAAASn//slw\u003d",
       "revId": "e089c725d82288288ce14b3c48defe62c91d1b68",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
