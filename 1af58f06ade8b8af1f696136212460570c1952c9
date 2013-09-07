@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASn//R9w\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 437,
+      "author": {
+        "id": 7680
+      },
+      "writtenOn": "2013-09-07T15:15:16Z",
+      "side": 1,
+      "message": "Drop the parens.",
+      "revId": "1af58f06ade8b8af1f696136212460570c1952c9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
