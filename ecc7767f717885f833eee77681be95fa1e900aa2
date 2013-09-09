@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASn//Q5c\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1845,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-09-09T00:42:02Z",
+      "side": 1,
+      "message": "Should this also be B -\u003e A ?",
+      "revId": "ecc7767f717885f833eee77681be95fa1e900aa2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//Q5Y\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1849,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-09-09T00:42:02Z",
+      "side": 1,
+      "message": "Because of this ^",
+      "revId": "ecc7767f717885f833eee77681be95fa1e900aa2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//Q5I\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 440,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-09-09T00:42:02Z",
+      "side": 1,
+      "message": "Won\u0027t these be set by the QueueItem class?",
+      "revId": "ecc7767f717885f833eee77681be95fa1e900aa2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//Q44\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 958,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-09-09T00:42:02Z",
+      "side": 1,
+      "message": "So this seems odd to me, and perhaps it is a case of not understanding it very well.\n\nIf a change has dependents and the change gets moved, is there a scenario where the change gets moved that is not above the dependents? Wouldn\u0027t it be better to move the change and its dependents behind it?\n\nPerhaps we are also missing a test case here?",
+      "revId": "ecc7767f717885f833eee77681be95fa1e900aa2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//Q40\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 977,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-09-09T00:42:02Z",
+      "side": 1,
+      "message": "Should you dequeue the item before canceling the jobs behind to make sure they are reset at the correct position?",
+      "revId": "ecc7767f717885f833eee77681be95fa1e900aa2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
