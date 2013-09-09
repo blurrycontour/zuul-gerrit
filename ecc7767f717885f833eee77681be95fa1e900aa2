@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "AAAASn//OH4\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1849,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-09-09T19:07:20Z",
+      "side": 1,
+      "message": "Oops, I meant to do what the comment says.  I think the outcome is the same, but I\u0027ll change the code to match the comment.",
+      "parentUuid": "AAAASn//Q5Y\u003d",
+      "revId": "ecc7767f717885f833eee77681be95fa1e900aa2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASn//Q5I\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 6
@@ -47,6 +65,24 @@
       "writtenOn": "2013-09-09T00:42:02Z",
       "side": 1,
       "message": "Won\u0027t these be set by the QueueItem class?",
+      "revId": "ecc7767f717885f833eee77681be95fa1e900aa2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//OGU\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 440,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-09-09T19:07:20Z",
+      "side": 1,
+      "message": "Yes.  I suppose this is a belt-and-suspenders thing that could probably be removed, but I think I\u0027d like to leave it alone for this change (this isn\u0027t trying to change behavior here).",
+      "parentUuid": "AAAASn//Q5I\u003d",
       "revId": "ecc7767f717885f833eee77681be95fa1e900aa2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -70,6 +106,24 @@
     },
     {
       "key": {
+        "uuid": "AAAASn//OIw\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 958,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-09-09T19:07:20Z",
+      "side": 1,
+      "message": "So the potentially confusing thing, that could certainly use some code comments, is that a change queue now has two simultaneous data structures.  There\u0027s the queue itself, which is a strictly linear queue of changes in the order in which they were enqueued (which includes dependency order -- dependencies are always enqueued ahead of changes that need them).\n\nThere is also (now) a tree structure that defines the current composition of changes that are used to build the Zuul refs for testing.  In practice, this tree is tall and skinny, with one central column composed of the current changes that are passing.  Failing changes are then branched off to the side and are not included in the list of commits being tested.\n\nSo this block (the else) handles cases where we are either moving a change \u0027up\u0027 (past a failed change), or possibly even back down (if a previously-failing change was restarted and is succeeding).  But in all cases, because the queue is processed in _queue_ order (not _tree_ order), the change it\u0027s based on will always be a change that is ahead of it in the queue.\n\nThe other part of this block (the if clause), deals with changes that depend on a failing item -- it ensures that they don\u0027t get moved around (they just stay behind the change they are currently behind).  They\u0027re basically dead at this point and just stay in the queue in case something changes.  Because of this, changes that depend on a failing change won\u0027t be moved to be behind the NNFI.  (I think that\u0027s the actual answer to your question.)",
+      "parentUuid": "AAAASn//Q44\u003d",
+      "revId": "ecc7767f717885f833eee77681be95fa1e900aa2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASn//Q40\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 6
@@ -81,6 +135,24 @@
       "writtenOn": "2013-09-09T00:42:02Z",
       "side": 1,
       "message": "Should you dequeue the item before canceling the jobs behind to make sure they are reset at the correct position?",
+      "revId": "ecc7767f717885f833eee77681be95fa1e900aa2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//OKc\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 977,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-09-09T19:07:20Z",
+      "side": 1,
+      "message": "Their position won\u0027t be finalized until prepareRef is called (a couple blocks above this).",
+      "parentUuid": "AAAASn//Q40\u003d",
       "revId": "ecc7767f717885f833eee77681be95fa1e900aa2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
