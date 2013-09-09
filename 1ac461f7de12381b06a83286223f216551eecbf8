@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASn//Nrg\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1000,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-09-09T21:24:48Z",
+      "side": 1,
+      "message": "Could this be if item_changed instead? removes the need for the if above.",
+      "revId": "1ac461f7de12381b06a83286223f216551eecbf8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
