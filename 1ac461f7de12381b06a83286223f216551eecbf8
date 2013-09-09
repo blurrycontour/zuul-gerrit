@@ -16,6 +16,24 @@
       "revId": "1ac461f7de12381b06a83286223f216551eecbf8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASn//NYQ\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1000,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-09-09T22:51:14Z",
+      "side": 1,
+      "message": "This way the debug output happens for a change-queue if it changes.",
+      "parentUuid": "AAAASn//Nrg\u003d",
+      "revId": "1ac461f7de12381b06a83286223f216551eecbf8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
