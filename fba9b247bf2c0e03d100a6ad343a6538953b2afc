@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAS3//5ps\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 726,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-09-17T13:43:54Z",
+      "side": 0,
+      "message": "a recommendation for future patches - please don\u0027t do incidental cleanups in the same patch: they make folk scratch their head because they aren\u0027t connected to the description in the review, and because they aren\u0027t connected to the change being made. Ideally this would be a separate patch which would be trivially approved while the other change requires more thought.",
+      "revId": "fba9b247bf2c0e03d100a6ad343a6538953b2afc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}

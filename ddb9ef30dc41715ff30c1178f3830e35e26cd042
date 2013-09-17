@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAS3//5qk\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 726,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-09-17T13:43:54Z",
+      "side": 1,
+      "message": "This looks wrong to me - _id returns bytestrings everywhere else; shouldn\u0027t this return \u0027\u0027 if you want to give it no id?",
+      "revId": "ddb9ef30dc41715ff30c1178f3830e35e26cd042",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
