@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAS3//zV4\u003d",
+        "filename": "tox.ini",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2013-09-18T23:42:42Z",
+      "side": 1,
+      "message": "As Monty pointed out on one of my earlier reviews, the install_command override is new in tox 1.6, so up here in the [tox] section you need...\n\n minversion \u003d 1.6",
+      "revId": "9a57808c1857147200726838acd19cc10919ae78",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
