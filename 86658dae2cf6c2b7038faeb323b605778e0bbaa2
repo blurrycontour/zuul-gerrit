@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAATH//+5Q\u003d",
+        "filename": "doc/source/statsd.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-10-07T00:07:43Z",
+      "side": 1,
+      "message": "I think this should be rephrased: \u0027Statsd support uses the statsd python module. Note that zuul will start without the statsd python module, so an existing running zuul may be missing it.\u0027",
+      "revId": "86658dae2cf6c2b7038faeb323b605778e0bbaa2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATH//+5I\u003d",
+        "filename": "doc/source/statsd.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-10-07T00:07:43Z",
+      "side": 1,
+      "message": "That isn\u0027t the initscript, it is configuration for it.",
+      "revId": "86658dae2cf6c2b7038faeb323b605778e0bbaa2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATH//+5M\u003d",
+        "filename": "doc/source/statsd.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-10-07T00:07:43Z",
+      "side": 1,
+      "message": "Typo - \u0027nn\u0027.",
+      "revId": "86658dae2cf6c2b7038faeb323b605778e0bbaa2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATH//+5E\u003d",
+        "filename": "doc/source/statsd.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-10-07T00:07:43Z",
+      "side": 1,
+      "message": "missing \u0027the\u0027",
+      "revId": "86658dae2cf6c2b7038faeb323b605778e0bbaa2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATH//+5A\u003d",
+        "filename": "doc/source/statsd.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-10-07T00:07:43Z",
+      "side": 1,
+      "message": "Might be simpler to say \u0027Some of the events emitted are:\u0027",
+      "revId": "86658dae2cf6c2b7038faeb323b605778e0bbaa2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATH//+4o\u003d",
+        "filename": "doc/source/statsd.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-10-07T00:07:43Z",
+      "side": 1,
+      "message": "Zuul doesn\u0027t emit any non-Gerrit events? Perhaps we should list all the Zuul specific events and then refer to Gerrit for the rest.",
+      "revId": "86658dae2cf6c2b7038faeb323b605778e0bbaa2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATH//+48\u003d",
+        "filename": "doc/source/statsd.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-10-07T00:07:43Z",
+      "side": 1,
+      "message": "unbalanced *",
+      "revId": "86658dae2cf6c2b7038faeb323b605778e0bbaa2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATH//+44\u003d",
+        "filename": "doc/source/statsd.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-10-07T00:07:43Z",
+      "side": 1,
+      "message": "preceeded?",
+      "revId": "86658dae2cf6c2b7038faeb323b605778e0bbaa2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
