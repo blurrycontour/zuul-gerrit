@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAATH//+PU\u003d",
+        "filename": "doc/source/statsd.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-10-07T08:53:30Z",
+      "side": 1,
+      "message": "I have replaced my sentence with your, though instead of \u0027existing running Zuul\u0027 I used \u0027existing Zuul installation\u0027.",
+      "parentUuid": "AAAATH//+5Q\u003d",
+      "revId": "86658dae2cf6c2b7038faeb323b605778e0bbaa2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAATH//+5I\u003d",
         "filename": "doc/source/statsd.rst",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2013-10-07T00:07:43Z",
       "side": 1,
       "message": "That isn\u0027t the initscript, it is configuration for it.",
+      "revId": "86658dae2cf6c2b7038faeb323b605778e0bbaa2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATH//+Pw\u003d",
+        "filename": "doc/source/statsd.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-10-07T08:53:30Z",
+      "side": 1,
+      "message": "Slightly rephrased.",
+      "parentUuid": "AAAATH//+5I\u003d",
       "revId": "86658dae2cf6c2b7038faeb323b605778e0bbaa2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "AAAATH//+QI\u003d",
+        "filename": "doc/source/statsd.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-10-07T08:53:30Z",
+      "side": 1,
+      "message": "That is valid in french :-D  Sorry, done.",
+      "parentUuid": "AAAATH//+5M\u003d",
+      "revId": "86658dae2cf6c2b7038faeb323b605778e0bbaa2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAATH//+5E\u003d",
         "filename": "doc/source/statsd.rst",
         "patchSetId": 1
@@ -64,6 +118,24 @@
       "writtenOn": "2013-10-07T00:07:43Z",
       "side": 1,
       "message": "missing \u0027the\u0027",
+      "revId": "86658dae2cf6c2b7038faeb323b605778e0bbaa2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATH//+Po\u003d",
+        "filename": "doc/source/statsd.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-10-07T08:53:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAATH//+5E\u003d",
       "revId": "86658dae2cf6c2b7038faeb323b605778e0bbaa2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "AAAATH//+Pc\u003d",
+        "filename": "doc/source/statsd.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-10-07T08:53:30Z",
+      "side": 1,
+      "message": "Indeed :)\nDone.",
+      "parentUuid": "AAAATH//+5A\u003d",
+      "revId": "86658dae2cf6c2b7038faeb323b605778e0bbaa2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAATH//+4o\u003d",
         "filename": "doc/source/statsd.rst",
         "patchSetId": 1
@@ -98,6 +188,24 @@
       "writtenOn": "2013-10-07T00:07:43Z",
       "side": 1,
       "message": "Zuul doesn\u0027t emit any non-Gerrit events? Perhaps we should list all the Zuul specific events and then refer to Gerrit for the rest.",
+      "revId": "86658dae2cf6c2b7038faeb323b605778e0bbaa2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATH//+Ns\u003d",
+        "filename": "doc/source/statsd.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-10-07T08:53:30Z",
+      "side": 1,
+      "message": "I have slightly rephrased both sentences in gerrit.events section.  I have put that section first to keep the list of metrics alphabetically sorted, we can move the gerrit.events section below the zuul.* sections.",
+      "parentUuid": "AAAATH//+4o\u003d",
       "revId": "86658dae2cf6c2b7038faeb323b605778e0bbaa2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "AAAATH//+Qc\u003d",
+        "filename": "doc/source/statsd.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-10-07T08:53:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAATH//+48\u003d",
+      "revId": "86658dae2cf6c2b7038faeb323b605778e0bbaa2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAATH//+44\u003d",
         "filename": "doc/source/statsd.rst",
         "patchSetId": 1
@@ -132,6 +258,24 @@
       "writtenOn": "2013-10-07T00:07:43Z",
       "side": 1,
       "message": "preceeded?",
+      "revId": "86658dae2cf6c2b7038faeb323b605778e0bbaa2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATH//+QM\u003d",
+        "filename": "doc/source/statsd.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-10-07T08:53:30Z",
+      "side": 1,
+      "message": "That is a count of changes pending actions or that have been triggered by Zuul.  Hence zuul is processing them.  Preceeded does not seem to be an appropriate description there.",
+      "parentUuid": "AAAATH//+44\u003d",
       "revId": "86658dae2cf6c2b7038faeb323b605778e0bbaa2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
