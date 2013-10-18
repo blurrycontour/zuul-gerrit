@@ -38,12 +38,14 @@ class Repo(object):
             self.log.exception("Unable to initialize repo for %s" % remote)
 
     def _ensure_cloned(self):
-        if self._initialized:
-            return
-        if not os.path.exists(self.local_path):
+        # If the repo is not initialized or the repo does not exist
+        # clone the repo.
+        if not self._initialized or not os.path.exists(self.local_path):
             self.log.debug("Cloning from %s to %s" % (self.remote_url,
                                                       self.local_path))
             git.Repo.clone_from(self.remote_url, self.local_path)
+        else:
+            return
         self.repo = git.Repo(self.local_path)
         if self.email:
             self.repo.config_writer().set_value('user', 'email',
