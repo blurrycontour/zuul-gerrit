@@ -31,19 +31,18 @@ class Repo(object):
         self.local_path = local
         self.email = email
         self.username = username
-        self._initialized = False
         try:
             self._ensure_cloned()
         except:
             self.log.exception("Unable to initialize repo for %s" % remote)
 
     def _ensure_cloned(self):
-        if self._initialized:
+        if os.path.exists(self.local_path):
             return
-        if not os.path.exists(self.local_path):
-            self.log.debug("Cloning from %s to %s" % (self.remote_url,
-                                                      self.local_path))
-            git.Repo.clone_from(self.remote_url, self.local_path)
+        # If the repo does not exist, clone the repo.
+        self.log.debug("Cloning from %s to %s" % (self.remote_url,
+                                                  self.local_path))
+        git.Repo.clone_from(self.remote_url, self.local_path)
         self.repo = git.Repo(self.local_path)
         if self.email:
             self.repo.config_writer().set_value('user', 'email',
@@ -52,7 +51,6 @@ class Repo(object):
             self.repo.config_writer().set_value('user', 'name',
                                                 self.username)
         self.repo.config_writer().write()
-        self._initialized = True
 
     def recreateRepoObject(self):
         self._ensure_cloned()
