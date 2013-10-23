@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAATX///GA\u003d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-10-23T09:16:22Z",
+      "side": 1,
+      "message": "The * zuul/merger.py is a little unusual in git commit messages IME. Just a comment.\n\nThis seems like something a bug has probably been filed for ?",
+      "revId": "c422a5aa27d6a73bf8a7b6c3eac2c862caecff48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATX///Fg\u003d",
+        "filename": "zuul/merger.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-10-23T09:16:22Z",
+      "side": 1,
+      "message": "This will be cleaner if you invert it:\n\n if os.path.exists(self.local_path):\n     return\n # all your init code here.",
+      "revId": "c422a5aa27d6a73bf8a7b6c3eac2c862caecff48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
