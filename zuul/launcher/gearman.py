@@ -155,6 +155,7 @@ class Gearman(object):
         self.sched = sched
         self.builds = {}
         self.meta_jobs = {}  # A list of meta-jobs like stop or describe
+        self.config = config
         server = config.get('gearman', 'server')
         if config.has_option('gearman', 'port'):
             port = config.get('gearman', 'port')
@@ -249,6 +250,9 @@ class Gearman(object):
 
             params['ZUUL_REF'] = item.change.ref
             params['ZUUL_COMMIT'] = item.change.newrev
+
+        if self.config.has_option('zuul', 'zuul_url'):
+            params['ZUUL_URL'] = self.config.get('zuul', 'zuul_url')
 
         # This is what we should be heading toward for parameters:
 
