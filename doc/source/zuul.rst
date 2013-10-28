@@ -139,6 +139,10 @@ zuul
   is included).  Defaults to ``false``.
   ``job_name_in_report=true``
 
+**zuul_url**
+  Zuul URL to be passed to Jenkins as ZUUL_URL parameter enabling
+  third part ifrastructure indicate their own Zuul server.
+
 smtp
 """"
 
