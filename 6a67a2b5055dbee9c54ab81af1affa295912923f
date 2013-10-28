@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAATn//yxs\u003d",
+        "filename": "zuul/launcher/gearman.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-10-28T23:13:40Z",
+      "side": 1,
+      "message": "The idiom here is to read value out of the config - please continue to do that rather than binding a reference to config.",
+      "revId": "6a67a2b5055dbee9c54ab81af1affa295912923f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
