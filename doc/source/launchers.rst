@@ -86,6 +86,11 @@ follows:
   The project that triggered this build
 **ZUUL_PIPELINE**
   The Zuul pipeline that is building this job
+**ZUUL_URL**
+  The url for the zuul server. This adds the possibility to pass
+  ZUUL_URL to jenkins. If not set, ZUUL_URL is not passed to Jenkins
+  and the job will not be able to query Zuul at all (unless the URL
+  is hardcoded in in some fashion).
 
 The following additional parameters will only be provided for builds
 associated with changes (i.e., in response to patchset-created or
