@@ -115,6 +115,15 @@ post-merge (ref-updated) builds:
 **ZUUL_SHORT_NEWREV**
   The shortened (7 character) SHA1 of the new revision
 
+The following additional parameter will only be provided when
+zuul_url option is configured in ``zuul`` section of ``zuul.conf``:
+
+**ZUUL_URL**
+  The url for the zuul server. This adds the possibility to pass
+  ZUUL_URL to jenkins. If not set, ZUUL_URL is not passed to Jenkins
+  and the job will not be able to query Zuul at all (unless the URL
+  is hardcoded in in some fashion).
+
 In order to test the correct build, configure the Jenkins Git SCM
 plugin as follows::
 
