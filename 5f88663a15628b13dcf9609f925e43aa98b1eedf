@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAATn//vck\u003d",
+        "filename": "doc/source/launchers.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 5660
+      },
+      "writtenOn": "2013-10-29T16:46:22Z",
+      "side": 1,
+      "message": "I\u0027d like to see this described as it is in the commit message, that it is optional and what happens when it is not set in zuul.conf",
+      "revId": "5f88663a15628b13dcf9609f925e43aa98b1eedf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
