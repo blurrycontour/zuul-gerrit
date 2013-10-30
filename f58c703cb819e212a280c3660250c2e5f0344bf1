@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAATn//tQU\u003d",
+        "filename": "doc/source/launchers.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-10-30T06:48:45Z",
+      "side": 1,
+      "message": "Trailing whitespace on these two lines.",
+      "revId": "f58c703cb819e212a280c3660250c2e5f0344bf1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn//tQA\u003d",
+        "filename": "doc/source/launchers.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-10-30T06:48:45Z",
+      "side": 1,
+      "message": "Presumably the Jenkins server is using another Zuul and thats why overriding the default is needed? Perhaps a more detailed explanation than the one-liner below would be useful.",
+      "revId": "f58c703cb819e212a280c3660250c2e5f0344bf1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn//tP8\u003d",
+        "filename": "zuul/launcher/gearman.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-10-30T06:48:45Z",
+      "side": 1,
+      "message": "Please don\u0027t do this - see my explanation in patch set 2.",
+      "revId": "f58c703cb819e212a280c3660250c2e5f0344bf1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
