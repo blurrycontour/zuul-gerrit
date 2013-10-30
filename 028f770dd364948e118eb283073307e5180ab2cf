@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAATn//qRQ\u003d",
+        "filename": "doc/source/launchers.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-10-30T18:17:22Z",
+      "side": 1,
+      "message": "Ok, so thats clearer - thank you. But it also makes it clear that this is actually devstack-gate specific!\n\nSo, I think the explanation is a little confusing for people using Zuul outside OpenStack (and folk do).\n\nHow about\n\n\"\"\"If not set, ZUUL_URL is not passed to Jenkins and the job will not be able to query Zuul at all (unless the URL is hardcoded in in some fashion).\"\"\"",
+      "revId": "028f770dd364948e118eb283073307e5180ab2cf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn//qRI\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 2419,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-10-30T18:17:22Z",
+      "side": 1,
+      "message": "Great test, thank you.\n\nPlease also add a negative test: that when zuul_url is not set in the config, ZUUL_URL is not passed to builders.\n\nThank you!",
+      "revId": "028f770dd364948e118eb283073307e5180ab2cf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
