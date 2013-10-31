@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAATn//lXk\u003d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-10-31T22:06:39Z",
+      "side": 1,
+      "message": "Nit: sentences should still be capitalised :).",
+      "revId": "6523b5237f67ac3699c0d6e273dc485e30ebba26",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn//lXg\u003d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-10-31T22:06:39Z",
+      "side": 1,
+      "message": "Do you mean \u0027savvy\u0027 ?",
+      "revId": "6523b5237f67ac3699c0d6e273dc485e30ebba26",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn//lXY\u003d",
+        "filename": "test-requirements.txt",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-10-31T22:06:39Z",
+      "side": 1,
+      "message": "This needs to go in the openstack/requirements repo before this patch can land.",
+      "revId": "6523b5237f67ac3699c0d6e273dc485e30ebba26",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
