@@ -16,6 +16,24 @@
       "revId": "cd34c1a61283b615eb374474c7cbbc87a6189ba3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn//bOI\u003d",
+        "filename": "doc/source/gating.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-11-06T13:40:01Z",
+      "side": 1,
+      "message": "breaking it in next patchset :)",
+      "parentUuid": "AAAATn//cHw\u003d",
+      "revId": "cd34c1a61283b615eb374474c7cbbc87a6189ba3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
