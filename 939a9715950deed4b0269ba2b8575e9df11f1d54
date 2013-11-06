@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAATn//crc\u003d",
+        "filename": "doc/source/launchers.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-11-06T01:39:08Z",
+      "side": 1,
+      "message": "Trailing whitespace on these two lines - please remove it.",
+      "revId": "939a9715950deed4b0269ba2b8575e9df11f1d54",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn//cqw\u003d",
+        "filename": "doc/source/launchers.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-11-06T01:39:08Z",
+      "side": 1,
+      "message": "Thank you for improving the docs here. Please remove this last line - it is no longer needed.",
+      "revId": "939a9715950deed4b0269ba2b8575e9df11f1d54",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
