@@ -16,6 +16,24 @@
       "revId": "39472f851af767dc46e00d418a7100a2448aa612",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn//Yf0\u003d",
+        "filename": "doc/source/gating.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-11-07T16:34:01Z",
+      "side": 1,
+      "message": "Today I learned: http://en.wikipedia.org/wiki/Serial_comma\n\nI have copy pasted, that is indeed better. Thank you!",
+      "parentUuid": "AAAATn//aQE\u003d",
+      "revId": "39472f851af767dc46e00d418a7100a2448aa612",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
