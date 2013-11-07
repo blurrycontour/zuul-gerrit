@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAATn//aQE\u003d",
+        "filename": "doc/source/gating.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-11-07T00:11:33Z",
+      "side": 1,
+      "message": "Sorry to nitpick, now I\u0027ve noticed an issue - this has a grammar issue: the first comma isn\u0027t needed and it may need the oxford comma.\n\nHow about this instead:\n\n The jobs for E would include the whole dependency chain: A, B, C, D, and E. E will \n be tested assuming that A, B, C, and D passed:",
+      "revId": "39472f851af767dc46e00d418a7100a2448aa612",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
