@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import contextlib
 import git
 import os
 import logging
@@ -34,7 +35,8 @@ class Repo(object):
         try:
             self._ensure_cloned()
         except:
-            self.log.exception("Unable to initialize repo for %s" % remote)
+            self.log.exception("Unable to initialize repo for %s" %
+                               self.remote_url)
 
     def _ensure_cloned(self):
         if os.path.exists(self.local_path):
@@ -43,102 +45,96 @@ class Repo(object):
         self.log.debug("Cloning from %s to %s" % (self.remote_url,
                                                   self.local_path))
         git.Repo.clone_from(self.remote_url, self.local_path)
-        self.repo = git.Repo(self.local_path)
+        repo = git.Repo(self.local_path)
         if self.email:
-            self.repo.config_writer().set_value('user', 'email',
-                                                self.email)
+            repo.config_writer().set_value('user', 'email',
+                                           self.email)
         if self.username:
-            self.repo.config_writer().set_value('user', 'name',
-                                                self.username)
-        self.repo.config_writer().write()
+            repo.config_writer().set_value('user', 'name',
+                                           self.username)
+        repo.config_writer().write()
 
-    def recreateRepoObject(self):
-        self._ensure_cloned()
-        self.repo = git.Repo(self.local_path)
+    @contextlib.contextmanager
+    def createRepoObject(self):
+        try:
+            self._ensure_cloned()
+            repo = git.Repo(self.local_path)
+        except:
+            self.log.exception("Unable to initialize repo for %s" %
+                               self.remote_url)
+        yield repo
 
     def reset(self):
-        self._ensure_cloned()
-        self.log.debug("Resetting repository %s" % self.local_path)
-        self.update()
-        origin = self.repo.remotes.origin
-        for ref in origin.refs:
-            if ref.remote_head == 'HEAD':
-                continue
-            self.repo.create_head(ref.remote_head, ref, force=True)
+        with self.createRepoObject() as repo:
+            self.log.debug("Resetting repository %s" % self.local_path)
+            self.update()
+            origin = repo.remotes.origin
+            for ref in origin.refs:
+                if ref.remote_head == 'HEAD':
+                    continue
+                repo.create_head(ref.remote_head, ref, force=True)
 
-        # Reset to remote HEAD (usually origin/master)
-        self.repo.head.reference = origin.refs['HEAD']
-        self.repo.head.reset(index=True, working_tree=True)
-        self.repo.git.clean('-x', '-f', '-d')
+            # Reset to remote HEAD (usually origin/master)
+            repo.head.reference = origin.refs['HEAD']
+            repo.head.reset(index=True, working_tree=True)
+            repo.git.clean('-x', '-f', '-d')
 
     def getBranchHead(self, branch):
-        return self.repo.heads[branch]
+        with self.createRepoObject() as repo:
+            branch_head = repo.heads[branch]
+        return branch_head
 
     def checkout(self, ref):
-        self._ensure_cloned()
-        self.log.debug("Checking out %s" % ref)
-        self.repo.head.reference = ref
-        self.repo.head.reset(index=True, working_tree=True)
+        with self.createRepoObject() as repo:
+            self.log.debug("Checking out %s" % ref)
+            repo.head.reference = ref
+            repo.head.reset(index=True, working_tree=True)
 
     def cherryPick(self, ref):
-        self._ensure_cloned()
-        self.log.debug("Cherry-picking %s" % ref)
-        self.fetch(ref)
-        self.repo.git.cherry_pick("FETCH_HEAD")
+        with self.createRepoObject() as repo:
+            self.log.debug("Cherry-picking %s" % ref)
+            self.fetch(ref)
+            repo.git.cherry_pick("FETCH_HEAD")
 
     def merge(self, ref, strategy=None):
-        self._ensure_cloned()
-        args = []
-        if strategy:
-            args += ['-s', strategy]
-        args.append('FETCH_HEAD')
-        self.fetch(ref)
-        self.log.debug("Merging %s with args %s" % (ref, args))
-        self.repo.git.merge(*args)
+        with self.createRepoObject() as repo:
+            args = []
+            if strategy:
+                args += ['-s', strategy]
+            args.append('FETCH_HEAD')
+            self.fetch(ref)
+            self.log.debug("Merging %s with args %s" % (ref, args))
+            repo.git.merge(*args)
 
     def fetch(self, ref):
-        self._ensure_cloned()
-        # The git.remote.fetch method may read in git progress info and
-        # interpret it improperly causing an AssertionError. Because the
-        # data was fetched properly subsequent fetches don't seem to fail.
-        # So try again if an AssertionError is caught.
-        origin = self.repo.remotes.origin
-        try:
-            origin.fetch(ref)
-        except AssertionError:
-            origin.fetch(ref)
-
-        # If the repository is packed, and we fetch a change that is
-        # also entirely packed, the cache may be out of date for the
-        # same reason as reset() above.  Avoid these problems by
-        # recreating the repo object.
-        # https://bugs.launchpad.net/zuul/+bug/1078946
-        self.repo = git.Repo(self.local_path)
+        with self.createRepoObject() as repo:
+            # The git.remote.fetch method may read in git progress info and
+            # interpret it improperly causing an AssertionError. Because the
+            # data was fetched properly subsequent fetches don't seem to fail.
+            # So try again if an AssertionError is caught.
+            origin = repo.remotes.origin
+            try:
+                origin.fetch(ref)
+            except AssertionError:
+                origin.fetch(ref)
 
     def createZuulRef(self, ref, commit='HEAD'):
-        self._ensure_cloned()
-        self.log.debug("CreateZuulRef %s at %s " % (ref, commit))
-        ref = ZuulReference.create(self.repo, ref, commit)
-        return ref.commit
+        with self.createRepoObject() as repo:
+            self.log.debug("CreateZuulRef %s at %s " % (ref, commit))
+            ref = ZuulReference.create(repo, ref, commit)
+            return ref.commit
 
     def push(self, local, remote):
-        self._ensure_cloned()
-        self.log.debug("Pushing %s:%s to %s " % (local, remote,
-                                                 self.remote_url))
-        self.repo.remotes.origin.push('%s:%s' % (local, remote))
+        with self.createRepoObject() as repo:
+            self.log.debug("Pushing %s:%s to %s " % (local, remote,
+                                                     self.remote_url))
+            repo.remotes.origin.push('%s:%s' % (local, remote))
 
     def update(self):
-        self._ensure_cloned()
-        self.log.debug("Updating repository %s" % self.local_path)
-        origin = self.repo.remotes.origin
-        origin.update()
-        # If the remote repository is repacked, the repo object's
-        # cache may be out of date.  Specifically, it caches whether
-        # to check the loose or packed DB for a given SHA.  Further,
-        # if there was no pack or lose directory to start with, the
-        # repo object may not even have a database for it.  Avoid
-        # these problems by recreating the repo object.
-        self.repo = git.Repo(self.local_path)
+        with self.createRepoObject() as repo:
+            self.log.debug("Updating repository %s" % self.local_path)
+            origin = repo.remotes.origin
+            origin.update()
 
 
 class Merger(object):
@@ -176,9 +172,7 @@ class Merger(object):
             self.log.exception("Unable to add project %s" % project)
 
     def getRepo(self, project):
-        r = self.repos.get(project, None)
-        r.recreateRepoObject()
-        return r
+        return self.repos.get(project, None)
 
     def updateRepo(self, project):
         repo = self.getRepo(project)
