@@ -32,10 +32,6 @@ class Repo(object):
         self.email = email
         self.username = username
         self._initialized = False
-        try:
-            self._ensure_cloned()
-        except:
-            self.log.exception("Unable to initialize repo for %s" % remote)
 
     def _ensure_cloned(self):
         if self._initialized:
@@ -54,93 +50,101 @@ class Repo(object):
         self.repo.config_writer().write()
         self._initialized = True
 
+    @contextlib.contextmanager
     def recreateRepoObject(self):
-        self._ensure_cloned()
-        self.repo = git.Repo(self.local_path)
+        try:
+            self._ensure_cloned()
+            self.repo = git.Repo(self.local_path)
+        except:
+            self.log.exception("Unable to initialize repo for %s" % remote)
+        yield self.repo
+        self.repo = None
 
     def reset(self):
-        self._ensure_cloned()
-        self.log.debug("Resetting repository %s" % self.local_path)
-        self.update()
-        origin = self.repo.remotes.origin
-        for ref in origin.refs:
-            if ref.remote_head == 'HEAD':
-                continue
-            self.repo.create_head(ref.remote_head, ref, force=True)
+        with self.recreateRepoObject():
+            self.log.debug("Resetting repository %s" % self.local_path)
+            self.update()
+            origin = self.repo.remotes.origin
+            for ref in origin.refs:
+                if ref.remote_head == 'HEAD':
+                    continue
+                self.repo.create_head(ref.remote_head, ref, force=True)
 
-        # Reset to remote HEAD (usually origin/master)
-        self.repo.head.reference = origin.refs['HEAD']
-        self.repo.head.reset(index=True, working_tree=True)
-        self.repo.git.clean('-x', '-f', '-d')
+            # Reset to remote HEAD (usually origin/master)
+            self.repo.head.reference = origin.refs['HEAD']
+            self.repo.head.reset(index=True, working_tree=True)
+            self.repo.git.clean('-x', '-f', '-d')
 
     def getBranchHead(self, branch):
-        return self.repo.heads[branch]
+        with self.recreateRepoObject():
+            branch_head = self.repo.heads[branch]
+        return branch_head
 
     def checkout(self, ref):
-        self._ensure_cloned()
-        self.log.debug("Checking out %s" % ref)
-        self.repo.head.reference = ref
-        self.repo.head.reset(index=True, working_tree=True)
+        with self.recreateRepoObject():
+            self.log.debug("Checking out %s" % ref)
+            self.repo.head.reference = ref
+            self.repo.head.reset(index=True, working_tree=True)
 
     def cherryPick(self, ref):
-        self._ensure_cloned()
-        self.log.debug("Cherry-picking %s" % ref)
-        self.fetch(ref)
-        self.repo.git.cherry_pick("FETCH_HEAD")
+        with self.recreateRepoObject():
+            self.log.debug("Cherry-picking %s" % ref)
+            self.fetch(ref)
+            self.repo.git.cherry_pick("FETCH_HEAD")
 
     def merge(self, ref, strategy=None):
-        self._ensure_cloned()
-        args = []
-        if strategy:
-            args += ['-s', strategy]
-        args.append('FETCH_HEAD')
-        self.fetch(ref)
-        self.log.debug("Merging %s with args %s" % (ref, args))
-        self.repo.git.merge(*args)
+        with self.recreateRepoObject():
+            args = []
+            if strategy:
+                args += ['-s', strategy]
+            args.append('FETCH_HEAD')
+            self.fetch(ref)
+            self.log.debug("Merging %s with args %s" % (ref, args))
+            self.repo.git.merge(*args)
 
     def fetch(self, ref):
-        self._ensure_cloned()
-        # The git.remote.fetch method may read in git progress info and
-        # interpret it improperly causing an AssertionError. Because the
-        # data was fetched properly subsequent fetches don't seem to fail.
-        # So try again if an AssertionError is caught.
-        origin = self.repo.remotes.origin
-        try:
-            origin.fetch(ref)
-        except AssertionError:
-            origin.fetch(ref)
+        with self.recreateRepoObject():
+            # The git.remote.fetch method may read in git progress info and
+            # interpret it improperly causing an AssertionError. Because the
+            # data was fetched properly subsequent fetches don't seem to fail.
+            # So try again if an AssertionError is caught.
+            origin = self.repo.remotes.origin
+            try:
+                origin.fetch(ref)
+            except AssertionError:
+                origin.fetch(ref)
 
-        # If the repository is packed, and we fetch a change that is
-        # also entirely packed, the cache may be out of date for the
-        # same reason as reset() above.  Avoid these problems by
-        # recreating the repo object.
-        # https://bugs.launchpad.net/zuul/+bug/1078946
-        self.repo = git.Repo(self.local_path)
+            # If the repository is packed, and we fetch a change that is
+            # also entirely packed, the cache may be out of date for the
+            # same reason as reset() above.  Avoid these problems by
+            # recreating the repo object.
+            # https://bugs.launchpad.net/zuul/+bug/1078946
+            self.repo = git.Repo(self.local_path)
 
     def createZuulRef(self, ref, commit='HEAD'):
-        self._ensure_cloned()
-        self.log.debug("CreateZuulRef %s at %s " % (ref, commit))
-        ref = ZuulReference.create(self.repo, ref, commit)
-        return ref.commit
+        with self.recreateRepoObject():
+            self.log.debug("CreateZuulRef %s at %s " % (ref, commit))
+            ref = ZuulReference.create(self.repo, ref, commit)
+            return ref.commit
 
     def push(self, local, remote):
-        self._ensure_cloned()
-        self.log.debug("Pushing %s:%s to %s " % (local, remote,
-                                                 self.remote_url))
-        self.repo.remotes.origin.push('%s:%s' % (local, remote))
+        with self.recreateRepoObject():
+            self.log.debug("Pushing %s:%s to %s " % (local, remote,
+                                                     self.remote_url))
+            self.repo.remotes.origin.push('%s:%s' % (local, remote))
 
     def update(self):
-        self._ensure_cloned()
-        self.log.debug("Updating repository %s" % self.local_path)
-        origin = self.repo.remotes.origin
-        origin.update()
-        # If the remote repository is repacked, the repo object's
-        # cache may be out of date.  Specifically, it caches whether
-        # to check the loose or packed DB for a given SHA.  Further,
-        # if there was no pack or lose directory to start with, the
-        # repo object may not even have a database for it.  Avoid
-        # these problems by recreating the repo object.
-        self.repo = git.Repo(self.local_path)
+        with self.recreateRepoObject():
+            self.log.debug("Updating repository %s" % self.local_path)
+            origin = self.repo.remotes.origin
+            origin.update()
+            # If the remote repository is repacked, the repo object's
+            # cache may be out of date.  Specifically, it caches whether
+            # to check the loose or packed DB for a given SHA.  Further,
+            # if there was no pack or lose directory to start with, the
+            # repo object may not even have a database for it.  Avoid
+            # these problems by recreating the repo object.
+            self.repo = git.Repo(self.local_path)
 
 
 class Merger(object):
