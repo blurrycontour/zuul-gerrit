@@ -16,6 +16,24 @@
       "revId": "0831cada7ec2deb515bbd8a2a8c4328b74f7c855",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn//M2g\u003d",
+        "filename": "zuul/merger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-11-13T01:14:06Z",
+      "side": 1,
+      "message": "Gah yes, I need to invert the logic in the first condition. We don\u0027t always want to set the config values as they will probably be set globally in most installs (this is how our configs are currently set). This allows for consistency across all projects.",
+      "parentUuid": "AAAATn//M5Y\u003d",
+      "revId": "0831cada7ec2deb515bbd8a2a8c4328b74f7c855",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
