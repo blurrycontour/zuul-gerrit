@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAATn//M5Y\u003d",
+        "filename": "zuul/merger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-11-13T00:52:00Z",
+      "side": 1,
+      "message": "My comment in patch set one still applies.\n\nFurther to that, it looks to me that you probably want to always apply the config values?",
+      "revId": "0831cada7ec2deb515bbd8a2a8c4328b74f7c855",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
