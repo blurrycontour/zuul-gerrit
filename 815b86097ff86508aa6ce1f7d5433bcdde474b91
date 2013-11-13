@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAATn//Iqw\u003d",
+        "filename": "zuul/merger.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-11-13T23:58:03Z",
+      "side": 1,
+      "message": "This seems unrelated? Also using remote was nicer, as one line is easier to read.",
+      "revId": "815b86097ff86508aa6ce1f7d5433bcdde474b91",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
