@@ -16,6 +16,24 @@
       "revId": "815b86097ff86508aa6ce1f7d5433bcdde474b91",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn//EeY\u003d",
+        "filename": "zuul/merger.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-11-14T20:35:09Z",
+      "side": 1,
+      "message": "Yes, this can go back to being the way it was, I will revert the changes here.",
+      "parentUuid": "AAAATn//Iqw\u003d",
+      "revId": "815b86097ff86508aa6ce1f7d5433bcdde474b91",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
