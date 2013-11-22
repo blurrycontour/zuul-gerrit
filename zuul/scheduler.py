@@ -144,7 +144,7 @@ class Scheduler(threading.Thread):
                             action_reporters[action].append(ActionReporter(
                                 self.reporters[reporter_name], params))
                         else:
-                            self.log.error('Invalid reporter name %s' %
+                            raise Exception('Invalid reporter name %s' %
                                            reporter_name)
             pipeline.start_actions = action_reporters['start']
             pipeline.success_actions = action_reporters['success']
