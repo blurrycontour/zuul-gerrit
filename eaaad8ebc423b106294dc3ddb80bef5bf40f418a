@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAATn/+mDw\u003d",
+        "filename": "zuul/merger.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-11-22T17:35:20Z",
+      "side": 1,
+      "message": "This makes it impossible to change the configure email or username values after a repo has been cloned.",
+      "revId": "eaaad8ebc423b106294dc3ddb80bef5bf40f418a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
