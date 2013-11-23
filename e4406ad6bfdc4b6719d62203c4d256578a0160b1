@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAATn/+kOY\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2013-11-23T05:13:51Z",
+      "side": 1,
+      "message": "I _believe_ this is correct.",
+      "revId": "e4406ad6bfdc4b6719d62203c4d256578a0160b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
