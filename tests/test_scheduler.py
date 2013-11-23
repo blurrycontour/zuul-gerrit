@@ -35,19 +35,19 @@ import urllib
 import urllib2
 import urlparse
 
-import git
-import gear
 import fixtures
+import gear
+import git
 import statsd
 import testtools
 
-import zuul.scheduler
-import zuul.webapp
 import zuul.launcher.gearman
 import zuul.reporter.gerrit
 import zuul.reporter.smtp
+import zuul.scheduler
 import zuul.trigger.gerrit
 import zuul.trigger.timer
+import zuul.webapp
 
 FIXTURE_DIR = os.path.join(os.path.dirname(__file__),
                            'fixtures')
@@ -604,7 +604,7 @@ class FakeWorker(gear.Worker):
                 continue
             try:
                 self.handleJob(job)
-            except:
+            except Exception:
                 self.log.exception("Worker exception:")
 
     def addFailTest(self, name, change):
@@ -1698,7 +1698,7 @@ class TestScheduler(testtools.TestCase):
 
     def test_can_merge(self):
         "Test whether a change is ready to merge"
-        # TODO: move to test_gerrit (this is a unit test!)
+        # TODO(pabelanger): move to test_gerrit (this is a unit test!)
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         trigger = self.sched.layout.pipelines['gate'].trigger
         a = self.sched.triggers['gerrit'].getChange(1, 2)

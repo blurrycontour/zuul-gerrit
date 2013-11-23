@@ -54,7 +54,7 @@ class Reporter(object):
             s = smtplib.SMTP(self.smtp_server, self.smtp_port)
             s.sendmail(from_email, to_email.split(','), msg.as_string())
             s.quit()
-        except:
+        except Exception:
             return "Could not send email via SMTP"
         return
 

@@ -26,8 +26,8 @@ pid_file_module = extras.try_imports(['daemon.pidlockfile', 'daemon.pidfile'])
 import logging
 import logging.config
 import os
-import sys
 import signal
+import sys
 import traceback
 
 import gear
@@ -113,8 +113,8 @@ class Server(object):
 
     def test_config(self, job_list_path):
         # See comment at top of file about zuul imports
-        import zuul.scheduler
         import zuul.launcher.gearman
+        import zuul.scheduler
         import zuul.trigger.gerrit
 
         logging.basicConfig(level=logging.DEBUG)
@@ -165,10 +165,10 @@ class Server(object):
 
     def main(self):
         # See comment at top of file about zuul imports
-        import zuul.scheduler
         import zuul.launcher.gearman
         import zuul.reporter.gerrit
         import zuul.reporter.smtp
+        import zuul.scheduler
         import zuul.trigger.gerrit
         import zuul.trigger.timer
         import zuul.webapp
@@ -249,7 +249,7 @@ def main():
         f = open(test_fn, 'w')
         f.close()
         os.unlink(test_fn)
-    except:
+    except Exception:
         print
         print "Unable to write to state directory: %s" % state_dir
         print
