@@ -13,14 +13,15 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import threading
-import select
 import json
-import time
-import Queue
-import paramiko
 import logging
 import pprint
+import Queue
+import select
+import threading
+import time
+
+import paramiko
 
 
 class GerritWatcher(threading.Thread):
@@ -72,7 +73,7 @@ class GerritWatcher(threading.Thread):
 
             if ret:
                 raise Exception("Gerrit error executing stream-events")
-        except:
+        except Exception:
             self.log.exception("Exception on ssh event stream:")
             time.sleep(5)
 
@@ -161,7 +162,7 @@ class Gerrit(object):
         try:
             self.log.debug("SSH command:\n%s" % command)
             stdin, stdout, stderr = self.client.exec_command(command)
-        except:
+        except Exception:
             self._open()
             stdin, stdout, stderr = self.client.exec_command(command)
 

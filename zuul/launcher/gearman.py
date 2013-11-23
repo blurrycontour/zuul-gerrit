@@ -16,8 +16,8 @@ import gear
 import inspect
 import json
 import logging
-import time
 import threading
+import time
 from uuid import uuid4
 
 import zuul.model
@@ -25,8 +25,9 @@ from zuul.model import Build
 
 
 class GearmanCleanup(threading.Thread):
-    """ A thread that checks to see if outstanding builds have
-    completed without reporting back. """
+    """A thread that checks to see if outstanding builds have
+    completed without reporting back.
+    """
     log = logging.getLogger("zuul.JenkinsCleanup")
 
     def __init__(self, gearman):
@@ -47,7 +48,7 @@ class GearmanCleanup(threading.Thread):
                 return
             try:
                 self.gearman.lookForLostBuilds()
-            except:
+            except Exception:
                 self.log.exception("Exception checking builds:")
 
 
@@ -410,7 +411,7 @@ class Gearman(object):
         if req.response.startswith("OK"):
             try:
                 del self.builds[job.unique]
-            except:
+            except Exception:
                 pass
             return True
         return False

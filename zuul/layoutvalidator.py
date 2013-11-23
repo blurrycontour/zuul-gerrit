@@ -14,8 +14,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import voluptuous as v
 import string
+
+import voluptuous as v
 
 
 # Several forms accept either a single item or a list, this makes
@@ -100,8 +101,8 @@ class LayoutSchema(object):
             self.job_name.schema(value)
 
     def validateTemplateCalls(self, calls):
-        """ Verify a project pass the parameters required
-            by a project-template
+        """Verify a project pass the parameters required
+        by a project-template.
         """
         for call in calls:
             schema = self.templates_schemas[call.get('name')]

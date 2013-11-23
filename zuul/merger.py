@@ -12,10 +12,11 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import git
-import os
 import logging
 import model
+import os
+
+import git
 
 
 class ZuulReference(git.Reference):
@@ -34,7 +35,7 @@ class Repo(object):
         self._initialized = False
         try:
             self._ensure_cloned()
-        except:
+        except Exception:
             self.log.exception("Unable to initialize repo for %s" % remote)
 
     def _ensure_cloned(self):
@@ -165,7 +166,7 @@ class Merger(object):
         fd.write('#!/bin/bash\n')
         fd.write('ssh -i %s $@\n' % key)
         fd.close()
-        os.chmod(name, 0755)
+        os.chmod(name, 0o755)
         os.environ['GIT_SSH'] = name
 
     def addProject(self, project, url):
@@ -174,7 +175,7 @@ class Merger(object):
             repo = Repo(url, path, self.email, self.username)
 
             self.repos[project] = repo
-        except:
+        except Exception:
             self.log.exception("Unable to add project %s" % project)
 
     def getRepo(self, project):
@@ -187,14 +188,14 @@ class Merger(object):
         try:
             self.log.info("Updating local repository %s", project)
             repo.update()
-        except:
+        except Exception:
             self.log.exception("Unable to update %s", project)
 
     def _mergeChange(self, change, ref, target_ref):
         repo = self.getRepo(change.project)
         try:
             repo.checkout(ref)
-        except:
+        except Exception:
             self.log.exception("Unable to checkout %s" % ref)
             return False
 
@@ -220,7 +221,7 @@ class Merger(object):
             # for the triggering change
             zuul_ref = change.branch + '/' + target_ref
             commit = repo.createZuulRef(zuul_ref, 'HEAD').hexsha
-        except:
+        except Exception:
             self.log.exception("Unable to set zuul ref %s for change %s" %
                                (zuul_ref, change))
             return False
@@ -246,7 +247,7 @@ class Merger(object):
             # we need to reset here in order to call getBranchHead
             try:
                 repo.reset()
-            except:
+            except Exception:
                 self.log.exception("Unable to reset repo %s" % repo)
                 return False
             commit = self._mergeChange(item.change,
@@ -279,7 +280,7 @@ class Merger(object):
                 try:
                     zuul_ref = i.change.branch + '/' + target_ref
                     repo.createZuulRef(zuul_ref, i.current_build_set.commit)
-                except:
+                except Exception:
                     self.log.exception("Unable to set zuul ref %s for "
                                        "change %s" % (zuul_ref, i.change))
                     return False
@@ -291,7 +292,7 @@ class Merger(object):
                     repo.push(ref, ref)
                     complete = self.trigger.waitForRefSha(i.change.project,
                                                           ref)
-                except:
+                except Exception:
                     self.log.exception("Unable to push %s" % ref)
                     return False
                 if not complete:

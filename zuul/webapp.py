@@ -15,6 +15,7 @@
 
 import logging
 import threading
+
 from paste import httpserver
 from webob import Request
 
@@ -40,7 +41,7 @@ class WebApp(threading.Thread):
         if request.path == '/status.json':
             try:
                 ret = self.scheduler.formatStatusJSON()
-            except:
+            except Exception:
                 self.log.exception("Exception formatting status:")
                 raise
             start_response('200 OK', [('content-type', 'application/json'),
