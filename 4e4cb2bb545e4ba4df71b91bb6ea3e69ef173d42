@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAATn/+dvE\u003d",
+        "filename": "tests/fixtures/zuul.conf",
+        "patchSetId": 13
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-11-25T19:38:06Z",
+      "side": 1,
+      "message": "Let\u0027s set the example to not have \u0027/p\u0027, and adjust our scripts to add it.",
+      "revId": "4e4cb2bb545e4ba4df71b91bb6ea3e69ef173d42",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/+dvg\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 2403,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-11-25T19:38:06Z",
+      "side": 1,
+      "message": "i think we can remove the negative test if we\u0027re going to require the param",
+      "revId": "4e4cb2bb545e4ba4df71b91bb6ea3e69ef173d42",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/+dxI\u003d",
+        "filename": "zuul/launcher/gearman.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-11-25T19:38:06Z",
+      "side": 1,
+      "message": "remove if",
+      "revId": "4e4cb2bb545e4ba4df71b91bb6ea3e69ef173d42",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/+dws\u003d",
+        "filename": "zuul/launcher/gearman.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-11-25T19:38:06Z",
+      "side": 1,
+      "message": "remove if",
+      "revId": "4e4cb2bb545e4ba4df71b91bb6ea3e69ef173d42",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/+dvs\u003d",
+        "filename": "zuul/launcher/gearman.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-11-25T19:38:06Z",
+      "side": 1,
+      "message": "remove the else clause",
+      "revId": "4e4cb2bb545e4ba4df71b91bb6ea3e69ef173d42",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
