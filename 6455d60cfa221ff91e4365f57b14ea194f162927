@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAATn/+gBA\u003d",
+        "filename": ".gitignore",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-11-25T12:59:46Z",
+      "side": 1,
+      "message": "Should probably be:\n\n  /.venv\n\nNote the other paths are wrong as well (aka missing leading slash) :-]",
+      "revId": "6455d60cfa221ff91e4365f57b14ea194f162927",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
