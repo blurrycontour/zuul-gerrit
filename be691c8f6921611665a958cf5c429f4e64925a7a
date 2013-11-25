@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAATn/+epY\u003d",
+        "filename": "tox.ini",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-11-25T16:50:52Z",
+      "side": 1,
+      "message": "Can you leave the \u0027H\u0027 ignore in here?  Most of hacking is way overkill for infra, so we don\u0027t generally enforce it.",
+      "revId": "be691c8f6921611665a958cf5c429f4e64925a7a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
