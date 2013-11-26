@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAATn/+YX4\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 14
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-11-26T17:30:48Z",
+      "side": 1,
+      "message": "Drop the \u0027defaults to\u0027, it should have no default value.",
+      "revId": "76f44de9fc04afeb4f6baa6665e60da791d9e939",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/+YYM\u003d",
+        "filename": "tests/fixtures/zuul.conf",
+        "patchSetId": 14
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-11-26T17:30:48Z",
+      "side": 1,
+      "message": "I\u0027m sorry, I thought about it some more, and I think you\u0027re right -- we should document this with /p, and we should use it that way in production too, in order to completely remove knowledge of where the git repos are from the scripts (and in this documentation, better convey that idea).",
+      "revId": "76f44de9fc04afeb4f6baa6665e60da791d9e939",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
