@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAATn/+YD0\u003d",
+        "filename": "doc/source/launchers.rst",
+        "patchSetId": 17
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-11-26T18:54:05Z",
+      "side": 1,
+      "message": "I think this documentation would be better as:\n\n  The url for the zuul server as configured in zuul.conf.  A test runner may use this URL as the basis for fetching git commits.\n\nIn particular, the bit about it not being passed is obsolete now, and I don\u0027t think the bit about hard-coding adds much.",
+      "revId": "e1443740bd3fb1b1cb9dce21652b49a30b700f0c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/+YDk\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 17
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-11-26T18:54:05Z",
+      "side": 1,
+      "message": "I\u0027d suggest:\n\n  URL of Zuul\u0027s git repos, accessible to test workers.  Usually \"http://zuul.example.com/p\".\n\nWe don\u0027t need to mention third parties (which is a concept specific to openstack) in this general documentation.",
+      "revId": "e1443740bd3fb1b1cb9dce21652b49a30b700f0c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
