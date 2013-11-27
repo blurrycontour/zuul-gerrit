@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAATn/+Sg0\u003d",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-11-27T20:26:35Z",
+      "side": 1,
+      "message": "Sometimes I run scripts in-tree.",
+      "parentUuid": "AAAATn/+SpE\u003d",
+      "revId": "cfd18563beed758417562baf7ca13afa41e2a50c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAATn/+SpA\u003d",
         "filename": "zuul/cmd/client.py",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2013-11-27T19:50:50Z",
       "side": 1,
       "message": "Just double checking - did HP write this?",
+      "revId": "cfd18563beed758417562baf7ca13afa41e2a50c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/+Sgg\u003d",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-11-27T20:26:35Z",
+      "side": 1,
+      "message": "Parts.  See server.py where it was copied from.",
+      "parentUuid": "AAAATn/+SpA\u003d",
       "revId": "cfd18563beed758417562baf7ca13afa41e2a50c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "AAAATn/+SgI\u003d",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-11-27T20:26:35Z",
+      "side": 1,
+      "message": "I could see most of the content of sendjob and enqueue moving to a different class to facilitate client use (including for tests).  I\u0027ll look into that.",
+      "parentUuid": "AAAATn/+Sn8\u003d",
+      "revId": "cfd18563beed758417562baf7ca13afa41e2a50c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAATn/+Sok\u003d",
         "filename": "zuul/cmd/client.py",
         "patchSetId": 2
@@ -64,6 +118,24 @@
       "writtenOn": "2013-11-27T19:50:50Z",
       "side": 1,
       "message": "This shouldn\u0027t be needed either.\n\nIf you have the hashbang and the __name__ checking code for use in uninstalled trees - have you tried \u0027pip install -e .\u0027 which gets a local tree installed quite nicely.",
+      "revId": "cfd18563beed758417562baf7ca13afa41e2a50c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/+Sfs\u003d",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-11-27T20:26:35Z",
+      "side": 1,
+      "message": "Yes I have.  I believe the code should be able to be run without being installed as well.  This enables that and hurts nothing.",
+      "parentUuid": "AAAATn/+Sok\u003d",
       "revId": "cfd18563beed758417562baf7ca13afa41e2a50c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -104,6 +176,24 @@
     },
     {
       "key": {
+        "uuid": "AAAATn/+SfQ\u003d",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-11-27T20:26:35Z",
+      "side": 1,
+      "message": "That should be a project wide change; I choose consistency for now.",
+      "parentUuid": "AAAATn/+Snc\u003d",
+      "revId": "cfd18563beed758417562baf7ca13afa41e2a50c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAATn/+SnY\u003d",
         "filename": "zuul/rpclistener.py",
         "patchSetId": 2
@@ -115,6 +205,24 @@
       "writtenOn": "2013-11-27T19:50:50Z",
       "side": 1,
       "message": "Nice - you might want to daemonise this though.",
+      "revId": "cfd18563beed758417562baf7ca13afa41e2a50c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/+Se8\u003d",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-11-27T20:26:35Z",
+      "side": 1,
+      "message": "Good catch, thanks.",
+      "parentUuid": "AAAATn/+SnY\u003d",
       "revId": "cfd18563beed758417562baf7ca13afa41e2a50c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
