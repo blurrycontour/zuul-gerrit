@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAATn/+SpE\u003d",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-11-27T19:50:50Z",
+      "side": 1,
+      "message": "Not needed - entrypoints will do this for us.",
+      "revId": "cfd18563beed758417562baf7ca13afa41e2a50c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/+SpA\u003d",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-11-27T19:50:50Z",
+      "side": 1,
+      "message": "Just double checking - did HP write this?",
+      "revId": "cfd18563beed758417562baf7ca13afa41e2a50c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/+Sn8\u003d",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-11-27T19:50:50Z",
+      "side": 1,
+      "message": "structurally this worries me - you have CLI code - arg parsing, UI - and model code - connecting to zuul, actually enqueuing - conflated in the one class. This makes it harder to reuse, and it would be pretty easy to sort out now before more commands are added.",
+      "revId": "cfd18563beed758417562baf7ca13afa41e2a50c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/+Sok\u003d",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-11-27T19:50:50Z",
+      "side": 1,
+      "message": "This shouldn\u0027t be needed either.\n\nIf you have the hashbang and the __name__ checking code for use in uninstalled trees - have you tried \u0027pip install -e .\u0027 which gets a local tree installed quite nicely.",
+      "revId": "cfd18563beed758417562baf7ca13afa41e2a50c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/+Sns\u003d",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-11-27T19:50:50Z",
+      "side": 1,
+      "message": "Same (C) question here.",
+      "revId": "cfd18563beed758417562baf7ca13afa41e2a50c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/+Snc\u003d",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-11-27T19:50:50Z",
+      "side": 1,
+      "message": "I\u0027d prefer to see this in __init__ - will play better with fake objects in tests.",
+      "revId": "cfd18563beed758417562baf7ca13afa41e2a50c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/+SnY\u003d",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-11-27T19:50:50Z",
+      "side": 1,
+      "message": "Nice - you might want to daemonise this though.",
+      "revId": "cfd18563beed758417562baf7ca13afa41e2a50c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
