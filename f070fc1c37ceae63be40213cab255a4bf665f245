@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAATn/+Ji0\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2990,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-12-01T20:40:34Z",
+      "side": 1,
+      "message": "BTW the expected use of this is:\n\n with ExpectedException(...):\n\nso if you import with #noqa, or add it to tox.ini you can do that, which will read more easily.",
+      "revId": "f070fc1c37ceae63be40213cab255a4bf665f245",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/+Jig\u003d",
+        "filename": "zuul/rpcclient.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-12-01T20:40:34Z",
+      "side": 1,
+      "message": "gear is a third party library - should be in it\u0027s own import section per PEP8.",
+      "revId": "f070fc1c37ceae63be40213cab255a4bf665f245",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/+Jic\u003d",
+        "filename": "zuul/rpcclient.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-12-01T20:40:34Z",
+      "side": 1,
+      "message": "It\u0027s a shame the gear library doesn\u0027t have a blocking layer, you could use it here.",
+      "revId": "f070fc1c37ceae63be40213cab255a4bf665f245",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/+JiY\u003d",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-12-01T20:40:34Z",
+      "side": 1,
+      "message": "Third party library again - should be imported between the stdlib and local blocks.",
+      "revId": "f070fc1c37ceae63be40213cab255a4bf665f245",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/+JiU\u003d",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-12-01T20:40:34Z",
+      "side": 1,
+      "message": "It doesn\u0027t matter at this scale, but a general efficient idiom in Python is to do:\n\n errors \u003d []\n errors.append(\u0027Foo\\n\u0027)\n error_str \u003d \u0027\u0027.join(errors)",
+      "revId": "f070fc1c37ceae63be40213cab255a4bf665f245",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/+JiQ\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-12-01T20:40:34Z",
+      "side": 1,
+      "message": "Is there a more specific exception we could catch? Catching Exception is super broad... OTOH perhaps the intent is that any error should eject key from the cache - in which case I think a one line comment would aid clarity here.",
+      "revId": "f070fc1c37ceae63be40213cab255a4bf665f245",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
