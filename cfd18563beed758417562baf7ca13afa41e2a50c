@@ -142,6 +142,24 @@
     },
     {
       "key": {
+        "uuid": "AAAATn/+Jio\u003d",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-12-01T20:40:45Z",
+      "side": 1,
+      "message": "For the record - it will trigger packaging errors in Debian which will have to be explicitly ignored - it does cause friction.",
+      "parentUuid": "AAAATn/+Sfs\u003d",
+      "revId": "cfd18563beed758417562baf7ca13afa41e2a50c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAATn/+Sns\u003d",
         "filename": "zuul/rpclistener.py",
         "patchSetId": 2
