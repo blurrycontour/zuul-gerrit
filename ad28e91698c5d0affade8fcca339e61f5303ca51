@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAATn/+ASY\u003d",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-12-03T15:42:02Z",
+      "side": 1,
+      "message": "How could it be a tuple?",
+      "parentUuid": "AAAATn/+C3s\u003d",
+      "revId": "ad28e91698c5d0affade8fcca339e61f5303ca51",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAATn/+C3Q\u003d",
         "filename": "zuul/trigger/gerrit.py",
         "patchSetId": 5
