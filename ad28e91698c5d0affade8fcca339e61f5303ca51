@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAATn/+C3s\u003d",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-12-03T04:42:46Z",
+      "side": 1,
+      "message": "Oh, just spotted this - args[\u0027trigger\u0027] could be a tuple, which will blow up.\n\n \u0027 % (args[\u0027trigger\u0027], )\n\nWill make this robust against that.",
+      "revId": "ad28e91698c5d0affade8fcca339e61f5303ca51",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/+C3Q\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-12-03T04:42:46Z",
+      "side": 1,
+      "message": "No thoughts on my comment here in change 4? Of the unaddressed/responded comments this one seems more than e.g. personal style.",
+      "revId": "ad28e91698c5d0affade8fcca339e61f5303ca51",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
