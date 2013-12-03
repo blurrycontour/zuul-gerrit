@@ -53,6 +53,24 @@
     },
     {
       "key": {
+        "uuid": "AAAATn/+GCg\u003d",
+        "filename": "zuul/rpcclient.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-12-03T15:41:36Z",
+      "side": 1,
+      "message": "That will be easy enough to add; but later.",
+      "parentUuid": "AAAATn/+Jic\u003d",
+      "revId": "f070fc1c37ceae63be40213cab255a4bf665f245",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAATn/+JiY\u003d",
         "filename": "zuul/rpclistener.py",
         "patchSetId": 4
@@ -98,6 +116,24 @@
       "writtenOn": "2013-12-01T20:40:34Z",
       "side": 1,
       "message": "Is there a more specific exception we could catch? Catching Exception is super broad... OTOH perhaps the intent is that any error should eject key from the cache - in which case I think a one line comment would aid clarity here.",
+      "revId": "f070fc1c37ceae63be40213cab255a4bf665f245",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/+GBA\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-12-03T15:41:36Z",
+      "side": 1,
+      "message": "That is the intent; it\u0027s also a common enough pattern in zuul that I don\u0027t think it warrants comments each time it\u0027s used.",
+      "parentUuid": "AAAATn/+JiQ\u003d",
       "revId": "f070fc1c37ceae63be40213cab255a4bf665f245",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
