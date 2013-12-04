@@ -16,6 +16,40 @@
       "revId": "bda643e20e0a9d19031a878bbdc93d3ebe85dc24",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/99S0\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1373,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-12-04T01:11:15Z",
+      "side": 1,
+      "message": "I think last_change_queues should get the value of change_queues here rather than being assigned the empty list.",
+      "revId": "bda643e20e0a9d19031a878bbdc93d3ebe85dc24",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/99SE\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1375,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-12-04T01:11:15Z",
+      "side": 1,
+      "message": "Then pass last_change_queues as the argument the combineChangeQueues. WIthout there is no shared state across iterations of this loop. I have a hunch the test is passing because the loop is running at least twice (first iteration sets last_change_queues and second iteration finds last_change_queues has the same length as new_change_queues), and these two iterations are sufficient to make the test case pass. But it may not always be sufficient so we need to fix this in the general case.",
+      "revId": "bda643e20e0a9d19031a878bbdc93d3ebe85dc24",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
