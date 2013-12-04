@@ -137,6 +137,24 @@
       "revId": "f070fc1c37ceae63be40213cab255a4bf665f245",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/99Ww\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-12-04T00:36:16Z",
+      "side": 1,
+      "message": "Ah, it\u0027s just extremely rare outside zuul. Is there perhaps a note in the dev docs for zuul about this?",
+      "parentUuid": "AAAATn/+GBA\u003d",
+      "revId": "f070fc1c37ceae63be40213cab255a4bf665f245",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
