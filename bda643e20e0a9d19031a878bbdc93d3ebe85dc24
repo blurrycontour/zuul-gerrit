@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAATn/99TU\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-12-04T01:07:59Z",
+      "side": 1,
+      "message": "This would be better using key function rather than a compare function - e.g.\n\n return sorted(self.job_trees.keys(), key\u003dattrgettr(\u0027name\u0027))",
+      "revId": "bda643e20e0a9d19031a878bbdc93d3ebe85dc24",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
