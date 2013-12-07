@@ -22,6 +22,7 @@ import os
 import pickle
 import Queue
 import re
+import sys
 import threading
 import time
 import yaml
@@ -63,12 +64,21 @@ class MergeFailure(Exception):
 class ManagementEvent(object):
     def __init__(self):
         self._wait_event = threading.Event()
+        self._exception = None
+        self._traceback = None
 
-    def setComplete(self):
+    def exception(self, e, tb):
+        self._exception = e
+        self._traceback = tb
+        self._wait_event.set()
+
+    def done(self):
         self._wait_event.set()
 
     def wait(self, timeout=None):
         self._wait_event.wait(timeout)
+        if self._exception:
+            raise self._exception, None, self._traceback
         return self._wait_event.is_set()
 
 
@@ -76,6 +86,13 @@ class ReconfigureEvent(ManagementEvent):
     def __init__(self, config):
         super(ReconfigureEvent, self).__init__()
         self.config = config
+
+
+class PromoteEvent(ManagementEvent):
+    def __init__(self, pipeline_name, change_ids):
+        super(PromoteEvent, self).__init__()
+        self.pipeline_name = pipeline_name
+        self.change_ids = change_ids
 
 
 class Scheduler(threading.Thread):
@@ -390,6 +407,14 @@ class Scheduler(threading.Thread):
         event.wait()
         self.log.debug("Reconfiguration complete")
 
+    def promote(self, pipeline_name, change_ids):
+        event = PromoteEvent(pipeline_name, change_ids)
+        self.management_event_queue.put(event)
+        self.wake_event.set()
+        self.log.debug("Waiting for promotion")
+        event.wait()
+        self.log.debug("Promotion complete")
+
     def exit(self):
         self.log.debug("Prepare to exit")
         self._pause = True
@@ -514,6 +539,43 @@ class Scheduler(threading.Thread):
         finally:
             self.layout_lock.release()
 
+    def _doPromoteEvent(self, event):
+        pipeline = self.layout.pipelines[event.pipeline_name]
+        change_ids = [c.split(',') for c in event.change_ids]
+        items = []
+        change_queue = None
+        for shared_queue in pipeline.queues:
+            if change_queue:
+                break
+            for item in shared_queue.queue:
+                if (item.change.number == change_ids[0][0] and
+                    item.change.patchset == change_ids[0][1]):
+                    change_queue = shared_queue
+                    break
+        if not change_queue:
+            raise Exception("Unable to find shared change queue for %s" %
+                            event.change_ids[0])
+        for number, patchset in change_ids:
+            found = False
+            for item in change_queue.queue:
+                if (item.change.number == number and
+                    item.change.patchset == patchset):
+                    found = True
+                    items.append(item)
+                    break
+            if not found:
+                raise Exception("Unable to find %s,%s in queue %s" %
+                                (number, patchset, change_queue))
+        for item in change_queue.queue[:]:
+            if item not in items:
+                items.append(item)
+            pipeline.manager.cancelJobs(item)
+            pipeline.manager.dequeueItem(item)
+        for item in items:
+            pipeline.manager.reEnqueueItem(item)
+        while pipeline.manager.processQueue():
+            pass
+
     def _areAllBuildsComplete(self):
         self.log.debug("Checking if all builds are complete")
         waiting = False
@@ -619,9 +681,16 @@ class Scheduler(threading.Thread):
         self.log.debug("Fetching management event")
         event = self.management_event_queue.get()
         self.log.debug("Processing management event %s" % event)
-        if isinstance(event, ReconfigureEvent):
-            self._doReconfigureEvent(event)
-        event.setComplete()
+        try:
+            if isinstance(event, ReconfigureEvent):
+                self._doReconfigureEvent(event)
+            elif isinstance(event, PromoteEvent):
+                self._doPromoteEvent(event)
+            else:
+                self.log.error("Unable to handle event %s" % event)
+            event.done()
+        except Exception as e:
+            event.exception(e, sys.exc_info()[2])
         self.management_event_queue.task_done()
 
     def process_result_queue(self):
@@ -964,7 +1033,7 @@ class BasePipelineManager(object):
         self.log.debug("Cancel jobs for change %s" % item.change)
         canceled = False
         to_remove = []
-        if prime and item.current_build_set.builds:
+        if prime and item.current_build_set.ref:
             item.resetAllBuilds()
         for build, build_item in self.building_jobs.items():
             if build_item == item:
