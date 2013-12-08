@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAATn/9rEs\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3027,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-12-08T20:30:40Z",
+      "side": 1,
+      "message": "I think this change is good, but it would be nice in future to follow the \u0027one conceptual change per changeset\u0027 guideline - it\u0027s much easier for reviewers :).",
+      "revId": "bc124af3c8a746e10b78763127bd5953ab9da066",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/9rEo\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3121,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-12-08T20:30:40Z",
+      "side": 1,
+      "message": "Can you please add a test for promoting a change with a dependency.\n\nE.g. the queue has A, then B, then C depends on B, then promote C. Should end up with B,C,A",
+      "revId": "bc124af3c8a746e10b78763127bd5953ab9da066",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/9rEY\u003d",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-12-08T20:30:40Z",
+      "side": 1,
+      "message": "Thank you for adding the tuple guards!",
+      "revId": "bc124af3c8a746e10b78763127bd5953ab9da066",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/9rEU\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-12-08T20:30:40Z",
+      "side": 1,
+      "message": "I\u0027d love a docstring here too please, or perhaps on __init__, or even both.",
+      "revId": "bc124af3c8a746e10b78763127bd5953ab9da066",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/9rEQ\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 417,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-12-08T20:30:40Z",
+      "side": 1,
+      "message": "The code duplication between e.g. reconfigure and promote is disturbing me a little; it would be lovely to refactor that (as a future change).",
+      "revId": "bc124af3c8a746e10b78763127bd5953ab9da066",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/9rEM\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 545,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-12-08T20:30:40Z",
+      "side": 1,
+      "message": "This variable name confuses me below; could you change it to something with a bit more meaning? Like changes_to_promote?",
+      "revId": "bc124af3c8a746e10b78763127bd5953ab9da066",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/9rEI\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 577,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-12-08T20:30:40Z",
+      "side": 1,
+      "message": "Why do you process the queue here?",
+      "revId": "bc124af3c8a746e10b78763127bd5953ab9da066",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/9rEE\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1036,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-12-08T20:30:40Z",
+      "side": 1,
+      "message": "Whats this change for?",
+      "revId": "bc124af3c8a746e10b78763127bd5953ab9da066",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
