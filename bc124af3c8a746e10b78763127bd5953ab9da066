@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "AAAATn/9nws\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3121,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-12-09T15:54:00Z",
+      "side": 1,
+      "message": "Yes, that\u0027s a good test.",
+      "parentUuid": "AAAATn/9rEo\u003d",
+      "revId": "bc124af3c8a746e10b78763127bd5953ab9da066",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAATn/9rEY\u003d",
         "filename": "zuul/rpclistener.py",
         "patchSetId": 1
@@ -104,6 +122,24 @@
     },
     {
       "key": {
+        "uuid": "AAAATn/9n5A\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 545,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-12-09T15:54:00Z",
+      "side": 1,
+      "message": "Items actually refers to a list of zuul.model.QueueItem objects, so it\u0027s not generic, if that\u0027s what you were thinking.  Most of this method is concerned with finding the queue items that match the supplied change_ids.",
+      "parentUuid": "AAAATn/9rEM\u003d",
+      "revId": "bc124af3c8a746e10b78763127bd5953ab9da066",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAATn/9rEI\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 1
@@ -121,6 +157,24 @@
     },
     {
       "key": {
+        "uuid": "AAAATn/9n2g\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 577,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-12-09T15:54:00Z",
+      "side": 1,
+      "message": "Because the event processors are responsible for processing the queue if they change it.",
+      "parentUuid": "AAAATn/9rEI\u003d",
+      "revId": "bc124af3c8a746e10b78763127bd5953ab9da066",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAATn/9rEE\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 1
@@ -132,6 +186,24 @@
       "writtenOn": "2013-12-08T20:30:40Z",
       "side": 1,
       "message": "Whats this change for?",
+      "revId": "bc124af3c8a746e10b78763127bd5953ab9da066",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/9nyA\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1036,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-12-09T15:54:00Z",
+      "side": 1,
+      "message": "This was a latent bug where if the queue was re-ordered between the time the ref was created and the first build started, then the ref for this change would not be updated.  This was uncovered by the new test which reorders the queue during that period.  The new code will create a new ref if we are cancelling jobs for a change that already has a ref.",
+      "parentUuid": "AAAATn/9rEE\u003d",
       "revId": "bc124af3c8a746e10b78763127bd5953ab9da066",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
