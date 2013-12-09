@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "AAAATn/9n+U\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-12-09T15:28:53Z",
+      "side": 1,
+      "message": "I think that would be incorrect -- setComplete is to be called by the work thread, wait is to be called by the thread requesting the work.\n\nPossibly you misread \"is_set\" for \"set\"?",
+      "parentUuid": "AAAATn/9rFI\u003d",
+      "revId": "ece690089c03e85986731bc32a746c62d594b686",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAATn/9rFA\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 1
@@ -64,6 +82,24 @@
       "writtenOn": "2013-12-08T20:22:28Z",
       "side": 1,
       "message": "This returns an indicator of success, but you don\u0027t consult it. AIUI that means the log on the next line might be false? If it doesn\u0027t mean that, what is the return code for - why do we need it when we have a blocking API that returns on success?",
+      "revId": "ece690089c03e85986731bc32a746c62d594b686",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/9n80\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-12-09T15:28:53Z",
+      "side": 1,
+      "message": "This returns an indicator of completeness, and the next line only says that it\u0027s complete.",
+      "parentUuid": "AAAATn/9rE8\u003d",
       "revId": "ece690089c03e85986731bc32a746c62d594b686",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
