@@ -33,6 +33,24 @@
       "revId": "468c85126e7d4f39c46ad297066aca416296e779",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/9hOM\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 391,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-12-10T16:57:59Z",
+      "side": 1,
+      "message": "Yes, it\u0027s an unused feature of the class which was based on a similar pattern in gear and nodepool.",
+      "parentUuid": "AAAATn/9lDA\u003d",
+      "revId": "468c85126e7d4f39c46ad297066aca416296e779",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
