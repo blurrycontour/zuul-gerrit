@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAATn/9lDU\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-12-10T01:25:02Z",
+      "side": 1,
+      "message": "I was misreading it, yes.",
+      "revId": "468c85126e7d4f39c46ad297066aca416296e779",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/9lDA\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 391,
+      "author": {
+        "id": 4190
+      },
+      "writtenOn": "2013-12-10T01:25:02Z",
+      "side": 1,
+      "message": "My point was that we don\u0027t consult the return value of event.wait().\n\n is_set \u003d event.wait()\n if is_set:\n     log_complete\n else:\n     log_incomplete\n\nBut, if thats impossible, why do we return a value from wait() at all? I\u0027m going to guess that it\u0027s because when a timeout is passed, it lets you determine that it timed out.\n\nThere don\u0027t seem to be any places where we use this with a timeout though, so it\u0027s not tested (as even though everything goes through the main loop, unused code is untested by definition).\n\nPerhaps add specific tests, or remove the unused feature? Or at minimum document what the intent is?",
+      "revId": "468c85126e7d4f39c46ad297066aca416296e779",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
