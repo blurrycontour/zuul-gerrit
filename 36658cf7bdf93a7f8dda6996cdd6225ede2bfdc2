@@ -16,6 +16,24 @@
       "revId": "36658cf7bdf93a7f8dda6996cdd6225ede2bfdc2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/9bSQ\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 586,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-12-11T16:47:47Z",
+      "side": 1,
+      "message": "No, NNFI only exists in the queue processor, which is called at the end of this method once everything is re-structured.  We are in the main run loop here, so it\u0027s not possible for it to be run external to this.",
+      "parentUuid": "AAAATn/9bT4\u003d",
+      "revId": "36658cf7bdf93a7f8dda6996cdd6225ede2bfdc2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
