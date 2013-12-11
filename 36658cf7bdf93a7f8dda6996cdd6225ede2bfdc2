@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAATn/9bT4\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 586,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-12-11T16:45:21Z",
+      "side": 1,
+      "message": "Will cancelling and dequeing items starting at the front of the queue cause nnfi to thrash and restart many jobs? Would it be better to start at the end of the queue and work forward?",
+      "revId": "36658cf7bdf93a7f8dda6996cdd6225ede2bfdc2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
