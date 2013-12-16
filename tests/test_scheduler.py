@@ -1971,12 +1971,12 @@ class TestScheduler(testtools.TestCase):
                          'SUCCESS')
         self.assertEqual(self.getJobFromHistory('project-test2').result,
                          'SUCCESS')
-        self.assertEqual(self.getJobFromHistory('project-test3').result,
-                         'SUCCESS')
-        self.assertEqual(self.getJobFromHistory('project-test4').result,
-                         'SUCCESS')
-        self.assertEqual(self.getJobFromHistory('project-test5').result,
-                         'SUCCESS')
+        self.assertEqual(self.getJobFromHistory('layered-project-test3'
+                                                ).result, 'SUCCESS')
+        self.assertEqual(self.getJobFromHistory('layered-project-test4'
+                                                ).result, 'SUCCESS')
+        self.assertEqual(self.getJobFromHistory('layered-project-foo-test5'
+                                                ).result, 'SUCCESS')
         self.assertEqual(self.getJobFromHistory('project-test6').result,
                          'SUCCESS')
 
