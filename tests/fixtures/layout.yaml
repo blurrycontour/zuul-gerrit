@@ -112,11 +112,11 @@ project-templates:
      - '{projectname}-test2'
   - name: test-three-and-four
     check:
-     - '{projectname}-test3'
-     - '{projectname}-test4'
+     - '{name}-test3'
+     - '{name}-test4'
   - name: test-five
     check:
-     - '{projectname}-test5'
+     - '{name}-{something}-test5'
 
 projects:
   - name: org/project
@@ -210,9 +210,8 @@ projects:
       - name: test-one-and-two
         projectname: project
       - name: test-three-and-four
-        projectname: project
       - name: test-five
-        projectname: project
+        something: foo
     check:
       - project-test6
 
