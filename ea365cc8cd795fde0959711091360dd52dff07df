@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAATn/9ATQ\u003d",
+        "filename": "README.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 6609
+      },
+      "writtenOn": "2013-12-17T19:52:50Z",
+      "side": 1,
+      "message": "Since https is supported I\u0027d prefer pointing people there rather than to http",
+      "revId": "ea365cc8cd795fde0959711091360dd52dff07df",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
