@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAATn/87xw\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 292,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-12-18T16:30:26Z",
+      "side": 1,
+      "message": "The order should be added somewhere to the rst documentation :-)",
+      "revId": "9b907a9f1603ba9937e52a0ae7a02c938a6ae79d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/87yM\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 308,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-12-18T16:30:26Z",
+      "side": 1,
+      "message": "That would concatenate the list of jobs but does not finely merge the dependency trees.\n\nA use case would be to have a template having a common dependency of jobs and a second template that would let us add a job somewhere as a grand-children.\n\nExample layout (pasted at http://paste.openstack.org/show/55332/ )\n\n # vim: set ts\u003d2 sw\u003d2 et ai foldmethod\u003dindent:\n pipelines:\n   - name: test\n     manager: IndependentPipelineManager\n     trigger:\n       gerrit:\n         - event: patchset-created\n        \n project-templates:\n   - name: unittests\n     test: \n      - \u0027{prefix}-lint\u0027:\n        - \u0027{prefix}-fasttests\u0027\n   - name: javascript\n     test: \n       - \u0027{prefix}-lint\u0027:  # ALSO DEPEND ON -lint\n        - \u0027{prefix}-javascript\u0027:\n          - \u0027{prefix}-jstests\u0027\n         \n projects:\n   - name: mediawiki/project\n     template:\n       - name: unittests\n         prefix: myProject\n       - name: javascript\n         prefix: myProject\n\nThink of the first template (unittests) as something which is common. The javascript template would append javascript tests as children of the \u0027{prefix}-lint\u0027 job which is common to both template.\n\nZuul gives me:\n\n Configured Pipeline Manager test\n   Events:\n    \u003cEventFilter types: patchset-created\u003e\n  Projects:\n    mediawiki/project\n      \u003cJob myProject-lint\u003e # DUPE\n        \u003cJob myProject-fasttests\u003e\n      \u003cJob myProject-lint\u003e  # DUPE\n        \u003cJob myProject-javascript\u003e\n          \u003cJob myProject-jstests\u003e\n\nthe myProject-lint appears twice :-D  The expected result would be:\n\n  Projects:\n    mediawiki/project\n      \u003cJob myProject-lint\u003e  # no more a duplicate\n        \u003cJob myProject-fasttests\u003e\n        \u003cJob myProject-javascript\u003e  # javascript injected at the right place\n          \u003cJob myProject-jstests\u003e\n\nUsing the super powerful debugging command \"print\", the expanded[pipeline.name] and config_project.get(pipeline.name, []) shows up as:\n\n [{\u0027myProject-lint\u0027: [\u0027myProject-fasttests\u0027]}]\n +\n [{\u0027myProject-lint\u0027: [{\u0027myProject-javascript\u0027: [\u0027myProject-jstests\u0027]}]}]\n \u003d\n [{\u0027myProject-lint\u0027: [\u0027myProject-fasttests\u0027]},\n  {\u0027myProject-lint\u0027: [{\u0027myProject-javascript\u0027: [\u0027myProject-jstests\u0027]}]}]\n\nThe list are properly concatenated, I guess there need some deep inspection of the dict contained in each lists :-/\n\n\n\nThe same issue occurs when adding a project specific job  as a child. Aka:\n\n projects:\n   - name: mediawiki/project\n     template:\n       - name: unittests\n         prefix: myProject\n     test:\n       - myProject-lint:\n         - localspecific\n\nGenerates duplicate myProject-lint:\n\n  Projects:\n    mediawiki/project\n      \u003cJob myProject-lint\u003e # DUPE\n        \u003cJob myProject-fasttests\u003e\n      \u003cJob myProject-lint\u003e  # DUPE\n          \u003cJob localspecific\u003e",
+      "revId": "9b907a9f1603ba9937e52a0ae7a02c938a6ae79d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
