@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAATn/861M\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 663,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-12-18T19:43:40Z",
+      "side": 1,
+      "message": "Excellent documentation coverage, thank you!",
+      "revId": "cc469bd2f08d0513a3726b518ca48003f1ba37d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/860w\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-12-18T19:43:40Z",
+      "side": 1,
+      "message": "Good enough for now. thanks",
+      "revId": "cc469bd2f08d0513a3726b518ca48003f1ba37d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
