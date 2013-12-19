@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAATn/815A\u003d",
+        "filename": "README.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-12-19T16:51:18Z",
+      "side": 1,
+      "message": "It says \"get\" but this is a URL for browsing (github supports both at the same url).  Perhaps this should be split into a browse url and a git clone url.",
+      "revId": "175aaac5d24832c0c71c9a3cd996bc6221acd346",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
