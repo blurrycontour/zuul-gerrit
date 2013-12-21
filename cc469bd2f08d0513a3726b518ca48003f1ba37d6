@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "AAAATn/8t5Q\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 656,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-12-21T11:29:04Z",
+      "side": 1,
+      "message": "This reads difficultly. Consider: \"(which only effects the order of jobs listed on the report)\"",
+      "revId": "cc469bd2f08d0513a3726b518ca48003f1ba37d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAATn/861M\u003d",
         "filename": "doc/source/zuul.rst",
         "patchSetId": 2
@@ -13,6 +30,40 @@
       "writtenOn": "2013-12-18T19:43:40Z",
       "side": 1,
       "message": "Excellent documentation coverage, thank you!",
+      "revId": "cc469bd2f08d0513a3726b518ca48003f1ba37d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/8t5M\u003d",
+        "filename": "tests/fixtures/layout.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-12-21T11:29:04Z",
+      "side": 1,
+      "message": "should this be renamed templates?",
+      "revId": "cc469bd2f08d0513a3726b518ca48003f1ba37d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/8t5E\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1981,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-12-21T11:29:04Z",
+      "side": 1,
+      "message": "We should test for the case where multiple templates define the same job. ie Make sure they don\u0027t get in there twice.",
       "revId": "cc469bd2f08d0513a3726b518ca48003f1ba37d6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
