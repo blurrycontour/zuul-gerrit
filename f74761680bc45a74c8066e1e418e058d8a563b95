@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAATn/8t4s\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2013-12-21T11:37:20Z",
+      "side": 1,
+      "message": "This appears to override the \u0027name\u0027 variable should it have been provided separately. Is this desired functionality and if so should the layout validation pick up on when somebody tries to redefine name.",
+      "revId": "f74761680bc45a74c8066e1e418e058d8a563b95",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
