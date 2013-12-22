@@ -1200,7 +1200,7 @@ class BasePipelineManager(object):
                 changed = True
                 status = ''
                 for item in queue.queue:
-                    status += self.pipeline.formatStatus(item)
+                    status += item.formatStatus()
                 if status:
                     self.log.debug("Queue %s status is now:\n %s" %
                                    (queue.name, status))
@@ -1237,15 +1237,15 @@ class BasePipelineManager(object):
             return False
 
         self.log.debug("Build %s completed" % build)
-        change = self.building_jobs[build]
+        item = self.building_jobs[build]
         self.log.debug("Found change %s which triggered completed build %s" %
-                       (change, build))
+                       (item, build))
 
         del self.building_jobs[build]
 
-        self.pipeline.setResult(change, build)
+        self.pipeline.setResult(item, build)
         self.log.debug("Change %s status is now:\n %s" %
-                       (change, self.pipeline.formatStatus(change)))
+                       (item, item.formatStatus()))
         self.updateBuildDescriptions(build.build_set)
         while self.processQueue():
             pass
