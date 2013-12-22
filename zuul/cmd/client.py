@@ -19,6 +19,7 @@ import ConfigParser
 import logging
 import logging.config
 import os
+import prettytable
 import sys
 
 import zuul.rpcclient
@@ -64,6 +65,16 @@ class Client(object):
         cmd_promote.add_argument('--changes', help='change ids',
                                  required=True, nargs='+')
         cmd_promote.set_defaults(func=self.promote)
+
+        cmd_list = subparsers.add_parser('list',
+                                         help='valid list subcommands')
+        list_subparsers = cmd_list.add_subparsers(title='lists')
+        list_running_jobs = list_subparsers.add_parser(
+            'running-jobs',
+            help='list the running jobs'
+        )
+        # TODO: add filters such as queue, project, changeid etc
+        list_running_jobs.set_defaults(func=self.list_running_jobs)
 
         self.args = parser.parse_args()
 
@@ -118,6 +129,12 @@ class Client(object):
         r = client.promote(pipeline=self.args.pipeline,
                            change_ids=self.args.changes)
         return r
+
+    def list_running_jobs(self):
+        client = zuul.rpcclient.RPCClient(self.server, self.port)
+        running_jobs = client.get_running_jobs()
+        print running_jobs
+        return True
 
 
 def main():
