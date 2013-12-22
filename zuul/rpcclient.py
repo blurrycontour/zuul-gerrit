@@ -62,5 +62,13 @@ class RPCClient(object):
                 }
         return self.submitJob('zuul:promote', data)
 
+    def get_running_jobs(self):
+        data = {}
+        job = self.submitJob('zuul:get_running_jobs', data)
+        if job.failure:
+            return False
+        else:
+            return json.loads(job.data[0])
+
     def shutdown(self):
         self.gearman.shutdown()

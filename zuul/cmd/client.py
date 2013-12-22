@@ -19,6 +19,7 @@ import ConfigParser
 import logging
 import logging.config
 import os
+import prettytable
 import sys
 
 import zuul.rpcclient
@@ -64,6 +65,21 @@ class Client(object):
         cmd_promote.add_argument('--changes', help='change ids',
                                  required=True, nargs='+')
         cmd_promote.set_defaults(func=self.promote)
+
+        cmd_show = subparsers.add_parser('show',
+                                         help='valid show subcommands')
+        show_subparsers = cmd_show.add_subparsers(title='show')
+        show_running_jobs = show_subparsers.add_parser(
+            'running-jobs',
+            help='show the running jobs'
+        )
+        show_running_jobs.add_argument(
+            '--columns',
+            help="comma separated list of columns to display (or 'ALL')",
+            default='job, worker_name, start_time, result'
+        )
+        # TODO: add filters such as queue, project, changeid etc
+        show_running_jobs.set_defaults(func=self.show_running_jobs)
 
         self.args = parser.parse_args()
 
@@ -118,6 +134,32 @@ class Client(object):
         r = client.promote(pipeline=self.args.pipeline,
                            change_ids=self.args.changes)
         return r
+
+    def show_running_jobs(self):
+        client = zuul.rpcclient.RPCClient(self.server, self.port)
+        running_jobs = client.get_running_jobs()
+
+        if len(running_jobs) == 0:
+            print "No jobs currently running"
+            return True
+
+        all_fields = []
+        for key in running_jobs[0].keys():
+            all_fields.append(key)
+        if self.args.columns.upper() == 'ALL':
+            fields = all_fields
+        else:
+            fields = [f.strip() for f in self.args.columns.split(',')
+                      if f.strip() in all_fields]
+
+        table = prettytable.PrettyTable(field_names=fields)
+        for row in running_jobs:
+            values = []
+            for f in fields:
+                values.append(row.get(f))
+            table.add_row(values)
+        print table
+        return True
 
 
 def main():
