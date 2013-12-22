@@ -48,6 +48,7 @@ class RPCListener(object):
     def register(self):
         self.worker.registerFunction("zuul:enqueue")
         self.worker.registerFunction("zuul:promote")
+        self.worker.registerFunction("zuul:get_running_jobs")
 
     def stop(self):
         self.log.debug("Stopping")
@@ -123,3 +124,37 @@ class RPCListener(object):
         change_ids = args['change_ids']
         self.sched.promote(pipeline_name, change_ids)
         job.sendWorkComplete()
+
+    def handle_get_running_jobs(self, job):
+        # args = json.loads(job.arguments)
+        # TODO: use args to filter by pipeline etc
+        running_jobs = []
+        for pipeline_name, pipeline in self.sched.layout.pipelines.iteritems():
+            for queue in pipeline.queues:
+                for item in queue.queue:
+                    for build in item.current_build_set.getBuilds():
+                        running_jobs.append({
+                            'job': build.job.name,
+                            'uuid': build.uuid,
+                            'launch_time': build.launch_time,
+                            'start_time': build.start_time,
+                            'end_time': build.end_time,
+                            'estimated_time': build.estimated_time,
+                            'pipeline': build.pipeline.name,
+                            'queue': queue.name,
+                            'canceled': build.canceled,
+                            'retry': build.retry,
+                            'url': build.url,
+                            'number': build.number,
+                            'result': build.result,
+                            'parameters': build.parameters,
+                            'worker_name': build.worker.name,
+                            'worker_hostname': build.worker.hostname,
+                            'worker_ips': build.worker.ips,
+                            'worker_fqdn': build.worker.fqdn,
+                            'worker_progam': build.worker.program,
+                            'worker_version': build.worker.version,
+                            'worker_extra': build.worker.extra,
+                        })
+
+        job.sendWorkComplete(json.dumps(running_jobs))
