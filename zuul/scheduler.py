@@ -130,6 +130,8 @@ class Scheduler(threading.Thread):
         self.management_event_queue = Queue.Queue()
         self.layout = model.Layout()
 
+        self.last_reconfigured = None
+
     def stop(self):
         self._stopped = True
         self.wake_event.set()
@@ -419,6 +421,7 @@ class Scheduler(threading.Thread):
         self.log.debug("Waiting for reconfiguration")
         event.wait()
         self.log.debug("Reconfiguration complete")
+        self.last_reconfigured = int(time.time() * 1000)
 
     def promote(self, pipeline_name, change_ids):
         event = PromoteEvent(pipeline_name, change_ids)
@@ -731,6 +734,9 @@ class Scheduler(threading.Thread):
             ret += ', queue length: %s' % self.trigger_event_queue.qsize()
             ret += '</p>'
 
+        if self.last_reconfigured:
+            ret += '<p>Last reconfigured: %s</p>' % self.last_reconfigured
+
         keys = self.layout.pipelines.keys()
         for key in keys:
             pipeline = self.layout.pipelines[key]
@@ -758,6 +764,9 @@ class Scheduler(threading.Thread):
         data['result_event_queue'] = {}
         data['result_event_queue']['length'] = \
             self.result_event_queue.qsize()
+
+        if self.last_reconfigured:
+            data['last_reconfigured'] = self.last_reconfigured
 
         pipelines = []
         data['pipelines'] = pipelines
