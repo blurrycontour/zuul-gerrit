@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAATn/8p1U\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 656,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-12-23T17:05:05Z",
+      "side": 1,
+      "message": "Ok.",
+      "parentUuid": "AAAATn/8t5Q\u003d",
+      "revId": "cc469bd2f08d0513a3726b518ca48003f1ba37d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAATn/861M\u003d",
         "filename": "doc/source/zuul.rst",
         "patchSetId": 2
@@ -53,6 +71,24 @@
     },
     {
       "key": {
+        "uuid": "AAAATn/8p1Q\u003d",
+        "filename": "tests/fixtures/layout.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-12-23T17:05:05Z",
+      "side": 1,
+      "message": "yes, but in another change since we have to deprecate it anyway.",
+      "parentUuid": "AAAATn/8t5M\u003d",
+      "revId": "cc469bd2f08d0513a3726b518ca48003f1ba37d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAATn/8t5E\u003d",
         "filename": "tests/test_scheduler.py",
         "patchSetId": 2
@@ -64,6 +100,24 @@
       "writtenOn": "2013-12-21T11:29:04Z",
       "side": 1,
       "message": "We should test for the case where multiple templates define the same job. ie Make sure they don\u0027t get in there twice.",
+      "revId": "cc469bd2f08d0513a3726b518ca48003f1ba37d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/8p0c\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1981,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-12-23T17:05:05Z",
+      "side": 1,
+      "message": "Actually, as noted in the comment in the next file, the current and desired behavior is that they _do_ get in there twice.  A future enhancement is an option to collapse them so that they don\u0027t show up twice.  We can test for the current behavior though.",
+      "parentUuid": "AAAATn/8t5E\u003d",
       "revId": "cc469bd2f08d0513a3726b518ca48003f1ba37d6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
