@@ -16,6 +16,24 @@
       "revId": "f74761680bc45a74c8066e1e418e058d8a563b95",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAATn/8puY\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-12-23T17:21:49Z",
+      "side": 1,
+      "message": "It\u0027s actually not possible to provide \u0027name\u0027 as a parameter to the template because the keyword \u0027name\u0027 is used to identify the template.  Consider an example:\n\n  projects:\n    - name: openstack/foo\n      template:\n        - name: template_one\n          foo: bar\n          name: baz\n\nNote that is not likely to work because name is defined twice, though unfortunately it is a limitation of the yaml parser that we can not validate that (last one wins, so it\u0027s actually going to override template_one with baz, and try to do a template lookup for the baz template).\n\nIn other words, \u0027name\u0027 is the one variable name that is not available to be passed to a template.\n\nThis matches the convention used in Jenkins Job Builder: that the \u0027name\u0027 variable contains the name of the (for lack of a better phrase) \u0027calling context\u0027 -- in this case (and typically in JJB) the context is a project.",
+      "parentUuid": "AAAATn/8t4s\u003d",
+      "revId": "f74761680bc45a74c8066e1e418e058d8a563b95",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
