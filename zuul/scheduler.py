@@ -39,7 +39,8 @@ def deep_format(obj, paramdict):
     """Apply the paramdict via str.format() to all string objects found within
        the supplied obj. Lists and dicts are traversed recursively.
 
-       Borrowed from Jenkins Job Builder project"""
+       Borrowed from Jenkins Job Builder project
+       """
     if isinstance(obj, str):
         ret = obj.format(**paramdict)
     elif isinstance(obj, list):
@@ -62,7 +63,7 @@ class MergeFailure(Exception):
 
 
 class ManagementEvent(object):
-    """An event that should be processed within the main queue run loop"""
+    """An event that should be processed within the main queue run loop."""
     def __init__(self):
         self._wait_event = threading.Event()
         self._exception = None

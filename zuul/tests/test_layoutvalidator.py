@@ -30,7 +30,7 @@ LAYOUT_RE = re.compile(r'^(good|bad)_.*\.yaml$')
 
 class TestLayoutValidator(testtools.TestCase):
     def test_layouts(self):
-        """Test layout file validation"""
+        """Test layout file validation."""
         print
         errors = []
         for fn in os.listdir(os.path.join(FIXTURE_DIR, 'layouts')):

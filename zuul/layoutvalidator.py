@@ -100,8 +100,8 @@ class LayoutSchema(object):
             self.job_name.schema(value)
 
     def validateTemplateCalls(self, calls):
-        """ Verify a project pass the parameters required
-            by a project-template
+        """Verify a project pass the parameters required by a
+        project-template.
         """
         for call in calls:
             schema = self.templates_schemas[call.get('name')]
