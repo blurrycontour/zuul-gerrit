@@ -100,7 +100,7 @@ class GerritEventConnector(threading.Thread):
                 return
             try:
                 self._handleEvent()
-            except:
+            except Exception:
                 self.log.exception("Exception moving Gerrit event:")
 
 
@@ -143,7 +143,7 @@ class Gerrit(object):
             self.baseurl, project)
         try:
             data = urllib2.urlopen(url).read()
-        except:
+        except Exception:
             self.log.error("Cannot get references from %s" % url)
             raise  # keeps urllib2 error informations
         ret = {}
@@ -186,7 +186,7 @@ class Gerrit(object):
         refs = {}
         try:
             refs = self._getInfoRefs(project)
-        except:
+        except Exception:
             self.log.exception("Exception looking for ref %s" %
                                ref)
         sha = refs.get(ref, '')
@@ -269,7 +269,7 @@ class Gerrit(object):
                 else:
                     # CLOSED, RULE_ERROR
                     return False
-        except:
+        except Exception:
             self.log.exception("Exception determining whether change"
                                "%s can merge:" % change)
             return False

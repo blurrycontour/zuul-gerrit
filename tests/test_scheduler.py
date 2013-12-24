@@ -609,7 +609,7 @@ class FakeWorker(gear.Worker):
                 continue
             try:
                 self.handleJob(job)
-            except:
+            except Exception:
                 self.log.exception("Worker exception:")
 
     def addFailTest(self, name, change):

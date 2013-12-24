@@ -47,7 +47,7 @@ class GearmanCleanup(threading.Thread):
                 return
             try:
                 self.gearman.lookForLostBuilds()
-            except:
+            except Exception:
                 self.log.exception("Exception checking builds:")
 
 
@@ -411,7 +411,7 @@ class Gearman(object):
         if req.response.startswith("OK"):
             try:
                 del self.builds[job.unique]
-            except:
+            except Exception:
                 pass
             return True
         return False
