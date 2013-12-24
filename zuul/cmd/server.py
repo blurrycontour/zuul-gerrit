@@ -252,7 +252,7 @@ def main():
         f = open(test_fn, 'w')
         f.close()
         os.unlink(test_fn)
-    except:
+    except Exception:
         print
         print "Unable to write to state directory: %s" % state_dir
         print
