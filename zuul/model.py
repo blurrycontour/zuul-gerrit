@@ -348,7 +348,7 @@ class Pipeline(object):
 
 
 class ActionReporter(object):
-    """An ActionReporter has a reporter and its configured paramaters"""
+    """An ActionReporter has a reporter and its configured paramaters."""
 
     def __repr__(self):
         return '<ActionReporter %s, %s>' % (self.reporter, self.params)
@@ -365,7 +365,8 @@ class ActionReporter(object):
 
     def getSubmitAllowNeeds(self):
         """Gets the submit allow needs from the reporter based off the
-        parameters."""
+        parameters.
+        """
         return self.reporter.getSubmitAllowNeeds(self.params)
 
 
@@ -374,7 +375,8 @@ class ChangeQueue(object):
     different projects; this is one of them.  For instance, there may
     a queue shared by interrelated projects foo and bar, and a second
     queue for independent project baz.  Pipelines have one or more
-    PipelineQueues."""
+    PipelineQueues.
+    """
     def __init__(self, pipeline, dependent=True):
         self.pipeline = pipeline
         self.name = ''
@@ -523,9 +525,10 @@ class Job(object):
 
 
 class JobTree(object):
-    """ A JobTree represents an instance of one Job, and holds JobTrees
+    """A JobTree represents an instance of one Job, and holds JobTrees
     whose jobs should be run if that Job succeeds.  A root node of a
-    JobTree will have no associated Job. """
+    JobTree will have no associated Job.
+    """
 
     def __init__(self, job):
         self.job = job
@@ -617,7 +620,7 @@ class BuildSet(object):
 
 
 class QueueItem(object):
-    """A changish inside of a Pipeline queue"""
+    """A changish inside of a Pipeline queue."""
 
     def __init__(self, pipeline, change):
         self.pipeline = pipeline
@@ -660,7 +663,7 @@ class QueueItem(object):
 
 
 class Changeish(object):
-    """Something like a change; either a change or a ref"""
+    """Something like a change; either a change or a ref."""
     is_reportable = False
 
     def __init__(self, project):
