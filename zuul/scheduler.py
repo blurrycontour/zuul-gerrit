@@ -395,7 +395,7 @@ class Scheduler(threading.Thread):
         try:
             if statsd:
                 statsd.incr('gerrit.event.%s' % event.type)
-        except:
+        except Exception:
             self.log.exception("Exception reporting event stats")
         self.trigger_event_queue.put(event)
         self.wake_event.set()
@@ -422,7 +422,7 @@ class Scheduler(threading.Thread):
                 statsd.incr(key)
                 key = 'zuul.pipeline.%s.all_jobs' % build.pipeline.name
                 statsd.incr(key)
-        except:
+        except Exception:
             self.log.exception("Exception reporting runtime stats")
         self.result_event_queue.put(('completed', build))
         self.wake_event.set()
@@ -490,11 +490,11 @@ class Scheduler(threading.Thread):
     def resume(self):
         try:
             self._load_queue()
-        except:
+        except Exception:
             self.log.exception("Unable to load queue")
         try:
             self._delete_queue()
-        except:
+        except Exception:
             self.log.exception("Unable to delete saved queue")
         self.log.debug("Resuming queue processing")
         self.wake_event.set()
@@ -659,7 +659,7 @@ class Scheduler(threading.Thread):
                     self.maintainTriggerCache()
                     self._maintain_trigger_cache = False
 
-            except:
+            except Exception:
                 self.log.exception("Exception in run handler:")
 
     def maintainTriggerCache(self):
@@ -882,7 +882,7 @@ class BasePipelineManager(object):
             if ret:
                 self.log.error("Reporting change start %s received: %s" %
                                (change, ret))
-        except:
+        except Exception:
             self.log.exception("Exception while reporting start:")
 
     def sendReport(self, action_reporters, change, message):
@@ -1051,7 +1051,7 @@ class BasePipelineManager(object):
                 self.log.debug("Adding build %s of job %s to item %s" %
                                (build, job, item))
                 item.addBuild(build)
-            except:
+            except Exception:
                 self.log.exception("Exception while launching job %s "
                                    "for change %s:" % (job, item.change))
 
@@ -1072,7 +1072,7 @@ class BasePipelineManager(object):
                                (build, item.change))
                 try:
                     self.sched.launcher.cancel(build)
-                except:
+                except Exception:
                     self.log.exception("Exception while canceling build %s "
                                        "for change %s" % (build, item.change))
                 to_remove.append(build)
@@ -1260,7 +1260,7 @@ class BasePipelineManager(object):
             if ret:
                 self.log.error("Reporting change %s received: %s" %
                                (item.change, ret))
-        except:
+        except Exception:
             self.log.exception("Exception while reporting:")
             item.setReportedResult('ERROR')
         self.updateBuildDescriptions(item.current_build_set)
@@ -1458,7 +1458,7 @@ class BasePipelineManager(object):
             if dt:
                 statsd.timing(key + '.resident_time', dt)
                 statsd.incr(key + '.total_changes')
-        except:
+        except Exception:
             self.log.exception("Exception reporting pipeline stats")
 
 
