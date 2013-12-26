@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAT3//7WU\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 766,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2013-12-26T23:49:51Z",
+      "side": 1,
+      "message": "I think version_string() (in pbr) is very resource intensive, and formatStatusJSON gets called _a lot_, so I think it would be worth caching this (just setting it as an attribute of Scheduler on __init__ is probably ok).",
+      "revId": "ad8c6e3f9ff83753a7f2e986738b45b63d846859",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
