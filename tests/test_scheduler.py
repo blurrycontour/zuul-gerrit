@@ -1717,7 +1717,7 @@ class TestScheduler(testtools.TestCase):
 
     def test_can_merge(self):
         "Test whether a change is ready to merge"
-        # TODO: move to test_gerrit (this is a unit test!)
+        #TODO(jeblair) move to test_gerrit (this is a unit test!)
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         trigger = self.sched.layout.pipelines['gate'].trigger
         a = self.sched.triggers['gerrit'].getChange(1, 2)

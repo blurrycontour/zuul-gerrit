@@ -206,7 +206,7 @@ class Scheduler(threading.Thread):
             pipeline.setManager(manager)
             layout.pipelines[conf_pipeline['name']] = pipeline
 
-            # TODO: move this into triggers (may require pluggable
+            #TODO(jeblair): move this into triggers (may require pluggable
             # configuration)
             if 'gerrit' in conf_pipeline['trigger']:
                 pipeline.trigger = self.triggers['gerrit']
@@ -313,7 +313,7 @@ class Scheduler(threading.Thread):
                         config_project.update(
                             {pipeline.name: expanded[pipeline.name] +
                              config_project.get(pipeline.name, [])})
-            # TODO: future enhancement -- add an option to the
+            #TODO(jeblair): future enhancement -- add an option to the
             # template block to indicate that duplicate jobs should be
             # merged (especially to handle the case where they have
             # children and you want all of the children to run after a
@@ -363,7 +363,7 @@ class Scheduler(threading.Thread):
         else:
             sshkey = None
 
-        # TODO: The merger should have an upstream repo independent of
+        #TODO(jeblair): The merger should have an upstream repo independent of
         # triggers, and then each trigger should provide a fetch
         # location.
         self.merger = merger.Merger(self.triggers['gerrit'],
