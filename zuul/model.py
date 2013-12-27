@@ -531,9 +531,16 @@ class JobTree(object):
         self.job = job
         self.job_trees = []
 
-    def addJob(self, job):
+    def addJob(self, job, collapse=False, prepend=False):
+        if collapse:
+            t = self.getJobTreeForJob(job)
+            if t:
+                return t
         t = JobTree(job)
-        self.job_trees.append(t)
+        if prepend:
+            self.job_trees.insert(0, t)
+        else:
+            self.job_trees.append(t)
         return t
 
     def getJobs(self):

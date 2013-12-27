@@ -75,9 +75,6 @@ class LayoutSchema(object):
                 }
     pipelines = [pipeline]
 
-    project_template = {v.Required('name'): str}
-    project_templates = [project_template]
-
     job = {v.Required('name'): str,
            'failure-message': str,
            'success-message': str,
@@ -182,7 +179,9 @@ class LayoutSchema(object):
 
         # Sub schema to validate a project template has existing
         # pipelines and jobs.
-        project_template = {'name': str}
+        project_template = {v.Required('name'): str,
+                            'collapse-jobs': bool,
+                            }
         for p in pipelines:
             project_template[p] = self.validateJob
         project_templates = [project_template]

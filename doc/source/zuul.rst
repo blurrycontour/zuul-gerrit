@@ -662,7 +662,25 @@ for the project.
 Note that if multiple templates are used for a project and one
 template specifies a job that is also specified in another template,
 or specified in the project itself, those jobs will be duplicated in
-the resulting project configuration.
+the resulting project configuration.  To alter this behavior, add
+'collapse-jobs' to the template definition::
+
+  project-templates:
+    - name: tarball-jobs
+      collapse-jobs: True
+      post:
+       - '{jobprefix}-tarball'
+    - name: upload-jobs
+      collapse-jobs: True
+      post:
+       - '{jobprefix}-tarball':
+         - '{jobprefix}-upload'
+
+If Zuul encounters an existing job (whether defined statically or by a
+template), instead of duplicating the definition, it will merge the
+jobs specified by the template.  In the example above, if tarball-jobs
+and upload-jobs are both specified for a project, the resulting
+configuration will be as if only upload-jobs was specified.
 
 logging.conf
 ~~~~~~~~~~~~
