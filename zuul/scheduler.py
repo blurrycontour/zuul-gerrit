@@ -233,6 +233,7 @@ class Scheduler(threading.Thread):
                 for pipe_name in layout.pipelines.keys()
                 if pipe_name in project_template
             )
+            tpl['collapse-jobs'] = project_template.get('collapse-jobs', False)
             project_templates[project_template.get('name')] = tpl
 
         for config_job in data.get('jobs', []):
@@ -272,56 +273,52 @@ class Scheduler(threading.Thread):
                 job._files = files
                 job.files = [re.compile(x) for x in files]
 
-        def add_jobs(job_tree, config_jobs):
+        def add_jobs(job_tree, config_jobs, collapse=False, prepend=False):
             for job in config_jobs:
                 if isinstance(job, list):
                     for x in job:
                         add_jobs(job_tree, x)
                 if isinstance(job, dict):
                     for parent, children in job.items():
-                        parent_tree = job_tree.addJob(layout.getJob(parent))
+                        parent_tree = job_tree.addJob(layout.getJob(parent),
+                                                      collapse, prepend)
                         add_jobs(parent_tree, children)
                 if isinstance(job, str):
-                    job_tree.addJob(layout.getJob(job))
+                    job_tree.addJob(layout.getJob(job), collapse, prepend)
 
         for config_project in data.get('projects', []):
             project = Project(config_project['name'])
             shortname = config_project['name'].split('/')[-1]
 
-            # This is reversed due to the prepend operation below, so
-            # the ultimate order is templates (in order) followed by
-            # statically defined jobs.
-            for requested_template in reversed(
-                config_project.get('template', [])):
+            expanded_templates = []
+            for requested_template in config_project.get('template', []):
                 # Fetch the template from 'project-templates'
                 tpl = project_templates.get(
                     requested_template.get('name'))
                 # Expand it with the project context
                 requested_template['name'] = shortname
-                expanded = deep_format(tpl, requested_template)
-                # Finally merge the expansion with whatever has been
-                # already defined for this project.  Prepend our new
-                # jobs to existing ones (which may have been
-                # statically defined or defined by other templates).
-                for pipeline in layout.pipelines.values():
-                    if pipeline.name in expanded:
-                        config_project.update(
-                            {pipeline.name: expanded[pipeline.name] +
-                             config_project.get(pipeline.name, [])})
-            # TODO: future enhancement -- add an option to the
-            # template block to indicate that duplicate jobs should be
-            # merged (especially to handle the case where they have
-            # children and you want all of the children to run after a
-            # single run of the parent).
+                expanded_templates.append(deep_format(
+                        tpl, requested_template))
 
             layout.projects[config_project['name']] = project
             mode = config_project.get('merge-mode', 'merge-resolve')
             project.merge_mode = model.MERGER_MAP[mode]
             for pipeline in layout.pipelines.values():
+                job_tree = None
+
                 if pipeline.name in config_project:
-                    job_tree = pipeline.addProject(project)
+                    if not job_tree:
+                        job_tree = pipeline.addProject(project)
                     config_jobs = config_project[pipeline.name]
                     add_jobs(job_tree, config_jobs)
+
+                for expanded in expanded_templates:
+                    if pipeline.name in expanded:
+                        if not job_tree:
+                            job_tree = pipeline.addProject(project)
+                        add_jobs(job_tree, expanded[pipeline.name],
+                                 collapse=tpl.get('collapse-jobs', False),
+                                 prepend=True)
 
         # All jobs should be defined at this point, get rid of
         # metajobs so that getJob isn't doing anything weird.
