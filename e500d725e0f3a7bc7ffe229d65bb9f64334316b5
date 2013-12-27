@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAT3//5LI\u003d",
+        "filename": "doc/source/reporters.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2013-12-27T18:20:15Z",
+      "side": 1,
+      "message": "According to doc-draft this tab has rendered in the expected way.",
+      "revId": "e500d725e0f3a7bc7ffe229d65bb9f64334316b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
