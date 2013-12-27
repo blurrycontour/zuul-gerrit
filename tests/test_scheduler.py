@@ -36,21 +36,21 @@ import urllib
 import urllib2
 import urlparse
 
-import git
-import gear
 import fixtures
+import gear
+import git
 import statsd
 import testtools
 
-import zuul.scheduler
-import zuul.webapp
-import zuul.rpclistener
-import zuul.rpcclient
 import zuul.launcher.gearman
 import zuul.reporter.gerrit
 import zuul.reporter.smtp
+import zuul.rpcclient
+import zuul.rpclistener
+import zuul.scheduler
 import zuul.trigger.gerrit
 import zuul.trigger.timer
+import zuul.webapp
 
 FIXTURE_DIR = os.path.join(os.path.dirname(__file__),
                            'fixtures')

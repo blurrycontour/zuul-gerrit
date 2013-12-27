@@ -14,8 +14,8 @@
 # under the License.
 
 import logging
-import threading
 from paste import httpserver
+import threading
 from webob import Request
 
 

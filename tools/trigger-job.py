@@ -18,8 +18,8 @@
 # parameters.
 
 import argparse
-import time
 import json
+import time
 from uuid import uuid4
 
 import gear

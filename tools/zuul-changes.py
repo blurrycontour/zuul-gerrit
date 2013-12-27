@@ -16,9 +16,9 @@
 # Print commands to leave gerrit comments for every change in one of
 # Zuul's pipelines.
 
-import urllib2
-import json
 import argparse
+import json
+import urllib2
 
 parser = argparse.ArgumentParser()
 parser.add_argument('url', help='The URL of the running Zuul instance')

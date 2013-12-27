@@ -13,14 +13,14 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import threading
-import select
 import json
-import time
-import Queue
-import paramiko
 import logging
+import paramiko
 import pprint
+import Queue
+import select
+import threading
+import time
 
 
 class GerritWatcher(threading.Thread):

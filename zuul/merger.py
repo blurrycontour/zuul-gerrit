@@ -13,9 +13,9 @@
 # under the License.
 
 import git
-import os
 import logging
 import model
+import os
 
 
 class ZuulReference(git.Reference):

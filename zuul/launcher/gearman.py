@@ -16,8 +16,8 @@ import gear
 import inspect
 import json
 import logging
-import time
 import threading
+import time
 from uuid import uuid4
 
 import zuul.model

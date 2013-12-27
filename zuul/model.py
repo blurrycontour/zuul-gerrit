@@ -12,10 +12,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import extras
 import re
 import time
 from uuid import uuid4
-import extras
 
 OrderedDict = extras.try_imports(['collections.OrderedDict',
                                   'ordereddict.OrderedDict'])
