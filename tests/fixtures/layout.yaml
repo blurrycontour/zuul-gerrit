@@ -120,6 +120,14 @@ project-templates:
   - name: test-five-also
     check:
      - '{name}-{something}-test5'
+  - name: test-collapse-one
+    check:
+     - '{name}-tarball'
+  - name: test-collapse-two
+    collapse-jobs: True
+    check:
+     - '{name}-tarball':
+         - '{name}-upload'
 
 projects:
   - name: org/project
@@ -219,6 +227,14 @@ projects:
         something: foo
     check:
       - project-test6
+
+  - name: org/collapsed-project
+    template:
+      - name: test-collapse-one
+      - name: test-collapse-two
+    check:
+      - collapsed-project-tarball
+      - local-job
 
   - name: org/node-project
     gate:
