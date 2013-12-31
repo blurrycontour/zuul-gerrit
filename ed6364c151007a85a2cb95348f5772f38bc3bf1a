@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAT3//ygA\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 443,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2013-12-31T15:12:11Z",
+      "side": 1,
+      "message": "I was confused by the * 1000 at first, expecting us to use a Unix epoch being the number of seconds since 1970.\n\nTurns out Javascript Date() accepts a value being the number of milliseconds since 1970.  So the value we craft here can be used as is on the client side.\n\nIs that worth comment?",
+      "revId": "ed6364c151007a85a2cb95348f5772f38bc3bf1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
