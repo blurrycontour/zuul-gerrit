@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAT3//uz4\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-01-02T18:46:47Z",
+      "side": 1,
+      "message": "However, the configuration isn\u0027t loaded until it\u0027s reconfigured (that is, even the initial configuration is a reconfiguration), so this makes sense to me.",
+      "parentUuid": "AAAAT3//xhI\u003d",
+      "revId": "ed6364c151007a85a2cb95348f5772f38bc3bf1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAT3//ygA\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 3
@@ -30,6 +48,41 @@
       "writtenOn": "2013-12-31T15:12:11Z",
       "side": 1,
       "message": "I was confused by the * 1000 at first, expecting us to use a Unix epoch being the number of seconds since 1970.\n\nTurns out Javascript Date() accepts a value being the number of milliseconds since 1970.  So the value we craft here can be used as is on the client side.\n\nIs that worth comment?",
+      "revId": "ed6364c151007a85a2cb95348f5772f38bc3bf1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAT3//uzo\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 443,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-01-02T18:46:47Z",
+      "side": 1,
+      "message": "Actually, the pattern in Zuul is that internally, timestamps are in seconds, and then converted as needed for other systems.  So I think we should set it to time.time() here, and multiply by 1000 when constructing the json output.",
+      "parentUuid": "AAAAT3//ygA\u003d",
+      "revId": "ed6364c151007a85a2cb95348f5772f38bc3bf1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAT3//uzU\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 791,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-01-02T18:46:47Z",
+      "side": 1,
+      "message": "(re above comment: move the *1000 here)",
       "revId": "ed6364c151007a85a2cb95348f5772f38bc3bf1a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
