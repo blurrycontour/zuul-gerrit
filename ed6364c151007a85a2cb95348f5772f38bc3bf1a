@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAT3//qNk\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 6786
+      },
+      "writtenOn": "2014-01-03T23:23:58Z",
+      "side": 1,
+      "message": "I think that due to the fact that initial configuration \u003d\u003d first reconfiguration it should be None before the first reconfigure method call.",
+      "parentUuid": "AAAAT3//uz4\u003d",
+      "revId": "ed6364c151007a85a2cb95348f5772f38bc3bf1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAT3//ygA\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 3
@@ -72,6 +90,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAT3//qNc\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 443,
+      "author": {
+        "id": 6786
+      },
+      "writtenOn": "2014-01-03T23:23:58Z",
+      "side": 1,
+      "message": "ok, got it",
+      "parentUuid": "AAAAT3//uzo\u003d",
+      "revId": "ed6364c151007a85a2cb95348f5772f38bc3bf1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAT3//uzU\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 3
@@ -83,6 +119,24 @@
       "writtenOn": "2014-01-02T18:46:47Z",
       "side": 1,
       "message": "(re above comment: move the *1000 here)",
+      "revId": "ed6364c151007a85a2cb95348f5772f38bc3bf1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAT3//qNY\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 791,
+      "author": {
+        "id": 6786
+      },
+      "writtenOn": "2014-01-03T23:23:58Z",
+      "side": 1,
+      "message": "ok",
+      "parentUuid": "AAAAT3//uzU\u003d",
       "revId": "ed6364c151007a85a2cb95348f5772f38bc3bf1a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
