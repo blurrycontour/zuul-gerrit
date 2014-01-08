@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUH//0No\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2935,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-01-08T06:02:41Z",
+      "side": 1,
+      "message": "Doesn\u0027t this clone need to happen after the fake changes below create the refs? Otherwise the ref checks that begin on line 2945 won\u0027t see the refs it is looking for.",
+      "revId": "99de73574d2aa9d3ec4ece4d3409ada9ff071454",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
