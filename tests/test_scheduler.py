@@ -214,6 +214,19 @@ class FakeChange(object):
                  "reason": ""}
         return event
 
+    def getChangeAbandonedEvent(self):
+        event = {"type": "change-abandoned",
+                 "change": {"project": self.project,
+                            "branch": self.branch,
+                            "id": "I5459869c07352a31bfb1e7a8cac379cabfcb25af",
+                            "number": str(self.number),
+                            "subject": self.subject,
+                            "owner": {"name": "User Name"},
+                            "url": "https://hostname/3"},
+                 "abandoner": {"name": "User Name"},
+                 "reason": ""}
+        return event
+
     def addApproval(self, category, value, username='jenkins',
                     granted_on=None):
         if not granted_on:
@@ -858,7 +871,8 @@ class TestScheduler(testtools.TestCase):
 
     def assertFinalState(self):
         # Make sure that the change cache is cleared
-        self.assertEqual(len(self.gerrit._change_cache.keys()), 0)
+        self.assertEqual(len(self.gerrit._change_cache.keys()), 0,
+                         "Change cache should have been cleared")
         # Make sure that git.Repo objects have been garbage collected.
         repos = []
         gc.collect()
@@ -1103,7 +1117,8 @@ class TestScheduler(testtools.TestCase):
                 if len(queue.queue) != 0:
                     print 'pipeline %s queue %s contents %s' % (
                         pipeline.name, queue.name, queue.queue)
-                self.assertEqual(len(queue.queue), 0)
+                self.assertEqual(len(queue.queue), 0,
+                                 "Queue should be empty")
 
     def assertReportedStat(self, key, value=None, kind=None):
         start = time.time()
@@ -2461,6 +2476,35 @@ class TestScheduler(testtools.TestCase):
         self.assertEqual(D.data['status'], 'MERGED')
         self.assertEqual(D.reported, 2)
         self.assertEqual(len(self.history), 9)  # 3 each for A, B, D.
+
+    def test_abandoned_change_dequeues(self):
+        "Test that an abandoned change is dequeued"
+
+        self.worker.hold_jobs_in_build = True
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertEqual(len(self.builds), 1, "One job being build (on hold)")
+        self.assertEqual(self.builds[0].name, 'project-merge')
+
+        self.fake_gerrit.addEvent(A.getChangeAbandonedEvent())
+        self.waitUntilSettled()
+
+        # For debugging purposes...
+        for pipeline in self.sched.layout.pipelines.values():
+            for queue in pipeline.queues:
+                self.log.info("pipepline %s queue %s contents %s" % (
+                    pipeline.name, queue.name, queue.queue))
+
+        self.worker.release('.*-merge')
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 0, "No job running")
+        self.assertEmptyQueues()
+        #self.assertEqual(len(self.builds), 0, "Abandonned change = nobuild")
+        #self.assertEqual(len(self.history), 0, "Nothing in history")
+        self.assertEqual(A.reported, 0, "Abandoned change should not report")
 
     def test_zuul_url_return(self):
         "Test if ZUUL_URL is returning when zuul_url is set in zuul.conf"

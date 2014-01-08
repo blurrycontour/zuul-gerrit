@@ -727,6 +727,8 @@ class Scheduler(threading.Thread):
                                      self.triggers.get(event.trigger_name))
             if event.type == 'patchset-created':
                 pipeline.manager.removeOldVersionsOfChange(change)
+            elif event.type == 'change-abandoned':
+                pipeline.manager.removeAbandonedChange(change)
             if pipeline.manager.eventMatches(event, change):
                 self.log.info("Adding %s, %s to %s" %
                               (project, change, pipeline))
@@ -986,6 +988,10 @@ class BasePipelineManager(object):
                            (change, old_change, old_change))
             self.removeChange(old_change)
 
+    def removeAbandonedChange(self, change):
+        self.log.debug("Change %s abandoned, removing." % change)
+        self.removeChange(change)
+
     def reEnqueueItem(self, item):
         change_queue = self.pipeline.getQueue(item.change.project)
         if change_queue:
@@ -1045,7 +1051,9 @@ class BasePipelineManager(object):
         # Remove a change from the queue, probably because it has been
         # superceded by another change.
         for item in self.pipeline.getAllItems():
-            if item.change == change:
+            self.log.debug("Does queue item %s match %s?" %
+                           (item.change, change))
+            if item.change == change or item.change.equals(change):
                 self.log.debug("Canceling builds behind change: %s "
                                "because it is being removed." % item.change)
                 self.cancelJobs(item)
