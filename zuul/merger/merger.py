@@ -16,6 +16,7 @@
 import git
 import os
 import logging
+import threading
 
 import zuul.model
 
@@ -142,6 +143,11 @@ class Repo(object):
                                                  self.remote_url))
         repo.remotes.origin.push('%s:%s' % (local, remote))
 
+    def push_url(self, url, refspecs):
+        repo = self.createRepoObject()
+        self.log.debug("Pushing %s to %s" % (refspecs, url))
+        repo.git.push([url] + refspecs)
+
     def update(self):
         repo = self.createRepoObject()
         self.log.debug("Updating repository %s" % self.local_path)
@@ -152,7 +158,7 @@ class Repo(object):
 class Merger(object):
     log = logging.getLogger("zuul.Merger")
 
-    def __init__(self, working_root, sshkey, email, username):
+    def __init__(self, working_root, sshkey, email, username, replicate_urls):
         self.repos = {}
         self.working_root = working_root
         if not os.path.exists(working_root):
@@ -161,6 +167,7 @@ class Merger(object):
             self._makeSSHWrapper(sshkey)
         self.email = email
         self.username = username
+        self.replicate_urls = replicate_urls
 
     def _makeSSHWrapper(self, key):
         name = os.path.join(self.working_root, '.ssh_wrapper')
@@ -263,6 +270,7 @@ class Merger(object):
         recent[key] = commit
         # Set the Zuul ref for this item to point to the most recent
         # commits of each project-branch
+        replicate_refspecs = {}
         for key, commit in recent.items():
             project, branch = key
             try:
@@ -273,7 +281,32 @@ class Merger(object):
                 self.log.exception("Unable to set zuul ref %s for "
                                    "item %s" % (zuul_ref, item))
                 return None
+            full_ref = 'refs/zuul/' + zuul_ref
+            refspecs = replicate_refspecs.get(project, [])
+            refspecs.append('%s:%s' % (full_ref, full_ref))
+            replicate_refspecs[project] = refspecs
+
+        self.replicateRefspecs(replicate_refspecs)
         return commit
+
+    def replicateRefspecs(self, refspecs):
+        threads = []
+        for url in self.replicate_urls:
+            t = threading.Thread(target=self._replicate,
+                                 args=(url, refspecs))
+            t.start()
+            threads.append(t)
+        for t in threads:
+            t.join()
+
+    def _replicate(self, url, project_refspecs):
+        try:
+            for project, refspecs in project_refspecs.items():
+                repo = self.getRepo(project, None)
+                repo.push_url(os.path.join(url, project.name + '.git'),
+                              refspecs)
+        except Exception:
+            self.log.exception("Exception pushing to %s" % url)
 
     def mergeChanges(self, items):
         recent = {}

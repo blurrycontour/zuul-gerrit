@@ -33,7 +33,7 @@ section of zuul.conf.  The location of the other two configuration
 files (as well as the location of the PID file when running Zuul as a
 server) are specified in a third section.
 
-The three sections of this config and their options are documented below.
+The sections of this config and their options are documented below.
 You can also find an example zuul.conf file in the git
 `repository
 <https://github.com/openstack-infra/zuul/blob/master/etc/zuul.conf-sample>`_
@@ -167,6 +167,16 @@ smtp
   Who the report should be emailed to by default.
   This can be overridden by individual pipelines.
   ``default_to=you@example.com``
+
+replication
+"""""""""""
+
+Zuul mergers can push the refs it creates to any number of servers.  To do so,
+list the git push URLs in this section, one per line as follows::
+
+  [replication]
+    url1=ssh://user@host1.example.com:port/path/to/repo
+    url2=ssh://user@host2.example.com:port/path/to/repo
 
 layout.yaml
 ~~~~~~~~~~~
