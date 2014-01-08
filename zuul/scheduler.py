@@ -701,6 +701,8 @@ class Scheduler(threading.Thread):
                                      self.triggers.get(event.trigger_name))
             if event.type == 'patchset-created':
                 pipeline.manager.removeOldVersionsOfChange(change)
+            elif event.type == 'change-abandoned':
+                pipeline.manager.removeAbandonedChange(change)
             if pipeline.manager.eventMatches(event):
                 self.log.info("Adding %s, %s to %s" %
                               (project, change, pipeline))
@@ -953,6 +955,10 @@ class BasePipelineManager(object):
             self.log.debug("Change %s is a new version of %s, removing %s" %
                            (change, old_change, old_change))
             self.removeChange(old_change)
+
+    def removeAbandonedChange(self, change):
+        self.log.debug("Change %s abandoned, removing." % change)
+        self.removeChange(change)
 
     def reEnqueueItem(self, item):
         change_queue = self.pipeline.getQueue(item.change.project)
