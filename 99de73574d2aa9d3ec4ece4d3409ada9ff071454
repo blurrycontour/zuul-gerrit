@@ -16,6 +16,24 @@
       "revId": "99de73574d2aa9d3ec4ece4d3409ada9ff071454",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH//0Kg\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2935,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-01-08T06:05:48Z",
+      "side": 1,
+      "message": "Misunderstanding -- these are the repos we are cloning _into_.",
+      "parentUuid": "AAAAUH//0No\u003d",
+      "revId": "99de73574d2aa9d3ec4ece4d3409ada9ff071454",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
