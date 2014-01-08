@@ -350,6 +350,11 @@ explanation of each of the parameters::
   well.  To suppress this behavior (and allow jobs to continue
   running), set this to ``false``.  Default: ``true``.
 
+**dequeue-on-change-abandon**
+  By default, whenever a change is abandoned Zuul will remove the change
+  from pipeline. To suppress this behavior (and allow jobs to continue
+  running), set this to ``false``. Default: ``true```.
+
 **success**
   Describes where Zuul should report to if all the jobs complete
   successfully.

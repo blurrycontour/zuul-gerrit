@@ -44,6 +44,7 @@ pipelines:
   - name: unused
     manager: IndependentPipelineManager
     dequeue-on-new-patchset: false
+    dequeue-on-change-abandon: false
     trigger:
       gerrit:
         - event: comment-added
