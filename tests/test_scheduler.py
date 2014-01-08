@@ -214,6 +214,19 @@ class FakeChange(object):
                  "reason": ""}
         return event
 
+    def getChangeAbandonedEvent(self):
+        event = {"type": "change-abandoned",
+                 "change": {"project": self.project,
+                            "branch": self.branch,
+                            "id": "I5459869c07352a31bfb1e7a8cac379cabfcb25af",
+                            "number": str(self.number),
+                            "subject": self.subject,
+                            "owner": {"name": "User Name"},
+                            "url": "https://hostname/3"},
+                 "abandoner": {"name": "User Name"},
+                 "reason": ""}
+        return event
+
     def addApproval(self, category, value):
         approval = {'description': self.categories[category][0],
                     'type': category,
@@ -2444,6 +2457,25 @@ class TestScheduler(testtools.TestCase):
         self.assertEqual(D.data['status'], 'MERGED')
         self.assertEqual(D.reported, 2)
         self.assertEqual(len(self.history), 9)  # 3 each for A, B, D.
+
+    def test_abandoned_change_dequeues(self):
+        "Test that an abandoned change is dequeued"
+
+        self.worker.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertEqual(len(self.builds), 1)
+        self.assertEqual(self.builds[0].name, 'project-merge')
+
+        self.worker.release('.*-merge')
+
+        self.fake_gerrit.addEvent(A.getChangeAbandonedEvent())
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 0)
+        self.assertEqual(len(self.history), 0)
+        self.assertEqual(A.reported, 0)
 
     def test_zuul_url_return(self):
         "Test if ZUUL_URL is returning when zuul_url is set in zuul.conf"
