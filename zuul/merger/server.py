@@ -44,13 +44,19 @@ class MergeServer(object):
         else:
             merge_name = None
 
+        replicate_urls = []
+        if self.config.has_section('replication'):
+            for k, v in self.config.items('replication'):
+                replicate_urls.append(v)
+
         if self.config.has_option('gerrit', 'sshkey'):
             sshkey = self.config.get('gerrit', 'sshkey')
         else:
             sshkey = None
 
         self.merger = merger.Merger(merge_root, sshkey,
-                                    merge_email, merge_name)
+                                    merge_email, merge_name,
+                                    replicate_urls)
 
     def start(self):
         self._running = True
