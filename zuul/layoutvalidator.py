@@ -59,6 +59,7 @@ class LayoutSchema(object):
                                'from': str,
                                'subject': str,
                                },
+                      'mysql': {'verified': int}
                       }
 
     pipeline = {v.Required('name'): str,
