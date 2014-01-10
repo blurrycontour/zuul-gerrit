@@ -119,6 +119,7 @@ class Server(object):
         logging.basicConfig(level=logging.DEBUG)
         self.sched = zuul.scheduler.Scheduler()
         self.sched.registerReporter(None, 'gerrit')
+        self.sched.registerReporter(None, 'mysql')
         self.sched.registerReporter(None, 'smtp')
         self.sched.registerTrigger(None, 'gerrit')
         self.sched.registerTrigger(None, 'timer')
@@ -168,6 +169,7 @@ class Server(object):
         import zuul.scheduler
         import zuul.launcher.gearman
         import zuul.reporter.gerrit
+        import zuul.reporter.mysql
         import zuul.reporter.smtp
         import zuul.trigger.gerrit
         import zuul.trigger.timer
@@ -187,7 +189,20 @@ class Server(object):
         timer = zuul.trigger.timer.Timer(self.config, self.sched)
         webapp = zuul.webapp.WebApp(self.sched)
         rpc = zuul.rpclistener.RPCListener(self.config, self.sched)
+
         gerrit_reporter = zuul.reporter.gerrit.Reporter(gerrit)
+
+        try:
+            mysql_reporter = zuul.reporter.mysql.Reporter(
+                self.config.get('mysql_host', 'localhost'),
+                self.config.get('mysql_port', 3306),
+                self.config.get('mysql_user'),
+                self.config.get('mysql_password'),
+                self.config.get('mysql_database'),
+                self.config.get('mysql_table'))
+        except:
+            mysql_reporter = None
+
         smtp_reporter = zuul.reporter.smtp.Reporter(
             self.config.get('smtp', 'default_from')
             if self.config.has_option('smtp', 'default_from') else 'zuul',
@@ -203,6 +218,8 @@ class Server(object):
         self.sched.registerTrigger(gerrit)
         self.sched.registerTrigger(timer)
         self.sched.registerReporter(gerrit_reporter)
+        if mysql_reporter:
+            self.sched.registerReporter(mysql_reporter)
         self.sched.registerReporter(smtp_reporter)
 
         self.sched.start()
