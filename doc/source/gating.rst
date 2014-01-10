@@ -28,6 +28,9 @@ changes are tested correctly.
 Zuul was designed to handle the workflow of the OpenStack project, but
 can be used with any project.
 
+Testing in parallel
+-------------------
+
 A particular focus of Zuul is ensuring correctly ordered testing of
 changes in parallel.  A gating system should always test each change
 applied to the tip of the branch exactly as it is going to be merged.
@@ -207,4 +210,39 @@ starts the process again testing *D* against the tip of the branch, and
         master -> D -> E;
     }
   }
+
+
+Cross projects dependencies
+---------------------------
+
+When your projects are closely coupled together, you want to make sure
+changes entering the gate are going to be tested with the version of
+other projects currently enqueued in the gate (since they will
+eventually be merged and might introduce breaking features).
+
+Such dependencies are declared in Zuul configuration by having a job
+declared in the DependentPipeline of several projects.  As an example,
+given a main project ``acme`` and a plugin ``acme-plugin`` you can
+define a job ``acme-tests`` which should be run for both projects:
+
+.. code-block:: yaml
+
+  projects::
+    - name: acme
+      gate:
+       - acme-tests
+
+    - name: acme-plugin
+     gate:
+      - acme-tests
+
+Whenever a change enters the queue, Zuul creates a reference for it.
+For each subsequent change, an additional reference is created so you
+will always be able to fetch the future state of your project
+dependencies for each change in the queue.  For example with the given
+changes entering the queue::
+
+
+
+
 
