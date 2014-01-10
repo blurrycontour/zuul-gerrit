@@ -28,6 +28,9 @@ changes are tested correctly.
 Zuul was designed to handle the workflow of the OpenStack project, but
 can be used with any project.
 
+Testing in parallel
+-------------------
+
 A particular focus of Zuul is ensuring correctly ordered testing of
 changes in parallel.  A gating system should always test each change
 applied to the tip of the branch exactly as it is going to be merged.
@@ -208,3 +211,71 @@ starts the process again testing *D* against the tip of the branch, and
     }
   }
 
+
+Cross projects dependencies
+---------------------------
+
+When your projects are closely coupled together, you want to make sure
+changes entering the gate are going to be tested with the version of
+other projects currently enqueued in the gate (since they will
+eventually be merged and might introduce breaking features).
+
+Such dependencies are can be defined in Zuul configuration by registering a job
+in DependentPipeline of several projects. Whenever a change enter such a
+pipeline, it will create reference for the other projects as well.  As an
+example, given a main project ``acme`` and a plugin ``plugin`` you can
+define a job ``acme-tests`` which should be run for both projects:
+
+.. code-block:: yaml
+
+  pipelines:
+    - name: gate
+      manager: DependentPipelineManager
+
+  projects::
+    - name: acme
+      gate:
+       - acme-tests
+    - name: plugin
+      gate:
+       - acme-tests  # Register job again
+
+Whenever a change enters the ``gate`` pipeline queue, Zuul creates a reference
+for it.  For each subsequent change, an additional reference is created for the
+change and used to mark changes ahead in the queue. As a result, you will
+always be able to fetch the future state of your project dependencies for each
+change in the queue.
+
+Based on the pipeline and projects definitions above, three changes are
+inserted in the ``gate`` pipeline with an associated Zuul reference:
+
+  ========  ======= ====== =========
+  Change    Project Branch Zuul Ref.
+  ========  ======= ====== =========
+  Change 1  acme    master master/Z1
+  Change 2  plugin  stable stable/Z2
+  Change 3  plugin  master master/Z3
+  ========  ======= ====== =========
+
+Since the changes enter a DependentPipelineManager pipeline, Zuul creates
+additional references:
+
+  ====== ======= ========= =============================
+  Change Project Zuul Ref. Description
+  ====== ======= ========= =============================
+  1      acme    master/Z1 acme master + change 1
+  ------ ------- --------- -----------------------------
+  2      acme    master/Z2 acme master + change 1
+  2      plugin  stable/Z2 plugin stable + change 2
+  ------ ------- --------- -----------------------------
+  3      acme    master/Z3 acme master + change 1
+  3      plugin  stable/Z3 plugin stable + change 2
+  3      plugin  master/Z3 plugin master + change 3
+  ====== ======= ========= =============================
+
+In order to test change 3, you would clone both repository and simply fetch the
+Z3 reference for each combinaison of (project, branch) you are interested in
+testing.  You will fetch  ``acme`` with master/Z3 and ``plugin`` with master/Z3
+and thus ends up with ``acme`` having change 1 applied.  When your job fetch
+several repositories, they will probably not have a Z reference, you can just
+check the branch.
