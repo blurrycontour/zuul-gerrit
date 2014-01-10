@@ -28,6 +28,9 @@ changes are tested correctly.
 Zuul was designed to handle the workflow of the OpenStack project, but
 can be used with any project.
 
+Testing in parallel
+-------------------
+
 A particular focus of Zuul is ensuring correctly ordered testing of
 changes in parallel.  A gating system should always test each change
 applied to the tip of the branch exactly as it is going to be merged.
@@ -208,3 +211,65 @@ starts the process again testing *D* against the tip of the branch, and
     }
   }
 
+
+Cross projects dependencies
+---------------------------
+
+When your projects are closely coupled together, you want to make sure
+changes entering the gate are going to be tested with the version of
+other projects currently enqueued in the gate (since they will
+eventually be merged and might introduce breaking features).
+
+Such dependencies are can be defined in Zuul configuration by registering a job
+in DependentPipeline of several projects. Whenever a change enter such a
+pipeline, it will create reference for the other projects as well.  As an
+example, given a main project ``acme`` and a plugin ``acme-plugin`` you can
+define a job ``acme-tests`` which should be run for both projects:
+
+.. code-block:: yaml
+
+  pipelines:
+    - name: gate
+      manager: DependentPipelineManager
+
+  projects::
+    - name: acme
+      gate:
+       - acme-tests
+    - name: acme-plugin
+     gate:
+      - acme-tests  # Register job again
+
+Whenever a change enters the ``gate`` pipeline queue, Zuul creates a reference
+for it.  For each subsequent change, an additional reference is created for the
+change and used to mark changes ahead in the queue. As a result, you will
+always be able to fetch the future state of your project dependencies for each
+change in the queue.
+
+Reusing the pipeline and projects definitions above, assume two changes are
+submitted in the ``gate`` pipeline.  The first change is made against project
+``acme`` the second change against ``acme-plugin`` project.  Zuul creates the
+following references:
+
+  =========== ========= ========
+  Project     Zuul Ref. Change
+  =========== ========= ========
+  acme        master/Z1 change 1
+  acme-plugin master/Z2 change 2
+  =========== ========= ========
+
+Since the changes enter a DependentPipelineManager pipeline, the reference
+identifier for the second change is applied on the first change:
+
+  =========== ========= ===============
+  Project     Zuul Ref. Changes applied
+  =========== ========= ===============
+  acme        master/Z1 change 1
+  acme        master/Z2 change 1
+  acme-plugin master/Z2 change 2
+  =========== ========= ===============
+
+When testing change 2 (on ``acme-plugin``), one will want to test it using the
+state of ``acme`` after change 1 has been merged.  Your script should thus
+fetch the reference ``master/Z2`` for both project ensuring change 2 is tested
+with ``acme`` updated to change 1.
