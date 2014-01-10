@@ -28,6 +28,9 @@ changes are tested correctly.
 Zuul was designed to handle the workflow of the OpenStack project, but
 can be used with any project.
 
+Testing in parallel
+-------------------
+
 A particular focus of Zuul is ensuring correctly ordered testing of
 changes in parallel.  A gating system should always test each change
 applied to the tip of the branch exactly as it is going to be merged.
@@ -208,3 +211,53 @@ starts the process again testing *D* against the tip of the branch, and
     }
   }
 
+
+Cross projects dependencies
+---------------------------
+
+When your projects are closely coupled together, you want to make sure
+changes entering the gate are going to be tested with the version of
+other projects currently enqueued in the gate (since they will
+eventually be merged and might introduce breaking features).
+
+Such dependencies are declared in Zuul configuration by having a job
+declared in the DependentPipeline of several projects.  As an example,
+given a main project ``acme`` and a plugin ``acme-plugin`` you can
+define a job ``acme-tests`` which should be run for both projects:
+
+.. code-block:: yaml
+
+  projects::
+    - name: acme
+      gate:
+       - acme-tests
+
+    - name: acme-plugin
+     gate:
+      - acme-tests
+
+Whenever a change enters the queue, Zuul creates a reference for it.
+For each subsequent change, an additional reference is created so you
+will always be able to fetch the future state of your project
+dependencies for each change in the queue.  For example given following
+changes entering the queue:
+
+  =========== ======== =========
+  Project     Change   Zuul Ref.
+  =========== ======== =========
+  acme        change 1 master/Z1
+  acme-plugin change 2 master/Z2
+  =========== ======== =========
+
+Zuul will create the following references:
+
+  =========== ========= ===============
+  Project     Zuul Ref. Changes applied
+  =========== ========= ===============
+  acme        master/Z1 change 1
+  acme        master/Z2 change 1
+  acme-plugin master/Z2 change 2
+  =========== ========= ===============
+
+When testing change 2, one will fetch master/Z2 reference for both
+project ensuring change 2 is tested with ``acme`` updated to change 1.
