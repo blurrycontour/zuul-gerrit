@@ -59,6 +59,7 @@ class LayoutSchema(object):
                                'from': str,
                                'subject': str,
                                },
+                      'mysql': variable_dict
                       }
 
     pipeline = {v.Required('name'): str,
