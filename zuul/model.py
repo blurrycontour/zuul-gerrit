@@ -400,7 +400,9 @@ class ChangeQueue(object):
     def enqueueChange(self, change):
         item = QueueItem(self.pipeline, change)
         self.enqueueItem(item)
-        item.enqueue_time = time.time()
+        if not change.enqueue_time:
+            change.enqueue_time = time.time()
+        item.enqueue_time = change.enqueue_time
         return item
 
     def enqueueItem(self, item):
@@ -694,6 +696,8 @@ class Change(Changeish):
         self.can_merge = False
         self.is_merged = False
         self.failed_to_merge = False
+        # in order to make change queue time durable
+        self.enqueue_time = None
 
     def _id(self):
         return '%s,%s' % (self.number, self.patchset)
