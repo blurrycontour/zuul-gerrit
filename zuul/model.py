@@ -569,9 +569,36 @@ class Build(object):
         self.canceled = False
         self.retry = False
         self.parameters = {}
+        self.worker = Worker()
 
     def __repr__(self):
-        return '<Build %s of %s>' % (self.uuid, self.job.name)
+        return ('<Build %s of %s on %s>' %
+                (self.uuid, self.job.name, self.worker))
+
+
+class Worker(object):
+    """A model of the worker running a job"""
+    def __init__(self):
+        self.name = "Unknown"
+        self.hostname = None
+        self.ips = []
+        self.fqdn = None
+        self.program = None
+        self.version = None
+        self.extra = {}
+
+    def update_from_data(self, data):
+        """Update worker information if contained in the WORK_DATA response."""
+        self.name = data.get('worker_name') or self.name
+        self.hostname = data.get('worker_hostname') or self.hostname
+        self.ips = data.get('worker_ips') or self.ips
+        self.fqdn = data.get('worker_fqdn') or self.fqdn
+        self.program = data.get('worker_program') or self.program
+        self.version = data.get('worker_version') or self.version
+        self.extra = data.get('worker_extra') or self.extra
+
+    def __repr__(self):
+        return '<Worker %s>' % self.name
 
 
 class BuildSet(object):
