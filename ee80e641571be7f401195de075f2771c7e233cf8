@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUH//iqA\u003d",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-01-12T02:56:37Z",
+      "side": 1,
+      "message": "gerrit has a wide variable_dict because it passes its options as parameters to the gerrit command.\n\nYou could have the list of allowable mysql options such as host and user etc here like the smtp reporter. (nit)",
+      "revId": "ee80e641571be7f401195de075f2771c7e233cf8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH//ipw\u003d",
+        "filename": "zuul/reporter/mysql.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-01-12T02:56:37Z",
+      "side": 1,
+      "message": "It might be better to keep the MySQL connection open in the setup.",
+      "revId": "ee80e641571be7f401195de075f2771c7e233cf8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH//ips\u003d",
+        "filename": "zuul/reporter/mysql.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-01-12T02:56:37Z",
+      "side": 1,
+      "message": "possibly should escape self.table here?",
+      "revId": "ee80e641571be7f401195de075f2771c7e233cf8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
