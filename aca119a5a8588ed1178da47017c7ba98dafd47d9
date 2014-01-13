@@ -16,6 +16,24 @@
       "revId": "aca119a5a8588ed1178da47017c7ba98dafd47d9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH//c1c\u003d",
+        "filename": "tox.ini",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-01-13T18:54:08Z",
+      "side": 1,
+      "message": "That was the idea, ensuring people generate doc when testing to make sure they don\u0027t introduce doc errors. I am fine removing it though.",
+      "parentUuid": "AAAAUH//f0E\u003d",
+      "revId": "aca119a5a8588ed1178da47017c7ba98dafd47d9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
