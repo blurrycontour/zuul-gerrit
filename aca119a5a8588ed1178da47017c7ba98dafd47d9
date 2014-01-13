@@ -34,6 +34,24 @@
       "revId": "aca119a5a8588ed1178da47017c7ba98dafd47d9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH//ciA\u003d",
+        "filename": "tox.ini",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 6786
+      },
+      "writtenOn": "2014-01-13T19:58:47Z",
+      "side": 1,
+      "message": "My only concern that it\u0027s not common way for other OpenStack projects. In addition, it\u0027ll be tested by gate-zuul-docs job.",
+      "parentUuid": "AAAAUH//c1c\u003d",
+      "revId": "aca119a5a8588ed1178da47017c7ba98dafd47d9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
