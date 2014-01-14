@@ -52,6 +52,24 @@
       "revId": "aca119a5a8588ed1178da47017c7ba98dafd47d9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH//X1E\u003d",
+        "filename": "tox.ini",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-01-14T14:26:55Z",
+      "side": 1,
+      "message": "Sure thing, removing \u0027doc\u0027 from the tox envlist.",
+      "parentUuid": "AAAAUH//ciA\u003d",
+      "revId": "aca119a5a8588ed1178da47017c7ba98dafd47d9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
