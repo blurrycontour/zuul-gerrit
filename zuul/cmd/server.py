@@ -210,7 +210,13 @@ class Server(object):
 
         self.log.info('Starting scheduler')
         self.sched.start()
-        self.sched.reconfigure(self.config)
+
+        try:
+            self.sched.reconfigure(self.config)
+        except:
+            self.log.exception("Layout configuration failure. Exiting.")
+            self.exit_handler(signal.SIGINT, None)
+
         self.sched.resume()
         self.log.info('Starting Webapp')
         webapp.start()
