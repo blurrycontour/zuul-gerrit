@@ -1,5 +1,5 @@
 [loggers]
-keys=root,zuul,gerrit
+keys=root,zuul,gerrit,gear
 
 [handlers]
 keys=console,debug,normal
@@ -17,6 +17,11 @@ handlers=debug,normal
 qualname=zuul
 
 [logger_gerrit]
+level=DEBUG
+handlers=debug,normal
+qualname=gerrit
+
+[logger_gear]
 level=DEBUG
 handlers=debug,normal
 qualname=gerrit
