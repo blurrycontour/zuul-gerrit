@@ -48,6 +48,8 @@ def stack_dump_handler(signum, frame):
 
 
 class Server(object):
+    log = logging.getLogger("zuul.Server")
+
     def __init__(self):
         self.args = None
         self.config = None
@@ -181,6 +183,7 @@ class Server(object):
 
         if (self.config.has_option('gearman_server', 'start') and
             self.config.getboolean('gearman_server', 'start')):
+            self.log.info('Starting internal Gearman server')
             self.start_gear_server()
 
         self.setup_logging('zuul', 'log_config')
@@ -210,10 +213,13 @@ class Server(object):
         self.sched.registerReporter(gerrit_reporter)
         self.sched.registerReporter(smtp_reporter)
 
+        self.log.info('Starting scheduler')
         self.sched.start()
         self.sched.reconfigure(self.config)
         self.sched.resume()
+        self.log.info('Starting Webapp')
         webapp.start()
+        self.log.info('Starting RPC')
         rpc.start()
 
         signal.signal(signal.SIGHUP, self.reconfigure_handler)
