@@ -16,6 +16,24 @@
       "revId": "1bd77d599d5f3656f2c980c7995c0c385e7a6a62",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+5oc\u003d",
+        "filename": "zuul/webapp.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-01-20T22:47:48Z",
+      "side": 1,
+      "message": "I suspect so, and I think this is indeed something we\u0027d want no-cache for.",
+      "parentUuid": "AAAAUH//D0g\u003d",
+      "revId": "1bd77d599d5f3656f2c980c7995c0c385e7a6a62",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
