@@ -128,6 +128,14 @@ class Gerrit(object):
             port = int(config.get('gerrit', 'port'))
         else:
             port = 29418
+        if config.has_option('gerrit', 'webuser'):
+            self.webuser = config.get('gerrit', 'webuser')
+        else:
+            self.webuser = None
+        if config.has_option('gerrit', 'webpass'):
+            self.webpass = config.get('gerrit', 'webpass')
+        else:
+            self.webpass = None
         self.gerrit = gerrit.Gerrit(self.server, user, port, sshkey)
         self.gerrit.startWatching()
         self.gerrit_connector = GerritEventConnector(
@@ -139,13 +147,22 @@ class Gerrit(object):
         self.gerrit_connector.join()
 
     def _getInfoRefs(self, project):
-        url = "%s/p/%s/info/refs?service=git-upload-pack" % (
+        url = "%s/%s/info/refs?service=git-upload-pack" % (
             self.baseurl, project)
         try:
             data = urllib2.urlopen(url).read()
-        except:
-            self.log.error("Cannot get references from %s" % url)
-            raise  # keeps urllib2 error informations
+        except urllib2.HTTPError, ex:
+            if int(ex.getcode()) == 401 and self.webuser is not None:
+                try:
+                    mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
+                    mgr.add_password('Gerrit Code Review', url,
+                                     self.webuser, self.webpass)
+                    opener = urllib2.build_opener(
+                        urllib2.HTTPDigestAuthHandler(mgr))
+                    data = opener.open(url).read()
+                except:
+                    self.log.error("Cannot get references from %s" % url)
+                    raise  # keeps urllib2 error informations
         ret = {}
         read_headers = False
         read_advertisement = False
