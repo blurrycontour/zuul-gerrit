@@ -375,13 +375,14 @@ class ChangeQueue(object):
     a queue shared by interrelated projects foo and bar, and a second
     queue for independent project baz.  Pipelines have one or more
     PipelineQueues."""
-    def __init__(self, pipeline, dependent=True):
+    def __init__(self, pipeline, dependent=True, actionable_size=0):
         self.pipeline = pipeline
         self.name = ''
         self.projects = []
         self._jobs = set()
         self.queue = []
         self.dependent = dependent
+        self.actionable_size = actionable_size
 
     def __repr__(self):
         return '<ChangeQueue %s: %s>' % (self.pipeline.name, self.name)
@@ -398,7 +399,7 @@ class ChangeQueue(object):
             self._jobs |= set(self.pipeline.getJobTree(project).getJobs())
 
     def enqueueChange(self, change):
-        item = QueueItem(self.pipeline, change)
+        item = QueueItem(self, self.pipeline, change)
         self.enqueueItem(item)
         item.enqueue_time = time.time()
         return item
@@ -444,6 +445,21 @@ class ChangeQueue(object):
     def mergeChangeQueue(self, other):
         for project in other.projects:
             self.addProject(project)
+        self.actionable_size = min(self.actionable_size, other.actionable_size)
+
+    def getActionableItems(self):
+        if self.dependent and self.actionable_size:
+            return self.queue[:self.actionable_size]
+        else:
+            return self.queue[:]
+
+    def increaseActionableSize(self):
+        if self.dependent:
+            self.actionable_size += 1
+
+    def decreaseActionableSize(self):
+        if self.dependent:
+            self.actionable_size = max(2, self.actionable_size / 2)
 
 
 class Project(object):
@@ -619,7 +635,8 @@ class BuildSet(object):
 class QueueItem(object):
     """A changish inside of a Pipeline queue"""
 
-    def __init__(self, pipeline, change):
+    def __init__(self, change_queue, pipeline, change):
+        self.change_queue = change_queue
         self.pipeline = pipeline
         self.change = change  # a changeish
         self.build_sets = []
