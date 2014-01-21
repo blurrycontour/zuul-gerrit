@@ -1172,7 +1172,8 @@ class BasePipelineManager(object):
         for queue in self.pipeline.queues:
             queue_changed = False
             nnfi = None  # Nearest non-failing item
-            for item in queue.queue[:]:
+            # slice and dice here
+            for item in queue.getItems():
                 item_changed, nnfi = self._processOneItem(item, nnfi)
                 if item_changed:
                     queue_changed = True
@@ -1248,6 +1249,9 @@ class BasePipelineManager(object):
                 self.log.debug("Reported change %s failed tests or failed "
                                "to merge" % (item.change))
                 raise MergeFailure("Change %s failed to merge" % item.change)
+                item.change_queue.decreaseActionableSize()
+            else:
+                item.change_queue.increaseActionableSize()
 
     def _reportItem(self, item):
         if item.reported:
@@ -1504,7 +1508,7 @@ class DependentPipelineManager(BasePipelineManager):
         change_queues = []
 
         for project in self.pipeline.getProjects():
-            change_queue = ChangeQueue(self.pipeline)
+            change_queue = ChangeQueue(self.pipeline, actionable_size=10)
             change_queue.addProject(project)
             change_queues.append(change_queue)
             self.log.debug("Created queue: %s" % change_queue)
