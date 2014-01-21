@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "AAAAUH/+0PU\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 450,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-01-21T20:04:50Z",
+      "side": 1,
+      "message": "Suggest \u0027getActionableItems\u0027 to make this more clear.",
+      "revId": "5f23a65288a115d77ad03d21707b55b043bc7e5b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUH/+0Pc\u003d",
         "filename": "zuul/model.py",
         "patchSetId": 1
@@ -13,6 +30,40 @@
       "writtenOn": "2014-01-21T20:03:27Z",
       "side": 1,
       "message": "It looks like ChangeQueue is instantiated for dependent change queues with actionable_size \u003d 10 and decreaseActionableSize limits to minimum 1, so I don\u0027t *think* this is currently an issue, *but* since dependent defaults to True and actionable_size defaults to 0, it makes me a little uncomfortable that the check here would make it impossible to increase from a actionable_size of zero just on principle.\n\nAny reason to not just make this:\n\n    if self.dependent:\n\n?",
+      "revId": "5f23a65288a115d77ad03d21707b55b043bc7e5b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+0OU\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 462,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-01-21T20:04:50Z",
+      "side": 1,
+      "message": "Suggest a higher min (than 1) here.  Let\u0027s have it at least always have a few changes lined up.  Maybe 2 or 4?",
+      "revId": "5f23a65288a115d77ad03d21707b55b043bc7e5b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+0O8\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1511,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-01-21T20:04:50Z",
+      "side": 1,
+      "message": "Suggest default of 20.",
       "revId": "5f23a65288a115d77ad03d21707b55b043bc7e5b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
