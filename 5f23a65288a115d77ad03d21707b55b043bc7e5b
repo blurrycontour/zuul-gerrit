@@ -71,6 +71,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAUH/+0Ko\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 462,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-01-21T20:15:23Z",
+      "side": 1,
+      "message": "Because the purpose of a dependent pipeline is to run things in parallel and hopefully do extra useful work. I think I agree with jeblair here and will set it to 2. 1 is worst case dependent pipelines will effectively fall back to that in those cases (will use twice as many resources to get there though).",
+      "parentUuid": "AAAAUH/+0M4\u003d",
+      "revId": "5f23a65288a115d77ad03d21707b55b043bc7e5b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUH/+0NQ\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 1
