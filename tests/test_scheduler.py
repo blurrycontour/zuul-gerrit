@@ -3301,3 +3301,35 @@ class TestScheduler(testtools.TestCase):
         self.worker.hold_jobs_in_build = False
         self.worker.release()
         self.waitUntilSettled()
+
+    def test_queue_rate_limiting(self):
+        "Test that DependentPipelines are rate limited"
+        self.config.set('zuul', 'layout_config',
+                        'tests/fixtures/layout-rate-limit.yaml')
+        self.sched.reconfigure(self.config)
+        #self.worker.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+
+        self.worker.addFailTest('project-test1', A)
+
+        A.addApproval('CRVW', 2)
+        B.addApproval('CRVW', 2)
+        C.addApproval('CRVW', 2)
+
+        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
+        self.waitUntilSettled()
+        #self.worker.release()
+        #self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'NEW')
+        self.assertEqual(B.data['status'], 'MERGED')
+        self.assertEqual(C.data['status'], 'MERGED')
+        queue = self.sched.layout.pipelines['gate'].queues[0]
+        # First failed change drops window to 1, then two consecutive
+        # merges bumps the window to 3.
+        self.assertEqual(queue.window, 3)
+        self.assertEqual(queue.window_floor, 1)
