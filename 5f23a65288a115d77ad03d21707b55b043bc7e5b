@@ -53,6 +53,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAUH/+0M4\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 462,
+      "author": {
+        "id": 5756
+      },
+      "writtenOn": "2014-01-21T20:08:53Z",
+      "side": 1,
+      "message": "Why not wait to see if it becomes an issue at 1? If things are really still bottlenecking, why set an arbitrary limit higher than 1?",
+      "parentUuid": "AAAAUH/+0OU\u003d",
+      "revId": "5f23a65288a115d77ad03d21707b55b043bc7e5b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUH/+0NQ\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 1
