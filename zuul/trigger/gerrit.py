@@ -114,6 +114,11 @@ class Gerrit(object):
         self._change_cache = {}
         self.sched = sched
         self.config = config
+        if config.has_option('gerrit', 'dontusehttp'):
+            dontusehttp = config.getboolean('gerrit', 'dontusehttp')
+        else:
+            dontusehttp = False
+        self.dontusehttp = dontusehttp
         self.server = config.get('gerrit', 'server')
         if config.has_option('gerrit', 'baseurl'):
             self.baseurl = config.get('gerrit', 'baseurl')
@@ -138,7 +143,7 @@ class Gerrit(object):
         self.gerrit_connector.stop()
         self.gerrit_connector.join()
 
-    def _getInfoRefs(self, project):
+    def _getInfoRefsHttp(self, project):
         url = "%s/p/%s/info/refs?service=git-upload-pack" % (
             self.baseurl, project)
         try:
@@ -182,10 +187,50 @@ class Gerrit(object):
             ret[ref] = revision
         return ret
 
+    def _getInfoRefs(self, project):
+        try:
+            data = self.gerrit.git_upload_pack(project)
+            if not data:
+                raise Exception(
+                    "Cann't access gerrit repository of %s", project)
+        except:
+            self.log.error("Cannot get references of %s" % project)
+            raise  # keeps gerrit ssh error informations
+        ret = {}
+        read_advertisement = False
+        i = 0
+        while i < len(data):
+            if len(data) - i < 4:
+                raise Exception("Invalid length in info/refs")
+            plen = int(data[i:i + 4], 16)
+            i += 4
+            # It's the length of the packet, including the 4 bytes of the
+            # length itself, unless it's null, in which case the length is
+            # not included.
+            if plen > 0:
+                plen -= 4
+            if len(data) - i < plen:
+                raise Exception("Invalid data in info/refs")
+            line = data[i:i + plen]
+            i += plen
+            if not read_advertisement:
+                read_advertisement = True
+                continue
+            if plen == 0:
+                # The terminating null
+                continue
+            line = line.strip()
+            revision, ref = line.split()
+            ret[ref] = revision
+        return ret
+
     def getRefSha(self, project, ref):
         refs = {}
         try:
-            refs = self._getInfoRefs(project)
+            if self.dontusehttp:
+                refs = self._getInfoRefs(project)
+            else:
+                refs = self._getInfoRefsHttp(project)
         except:
             self.log.exception("Exception looking for ref %s" %
                                ref)

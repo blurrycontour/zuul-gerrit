@@ -112,6 +112,11 @@ class Gerrit(object):
     def eventDone(self):
         self.event_queue.task_done()
 
+    def git_upload_pack(self, project):
+        cmd = 'git upload-pack %s' % (project)
+        out, err = self._ssh(cmd, "0000")
+        return out
+
     def review(self, project, change, message, action={}):
         cmd = 'gerrit review --project %s' % project
         if message:
@@ -154,7 +159,7 @@ class Gerrit(object):
                        key_filename=self.keyfile)
         self.client = client
 
-    def _ssh(self, command):
+    def _ssh(self, command, send=None):
         if not self.client:
             self._open()
 
@@ -164,6 +169,9 @@ class Gerrit(object):
         except:
             self._open()
             stdin, stdout, stderr = self.client.exec_command(command)
+
+        if send is not None and len(send) > 0:
+            stdin.write(send)
 
         out = stdout.read()
         self.log.debug("SSH received stdout:\n%s" % out)
