@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "AAAAUH/+vfk\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 5756
+      },
+      "writtenOn": "2014-01-22T15:59:36Z",
+      "side": 1,
+      "message": "Since these window defaults are also used in the config code as defaults, seems like it would make sense to define them as constants to use in both places.",
+      "revId": "2c6747d14303e53bae890c64959fc17aaa7e6e3d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUH/+wVU\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 7
