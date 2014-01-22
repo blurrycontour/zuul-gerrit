@@ -5,6 +5,8 @@
 .. _`Gearman Plugin`:
    https://wiki.jenkins-ci.org/display/JENKINS/Gearman+Plugin
 
+.. _FormPost: http://docs.openstack.org/developer/swift/misc.html#module-swift.common.middleware.formpost
+
 .. _launchers:
 
 Launchers
@@ -118,6 +120,31 @@ post-merge (ref-updated) builds:
   The shortened (7 character) SHA1 of the old revision.
 **ZUUL_SHORT_NEWREV**
   The shortened (7 character) SHA1 of the new revision.
+
+If swift information has been configured for the job zuul will also
+provide signed credentials for the builder to upload results and
+assets into containers using the `FormPost`_ middleware.
+
+Each zuul container/instruction set will contain each of the following
+parameters where $NAME is the ``name`` defined in the layout.
+
+*SWIFT_$NAME_URL*
+  The swift destination URL. This will be the entire URL including
+  the AUTH, container and path prefix (folder).
+*SWIFT_$NAME_HMAC_BODY*
+  The information signed in the HMAC body. The body is as follows::
+
+    PATH TO OBJECT PREFIX (excluding domain)
+    BLANK LINE (zuul implements no form redirect)
+    MAX FILE SIZE
+    MAX FILE COUNT
+    SIGNATURE EXPIRY
+
+*SWIFT_$NAME_SIGNATURE*
+  The HMAC body signed with the configured key.
+*SWIFT_$NAME_LOGSERVER_PREFIX*
+  The URL to prepend to the object path when returning the results
+  from a build.
 
 In order to test the correct build, configure the Jenkins Git SCM
 plugin as follows::
