@@ -114,6 +114,11 @@ class Gerrit(object):
         self._change_cache = {}
         self.sched = sched
         self.config = config
+        if config.has_option('gerrit', 'use_http'):
+            use_http = config.getboolean('gerrit', 'use_http')
+        else:
+            use_http = True
+        self.use_http = use_http
         self.server = config.get('gerrit', 'server')
         if config.has_option('gerrit', 'baseurl'):
             self.baseurl = config.get('gerrit', 'baseurl')
@@ -139,19 +144,33 @@ class Gerrit(object):
         self.gerrit_connector.join()
 
     def _getInfoRefs(self, project):
-        url = "%s/p/%s/info/refs?service=git-upload-pack" % (
-            self.baseurl, project)
-        try:
-            data = urllib2.urlopen(url).read()
-        except:
-            self.log.error("Cannot get references from %s" % url)
-            raise  # keeps urllib2 error informations
+        if self.use_http:
+            url = "%s/p/%s/info/refs?service=git-upload-pack" % (
+                self.baseurl, project)
+            try:
+                data = urllib2.urlopen(url).read()
+            except:
+                self.log.error("Cannot get references from %s" % url)
+                raise  # keeps urllib2 error informations
+        else:
+            try:
+                data = self.gerrit.git_upload_pack(project)
+                if not data:
+                    raise Exception(
+                        "Cann't access gerrit repository of %s", project)
+            except:
+                self.log.error("Cannot get references of %s" % project)
+                raise  # keeps gerrit ssh error informations
         ret = {}
-        read_headers = False
+        # HTTP has header, but ssh doesn't
+        if self.use_http:
+            read_headers = False
+            if data[4] != '#':
+                raise Exception("Gerrit repository does not support "
+                                "git-upload-pack")
+        else:
+            read_headers = True
         read_advertisement = False
-        if data[4] != '#':
-            raise Exception("Gerrit repository does not support "
-                            "git-upload-pack")
         i = 0
         while i < len(data):
             if len(data) - i < 4:

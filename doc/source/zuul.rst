@@ -79,6 +79,11 @@ gerrit
   Path to SSH key to use when logging into above server.
   ``sshkey=/home/zuul/.ssh/id_rsa``
 
+**use_http**
+  Whether legacy http method should be used to fetch gerrit refs.
+  (default: True)
+  ``use_http=true``
+
 zuul
 """"
 
