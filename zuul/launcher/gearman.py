@@ -16,6 +16,7 @@ import gear
 import inspect
 import json
 import logging
+import os
 import time
 import threading
 from uuid import uuid4
@@ -151,8 +152,9 @@ class Gearman(object):
     log = logging.getLogger("zuul.Gearman")
     negative_function_cache_ttl = 5
 
-    def __init__(self, config, sched):
+    def __init__(self, config, sched, swift):
         self.sched = sched
+        self.swift = swift
         self.builds = {}
         self.meta_jobs = {}  # A list of meta-jobs like stop or describe
         self.zuul_server = config.get('zuul', 'zuul_url')
@@ -170,6 +172,10 @@ class Gearman(object):
             config.getboolean('gearman_server', 'start')):
             self.gearman.waitForGearmanToSettle()
 
+        self.logserver_prefix = (
+            config.get('swift', 'logserver_prefix')
+            if config.has_option('swift', 'logserver_prefix') else None
+        )
         self.cleanup_thread = GearmanCleanup(self)
         self.cleanup_thread.start()
         self.function_cache = set()
@@ -216,6 +222,27 @@ class Gearman(object):
         self.log.debug("Function %s is not registered" % name)
         return False
 
+    def _get_extra_job_instructions(self, destination_prefix=''):
+        """Define extra information/instructions to send to the worker as part
+        of the build arguments. For example destination information for log
+        uploads."""
+
+        #NOTE(jhesketh): Perhaps additional instructions could be pluggable
+        # similar to reporters etc. But for now I'm just placing this here
+
+        params = {}
+        if self.swift.connection:
+            url, hmac_body, signature = \
+                self.swift.generate_form_post_middleware_params(
+                    destination_prefix)
+            params['ZUUL_EXTRA_SWIFT_URL'] = url
+            params['ZUUL_EXTRA_SWIFT_HMAC_BODY'] = hmac_body
+            params['ZUUL_EXTRA_SWIFT_SIGNATURE'] = signature
+            params['ZUUL_EXTRA_SWIFT_LOGSERVER_PREFIX'] = self.logserver_prefix
+            params['ZUUL_EXTRA_SWIFT_DESTINATION_PREFIX'] = destination_prefix
+
+        return params
+
     def launch(self, job, item, pipeline, dependent_items=[]):
         self.log.info("Launch job %s for change %s with dependent changes %s" %
                       (job, item.change,
@@ -227,6 +254,7 @@ class Gearman(object):
                       ZUUL_PROJECT=item.change.project.name)
         params['ZUUL_PIPELINE'] = pipeline.name
         params['ZUUL_URL'] = self.zuul_server
+        destination_prefix = ''
         if hasattr(item.change, 'refspec'):
             changes_str = '^'.join(
                 ['%s:%s:%s' % (i.change.project.name, i.change.branch,
@@ -245,6 +273,14 @@ class Gearman(object):
             params['ZUUL_CHANGE_IDS'] = zuul_changes
             params['ZUUL_CHANGE'] = str(item.change.number)
             params['ZUUL_PATCHSET'] = str(item.change.patchset)
+
+            # The destination_prefix is more or less a directory within swift.
+            # zuul can generate the unique log destination for the worker so if
+            # needed zuul could notify another system of the unique job run
+            # (such as a database) or even make them sequential.
+            destination_prefix = os.path.join(i.change.number,
+                                              i.change.patchset, pipeline.name,
+                                              job.name, uuid) + '/'
         if hasattr(item.change, 'ref'):
             params['ZUUL_REFNAME'] = item.change.ref
             params['ZUUL_OLDREV'] = item.change.oldrev
@@ -252,6 +288,7 @@ class Gearman(object):
 
             params['ZUUL_REF'] = item.change.ref
             params['ZUUL_COMMIT'] = item.change.newrev
+        params.update(self._get_extra_job_instructions(destination_prefix))
 
         # This is what we should be heading toward for parameters:
 
