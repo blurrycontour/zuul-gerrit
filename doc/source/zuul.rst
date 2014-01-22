@@ -79,6 +79,12 @@ gerrit
   Path to SSH key to use when logging into above server.
   ``sshkey=/home/zuul/.ssh/id_rsa``
 
+**git_avoid_http**
+  Whether legacy http method should be used to fetch gerrit refs. The http
+  interface doesn't support authentication and is insecure. SSH will be use
+  instead when the option is set true which is recommended. (default: False)
+  ``git_avoid_http=false``
+
 zuul
 """"
 
