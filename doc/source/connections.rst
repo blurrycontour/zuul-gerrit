@@ -38,6 +38,12 @@ Create a connection with gerrit.
   Path to SSH key to use when logging into above server.
   ``sshkey=/home/zuul/.ssh/id_rsa``
 
+**git_access**
+  Optional: Method for accessing gerrit refs. Defaults to ``http`` and can be
+  changed to ``ssh`` when HTTP access is not suitable (eg. requires
+  authentication).
+  ``git_access=http``
+
 
 Gerrit Configuration
 ~~~~~~~~~~~~~~~~~~~~
