@@ -12,6 +12,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import inspect
+import logging
 import re
 import time
 from uuid import uuid4
@@ -517,6 +519,8 @@ class Project(object):
 
 
 class Job(object):
+    log = logging.getLogger("model.Job")
+
     def __init__(self, name):
         # If you add attributes here, be sure to add them to the copy method.
         self.name = name
@@ -531,6 +535,7 @@ class Job(object):
         self._branches = []
         self.files = []
         self._files = []
+        self.swift = None
 
     def __str__(self):
         return self.name
@@ -555,6 +560,8 @@ class Job(object):
         if other.files:
             self.files = other.files[:]
             self._files = other._files[:]
+        if other.swift:
+            self.swift = other.swift[:]
         self.hold_following_changes = other.hold_following_changes
         self.voting = other.voting
 
@@ -578,6 +585,33 @@ class Job(object):
             return False
 
         return True
+
+    def updateBuildParams(self, item, swift_conn, params):
+        """Allow the job to modify and add build parameters"""
+
+        if self.swift and swift_conn.connection:
+            params['ZUUL_SWIFT'] = []
+            for s in self.swift:
+                swift_instructions = {}
+                swift_instructions['NAME'] = s.name
+                (swift_instructions['URL'],
+                 swift_instructions['HMAC_BODY'],
+                 swift_instructions['SIGNATURE']) = \
+                    swift_conn.generate_form_post_middleware_params(
+                        params['LOG_PATH'], **s)
+
+                swift_instructions['LOGSERVER_PREFIX'] = s['logserver_prefix']
+                params['ZUUL_SWIFT'].append(swift_instructions)
+
+        if callable(self.parameter_function):
+            pargs = inspect.getargspec(self.parameter_function)
+            if len(pargs.args) == 2:
+                self.parameter_function(item, params)
+            else:
+                self.parameter_function(item, self, params)
+            self.log.debug("Custom parameter function used for self %s, "
+                           "change: %s, params: %s" % (self, item.change,
+                                                       params))
 
 
 class JobTree(object):
@@ -723,6 +757,20 @@ class Changeish(object):
 
     def __init__(self, project):
         self.project = project
+        self.base_path = None
+
+    def getBasePath(self):
+        if self.base_path is not None:
+            return self.base_path
+
+        if hasattr(self, 'refspec'):
+            self.base_path = "%s/%s/%s/%s" % (
+                self.number[-2:], self.number, self.patchset, self.pipeline)
+        elif hasattr(self, 'ref'):
+            self.base_path = "%s/%s/%s" % (
+                self.newrev[:2], self.newrev, self.pipeline)
+
+        return self.base_path
 
     def equals(self, other):
         raise NotImplementedError()
