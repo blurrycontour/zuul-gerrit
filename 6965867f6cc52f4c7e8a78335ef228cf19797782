@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUH/+yeU\u003d",
+        "filename": "etc/zuul.conf-sample",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2014-01-22T05:54:09Z",
+      "side": 1,
+      "message": "probably should genericise this, to http://identity.api.example.com or similar",
+      "revId": "6965867f6cc52f4c7e8a78335ef228cf19797782",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+yeI\u003d",
+        "filename": "etc/zuul.conf-sample",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2014-01-22T05:54:09Z",
+      "side": 1,
+      "message": "Likewise here for region name.  Perhaps TBD?",
+      "revId": "6965867f6cc52f4c7e8a78335ef228cf19797782",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+ycI\u003d",
+        "filename": "etc/zuul.conf-sample",
+        "patchSetId": 3
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2014-01-22T05:54:09Z",
+      "side": 1,
+      "message": "What about other available options, such as: retries, preauthurl, preauthtoken, snet, starting_backoff, max_backoff, tenant_name, auth_version, cacert, insecure, ssl_compression as defined in swift.py - should they be listed?",
+      "revId": "6965867f6cc52f4c7e8a78335ef228cf19797782",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
