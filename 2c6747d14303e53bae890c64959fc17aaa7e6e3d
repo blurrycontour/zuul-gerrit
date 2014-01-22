@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUH/+wVU\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 1561
+      },
+      "writtenOn": "2014-01-22T13:46:52Z",
+      "side": 1,
+      "message": "Suggestion: You may want to list all of these in zuul.models.Pipeline.__init__ for consistency",
+      "revId": "2c6747d14303e53bae890c64959fc17aaa7e6e3d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
