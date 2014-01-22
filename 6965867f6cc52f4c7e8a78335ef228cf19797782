@@ -50,6 +50,24 @@
       "revId": "6965867f6cc52f4c7e8a78335ef228cf19797782",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+yTg\u003d",
+        "filename": "etc/zuul.conf-sample",
+        "patchSetId": 3
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-01-22T06:08:09Z",
+      "side": 1,
+      "message": "These are listed in the docs",
+      "parentUuid": "AAAAUH/+ycI\u003d",
+      "revId": "6965867f6cc52f4c7e8a78335ef228cf19797782",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
