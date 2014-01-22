@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUH/+tTU\u003d",
+        "filename": "tests/fixtures/layout-require-approval.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-01-22T23:44:37Z",
+      "side": 1,
+      "message": "Won\u0027t this trigger the gate on the first time Jenkins posts from a \u0027check\u0027 pipeline?\n\nShould this be another require-approval where approved \u003d\u003d 1?",
+      "revId": "915df1ee53bd3e0173f50de752398b2782daf8c7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+tTQ\u003d",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-01-22T23:44:37Z",
+      "side": 1,
+      "message": "Perhaps we should add in email address and uid filtering while here?",
+      "revId": "915df1ee53bd3e0173f50de752398b2782daf8c7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
