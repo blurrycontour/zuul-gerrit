@@ -167,6 +167,7 @@ class Server(object):
         # See comment at top of file about zuul imports
         import zuul.scheduler
         import zuul.launcher.gearman
+        import zuul.lib.swift
         import zuul.reporter.gerrit
         import zuul.reporter.smtp
         import zuul.trigger.gerrit
@@ -181,8 +182,10 @@ class Server(object):
         self.setup_logging('zuul', 'log_config')
 
         self.sched = zuul.scheduler.Scheduler()
+        self.swift = zuul.lib.swift.Swift(self.config)
 
-        gearman = zuul.launcher.gearman.Gearman(self.config, self.sched)
+        gearman = zuul.launcher.gearman.Gearman(self.config, self.sched,
+                                                self.swift)
         gerrit = zuul.trigger.gerrit.Gerrit(self.config, self.sched)
         timer = zuul.trigger.timer.Timer(self.config, self.sched)
         webapp = zuul.webapp.WebApp(self.sched)
