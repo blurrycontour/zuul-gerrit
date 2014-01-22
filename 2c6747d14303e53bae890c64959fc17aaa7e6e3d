@@ -2,6 +2,108 @@
   "comments": [
     {
       "key": {
+        "uuid": "AAAAUH/+u9M\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 3315,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-01-22T17:43:29Z",
+      "side": 1,
+      "message": "Why set B\u003c-C?",
+      "revId": "2c6747d14303e53bae890c64959fc17aaa7e6e3d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+u80\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 3347,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-01-22T17:43:29Z",
+      "side": 1,
+      "message": "Why 2 releases here?",
+      "revId": "2c6747d14303e53bae890c64959fc17aaa7e6e3d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+u8o\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 3370,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-01-22T17:43:29Z",
+      "side": 1,
+      "message": "double release?",
+      "revId": "2c6747d14303e53bae890c64959fc17aaa7e6e3d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+u8g\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 3391,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-01-22T17:43:29Z",
+      "side": 1,
+      "message": "double release?",
+      "revId": "2c6747d14303e53bae890c64959fc17aaa7e6e3d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+u8c\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 3442,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-01-22T17:43:29Z",
+      "side": 1,
+      "message": "double release",
+      "revId": "2c6747d14303e53bae890c64959fc17aaa7e6e3d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+u7M\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 3466,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-01-22T17:43:29Z",
+      "side": 1,
+      "message": "double release",
+      "revId": "2c6747d14303e53bae890c64959fc17aaa7e6e3d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUH/+vfk\u003d",
         "filename": "zuul/model.py",
         "patchSetId": 7
