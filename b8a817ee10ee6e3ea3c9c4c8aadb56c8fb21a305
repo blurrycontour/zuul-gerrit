@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUH/+wQs\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 841,
+      "author": {
+        "id": 1561
+      },
+      "writtenOn": "2014-01-22T13:59:12Z",
+      "side": 1,
+      "message": "It\u0027s technically bad practice to put [] in kwargs like this, but fine since it\u0027s consistent with the rest for now ...",
+      "revId": "b8a817ee10ee6e3ea3c9c4c8aadb56c8fb21a305",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
