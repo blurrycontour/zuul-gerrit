@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import logging
 import re
 import time
 from uuid import uuid4
@@ -517,6 +518,8 @@ class Project(object):
 
 
 class Job(object):
+    log = logging.getLogger("model.Job")
+
     def __init__(self, name):
         # If you add attributes here, be sure to add them to the copy method.
         self.name = name
@@ -531,6 +534,7 @@ class Job(object):
         self._branches = []
         self.files = []
         self._files = []
+        self.swift = None
 
     def __str__(self):
         return self.name
@@ -555,6 +559,8 @@ class Job(object):
         if other.files:
             self.files = other.files[:]
             self._files = other._files[:]
+        if other.swift:
+            self.swift = other.swift[:]
         self.hold_following_changes = other.hold_following_changes
         self.voting = other.voting
 
@@ -757,6 +763,20 @@ class Changeish(object):
 
     def __init__(self, project):
         self.project = project
+        self.base_path = None
+
+    def getBasePath(self):
+        if self.base_path is not None:
+            return self.base_path
+
+        if hasattr(self, 'refspec'):
+            self.base_path = "%s/%s/%s" % (
+                self.number[-2:], self.number, self.patchset)
+        elif hasattr(self, 'ref'):
+            self.base_path = "%s/%s" % (
+                self.newrev[:2], self.newrev)
+
+        return self.base_path
 
     def equals(self, other):
         raise NotImplementedError()

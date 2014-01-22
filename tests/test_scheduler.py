@@ -47,6 +47,7 @@ import zuul.webapp
 import zuul.rpclistener
 import zuul.rpcclient
 import zuul.launcher.gearman
+import zuul.lib.swift
 import zuul.merger.server
 import zuul.merger.client
 import zuul.reporter.gerrit
@@ -821,13 +822,16 @@ class TestScheduler(testtools.TestCase):
         self.merge_server.start()
 
         self.sched = zuul.scheduler.Scheduler()
+        self.swift = zuul.lib.swift.Swift(self.config)
 
         def URLOpenerFactory(*args, **kw):
             args = [self.fake_gerrit] + list(args)
             return FakeURLOpener(self.upstream_root, *args, **kw)
 
         urllib2.urlopen = URLOpenerFactory
-        self.launcher = zuul.launcher.gearman.Gearman(self.config, self.sched)
+
+        self.launcher = zuul.launcher.gearman.Gearman(self.config, self.sched,
+                                                      self.swift)
         self.merge_client = zuul.merger.client.MergeClient(
             self.config, self.sched)
 
