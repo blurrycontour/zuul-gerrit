@@ -21,6 +21,14 @@ git_dir=/var/lib/zuul/git
 status_url=https://jenkins.example.com/zuul/status
 zuul_url=http://zuul.example.com/p
 
+[swift]
+authurl=https://identity.api.rackspacecloud.com/v2.0/
+user=username
+key=password
+
+region_name=SYD
+container=logs
+
 [smtp]
 server=localhost
 port=25

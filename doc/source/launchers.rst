@@ -7,6 +7,8 @@
 
 .. _launchers:
 
+.. _FormPost: http://docs.openstack.org/developer/swift/misc.html#module-swift.common.middleware.formpost
+
 Launchers
 =========
 
@@ -118,6 +120,25 @@ post-merge (ref-updated) builds:
   The shortened (7 character) SHA1 of the old revision
 **ZUUL_SHORT_NEWREV**
   The shortened (7 character) SHA1 of the new revision
+
+If swift information has been configured zuul will also provide
+signed credentials for the builder to upload results into a container
+using the `FormPost`_ middleware.
+
+**ZUUL_EXTRA_SWIFT_URL**
+  The swift destination URL. This will be the entire URL including
+  the AUTH, container and path prefix (folder).
+**ZUUL_EXTRA_SWIFT_HMAC_BODY**
+  The information signed in the HMAC body. The body is as follows::
+
+    PATH TO OBJECT PREFIX (excluding domain)
+    BLANK LINE (zuul implements no form redirect)
+    MAX FILE SIZE
+    MAX FILE COUNT
+    SIGNATURE EXPIRY
+
+**ZUUL_EXTRA_SWIFT_SIGNATURE**
+  The HMAC body signed with the configured key.
 
 In order to test the correct build, configure the Jenkins Git SCM
 plugin as follows::

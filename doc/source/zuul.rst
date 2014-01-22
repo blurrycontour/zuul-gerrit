@@ -160,6 +160,49 @@ smtp
   This can be overridden by individual pipelines.
   ``default_to=you@example.com``
 
+swift
+"""""
+
+To send (optional) swift upload instructions this section must be present.
+
+**authurl**
+  The (keystone) Auth URL for swift
+  ``For example, https://identity.api.rackspacecloud.com/v2.0/``
+
+Any of the `swiftclient connection parameters`_ can also be defined
+here by the same name.
+
+.. _swiftclient connection parameters: http://docs.openstack.org/developer/python-swiftclient/swiftclient.html#module-swiftclient.client
+
+**region_name** (optional)
+  The region name holding the swift container
+  ``For example, SYD``
+
+**container** (optional)
+  Container name to place the log into
+  ``For example, logs``
+
+**expiry** (optional)
+  How long the signed destination should be available for
+  ``default: 7200 (2hrs)``
+
+**max_file_size** (optional)
+  The maximum size of an individual file
+  ``default: 104857600 (100MB)``
+
+**max_file_count** (optional)
+  The maximum number of separate files to allow
+  ``default: 10``
+
+**file_path_prefix** (optional)
+  A prefix to add to object names after the container. The final path is
+  built as "V1/AUTH_user/CONTAINER/PREFIX/filename".
+
+**X-Account-Meta-Temp-Url-Key** (optional)
+  This is the key used to sign the HMAC message. zuul will send the
+  key to swift for you so you only need to define it here. If you do
+  not set a key zuul will generate one automatically.
+
 replication
 """""""""""
 
