@@ -139,6 +139,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAUH/+uO8\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-01-22T19:43:15Z",
+      "side": 1,
+      "message": "I am leaning towards not doing this because these are defaults for a generic ChangeQueue and the defaults in config are for dependent pipelines. The distinction could be better, but notice window is a different value in each.",
+      "parentUuid": "AAAAUH/+vfk\u003d",
+      "revId": "2c6747d14303e53bae890c64959fc17aaa7e6e3d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUH/+wVU\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 7
