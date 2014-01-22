@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAUH/+ubs\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 3315,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-01-22T19:13:38Z",
+      "side": 1,
+      "message": "It tests the case where a dependency and the window do not overlap.",
+      "parentUuid": "AAAAUH/+u9M\u003d",
+      "revId": "2c6747d14303e53bae890c64959fc17aaa7e6e3d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUH/+u80\u003d",
         "filename": "tests/test_scheduler.py",
         "patchSetId": 7
