@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAUH/+m6M\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 590,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-01-23T22:46:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAUH/+ntA\u003d",
+      "revId": "878bd28abd7db0a2f3bbc2b224eb5774b1da4f73",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUH/+nuE\u003d",
         "filename": "zuul/model.py",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2014-01-23T20:12:33Z",
       "side": 1,
       "message": "Does this pattern have anything over \"self.extra \u003d data.get(\u0027worker_extra\u0027, self.extra)\" ?\n\n(This is just a question, I don\u0027t care which way you write it.)",
+      "revId": "878bd28abd7db0a2f3bbc2b224eb5774b1da4f73",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+m6Q\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 599,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-01-23T22:46:03Z",
+      "side": 1,
+      "message": "I don\u0027t think there is any advantage. I guess in my mind I was thinking \"get this key, but if it doesn\u0027t exist, keep the value\". Using the default setting is neater though so I\u0027ll switch to that since I have to reroll.",
+      "parentUuid": "AAAAUH/+nuE\u003d",
       "revId": "878bd28abd7db0a2f3bbc2b224eb5774b1da4f73",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
