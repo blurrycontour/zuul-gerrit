@@ -110,12 +110,6 @@ zuul
   Optional: Value to pass to `git config user.name`.
   ``git_user_name=zuul``
 
-**push_change_refs**
-  Boolean value (``true`` or ``false``) that determines if Zuul should
-  push change refs to the git origin server for the git repositories in
-  git_dir.
-  ``push_change_refs=true``
-
 **report_times**
   Boolean value (``true`` or ``false``) that determines if Zuul should
   include elapsed times for each job in the textual report.
@@ -159,16 +153,6 @@ smtp
   Who the report should be emailed to by default.
   This can be overridden by individual pipelines.
   ``default_to=you@example.com``
-
-replication
-"""""""""""
-
-Zuul can push the refs it creates to any number of servers.  To do so,
-list the git push URLs in this section, one per line as follows::
-
-  [replication]
-    url1=ssh://user@host1.example.com:port/path/to/repo
-    url2=ssh://user@host2.example.com:port/path/to/repo
 
 layout.yaml
 ~~~~~~~~~~~

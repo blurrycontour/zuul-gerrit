@@ -66,9 +66,10 @@ logging.basicConfig(level=logging.DEBUG,
 
 
 def repack_repo(path):
-    output = subprocess.Popen(
-        ['git', '--git-dir=%s/.git' % path, 'repack', '-afd'],
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    cmd = ['git', '--git-dir=%s/.git' % path, 'repack', '-afd']
+    output = subprocess.Popen(cmd, close_fds=True,
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE)
     out = output.communicate()
     if output.returncode:
         raise Exception("git repack returned %d" % output.returncode)
@@ -158,6 +159,7 @@ class FakeChange(object):
         repo.head.reference = 'master'
         repo.head.reset(index=True, working_tree=True)
         repo.git.clean('-x', '-f', '-d')
+        repo.heads['master'].checkout()
         return r
 
     def addPatchset(self, files=[], large=False):
@@ -944,11 +946,17 @@ class TestScheduler(testtools.TestCase):
         repo_messages = [c.message.strip() for c in repo.iter_commits(ref)]
         repo_shas = [c.hexsha for c in repo.iter_commits(ref)]
         commit_messages = ['%s-1' % commit.subject for commit in commits]
+        self.log.debug("Checking if job %s has changes; commit_messages %s;"
+                       " repo_messages %s; sha %s" % (job, commit_messages,
+                                                      repo_messages, sha))
         for msg in commit_messages:
             if msg not in repo_messages:
+                self.log.debug("  messages do not match")
                 return False
         if repo_shas[0] != sha:
+            self.log.debug("  sha does not match")
             return False
+        self.log.debug("  OK")
         return True
 
     def registerJobs(self):
@@ -2343,6 +2351,10 @@ class TestScheduler(testtools.TestCase):
     def test_merger_repack_large_change(self):
         "Test that the merger works with large changes after a repack"
         # https://bugs.launchpad.net/zuul/+bug/1078946
+        # This test assumes the repo is already cloned; make sure it is
+        url = self.sched.triggers['gerrit'].getGitUrl(
+            self.sched.layout.projects['org/project1'])
+        self.sched.merger.addProject('org/project1', url)
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
         A.addPatchset(large=True)
         path = os.path.join(self.upstream_root, "org/project1")
@@ -3024,39 +3036,6 @@ class TestScheduler(testtools.TestCase):
                          'SUCCESS')
         self.assertEqual(B.data['status'], 'MERGED')
         self.assertEqual(B.reported, 2)
-
-    def test_push_urls(self):
-        "Test that Zuul can push refs to multiple URLs"
-        upstream_path = os.path.join(self.upstream_root, 'org/project')
-        replica1 = os.path.join(self.upstream_root, 'replica1')
-        replica2 = os.path.join(self.upstream_root, 'replica2')
-
-        self.config.add_section('replication')
-        self.config.set('replication', 'url1', 'file://%s' % replica1)
-        self.config.set('replication', 'url2', 'file://%s' % replica2)
-        self.sched.reconfigure(self.config)
-
-        r1 = git.Repo.clone_from(upstream_path, replica1 + '/org/project.git')
-        r2 = git.Repo.clone_from(upstream_path, replica2 + '/org/project.git')
-
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
-        B = self.fake_gerrit.addFakeChange('org/project', 'mp', 'B')
-        B.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
-        self.waitUntilSettled()
-        count = 0
-        for ref in r1.refs:
-            if ref.path.startswith('refs/zuul'):
-                count += 1
-        self.assertEqual(count, 3)
-
-        count = 0
-        for ref in r2.refs:
-            if ref.path.startswith('refs/zuul'):
-                count += 1
-        self.assertEqual(count, 3)
 
     def test_timer(self):
         "Test that a periodic job is triggered"
