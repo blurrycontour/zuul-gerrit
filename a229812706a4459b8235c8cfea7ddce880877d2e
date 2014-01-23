@@ -16,6 +16,24 @@
       "revId": "a229812706a4459b8235c8cfea7ddce880877d2e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+tDU\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1005,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-01-23T00:48:34Z",
+      "side": 1,
+      "message": "Jeblair pointed out that each of these restrictions is optional which makes my proposal for starting with a False flag and marking it True much more difficult. I am fine with this as is.",
+      "parentUuid": "AAAAUH/+tKo\u003d",
+      "revId": "a229812706a4459b8235c8cfea7ddce880877d2e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
