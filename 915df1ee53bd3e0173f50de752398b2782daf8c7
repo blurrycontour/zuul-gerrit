@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAUH/+tF0\u003d",
+        "filename": "tests/fixtures/layout-require-approval.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-01-23T00:40:26Z",
+      "side": 1,
+      "message": "Yes, but it won\u0027t be enqueued if it hasn\u0027t been approved though (because it does not satisfy the gerrit merge requirement).  If it has been approved, it will be enqueued.  That\u0027s the desired behavior we\u0027re testing.",
+      "parentUuid": "AAAAUH/+tTU\u003d",
+      "revId": "915df1ee53bd3e0173f50de752398b2782daf8c7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUH/+tTQ\u003d",
         "filename": "zuul/layoutvalidator.py",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2014-01-22T23:44:37Z",
       "side": 1,
       "message": "Perhaps we should add in email address and uid filtering while here?",
+      "revId": "915df1ee53bd3e0173f50de752398b2782daf8c7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+tFM\u003d",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-01-23T00:40:26Z",
+      "side": 1,
+      "message": "I don\u0027t think we get account id number, if that\u0027s what you meant by uid.  email address should be added.",
+      "parentUuid": "AAAAUH/+tTQ\u003d",
       "revId": "915df1ee53bd3e0173f50de752398b2782daf8c7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
