@@ -240,6 +240,8 @@ class Pipeline(object):
             j_queue = dict(name=queue.name)
             j_queues.append(j_queue)
             j_queue['heads'] = []
+            j_queue['window'] = queue.window
+            j_queue['dependent'] = queue.dependent
 
             j_changes = []
             for e in queue.queue:
@@ -299,6 +301,7 @@ class Pipeline(object):
     def formatItemJSON(self, item):
         changeish = item.change
         ret = {}
+        ret['active'] = changeish.active
         if hasattr(changeish, 'url') and changeish.url is not None:
             ret['url'] = changeish.url
         else:
@@ -705,6 +708,7 @@ class Changeish(object):
 
     def __init__(self, project):
         self.project = project
+        self.active = False
 
     def equals(self, other):
         raise NotImplementedError()
