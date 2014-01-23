@@ -16,6 +16,24 @@
       "revId": "b8a817ee10ee6e3ea3c9c4c8aadb56c8fb21a305",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+nKY\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 841,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-01-23T21:48:42Z",
+      "side": 1,
+      "message": "Yeah, thar be dragons here, but these are all treated as read-only.  Certainly open to changing it though to reduce potential for error.",
+      "parentUuid": "AAAAUH/+wQs\u003d",
+      "revId": "b8a817ee10ee6e3ea3c9c4c8aadb56c8fb21a305",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
