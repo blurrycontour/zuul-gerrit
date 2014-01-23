@@ -16,6 +16,24 @@
       "revId": "1a10a16b86f720f8973187c2ff1739c491b4d73a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+oAQ\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1156,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-01-23T19:23:59Z",
+      "side": 1,
+      "message": "I don\u0027t think so, however, this does suggest to me that we might need to protect running processOneItem on an item that has been removed.",
+      "parentUuid": "AAAAUH/+oDQ\u003d",
+      "revId": "1a10a16b86f720f8973187c2ff1739c491b4d73a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
