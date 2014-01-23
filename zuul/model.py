@@ -240,6 +240,8 @@ class Pipeline(object):
             j_queue = dict(name=queue.name)
             j_queues.append(j_queue)
             j_queue['heads'] = []
+            j_queue['window'] = queue.window
+            j_queue['dependent'] = queue.dependent
 
             j_changes = []
             for e in queue.queue:
