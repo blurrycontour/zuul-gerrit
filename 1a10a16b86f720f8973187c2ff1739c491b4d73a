@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUH/+oDQ\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1156,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-01-23T19:12:09Z",
+      "side": 1,
+      "message": "Below we iterate over a copy of the queue\u0027s internal queue. In the calls to isActionable here we operate on a different copy of the queues internal queue (it uses a slice of window size). Do we need to worry about race conditions around the modifications of these two copies of queue.queue?",
+      "revId": "1a10a16b86f720f8973187c2ff1739c491b4d73a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
