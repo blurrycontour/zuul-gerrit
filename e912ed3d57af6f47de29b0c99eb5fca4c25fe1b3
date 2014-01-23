@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUH/+oDE\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2465,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-01-23T19:14:29Z",
+      "side": 1,
+      "message": "Between adding the change and adding the abandoned event, you need to trigger a check queue run using addEvent(A.getPatchsetCreatedEvent(1)).  Then do waitUntilSettled().\n\nThat should then start jobs running.  Since you have told them to \"hold in build\", they should just sit there.  You can then assert that there is exactly one job running (it should be the -merge job).\n\nThen you can add the changeabandonedevent...",
+      "revId": "e912ed3d57af6f47de29b0c99eb5fca4c25fe1b3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+oCk\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2467,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-01-23T19:14:29Z",
+      "side": 1,
+      "message": "Then call self.worker.relase() to release the held jobs, then wait until its settled again.  When it is, there should be no jobs running and no change in the queue.  You can also assert that the change has not reported.",
+      "revId": "e912ed3d57af6f47de29b0c99eb5fca4c25fe1b3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
