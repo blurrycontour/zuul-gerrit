@@ -461,11 +461,11 @@ class ChangeQueue(object):
         self.window = min(self.window, other.window)
         # TODO merge semantics
 
-    def getActionableItems(self):
-        if self.dependent and self.window:
-            return self.queue[:self.window]
+    def isActionable(self, item):
+        if self.dependent:
+            return item in self.queue[:self.window]
         else:
-            return self.queue[:]
+            return True
 
     def increaseWindowSize(self):
         if self.dependent:
