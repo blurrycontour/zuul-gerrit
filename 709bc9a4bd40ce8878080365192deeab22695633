@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUH/+myA\u003d",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2014-01-23T22:59:38Z",
+      "side": 1,
+      "message": "Maybe just omit the sigint and allow it to resume, so that it doesn\u0027t die if a running zuul daemon tries to reload a suddenly invalid config update?",
+      "revId": "709bc9a4bd40ce8878080365192deeab22695633",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
