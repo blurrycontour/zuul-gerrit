@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUH/+tKo\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1005,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-01-23T00:20:37Z",
+      "side": 1,
+      "message": "Not really a fan of defaulting to True here then setting to false if things don\u0027t match. Would be easier to read if we found_approval is set to true when all critera are found to positively match rather than negatively rule out.",
+      "revId": "a229812706a4459b8235c8cfea7ddce880877d2e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
