@@ -20,6 +20,7 @@ Contents:
 
    gating
    triggers
+   mergers
    launchers
    reporters
    zuul
