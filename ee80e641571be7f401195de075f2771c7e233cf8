@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAUH/+U7w\u003d",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 2271
+      },
+      "writtenOn": "2014-01-28T00:16:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAUH//iqA\u003d",
+      "revId": "ee80e641571be7f401195de075f2771c7e233cf8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUH//ipw\u003d",
         "filename": "zuul/reporter/mysql.py",
         "patchSetId": 9
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAUH/+U7c\u003d",
+        "filename": "zuul/reporter/mysql.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 2271
+      },
+      "writtenOn": "2014-01-28T00:16:39Z",
+      "side": 1,
+      "message": "I originally did this, and it didn\u0027t work out for me. If there is a large gap between reportings, then the connection will timeout.",
+      "parentUuid": "AAAAUH//ipw\u003d",
+      "revId": "ee80e641571be7f401195de075f2771c7e233cf8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUH//ips\u003d",
         "filename": "zuul/reporter/mysql.py",
         "patchSetId": 9
@@ -47,6 +83,24 @@
       "writtenOn": "2014-01-12T02:56:37Z",
       "side": 1,
       "message": "possibly should escape self.table here?",
+      "revId": "ee80e641571be7f401195de075f2771c7e233cf8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+U60\u003d",
+        "filename": "zuul/reporter/mysql.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 2271
+      },
+      "writtenOn": "2014-01-28T00:16:39Z",
+      "side": 1,
+      "message": "Given its not escaped in the lines below, and would make this line inconsistent with the others I\u0027m not sure this is a good idea.",
+      "parentUuid": "AAAAUH//ips\u003d",
       "revId": "ee80e641571be7f401195de075f2771c7e233cf8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
