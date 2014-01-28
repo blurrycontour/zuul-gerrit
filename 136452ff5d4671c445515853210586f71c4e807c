@@ -16,6 +16,24 @@
       "revId": "136452ff5d4671c445515853210586f71c4e807c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+U7k\u003d",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-01-28T00:15:34Z",
+      "side": 1,
+      "message": "Yup, reading the argparse docs it should return the value to the version keyword arg instead of printing it directly.",
+      "parentUuid": "AAAAUH/+m0Q\u003d",
+      "revId": "136452ff5d4671c445515853210586f71c4e807c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
