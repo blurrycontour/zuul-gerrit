@@ -16,6 +16,24 @@
       "revId": "6290ecef378461cab754225603387235c3f622be",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+TEM\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-01-28T09:10:36Z",
+      "side": 1,
+      "message": "I guess I was over engineering :-)  Next patchset remove most of the code and always dequeue an abandoned change.",
+      "parentUuid": "AAAAUH/+oIU\u003d",
+      "revId": "6290ecef378461cab754225603387235c3f622be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
