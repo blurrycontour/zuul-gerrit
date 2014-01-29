@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUH/+L6A\u003d",
+        "filename": "requirements.txt",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-01-29T10:29:40Z",
+      "side": 1,
+      "message": "Should be using camel case: PrettyTable\n\nIf the package is already installed (as a dependency of another package for example), pip freeze will list PrettyTable and will fail to match it with \u0027prettytable\u0027. It would thus bails out saying it can find the dependency.  I had that issue with WebOb which was listed as \u0027kebob\u0027: https://review.openstack.org/#/c/26786/\n\n\nAlso nitpick: can you add a new line at the end of the file? Might want to configure your text editor to always write a newline at end of file.",
+      "revId": "0052437bb7cac61ee2aa0ed168da8cca2486449c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+L34\u003d",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-01-29T10:29:40Z",
+      "side": 1,
+      "message": "I would name the command \u0027show\u0027 like in git with a help text like:\n\n inspect remote Zuul server",
+      "revId": "0052437bb7cac61ee2aa0ed168da8cca2486449c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+L2I\u003d",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-01-29T10:29:40Z",
+      "side": 1,
+      "message": "The available columns could be made a list, then you can define this option to be of argparse type \u0027choices\u0027 http://docs.python.org/2/library/argparse.html#choices\n\nSomething like:\n\n running_jobs_columns \u003d [ \u0027job\u0027, \u0027worker_name\u0027, \u0027start_time\u0027, \u0027result\u0027 ]\n\n list_running_jobs.add_argument(\n  \u0027--columns\u0027,\n choices \u003d running_jobs_columns\n )\n\nShould yield a documentation similar to:\n\n usage: client.py list running-jobs [-h] [--columns {job, worker_name, start_time, result}]\n\nThat would also let us validate the columns being requested.",
+      "revId": "0052437bb7cac61ee2aa0ed168da8cca2486449c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+L10\u003d",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-01-29T10:29:40Z",
+      "side": 1,
+      "message": "I would leave earlier to save a level of indentation:\n\n if len(running_jobs) \u003d\u003d 0:\n    print \"No jobs currently running\"\n    return True\n    \n    # rest of code...",
+      "revId": "0052437bb7cac61ee2aa0ed168da8cca2486449c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+L1k\u003d",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-01-29T10:29:40Z",
+      "side": 1,
+      "message": "Whenever --columns is made a argparse type \u0027choices\u0027, self.args.columns will yield a list. rendering that line useless.",
+      "revId": "0052437bb7cac61ee2aa0ed168da8cca2486449c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+Lx0\u003d",
+        "filename": "zuul/rpcclient.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-01-29T10:29:40Z",
+      "side": 1,
+      "message": "I think enqueue() and promote() should still return the job to make it consistent with submitJob().",
+      "revId": "0052437bb7cac61ee2aa0ed168da8cca2486449c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+Ly4\u003d",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-01-29T10:29:40Z",
+      "side": 1,
+      "message": "Can we list all those fields in some list so they can be dumped to the user when running  zuul list running-jobs --help ?",
+      "revId": "0052437bb7cac61ee2aa0ed168da8cca2486449c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
