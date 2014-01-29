@@ -3969,3 +3969,52 @@ For CI problems and help debugging, contact ci@example.org"""
 
         running_items = client.get_running_jobs()
         self.assertEqual(0, len(running_items))
+
+    def test_cloner(self):
+        log = logging.getLogger("zuul.test.cloner")
+
+        self.config.set('zuul', 'layout_config',
+                        'tests/fixtures/layout-gating.yaml')
+        self.sched.reconfigure(self.config)
+        self.registerJobs()
+
+        self.worker.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+        A.addApproval('CRVW', 2)
+        B.addApproval('CRVW', 2)
+        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
+        self.waitUntilSettled()
+
+        self.assertEquals(2, len(self.builds), "Two builds are running")
+
+        a_zuul_ref = b_zuul_ref = None
+        log.debug("# of builds: %s" % len(self.builds))
+        for build in self.builds:
+            log.debug("Build parameters: %s", build.parameters)
+            if build.parameters['ZUUL_CHANGE'] == '1':
+                a_zuul_ref = build.parameters['ZUUL_REF']
+            if build.parameters['ZUUL_CHANGE'] == '2':
+                b_zuul_ref = build.parameters['ZUUL_REF']
+        self.assertIsNotNone(a_zuul_ref, 'Zuul reference for change A')
+        self.assertIsNotNone(b_zuul_ref, 'Zuul reference for change B')
+
+        log.debug("Refs are: A: %s B: %s" % (a_zuul_ref, b_zuul_ref))
+        repo1 = git.Repo(os.path.join(self.git_root, 'org/project1'))
+        log.debug("Repo1 references: %s" % repo1.references)
+        repo2 = git.Repo(os.path.join(self.git_root, 'org/project2'))
+        log.debug("Repo2 references: %s" % repo2.references)
+
+        # 2 refs
+        repo1_zref = [ref.path for ref in repo1.references
+                      if ref.path.startswith('refs/zuul/')]
+        repo2_zref = [ref.path for ref in repo2.references
+                      if ref.path.startswith('refs/zuul/')]
+        self.assertIn(a_zuul_ref, repo1_zref)
+        self.assertIn(b_zuul_ref, repo1_zref)
+        self.assertIn(b_zuul_ref, repo2_zref)
+
+        self.worker.hold_jobs_in_build = False
+        self.worker.release()
+        self.waitUntilSettled()
