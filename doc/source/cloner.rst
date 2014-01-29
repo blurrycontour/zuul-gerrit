@@ -1,0 +1,61 @@
+:title: Zuul Cloner
+
+Zuul Cloner
+===========
+
+Zuul includes a simple command line client that may be used to clone
+repositories with Zuul references applied.
+
+Configuration
+-------------
+
+Clone map
+'''''''''
+
+By default, Zuul cloner it will clone the project under ``basepath`` which
+would create sub directories whenever a project name contains slashes.  Since
+you might want to finely tweak the final destination, a clone map let you
+change the destination on a per project basis.  The configuration is done using
+a YAML file passed with ``-m``.
+
+With a project hierarchy such as::
+
+ project
+ thirdparty/plugins/plugin1
+
+You might want to get ``project`` straight in the base path, the clone map would be::
+
+  clonemap:
+   - name: 'project'
+     dest: '.'
+
+Then to strip out ``thirdparty`` such as the plugins land under the
+``/plugins`` directory of the basepath, you can use regex and capturing
+groups::
+
+  clonemap:
+   - name: 'project'
+     dest: '.'
+   - name: 'thirdparty/(plugins/.*)'
+     dest: '\1'
+
+The resulting workspace will be::
+
+  /                 -> project
+  /plugins/plugin1  -> thirdparty/plugins/plugin1
+
+
+Zuul parameters
+'''''''''''''''
+
+The Zuul cloner reuses Zuul parameters such as ZUUL_BRANCH, ZUUL_REF or
+ZUUL_PROJECT.  It will attempt to load them from the environnement variables or
+you can pass them as parameters (in which case it will override the
+environnement variable if it is set).  The command line parameters do not use
+the zuul prefix, hence ZUUL_REF can be passed using --ref.
+
+Usage
+-----
+The general options that apply are:
+
+.. program-output:: zuul-cloner --help
