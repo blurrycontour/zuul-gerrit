@@ -25,6 +25,7 @@ Contents:
    reporters
    zuul
    client
+   cloner
    statsd
 
 Indices and tables
