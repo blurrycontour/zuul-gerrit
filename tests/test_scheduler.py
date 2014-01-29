@@ -42,6 +42,7 @@ import six.moves.urllib.parse as urlparse
 import statsd
 import testtools
 
+import zuul.cmd.cloner
 import zuul.scheduler
 import zuul.webapp
 import zuul.rpclistener
@@ -3636,6 +3637,53 @@ class TestScheduler(testtools.TestCase):
         self.assertEqual("FakeBuilder", build.worker.program)
         self.assertEqual("v1.1", build.worker.version)
         self.assertEqual({'something': 'else'}, build.worker.extra)
+
+        self.worker.hold_jobs_in_build = False
+        self.worker.release()
+        self.waitUntilSettled()
+
+    def test_cloner(self):
+        self.config.set('zuul', 'layout_config',
+                        'tests/fixtures/layout-gating.yaml')
+        self.sched.reconfigure(self.config)
+        self.registerJobs()
+
+        self.worker.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+        A.addApproval('CRVW', 2)
+        B.addApproval('CRVW', 2)
+        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
+        self.waitUntilSettled()
+
+        self.assertEquals(2, len(self.builds), "Two builds are running")
+
+        a_zuul_ref = b_zuul_ref = None
+        print "# of builds: %s" % len(self.builds)
+        for build in self.builds:
+            print build.parameters
+            if build.parameters['ZUUL_CHANGE'] == '1':
+                a_zuul_ref = build.parameters['ZUUL_REF']
+            if build.parameters['ZUUL_CHANGE'] == '2':
+                b_zuul_ref = build.parameters['ZUUL_REF']
+        self.assertIsNotNone(a_zuul_ref, 'Zuul reference for change A')
+        self.assertIsNotNone(b_zuul_ref, 'Zuul reference for change B')
+
+        print "Refs are:\n\tA: %s\n\tB: %s\n" % (a_zuul_ref, b_zuul_ref)
+        repo1 = git.Repo(os.path.join(self.git_root, 'org/project1'))
+        print "Repo1 references: %s" % repo1.references
+        repo2 = git.Repo(os.path.join(self.git_root, 'org/project2'))
+        print "Repo2 references: %s" % repo2.references
+
+        # 2 refs
+        repo1_zref = [ref.path for ref in repo1.references
+                      if ref.path.startswith('refs/zuul/')]
+        repo2_zref = [ref.path for ref in repo2.references
+                      if ref.path.startswith('refs/zuul/')]
+        self.assertIn(a_zuul_ref, repo1_zref)
+        self.assertIn(b_zuul_ref, repo1_zref)
+        self.assertIn(b_zuul_ref, repo2_zref)
 
         self.worker.hold_jobs_in_build = False
         self.worker.release()
