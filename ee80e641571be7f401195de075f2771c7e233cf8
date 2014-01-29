@@ -72,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAUH/+H5c\u003d",
+        "filename": "zuul/reporter/mysql.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-01-29T22:36:59Z",
+      "side": 1,
+      "message": "Could we have a retry if not connected and raise an exception if it fails?",
+      "parentUuid": "AAAAUH/+U7c\u003d",
+      "revId": "ee80e641571be7f401195de075f2771c7e233cf8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUH//ips\u003d",
         "filename": "zuul/reporter/mysql.py",
         "patchSetId": 9
@@ -101,6 +119,24 @@
       "side": 1,
       "message": "Given its not escaped in the lines below, and would make this line inconsistent with the others I\u0027m not sure this is a good idea.",
       "parentUuid": "AAAAUH//ips\u003d",
+      "revId": "ee80e641571be7f401195de075f2771c7e233cf8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+H5Q\u003d",
+        "filename": "zuul/reporter/mysql.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-01-29T22:36:59Z",
+      "side": 1,
+      "message": "Well I meant and also below. I\u0027m not sure how sqlalchemy handles escaping though to be honest.",
+      "parentUuid": "AAAAUH/+U60\u003d",
       "revId": "ee80e641571be7f401195de075f2771c7e233cf8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
