@@ -58,6 +58,9 @@ class Repo(object):
         repo.config_writer().write()
         self._initialized = True
 
+    def isInitialized(self):
+        return self._initialized
+
     def createRepoObject(self):
         try:
             self._ensure_cloned()
@@ -130,9 +133,13 @@ class Repo(object):
         except AssertionError:
             origin.fetch(ref)
 
+    def fetch_from(self, repository, refspec):
+        repo = self.createRepoObject()
+        repo.git.fetch(repository, refspec)
+
     def createZuulRef(self, ref, commit='HEAD'):
         repo = self.createRepoObject()
-        self.log.debug("CreateZuulRef %s at %s " % (ref, commit))
+        self.log.debug("CreateZuulRef %s at %s" % (ref, commit))
         ref = ZuulReference.create(repo, ref, commit)
         return ref.commit
 
