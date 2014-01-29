@@ -90,6 +90,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAUH/+Hzg\u003d",
+        "filename": "zuul/reporter/mysql.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 2271
+      },
+      "writtenOn": "2014-01-29T23:00:26Z",
+      "side": 1,
+      "message": "I\u0027m not sure I agree. I worry about adding complexity here. Sure, its just a retry, but its another thing which might have a bug.",
+      "parentUuid": "AAAAUH/+H5c\u003d",
+      "revId": "ee80e641571be7f401195de075f2771c7e233cf8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUH//ips\u003d",
         "filename": "zuul/reporter/mysql.py",
         "patchSetId": 9
@@ -137,6 +155,24 @@
       "side": 1,
       "message": "Well I meant and also below. I\u0027m not sure how sqlalchemy handles escaping though to be honest.",
       "parentUuid": "AAAAUH/+U60\u003d",
+      "revId": "ee80e641571be7f401195de075f2771c7e233cf8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+H1I\u003d",
+        "filename": "zuul/reporter/mysql.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 2271
+      },
+      "writtenOn": "2014-01-29T23:00:26Z",
+      "side": 1,
+      "message": "This isn\u0027t sqlalchemy though, its the mysql library. If you read the comment above, you\u0027ll see there are limitations in that library which mean I can\u0027t safe quote these strings.",
+      "parentUuid": "AAAAUH/+H5Q\u003d",
       "revId": "ee80e641571be7f401195de075f2771c7e233cf8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
