@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAUH/+LS8\u003d",
+        "filename": "requirements.txt",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-01-29T12:40:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAUH/+L6A\u003d",
+      "revId": "0052437bb7cac61ee2aa0ed168da8cca2486449c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUH/+L34\u003d",
         "filename": "zuul/cmd/client.py",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2014-01-29T10:29:40Z",
       "side": 1,
       "message": "I would name the command \u0027show\u0027 like in git with a help text like:\n\n inspect remote Zuul server",
+      "revId": "0052437bb7cac61ee2aa0ed168da8cca2486449c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+LSk\u003d",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-01-29T12:40:01Z",
+      "side": 1,
+      "message": "I\u0027m hoping other list subcommands would come up in the future. For example \"show pipelines\" or \"show registered jobs/workers\" etc. \n\nThis isn\u0027t inspecting a remote zuul server, the current list implemented shows workers registered as running tasks for this zuul server.\n\nI have changed this to \"show\".",
+      "parentUuid": "AAAAUH/+L34\u003d",
       "revId": "0052437bb7cac61ee2aa0ed168da8cca2486449c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAUH/+LQs\u003d",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-01-29T12:40:01Z",
+      "side": 1,
+      "message": "This would involve the client knowing the available columns the RPC will return. I do think there\u0027s an argument for hard coding the list, but for now I decided to validate it below with the response as you highlighted",
+      "parentUuid": "AAAAUH/+L2I\u003d",
+      "revId": "0052437bb7cac61ee2aa0ed168da8cca2486449c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUH/+L10\u003d",
         "filename": "zuul/cmd/client.py",
         "patchSetId": 3
@@ -64,6 +118,24 @@
       "writtenOn": "2014-01-29T10:29:40Z",
       "side": 1,
       "message": "I would leave earlier to save a level of indentation:\n\n if len(running_jobs) \u003d\u003d 0:\n    print \"No jobs currently running\"\n    return True\n    \n    # rest of code...",
+      "revId": "0052437bb7cac61ee2aa0ed168da8cca2486449c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+LQo\u003d",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-01-29T12:40:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAUH/+L10\u003d",
       "revId": "0052437bb7cac61ee2aa0ed168da8cca2486449c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -104,6 +176,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAUH/+LPw\u003d",
+        "filename": "zuul/rpcclient.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-01-29T12:40:01Z",
+      "side": 1,
+      "message": "This shouldn\u0027t have been changed here actually. I do agree though, but they should be in a different patchset so I\u0027m removing this.",
+      "parentUuid": "AAAAUH/+Lx0\u003d",
+      "revId": "0052437bb7cac61ee2aa0ed168da8cca2486449c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUH/+Ly4\u003d",
         "filename": "zuul/rpclistener.py",
         "patchSetId": 3
@@ -115,6 +205,24 @@
       "writtenOn": "2014-01-29T10:29:40Z",
       "side": 1,
       "message": "Can we list all those fields in some list so they can be dumped to the user when running  zuul list running-jobs --help ?",
+      "revId": "0052437bb7cac61ee2aa0ed168da8cca2486449c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/+LPQ\u003d",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-01-29T12:40:01Z",
+      "side": 1,
+      "message": "I agree, this is probably the better solution to my comments in cmd/client.py. However I\u0027m not sure where this would be best situated? (perhaps a change for another patchset)",
+      "parentUuid": "AAAAUH/+Ly4\u003d",
       "revId": "0052437bb7cac61ee2aa0ed168da8cca2486449c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
