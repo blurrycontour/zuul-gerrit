@@ -410,6 +410,12 @@ explanation of each of the parameters::
   Uses the same syntax as **success**, but describes what Zuul should
   do if at least one job fails.
 
+**merge-failure**
+  Uses the same syntax as **success**, but describes what Zuul should
+  do if it is unable to merge in the patchset. If no merge-failure
+  reporters are listed then the ``failure`` reporter will be used to
+  notify of unsuccessful merges.
+
 **start**
   Uses the same syntax as **success**, but describes what Zuul should
   do when a change is added to the pipeline manager.  This can be used,

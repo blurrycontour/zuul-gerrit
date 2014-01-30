@@ -3570,3 +3570,8 @@ class TestScheduler(testtools.TestCase):
         self.assertEqual(queue.window, 2)
         self.assertEqual(queue.window_floor, 1)
         self.assertEqual(C.data['status'], 'MERGED')
+
+    def test_merge_failed_reporters(self):
+        """Test the correct failed message is sent to the correct merge-failure
+        reporters."""
+        pass
