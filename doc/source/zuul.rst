@@ -238,6 +238,12 @@ explanation of each of the parameters::
   reported back to Gerrit when at least one voting build fails.
   Defaults to "Build failed."
 
+**merge-failure-message**
+  An optional field that supplies the introductory text in message
+  reported back to Gerrit when a change fails to merge with the
+  current state of the repository.
+  Defaults to "Merge failed."
+
 **manager**
   There are currently two schemes for managing pipelines:
 
@@ -407,6 +413,12 @@ explanation of each of the parameters::
 **failure**
   Uses the same syntax as **success**, but describes what Zuul should
   do if at least one job fails.
+
+**merge-failure**
+  Uses the same syntax as **success**, but describes what Zuul should
+  do if it is unable to merge in the patchset. If no merge-failure
+  reporters are listed then the ``failure`` reporters will be used to
+  notify of unsuccessful merges.
 
 **start**
   Uses the same syntax as **success**, but describes what Zuul should
