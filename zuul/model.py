@@ -63,6 +63,7 @@ class Pipeline(object):
         self.name = name
         self.description = None
         self.failure_message = None
+        self.merge_failure_message = None
         self.success_message = None
         self.dequeue_on_new_patchset = True
         self.job_trees = {}  # project -> JobTree
@@ -168,6 +169,11 @@ class Pipeline(object):
                 return False
             if build.result != 'SUCCESS':
                 return False
+        return True
+
+    def didMergerSucceed(self, item):
+        if item.current_build_set.unable_to_merge:
+            return False
         return True
 
     def didAnyJobFail(self, item):

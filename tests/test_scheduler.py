@@ -49,6 +49,7 @@ import zuul.rpcclient
 import zuul.launcher.gearman
 import zuul.merger.server
 import zuul.merger.client
+import zuul.merger.merger
 import zuul.reporter.gerrit
 import zuul.reporter.smtp
 import zuul.trigger.gerrit
@@ -743,6 +744,18 @@ class FakeSMTP(object):
         return True
 
 
+class FakeMerger(zuul.merger.merger.Merger):
+    def __init__(self, test_scheduler, working_root, sshkey, email, username):
+        self.test_scheduler = test_scheduler
+        return super(FakeMerger, self).__init__(working_root, sshkey, email,
+                                                username)
+
+    def mergeChanges(self, items):
+        if self.test_scheduler.merger_fail_merge:
+            return None
+        return super(FakeMerger, self).mergeChanges(items)
+
+
 class TestScheduler(testtools.TestCase):
     log = logging.getLogger("zuul.test")
 
@@ -816,6 +829,14 @@ class TestScheduler(testtools.TestCase):
         self.worker = FakeWorker('fake_worker', self)
         self.worker.addServer('127.0.0.1', self.gearman_server.port)
         self.gearman_server.worker = self.worker
+
+        self.merger_fail_merge = False
+
+        def FakeMergerFactory(*args, **kwargs):
+            return FakeMerger(self, *args, **kwargs)
+
+        self.useFixture(fixtures.MonkeyPatch('zuul.merger.merger.Merger',
+                                             FakeMergerFactory))
 
         self.merge_server = zuul.merger.server.MergeServer(self.config)
         self.merge_server.start()
@@ -3640,3 +3661,68 @@ class TestScheduler(testtools.TestCase):
         self.worker.hold_jobs_in_build = False
         self.worker.release()
         self.waitUntilSettled()
+
+    def test_merge_failure_reporters(self):
+        """Check that the config is set up correctly"""
+
+        self.config.set('zuul', 'layout_config',
+                        'tests/fixtures/layout-merge-failure.yaml')
+        self.sched.reconfigure(self.config)
+        self.registerJobs()
+
+        self.assertEqual(
+            len(self.sched.layout.pipelines['check'].merge_failure_actions), 1)
+        self.assertEqual(
+            len(self.sched.layout.pipelines['gate'].merge_failure_actions), 2)
+
+        self.assertTrue(isinstance(
+            self.sched.layout.pipelines['check'].merge_failure_actions[0].
+            reporter, zuul.reporter.gerrit.Reporter))
+
+        self.assertTrue(
+            (
+                isinstance(self.sched.layout.pipelines['gate'].
+                           merge_failure_actions[0].reporter,
+                           zuul.reporter.smtp.Reporter) and
+                isinstance(self.sched.layout.pipelines['gate'].
+                           merge_failure_actions[1].reporter,
+                           zuul.reporter.gerrit.Reporter)
+            ) or (
+                isinstance(self.sched.layout.pipelines['gate'].
+                           merge_failure_actions[0].reporter,
+                           zuul.reporter.gerrit.Reporter) and
+                isinstance(self.sched.layout.pipelines['gate'].
+                           merge_failure_actions[1].reporter,
+                           zuul.reporter.smtp.Reporter)
+            )
+        )
+
+    def test_merge_failure_reports(self):
+        """Check that when a change fails to merge the correct message is sent
+        to the correct reporter"""
+        self.config.set('zuul', 'layout_config',
+                        'tests/fixtures/layout-merge-failure.yaml')
+        self.sched.reconfigure(self.config)
+        self.registerJobs()
+
+        # Check a test failure isn't reported to SMTP
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('CRVW', 2)
+        self.worker.addFailTest('project-test1', A)
+        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        self.waitUntilSettled()
+
+        self.assertEqual(0, len(self.smtp_messages))
+
+        # Check a merge failure is reported to SMTP
+        self.merger_fail_merge = True
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        B.addApproval('CRVW', 2)
+        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
+        self.waitUntilSettled()
+
+        self.assertEqual(1, len(self.smtp_messages))
+        self.assertEqual('Merge failed.\n\nThis change was unable to be '
+                         + 'automatically merged with the current state of the'
+                         + ' repository. Please rebase your change and upload '
+                         + 'a new patchset.', self.smtp_messages[0]['body'])

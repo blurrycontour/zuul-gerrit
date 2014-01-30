@@ -226,13 +226,15 @@ class Scheduler(threading.Thread):
             pipeline.precedence = precedence
             pipeline.failure_message = conf_pipeline.get('failure-message',
                                                          "Build failed.")
+            pipeline.merge_failure_message = conf_pipeline.get(
+                'merge-failure-message', "Merge failed.")
             pipeline.success_message = conf_pipeline.get('success-message',
                                                          "Build succeeded.")
             pipeline.dequeue_on_new_patchset = conf_pipeline.get(
                 'dequeue-on-new-patchset', True)
 
             action_reporters = {}
-            for action in ['start', 'success', 'failure']:
+            for action in ['start', 'success', 'failure', 'merge-failure']:
                 action_reporters[action] = []
                 if conf_pipeline.get(action):
                     for reporter_name, params \
@@ -246,6 +248,11 @@ class Scheduler(threading.Thread):
             pipeline.start_actions = action_reporters['start']
             pipeline.success_actions = action_reporters['success']
             pipeline.failure_actions = action_reporters['failure']
+            if len(action_reporters['merge-failure']) > 0:
+                pipeline.merge_failure_actions = \
+                    action_reporters['merge-failure']
+            else:
+                pipeline.merge_failure_actions = action_reporters['failure']
 
             pipeline.window = conf_pipeline.get('window', 20)
             pipeline.window_floor = conf_pipeline.get('window-floor', 3)
@@ -935,6 +942,8 @@ class BasePipelineManager(object):
         self.log.info("    %s" % self.pipeline.success_actions)
         self.log.info("  On failure:")
         self.log.info("    %s" % self.pipeline.failure_actions)
+        self.log.info("  On merge-failure:")
+        self.log.info("    %s" % self.pipeline.merge_failure_actions)
 
     def getSubmitAllowNeeds(self):
         # Get a list of code review labels that are allowed to be
@@ -1355,10 +1364,12 @@ class BasePipelineManager(object):
         self.log.debug("Reporting change %s" % item.change)
         ret = True  # Means error as returned by trigger.report
         if self.pipeline.didAllJobsSucceed(item):
-            self.log.debug("success %s %s" % (self.pipeline.success_actions,
-                                              self.pipeline.failure_actions))
+            self.log.debug("success %s" % (self.pipeline.success_actions))
             actions = self.pipeline.success_actions
             item.setReportedResult('SUCCESS')
+        elif not self.pipeline.didMergerSucceed(item):
+            actions = self.pipeline.merge_failure_actions
+            item.setReportedResult('MERGER_FAILURE')
         else:
             actions = self.pipeline.failure_actions
             item.setReportedResult('FAILURE')
@@ -1382,6 +1393,8 @@ class BasePipelineManager(object):
         ret = ''
         if self.pipeline.didAllJobsSucceed(item):
             ret += self.pipeline.success_message + '\n\n'
+        elif not self.pipeline.didMergerSucceed(item):
+            ret += self.pipeline.merge_failure_message + '\n\n'
         else:
             ret += self.pipeline.failure_message + '\n\n'
 
