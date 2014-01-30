@@ -3570,3 +3570,38 @@ class TestScheduler(testtools.TestCase):
         self.assertEqual(queue.window, 2)
         self.assertEqual(queue.window_floor, 1)
         self.assertEqual(C.data['status'], 'MERGED')
+
+    def test_merge_failure_reporters(self):
+        """Check the that config is set up correctly"""
+
+        self.config.set('zuul', 'layout_config',
+                        'tests/fixtures/layout-merge-failure.yaml')
+        self.sched.reconfigure(self.config)
+        self.registerJobs()
+
+        self.assertEqual(
+            len(self.sched.layout.pipelines['check'].merge_failure_actions), 2)
+        self.assertEqual(
+            len(self.sched.layout.pipelines['gate'].merge_failure_actions), 1)
+
+        self.assertTrue(isinstance(
+            self.sched.layout.pipelines['gate'].merge_failure_actions[0].
+            reporter, zuul.reporter.gerrit.Reporter))
+
+        self.assertTrue(
+            (
+                isinstance(self.sched.layout.pipelines['check'].
+                           merge_failure_actions[0].reporter,
+                           zuul.reporter.smtp.Reporter) and
+                isinstance(self.sched.layout.pipelines['check'].
+                           merge_failure_actions[1].reporter,
+                           zuul.reporter.gerrit.Reporter)
+            ) or (
+                isinstance(self.sched.layout.pipelines['check'].
+                           merge_failure_actions[0].reporter,
+                           zuul.reporter.gerrit.Reporter) and
+                isinstance(self.sched.layout.pipelines['check'].
+                           merge_failure_actions[1].reporter,
+                           zuul.reporter.smtp.Reporter)
+            )
+        )

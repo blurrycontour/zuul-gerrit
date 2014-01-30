@@ -63,6 +63,7 @@ class Pipeline(object):
         self.name = name
         self.description = None
         self.failure_message = None
+        self.merge_failure_message = None
         self.success_message = None
         self.dequeue_on_new_patchset = True
         self.job_trees = {}  # project -> JobTree
@@ -168,6 +169,11 @@ class Pipeline(object):
                 return False
             if build.result != 'SUCCESS':
                 return False
+        return True
+
+    def didJobMerge(self, item):
+        if item.current_build_set.unable_to_merge:
+            return False
         return True
 
     def didAnyJobFail(self, item):
@@ -521,6 +527,7 @@ class Job(object):
         # If you add attributes here, be sure to add them to the copy method.
         self.name = name
         self.failure_message = None
+        self.merge_failure_message = None
         self.success_message = None
         self.failure_pattern = None
         self.success_pattern = None
@@ -541,6 +548,8 @@ class Job(object):
     def copy(self, other):
         if other.failure_message:
             self.failure_message = other.failure_message
+        if other.merge_failure_message:
+            self.merge_failure_message = other.merge_failure_message
         if other.success_message:
             self.success_message = other.success_message
         if other.failure_pattern:

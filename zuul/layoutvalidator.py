@@ -83,6 +83,7 @@ class LayoutSchema(object):
                 'trigger': trigger,
                 'success': report_actions,
                 'failure': report_actions,
+                'merge-failure': report_actions,
                 'start': report_actions,
                 'window': window,
                 'window-floor': window_floor,
