@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUH/93ao\u003d",
+        "filename": "doc/source/triggers.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-03T04:37:56Z",
+      "side": 1,
+      "message": "\"available to workers\" (although another patchset to fix the Jenkins documentation is probably better)",
+      "revId": "93f8b844edbd69ed20b6d080eff8b0acfc14b740",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/93a0\u003d",
+        "filename": "zuul/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-03T04:37:56Z",
+      "side": 1,
+      "message": "This line wrap looks a bit short now",
+      "revId": "93f8b844edbd69ed20b6d080eff8b0acfc14b740",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/93as\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-03T04:37:56Z",
+      "side": 1,
+      "message": "This line wrap is a bit short too",
+      "revId": "93f8b844edbd69ed20b6d080eff8b0acfc14b740",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
