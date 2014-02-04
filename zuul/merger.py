@@ -208,10 +208,13 @@ class Merger(object):
                 repo.cherryPick(change.refspec)
             else:
                 raise Exception("Unsupported merge mode: %s" % mode)
-        except Exception:
-            # Log exceptions at debug level because they are
+        except git.GitCommandError:
+            # Log git exceptions at debug level because they are
             # usually benign merge conflicts
             self.log.debug("Unable to merge %s" % change, exc_info=True)
+            return False
+        except Exception:
+            self.log.exception("Exception while merging a change:")
             return False
 
         try:
