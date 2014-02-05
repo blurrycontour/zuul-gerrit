@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUH/9r44\u003d",
+        "filename": "zuul/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-05T00:29:19Z",
+      "side": 1,
+      "message": "Wrapping here seems wrong now",
+      "revId": "0c3843ec64deac01ce0890b408300293bdde4391",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
