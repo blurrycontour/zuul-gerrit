@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUH/9qJ4\u003d",
+        "filename": "requirements.txt",
+        "patchSetId": 6
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 6786
+      },
+      "writtenOn": "2014-02-05T09:41:10Z",
+      "side": 1,
+      "message": "I think it\u0027ll be better to depend on more specific versions (it could be taken from global reqs for example).",
+      "revId": "3c66fe1de0ea0284b58e48c64fad24be4d60dcb0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/9qJw\u003d",
+        "filename": "requirements.txt",
+        "patchSetId": 6
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 6786
+      },
+      "writtenOn": "2014-02-05T09:41:10Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "3c66fe1de0ea0284b58e48c64fad24be4d60dcb0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
