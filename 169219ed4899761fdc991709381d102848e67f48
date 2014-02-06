@@ -138,6 +138,24 @@
       "revId": "169219ed4899761fdc991709381d102848e67f48",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/9cHE\u003d",
+        "filename": "zuul/merger.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-02-06T22:10:37Z",
+      "side": 1,
+      "message": "Gotcha I see it now. The calls to _mergeItem happen in the loop so we are carrying state across calls. Missed that in the first review.",
+      "parentUuid": "AAAAUH/9cLI\u003d",
+      "revId": "169219ed4899761fdc991709381d102848e67f48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
