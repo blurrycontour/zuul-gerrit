@@ -3253,6 +3253,7 @@ class TestScheduler(testtools.TestCase):
             self.assertEqual(
                 enqueue_times[str(item.change)], item.enqueue_time)
 
+        self.waitUntilSettled()
         self.worker.release('.*-merge')
         self.waitUntilSettled()
         self.worker.release('.*-merge')
@@ -3319,6 +3320,7 @@ class TestScheduler(testtools.TestCase):
         r = client.promote(pipeline='gate',
                            change_ids=['3,1'])
 
+        self.waitUntilSettled()
         self.worker.release('.*-merge')
         self.waitUntilSettled()
         self.worker.release('.*-merge')
