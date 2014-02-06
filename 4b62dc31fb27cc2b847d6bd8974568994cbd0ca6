@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUH/9cVQ\u003d",
+        "filename": "zuul/merger/client.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-02-06T21:53:45Z",
+      "side": 1,
+      "message": "I am not sure updateRepo needs to be an explicit job, shouldn\u0027t it just implicitly happen when the merge server needs to update things?",
+      "revId": "4b62dc31fb27cc2b847d6bd8974568994cbd0ca6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
