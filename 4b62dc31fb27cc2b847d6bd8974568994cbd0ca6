@@ -16,6 +16,24 @@
       "revId": "4b62dc31fb27cc2b847d6bd8974568994cbd0ca6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/9cIM\u003d",
+        "filename": "zuul/merger/client.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-02-06T22:22:23Z",
+      "side": 1,
+      "message": "It\u0027s to handle ref-updated events.  Some folks pull from zuul repos for post jobs; I think we always pull from gerrit.  Regardless, this makes it so that you can pull from a zuul merger for a ref-updated event like you can now pull from zuul.  This could probably be reworked a bit more (perhaps even to set a zuul ref), but it\u0027s as close to the current behavior as possible.\n\nYou\u0027ll note elsewhere the change-with-ref vs change-without-ref dichotomy (prepareRef in particular).",
+      "parentUuid": "AAAAUH/9cVQ\u003d",
+      "revId": "4b62dc31fb27cc2b847d6bd8974568994cbd0ca6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
