@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUH/9cqw\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-02-06T20:57:19Z",
+      "side": 1,
+      "message": "This appears to be a noop object. Did you intend on making the classes below inherity from this class?",
+      "revId": "7516b953b5a08e310018da67b09b690e21a1ee1b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
