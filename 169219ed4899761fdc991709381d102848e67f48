@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAUH/9cKU\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-02-06T22:04:34Z",
+      "side": 1,
+      "message": "Left over from debugging; let\u0027s just remove.",
+      "parentUuid": "AAAAUH/9db8\u003d",
+      "revId": "169219ed4899761fdc991709381d102848e67f48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUH/9dV4\u003d",
         "filename": "tests/test_scheduler.py",
         "patchSetId": 2
@@ -70,6 +88,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAUH/9cLs\u003d",
+        "filename": "zuul/merger.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-02-06T22:04:34Z",
+      "side": 1,
+      "message": "Indeed, this looks like cruft from an abortive change.",
+      "parentUuid": "AAAAUH/9dRs\u003d",
+      "revId": "169219ed4899761fdc991709381d102848e67f48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUH/9dGU\u003d",
         "filename": "zuul/merger.py",
         "patchSetId": 2
@@ -81,6 +117,24 @@
       "writtenOn": "2014-02-06T20:01:26Z",
       "side": 1,
       "message": "Why is recent an argument here? empty dict is the value always passed in and the ref to recent in the caller is not used.",
+      "revId": "169219ed4899761fdc991709381d102848e67f48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/9cLI\u003d",
+        "filename": "zuul/merger.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-02-06T22:04:34Z",
+      "side": 1,
+      "message": "It\u0027s modified in place in this method (after all, python objects are pass-by-reference).  I guess it\u0027s a bit more of a procedural paradigm than object oriented.  For that, we\u0027d need a transient object to represent this merge operation.\n\nAt any rate, it\u0027s basically a scratch pad where the merger keeps track of the most recent commits for each project-branch as it walks down the stack.",
+      "parentUuid": "AAAAUH/9dGU\u003d",
       "revId": "169219ed4899761fdc991709381d102848e67f48",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
