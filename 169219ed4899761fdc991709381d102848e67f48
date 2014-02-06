@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "AAAAUH/9dWc\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-02-06T20:01:26Z",
+      "side": 1,
+      "message": "Lesson from logstash crm interactions, we probably want to set close_fds\u003dTrue for most of our Popen()s.",
+      "revId": "169219ed4899761fdc991709381d102848e67f48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUH/9db8\u003d",
         "filename": "tests/test_scheduler.py",
         "patchSetId": 2
@@ -13,6 +30,57 @@
       "writtenOn": "2014-02-06T19:24:52Z",
       "side": 1,
       "message": "Why print instead of log here? Probably it\u0027s a print debug?",
+      "revId": "169219ed4899761fdc991709381d102848e67f48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/9dV4\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-02-06T20:01:26Z",
+      "side": 1,
+      "message": "Should these be log messages instead of prints? Not sure if that matters much in the test suite.",
+      "revId": "169219ed4899761fdc991709381d102848e67f48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/9dRs\u003d",
+        "filename": "zuul/merger.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-02-06T20:01:26Z",
+      "side": 1,
+      "message": "It isn\u0027t clear to me what the RemoteProgress argument does here. And my attempts at deciphering it from the pygit source have failed me. It appears that RemoteProgress can be used to execute callbacks at certain points during the clone operation but none appear to be in use here.",
+      "revId": "169219ed4899761fdc991709381d102848e67f48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUH/9dGU\u003d",
+        "filename": "zuul/merger.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-02-06T20:01:26Z",
+      "side": 1,
+      "message": "Why is recent an argument here? empty dict is the value always passed in and the ref to recent in the caller is not used.",
       "revId": "169219ed4899761fdc991709381d102848e67f48",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
