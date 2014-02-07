@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUH/9bQs\u003d",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-02-07T00:04:44Z",
+      "side": 1,
+      "message": "This executes code at import time before daemonization has happened or before the setup_logging below. This should happen after both of those things which is still early enough to capture logs for the log methods you have added below.",
+      "revId": "256e6ecbf23195b80350fb8ef8dfc148957b7d39",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
