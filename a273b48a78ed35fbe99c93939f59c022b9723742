@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUX//vYk\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-11T05:51:42Z",
+      "side": 1,
+      "message": "Consider:\n\nUsually \"http://zuul-merger001.example.com/p\"\n\nPerhaps this config should be renamed from \u0027zuul_url\u0027 as that\u0027s confusing with zuul\u0027s status.json. Maybe  \"zuul_git_url\"? Is it also worth noting that ssh+git protocols could be used?",
+      "revId": "a273b48a78ed35fbe99c93939f59c022b9723742",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX//vXc\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1007,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-11T05:51:42Z",
+      "side": 1,
+      "message": "Could you break out of this (deeper) for loop here?",
+      "revId": "a273b48a78ed35fbe99c93939f59c022b9723742",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX//vOM\u003d",
+        "filename": "zuul/merger/client.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-11T05:51:42Z",
+      "side": 1,
+      "message": "Might be worth commenting that this is only for the test suite\u0027s benefit",
+      "revId": "a273b48a78ed35fbe99c93939f59c022b9723742",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX//vPo\u003d",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-11T05:51:42Z",
+      "side": 1,
+      "message": "Missing blank line?",
+      "revId": "a273b48a78ed35fbe99c93939f59c022b9723742",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX//vJ4\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-11T05:51:42Z",
+      "side": 1,
+      "message": "(opinion) it would be clearer to use\n\n  self.merger_client",
+      "revId": "a273b48a78ed35fbe99c93939f59c022b9723742",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX//vL8\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1233,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-11T05:51:42Z",
+      "side": 1,
+      "message": "This logic is difficult to read. Consider:\n\n  if not ready or not ready_ahead:\n\nWhich since the only action is set ready_ahead \u003d False this can be changed to:\n\n  if not read:\n    ready_ahead \u003d False\n\nor\n\n  ready_ahead \u003d False if not ready else ready_ahead",
+      "revId": "a273b48a78ed35fbe99c93939f59c022b9723742",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX//vJI\u003d",
+        "filename": "zuul/trigger/timer.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-11T05:51:42Z",
+      "side": 1,
+      "message": "Perhaps add a TODO/FIXME?",
+      "revId": "a273b48a78ed35fbe99c93939f59c022b9723742",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX//vIU\u003d",
+        "filename": "zuul/trigger/timer.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-11T05:51:42Z",
+      "side": 1,
+      "message": "Should the upstream git repository be set in zuul.conf? (ie git.openstack.org)",
+      "revId": "a273b48a78ed35fbe99c93939f59c022b9723742",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
