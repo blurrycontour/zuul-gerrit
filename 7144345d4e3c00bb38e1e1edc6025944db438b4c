@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAUX//qbM\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 705,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-02-11T17:07:56Z",
+      "side": 1,
+      "message": "Each time we run through the loop, we consume from the queues.  If the exception is related to that, then we won\u0027t be processing the same thing on the next loop so it won\u0027t be a problem.  This is the typical situation.\n\nIf the exception is due to, say, the pause event (reconfiguration, etc), it\u0027s quite likely that Zuul is in an unrecoverable state anyway.\n\nOther than this potential infinite loop being faster than before, this actually isn\u0027t a significant structural change.",
+      "parentUuid": "AAAAUX//vbo\u003d",
+      "revId": "7144345d4e3c00bb38e1e1edc6025944db438b4c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUX//vaI\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2014-02-11T04:44:16Z",
       "side": 1,
       "message": "Do we actually want to drop failed items if we don\u0027t know why they failed?\n\n(I can see how this might answer my previous comment though)",
+      "revId": "7144345d4e3c00bb38e1e1edc6025944db438b4c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX//qZo\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 752,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-02-11T17:07:56Z",
+      "side": 1,
+      "message": "Yes, and it is indeed because of the previous comment.",
+      "parentUuid": "AAAAUX//vaI\u003d",
       "revId": "7144345d4e3c00bb38e1e1edc6025944db438b4c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
