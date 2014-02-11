@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUX//vbo\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 705,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-11T04:44:16Z",
+      "side": 1,
+      "message": "This exception seems to broad to me. Is there a risk that by setting the wake_event after a failure that we keep hitting that failure in this loop thereby locking up zuul?",
+      "revId": "7144345d4e3c00bb38e1e1edc6025944db438b4c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX//vaI\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 752,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-11T04:44:16Z",
+      "side": 1,
+      "message": "Do we actually want to drop failed items if we don\u0027t know why they failed?\n\n(I can see how this might answer my previous comment though)",
+      "revId": "7144345d4e3c00bb38e1e1edc6025944db438b4c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
