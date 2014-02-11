@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUX//t0s\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 3593,
+      "author": {
+        "id": 6786
+      },
+      "writtenOn": "2014-02-11T09:14:18Z",
+      "side": 1,
+      "message": "Due to test results \u0027build.worker.name\u0027 \u003d\u003d \u0027Unknown\u0027 that means that worker name hasn\u0027t been updated.",
+      "revId": "c493c69ce246e16bb32a10d27537942cff2edab6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
