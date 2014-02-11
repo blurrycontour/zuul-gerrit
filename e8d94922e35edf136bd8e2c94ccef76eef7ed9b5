@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUX//vGo\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2829,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-11T05:58:11Z",
+      "side": 1,
+      "message": "Should we check that jobs are also marked as canceled?",
+      "revId": "e8d94922e35edf136bd8e2c94ccef76eef7ed9b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
