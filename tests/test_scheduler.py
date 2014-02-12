@@ -27,6 +27,7 @@ import random
 import re
 import select
 import shutil
+import six.moves.urllib.parse as urlparse
 import socket
 import string
 import subprocess
@@ -34,7 +35,6 @@ import threading
 import time
 import urllib
 import urllib2
-import urlparse
 
 import git
 import gear
