@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAUX//hn0\u003d",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-02-12T16:42:03Z",
+      "side": 1,
+      "message": "Moved to where Jeremy said (aka after setup_logging).",
+      "parentUuid": "AAAAUH/9bQs\u003d",
+      "revId": "256e6ecbf23195b80350fb8ef8dfc148957b7d39",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUH/9bPI\u003d",
         "filename": "zuul/cmd/server.py",
         "patchSetId": 1
@@ -36,6 +54,41 @@
     },
     {
       "key": {
+        "uuid": "AAAAUX//hG0\u003d",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-02-12T16:42:03Z",
+      "side": 1,
+      "message": "Now getting the logger after it has been setup\n\n   self.setup_logging(\u0027zuul\u0027, \u0027log_config\u0027)\n + self.log \u003d logging.getLogger(\"zuul.Server\")\n\nI have also moved that block AFTER the gearman start, because for some reason the Gearman logging configuration would never get logged :(",
+      "parentUuid": "AAAAUH/9bPI\u003d",
+      "revId": "256e6ecbf23195b80350fb8ef8dfc148957b7d39",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX//hE8\u003d",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-02-12T16:42:03Z",
+      "side": 1,
+      "message": "Dropped Gearman server start, if I get setup_loggin(\u0027zuul\u0027) called before the gearman start, Gearman logging configuration is not loaded at all.",
+      "revId": "256e6ecbf23195b80350fb8ef8dfc148957b7d39",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUH/9bPY\u003d",
         "filename": "zuul/cmd/server.py",
         "patchSetId": 1
@@ -47,6 +100,24 @@
       "writtenOn": "2014-02-07T00:15:32Z",
       "side": 1,
       "message": "...and here?",
+      "revId": "256e6ecbf23195b80350fb8ef8dfc148957b7d39",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX//hMQ\u003d",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-02-12T16:42:03Z",
+      "side": 1,
+      "message": "The log setup is server.main() already, so I dont think we need logging there.",
+      "parentUuid": "AAAAUH/9bPY\u003d",
       "revId": "256e6ecbf23195b80350fb8ef8dfc148957b7d39",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
