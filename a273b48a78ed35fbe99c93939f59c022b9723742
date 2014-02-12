@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAUX//qX4\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-02-12T01:32:48Z",
+      "side": 1,
+      "message": "It might be colocated.  I\u0027ll write up both.",
+      "parentUuid": "AAAAUX//vYk\u003d",
+      "revId": "a273b48a78ed35fbe99c93939f59c022b9723742",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUX//vXc\u003d",
         "filename": "tests/test_scheduler.py",
         "patchSetId": 4
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAUX//qk0\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1007,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-02-12T01:32:48Z",
+      "side": 1,
+      "message": "Yes, but this isn\u0027t exactly performance critical.",
+      "parentUuid": "AAAAUX//vXc\u003d",
+      "revId": "a273b48a78ed35fbe99c93939f59c022b9723742",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUX//vOM\u003d",
         "filename": "zuul/merger/client.py",
         "patchSetId": 4
@@ -47,6 +83,24 @@
       "writtenOn": "2014-02-11T05:51:42Z",
       "side": 1,
       "message": "Might be worth commenting that this is only for the test suite\u0027s benefit",
+      "revId": "a273b48a78ed35fbe99c93939f59c022b9723742",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX//qjU\u003d",
+        "filename": "zuul/merger/client.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-02-12T01:32:48Z",
+      "side": 1,
+      "message": "self.build_sets?  It\u0027s used in onBuildCompleted to push the results back into the scheduler.",
+      "parentUuid": "AAAAUX//vOM\u003d",
       "revId": "a273b48a78ed35fbe99c93939f59c022b9723742",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -87,6 +141,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAUX//qV0\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-02-12T01:32:48Z",
+      "side": 1,
+      "message": "I think there\u0027s a not-fully-formed idea that the merger might have an API and we\u0027re just using a client-server implementation.  At any rate, I like the idea that the scheduler doesn\u0027t have to care about how it\u0027s implemented.  Probably the model-\u003ejson translation should actually happen inside the merge client to complete this idea.  We can change that later.",
+      "parentUuid": "AAAAUX//vJ4\u003d",
+      "revId": "a273b48a78ed35fbe99c93939f59c022b9723742",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUX//vL8\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 4
@@ -98,6 +170,24 @@
       "writtenOn": "2014-02-11T05:51:42Z",
       "side": 1,
       "message": "This logic is difficult to read. Consider:\n\n  if not ready or not ready_ahead:\n\nWhich since the only action is set ready_ahead \u003d False this can be changed to:\n\n  if not read:\n    ready_ahead \u003d False\n\nor\n\n  ready_ahead \u003d False if not ready else ready_ahead",
+      "revId": "a273b48a78ed35fbe99c93939f59c022b9723742",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX//qio\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1233,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-02-12T01:32:48Z",
+      "side": 1,
+      "message": "Er, yeah, that middle one is the easiest, I think.",
+      "parentUuid": "AAAAUX//vL8\u003d",
       "revId": "a273b48a78ed35fbe99c93939f59c022b9723742",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -132,6 +222,24 @@
       "writtenOn": "2014-02-11T05:51:42Z",
       "side": 1,
       "message": "Should the upstream git repository be set in zuul.conf? (ie git.openstack.org)",
+      "revId": "a273b48a78ed35fbe99c93939f59c022b9723742",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX//qgc\u003d",
+        "filename": "zuul/trigger/timer.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-02-12T01:32:48Z",
+      "side": 1,
+      "message": "I\u0027m not sure of the best solution.  It may need to wait until there\u0027s a real use case.  But yes, one option would be to configure the remote repo location in a [timer] section of zuul.conf.\n\nAt any rate, this isn\u0027t a change, just a code-move, basically.",
+      "parentUuid": "AAAAUX//vIU\u003d",
       "revId": "a273b48a78ed35fbe99c93939f59c022b9723742",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
