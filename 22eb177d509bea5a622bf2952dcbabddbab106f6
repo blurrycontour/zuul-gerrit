@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUX//es8\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-12T21:55:51Z",
+      "side": 1,
+      "message": "If possible, I\u0027d still like this variable renamed. Perhaps \u0027merger_public_url\u0027 or \u0027merger_remote_url\u0027?",
+      "revId": "22eb177d509bea5a622bf2952dcbabddbab106f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
