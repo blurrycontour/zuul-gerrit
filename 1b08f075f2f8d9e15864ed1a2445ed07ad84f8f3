@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAUX//ab8\u003d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-13T11:48:26Z",
+      "side": 1,
+      "message": "Yep, noted.",
+      "parentUuid": "AAAAUH/9Uwk\u003d",
+      "revId": "1b08f075f2f8d9e15864ed1a2445ed07ad84f8f3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUH/9Uxc\u003d",
         "filename": "zuul/launcher/gearman.py",
         "patchSetId": 7
@@ -30,6 +48,24 @@
       "writtenOn": "2014-02-07T18:41:16Z",
       "side": 1,
       "message": "This might be bikeshedding, but does \"_EXTRA\" actually get us anything?  It seems like SWIFT makes this enough of a namespace not to collide with other potentially similar variables.",
+      "revId": "1b08f075f2f8d9e15864ed1a2445ed07ad84f8f3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX//ab0\u003d",
+        "filename": "zuul/launcher/gearman.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-13T11:48:26Z",
+      "side": 1,
+      "message": "Agreed. Done.",
+      "parentUuid": "AAAAUH/9Uxc\u003d",
       "revId": "1b08f075f2f8d9e15864ed1a2445ed07ad84f8f3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAUX//abs\u003d",
+        "filename": "zuul/launcher/gearman.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 283,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-13T11:48:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAUH/9UyM\u003d",
+      "revId": "1b08f075f2f8d9e15864ed1a2445ed07ad84f8f3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUH/9U6U\u003d",
         "filename": "zuul/lib/swift.py",
         "patchSetId": 7
@@ -64,6 +118,24 @@
       "writtenOn": "2014-02-07T18:41:16Z",
       "side": 1,
       "message": "I can\u0027t find sufficient documentation for get_auth; http://docs.openstack.org/developer/python-swiftclient/swiftclient.html#swiftclient.client.Connection.get_auth isn\u0027t that helpful...\n\nBut what I was wondering is what is \"storage_url\"?  Is it really something that we need to get each time we want to generate a sig and start a job?  Could we instead get this and store it at initialization/connection time and keep it around?  The advantage of the HMAC method is that you don\u0027t have to communicate out of bound for each request, so I think it would be good to avoid that.\n\nChatted with notmyname, he says the part of storage_url used in the HMAC is not going to change, so it\u0027s safe to store it at startup.",
+      "revId": "1b08f075f2f8d9e15864ed1a2445ed07ad84f8f3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX//aaY\u003d",
+        "filename": "zuul/lib/swift.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-13T11:48:26Z",
+      "side": 1,
+      "message": "I\u0027m not sure if we can move it. The helper class (ie swift.client.Connection) will reconnect if it has lost connection. I don\u0027t know enough about the tokens to know if it will be different and if we need a valid one to generate a valid hmac?\n\nThe storage_url returns the actual swift destination such as \"http://swift.cloud.example.org/V1/AUTH_user\" where AUTH_user can be a long UUID. I can\u0027t remember where I read this now but I can try and find it again if you need.",
+      "parentUuid": "AAAAUH/9U6U\u003d",
       "revId": "1b08f075f2f8d9e15864ed1a2445ed07ad84f8f3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
