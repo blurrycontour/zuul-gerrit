@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUX//UC0\u003d",
+        "filename": "etc/zuul.conf-sample",
+        "patchSetId": 5
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-14T02:08:47Z",
+      "side": 1,
+      "message": "why not:\n  use_http\u003dtrue\nby default?\n\nThis needs documenting",
+      "revId": "72156b0630661e98e10c7004ea2ee6cf017b3374",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX//UCg\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-14T02:08:47Z",
+      "side": 1,
+      "message": "Thinking about it, would it make more sense to say \u0027use_ssh\u0027?",
+      "revId": "72156b0630661e98e10c7004ea2ee6cf017b3374",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX//UB4\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-14T02:08:47Z",
+      "side": 1,
+      "message": "for consistency why not call this _getInfoRefsSSH?",
+      "revId": "72156b0630661e98e10c7004ea2ee6cf017b3374",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX//UBg\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-14T02:08:47Z",
+      "side": 1,
+      "message": "This could be pulled out into the old method name (_getInfoRefs)",
+      "revId": "72156b0630661e98e10c7004ea2ee6cf017b3374",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
