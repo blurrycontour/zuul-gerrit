@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUX//PeA\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 875,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-02-14T15:48:15Z",
+      "side": 1,
+      "message": "Used that while writing the test, found it useful so I have left it around.  Maybe it should be made in another change?",
+      "revId": "9e0f7f2a59983a83b65a49149d228c86698ec844",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX//Pd4\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1121,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-02-14T15:48:15Z",
+      "side": 1,
+      "message": "Used that while writing the test, found it useful so I have left it around.  Maybe it should be made in another change?",
+      "revId": "9e0f7f2a59983a83b65a49149d228c86698ec844",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX//Pfs\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 731,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-02-14T15:48:15Z",
+      "side": 1,
+      "message": "The change being passed there does not match the change in the queue....",
+      "revId": "9e0f7f2a59983a83b65a49149d228c86698ec844",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX//Peo\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1056,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-02-14T15:48:15Z",
+      "side": 1,
+      "message": "... since the change passed and the one in queue are not equals, the existing test:\n\n item.change \u003d\u003d change\n\nWas always false and the builds are not cancelled.  Using the item.change.equals(changes) let us compare the changes properly.\n\n\nThe debug line above is merely for reviewers to have traces in the Jenkins logs.  Ie we have:\n\nChange get abandoned (id ends with 50)\n\n Processing trigger event \u003cTriggerEvent change-abandoned org/project master 1,None\u003e\n Change \u003cChange 0x7f81f80f3b50 1,1\u003e abandoned, removing.\n\nBut the queued one is different (id ends with d0), that is the one we want to remove:\n\n Does queue item \u003cChange 0x7f81f80f3ad0 1,1\u003e match \u003cChange 0x7f81f80f3b50 1,1\u003e?\n\nAnd indeed we do remove the matching change in the queue:\n\n Canceling builds behind change: \u003cChange 0x7f81f80f3ad0 1,1\u003e because it is being removed.\n Cancel jobs for change \u003cChange 0x7f81f80f3ad0 1,1\u003e",
+      "revId": "9e0f7f2a59983a83b65a49149d228c86698ec844",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
