@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUX//LB8\u003d",
+        "filename": "doc/source/gating.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-15T06:20:20Z",
+      "side": 1,
+      "message": "are can be?\n\nPerhaps: \"Such dependencies can be defined in Zuul\u0027s configuration ...\"",
+      "revId": "8db67b823540d076390601950e8fc9fab050cd1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX//LBw\u003d",
+        "filename": "doc/source/gating.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-15T06:20:20Z",
+      "side": 1,
+      "message": "in a DependentPipeline..\n\nWhenever a change /enters/",
+      "revId": "8db67b823540d076390601950e8fc9fab050cd1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX//LBk\u003d",
+        "filename": "doc/source/gating.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-15T06:20:20Z",
+      "side": 1,
+      "message": "create references",
+      "revId": "8db67b823540d076390601950e8fc9fab050cd1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX//LBc\u003d",
+        "filename": "doc/source/gating.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-15T06:20:20Z",
+      "side": 1,
+      "message": "Perhaps: \"for the changes ahead in the queue.\"",
+      "revId": "8db67b823540d076390601950e8fc9fab050cd1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX//LBQ\u003d",
+        "filename": "doc/source/gating.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-15T06:20:20Z",
+      "side": 1,
+      "message": "s/projects/project",
+      "revId": "8db67b823540d076390601950e8fc9fab050cd1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX//LBM\u003d",
+        "filename": "doc/source/gating.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-15T06:20:20Z",
+      "side": 1,
+      "message": "perhaps: \"with the associated references:\"",
+      "revId": "8db67b823540d076390601950e8fc9fab050cd1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX//LAA\u003d",
+        "filename": "doc/source/gating.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-15T06:20:20Z",
+      "side": 1,
+      "message": "In order to test change 3, you would clone both repositories and simply fetch the Z3 reference for each combination of project/branch you are interested in testing. For example, you could fetch  ``acme`` with master/Z3 and ``plugin`` with master/Z3 and thus have ``acme`` with change 1 applied as the expected state for when Change 3 would merge. When your job fetches several repositories without changes ahead in the queue, they may not have a Z reference in which case you can just check out the branch.",
+      "revId": "8db67b823540d076390601950e8fc9fab050cd1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
