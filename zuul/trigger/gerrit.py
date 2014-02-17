@@ -15,7 +15,9 @@
 import logging
 import threading
 import time
-import urllib2
+
+from six.moves.urllib import request as urlrequest
+
 from zuul.lib import gerrit
 from zuul.model import TriggerEvent, Change
 
@@ -142,7 +144,7 @@ class Gerrit(object):
         url = "%s/p/%s/info/refs?service=git-upload-pack" % (
             self.baseurl, project)
         try:
-            data = urllib2.urlopen(url).read()
+            data = urlrequest.urlopen(url).read()
         except:
             self.log.error("Cannot get references from %s" % url)
             raise  # keeps urllib2 error informations

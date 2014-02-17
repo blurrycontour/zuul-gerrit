@@ -32,13 +32,12 @@ import string
 import subprocess
 import threading
 import time
-import urllib
-import urllib2
 import urlparse
 
 import git
 import gear
 import fixtures
+from six.moves.urllib import request as urlrequest
 import statsd
 import testtools
 
@@ -808,7 +807,7 @@ class TestScheduler(testtools.TestCase):
             args = [self.fake_gerrit] + list(args)
             return FakeURLOpener(self.upstream_root, *args, **kw)
 
-        urllib2.urlopen = URLOpenerFactory
+        urlrequest.urlopen = URLOpenerFactory
         self.launcher = zuul.launcher.gearman.Gearman(self.config, self.sched)
 
         self.smtp_messages = []
@@ -2870,7 +2869,7 @@ class TestScheduler(testtools.TestCase):
 
         port = self.webapp.server.socket.getsockname()[1]
 
-        f = urllib.urlopen("http://localhost:%s/status.json" % port)
+        f = urlrequest.urlopen("http://localhost:%s/status.json" % port)
         data = f.read()
 
         self.worker.hold_jobs_in_build = False
@@ -3081,7 +3080,7 @@ class TestScheduler(testtools.TestCase):
         self.waitUntilSettled()
         port = self.webapp.server.socket.getsockname()[1]
 
-        f = urllib.urlopen("http://localhost:%s/status.json" % port)
+        f = urlrequest.urlopen("http://localhost:%s/status.json" % port)
         data = f.read()
 
         self.worker.hold_jobs_in_build = False

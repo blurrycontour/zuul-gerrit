@@ -16,9 +16,10 @@
 # Print commands to leave gerrit comments for every change in one of
 # Zuul's pipelines.
 
-import urllib2
 import json
 import argparse
+
+from six.moves.urllib import request as urlrequest
 
 parser = argparse.ArgumentParser()
 parser.add_argument('url', help='The URL of the running Zuul instance')
@@ -28,7 +29,7 @@ parser.add_argument('--review-host', default='review',
                     help='The Gerrit hostname')
 options = parser.parse_args()
 
-data = urllib2.urlopen('%s/status.json' % options.url).read()
+data = urlrequest.urlopen('%s/status.json' % options.url).read()
 data = json.loads(data)
 
 for pipeline in data['pipelines']:
