@@ -16,6 +16,24 @@
       "revId": "c77bf08658a88c88facb1060c3e8ab67b045aca6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX/++ew\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2832,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-02-17T21:33:29Z",
+      "side": 1,
+      "message": "Actually, it doesn\u0027t run; it is LOST because it is never registered by the test runner.  But we can make it run.",
+      "parentUuid": "AAAAUX/++xA\u003d",
+      "revId": "c77bf08658a88c88facb1060c3e8ab67b045aca6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
