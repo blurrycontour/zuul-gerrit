@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUX/+/C8\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-02-17T20:02:17Z",
+      "side": 1,
+      "message": "This isn\u0027t used by all commands, just the merger workers.",
+      "revId": "4c9f613d42b121c028ef298a4db135d55d58dfc9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX/+/DI\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-02-17T20:02:17Z",
+      "side": 1,
+      "message": "See above.",
+      "revId": "4c9f613d42b121c028ef298a4db135d55d58dfc9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
