@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAUX/++wY\u003d",
+        "filename": "zuul/cmd/merger.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2014-02-17T20:59:42Z",
+      "side": 1,
+      "message": "While I agree, it\u0027s in this order already in other similar config readers throughout zuul, so we\u0027d want to keep it consistent and switch it in all of them if so.",
+      "parentUuid": "AAAAUX/++34\u003d",
+      "revId": "4076e2b432992b71873b659649e35f0e665ab3ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUX/++2o\u003d",
         "filename": "zuul/merger/server.py",
         "patchSetId": 7
