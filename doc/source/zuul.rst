@@ -143,6 +143,14 @@ merger
   "http://zuul.example.com/p" or "http://zuul-merger01.example.com/p"
   depending on whether the merger is co-located with the Zuul server.
 
+**log_config**
+  Path to log config file.  Used by all Zuul commands.
+  ``log_config=/etc/zuul/logging.yaml``
+
+**pidfile**
+  Path to PID lock file.  Used by all Zuul commands.
+  ``pidfile=/var/run/zuul-merger/merger.pid``
+
 smtp
 """"
 
