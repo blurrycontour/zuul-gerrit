@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUX/++34\u003d",
+        "filename": "zuul/cmd/merger.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-02-17T20:53:53Z",
+      "side": 1,
+      "message": "Might wants ~/zuul.conf to be used instead of the one in /etc if that exists. Switching the order of these file names would accomplish that.",
+      "revId": "4076e2b432992b71873b659649e35f0e665ab3ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX/++2o\u003d",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-02-17T20:53:53Z",
+      "side": 1,
+      "message": "Is there a race between registering functions and trying to getJob in run()? does that matter in a meaningful way with gear?",
+      "revId": "4076e2b432992b71873b659649e35f0e665ab3ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
