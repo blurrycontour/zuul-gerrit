@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAUX/+2/M\u003d",
+        "filename": "doc/source/gating.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-02-18T15:31:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAUX//LB8\u003d",
+      "revId": "8db67b823540d076390601950e8fc9fab050cd1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUX//LBw\u003d",
         "filename": "doc/source/gating.rst",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2014-02-15T06:20:20Z",
       "side": 1,
       "message": "in a DependentPipeline..\n\nWhenever a change /enters/",
+      "revId": "8db67b823540d076390601950e8fc9fab050cd1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX/+2+U\u003d",
+        "filename": "doc/source/gating.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-02-18T15:31:31Z",
+      "side": 1,
+      "message": "Done boths.",
+      "parentUuid": "AAAAUX//LBw\u003d",
       "revId": "8db67b823540d076390601950e8fc9fab050cd1e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAUX/+290\u003d",
+        "filename": "doc/source/gating.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-02-18T15:31:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAUX//LBk\u003d",
+      "revId": "8db67b823540d076390601950e8fc9fab050cd1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUX//LBc\u003d",
         "filename": "doc/source/gating.rst",
         "patchSetId": 4
@@ -64,6 +118,24 @@
       "writtenOn": "2014-02-15T06:20:20Z",
       "side": 1,
       "message": "Perhaps: \"for the changes ahead in the queue.\"",
+      "revId": "8db67b823540d076390601950e8fc9fab050cd1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX/+26M\u003d",
+        "filename": "doc/source/gating.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-02-18T15:31:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAUX//LBc\u003d",
       "revId": "8db67b823540d076390601950e8fc9fab050cd1e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAUX/+28E\u003d",
+        "filename": "doc/source/gating.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-02-18T15:31:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAUX//LBQ\u003d",
+      "revId": "8db67b823540d076390601950e8fc9fab050cd1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUX//LBM\u003d",
         "filename": "doc/source/gating.rst",
         "patchSetId": 4
@@ -104,6 +194,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAUX/+274\u003d",
+        "filename": "doc/source/gating.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-02-18T15:31:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAUX//LBM\u003d",
+      "revId": "8db67b823540d076390601950e8fc9fab050cd1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUX//LAA\u003d",
         "filename": "doc/source/gating.rst",
         "patchSetId": 4
@@ -115,6 +223,24 @@
       "writtenOn": "2014-02-15T06:20:20Z",
       "side": 1,
       "message": "In order to test change 3, you would clone both repositories and simply fetch the Z3 reference for each combination of project/branch you are interested in testing. For example, you could fetch  ``acme`` with master/Z3 and ``plugin`` with master/Z3 and thus have ``acme`` with change 1 applied as the expected state for when Change 3 would merge. When your job fetches several repositories without changes ahead in the queue, they may not have a Z reference in which case you can just check out the branch.",
+      "revId": "8db67b823540d076390601950e8fc9fab050cd1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX/+27I\u003d",
+        "filename": "doc/source/gating.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-02-18T15:31:31Z",
+      "side": 1,
+      "message": "Awesome, copy pasted :-]",
+      "parentUuid": "AAAAUX//LAA\u003d",
       "revId": "8db67b823540d076390601950e8fc9fab050cd1e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
