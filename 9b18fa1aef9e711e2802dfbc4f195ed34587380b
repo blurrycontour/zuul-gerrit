@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUX/+hec\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3607,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-02-20T18:37:03Z",
+      "side": 1,
+      "message": "This test should continue and actually encounter a merge failure and determine it does the right thing.  A second test, or further continuation of this test should run a real failure through the pipeline as well and make sure it dtrt.",
+      "revId": "9b18fa1aef9e711e2802dfbc4f195ed34587380b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX/+hcQ\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-02-20T18:37:03Z",
+      "side": 1,
+      "message": "Not Job; something to do with a Change.  Like \u0027didChangeMergeConflict\u0027 or whatever along those lines works for you.  This is additionally tricky because \u0027merge\u0027 in Zuul could mean \"gerrit merged this change\" which is different than \"git is able to merge or rebase this patchset\".\n\nOh, how about \"didMergerSucceed\" ?",
+      "revId": "9b18fa1aef9e711e2802dfbc4f195ed34587380b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX/+hSI\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1312,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-02-20T18:37:03Z",
+      "side": 1,
+      "message": "This sets the result for the item as a whole.  It\u0027s basically only used in the set description method (that updates the jenkins job info page).  This is fine (or you could ignore this case and leave as-is), but important to keep in mind below.\n\nIt is the first two-word result of any kind, which means we need to decide if we want spaces or underscores (for easier machine parsing).  :)",
+      "revId": "9b18fa1aef9e711e2802dfbc4f195ed34587380b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX/+hPY\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1344,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-02-20T18:37:03Z",
+      "side": 1,
+      "message": "When an item is set as unable to merge, it gets a message:\n\n            msg \u003d (\"This change was unable to be automatically merged \"\n                   \"with the current state of the repository. Please \"\n                   \"rebase your change and upload a new patchset.\")\n\nI think your change needs to take that into account somehow (possibly by replacing it; I haven\u0027t thought through all the implications).",
+      "revId": "9b18fa1aef9e711e2802dfbc4f195ed34587380b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX/+hRM\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1363,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-02-20T18:37:03Z",
+      "side": 1,
+      "message": "This is checking the result of builds themselves which are generally set to SKIPPED when a change can\u0027t merge.  See setUnableToMerge.  This is not checking the result of the item overall which was set above.",
+      "revId": "9b18fa1aef9e711e2802dfbc4f195ed34587380b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
