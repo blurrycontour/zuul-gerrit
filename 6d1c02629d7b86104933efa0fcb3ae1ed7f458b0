@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUX/+hto\u003d",
+        "filename": "etc/zuul.conf-sample",
+        "patchSetId": 11
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-02-20T17:56:57Z",
+      "side": 1,
+      "message": "I think this is \u0027default_container\u0027 now.",
+      "revId": "6d1c02629d7b86104933efa0fcb3ae1ed7f458b0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX/+h18\u003d",
+        "filename": "zuul/lib/swift.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-02-20T17:56:57Z",
+      "side": 1,
+      "message": "I\u0027m sticking with the idea that there should be no swift interaction here, only at startup.  See comment in patchset 7.",
+      "revId": "6d1c02629d7b86104933efa0fcb3ae1ed7f458b0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX/+hnE\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 588,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-02-20T17:56:57Z",
+      "side": 1,
+      "message": "I liked this better in the launcher; this file shouldn\u0027t really do much other than manage internal data structures -- rather, the launcher should act on and update the information managed by these classes.",
+      "revId": "6d1c02629d7b86104933efa0fcb3ae1ed7f458b0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX/+hlw\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 597,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-02-20T17:56:57Z",
+      "side": 1,
+      "message": "It looks like dictionaries at Job.swift[i] are being updated with information about an Item.  We should keep Jobs as abstract representations of things to run without any details of specific items or builds, etc., because they are referenced by multiple items in multiple pipelines, etc.",
+      "revId": "6d1c02629d7b86104933efa0fcb3ae1ed7f458b0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
