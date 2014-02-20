@@ -139,6 +139,24 @@
       "revId": "1b08f075f2f8d9e15864ed1a2445ed07ad84f8f3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX/+h30\u003d",
+        "filename": "zuul/lib/swift.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-02-20T17:28:03Z",
+      "side": 1,
+      "message": "We don\u0027t use the auth_token, only the storage_url, and as notmyname says, the part of the storage_url used in the HMAC isn\u0027t going to change so we should be good to move this.\n\nMoreover, the point of an HMAC system is that you share a secret before hand, and use that secret to validate untrusted input later with no further interaction.  It would defeat the point if we had to maintain a connection and exchange information with swift for each use.  So if this doesn\u0027t work, we should deal with that.\n\nAs a further aside, theoretically, zuul shouldn\u0027t have to talk to swift at all, however, having it supply the shared secret to swift on startup and otherwise fetching information like the long boring storage_url is very convenient for the operator, so I think we should do that.",
+      "parentUuid": "AAAAUX//aaY\u003d",
+      "revId": "1b08f075f2f8d9e15864ed1a2445ed07ad84f8f3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
