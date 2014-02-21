@@ -657,6 +657,10 @@ class QueueItem(object):
             ret['url'] = changeish.url
         else:
             ret['url'] = None
+        if hasattr(changeish, 'subject') and changeish.subject is not None:
+            ret['subject'] = changeish.subject
+        else:
+            ret['subject'] = None
         ret['id'] = changeish._id()
         if self.item_ahead:
             ret['item_ahead'] = self.item_ahead.change._id()
@@ -790,6 +794,7 @@ class Change(Changeish):
         self.url = None
         self.patchset = None
         self.refspec = None
+        self.subject = None
 
         self.files = []
         self.needs_change = None

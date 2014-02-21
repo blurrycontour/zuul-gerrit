@@ -324,6 +324,7 @@ class Gerrit(object):
         change.project = self.sched.getProject(data['project'])
         change.branch = data['branch']
         change.url = data['url']
+        change.summary = data.get('summary')
         max_ps = 0
         change.files = []
         for ps in data['patchSets']:
