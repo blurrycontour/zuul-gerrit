@@ -1275,7 +1275,7 @@ class BasePipelineManager(object):
                 changed = True
                 status = ''
                 for item in queue.queue:
-                    status += self.pipeline.formatStatus(item)
+                    status += item.formatStatus()
                 if status:
                     self.log.debug("Queue %s status is now:\n %s" %
                                    (queue.name, status))
@@ -1304,7 +1304,7 @@ class BasePipelineManager(object):
 
         self.pipeline.setResult(item, build)
         self.log.debug("Item %s status is now:\n %s" %
-                       (item, self.pipeline.formatStatus(item)))
+                       (item, item.formatStatus()))
         self.updateBuildDescriptions(build.build_set)
         return True
 
