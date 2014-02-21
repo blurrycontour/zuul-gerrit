@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUX/+dnI\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-02-21T01:23:42Z",
+      "side": 1,
+      "message": "This should probably be an option for the mergers? (documented above)",
+      "revId": "f4f2890cd48ead511505fe5100d7dc85f1cf691d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
