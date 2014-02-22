@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUX/+Sec\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-22T07:35:31Z",
+      "side": 1,
+      "message": "should this be change.subject? and perhaps only getting the first line of the summary?",
+      "revId": "39986b331f652d5944428762f864e2292e74754b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
