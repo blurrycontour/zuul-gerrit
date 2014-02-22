@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUX/+Sfg\u003d",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-22T07:31:32Z",
+      "side": 1,
+      "message": "typo here",
+      "revId": "efd15ff5e82d0a60a00e0349bb7d682502644140",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
