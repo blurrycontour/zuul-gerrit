@@ -16,6 +16,24 @@
       "revId": "39986b331f652d5944428762f864e2292e74754b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAU3///jA\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 1297
+      },
+      "writtenOn": "2014-02-22T20:09:50Z",
+      "side": 1,
+      "message": "Ah, probably right, my fault, first line seems like a decision that should be left to people consuming this data, not being a decision made in this code. Not everyone just wants the first line ;)",
+      "parentUuid": "AAAAUX/+Sec\u003d",
+      "revId": "39986b331f652d5944428762f864e2292e74754b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
