@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAUX/+SiE\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-22T07:15:12Z",
+      "side": 1,
+      "message": "I\u0027m not sure this is a legacy method. We should also note that the default is True",
+      "revId": "4f1a6abfd002d04dbc002a21cde4b1cf1bc9ee5d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX/+SiI\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-22T07:15:12Z",
+      "side": 1,
+      "message": "I would would prefer that you place the above IF into the old _getInfoRefs. eg:\n\n  def _getInfoRefs(self, project):\n      if self.use_http:\n          refs \u003d self._getInfoRefsHttp(project)\n      else:\n          refs \u003d self._getInfoRefsSsh(project)",
+      "revId": "4f1a6abfd002d04dbc002a21cde4b1cf1bc9ee5d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
