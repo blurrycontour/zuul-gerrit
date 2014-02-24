@@ -157,6 +157,24 @@
       "revId": "1b08f075f2f8d9e15864ed1a2445ed07ad84f8f3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAU3//6J8\u003d",
+        "filename": "zuul/lib/swift.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-24T05:43:09Z",
+      "side": 1,
+      "message": "Yep, I see what you mean now. Yes, we could get rid of it, but I also agree that this is very convenient for the operator so I\u0027ll move it into the connect method.",
+      "parentUuid": "AAAAUX/+h30\u003d",
+      "revId": "1b08f075f2f8d9e15864ed1a2445ed07ad84f8f3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
