@@ -34,6 +34,24 @@
       "revId": "39986b331f652d5944428762f864e2292e74754b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAU3//xBI\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-02-24T21:56:24Z",
+      "side": 1,
+      "message": "I think we only have usecases for the first line (first line \u003d\u003d subject) at this point (czuul and zuul status both just want to display that afaict).  Considering the volume of data we\u0027re starting to transfer (and the frequency), I think we might want to try to limit it to just the subject for now, so I think I agree with Joshua.\n\nBut at any rate, model.py has \u0027subject\u0027 already, so I think all this file needs is s/summary/subject/.",
+      "parentUuid": "AAAAU3///jA\u003d",
+      "revId": "39986b331f652d5944428762f864e2292e74754b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
