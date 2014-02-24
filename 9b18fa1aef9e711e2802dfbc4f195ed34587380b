@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAU3//7HM\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3607,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-24T02:41:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAUX/+hec\u003d",
+      "revId": "9b18fa1aef9e711e2802dfbc4f195ed34587380b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUX/+hcQ\u003d",
         "filename": "zuul/model.py",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2014-02-20T18:37:03Z",
       "side": 1,
       "message": "Not Job; something to do with a Change.  Like \u0027didChangeMergeConflict\u0027 or whatever along those lines works for you.  This is additionally tricky because \u0027merge\u0027 in Zuul could mean \"gerrit merged this change\" which is different than \"git is able to merge or rebase this patchset\".\n\nOh, how about \"didMergerSucceed\" ?",
+      "revId": "9b18fa1aef9e711e2802dfbc4f195ed34587380b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX/+dR0\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-24T02:41:05Z",
+      "side": 1,
+      "message": "I like didMergerSucceed :-)",
+      "parentUuid": "AAAAUX/+hcQ\u003d",
       "revId": "9b18fa1aef9e711e2802dfbc4f195ed34587380b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAUX/+dRE\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1312,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-24T02:41:05Z",
+      "side": 1,
+      "message": "I guess I didn\u0027t understand where this was used. If it is for machine parsing then I\u0027m going to change it to \"MERGER_FAILURE\" as a suggestion.",
+      "parentUuid": "AAAAUX/+hSI\u003d",
+      "revId": "9b18fa1aef9e711e2802dfbc4f195ed34587380b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUX/+hPY\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 2
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAUX/+dMo\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1344,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-24T02:41:05Z",
+      "side": 1,
+      "message": "The onMergeCompleted method sets item.current_build_set.unable_to_merge_message which is as you quoted and therefore returned in the result.",
+      "parentUuid": "AAAAUX/+hPY\u003d",
+      "revId": "9b18fa1aef9e711e2802dfbc4f195ed34587380b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUX/+hRM\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 2
@@ -81,6 +153,24 @@
       "writtenOn": "2014-02-20T18:37:03Z",
       "side": 1,
       "message": "This is checking the result of builds themselves which are generally set to SKIPPED when a change can\u0027t merge.  See setUnableToMerge.  This is not checking the result of the item overall which was set above.",
+      "revId": "9b18fa1aef9e711e2802dfbc4f195ed34587380b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAUX/+dMk\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1363,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-24T02:41:05Z",
+      "side": 1,
+      "message": "Yeah, these aren\u0027t needed so I\u0027ve removed them. If the change doesn\u0027t merge the jobs won\u0027t even run so they don\u0027t need a merge failure state.",
+      "parentUuid": "AAAAUX/+hRM\u003d",
       "revId": "9b18fa1aef9e711e2802dfbc4f195ed34587380b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
