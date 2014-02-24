@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAU3//w9A\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 756,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-02-24T22:04:34Z",
+      "side": 1,
+      "message": "So actually, you shouldn\u0027t need a fake merger, because you can just construct some changes that conflict.  There should be examples of that in this file.  Search for \u0027conflict\u0027.",
+      "revId": "fe36fad79b0a7a781b3b02a342f0f4980bab056f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAU3//w70\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1397,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-02-24T22:04:34Z",
+      "side": 1,
+      "message": "I think what I was getting at in the comment in the other patchset is that it seems like we would now have two places where what the user would percieve as the failure message is constructed.  The \"Merge failed.\" part which is user configurable, and the \"Please rebase your patchset...\" part which is not.  My thought is that perhaps we could completely replace the hardcoded \"Please rebase\" bit with this new functionality, and just have it default to the current message.  Would that work?",
+      "revId": "fe36fad79b0a7a781b3b02a342f0f4980bab056f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
