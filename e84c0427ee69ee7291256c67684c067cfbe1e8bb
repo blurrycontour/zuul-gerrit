@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAU3//6iY\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 652,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-24T05:22:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAUX/+hAM\u003d",
+      "revId": "e84c0427ee69ee7291256c67684c067cfbe1e8bb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUX/+hAg\u003d",
         "filename": "zuul/model.py",
         "patchSetId": 8
@@ -30,6 +48,24 @@
       "writtenOn": "2014-02-20T19:13:21Z",
       "side": 1,
       "message": "Should the worker be a new dictionary?  Most of the rest of the json matches the internal object structure pretty closely.\n\n  job[x][\u0027worker\u0027][\u0027name\u0027]",
+      "revId": "e84c0427ee69ee7291256c67684c067cfbe1e8bb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAU3//6ig\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 711,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-24T05:22:24Z",
+      "side": 1,
+      "message": "Yep, that makes sense to me.",
+      "parentUuid": "AAAAUX/+hAg\u003d",
       "revId": "e84c0427ee69ee7291256c67684c067cfbe1e8bb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
