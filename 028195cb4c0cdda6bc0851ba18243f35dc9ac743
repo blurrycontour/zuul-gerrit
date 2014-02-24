@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAU3//xGI\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-02-24T21:49:40Z",
+      "side": 1,
+      "message": "can drop logging now",
+      "revId": "028195cb4c0cdda6bc0851ba18243f35dc9ac743",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAU3//xFw\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 521,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-02-24T21:49:40Z",
+      "side": 1,
+      "message": "can drop logging",
+      "revId": "028195cb4c0cdda6bc0851ba18243f35dc9ac743",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
