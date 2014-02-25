@@ -367,13 +367,17 @@ class Gerrit(object):
         return change
 
     def getGitUrl(self, project):
-        server = self.config.get('gerrit', 'server')
-        user = self.config.get('gerrit', 'user')
-        if self.config.has_option('gerrit', 'port'):
-            port = int(self.config.get('gerrit', 'port'))
+        if self.config.has_option('gerrit', 'fetch_url'):
+            fetch_url = self.config.get('gerrit', 'fetch_url')
+            url = fetch_url + project.name
         else:
-            port = 29418
-        url = 'ssh://%s@%s:%s/%s' % (user, server, port, project.name)
+            server = self.config.get('gerrit', 'server')
+            user = self.config.get('gerrit', 'user')
+            if self.config.has_option('gerrit', 'port'):
+                port = int(self.config.get('gerrit', 'port'))
+            else:
+                port = 29418
+            url = 'ssh://%s@%s:%s/%s' % (user, server, port, project.name)
         return url
 
     def getGitwebUrl(self, project, sha=None):
