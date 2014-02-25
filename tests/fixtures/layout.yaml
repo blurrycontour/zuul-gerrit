@@ -142,6 +142,7 @@ projects:
       - project-test1
 
   - name: org/project1
+    queue-name: integration
     check:
       - project1-merge:
         - project1-test1

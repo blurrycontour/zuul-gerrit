@@ -664,6 +664,19 @@ projects.  Here is an example::
 **name**
   The name of the project (as known by Gerrit).
 
+**queue-name (optional)**
+  Zuul will automatically combine projects that share a job into
+  shared change queues for dependent pipeline managers.  In order to
+  report statistics about these queues, it is convenient for them to
+  have names.  Normally Zuul automatically names change queues
+  according to the projects they contain.  However, these are too long
+  for graphite, and can also change over time as projects are added and
+  removed.  If you assign a queue-name to a project, Zuul will use
+  that as the name for the shared change queue instead of the
+  automatically generated one.  It is an error for a shared change
+  queue to have more than one project with a queue-name if they are
+  not the same.
+
 **merge-mode (optional)**
   An optional value that indicates what strategy should be used to
   merge changes to this project.  Supported values are:

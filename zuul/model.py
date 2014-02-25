@@ -403,6 +403,8 @@ class ChangeQueue(object):
                  window_decrease_type='exponential', window_decrease_factor=2):
         self.pipeline = pipeline
         self.name = ''
+        self.assigned_name = None
+        self.generated_name = None
         self.projects = []
         self._jobs = set()
         self.queue = []
@@ -425,7 +427,10 @@ class ChangeQueue(object):
             self.projects.append(project)
             names = [x.name for x in self.projects]
             names.sort()
-            self.name = ', '.join(names)
+            self.generated_name = ', '.join(names)
+            if self.assigned_name is None and project.queue_name is not None:
+                self.assigned_name = project.queue_name
+            self.name = self.assigned_name or self.generated_name
             self._jobs |= set(self.pipeline.getJobTree(project).getJobs())
 
     def enqueueChange(self, change):
@@ -508,6 +513,7 @@ class Project(object):
     def __init__(self, name):
         self.name = name
         self.merge_mode = MERGER_MERGE_RESOLVE
+        self.queue_name = None
 
     def __str__(self):
         return self.name
