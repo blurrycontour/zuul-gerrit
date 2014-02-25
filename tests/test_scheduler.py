@@ -417,7 +417,11 @@ class FakeGerritTrigger(zuul.trigger.gerrit.Gerrit):
         self.upstream_root = upstream_root
 
     def getGitUrl(self, project):
-        return os.path.join(self.upstream_root, project.name)
+        if CONFIG.has_option('gerrit', 'fetch_url'):
+            fetch_url = CONFIG.get('gerrit', 'fetch_url')
+            return os.path.join(fetch_url, project.name)
+        else:
+            return os.path.join(self.upstream_root, project.name)
 
 
 class FakeStatsd(threading.Thread):
@@ -771,18 +775,9 @@ class TestScheduler(testtools.TestCase):
                 level=logging.DEBUG,
                 format='%(asctime)s %(name)-32s '
                 '%(levelname)-8s %(message)s'))
-        tmp_root = self.useFixture(fixtures.TempDir(
-            rootdir=os.environ.get("ZUUL_TEST_ROOT"))).path
-        self.test_root = os.path.join(tmp_root, "zuul-test")
-        self.upstream_root = os.path.join(self.test_root, "upstream")
-        self.git_root = os.path.join(self.test_root, "git")
 
+        self.make_dirs()
         CONFIG.set('merger', 'git_dir', self.git_root)
-        if os.path.exists(self.test_root):
-            shutil.rmtree(self.test_root)
-        os.makedirs(self.test_root)
-        os.makedirs(self.upstream_root)
-        os.makedirs(self.git_root)
 
         # For each project in config:
         self.init_repo("org/project")
@@ -876,6 +871,20 @@ class TestScheduler(testtools.TestCase):
 
         self.addCleanup(self.assertFinalState)
         self.addCleanup(self.shutdown)
+
+    def make_dirs(self):
+        if not hasattr(self, 'test_root'):
+            tmp_root = self.useFixture(fixtures.TempDir(
+                rootdir=os.environ.get("ZUUL_TEST_ROOT"))).path
+            self.test_root = os.path.join(tmp_root, "zuul-test")
+            self.upstream_root = os.path.join(self.test_root, "upstream")
+            self.git_root = os.path.join(self.test_root, "git")
+
+            if os.path.exists(self.test_root):
+                shutil.rmtree(self.test_root)
+            os.makedirs(self.test_root)
+            os.makedirs(self.upstream_root)
+            os.makedirs(self.git_root)
 
     def assertFinalState(self):
         # Make sure that the change cache is cleared

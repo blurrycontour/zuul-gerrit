@@ -79,6 +79,12 @@ gerrit
   Path to SSH key to use when logging into above server.
   ``sshkey=/home/zuul/.ssh/id_rsa``
 
+**fetch_url**
+  Optional: Base url from which Zuul refs should be fetched if
+  different than the Gerrit server itself. Defaults to ``None``
+  and items will be fetched from Gerrit. Example:
+  ``fetch_url=https://example.com/``
+
 zuul
 """"
 
@@ -150,6 +156,12 @@ merger
 **pidfile**
   Path to PID lock file for the merger process.
   ``pidfile=/var/run/zuul-merger/merger.pid``
+
+**poll**
+  Optional boolean value defaults to ``False``. If set to ``True``
+  indicates to the merger process that refs should be polled as
+  they may not be immediately available.
+  ``poll=False``
 
 smtp
 """"
