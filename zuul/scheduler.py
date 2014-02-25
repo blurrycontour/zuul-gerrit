@@ -381,6 +381,8 @@ class Scheduler(threading.Thread):
 
             layout.projects[config_project['name']] = project
             mode = config_project.get('merge-mode', 'merge-resolve')
+            queue_name = config_project.get('queue-name')
+            project.queue_name = queue_name
             project.merge_mode = model.MERGER_MAP[mode]
             for pipeline in layout.pipelines.values():
                 if pipeline.name in config_project:
@@ -1628,7 +1630,8 @@ class DependentPipelineManager(BasePipelineManager):
         self.log.info("  Shared change queues:")
         for queue in new_change_queues:
             self.pipeline.addQueue(queue)
-            self.log.info("    %s" % queue)
+            self.log.info("    %s containing %s" % (
+                queue, queue.generated_name))
 
     def combineChangeQueues(self, change_queues):
         self.log.debug("Combining shared queues")
@@ -1640,6 +1643,13 @@ class DependentPipelineManager(BasePipelineManager):
                     self.log.debug("Merging queue %s into %s" % (a, b))
                     b.mergeChangeQueue(a)
                     merged_a = True
+                    names = set()
+                    for p in b.projects:
+                        if p.queue_name:
+                            names.add(p.queue_name)
+                    if len(names) > 1:
+                        raise Exception("More than one name assigned to "
+                                        "shared queue: %s" % (names,))
                     break  # this breaks out of 'for b' and continues 'for a'
             if not merged_a:
                 self.log.debug("Keeping queue %s" % (a))

@@ -190,6 +190,7 @@ class LayoutSchema(object):
         project = {'name': str,
                    'merge-mode': v.Any('merge', 'merge-resolve,',
                                        'cherry-pick'),
+                   'queue-name': str,
                    'template': self.validateTemplateCalls,
                    }
 
