@@ -14,10 +14,22 @@
 # under the License.
 
 import git
-import os
+import git.exc
 import logging
+import os
+import time
 
 import zuul.model
+
+
+def iterate_timeout(max_seconds, interval, purpose):
+    start = time.time()
+    count = 0
+    while (time.time() < start + max_seconds):
+        count += 1
+        yield count
+        time.sleep(interval)
+    raise Exception("Timeout waiting for %s" % purpose)
 
 
 class ZuulReference(git.Reference):
@@ -116,35 +128,47 @@ class Repo(object):
         repo.head.reference = ref
         repo.head.reset(index=True, working_tree=True)
 
-    def cherryPick(self, ref):
+    def cherryPick(self, ref, poll=False, poll_interval=1, poll_timeout=60):
         repo = self.createRepoObject()
         self.log.debug("Cherry-picking %s" % ref)
-        self.fetch(ref)
+        self.fetch(ref, poll, poll_interval, poll_timeout)
         repo.git.cherry_pick("FETCH_HEAD")
         return repo.head.commit
 
-    def merge(self, ref, strategy=None):
+    def merge(self, ref, strategy=None, poll=False,
+              poll_interval=1, poll_timeout=60):
         repo = self.createRepoObject()
         args = []
         if strategy:
             args += ['-s', strategy]
         args.append('FETCH_HEAD')
-        self.fetch(ref)
+        self.fetch(ref, poll, poll_interval, poll_timeout)
         self.log.debug("Merging %s with args %s" % (ref, args))
         repo.git.merge(*args)
         return repo.head.commit
 
-    def fetch(self, ref):
+    def fetch(self, ref, poll=False, poll_interval=1, poll_timeout=60):
         repo = self.createRepoObject()
         # The git.remote.fetch method may read in git progress info and
         # interpret it improperly causing an AssertionError. Because the
         # data was fetched properly subsequent fetches don't seem to fail.
         # So try again if an AssertionError is caught.
         origin = repo.remotes.origin
-        try:
-            origin.fetch(ref)
-        except AssertionError:
-            origin.fetch(ref)
+        if poll:
+            for count in iterate_timeout(poll_timeout, poll_interval,
+                                         "fetching ref for merging"):
+                try:
+                    origin.fetch(ref)
+                except git.exc.GitCommandError:
+                    continue
+                except AssertionError:
+                    origin.fetch(ref)
+                break
+        else:
+            try:
+                origin.fetch(ref)
+            except AssertionError:
+                origin.fetch(ref)
 
     def fetchFrom(self, repository, refspec):
         repo = self.createRepoObject()
@@ -172,7 +196,8 @@ class Repo(object):
 class Merger(object):
     log = logging.getLogger("zuul.Merger")
 
-    def __init__(self, working_root, sshkey, email, username):
+    def __init__(self, working_root, sshkey, email, username,
+                 poll=False, poll_interval=1, poll_timeout=60):
         self.repos = {}
         self.working_root = working_root
         if not os.path.exists(working_root):
@@ -181,6 +206,9 @@ class Merger(object):
             self._makeSSHWrapper(sshkey)
         self.email = email
         self.username = username
+        self.poll = poll
+        self.poll_interval = poll_interval
+        self.poll_timeout = poll_timeout
 
     def _makeSSHWrapper(self, key):
         name = os.path.join(self.working_root, '.ssh_wrapper')
@@ -229,11 +257,17 @@ class Merger(object):
         try:
             mode = item['merge_mode']
             if mode == zuul.model.MERGER_MERGE:
-                commit = repo.merge(item['refspec'])
+                commit = repo.merge(item['refspec'], poll=self.poll,
+                                    poll_interval=self.poll_interval,
+                                    poll_timeout=self.poll_timeout)
             elif mode == zuul.model.MERGER_MERGE_RESOLVE:
-                commit = repo.merge(item['refspec'], 'resolve')
+                commit = repo.merge(item['refspec'], 'resolve', poll=self.poll,
+                                    poll_interval=self.poll_interval,
+                                    poll_timeout=self.poll_timeout)
             elif mode == zuul.model.MERGER_CHERRY_PICK:
-                commit = repo.cherryPick(item['refspec'])
+                commit = repo.cherryPick(item['refspec'], poll=self.poll,
+                                         poll_interval=self.poll_interval,
+                                         poll_timeout=self.poll_timeout)
             else:
                 raise Exception("Unsupported merge mode: %s" % mode)
         except git.GitCommandError:
