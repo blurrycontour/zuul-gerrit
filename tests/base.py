@@ -448,17 +448,6 @@ class FakeURLOpener(object):
         return ret
 
 
-class FakeGerritTrigger(zuul.trigger.gerrit.Gerrit):
-    name = 'gerrit'
-
-    def __init__(self, upstream_root, *args):
-        super(FakeGerritTrigger, self).__init__(*args)
-        self.upstream_root = upstream_root
-
-    def getGitUrl(self, project):
-        return os.path.join(self.upstream_root, project.name)
-
-
 class FakeStatsd(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
@@ -822,43 +811,10 @@ class ZuulTestCase(testtools.TestCase):
                 level=logging.DEBUG,
                 format='%(asctime)s %(name)-32s '
                 '%(levelname)-8s %(message)s'))
-        if USE_TEMPDIR:
-            tmp_root = self.useFixture(fixtures.TempDir(
-                    rootdir=os.environ.get("ZUUL_TEST_ROOT"))).path
-        else:
-            tmp_root = os.environ.get("ZUUL_TEST_ROOT")
-        self.test_root = os.path.join(tmp_root, "zuul-test")
-        self.upstream_root = os.path.join(self.test_root, "upstream")
-        self.git_root = os.path.join(self.test_root, "git")
-
-        if os.path.exists(self.test_root):
-            shutil.rmtree(self.test_root)
-        os.makedirs(self.test_root)
-        os.makedirs(self.upstream_root)
-        os.makedirs(self.git_root)
 
         # Make per test copy of Configuration.
         self.setup_config()
-        self.config.set('zuul', 'layout_config',
-                        os.path.join(FIXTURE_DIR, "layout.yaml"))
-        self.config.set('merger', 'git_dir', self.git_root)
-
-        # For each project in config:
-        self.init_repo("org/project")
-        self.init_repo("org/project1")
-        self.init_repo("org/project2")
-        self.init_repo("org/project3")
-        self.init_repo("org/project4")
-        self.init_repo("org/project5")
-        self.init_repo("org/project6")
-        self.init_repo("org/one-job-project")
-        self.init_repo("org/nonvoting-project")
-        self.init_repo("org/templated-project")
-        self.init_repo("org/layered-project")
-        self.init_repo("org/node-project")
-        self.init_repo("org/conflict-project")
-        self.init_repo("org/noop-project")
-        self.init_repo("org/experimental-project")
+        self.setup_repos()
 
         self.statsd = FakeStatsd()
         os.environ['STATSD_HOST'] = 'localhost'
@@ -908,8 +864,7 @@ class ZuulTestCase(testtools.TestCase):
         zuul.lib.gerrit.Gerrit = FakeGerrit
         self.useFixture(fixtures.MonkeyPatch('smtplib.SMTP', FakeSMTPFactory))
 
-        self.gerrit = FakeGerritTrigger(
-            self.upstream_root, self.config, self.sched)
+        self.gerrit = zuul.trigger.gerrit.Gerrit(self.config, self.sched)
         self.gerrit.replication_timeout = 1.5
         self.gerrit.replication_retry_interval = 0.5
         self.fake_gerrit = self.gerrit.gerrit
@@ -949,8 +904,47 @@ class ZuulTestCase(testtools.TestCase):
 
     def setup_config(self):
         """Per test config object. Override to set different config."""
+        if USE_TEMPDIR:
+            tmp_root = self.useFixture(fixtures.TempDir(
+                    rootdir=os.environ.get("ZUUL_TEST_ROOT"))).path
+        else:
+            tmp_root = os.environ.get("ZUUL_TEST_ROOT")
+        self.test_root = os.path.join(tmp_root, "zuul-test")
+        self.upstream_root = os.path.join(self.test_root, "upstream")
+        self.git_root = os.path.join(self.test_root, "git")
+
+        if os.path.exists(self.test_root):
+            shutil.rmtree(self.test_root)
+        os.makedirs(self.test_root)
+        os.makedirs(self.upstream_root)
+        os.makedirs(self.git_root)
+
         self.config = ConfigParser.ConfigParser()
         self.config.read(os.path.join(FIXTURE_DIR, "zuul.conf"))
+
+        self.config.set('zuul', 'layout_config',
+                        os.path.join(FIXTURE_DIR, "layout.yaml"))
+        self.config.set('merger', 'git_dir', self.git_root)
+        self.config.set('gerrit', 'fetch_url', self.upstream_root)
+
+    def setup_repos(self):
+        """Per test repos. Override to set different repos."""
+        # For each project in config:
+        self.init_repo("org/project")
+        self.init_repo("org/project1")
+        self.init_repo("org/project2")
+        self.init_repo("org/project3")
+        self.init_repo("org/project4")
+        self.init_repo("org/project5")
+        self.init_repo("org/project6")
+        self.init_repo("org/one-job-project")
+        self.init_repo("org/nonvoting-project")
+        self.init_repo("org/templated-project")
+        self.init_repo("org/layered-project")
+        self.init_repo("org/node-project")
+        self.init_repo("org/conflict-project")
+        self.init_repo("org/noop-project")
+        self.init_repo("org/experimental-project")
 
     def assertFinalState(self):
         # Make sure that git.Repo objects have been garbage collected.
@@ -1027,6 +1021,35 @@ class ZuulTestCase(testtools.TestCase):
         repo.head.reference = repo.heads['master']
         repo.head.reset(index=True, working_tree=True)
         repo.git.clean('-x', '-f', '-d')
+
+    def clone_repo(self, source_root, dest_root, project):
+        source_path = os.path.join(source_root, project)
+        source_repo = git.Repo(source_path)
+        dest_path = os.path.join(dest_root, project)
+        dest_repo = source_repo.clone(dest_path)
+
+        dest_repo.config_writer().set_value('user', 'email',
+                                            'user@example.com')
+        dest_repo.config_writer().set_value('user', 'name', 'User Name')
+        dest_repo.config_writer().write()
+
+    def update_repo(self, repo_root, project):
+        path = os.path.join(repo_root, project)
+        repo = git.Repo(path)
+        origin = repo.remotes.origin
+        origin.update()
+        try:
+            origin.fetch('+refs/zuul/*:refs/zuul/*')
+        except TypeError:
+            # GitPython does the fetch properly but runs into a TypeError
+            # anyways.
+            pass
+        try:
+            origin.fetch('+refs/changes/*:refs/changes/*')
+        except TypeError:
+            # GitPython does the fetch properly but runs into a TypeError
+            # anyways.
+            pass
 
     def ref_has_change(self, ref, change):
         path = os.path.join(self.git_root, change.project)
@@ -1170,11 +1193,11 @@ class ZuulTestCase(testtools.TestCase):
                 ret = False
         return ret
 
-    def waitUntilSettled(self):
+    def waitUntilSettled(self, timeout=10):
         self.log.debug("Waiting until settled...")
         start = time.time()
         while True:
-            if time.time() - start > 10:
+            if time.time() - start > timeout:
                 print 'queue status:',
                 print self.sched.trigger_event_queue.empty(),
                 print self.sched.result_event_queue.empty(),
