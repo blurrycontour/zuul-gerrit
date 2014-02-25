@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAU3//j+A\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-25T22:31:47Z",
+      "side": 1,
+      "message": "I\u0027m still not sure this is the legacy method sorry.",
+      "revId": "750363e7fa730d8e899f0aa3c91d3827e58b4cb7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAU3//j+Q\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-25T22:31:47Z",
+      "side": 1,
+      "message": "This isn\u0027t quite what I meant sorry :-(. I meant to have:\n\n  def _getInfoRefsHttp(self, project):\n    .....\n\n  def _getInfoRefsSsh(self, project):\n    .....\n\n  def _getInfoRefs(self, project):\n    if self.use_http:\n      self._getInfoRefsHttp(project)\n    else:\n      self._getInfoRefsSsh(project)",
+      "revId": "750363e7fa730d8e899f0aa3c91d3827e58b4cb7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
