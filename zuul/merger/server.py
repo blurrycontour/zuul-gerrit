@@ -44,13 +44,29 @@ class MergeServer(object):
         else:
             merge_name = None
 
+        if self.config.has_option('merger', 'poll'):
+            poll = self.config.getboolean('merger', 'poll')
+        else:
+            poll = False
+
+        if self.config.has_option('merger', 'poll_interval'):
+            poll_interval = self.config.getint('merger', 'poll_interval')
+        else:
+            poll_interval = 1
+
+        if self.config.has_option('merger', 'poll_timeout'):
+            poll_timeout = self.config.getint('merger', 'poll_timeout')
+        else:
+            poll_timeout = 60
+
         if self.config.has_option('gerrit', 'sshkey'):
             sshkey = self.config.get('gerrit', 'sshkey')
         else:
             sshkey = None
 
         self.merger = merger.Merger(merge_root, sshkey,
-                                    merge_email, merge_name)
+                                    merge_email, merge_name,
+                                    poll, poll_interval, poll_timeout)
 
     def start(self):
         self._running = True

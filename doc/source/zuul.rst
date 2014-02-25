@@ -83,6 +83,16 @@ gerrit
   Path to SSH key to use when logging into above server.
   ``sshkey=/home/zuul/.ssh/id_rsa``
 
+**fetch_url**
+  Optional: Base url sent to mergers from which Zuul refs should be
+  fetched if different than the Gerrit server itself. Defaults to
+  ``None`` and items will be fetched from Gerrit. If specified the
+  project names are appended to this url to form the actual fetch
+  location. This is potentially useful when using Gerrit's replication
+  feature to replicate refs to remote servers which zuul mergers may
+  have access to instead of Gerrit itself.
+  Example: ``fetch_url=https://example.com/``
+
 zuul
 """"
 
@@ -161,6 +171,25 @@ merger
 **pidfile**
   Path to PID lock file for the merger process.
   ``pidfile=/var/run/zuul-merger/merger.pid``
+
+**poll**
+  Optional boolean value defaults to ``False``. If set to ``True``
+  indicates to the merger process that refs should be polled as
+  they may not be immediately available.
+  ``poll=False``
+
+**poll_interval**
+  Number of seconds between polls if using the ``poll`` option above.
+  This setting has no affect if ``poll=False``. The default value is
+  ``1`` second.
+  ``poll_interval=1``
+
+**poll_timeout**
+  Number of seconds to continue polling for before giving up when using
+  the above ``poll`` option. Hitting this timeout will result in a
+  failed merge which will be reported back to zuul. The default value
+  is ``60`` seconds.
+  ``poll_timeout=60``
 
 smtp
 """"
