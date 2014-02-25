@@ -417,7 +417,11 @@ class FakeGerritTrigger(zuul.trigger.gerrit.Gerrit):
         self.upstream_root = upstream_root
 
     def getGitUrl(self, project):
-        return os.path.join(self.upstream_root, project.name)
+        if self.config.has_option('gerrit', 'fetch_url'):
+            fetch_url = self.config.get('gerrit', 'fetch_url')
+            return os.path.join(fetch_url, project.name)
+        else:
+            return os.path.join(self.upstream_root, project.name)
 
 
 class FakeStatsd(threading.Thread):
@@ -746,6 +750,8 @@ class FakeSMTP(object):
 class TestScheduler(testtools.TestCase):
     log = logging.getLogger("zuul.test")
 
+    TEST_CONFIG = CONFIG
+
     def setUp(self):
         super(TestScheduler, self).setUp()
         test_timeout = os.environ.get('OS_TEST_TIMEOUT', 0)
@@ -771,18 +777,9 @@ class TestScheduler(testtools.TestCase):
                 level=logging.DEBUG,
                 format='%(asctime)s %(name)-32s '
                 '%(levelname)-8s %(message)s'))
-        tmp_root = self.useFixture(fixtures.TempDir(
-            rootdir=os.environ.get("ZUUL_TEST_ROOT"))).path
-        self.test_root = os.path.join(tmp_root, "zuul-test")
-        self.upstream_root = os.path.join(self.test_root, "upstream")
-        self.git_root = os.path.join(self.test_root, "git")
 
-        CONFIG.set('merger', 'git_dir', self.git_root)
-        if os.path.exists(self.test_root):
-            shutil.rmtree(self.test_root)
-        os.makedirs(self.test_root)
-        os.makedirs(self.upstream_root)
-        os.makedirs(self.git_root)
+        self.make_dirs()
+        self.TEST_CONFIG.set('merger', 'git_dir', self.git_root)
 
         # For each project in config:
         self.init_repo("org/project")
@@ -808,7 +805,7 @@ class TestScheduler(testtools.TestCase):
 
         self.config = ConfigParser.ConfigParser()
         cfg = StringIO()
-        CONFIG.write(cfg)
+        self.TEST_CONFIG.write(cfg)
         cfg.seek(0)
         self.config.readfp(cfg)
         self.config.set('gearman', 'port', str(self.gearman_server.port))
@@ -876,6 +873,20 @@ class TestScheduler(testtools.TestCase):
 
         self.addCleanup(self.assertFinalState)
         self.addCleanup(self.shutdown)
+
+    def make_dirs(self):
+        if not hasattr(self, 'test_root'):
+            tmp_root = self.useFixture(fixtures.TempDir(
+                rootdir=os.environ.get("ZUUL_TEST_ROOT"))).path
+            self.test_root = os.path.join(tmp_root, "zuul-test")
+            self.upstream_root = os.path.join(self.test_root, "upstream")
+            self.git_root = os.path.join(self.test_root, "git")
+
+            if os.path.exists(self.test_root):
+                shutil.rmtree(self.test_root)
+            os.makedirs(self.test_root)
+            os.makedirs(self.upstream_root)
+            os.makedirs(self.git_root)
 
     def assertFinalState(self):
         # Make sure that the change cache is cleared
@@ -2873,7 +2884,7 @@ class TestScheduler(testtools.TestCase):
         sched = zuul.scheduler.Scheduler()
         sched.registerTrigger(None, 'gerrit')
         sched.registerTrigger(None, 'timer')
-        sched.testConfig(CONFIG.get('zuul', 'layout_config'))
+        sched.testConfig(self.TEST_CONFIG.get('zuul', 'layout_config'))
 
     def test_build_description(self):
         "Test that build descriptions update"
