@@ -44,13 +44,19 @@ class MergeServer(object):
         else:
             merge_name = None
 
+        if self.config.has_option('merger', 'poll'):
+            poll = self.config.getboolean('merger', 'poll')
+        else:
+            poll = False
+
         if self.config.has_option('gerrit', 'sshkey'):
             sshkey = self.config.get('gerrit', 'sshkey')
         else:
             sshkey = None
 
         self.merger = merger.Merger(merge_root, sshkey,
-                                    merge_email, merge_name)
+                                    merge_email, merge_name,
+                                    poll)
 
     def start(self):
         self._running = True

@@ -417,7 +417,11 @@ class FakeGerritTrigger(zuul.trigger.gerrit.Gerrit):
         self.upstream_root = upstream_root
 
     def getGitUrl(self, project):
-        return os.path.join(self.upstream_root, project.name)
+        if CONFIG.has_option('gerrit', 'location_override'):
+            location = CONFIG.get('gerrit', 'location_override')
+            return os.path.join(location, project.name)
+        else:
+            return os.path.join(self.upstream_root, project.name)
 
 
 class FakeStatsd(threading.Thread):
@@ -778,6 +782,8 @@ class TestScheduler(testtools.TestCase):
         self.git_root = os.path.join(self.test_root, "git")
 
         CONFIG.set('merger', 'git_dir', self.git_root)
+        CONFIG.set('merger', 'poll', True)
+        CONFIG.set('gerrit', 'location_override', self.upstream_root)
         if os.path.exists(self.test_root):
             shutil.rmtree(self.test_root)
         os.makedirs(self.test_root)
