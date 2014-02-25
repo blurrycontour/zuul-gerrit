@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAU3//jos\u003d",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2014-02-25T23:21:02Z",
+      "side": 1,
+      "message": "Can\u0027t hurt, though at worse we\u0027ll only retry 60 times and fail within roughly a minute. I\u0027d be more concerned about the magic constants.",
+      "parentUuid": "AAAAU3//j54\u003d",
+      "revId": "915399ac3ecaaa81a65a11d4a9b8160c33fd3da1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAU3//j50\u003d",
         "filename": "zuul/merger/merger.py",
         "patchSetId": 1
