@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAU3//j6U\u003d",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-25T22:42:55Z",
+      "side": 1,
+      "message": "Should set a default for poll here too",
+      "revId": "915399ac3ecaaa81a65a11d4a9b8160c33fd3da1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAU3//j54\u003d",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-25T22:42:55Z",
+      "side": 1,
+      "message": "Could we tighten this exception?",
+      "revId": "915399ac3ecaaa81a65a11d4a9b8160c33fd3da1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAU3//j50\u003d",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-25T22:42:55Z",
+      "side": 1,
+      "message": "Possibly set a default for poll here too?",
+      "revId": "915399ac3ecaaa81a65a11d4a9b8160c33fd3da1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
