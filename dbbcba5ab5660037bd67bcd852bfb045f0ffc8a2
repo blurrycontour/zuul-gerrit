@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAU3//kFw\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 671,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-25T22:25:36Z",
+      "side": 1,
+      "message": "(nit) This part sounds more like a commit message than user-guide.\n\nPerhaps \"Zuul can automatically name change queues, however these can grow quite long and are prone to changing as projects in the queue change. If you assign a queue-name......\"",
+      "revId": "dbbcba5ab5660037bd67bcd852bfb045f0ffc8a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAU3//kDY\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2903,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-25T22:25:36Z",
+      "side": 1,
+      "message": "(nit) isn\u0027t is meant to be:\n\n  assertEqual(\u0027integration\u0027, q1.name)?\n\nI realise this isn\u0027t how it is in the rest of the file though.",
+      "revId": "dbbcba5ab5660037bd67bcd852bfb045f0ffc8a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAU3//kDk\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2906,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-25T22:25:36Z",
+      "side": 1,
+      "message": "(nit) this could be a separate test",
+      "revId": "dbbcba5ab5660037bd67bcd852bfb045f0ffc8a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAU3//j/8\u003d",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 431,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-25T22:25:36Z",
+      "side": 1,
+      "message": "The self.assigned_name part isn\u0027t necessary due to the check that only one project can have a queue_name. Perhaps the check for only having one queue_name should be done here though.",
+      "revId": "dbbcba5ab5660037bd67bcd852bfb045f0ffc8a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAU3//kBY\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1634,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-25T22:25:36Z",
+      "side": 1,
+      "message": "(nit) maybe rather than generated_name this could be \u0027project_list\u0027 or something?",
+      "revId": "dbbcba5ab5660037bd67bcd852bfb045f0ffc8a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAU3//kAI\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1652,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-25T22:25:36Z",
+      "side": 1,
+      "message": "Should this be moved into model.ChangeQueue.addProject() to save the iteration here?",
+      "revId": "dbbcba5ab5660037bd67bcd852bfb045f0ffc8a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
