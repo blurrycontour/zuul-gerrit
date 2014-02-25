@@ -93,7 +93,7 @@ class FakeChange(object):
                   'VRFY': ('Verified', -2, 2)}
 
     def __init__(self, gerrit, number, project, branch, subject,
-                 status='NEW', upstream_root=None):
+                 status='NEW', upstream_root=None, git_replica=None):
         self.gerrit = gerrit
         self.reported = 0
         self.queried = 0
@@ -127,6 +127,7 @@ class FakeChange(object):
             'url': 'https://hostname/%s' % number}
 
         self.upstream_root = upstream_root
+        self.git_replica = git_replica
         self.addPatchset()
         self.data['submitRecords'] = self.getSubmitRecords()
 
@@ -162,6 +163,8 @@ class FakeChange(object):
         repo.head.reset(index=True, working_tree=True)
         repo.git.clean('-x', '-f', '-d')
         repo.heads['master'].checkout()
+        g = repo.git
+        g.push('replica', mirror=True)
         return r
 
     def addPatchset(self, files=[], large=False):
@@ -330,6 +333,8 @@ class FakeChange(object):
         repo = git.Repo(path)
         repo.heads[self.branch].commit = \
             repo.commit(self.patchsets[-1]['revision'])
+        g = repo.git
+        g.push('replica', mirror=True)
 
     def setReported(self):
         self.reported += 1
@@ -345,7 +350,8 @@ class FakeGerrit(object):
     def addFakeChange(self, project, branch, subject):
         self.change_number += 1
         c = FakeChange(self, self.change_number, project, branch, subject,
-                       upstream_root=self.upstream_root)
+                       upstream_root=self.upstream_root,
+                       git_replica=self.git_replica)
         self.changes[self.change_number] = c
         return c
 
@@ -412,12 +418,13 @@ class FakeURLOpener(object):
 class FakeGerritTrigger(zuul.trigger.gerrit.Gerrit):
     name = 'gerrit'
 
-    def __init__(self, upstream_root, *args):
+    def __init__(self, upstream_root, git_replica, *args):
         super(FakeGerritTrigger, self).__init__(*args)
         self.upstream_root = upstream_root
+        self.git_replica = git_replica
 
     def getGitUrl(self, project):
-        return os.path.join(self.upstream_root, project.name)
+        return os.path.join(self.git_replica, project.name)
 
 
 class FakeStatsd(threading.Thread):
@@ -776,13 +783,17 @@ class TestScheduler(testtools.TestCase):
         self.test_root = os.path.join(tmp_root, "zuul-test")
         self.upstream_root = os.path.join(self.test_root, "upstream")
         self.git_root = os.path.join(self.test_root, "git")
+        self.git_replica = os.path.join(self.test_root, "git_replica")
 
         CONFIG.set('merger', 'git_dir', self.git_root)
+        CONFIG.set('merger', 'poll', True)
+        CONFIG.set('gerrit', 'location_override', self.git_replica)
         if os.path.exists(self.test_root):
             shutil.rmtree(self.test_root)
         os.makedirs(self.test_root)
         os.makedirs(self.upstream_root)
         os.makedirs(self.git_root)
+        os.makedirs(self.git_replica)
 
         # For each project in config:
         self.init_repo("org/project")
@@ -841,11 +852,12 @@ class TestScheduler(testtools.TestCase):
         self.useFixture(fixtures.MonkeyPatch('smtplib.SMTP', FakeSMTPFactory))
 
         self.gerrit = FakeGerritTrigger(
-            self.upstream_root, self.config, self.sched)
+            self.upstream_root, self.git_replica, self.config, self.sched)
         self.gerrit.replication_timeout = 1.5
         self.gerrit.replication_retry_interval = 0.5
         self.fake_gerrit = self.gerrit.gerrit
         self.fake_gerrit.upstream_root = self.upstream_root
+        self.fake_gerrit.git_replica = self.git_replica
 
         self.webapp = zuul.webapp.WebApp(self.sched, port=0)
         self.rpc = zuul.rpclistener.RPCListener(self.config, self.sched)
@@ -944,6 +956,14 @@ class TestScheduler(testtools.TestCase):
         repo.head.reference = master
         repo.head.reset(index=True, working_tree=True)
         repo.git.clean('-x', '-f', '-d')
+
+        # Init replica
+        path = os.path.join(self.git_replica, *parts[:-1])
+        if not os.path.exists(path):
+            os.makedirs(path)
+        dest_path = os.path.join(self.git_replica, project)
+        repo.clone(dest_path, bare=True)
+        repo.create_remote('replica', 'file://' + dest_path)
 
     def ref_has_change(self, ref, change):
         path = os.path.join(self.git_root, change.project)
