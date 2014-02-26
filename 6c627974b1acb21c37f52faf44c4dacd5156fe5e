@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAU3//i78\u003d",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-02-26T01:28:16Z",
+      "side": 1,
+      "message": "worker_name won\u0027t match the worker.name key in the dict below.",
+      "revId": "6c627974b1acb21c37f52faf44c4dacd5156fe5e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
