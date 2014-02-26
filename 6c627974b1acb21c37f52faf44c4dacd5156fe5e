@@ -16,6 +16,24 @@
       "revId": "6c627974b1acb21c37f52faf44c4dacd5156fe5e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAU3//i04\u003d",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-02-26T01:34:03Z",
+      "side": 1,
+      "message": "Good catch! :-)",
+      "parentUuid": "AAAAU3//i78\u003d",
+      "revId": "6c627974b1acb21c37f52faf44c4dacd5156fe5e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
