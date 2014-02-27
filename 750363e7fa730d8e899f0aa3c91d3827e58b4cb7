@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAVX//+nA\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 7170
+      },
+      "writtenOn": "2014-02-27T02:07:26Z",
+      "side": 1,
+      "message": "The ssh method is recommended over http as ssh can provide authentication and more security, the http method is only kept as backward compatibility.",
+      "parentUuid": "AAAAU3//j+A\u003d",
+      "revId": "750363e7fa730d8e899f0aa3c91d3827e58b4cb7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAU3//j+Q\u003d",
         "filename": "zuul/trigger/gerrit.py",
         "patchSetId": 7
@@ -30,6 +48,24 @@
       "writtenOn": "2014-02-25T22:31:47Z",
       "side": 1,
       "message": "This isn\u0027t quite what I meant sorry :-(. I meant to have:\n\n  def _getInfoRefsHttp(self, project):\n    .....\n\n  def _getInfoRefsSsh(self, project):\n    .....\n\n  def _getInfoRefs(self, project):\n    if self.use_http:\n      self._getInfoRefsHttp(project)\n    else:\n      self._getInfoRefsSsh(project)",
+      "revId": "750363e7fa730d8e899f0aa3c91d3827e58b4cb7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAVX//+kQ\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 7170
+      },
+      "writtenOn": "2014-02-27T02:07:26Z",
+      "side": 1,
+      "message": "I understand, but now it is even better. more code is reused, less changes than before.",
+      "parentUuid": "AAAAU3//j+Q\u003d",
       "revId": "750363e7fa730d8e899f0aa3c91d3827e58b4cb7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
