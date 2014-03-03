@@ -3,6 +3,7 @@ hacking>=0.5.6,<0.8
 coverage>=3.6
 sphinx>=1.1.2,<1.2
 sphinxcontrib-blockdiag>=0.5.5
+oslosphinx
 docutils==0.9.1
 discover
 fixtures>=0.3.14
