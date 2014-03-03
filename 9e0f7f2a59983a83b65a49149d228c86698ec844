@@ -89,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAVn//1oo\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2505,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-03-03T21:54:25Z",
+      "side": 1,
+      "message": "Yeah too many copy pasting and my brain ended up not processing comments any more \u003d)",
+      "parentUuid": "AAAAUX/+1O0\u003d",
+      "revId": "9e0f7f2a59983a83b65a49149d228c86698ec844",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUX/+1OQ\u003d",
         "filename": "tests/test_scheduler.py",
         "patchSetId": 5
@@ -100,6 +118,24 @@
       "writtenOn": "2014-02-18T18:40:05Z",
       "side": 1,
       "message": "You can probably assert that len(history)\u003d\u003d1 and history[0].result\u003d\u003d\u0027ABORTED\u0027.",
+      "revId": "9e0f7f2a59983a83b65a49149d228c86698ec844",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAVn//1mA\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2506,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-03-03T21:54:25Z",
+      "side": 1,
+      "message": "Forgot to restore that indeed. I have added the assertions you have suggested.",
+      "parentUuid": "AAAAUX/+1OQ\u003d",
       "revId": "9e0f7f2a59983a83b65a49149d228c86698ec844",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -152,6 +188,24 @@
       "side": 1,
       "message": "It looks like the change-abandoned event does not include a patchset number, so the existing logic in trigger/gerrit.py getChange will produce a new change object.  I feel like that should probably be addressed.  You could talk me into accepting this and then fixing the other thing in another patchset, but I don\u0027t think it would be too hard to update getChange to do the right thing.",
       "parentUuid": "AAAAUX//Peo\u003d",
+      "revId": "9e0f7f2a59983a83b65a49149d228c86698ec844",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAVn//1Vs\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1056,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-03-03T21:54:25Z",
+      "side": 1,
+      "message": "The getChangeAbandonedEvent() is a copy paste of getChangeRestoredEvent() which missed attaching a patchset to the event.\n\nThe documentation for your Gerrit version does show both events have a \u0027patchset\u0027 field: https://review.openstack.org/Documentation/cmd-stream-events.html#_events\n\nAdding a patchset to both events. Thank you very much!",
+      "parentUuid": "AAAAUX/+1Kc\u003d",
       "revId": "9e0f7f2a59983a83b65a49149d228c86698ec844",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
