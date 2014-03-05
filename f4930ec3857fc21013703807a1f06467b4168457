@@ -16,6 +16,75 @@
       "revId": "f4930ec3857fc21013703807a1f06467b4168457",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAVn//i04\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2014-03-05T14:18:58Z",
+      "side": 1,
+      "message": "We already do (see line 222).",
+      "parentUuid": "AAAAVn//i5g\u003d",
+      "revId": "f4930ec3857fc21013703807a1f06467b4168457",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAVn//i0g\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2014-03-05T14:18:58Z",
+      "side": 1,
+      "message": "This logs when starting to wait...",
+      "revId": "f4930ec3857fc21013703807a1f06467b4168457",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAVn//iz8\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2014-03-05T14:18:58Z",
+      "side": 1,
+      "message": "...and this when it succeeds...",
+      "revId": "f4930ec3857fc21013703807a1f06467b4168457",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAVn//izk\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2014-03-05T14:18:58Z",
+      "side": 1,
+      "message": "...or this when it takes to long and zuul gives up. You can tell easily from the delta between log timestamps how long that was.",
+      "revId": "f4930ec3857fc21013703807a1f06467b4168457",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
