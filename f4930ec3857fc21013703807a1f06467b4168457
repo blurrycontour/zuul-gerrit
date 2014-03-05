@@ -85,6 +85,24 @@
       "revId": "f4930ec3857fc21013703807a1f06467b4168457",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAVn//dys\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 6316
+      },
+      "writtenOn": "2014-03-05T22:43:18Z",
+      "side": 1,
+      "message": "Ah okay, thanks for walking me through this.",
+      "parentUuid": "AAAAVn//izk\u003d",
+      "revId": "f4930ec3857fc21013703807a1f06467b4168457",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
