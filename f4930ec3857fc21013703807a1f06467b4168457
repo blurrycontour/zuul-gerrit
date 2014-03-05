@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAVn//i5g\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 6316
+      },
+      "writtenOn": "2014-03-05T13:58:26Z",
+      "side": 1,
+      "message": "can we output time and sha to a log file here?",
+      "revId": "f4930ec3857fc21013703807a1f06467b4168457",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
