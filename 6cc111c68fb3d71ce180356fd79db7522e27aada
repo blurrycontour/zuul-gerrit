@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAVn//oLE\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-03-05T00:16:06Z",
+      "side": 1,
+      "message": "I am not a fan of this paragraph in particular for this line. I am pretty sure that https is plenty secure and can be made to do authentication (though authentication probably requires a different Zuul change). This option description should be less opinionated in its appraisal of the different values.\n\nNot only that but I am not sure using ssh is recommended in all cases. Fetching git refs over http(s) scales much further than relying on the gerrit ssh server which could make http(s) the recommended protocol for some deployments. For this reason I don\u0027t see http(s) being legacy, instead it is just another option available to those building a CI system.\n\nIt would be best to simply say something along the lines of \"Determine whether http(s) should be used by git to fetch gerrit refs. If http(s) is disabled ssh will be used instead.\"",
+      "revId": "6cc111c68fb3d71ce180356fd79db7522e27aada",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
