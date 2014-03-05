@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAVn//n6o\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1399,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-03-05T00:47:58Z",
+      "side": 1,
+      "message": "The old behavior only stated that a change failed to merge if it was the actual change that failed to merge. Dependent changes have this message only. This adds new behavior that is more verbose and still correct which is fine by me. Just pointing out that there is a behavior change here.",
+      "revId": "f114ee1106fc3fad5a8cbfc115a22154fc23c6ed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
