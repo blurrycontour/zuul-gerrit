@@ -48,6 +48,7 @@ class RPCListener(object):
     def register(self):
         self.worker.registerFunction("zuul:enqueue")
         self.worker.registerFunction("zuul:promote")
+        self.worker.registerFunction("zuul:metrics")
 
     def stop(self):
         self.log.debug("Stopping")
@@ -123,3 +124,22 @@ class RPCListener(object):
         change_ids = args['change_ids']
         self.sched.promote(pipeline_name, change_ids)
         job.sendWorkComplete()
+
+    def handle_metrics(self, job):
+        metrics = {}
+
+        metrics['zuul_version'] = self.sched.zuul_version
+
+        metrics['scheduler'] = {}
+        metrics['scheduler']['wake_event'] = self.sched.wake_event.is_set()
+        metrics['scheduler']['layout_lock'] = self.sched.layout_lock.locked()
+        metrics['scheduler']['run_handler_lock'] = \
+            self.sched.run_handler_lock.locked()
+        metrics['scheduler']['last_processed_trigger_event'] = \
+            str(self.sched.last_processed_trigger_event)
+        metrics['scheduler']['last_processed_result_event'] = \
+            str(self.sched.last_processed_result_event)
+        metrics['scheduler']['last_processed_management_event'] = \
+            str(self.sched.last_processed_management_event)
+
+        job.sendWorkComplete(json.dumps(metrics))

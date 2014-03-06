@@ -895,6 +895,7 @@ class TriggerEvent(object):
         # For events that arrive with a destination pipeline (eg, from
         # an admin command, etc):
         self.forced_pipeline = None
+        self.triggered_time = time.time()
 
     def __repr__(self):
         ret = '<TriggerEvent %s %s' % (self.type, self.project_name)
@@ -906,7 +907,7 @@ class TriggerEvent(object):
         if self.approvals:
             ret += ' ' + ', '.join(
                 ['%s:%s' % (a['type'], a['value']) for a in self.approvals])
-        ret += '>'
+        ret += ' triggered at %d>' % self.triggered_time
 
         return ret
 
