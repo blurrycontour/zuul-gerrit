@@ -55,6 +55,7 @@ import zuul.reporter.gerrit
 import zuul.reporter.smtp
 import zuul.trigger.gerrit
 import zuul.trigger.timer
+import zuul.version
 
 FIXTURE_DIR = os.path.join(os.path.dirname(__file__),
                            'fixtures')
@@ -3929,3 +3930,65 @@ For CI problems and help debugging, contact ci@example.org"""
 
         running_items = client.get_running_jobs()
         self.assertEqual(0, len(running_items))
+
+    def test_client_get_metrics(self):
+        "Test that the RPC client can get metrics from zuul"
+
+        client = zuul.rpcclient.RPCClient('127.0.0.1',
+                                          self.gearman_server.port)
+        self.waitUntilSettled()
+
+        metrics = client.get_metrics()
+
+        self.assertEqual(zuul.version.version_info.version_string(),
+                         metrics['zuul_version'])
+
+        self.assertFalse(metrics['scheduler']['run_handler_lock'])
+        self.assertFalse(metrics['scheduler']['layout_lock'])
+        self.assertFalse(metrics['scheduler']['wake_event'])
+
+        self.assertEqual('None',
+                         metrics['scheduler']['last_processed_trigger_event'])
+        self.assertEqual('None',
+                         metrics['scheduler']['last_processed_result_event'])
+        self.assertEqual(
+            '<ReconfigureEvent triggered at ',
+            metrics['scheduler']['last_processed_management_event'][:-11]
+        )
+
+        self.worker.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('CRVW', 2)
+        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        self.waitUntilSettled()
+
+        metrics = client.get_metrics()
+        self.assertEqual(
+            '<TriggerEvent comment-added org/project master 1,1 APRV:1 '
+            'triggered at ',
+            metrics['scheduler']['last_processed_trigger_event'][:-11]
+        )
+        self.assertEqual(
+            '<BuildStartedEvent <Build ',
+            metrics['scheduler']['last_processed_result_event'][:26]
+        )
+
+        self.worker.hold_jobs_in_build = False
+        self.worker.release()
+        self.waitUntilSettled()
+
+        metrics = client.get_metrics()
+        self.assertEqual(
+            '<BuildCompletedEvent <Build ',
+            metrics['scheduler']['last_processed_result_event'][:28]
+        )
+
+    def test_metrics_json(self):
+        "Test that we can retrieve JSON status info"
+        port = self.webapp.server.socket.getsockname()[1]
+
+        f = urllib.urlopen("http://localhost:%s/metrics.json" % port)
+        data = f.read()
+        data = json.loads(data)
+
+        self.assertEqual(2, len(data))

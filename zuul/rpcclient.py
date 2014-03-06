@@ -70,5 +70,15 @@ class RPCClient(object):
         else:
             return json.loads(job.data[0])
 
+    def get_metrics(self):
+        """Get a set of internal metrics of zuuls current state for debugging
+        """
+        data = {}
+        job = self.submitJob('zuul:metrics', data)
+        if job.failure:
+            return False
+        else:
+            return json.loads(job.data[0])
+
     def shutdown(self):
         self.gearman.shutdown()

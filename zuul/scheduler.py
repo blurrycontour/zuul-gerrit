@@ -67,6 +67,10 @@ class ManagementEvent(object):
         self._wait_event = threading.Event()
         self._exception = None
         self._traceback = None
+        self._event_time = time.time()
+
+    def __repr__(self):
+        return '<ManagementEvent triggered at %d>' % self._event_time
 
     def exception(self, e, tb):
         self._exception = e
@@ -93,6 +97,9 @@ class ReconfigureEvent(ManagementEvent):
         super(ReconfigureEvent, self).__init__()
         self.config = config
 
+    def __repr__(self):
+        return '<ReconfigureEvent triggered at %d>' % self._event_time
+
 
 class PromoteEvent(ManagementEvent):
     """Promote one or more changes to the head of the queue.
@@ -107,12 +114,20 @@ class PromoteEvent(ManagementEvent):
         self.pipeline_name = pipeline_name
         self.change_ids = change_ids
 
+    def __repr__(self):
+        return '<PromoteEvent %s %s triggered at %d>' % (self.pipeline_name,
+                                                         str(self.change_ids),
+                                                         self._event_time)
+
 
 class ResultEvent(object):
     """An event that needs to modify the pipeline state due to a
     result from an external system."""
+    def __init__(self):
+        self._event_time = time.time()
 
-    pass
+    def __repr__(self):
+        return '<ResultEvent triggered at %d>' % self._event_time
 
 
 class BuildStartedEvent(ResultEvent):
@@ -122,7 +137,12 @@ class BuildStartedEvent(ResultEvent):
     """
 
     def __init__(self, build):
+        super(BuildStartedEvent, self).__init__()
         self.build = build
+
+    def __repr__(self):
+        return '<BuildStartedEvent %s triggered at %d>' % (self.build,
+                                                           self._event_time)
 
 
 class BuildCompletedEvent(ResultEvent):
@@ -132,7 +152,12 @@ class BuildCompletedEvent(ResultEvent):
     """
 
     def __init__(self, build):
+        super(BuildCompletedEvent, self).__init__()
         self.build = build
+
+    def __repr__(self):
+        return '<BuildCompletedEvent %s triggered at %d>' % (self.build,
+                                                             self._event_time)
 
 
 class MergeCompletedEvent(ResultEvent):
@@ -146,11 +171,16 @@ class MergeCompletedEvent(ResultEvent):
     """
 
     def __init__(self, build_set, zuul_url, merged, updated, commit):
+        super(MergeCompletedEvent, self).__init__()
         self.build_set = build_set
         self.zuul_url = zuul_url
         self.merged = merged
         self.updated = updated
         self.commit = commit
+
+    def __repr__(self):
+        return ('<MergeCompletedEvent %s, commit %s triggered at %d>' %
+                (self.zuul_url, self.commit, self._event_time))
 
 
 class Scheduler(threading.Thread):
@@ -173,8 +203,11 @@ class Scheduler(threading.Thread):
         self._maintain_trigger_cache = False
 
         self.trigger_event_queue = Queue.Queue()
+        self.last_processed_trigger_event = None
         self.result_event_queue = Queue.Queue()
+        self.last_processed_result_event = None
         self.management_event_queue = Queue.Queue()
+        self.last_processed_management_event = None
         self.layout = model.Layout()
 
         self.zuul_version = zuul_version.version_info.version_string()
@@ -749,6 +782,7 @@ class Scheduler(threading.Thread):
     def process_event_queue(self):
         self.log.debug("Fetching trigger event")
         event = self.trigger_event_queue.get()
+        self.last_processed_trigger_event = event
         self.log.debug("Processing trigger event %s" % event)
         try:
             project = self.layout.projects.get(event.project_name)
@@ -771,6 +805,7 @@ class Scheduler(threading.Thread):
     def process_management_queue(self):
         self.log.debug("Fetching management event")
         event = self.management_event_queue.get()
+        self.last_processed_management_event = event
         self.log.debug("Processing management event %s" % event)
         try:
             if isinstance(event, ReconfigureEvent):
@@ -787,6 +822,7 @@ class Scheduler(threading.Thread):
     def process_result_queue(self):
         self.log.debug("Fetching result event")
         event = self.result_event_queue.get()
+        self.last_processed_result_event = event
         self.log.debug("Processing result event %s" % event)
         try:
             if isinstance(event, BuildStartedEvent):
