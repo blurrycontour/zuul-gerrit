@@ -16,6 +16,24 @@
       "revId": "6cc111c68fb3d71ce180356fd79db7522e27aada",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAVn//b3g\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 7170
+      },
+      "writtenOn": "2014-03-06T03:41:49Z",
+      "side": 1,
+      "message": "Zuul is already depending on gerrit\u0027s push stream which on only available over ssh, so instead of using both http(s) and ssh interfaces, I think it is better to stick on single interface, That\u0027s why I\u0027m suggesting ssh.",
+      "parentUuid": "AAAAVn//oLE\u003d",
+      "revId": "6cc111c68fb3d71ce180356fd79db7522e27aada",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
