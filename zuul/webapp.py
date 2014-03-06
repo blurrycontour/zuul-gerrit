@@ -13,10 +13,16 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import json
 import logging
 import threading
 from paste import httpserver
 from webob import Request
+
+import zuul.rpcclient
+
+# TODO: This should be implemented as an RPC client so that it has the
+# possibility to be broken out from zuul.
 
 
 class WebApp(threading.Thread):
@@ -47,6 +53,28 @@ class WebApp(threading.Thread):
             start_response('200 OK', [('content-type', 'application/json'),
                                       ('Access-Control-Allow-Origin', '*')])
             return [ret]
+        if request.path == '/metrics.json':
+            # make an RPC to get the metrics, for now grab the gearman details
+            # from the scheduler.
+            # TODO: fix me once status.json is also an RPC (ie webapp should
+            # have its own config to know where gearman is etc)
+            server = self.scheduler.config.get('gearman', 'server')
+            if self.scheduler.config.has_option('gearman', 'port'):
+                port = self.scheduler.config.get('gearman', 'port')
+            else:
+                port = 4730
+            try:
+                client = zuul.rpcclient.RPCClient(server, port)
+                ret = json.dumps(client.get_metrics())
+            except Exception:
+                self.log.exception("Exception getting metrics")
+                raise
+
+            start_response('200 OK', [('content-type', 'application/json'),
+                                      ('Access-Control-Allow-Origin', '*')])
+
+            return [ret]
+
         else:
             start_response('404 Not Found', [('content-type', 'text/plain')])
             return ['Not found.']
