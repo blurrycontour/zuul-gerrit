@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAVn//AZA\u003d",
+        "filename": "zuul/cmd/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-03-10T19:27:33Z",
+      "side": 1,
+      "message": "This won\u0027t actually log anything as intended as signal.pause appears to only throw KeyboardInterrupt and will run signal handlers otherwise.",
+      "revId": "006ec6af0482a4381890a987d538ad9992685540",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAVn/+//o\u003d",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-03-10T19:27:33Z",
+      "side": 1,
+      "message": "This won\u0027t actually log anything as signal.pause won\u0027t throw anyhting other than KeyboardInterrupt and other signals will run the signal handler.",
+      "revId": "006ec6af0482a4381890a987d538ad9992685540",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
