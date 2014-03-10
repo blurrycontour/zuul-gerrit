@@ -95,6 +95,7 @@ class Merger(object):
         import zuul.merger.server
 
         self.setup_logging('merger', 'log_config')
+        self.log = logging.getLogger("zuul.MergerCMD")
 
         self.merger = zuul.merger.server.MergeServer(self.config)
         self.merger.start()
@@ -107,6 +108,9 @@ class Merger(object):
             except KeyboardInterrupt:
                 print "Ctrl + C: asking merger to exit nicely...\n"
                 self.exit_handler(signal.SIGINT, None)
+            except Exception:
+                self.log.exception("Main thread exiting.")
+                raise
 
 
 def main():

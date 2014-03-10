@@ -239,6 +239,9 @@ class Server(object):
             except KeyboardInterrupt:
                 print "Ctrl + C: asking scheduler to exit nicely...\n"
                 self.exit_handler(signal.SIGINT, None)
+            except Exception:
+                self.log.exception("Main thread exiting.")
+                raise
 
 
 def main():
