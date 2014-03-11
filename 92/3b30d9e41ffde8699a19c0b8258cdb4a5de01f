@@ -1,0 +1,11 @@
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Approved+1: Monty Taylor <mordred@inaugust.com>
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Verified+2: Jenkins
+Approved+1: Clark Boylan <cboylan@sapwetik.org>
+Code-Review+1: Joshua Hesketh <joshua.hesketh@rackspace.com>
+Submitted-by: Jenkins
+Submitted-at: Tue, 11 Mar 2014 22:24:44 +0000
+Reviewed-on: https://review.openstack.org/79109
+Project: openstack-infra/zuul
+Branch: refs/heads/master
