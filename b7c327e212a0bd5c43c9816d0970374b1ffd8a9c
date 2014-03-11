@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAVn/+85Q\u003d",
+        "filename": "doc/source/cloner.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-03-11T03:43:38Z",
+      "side": 1,
+      "message": "s/reuse/uses",
+      "revId": "b7c327e212a0bd5c43c9816d0970374b1ffd8a9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
