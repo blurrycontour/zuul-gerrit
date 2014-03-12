@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAWH///pk\u003d",
+        "filename": "doc/source/cloner.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-03-12T13:44:37Z",
+      "side": 1,
+      "message": "Left over from when I wanted to use zuul.conf, apparently not needed so I dropped it entirely forgetting to clean up documentation.\n\nRemoved.",
+      "parentUuid": "AAAAVn/+3M4\u003d",
+      "revId": "b7c327e212a0bd5c43c9816d0970374b1ffd8a9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAVn/+85Q\u003d",
         "filename": "doc/source/cloner.rst",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2014-03-11T03:43:38Z",
       "side": 1,
       "message": "s/reuse/uses",
+      "revId": "b7c327e212a0bd5c43c9816d0970374b1ffd8a9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH///pI\u003d",
+        "filename": "doc/source/cloner.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-03-12T13:44:37Z",
+      "side": 1,
+      "message": "Done. More typos coming with next patchset sorry :(",
+      "parentUuid": "AAAAVn/+85Q\u003d",
       "revId": "b7c327e212a0bd5c43c9816d0970374b1ffd8a9c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
