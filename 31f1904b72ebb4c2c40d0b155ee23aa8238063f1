@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAWH//UCU\u003d",
+        "filename": "tests/fixtures/layout.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-03-18T17:28:50Z",
+      "side": 1,
+      "message": "This no-job-project does not appear to be used by any tests and its repo is not init\u0027d by the test suite.",
+      "revId": "31f1904b72ebb4c2c40d0b155ee23aa8238063f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
