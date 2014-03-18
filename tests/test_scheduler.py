@@ -795,6 +795,7 @@ class TestScheduler(testtools.TestCase):
         self.init_repo("org/layered-project")
         self.init_repo("org/node-project")
         self.init_repo("org/conflict-project")
+        self.init_repo("org/noop-project")
 
         self.statsd = FakeStatsd()
         os.environ['STATSD_HOST'] = 'localhost'
@@ -2654,6 +2655,19 @@ class TestScheduler(testtools.TestCase):
         self.assertEqual(len(self.history), 10)
         self.assertEqual(self.countJobResults(self.history, 'ABORTED'), 1)
 
+    def test_noop_job(self):
+        "Test that the internal noop job works"
+        A = self.fake_gerrit.addFakeChange('org/noop-project', 'master', 'A')
+        A.addApproval('CRVW', 2)
+        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.gearman_server.getQueue()), 0)
+        self.assertTrue(self.sched._areAllBuildsComplete())
+        self.assertEqual(len(self.history), 0)
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2)
+
     def test_zuul_refs(self):
         "Test that zuul refs exist and have the right changes"
         self.worker.hold_jobs_in_build = True
@@ -2870,13 +2884,13 @@ class TestScheduler(testtools.TestCase):
         self.sched.reconfigure(self.config)
         self.waitUntilSettled()
 
-        self.gearman_server.release('noop')
+        self.gearman_server.release('gate-noop')
         self.waitUntilSettled()
         self.assertEqual(len(self.gearman_server.getQueue()), 0)
         self.assertTrue(self.sched._areAllBuildsComplete())
 
         self.assertEqual(len(self.history), 1)
-        self.assertEqual(self.history[0].name, 'noop')
+        self.assertEqual(self.history[0].name, 'gate-noop')
         self.assertEqual(self.history[0].result, 'SUCCESS')
 
     def test_file_jobs(self):

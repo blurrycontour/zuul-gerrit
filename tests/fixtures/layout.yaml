@@ -232,6 +232,10 @@ projects:
         - conflict-project-test1
         - conflict-project-test2
 
+  - name: org/no-job-project
+    gate:
+      - gate-noop
+
   - name: org/noop-project
     gate:
       - noop
