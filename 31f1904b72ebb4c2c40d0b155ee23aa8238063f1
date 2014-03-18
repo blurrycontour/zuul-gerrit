@@ -16,6 +16,24 @@
       "revId": "31f1904b72ebb4c2c40d0b155ee23aa8238063f1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH//Twk\u003d",
+        "filename": "tests/fixtures/layout.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-03-18T17:58:27Z",
+      "side": 1,
+      "message": "Actually, it was here before, it was just called \u0027noop-project\u0027 and its purpose was to ensure that gate-noop was pre-registered before the reconfiguration test in test_stuck_job_cleanup.  However, we could actually just register that job manually in that test, so I\u0027ll move it there for clarity.",
+      "parentUuid": "AAAAWH//UCU\u003d",
+      "revId": "31f1904b72ebb4c2c40d0b155ee23aa8238063f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
