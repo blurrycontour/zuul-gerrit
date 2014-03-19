@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAWH//Jmw\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2875,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-03-19T22:03:24Z",
+      "side": 1,
+      "message": "(nit) Without the context of this patch \"this job\" is a little ambiguous. Suggest \"The gate-noop job won\u0027t be...\"",
+      "revId": "18c6444f3226dc0b22489955bc97a79a188b8443",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
