@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAWH//BoM\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 6172
+      },
+      "writtenOn": "2014-03-20T20:41:52Z",
+      "side": 1,
+      "message": "Lines 255-259 Could be simplified to :\n\n pipeline.merge_failure_actions \u003d \\\n       action_reporters[\u0027merge-failure\u0027] or action_reporters[\u0027failure\u0027]",
+      "revId": "b7179777f4df9d0832abb12c2fb055ab60b4499d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
