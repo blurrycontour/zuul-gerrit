@@ -19,7 +19,7 @@
 (function ($) {
     var $container, $msg, $msgWrap, $indicator, $queueInfo, $queueEventsNum,
         $queueResultsNum, $pipelines, $jq;
-    var xhr, prevHtml, zuul,
+    var xhr, prevData, zuul,
         demo = location.search.match(/[?&]demo=([^?&]*)/),
         source = demo ?
             './status-' + (demo[1] || 'basic') + '.json-sample' :
@@ -49,12 +49,17 @@
 
             xhr = $.ajax({
                 url: source,
-                dataType: 'json',
+                dataType: 'text',
                 cache: false
-            })
-            .done(function (data) {
-                var html = '';
-                data = data || {};
+            }).done(function (data) {
+                data = data || '';
+
+                if (data == prevData) {
+                    // Nothing to update
+                    return xhr;
+                }
+                prevData = data;
+                data = JSON.parse(data);
 
                 if ('message' in data) {
                     $msg.html(data.message);
@@ -74,15 +79,10 @@
                         last_reconfigured.toString());
                 }
 
+                $pipelines.html('');
                 $.each(data.pipelines, function (i, pipeline) {
-                    html += zuul.format.pipeline(pipeline);
+                    $pipelines.append(zuul.format.pipeline(pipeline));
                 });
-
-                // Only re-parse the DOM if we have to
-                if (html !== prevHtml) {
-                    prevHtml = html;
-                    $pipelines.html(html);
-                }
 
                 $queueEventsNum.text(
                     data.trigger_event_queue ?
@@ -107,68 +107,92 @@
 
         format: {
             change: function (change) {
-                var html = '<div class="well well-small zuul-change">' +
-                        '<ul class="nav nav-list">',
-                    id = change.id,
-                    url = change.url;
+                var $html = $('<div />'),
+                    $list = $('<ul />');
 
-                html += '<li class="nav-header">' + change.project;
-                if (id.length === 40) {
-                    id = id.substr(0, 7);
+                if (change.id.length === 40) {
+                    change.id = change.id.substr(0, 7);
                 }
-                html += ' <span class="zuul-change-id">';
-                if (url !== null) {
-                    html += '<a href="' + url + '">';
+
+                $html.addClass('well well-small zuul-change');
+                $list.addClass('nav nav-list');
+
+                var $first_item = $('<li />').html(change.project).
+                    addClass('nav-header');
+
+                if (change.url !== null) {
+                    var $id_span = $('<span />').append(
+                        $('<a href="' + change.url + '" />').html(change.id)
+                    );
                 }
-                html += id;
-                if (url !== null) {
-                    html += '</a>';
+                else {
+                    var $id_span = $('<span />').html(change.id);
                 }
-                html += '</span></li>';
+                $first_item.append($id_span.addClass('zuul-change-id'));
+                $list.append($first_item);
 
                 $.each(change.jobs, function (i, job) {
-                    var result = job.result ? job.result.toLowerCase() : null,
-                        resultClass = 'zuul-result label';
+                    var $item = $('<li />');
+
+                    var result = job.result ? job.result.toLowerCase() : null;
                     if (result === null) {
                         result = job.url ? 'in progress' : 'queued';
                     }
                     switch (result) {
-                    case 'success':
-                        resultClass += ' label-success';
-                        break;
-                    case 'failure':
-                        resultClass += ' label-important';
-                        break;
-                    case 'lost':
-                    case 'unstable':
-                        resultClass += ' label-warning';
-                        break;
+                        case 'success':
+                            resultClass = ' label-success';
+                            break;
+                        case 'failure':
+                            resultClass = ' label-important';
+                            break;
+                        case 'lost':
+                        case 'unstable':
+                            resultClass = ' label-warning';
+                            break;
                     }
-                    html += '<li class="zuul-change-job">';
-                    html += job.url !== null ?
-                        '<a href="' + job.url + '" ' +
-                        'class="zuul-change-job-link">' :
-                        '<span class="zuul-change-job-link">';
-                    html += job.name;
-                    html += ' <span class="' + resultClass + '">' + result +
-                        '</span>';
+
+                    $item.addClass('zuul-change-job');
+                    if (job.url !== null) {
+                        $job_line = $('<a href="' + job.url + '" />').
+                            addClass('zuul-change-job-link');
+                    }
+                    else{
+                        $job_line = $('<span />').
+                            addClass('zuul-change-job-link');
+                    }
+                    $job_line.html(job.name);
+                    $job_line.append(
+                        $('<span />').addClass('zuul-result label').
+                            addClass(resultClass).html(result)
+                    );
+
                     if (job.voting === false) {
-                        html += ' <span class="muted">(non-voting)</span>';
+                        $job_line.append(
+                            $(' <span />').addClass('muted').
+                                html(' (non-voting)')
+                        );
                     }
-                    html += job.url !== null ? '</a>' : '</span>';
-                    html += '</li>';
+                    $item.append($job_line);
+                    $list.append($item);
                 });
 
-                html += '</ul></div>';
-                return html;
+                $html.append($list);
+                return $html;
             },
 
             pipeline: function (pipeline) {
-                var html = '<div class="zuul-pipeline span4"><h3>' +
-                    pipeline.name + '</h3>';
+                var $html = $('<div />');
+
+                $html.addClass('zuul-pipeline span4');
+                $html.append(
+                    $('<h3 />').html(pipeline.name)
+                );
                 if (typeof pipeline.description === 'string') {
-                    html += '<p><small>' + pipeline.description +
-                        '</small></p>';
+                    $html.append(
+                        $('<p />').append(
+                            $('<small />').html(pipeline.description)
+                        )
+                    );
                 }
 
                 $.each(pipeline.change_queues,
@@ -177,26 +201,22 @@
                         if (pipeline.change_queues.length > 1 &&
                             headNum === 0) {
                             var name = changeQueue.name;
-                            html += '<p>Queue: <abbr title="' + name + '">';
                             if (name.length > 32) {
-                                name = name.substr(0, 32) + '...';
+                                short_name = name.substr(0, 32) + '...';
                             }
-                            html += name + '</abbr></p>';
+                            $html.append(
+                                $('<p />').html('Queue: ').append(
+                                    $('<abbr />').attr('title', name).
+                                        html(short_name)
+                                )
+                            );
                         }
                         $.each(changes, function (changeNum, change) {
-                            // If there are multiple changes in the same head
-                            // it means they're connected
-                            if (changeNum > 0) {
-                                html += '<div class="zuul-change-arrow">' +
-                                    '&uarr;</div>';
-                            }
-                            html += zuul.format.change(change);
+                            $html.append(zuul.format.change(change))
                         });
                     });
                 });
-
-                html += '</div>';
-                return html;
+                return $html;
             }
         },
 
