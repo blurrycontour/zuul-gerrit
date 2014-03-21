@@ -24,6 +24,9 @@
         source = demo ?
             './status-' + (demo[1] || 'basic') + '.json-sample' :
             'status.json';
+        if (demo[1] == 'openstack-live') {
+             source = 'http://zuul.openstack.org/status.json';
+        }
 
     zuul = {
         enabled: true,
