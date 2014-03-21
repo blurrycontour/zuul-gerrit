@@ -452,7 +452,7 @@
         $container.removeClass('zuul-container-loading');
         setTimeout(function () {
             $indicator.removeClass('zuul-spinner-on');
-        }, 550);
+        }, 500);
     });
 
     $jq.one('update-end', function () {
