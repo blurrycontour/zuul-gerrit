@@ -135,8 +135,8 @@
                 }
 
                 if (result == 'in progress') {
-                    return zuul.format.progress_bar(job.elapsed_time,
-                                                    job.remaining_time);
+                    return zuul.format.job_progress_bar(job.elapsed_time,
+                                                        job.remaining_time);
                 }
                 else {
                     return zuul.format.status_label(result);
@@ -145,7 +145,7 @@
 
             status_label: function(result) {
                 $status = $('<span />');
-                $status.addClass('zuul-result label');
+                $status.addClass('zuul-job-result label');
 
                 switch (result) {
                     case 'success':
@@ -167,11 +167,11 @@
                 return $status;
             },
 
-            progress_bar: function(elapsed_time, remaining_time) {
+            job_progress_bar: function(elapsed_time, remaining_time) {
                 progress_percent = 100 * (remaining_time / (elapsed_time +
                                                             remaining_time));
                 $bar_outter = $('<div />');
-                $bar_outter.addClass('progress zuul-result');
+                $bar_outter.addClass('progress zuul-job-result');
                 $bar_inner = $('<div />');
                 $bar_inner.addClass('progress-bar');
                 $bar_inner.attr('role', 'progressbar');
@@ -183,7 +183,6 @@
 
                 $bar_outter.append($bar_inner);
                 return $bar_outter;
-
             },
 
             enqueue_time: function(ms) {
@@ -226,6 +225,44 @@
                 return r;
             },
 
+            change_total_progress_bar: function(change) {
+                job_percent = Math.floor(100 / change.jobs.length);
+                $bar_outter = $('<div />');
+                $bar_outter.addClass('progress zuul-change-total-result');
+
+                $.each(change.jobs, function (i, job) {
+                    var result = job.result ? job.result.toLowerCase() : null;
+                    if (result === null) {
+                        result = job.url ? 'in progress' : 'queued';
+                    }
+
+                    if (result != 'queued') {
+                        $bar_inner = $('<div />');
+                        $bar_inner.addClass('progress-bar');
+
+                        switch (result) {
+                            case 'success':
+                                $bar_inner.addClass('progress-bar-success');
+                                break;
+                            case 'lost':
+                            case 'failure':
+                                $bar_inner.addClass('progress-bar-danger');
+                                break;
+                            case 'unstable':
+                                $bar_inner.addClass('progress-bar-warning');
+                                break;
+                            case 'in progress':
+                            case 'queued':
+                                break;
+                        }
+                        $bar_inner.attr('title', job.name);
+                        $bar_inner.css('width', job_percent + '%');
+                        $bar_outter.append($bar_inner);
+                    }
+                });
+                return $bar_outter;
+            },
+
             change_header: function(change) {
                 change_id = change.id;
                 if (change_id.length === 40) {
@@ -237,6 +274,7 @@
 
                 $left = $('<div />');
                 $left.addClass('col-xs-8')
+                $left.html(change.project + '<br />');
 
                 $change_link = $('<small />');
                 if (change.url !== null) {
@@ -247,9 +285,21 @@
                 else {
                     $change_link.html(change_id);
                 }
-                $left.html(change.project + '<br />');
-                $left.append($change_link);
 
+                $change_progress_row = $('<div />');
+                $change_progress_row.addClass('row');
+                $change_progress_row_left = $('<div />');
+                $change_progress_row_left.addClass('col-xs-3');
+                $change_progress_row_left.append($change_link);
+
+                $change_progress_row_right = $('<div />');
+                $change_progress_row_right.addClass('col-xs-9');
+                $change_progress_row_right.append(
+                    zuul.format.change_total_progress_bar(change));
+
+                $change_progress_row.append($change_progress_row_left,
+                                            $change_progress_row_right);
+                $left.append($change_progress_row);
 
                 remaining_time = zuul.format.time(change.remaining_time, true);
                 enqueue_time = zuul.format.enqueue_time(change.enqueue_time);
