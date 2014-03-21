@@ -3,6 +3,7 @@
 // Copyright 2012 OpenStack Foundation
 // Copyright 2013 Timo Tijhof
 // Copyright 2013 Wikimedia Foundation
+// Copyright 2014 Rackspace Australia
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may
 // not use this file except in compliance with the License. You may obtain
@@ -109,6 +110,107 @@
         },
 
         format: {
+            job: function(job) {
+                if (job.url !== null) {
+                    $job_line = $('<a href="' + job.url + '" />');
+                }
+                else{
+                    $job_line = $('<span />');
+                }
+                $job_line.html(job.name)
+                    .append(zuul.format.job_status(job));
+
+                if (job.voting === false) {
+                    $job_line.append(
+                        $(' <small />').html(' (non-voting)')
+                    );
+                }
+                return $job_line;
+            },
+
+            job_status: function(job) {
+                var result = job.result ? job.result.toLowerCase() : null;
+                if (result === null) {
+                    result = job.url ? 'in progress' : 'queued';
+                }
+
+                if (result == 'in progress') {
+                    return zuul.format.progress_bar(job.elapsed_time,
+                                                    job.remaining_time);
+                }
+                else {
+                    return zuul.format.status_label(result);
+                }
+            },
+
+            status_label: function(result) {
+                $status = $('<span />');
+                $status.addClass('zuul-result label');
+
+                switch (result) {
+                    case 'success':
+                        $status.addClass('label-success');
+                        break;
+                    case 'failure':
+                        $status.addClass('label-danger');
+                        break;
+                    case 'unstable':
+                        $status.addClass('label-warning');
+                        break;
+                    case 'in progress':
+                    case 'queued':
+                    case 'lost':
+                        $status.addClass('label-default');
+                        break;
+                }
+                $status.html(result);
+                return $status;
+            },
+
+            progress_bar: function(elapsed_time, remaining_time) {
+                var progress_percent = 100 * (elapsed_time / (elapsed_time +
+                                                              remaining_time));
+                var $bar_inner = $('<div />')
+                    .addClass('progress-bar')
+                    .attr('role', 'progressbar')
+                    .attr('aria-valuenow', 'progressbar')
+                    .attr('aria-valuemin', progress_percent)
+                    .attr('aria-valuemin', '0')
+                    .attr('aria-valuemax', '100')
+                    .css('width', progress_percent + '%');
+
+                var $bar_outter = $('<div />')
+                    .addClass('progress zuul-result')
+                    .append($bar_inner);
+
+                return $bar_outter;
+            },
+
+            time: function(ms, words) {
+                if (typeof(words) === 'undefined') words = false;
+                var seconds = (+ms)/1000;
+                var minutes = Math.floor(seconds/60);
+                var hours = Math.floor(minutes/60);
+                seconds = Math.floor(seconds % 60);
+                minutes = Math.floor(minutes % 60);
+                r = '';
+                if (words) {
+                    if (hours) {
+                        r += hours;
+                        r += ' hr ';
+                    }
+                    r += minutes + ' min';
+                } else {
+                    if (hours < 10) r += '0';
+                    r += hours + ':';
+                    if (minutes < 10) r += '0';
+                    r += minutes + ':';
+                    if (seconds < 10) r += '0';
+                    r += seconds;
+                }
+                return r;
+            },
+
             change: function (change) {
                 var $html = $('<div />');
 
@@ -138,49 +240,7 @@
                     var $item = $('<li />');
                     $item.addClass('list-group-item');
                     $item.addClass('zuul-change-job');
-
-                    if (job.url !== null) {
-                        $job_line = $('<a href="' + job.url + '" />').
-                            addClass('zuul-change-job-link');
-                    }
-                    else{
-                        $job_line = $('<span />').
-                            addClass('zuul-change-job-link');
-                    }
-                    $job_line.html(job.name);
-
-                    var result = job.result ? job.result.toLowerCase() : null;
-                    if (result === null) {
-                        result = job.url ? 'in progress' : 'queued';
-                    }
-                    switch (result) {
-                        case 'success':
-                            resultClass = ' label-success';
-                            break;
-                        case 'failure':
-                            resultClass = ' label-danger';
-                            break;
-                        case 'unstable':
-                            resultClass = ' label-warning';
-                            break;
-                        case 'in progress':
-                        case 'queued':
-                        case 'lost':
-                            resultClass = ' label-default';
-                            break;
-                    }
-                    $job_line.append(
-                        $('<span />').addClass('zuul-result label').
-                            addClass(resultClass).html(result)
-                    );
-
-                    if (job.voting === false) {
-                        $job_line.append(
-                            $(' <span />').addClass('muted').
-                                html(' (non-voting)')
-                        );
-                    }
-                    $item.append($job_line);
+                    $item.append(zuul.format.job(job));
                     $list.append($item);
                 });
 
@@ -209,8 +269,9 @@
                         if (pipeline.change_queues.length > 1 &&
                             headNum === 0) {
                             var name = changeQueue.name;
-                            if (name.length > 32) {
-                                short_name = name.substr(0, 32) + '...';
+                            var short_name = name;
+                            if (short_name.length > 32) {
+                                short_name = short_name.substr(0, 32) + '...';
                             }
                             $html.append(
                                 $('<p />').html('Queue: ').append(
