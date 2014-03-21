@@ -31,6 +31,7 @@
 
     zuul = {
         enabled: true,
+        collapsed_exceptions: [],
 
         schedule: function () {
             if (!zuul.enabled) {
@@ -264,7 +265,7 @@
             },
 
             change_header: function(change) {
-                change_id = change.id;
+                change_id = change.id || 'NA';
                 if (change_id.length === 40) {
                     change_id = change_id.substr(0, 7);
                 }
@@ -329,16 +330,27 @@
             },
 
             change_panel: function (change) {
-                var $html = $('<div />');
-                $html.addClass('panel panel-default zuul-change');
+                var $panel = $('<div />');
+                $panel.addClass('panel panel-default zuul-change');
+                if (change.id !== null) {
+                    $panel.attr('id', change.id.replace(',', '_'));
+                }
+                else{
+                    // Not a change. Use a combination of project and
+                    // enqueue time
+                    $panel.attr('id', change.project.replace('/', '_') + '-' +
+                                change.enqueue_time);
+                }
 
                 var $header = $('<div />');
-                $header.addClass('panel-heading');
+                $header.addClass('panel-heading patchset-header');
                 $header.append(zuul.format.change_header(change));
 
-                $html.append($header);
-                $html.append(zuul.format.change_list(change.jobs));
-                return $html;
+                $panel.append($header);
+                $panel.append(zuul.format.change_list(change.jobs));
+                $header.click(zuul.toggle_patchset);
+                zuul.display_patchset($panel);
+                return $panel;
             },
 
             pipeline: function (pipeline) {
@@ -362,6 +374,7 @@
                         if (pipeline.change_queues.length > 1 &&
                             headNum === 0) {
                             var name = changeQueue.name;
+                            short_name = name;
                             if (name.length > 32) {
                                 short_name = name.substr(0, 32) + '...';
                             }
@@ -392,7 +405,41 @@
         one: function () {
             $jq.one.apply($jq, arguments);
             return this;
-        }
+        },
+
+        toggle_patchset: function(e) {
+            // Toggle showing/hiding the patchset when the header is clicked
+            // Grab the patchset panel
+            $panel = $(e.target).parents('.zuul-change');
+            $body = $panel.children(':not(.patchset-header)');
+            $body.toggle(200);
+            collapsed_index = zuul.collapsed_exceptions.indexOf(
+                $panel.attr('id'));
+            if (collapsed_index == -1 ) {
+                // Currently not an exception, add it to list
+                zuul.collapsed_exceptions.push($panel.attr('id'));
+            }
+            else {
+                // Currently an except, remove from exceptions
+                zuul.collapsed_exceptions.splice(collapsed_index, 1);
+            }
+        },
+
+        display_patchset: function($panel) {
+            // Determine if to show or hide the patchset when loaded
+            $body = $panel.children(':not(.patchset-header)');
+            collapsed_index = zuul.collapsed_exceptions.indexOf(
+                $panel.attr('id'));
+            if (collapsed_index == -1 ) {
+                // Currently not an exception
+                // we are hiding by default
+                $body.hide();
+            }
+            else {
+                // Currently an exception
+                // Do nothing more (will display)
+            }
+        },
     };
 
     $jq = $(zuul);
