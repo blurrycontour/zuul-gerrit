@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAWH/++iQ\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 6172
+      },
+      "writtenOn": "2014-03-21T08:31:20Z",
+      "side": 1,
+      "message": "I wold prefer to refactor this code a bit, a make it more readable e.g.: \n\n  var $header \u003d $(\u0027\u003cdiv /\u003e\u0027); \n  $header\n     .addClass(\u0027panel-heading patchset-header\u0027)\n     .append(zuul.format.change_list(change.jobs));\n\n  var panel_id \u003d change.id ? change.id.replace(\u0027,\u0027,  \u0027_\u0027)\n                           : change.project.replace(\u0027/\u0027,  \u0027_\u0027) + \u0027-\u0027 + change.enqueue_time\n  var $panel \u003d $(\u0027\u003cdiv /\u003e\u0027);\n  $panel\n      .attr(\"id\", panel_id)\n      .addClass(\u0027panel panel-default zuul-change\u0027)\n      .append($header)\n      .append(zuul.format.change_list(change.jobs));\n     \n  $header.click(zuul.toggle_patchset);\n  zuul.display_patchset($panel);\n  return $panel;",
+      "revId": "106bfddca74dc1dd42cabdac352f086df0e2fd0a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
