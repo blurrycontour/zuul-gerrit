@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAWH/++d0\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 6172
+      },
+      "writtenOn": "2014-03-21T08:40:51Z",
+      "side": 1,
+      "message": "it will be cleaner if you use dot notation: \n\n  $change_progress_row_left \u003d $(\u0027\u003cdiv /\u003e\u0027)\n     .addClass(\u0027col-xs-3\u0027)\n     .append($change_link);\n  $change_progress_row_right \u003d $(\u0027\u003cdiv /\u003e\u0027)\n     .addClass(\u0027col-xs-9\u0027)\n     .append(zuul.format.change_total_progress_bar(change))\n\n  $change_progress_row \u003d $(\u0027\u003cdiv /\u003e\u0027)\n     .addClass(\u0027row\u0027)\n     .append($change_progress_row_left)  \n     .append($change_progress_row_right) \n\n  $left.append($change_progress_row);",
+      "revId": "02ad12dd0bd46f3ec3423e03b34081fd62cf06a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
