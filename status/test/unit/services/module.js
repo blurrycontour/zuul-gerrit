@@ -14,7 +14,10 @@
  * under the License.
  */
 
-describe('zuul.services', function () {
+describe('zuul', function () {
     'use strict';
 
+    it('should have jQuery', function () {
+        expect(jQuery).toBeTruthy();
+    });
 });
