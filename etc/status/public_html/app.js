@@ -21,6 +21,7 @@
     var $container, $msg, $indicator, $queueInfo, $queueEventsNum,
         $queueResultsNum, $pipelines, $jq;
     var xhr, zuul,
+        current_filter = '',
         demo = location.search.match(/[?&]demo=([^?&]*)/),
         source = demo ?
             './status-' + (demo[1] || 'basic') + '.json-sample' :
@@ -28,6 +29,24 @@
         if (demo[1] == 'openstack-live') {
              source = 'http://zuul.openstack.org/status.json';
         }
+
+    function set_cookie(name, value) {
+        document.cookie = name + "=" + value + "; path=/";
+    }
+
+    function read_cookie(name, default_value) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0;i < ca.length;i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) == 0) {
+                return c.substring(nameEQ.length, c.length);
+            }
+        }
+        return default_value;
+    }
+
 
     zuul = {
         enabled: true,
@@ -282,10 +301,13 @@
                     .append($change_progress_row_left)
                     .append($change_progress_row_right)
 
+                $project_span = $('<span />')
+                    .addClass('change_project')
+                    .html(change.project);
+
                 $left = $('<div />')
                     .addClass('col-xs-8')
-                    .html(change.project + '<br />')
-                    .append($change_progress_row);
+                    .append($project_span, $('<br />'), $change_progress_row);
 
                 remaining_time = zuul.format.time(change.remaining_time, true);
                 enqueue_time = zuul.format.enqueue_time(change.enqueue_time);
@@ -334,7 +356,6 @@
                     .append(zuul.format.change_list(change.jobs));
 
                 $header.click(zuul.toggle_patchset);
-                zuul.display_patchset($panel);
                 return $panel;
             },
 
@@ -372,12 +393,67 @@
                             );
                         }
                         $.each(changes, function (changeNum, change) {
-                            $html.append(zuul.format.change_panel(change))
+                            var $panel = zuul.format.change_panel(change);
+                            $html.append($panel)
+                            zuul.display_patchset($panel);
                         });
                     });
                 });
                 return $html;
-            }
+            },
+
+            filter_form_group: function(default_text) {
+                // Update the filter form with a clear button if required
+
+                var $label = $('<label />')
+                    .addClass('control-label')
+                    .attr('for', 'filter_string')
+                    .html('Filters')
+                    .css('padding-right', '0.5em');
+
+                var $input = $('<input />')
+                    .attr('type', 'text')
+                    .attr('id', 'filter_string')
+                    .addClass('form-control')
+                    .attr('title',
+                          'project(s), pipeline(s) or review(s) comma ' +
+                          'separated')
+                    .attr('value', default_text);
+
+                $input.change(zuul.handle_filter_change);
+
+                var $clear_icon = $('<span />')
+                    .addClass('form-control-feedback')
+                    .addClass('glyphicon glyphicon-remove-circle')
+                    .attr('id', 'filter_form_clear_box')
+                    .css('cursor', 'pointer');
+
+                $clear_icon.click(function() {
+                    $('#filter_string').val('').change();
+                });
+
+                if (default_text == '') {
+                    $clear_icon.hide();
+                }
+
+                var $form_group = $('<div />')
+                    .addClass('form-group has-feedback')
+                    .append($label, $input, $clear_icon);
+                return $form_group;
+            },
+
+            filter_form: function() {
+                // Build the filter form filling anything from cookies
+
+                $filter_form = $('<form />')
+                    .attr('role', 'form')
+                    .addClass('form-inline')
+                    .submit(zuul.handle_filter_change);
+
+                $filter_form.append(zuul.format.filter_form_group(
+                    current_filter));
+                return $filter_form;
+            },
         },
 
         emit: function () {
@@ -411,8 +487,11 @@
             }
         },
 
-        display_patchset: function($panel) {
-            // Determine if to show or hide the patchset when loaded
+        display_patchset: function($panel, animate) {
+            // Determine if to show or hide the patchset and/or the results
+            // when loaded
+
+            // See if we should hide the body/results
             $body = $panel.children(':not(.patchset-header)');
             collapsed_index = zuul.collapsed_exceptions.indexOf(
                 $panel.attr('id'));
@@ -425,8 +504,58 @@
                 // Currently an exception
                 // Do nothing more (will display)
             }
+
+            // Check if we should hide the whole panel
+            var panel_project = $panel.find('.change_project').html()
+                .toLowerCase();
+            var panel_pipeline = $panel.parents('.zuul-pipeline')
+                .children('h3').html().toLowerCase();
+            var panel_change = $panel.attr('id');
+            if (current_filter != '') {
+                show_panel = false;
+                filter = current_filter.trim().split(/[\s,]+/);
+                $.each(filter, function(index, f_val) {
+                    if (f_val != '') {
+                        f_val = f_val.toLowerCase();
+                        if (panel_project.indexOf(f_val) != '-1' ||
+                            panel_pipeline.indexOf(f_val) != '-1' ||
+                            panel_change.indexOf(f_val) != '-1') {
+                            show_panel = true;
+                        }
+                    }
+                });
+                if (show_panel == true) {
+                    $panel.show(animate);
+                }
+                else {
+                    $panel.hide(animate);
+                }
+            }
+            else {
+                $panel.show(animate);
+            }
+        },
+
+        handle_filter_change: function(e) {
+            // Update the filter and save it to a cookie
+            current_filter = $('#filter_string').val();
+            set_cookie('zuul_filter_string', current_filter);
+            if (current_filter == '') {
+                $('#filter_form_clear_box').hide();
+            }
+            else {
+                $('#filter_form_clear_box').show();
+            }
+
+            $('.zuul-change').each(function(index, obj) {
+                $panel = $(obj);
+                zuul.display_patchset($panel, 200);
+            })
+            return false;
         },
     };
+
+    current_filter = read_cookie('zuul_filter_string', current_filter);
 
     $jq = $(zuul);
 
@@ -461,6 +590,9 @@
                        '<span>0</span> results.</p>');
         $queueEventsNum =  $queueInfo.find('span').eq(0);
         $queueResultsNum =  $queueEventsNum.next();
+
+        $filter_form = zuul.format.filter_form();
+
         $pipelines = $('<div class="row"></div>');
         $zuulVersion = $('<p>Zuul version: <span id="zuul-version-span">' +
                          '</span></p>');
@@ -468,8 +600,9 @@
                         '<span id="last-reconfigured-span"></span></p>');
 
         $container = $('#zuul-container').append($msg, $indicator,
-                                                 $queueInfo, $pipelines,
-                                                 $zuulVersion, $lastReconf);
+                                                 $queueInfo, $filter_form,
+                                                 $pipelines, $zuulVersion,
+                                                 $lastReconf);
 
         zuul.schedule();
 
