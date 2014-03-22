@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAWH/+2uQ\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 6172
+      },
+      "writtenOn": "2014-03-22T22:23:28Z",
+      "side": 1,
+      "message": "Nice refactoring, I like it, but we can make it even better, if we remove 117,118 lines:\n\n var $html \u003d $(\u0027\u003cdiv /\u003e\u0027).addClass(\u0027well well-small zuul-change\u0027),\n       $list \u003d $(\u0027\u003cul /\u003e\u0027).addClass(\u0027nav nav-list\u0027);",
+      "revId": "a20d8c41700a0b383c7567f180a1013a9112124b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/+2t8\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 6172
+      },
+      "writtenOn": "2014-03-22T22:23:28Z",
+      "side": 1,
+      "message": "here and multiply times above 2 nits: \n\n$(\"\u003ca /\u003e\").attr(\"href\", change.url).text(change.id)\n\nabout attr: \n\nAs in other place we are trying to avoid to generate by hand proper HTML code.. we can use here \"attr\" to set \"href\"\n\n\nhtml() vs text(): \nThere result will be the same in our case, but actually it will be better to avoid even possibility of \"xss\" and other nasty stuff",
+      "revId": "a20d8c41700a0b383c7567f180a1013a9112124b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/+2t4\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 6172
+      },
+      "writtenOn": "2014-03-22T22:23:28Z",
+      "side": 1,
+      "message": "var $html \u003d $(\u0027\u003cdiv /\u003e\u0027)\n       .addClass(\u0027zuul-pipeline span4\u0027)\n       .append($(\u0027\u003ch3 /\u003e\u0027).html(pipeline.name));",
+      "revId": "a20d8c41700a0b383c7567f180a1013a9112124b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/+2tk\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 6172
+      },
+      "writtenOn": "2014-03-22T22:23:28Z",
+      "side": 1,
+      "message": "Usually to make dot notation cleaner, js developers are using next formatting:  \n\n $html.append(\n   $(\u0027\u003cp /\u003e\u0027)\n       .html(\u0027Queue: \u0027)\n       .append(\n           $(\u0027\u003cabbr /\u003e\u0027)\n                .attr(\u0027title\u0027, name)\n                .html(short_name)\n       )\n )",
+      "revId": "a20d8c41700a0b383c7567f180a1013a9112124b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
