@@ -1,0 +1,45 @@
+<!--
+Copyright 2013 OpenStack Foundation
+Copyright 2013 Timo Tijhof
+Copyright 2013 Wikimedia Foundation
+Copyright 2014 Hewlett-Packard Development Company, L.P.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may
+not use this file except in compliance with the License. You may obtain
+a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+License for the specific language governing permissions and limitations
+under the License.
+-->
+<!DOCTYPE html>
+<html id="ng-app" ng-app="zuul-status" dir="ltr" lang="en">
+<head>
+    <title>Zuul Status</title>
+
+    <!-- build:js(bower_components) /js/libs.js -->
+    <script src="jquery/jquery.js"></script>
+    <script src="jquery-visibility/jquery-visibility.js"></script>
+    <script src="jquery-graphite/jquery.graphite.js"></script>
+    <script src="bootstrap/dist/js/bootstrap.js"></script>
+    <!-- endbuild -->
+
+    <script src="js/status.js"></script>
+
+    <link rel="stylesheet" href="styles/main.css" />
+
+</head>
+<body>
+
+    <div class="container">
+        <h1>Zuul Status</h1>
+        <p>Real-time status monitor of Zuul, the pipeline manager between Gerrit and Workers.</p>
+
+        <div class="zuul-container" id="zuul-container"></div>
+    </div>
+</body>
+</html>
