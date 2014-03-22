@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAWH/+2s8\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 6172
+      },
+      "writtenOn": "2014-03-22T22:49:24Z",
+      "side": 1,
+      "message": "oh this can be very dangerous, cause without \"var\" it\u0027s global variable..\npls add \"var\" here\n\nand as well it will be better to make $(\"\u003ca\u003e\").attr(\"href\", job.url)",
+      "revId": "437c9c727895588b87434561cdb9c9eb0584decf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/+2sw\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 6172
+      },
+      "writtenOn": "2014-03-22T22:49:24Z",
+      "side": 1,
+      "message": "why we don\u0027t use here .text() ? (in other cases as well)",
+      "revId": "437c9c727895588b87434561cdb9c9eb0584decf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/+2tA\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 6172
+      },
+      "writtenOn": "2014-03-22T22:49:24Z",
+      "side": 1,
+      "message": "Somewhere on top we already used ||\n\n  result \u003d result || (job.url ? \u0027in progress\u0027 : \u0027queued\u0027);",
+      "revId": "437c9c727895588b87434561cdb9c9eb0584decf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/+2sQ\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 6172
+      },
+      "writtenOn": "2014-03-22T22:49:24Z",
+      "side": 1,
+      "message": "you may use here dot notation",
+      "revId": "437c9c727895588b87434561cdb9c9eb0584decf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/+2sE\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 6172
+      },
+      "writtenOn": "2014-03-22T22:49:24Z",
+      "side": 1,
+      "message": "lol didn\u0027t know about this way to covert str to number!\u003d) thanks",
+      "revId": "437c9c727895588b87434561cdb9c9eb0584decf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/+2r4\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 6172
+      },
+      "writtenOn": "2014-03-22T22:49:24Z",
+      "side": 1,
+      "message": "\"var r\" it\u0027s important",
+      "revId": "437c9c727895588b87434561cdb9c9eb0584decf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
