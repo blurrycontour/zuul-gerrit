@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAWH/+2YI\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 6786
+      },
+      "writtenOn": "2014-03-23T06:56:56Z",
+      "side": 1,
+      "message": "+1 getJSON will look much clearer.",
+      "parentUuid": "AAAAWH/+2tU\u003d",
+      "revId": "a20d8c41700a0b383c7567f180a1013a9112124b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAWH/+2uQ\u003d",
         "filename": "etc/status/public_html/app.js",
         "patchSetId": 2
