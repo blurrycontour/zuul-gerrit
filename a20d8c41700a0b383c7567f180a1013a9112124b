@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAWH/+1IU\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-03-23T23:47:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAWH/+2YI\u003d",
+      "revId": "a20d8c41700a0b383c7567f180a1013a9112124b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAWH/+2uQ\u003d",
         "filename": "etc/status/public_html/app.js",
         "patchSetId": 2
@@ -48,6 +66,24 @@
       "writtenOn": "2014-03-22T22:23:28Z",
       "side": 1,
       "message": "Nice refactoring, I like it, but we can make it even better, if we remove 117,118 lines:\n\n var $html \u003d $(\u0027\u003cdiv /\u003e\u0027).addClass(\u0027well well-small zuul-change\u0027),\n       $list \u003d $(\u0027\u003cul /\u003e\u0027).addClass(\u0027nav nav-list\u0027);",
+      "revId": "a20d8c41700a0b383c7567f180a1013a9112124b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/+1Gg\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-03-23T23:47:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAWH/+2uQ\u003d",
       "revId": "a20d8c41700a0b383c7567f180a1013a9112124b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -71,6 +107,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAWH/+1Gk\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-03-23T23:47:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAWH/+2t8\u003d",
+      "revId": "a20d8c41700a0b383c7567f180a1013a9112124b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAWH/+2t4\u003d",
         "filename": "etc/status/public_html/app.js",
         "patchSetId": 2
@@ -88,6 +142,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAWH/+1GA\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-03-23T23:47:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAWH/+2t4\u003d",
+      "revId": "a20d8c41700a0b383c7567f180a1013a9112124b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAWH/+2tk\u003d",
         "filename": "etc/status/public_html/app.js",
         "patchSetId": 2
@@ -99,6 +171,24 @@
       "writtenOn": "2014-03-22T22:23:28Z",
       "side": 1,
       "message": "Usually to make dot notation cleaner, js developers are using next formatting:  \n\n $html.append(\n   $(\u0027\u003cp /\u003e\u0027)\n       .html(\u0027Queue: \u0027)\n       .append(\n           $(\u0027\u003cabbr /\u003e\u0027)\n                .attr(\u0027title\u0027, name)\n                .html(short_name)\n       )\n )",
+      "revId": "a20d8c41700a0b383c7567f180a1013a9112124b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/+1Fs\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-03-23T23:47:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAWH/+2tk\u003d",
       "revId": "a20d8c41700a0b383c7567f180a1013a9112124b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
