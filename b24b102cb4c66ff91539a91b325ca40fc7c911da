@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAWH/+ziA\u003d",
+        "filename": "bower.json",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-03-24T07:35:06Z",
+      "side": 1,
+      "message": "some rouge whitespace here",
+      "revId": "b24b102cb4c66ff91539a91b325ca40fc7c911da",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/+zh4\u003d",
+        "filename": "package.json",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-03-24T07:35:06Z",
+      "side": 1,
+      "message": "rouge tab here",
+      "revId": "b24b102cb4c66ff91539a91b325ca40fc7c911da",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
