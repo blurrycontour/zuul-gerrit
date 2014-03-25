@@ -1,0 +1,225 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAWH/+qSg\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 5
+      },
+      "lineNbr": 275,
+      "author": {
+        "id": 6172
+      },
+      "writtenOn": "2014-03-25T08:30:37Z",
+      "side": 1,
+      "message": "Let\u0027s improve this method a bit.\n\nvar change_id",
+      "revId": "96aee3919dd5626cc2e9964c3565d5883dfbbe7e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/+qSM\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 5
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 6172
+      },
+      "writtenOn": "2014-03-25T08:30:37Z",
+      "side": 1,
+      "message": "var",
+      "revId": "96aee3919dd5626cc2e9964c3565d5883dfbbe7e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/+qSI\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 5
+      },
+      "lineNbr": 290,
+      "author": {
+        "id": 6172
+      },
+      "writtenOn": "2014-03-25T08:30:37Z",
+      "side": 1,
+      "message": "var",
+      "revId": "96aee3919dd5626cc2e9964c3565d5883dfbbe7e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/+qSA\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 5
+      },
+      "lineNbr": 294,
+      "author": {
+        "id": 6172
+      },
+      "writtenOn": "2014-03-25T08:30:37Z",
+      "side": 1,
+      "message": "var",
+      "revId": "96aee3919dd5626cc2e9964c3565d5883dfbbe7e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/+qR8\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 5
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 6172
+      },
+      "writtenOn": "2014-03-25T08:30:37Z",
+      "side": 1,
+      "message": "var",
+      "revId": "96aee3919dd5626cc2e9964c3565d5883dfbbe7e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/+qSk\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 5
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 6172
+      },
+      "writtenOn": "2014-03-25T08:30:37Z",
+      "side": 1,
+      "message": "var $project_span",
+      "revId": "96aee3919dd5626cc2e9964c3565d5883dfbbe7e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/+qRs\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 5
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 6172
+      },
+      "writtenOn": "2014-03-25T08:30:37Z",
+      "side": 1,
+      "message": "var",
+      "revId": "96aee3919dd5626cc2e9964c3565d5883dfbbe7e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/+qRc\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 5
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 6172
+      },
+      "writtenOn": "2014-03-25T08:30:37Z",
+      "side": 1,
+      "message": "var",
+      "revId": "96aee3919dd5626cc2e9964c3565d5883dfbbe7e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/+qRU\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 5
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 6172
+      },
+      "writtenOn": "2014-03-25T08:30:37Z",
+      "side": 1,
+      "message": "var",
+      "revId": "96aee3919dd5626cc2e9964c3565d5883dfbbe7e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/+qRE\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 5
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 6172
+      },
+      "writtenOn": "2014-03-25T08:30:37Z",
+      "side": 1,
+      "message": "var, and I think that we should use \"text\" instead of \"html\"\n\nand it will be simpler to read if you write: \n\n  $remaining_time \u003d $(\u0027\u003csmall /\u003e\u0027)\n      .addClass(\u0027time\u0027)\n      .attr(\u0027title\u0027, \u0027Remaining Time\u0027)\n      .text(remaining_time);",
+      "revId": "96aee3919dd5626cc2e9964c3565d5883dfbbe7e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/+qQ8\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 5
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 6172
+      },
+      "writtenOn": "2014-03-25T08:30:37Z",
+      "side": 1,
+      "message": "same here\n\n  var $enqueue_time \u003d $(\u0027\u003csmall /\u003e\u0027)\n       .addClass(\u0027time\u0027)\n       .attr(\u0027title\u0027, \u0027Elapsed Time\u0027)\n       .text(enqueue_time);",
+      "revId": "96aee3919dd5626cc2e9964c3565d5883dfbbe7e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/+qQI\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 5
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 6172
+      },
+      "writtenOn": "2014-03-25T08:30:37Z",
+      "side": 1,
+      "message": "var",
+      "revId": "96aee3919dd5626cc2e9964c3565d5883dfbbe7e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/+qQA\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 5
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 6172
+      },
+      "writtenOn": "2014-03-25T08:30:37Z",
+      "side": 1,
+      "message": "var",
+      "revId": "96aee3919dd5626cc2e9964c3565d5883dfbbe7e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
