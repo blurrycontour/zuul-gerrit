@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAWH/+swM\u003d",
+        "filename": "tools/install-js.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 9717
+      },
+      "writtenOn": "2014-03-25T00:11:41Z",
+      "side": 1,
+      "message": "This version of node (in fact, all current published versions of node) currently are packaged with a version of npm that is no longer compatible with the certificate chain of the upstream repository. \n\nTo circumvent this, you have to temporarily ignore the CA chain, upgrade npm, and then re-enable the CA chain, as follows:\n\nnodeenv -p {envdir} --node\u003d0.10.26 || true\n\nnpm config set ca \"\"\n\nnpm install npm -g\n\nnpm config delete ca",
+      "revId": "dda463a892edd96651f79f05f319857dc296cfa1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
