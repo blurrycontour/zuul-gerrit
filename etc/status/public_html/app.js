@@ -53,11 +53,11 @@
 
         schedule: function () {
             if (!zuul.enabled) {
-                setTimeout(zuul.schedule, 5000);
+                setTimeout(zuul.schedule, 5000000);
                 return;
             }
             zuul.update().complete(function () {
-                setTimeout(zuul.schedule, 5000);
+                setTimeout(zuul.schedule, 5000000);
             });
         },
 
@@ -327,7 +327,7 @@
 
             change_list: function(jobs) {
                 var $list = $('<ul />')
-                    .addClass('list-group');
+                    .addClass('list-group zuul-patchset-body');
 
                 $.each(jobs, function (i, job) {
                     var $item = $('<li />')
@@ -342,7 +342,7 @@
 
             change_panel: function (change) {
                 var $header = $('<div />')
-                    .addClass('panel-heading patchset-header')
+                    .addClass('panel-heading zuul-patchset-header')
                     .append(zuul.format.change_header(change));
 
                 var panel_id = change.id ? change.id.replace(',', '_')
@@ -351,6 +351,7 @@
                 var $panel = $('<div />')
                     .attr("id", panel_id)
                     .addClass('panel panel-default zuul-change')
+                    .css('margin-bottom', '5px')
                     .append($header)
                     .append(zuul.format.change_list(change.jobs));
 
@@ -358,10 +359,142 @@
                 return $panel;
             },
 
+            change_status_icon: function(change) {
+                var icon_class = 'text-success glyphicon-ok-sign';
+                var icon_title = 'Succeeding';
+
+                if (change.active != true) {
+                    // Grey icon
+                    icon_class = 'text-muted glyphicon-minus-sign';
+                    icon_title = 'Waiting until closer to head of queue to'
+                        + ' start jobs';
+                }
+                else if (change.failing_reasons &&
+                         change.failing_reasons.length > 0) {
+                    var reason = change['failing_reasons'].join(', ');
+                    icon_title = 'Failing because ' + reason;
+                    if (reason.match(/merge conflict/)) {
+                        // Black icon
+                        icon_class = 'text-warning ' +
+                            'glyphicon-remove-sign';
+                    }
+                    else {
+                        // Red icon
+                        icon_class = 'text-danger ' +
+                            'glyphicon-remove-sign';
+                    }
+                }
+
+                $icon = $('<span />')
+                    .addClass('glyphicon')
+                    .addClass(icon_class)
+                    .css('font-size', '22px')
+                    .attr('title', icon_title);
+
+                return $icon;
+            },
+
+            change_tree_branch: function(change, change_queue) {
+                $tracks = $('<tr />')
+                    .css('height', '100%')
+                    .css('padding', '0')
+                    .css('margin', '0');
+
+                for (var i = 0; i < change_queue._tree_columns; i++) {
+                    var $rail  = $('<td />')
+                        .css('height', '100%')
+                        .css('padding', '0')
+                        .css('margin', '0');
+
+                    if (i < change._tree.length && change._tree[i] !== null) {
+                        a = '<span>|</span>';
+                        $rail.append($(a));
+                        $rail.css('background', 'green');
+                    }
+
+                    if (i == change._tree_index) {
+                        $rail.append(zuul.format.change_status_icon(change));
+
+                        if (change._tree_branches.indexOf(i) != -1) {
+                            if (change._tree_branches.indexOf(i) ==
+                                change._tree_branches.length - 1) {
+                                // Angle line
+                                a = '<span>&gt;</span>';
+                                $rail.append($(a));
+                            }
+                            else {
+                                // T line
+                                a = '<span>T</span>';
+                                $rail.append($(a));
+                            }
+                        }
+                    }
+                    $tracks.append($rail);
+                }
+                var $table = $('<table />')
+                    .addClass('table-borderless')
+                    .css('height', '100%')
+                    .css('padding', '0')
+                    .css('margin', '0')
+                    .append($tracks);
+                return $table;
+            },
+
+            change_with_status_tree: function(change, change_queue) {
+                var $tree_column = $('<div />')
+                    .addClass('col-xs-1')
+                    .css('display', 'table-cell')
+                    .css('float', 'right')
+                    .append(
+                        zuul.format.change_tree_branch(change, change_queue)
+                    );
+                var $change_column = $('<div />')
+                    .addClass('col-xs-11')
+                    .css('display', 'table-cell')
+                    .css('float', 'none')
+                    .css('padding', '0')
+                    .append(zuul.format.change_panel(change));
+
+                var $change_box = $('<div />')
+                    .addClass('row zuul-change-box')
+                    .css('display', 'table')
+                    .append($tree_column)
+                    .append($change_column);
+
+                // var $tree_column = $('<td />')
+                //     .append(
+                //         zuul.format.change_tree_branch(change, change_queue)
+                //     );
+                // var $change_column = $('<td />')
+                //     .append(zuul.format.change_panel(change));
+
+                // var $change_box = $('<tabe />')
+                //     .addClass('zuul-change-box')
+                //     .append(
+                //         $('<tr />')
+                //         .append($tree_column)
+                //         .append($change_column)
+                //     );
+
+                return $change_box;
+            },
+
             pipeline: function (pipeline) {
+                var count = zuul.create_tree(pipeline);
                 var $html = $('<div />')
                     .addClass('zuul-pipeline col-md-4')
-                    .append($('<h3 />').text(pipeline.name));
+                    .append(
+                        $('<h3 />')
+                            .css('vertical-align', 'middle')
+                            .text(pipeline.name)
+                            .append(
+                                $('<span />')
+                                    .addClass('badge pull-right')
+                                    .css('vertical-align', 'middle')
+                                    .css('margin-top', '0.5em')
+                                    .text(count)
+                            )
+                    );
 
                 if (typeof pipeline.description === 'string') {
                     $html.append(
@@ -372,11 +505,11 @@
                 }
 
                 $.each(pipeline.change_queues,
-                       function (queueNum, changeQueue) {
-                    $.each(changeQueue.heads, function (headNum, changes) {
+                       function (queue_i, change_queue) {
+                    $.each(change_queue.heads, function (head_i, changes) {
                         if (pipeline.change_queues.length > 1 &&
-                            headNum === 0) {
-                            var name = changeQueue.name;
+                            head_i === 0) {
+                            var name = change_queue.name;
                             var short_name = name;
                             if (short_name.length > 32) {
                                 short_name = short_name.substr(0, 32) + '...';
@@ -391,10 +524,12 @@
                                     )
                             );
                         }
-                        $.each(changes, function (changeNum, change) {
-                            var $panel = zuul.format.change_panel(change);
-                            $html.append($panel)
-                            zuul.display_patchset($panel);
+                        $.each(changes, function (change_i, change) {
+                            var $change_box =
+                                zuul.format.change_with_status_tree(
+                                    change, change_queue);
+                            $html.append($change_box)
+                            zuul.display_patchset($change_box);
                         });
                     });
                 });
@@ -496,7 +631,7 @@
             // Toggle showing/hiding the patchset when the header is clicked
             // Grab the patchset panel
             var $panel = $(e.target).parents('.zuul-change');
-            var $body = $panel.children(':not(.patchset-header)');
+            var $body = $panel.children('.zuul-patchset-body');
             $body.toggle(200);
             var collapsed_index = zuul.collapsed_exceptions.indexOf(
                 $panel.attr('id'));
@@ -510,15 +645,17 @@
             }
         },
 
-        display_patchset: function($panel, animate) {
+        display_patchset: function($change_box, animate) {
             // Determine if to show or hide the patchset and/or the results
             // when loaded
 
             // See if we should hide the body/results
-            var $body = $panel.children(':not(.patchset-header)');
+            var $panel = $change_box.find('.zuul-change');
+            var panel_change = $panel.attr('id');
+            var $body = $panel.children('.zuul-patchset-body');
             var expand_by_default = $('#expand_by_default').prop('checked');
-            var collapsed_index = zuul.collapsed_exceptions.indexOf(
-                $panel.attr('id'));
+            var collapsed_index = zuul.collapsed_exceptions.indexOf(panel_change);
+
             if (expand_by_default && collapsed_index == -1 ||
                 !expand_by_default && collapsed_index != -1) {
                 // Expand by default, or is an exception
@@ -531,9 +668,9 @@
             // Check if we should hide the whole panel
             var panel_project = $panel.find('.change_project').text()
                 .toLowerCase();
-            var panel_pipeline = $panel.parents('.zuul-pipeline')
-                .children('h3').text().toLowerCase();
-            var panel_change = $panel.attr('id');
+            var panel_pipeline = $change_box.parents('.zuul-pipeline')
+                .children('h3').html().toLowerCase();
+
             if (current_filter != '') {
                 show_panel = false;
                 filter = current_filter.trim().split(/[\s,]+/);
@@ -548,14 +685,14 @@
                     }
                 });
                 if (show_panel == true) {
-                    $panel.show(animate);
+                    $change_box.show(animate);
                 }
                 else {
-                    $panel.hide(animate);
+                    $change_box.hide(animate);
                 }
             }
             else {
-                $panel.show(animate);
+                $change_box.show(animate);
             }
         },
 
@@ -570,9 +707,9 @@
                 $('#filter_form_clear_box').show();
             }
 
-            $('.zuul-change').each(function(index, obj) {
-                $panel = $(obj);
-                zuul.display_patchset($panel, 200);
+            $('.zuul-change-box').each(function(index, obj) {
+                $change_box = $(obj);
+                zuul.display_patchset($change_box, 200);
             })
             return false;
         },
@@ -581,10 +718,71 @@
             // Handle toggling expand by default
             set_cookie('zuul_expand_by_default', e.target.checked);
             zuul.collapsed_exceptions = [];
-            $('.zuul-change').each(function(index, obj) {
-                $panel = $(obj);
-                zuul.display_patchset($panel, 200);
+            $('.zuul-change-box').each(function(index, obj) {
+                $change_box = $(obj);
+                zuul.display_patchset($change_box, 200);
             })
+        },
+
+        create_tree: function(pipeline) {
+            var count = 0;
+            var pipeline_max_tree_columns = 1;
+            $.each(pipeline.change_queues, function(change_queue_i,
+                                                       change_queue) {
+                var tree = [];
+                var max_tree_columns = 1;
+                var changes = [];
+                var last_tree_length = 0;
+                $.each(change_queue.heads, function(head_i, head) {
+                    $.each(head, function(change_i, change) {
+                        changes[change.id] = change;
+                        change._tree_position = change_i;
+                    });
+                });
+                $.each(change_queue.heads, function(head_i, head) {
+                    $.each(head, function(change_i, change) {
+                        count += 1;
+                        var idx = tree.indexOf(change.id);
+                        if (idx > -1) {
+                            change._tree_index = idx;
+                            // remove...
+                            tree[idx] = null;
+                            while (tree[tree.length - 1] === null) {
+                                tree.pop();
+                            }
+                        } else {
+                            change._tree_index = 0;
+                        }
+                        change._tree_branches = [];
+                        change._tree = [];
+                        if (typeof(change.items_behind) === 'undefined') {
+                            change.items_behind = [];
+                        }
+                        change.items_behind.sort(function(a, b) {
+                            return (changes[b]._tree_position -
+                                    changes[a]._tree_position);
+                        });
+                        $.each(change.items_behind, function(i, id) {
+                            tree.push(id);
+                            if (tree.length>last_tree_length &&
+                                last_tree_length > 0)
+                                change._tree_branches.push(
+                                    tree.length - 1);
+                        });
+                        if (tree.length > max_tree_columns) {
+                            max_tree_columns = tree.length;
+                        }
+                        if (tree.length > pipeline_max_tree_columns) {
+                            pipeline_max_tree_columns = tree.length;
+                        }
+                        change._tree = tree.slice(0);  // make a copy
+                        last_tree_length = tree.length;
+                    });
+                });
+                change_queue._tree_columns = max_tree_columns;
+            });
+            pipeline._tree_columns = pipeline_max_tree_columns;
+            return count;
         },
     };
 
