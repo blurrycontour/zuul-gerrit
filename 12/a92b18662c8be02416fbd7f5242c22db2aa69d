@@ -1,0 +1,11 @@
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Verified+2: Jenkins
+Approved+1: Clark Boylan <cboylan@sapwetik.org>
+Code-Review+2: Clark Boylan <cboylan@sapwetik.org>
+Code-Review+1: Matthew Treinish <mtreinish@kortar.org>
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Submitted-by: Jenkins
+Submitted-at: Wed, 26 Mar 2014 19:23:56 +0000
+Reviewed-on: https://review.openstack.org/83181
+Project: openstack-infra/zuul
+Branch: refs/heads/master
