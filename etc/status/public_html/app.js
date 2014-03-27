@@ -280,8 +280,12 @@
 
                 $change_link = $('<small />');
                 if (change.url !== null) {
+                    var $change_id = change.id;
+                    if (/^[0-9a-f]{40}$/.test($change_id)) {
+                        $change_id = change_id.slice(0, 6);
+                    }
                     $change_link.append(
-                        $("<a />").attr("href", change.url).text(change.id)
+                        $("<a />").attr("href", change.url).text($change_id)
                     );
                 }
                 else {
