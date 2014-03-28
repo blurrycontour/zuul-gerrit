@@ -69,6 +69,24 @@
       "revId": "50ede4bf1cb69ca9ddbd3019569ce5b0274728ff",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/+NUU\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 3
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-03-28T12:11:23Z",
+      "side": 1,
+      "message": "Ah, fair points.. I wonder if we should do OR \u003e 10 chars? We could also append a \u0027...\u0027",
+      "parentUuid": "AAAAWH/+NWM\u003d",
+      "revId": "50ede4bf1cb69ca9ddbd3019569ce5b0274728ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
