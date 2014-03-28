@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAWH/+NWI\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 3
+      },
+      "lineNbr": 283,
+      "author": {
+        "id": 6786
+      },
+      "writtenOn": "2014-03-28T12:05:51Z",
+      "side": 1,
+      "message": "ok",
+      "parentUuid": "AAAAWH/+NY8\u003d",
+      "revId": "50ede4bf1cb69ca9ddbd3019569ce5b0274728ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAWH/+NYY\u003d",
         "filename": "etc/status/public_html/app.js",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2014-03-28T12:00:56Z",
       "side": 1,
       "message": "Why wouldn\u0027t we shorten the change-id regardless of contents if it is \u003e 6 chars?",
+      "revId": "50ede4bf1cb69ca9ddbd3019569ce5b0274728ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/+NWM\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 3
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 6786
+      },
+      "writtenOn": "2014-03-28T12:05:51Z",
+      "side": 1,
+      "message": "It\u0027s a common approach to display only first 6 chars of commit id. For change id it\u0027ll mean that we\u0027ll cut the patch set # and IMO it\u0027s incorrect.",
+      "parentUuid": "AAAAWH/+NYY\u003d",
       "revId": "50ede4bf1cb69ca9ddbd3019569ce5b0274728ff",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
