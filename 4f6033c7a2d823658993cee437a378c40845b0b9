@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAWH/+G8g\u003d",
+        "filename": "tests/fixtures/layout-idle.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2014-03-29T18:24:53Z",
+      "side": 1,
+      "message": "Similar to my confusion on the nodepool samples, */1 means the same as * doesn\u0027t it?",
+      "revId": "4f6033c7a2d823658993cee437a378c40845b0b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
