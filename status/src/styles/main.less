@@ -13,52 +13,9 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-/**
- * Styles specific to the overall application.
- */
 
-.zuul-change-id {
-    float: right;
-}
+// Library inclusions
+@import './bootstrap.less';
 
-.zuul-job-result {
-    float: right;
-    width: 70px;
-    height: 15px;
-    margin: 0;
-}
-
-.zuul-change-total-result {
-    height: 10px;
-    width: 100px;
-    margin: 5px 0 0 0;
-}
-
-.zuul-spinner,
-.zuul-spinner:hover {
-    opacity: 0;
-    transition: opacity 0.5s ease-out;
-    cursor: default;
-    pointer-events: none;
-}
-
-.zuul-spinner-on,
-.zuul-spinner-on:hover {
-    opacity: 1;
-    transition-duration: 0.2s;
-    cursor: progress;
-}
-
-.zuul-change-job {
-    padding: 5px 10px;
-}
-
-.time_bad {
-    color: #cf2f19;
-}
-.time_warn {
-    color: #e39f00;
-}
-.time_good {
-    color: #888888;
-}
+// Local inclusions
+@import './zuul.less';

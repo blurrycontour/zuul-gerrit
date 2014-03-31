@@ -108,7 +108,7 @@ module.exports = function (grunt) {
         },
 
         /**
-         * grunt recess
+         * grunt less
          *
          * Compiles our .less CSS files into real CSS, linting as it goes. We
          * do this manually during our build process so that we can inject
@@ -117,15 +117,19 @@ module.exports = function (grunt) {
          * Note: We're using LessCSS here because SASS requires ruby-compass,
          * and cannot be easily installed with npm.
          */
-        recess: {
+        less: {
             options: {
-                compile: true
+                paths: [
+                    dir.bower + '/bootstrap/less'
+                ],
+                cleancss: true,
+                strictMath: true,
+                strictUnits: true
             },
             theme: {
-                src: [
-                    dir.source + '/styles/main.less'
-                ],
-                dest: dir.output + '/styles/main.css'
+                files: {
+                    './dist/styles/main.css': dir.source + '/styles/main.less'
+                }
             }
         },
 
@@ -338,11 +342,11 @@ module.exports = function (grunt) {
                 ],
                 tasks: ['concat']
             },
-            recess: {
+            less: {
                 files: [
                     dir.source + '/styles/**/*.less'
                 ],
-                tasks: ['recess:theme']
+                tasks: ['less:theme']
             },
             copy: {
                 files: [
@@ -462,7 +466,7 @@ module.exports = function (grunt) {
         'jshint',
         'useminPrepare',
         'concat',
-        'recess',
+        'less',
         'imagemin',
         'copy',
         'usemin'
