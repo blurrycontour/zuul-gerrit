@@ -12,14 +12,3 @@ config
 doc/build/*
 zuul/versioninfo
 dist/
-
-# Javascript
-.build
-.local
-node_modules
-bower_components
-npm-debug.log
-*.iml
-.idea
-reports
-cover

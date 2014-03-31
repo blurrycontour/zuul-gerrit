@@ -34,7 +34,7 @@ module.exports = function (config) {
 
         files: [
             './dist/js/*.js',
-            './status/test/unit/**/*.js'
+            './test/unit/**/*.js'
         ],
 
         exclude: [

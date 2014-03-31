@@ -39,8 +39,8 @@ module.exports = function (grunt) {
     'use strict';
 
     var dir = {
-        source: './status/src',
-        test: './status/test',
+        source: './src',
+        test: './test',
         output: './dist',
         report: './reports',
         bower: './bower_components'

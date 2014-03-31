@@ -1,3 +1,13 @@
 public_html/jquery.min.js
 public_html/jquery-visibility.min.js
 public_html/bootstrap
+
+.build
+.local
+node_modules
+bower_components
+npm-debug.log
+*.iml
+.idea
+reports
+cover
