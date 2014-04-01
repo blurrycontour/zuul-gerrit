@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAWH/90XM\u003d",
+        "filename": "status/test/unit/services/module.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-04-01T23:11:18Z",
+      "side": 1,
+      "message": "I\u0027m not sure what we are testing here. The test/unit/services/module.js file is a bit more clear. Does this even test anything? maybe it deserves a comment if so?",
+      "revId": "f5aa724d985f378ae0656ff72816247b79e2ab6f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/90VQ\u003d",
+        "filename": "tools/bootstrap.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-04-01T23:11:18Z",
+      "side": 1,
+      "message": "According to git grep this file is not used. Maybe it should be called from the tox.ini?",
+      "revId": "f5aa724d985f378ae0656ff72816247b79e2ab6f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/90Rw\u003d",
+        "filename": "tools/buildjs.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-04-01T23:11:18Z",
+      "side": 1,
+      "message": "This script doesn\u0027t seem to be used either.",
+      "revId": "f5aa724d985f378ae0656ff72816247b79e2ab6f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
