@@ -194,6 +194,15 @@ module.exports = function (grunt) {
                             'robots.txt'
                         ]
                     },
+                    {
+                        expand: true,
+                        dot: true,
+                        cwd: dir.bower + '/bootstrap/fonts',
+                        dest: dir.output + '/fonts',
+                        src: [
+                            '**/*.{eot,svg,ttf,woff}'
+                        ]
+                    },
                 ]
             }
         },
