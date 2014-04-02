@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAWH/9wpU\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-02T10:40:17Z",
+      "side": 1,
+      "message": "Perhaps for clarity the \"Base url sent to mergers from which zuul refs.....\"? (nit)",
+      "revId": "a4c63e1ceb59f12a09630501b65de8719c2ed902",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/9zLg\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-02T10:40:17Z",
+      "side": 1,
+      "message": "(nit) I think it\u0027d be helpful to mention here that gerrit has a replication feature (ie that is the context for this param)",
+      "revId": "a4c63e1ceb59f12a09630501b65de8719c2ed902",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/9wrg\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-02T10:40:17Z",
+      "side": 1,
+      "message": "I wonder if this should be set to True by default?",
+      "revId": "a4c63e1ceb59f12a09630501b65de8719c2ed902",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/9zK0\u003d",
+        "filename": "tests/test_scheduler_remote.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-02T10:40:17Z",
+      "side": 1,
+      "message": "Probably a newer year than this",
+      "revId": "a4c63e1ceb59f12a09630501b65de8719c2ed902",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/9wsE\u003d",
+        "filename": "tests/test_scheduler_remote.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-02T10:40:17Z",
+      "side": 1,
+      "message": "I might be missing something here, but this won\u0027t override the CONFIG in test_scheduler.py... I think it\u0027ll only affect references to CONFIG in this file so you\u0027ll end up with two CONFIG values depending on whether the method is inherited or defined in here.",
+      "revId": "a4c63e1ceb59f12a09630501b65de8719c2ed902",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/9zKU\u003d",
+        "filename": "tests/test_scheduler_remote.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-02T10:40:17Z",
+      "side": 1,
+      "message": "Why not just set these in the zuul_remote.conf?",
+      "revId": "a4c63e1ceb59f12a09630501b65de8719c2ed902",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/9wac\u003d",
+        "filename": "tests/test_scheduler_remote.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-02T10:40:17Z",
+      "side": 1,
+      "message": "I wonder if it is possible to copy the upstream_root dir to somewhere else to reflect a different repository? Not sure if it\u0027d gain much though. (nit)",
+      "revId": "a4c63e1ceb59f12a09630501b65de8719c2ed902",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
