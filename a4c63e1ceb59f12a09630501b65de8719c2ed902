@@ -53,6 +53,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAWH/9iJs\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-04-03T21:26:55Z",
+      "side": 1,
+      "message": "I think it is better to leave it False by default as polling should only be necessary under specific circumstances. When talking to gerrit it is never necessary.",
+      "parentUuid": "AAAAWH/9wrg\u003d",
+      "revId": "a4c63e1ceb59f12a09630501b65de8719c2ed902",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAWH/9zK0\u003d",
         "filename": "tests/test_scheduler_remote.py",
         "patchSetId": 5
