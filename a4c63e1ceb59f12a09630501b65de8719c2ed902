@@ -87,6 +87,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAWH/9iS8\u003d",
+        "filename": "tests/test_scheduler_remote.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-04-03T21:03:44Z",
+      "side": 1,
+      "message": "Good catch, this should be made a class var instead. I will fix that.",
+      "parentUuid": "AAAAWH/9wsE\u003d",
+      "revId": "a4c63e1ceb59f12a09630501b65de8719c2ed902",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAWH/9zKU\u003d",
         "filename": "tests/test_scheduler_remote.py",
         "patchSetId": 5
@@ -104,6 +122,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAWH/9iSo\u003d",
+        "filename": "tests/test_scheduler_remote.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-04-03T21:03:44Z",
+      "side": 1,
+      "message": "I wanted to make it clear in the test itself what was being changed. I need a different file because the test writes it back to disk. This felt like a good balance here.",
+      "parentUuid": "AAAAWH/9zKU\u003d",
+      "revId": "a4c63e1ceb59f12a09630501b65de8719c2ed902",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAWH/9wac\u003d",
         "filename": "tests/test_scheduler_remote.py",
         "patchSetId": 5
@@ -115,6 +151,24 @@
       "writtenOn": "2014-04-02T10:40:17Z",
       "side": 1,
       "message": "I wonder if it is possible to copy the upstream_root dir to somewhere else to reflect a different repository? Not sure if it\u0027d gain much though. (nit)",
+      "revId": "a4c63e1ceb59f12a09630501b65de8719c2ed902",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/9iSU\u003d",
+        "filename": "tests/test_scheduler_remote.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-04-03T21:03:44Z",
+      "side": 1,
+      "message": "That is what I did on one of the inital passes for testing this. It is clunky and requires a lot more bootstrapping and doesn\u0027t exercise any additional code.",
+      "parentUuid": "AAAAWH/9wac\u003d",
       "revId": "a4c63e1ceb59f12a09630501b65de8719c2ed902",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
