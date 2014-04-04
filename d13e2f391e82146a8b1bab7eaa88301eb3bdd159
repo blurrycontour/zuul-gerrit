@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAWH/9aJs\u003d",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-04-04T18:09:51Z",
+      "side": 1,
+      "message": "The fixture dir is actually special in this case and is fine here. It points to the file fixtures relative to the base test class. I think I am ok with this as is, the config stuff definitely needs to be fixed and will be shortly.\n\nNote that things other than test classes use FIXTURE_DIR and its location is fixed relative to this file.",
+      "parentUuid": "AAAAWH/9fpg\u003d",
+      "revId": "d13e2f391e82146a8b1bab7eaa88301eb3bdd159",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAWH/9fpw\u003d",
         "filename": "tests/base.py",
         "patchSetId": 5
