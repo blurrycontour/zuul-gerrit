@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAWH/9Z64\u003d",
+        "filename": "tests/test_merger_poll.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-04-04T18:38:27Z",
+      "side": 1,
+      "message": "I haven\u0027t done this in the latest patchset because I wanted to talk more about what we think that mixin should contain. Do you think these two tests are sufficient or should we look at the entire list and try to make some educated decisions about what belongs where.",
+      "parentUuid": "AAAAWH/9feg\u003d",
+      "revId": "8c6fe85186a6621e1d39ec4941063c4565025313",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAWH/9fdc\u003d",
         "filename": "zuul/trigger/gerrit.py",
         "patchSetId": 12
