@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAWH/9fr8\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3240,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-04T05:45:13Z",
+      "side": 1,
+      "message": "Could we put most of this test in a loop? Ie set the layout-idle, unset it, release, check numbers (where history is 2*i). Reading this confused me to why it\u0027s here twice so some clarity that we\u0027re checking that the timer still works after being turned on/off etc might be helpful.",
+      "revId": "b95cfd5aa549a5c212da20c76290941fbc421514",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
