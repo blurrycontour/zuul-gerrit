@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAWH/9fpg\u003d",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-04T06:01:07Z",
+      "side": 1,
+      "message": "This should also be done as part of the class IMO (see comment below)",
+      "revId": "d13e2f391e82146a8b1bab7eaa88301eb3bdd159",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/9fpw\u003d",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-04T06:01:07Z",
+      "side": 1,
+      "message": "Why do we even need this here? Why not let setUp define it?\n\nWe could have this as a method in the base class as \"setup_config\" then if a subclass wants to overwrite it they could overwrite that method.",
+      "revId": "d13e2f391e82146a8b1bab7eaa88301eb3bdd159",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/9fo4\u003d",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 757,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-04T06:01:07Z",
+      "side": 1,
+      "message": "Not sure why this is named TestSupportMixin?\n\nI\u0027m not sure what kind of notation is usually used, but to me it\u0027d make more sense to call it something like \"ZuulComponents\" since it is setting up all of the parts of a typical setup.\n\nAnother approach is to make this object inherit TestCase and call it \"ZuulTestCase\" rather than be a Mixin.",
+      "revId": "d13e2f391e82146a8b1bab7eaa88301eb3bdd159",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/9fog\u003d",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 800,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-04T06:01:07Z",
+      "side": 1,
+      "message": "TEST_CONFIG here is probably wrong. This should be CONFIG.\n\nBetter yet though, I just like moving the CONFIG from above into the instance as described.",
+      "revId": "d13e2f391e82146a8b1bab7eaa88301eb3bdd159",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/9foI\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1278,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-04T06:01:07Z",
+      "side": 1,
+      "message": "I\u0027m not sure why this is even being printed here... was this somebody debugging and forgetting to remove it?",
+      "revId": "d13e2f391e82146a8b1bab7eaa88301eb3bdd159",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/9foE\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1303,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-04T06:01:07Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "d13e2f391e82146a8b1bab7eaa88301eb3bdd159",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/9foA\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1305,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-04T06:01:07Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "d13e2f391e82146a8b1bab7eaa88301eb3bdd159",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
