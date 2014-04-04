@@ -1345,6 +1345,11 @@ class BasePipelineManager(object):
         build_set.zuul_url = event.zuul_url
         if event.merged:
             build_set.commit = event.commit
+        elif event.updated and not hasattr(item.change, 'newrev'):
+            # The repo was updated without a specific rev in mind.
+            # This will happen with NullChanges for timer triggered
+            # jobs. The update was successful so just return.
+            return
         elif event.updated:
             build_set.commit = item.change.newrev
         if not build_set.commit:
