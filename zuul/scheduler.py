@@ -1343,6 +1343,9 @@ class BasePipelineManager(object):
         item = build_set.item
         build_set.merge_state = build_set.COMPLETE
         build_set.zuul_url = event.zuul_url
+        if isinstance(item.change, model.NullChange):
+            # Merges are noops on NullChanges.
+            return
         if event.merged:
             build_set.commit = event.commit
         elif event.updated:
