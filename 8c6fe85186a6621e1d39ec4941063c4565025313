@@ -50,6 +50,24 @@
       "revId": "8c6fe85186a6621e1d39ec4941063c4565025313",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/9acI\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 372,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-04-04T17:25:18Z",
+      "side": 1,
+      "message": "Good catch, when I made the tests append the \u0027/\u0027 I didn\u0027t even think to fix it here. Brain was too focused on fixing tests :)",
+      "parentUuid": "AAAAWH/9fdc\u003d",
+      "revId": "8c6fe85186a6621e1d39ec4941063c4565025313",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
