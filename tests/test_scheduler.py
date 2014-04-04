@@ -3228,6 +3228,16 @@ class TestScheduler(testtools.TestCase):
         self.assertEqual(len(self.builds), 0)
         self.assertEqual(len(self.history), 4)
 
+        # Stop running idle jobs and let any left over jobs
+        # clean up. This avoid races between cleanup and
+        # more periodic jobs being enqueued.
+        self.config.set('zuul', 'layout_config',
+                        'tests/fixtures/layout.yaml')
+        self.sched.reconfigure(self.config)
+        self.registerJobs()
+        self.worker.release('.*')
+        self.waitUntilSettled()
+
     def test_check_smtp_pool(self):
         self.config.set('zuul', 'layout_config',
                         'tests/fixtures/layout-smtp.yaml')
