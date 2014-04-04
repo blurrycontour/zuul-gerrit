@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAWH/9fdo\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-04T06:11:21Z",
+      "side": 1,
+      "message": "We should document that the project name is appended",
+      "revId": "8c6fe85186a6621e1d39ec4941063c4565025313",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/9feg\u003d",
+        "filename": "tests/test_merger_poll.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-04T06:11:21Z",
+      "side": 1,
+      "message": "These could be part of another mixin rather than copied and pasted. Specifically if the TestSupportMixin becomes ZuulTestCase it might make sense to have mixin\u0027s like this.",
+      "revId": "8c6fe85186a6621e1d39ec4941063c4565025313",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/9fdc\u003d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 372,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-04T06:11:21Z",
+      "side": 1,
+      "message": "Consider some hardening here in detecting if the fetch_url has a trailing slash or not. You could use os.path.join even.",
+      "revId": "8c6fe85186a6621e1d39ec4941063c4565025313",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
