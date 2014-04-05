@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAWH/9XTo\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-05T08:51:46Z",
+      "side": 1,
+      "message": "ah sorry, very blind. Thanks!",
+      "parentUuid": "AAAAWH/9Xu8\u003d",
+      "revId": "7391e951e28b289554912bb6b208dfe1d32e834f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAWH/9X24\u003d",
         "filename": "tests/test_scheduler.py",
         "patchSetId": 8
@@ -47,6 +65,24 @@
       "writtenOn": "2014-04-05T01:52:42Z",
       "side": 1,
       "message": "I\u0027m not sure how this didn\u0027t throw an error... repack_repo has been moved into the base, should this (and the others) still be tests.base.repack_repo?",
+      "revId": "7391e951e28b289554912bb6b208dfe1d32e834f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/9XTg\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 1267,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-05T08:51:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAWH/9X24\u003d",
       "revId": "7391e951e28b289554912bb6b208dfe1d32e834f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
