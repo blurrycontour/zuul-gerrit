@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAWH/9X0o\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 3922,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-05T02:11:56Z",
+      "side": 1,
+      "message": "not sure if you\u0027d still want this one here",
+      "revId": "ec570a9fa368bf1aef867064d3b7117753a018ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/9X0s\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 3930,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-05T02:11:56Z",
+      "side": 1,
+      "message": "should use self.log.debug for these print statements",
+      "revId": "ec570a9fa368bf1aef867064d3b7117753a018ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/9X0c\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 3931,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-05T02:11:56Z",
+      "side": 1,
+      "message": "I can\u0027t see how this is testing the cloner? Shouldn\u0027t you use the cloner object to fetch the patchset given the zuul parameters and then check that a_zuul_ref exists in there?",
+      "revId": "ec570a9fa368bf1aef867064d3b7117753a018ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/9X0Y\u003d",
+        "filename": "zuul/cmd/cloner.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-05T02:11:56Z",
+      "side": 1,
+      "message": "I would consider moving this object into the lib/",
+      "revId": "ec570a9fa368bf1aef867064d3b7117753a018ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/9X0U\u003d",
+        "filename": "zuul/cmd/cloner.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-05T02:11:56Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "ec570a9fa368bf1aef867064d3b7117753a018ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
