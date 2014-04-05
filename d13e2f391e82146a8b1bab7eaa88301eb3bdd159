@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAWH/9X7c\u003d",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-05T01:52:27Z",
+      "side": 1,
+      "message": "yep, makes sense",
+      "parentUuid": "AAAAWH/9aJs\u003d",
+      "revId": "d13e2f391e82146a8b1bab7eaa88301eb3bdd159",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAWH/9fpw\u003d",
         "filename": "tests/base.py",
         "patchSetId": 5
