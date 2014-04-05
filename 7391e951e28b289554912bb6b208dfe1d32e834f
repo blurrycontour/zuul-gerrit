@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "AAAAWH/9Xu8\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-04-05T03:37:30Z",
+      "side": 1,
+      "message": "I import repack_repo here without the namespacing. This is why it works below.",
+      "revId": "7391e951e28b289554912bb6b208dfe1d32e834f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAWH/9X24\u003d",
         "filename": "tests/test_scheduler.py",
         "patchSetId": 8
