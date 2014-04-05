@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAWH/9X3s\u003d",
+        "filename": "tests/base.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 795,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-05T01:52:42Z",
+      "side": 1,
+      "message": "I wonder if this should also go in the setup_config method? Specifically it\u0027ll be clearer that the layout_config set in the .conf file is overwritten (presumably to get the fixture-dir correct).",
+      "revId": "7391e951e28b289554912bb6b208dfe1d32e834f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/9X24\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 1267,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-05T01:52:42Z",
+      "side": 1,
+      "message": "I\u0027m not sure how this didn\u0027t throw an error... repack_repo has been moved into the base, should this (and the others) still be tests.base.repack_repo?",
+      "revId": "7391e951e28b289554912bb6b208dfe1d32e834f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
