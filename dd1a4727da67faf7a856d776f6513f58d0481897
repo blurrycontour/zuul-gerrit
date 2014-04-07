@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAWH/9Sf4\u003d",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-07T11:10:44Z",
+      "side": 1,
+      "message": "Is this gear_server PID necessary? Possibly a fix for another change though",
+      "revId": "dd1a4727da67faf7a856d776f6513f58d0481897",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/9ShA\u003d",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-07T11:10:44Z",
+      "side": 1,
+      "message": "This could probably be moved into ZuulApp, but it would possibly be a functionality change",
+      "revId": "dd1a4727da67faf7a856d776f6513f58d0481897",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/9Si0\u003d",
+        "filename": "zuul/cmd/merger.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-07T11:10:44Z",
+      "side": 1,
+      "message": "You can just drop the __init__ here as it\u0027s not adding anything",
+      "revId": "dd1a4727da67faf7a856d776f6513f58d0481897",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAWH/9Sig\u003d",
+        "filename": "zuul/cmd/merger.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-07T11:10:44Z",
+      "side": 1,
+      "message": "(nit) This change is a little bit dragged in and could be explained in the commit message",
+      "revId": "dd1a4727da67faf7a856d776f6513f58d0481897",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
