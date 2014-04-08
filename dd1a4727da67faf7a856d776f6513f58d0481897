@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAWn//6M4\u003d",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-04-08T15:07:14Z",
+      "side": 1,
+      "message": "Lets update the commit message to mention Client.gear_server_pid is gone :-)",
+      "parentUuid": "AAAAWn///1E\u003d",
+      "revId": "dd1a4727da67faf7a856d776f6513f58d0481897",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAWH/9ShA\u003d",
         "filename": "zuul/cmd/client.py",
         "patchSetId": 3
