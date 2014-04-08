@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAWn///1E\u003d",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-08T01:24:23Z",
+      "side": 1,
+      "message": "(nit) now this gear_server_pid is gone it should possibly be mentioned in the commit message (or even done as a separate commit)",
+      "parentUuid": "AAAAWH/9Qn4\u003d",
+      "revId": "dd1a4727da67faf7a856d776f6513f58d0481897",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAWH/9ShA\u003d",
         "filename": "zuul/cmd/client.py",
         "patchSetId": 3
