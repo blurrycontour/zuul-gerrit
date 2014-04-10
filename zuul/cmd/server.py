@@ -61,6 +61,8 @@ class Server(object):
                             help='specify the layout file')
         parser.add_argument('-d', dest='nodaemon', action='store_true',
                             help='do not run as a daemon')
+        parser.add_argument('-m', '--with-merger', action='store_true',
+                            help='also run a merger with zuul-server')
         parser.add_argument('-t', dest='validate', nargs='?', const=True,
                             metavar='JOB_LIST',
                             help='validate layout file syntax (optionally '
@@ -109,6 +111,9 @@ class Server(object):
         signal.signal(signal.SIGUSR1, signal.SIG_IGN)
         self.sched.exit()
         self.sched.join()
+        if self.args.with_merger:
+            self.merger.stop()
+            self.merger.join()
         self.stop_gear_server()
 
     def term_handler(self, signum, frame):
@@ -232,6 +237,12 @@ class Server(object):
         webapp.start()
         self.log.info('Starting RPC')
         rpc.start()
+
+        if self.args.with_merger:
+            import zuul.merger.server
+            self.log.info('Starting merger server')
+            self.merger_server = zuul.merger.server.MergeServer(self.config)
+            self.merger_server.start()
 
         signal.signal(signal.SIGHUP, self.reconfigure_handler)
         signal.signal(signal.SIGUSR1, self.exit_handler)
