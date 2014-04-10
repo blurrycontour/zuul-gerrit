@@ -49,6 +49,11 @@ gearman
   Port on which the Gearman server is listening.
   ``port=4730``
 
+**register_check**
+  Whether to check if job is registered with gearman or not
+  (default: True).
+  ``register_check=true``
+
 gearman_server
 """"""""""""""
 
