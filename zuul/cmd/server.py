@@ -84,6 +84,7 @@ class Server(zuul.cmd.ZuulApp):
         logging.basicConfig(level=logging.DEBUG)
         self.sched = zuul.scheduler.Scheduler()
         self.sched.registerReporter(None, 'gerrit')
+        self.sched.registerReporter(None, 'mysql')
         self.sched.registerReporter(None, 'smtp')
         self.sched.registerTrigger(None, 'gerrit')
         self.sched.registerTrigger(None, 'timer')
@@ -142,6 +143,7 @@ class Server(zuul.cmd.ZuulApp):
         import zuul.merger.client
         import zuul.lib.swift
         import zuul.reporter.gerrit
+        import zuul.reporter.mysql
         import zuul.reporter.smtp
         import zuul.trigger.gerrit
         import zuul.trigger.timer
@@ -165,7 +167,24 @@ class Server(zuul.cmd.ZuulApp):
         timer = zuul.trigger.timer.Timer(self.config, self.sched)
         webapp = zuul.webapp.WebApp(self.sched)
         rpc = zuul.rpclistener.RPCListener(self.config, self.sched)
+
         gerrit_reporter = zuul.reporter.gerrit.Reporter(gerrit)
+
+        try:
+            mysql_reporter = zuul.reporter.mysql.Reporter(
+                (self.config.get('mysql', 'host')
+                 if self.config.has_option('mysql', 'host') else 'localhost'),
+                (int(self.config.get('mysql', 'port'))
+                 if self.config.has_option('mysql', 'port') else 3306),
+                self.config.get('mysql', 'user'),
+                self.config.get('mysql', 'password'),
+                self.config.get('mysql', 'database'),
+                self.config.get('mysql', 'table'))
+        except Exception:
+            log = logging.getLogger("zuul.server.main")
+            log.exception('Unable to configure mysql reporter:')
+            mysql_reporter = None
+
         smtp_reporter = zuul.reporter.smtp.Reporter(
             self.config.get('smtp', 'default_from')
             if self.config.has_option('smtp', 'default_from') else 'zuul',
@@ -182,6 +201,8 @@ class Server(zuul.cmd.ZuulApp):
         self.sched.registerTrigger(gerrit)
         self.sched.registerTrigger(timer)
         self.sched.registerReporter(gerrit_reporter)
+        if mysql_reporter:
+            self.sched.registerReporter(mysql_reporter)
         self.sched.registerReporter(smtp_reporter)
 
         self.log.info('Starting scheduler')
