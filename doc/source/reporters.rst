@@ -58,3 +58,26 @@ providing alternatives as arguments to the reporter. For example, ::
           to: you@example.com
           from: alternative@example.com
           subject: Change {change} failed
+
+MySQL
+-----
+
+Insert results into a database to allow for easy data analysis.
+
+zuul.conf contains the MySQL server details as described in
+:ref:`zuulconf`.
+
+You'll also need to create a table with the name configured in
+zuul.conf.
+
+For example:
+
+  CREATE TABLE `zuul_results` (
+   `id` int(11) NOT NULL AUTO_INCREMENT,
+   `timestamp` int(11) NOT NULL,
+   `number` int(11) NOT NULL,
+   `patchset` int(11) NOT NULL,
+   `score` varchar(250) NOT NULL,
+   PRIMARY KEY (`id`)
+  ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+

@@ -67,6 +67,7 @@ class LayoutSchema(object):
                                'from': str,
                                'subject': str,
                                },
+                      'mysql': {'score': int}
                       }
     window = v.All(int, v.Range(min=0))
     window_floor = v.All(int, v.Range(min=1))
