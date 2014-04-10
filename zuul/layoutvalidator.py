@@ -81,6 +81,7 @@ class LayoutSchema(object):
                                'from': str,
                                'subject': str,
                                },
+                      'mysql': {'score': int}
                       }
 
     require = {'approval': toList(require_approval),

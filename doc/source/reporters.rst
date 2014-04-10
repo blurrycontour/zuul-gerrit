@@ -58,3 +58,65 @@ providing alternatives as arguments to the reporter. For example, ::
           to: you@example.com
           from: alternative@example.com
           subject: Change {change} failed
+
+MySQL
+-----
+
+Insert results into a database to allow for easy data analysis.
+
+zuul.conf contains the MySQL server details as described in
+:ref:`zuulconf`.
+
+The reporter requires one argument:
+
+**score**
+  Provide a value to insert into the database. For success it might be 1
+  for failure, -1. This field can be a string so values such as ``A+``
+  are also accepted.
+
+An example pipeline that reports to gerrit and mysql could be ::
+
+  - name: check
+    manager: IndependentPipelineManager
+    trigger:
+      - event: patchset-created
+    success:
+      gerrit:
+        verified: 1
+      mysql:
+        score: 1
+    failure:
+      gerrit:
+        verified: -1
+      mysql:
+        score: -1
+  - name: gate
+    manager: DependentPipelineManager
+    trigger:
+      - event: comment-added
+        approval:
+          - approved: 1
+    success:
+      gerrit:
+        verified: 2
+        submit: true
+      mysql:
+        score: 2
+    failure:
+      gerrit:
+        verified: -2
+      mysql:
+        score: -2
+
+The reporter will attempt to create the table if it doesn't already
+exist. Alternatively you can create one yourself from the following
+example schema:
+
+  CREATE TABLE `zuul_results` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `timestamp` int(11) NOT NULL,
+  `changeid` varchar(250) NOT NULL,
+  `score` int(11) NOT NULL,
+  `comment` TEXT,
+  PRIMARY KEY (`id`)
+  ) ENGINE=InnoDB DEFAULT CHARSET=latin1
