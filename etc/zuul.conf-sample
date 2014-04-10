@@ -4,6 +4,9 @@ server=127.0.0.1
 [gearman_server]
 start=true
 
+[merger_server]
+start=false
+
 [gerrit]
 server=review.example.com
 ;baseurl=https://review.example.com/r

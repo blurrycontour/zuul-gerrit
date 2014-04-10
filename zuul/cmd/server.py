@@ -109,6 +109,7 @@ class Server(object):
         signal.signal(signal.SIGUSR1, signal.SIG_IGN)
         self.sched.exit()
         self.sched.join()
+        self.stop_merger_server()
         self.stop_gear_server()
 
     def term_handler(self, signum, frame):
@@ -147,6 +148,17 @@ class Server(object):
                 print "Job %s not defined" % job
                 failure = True
         return failure
+
+    def start_merger_server(self):
+        import zuul.merger.server
+        self.log.info('Starting merger server')
+        self.merger_server = zuul.merger.server.MergeServer(self.config)
+        self.merger_server.start()
+
+    def stop_merger_server(self):
+        if self.args.with_merger:
+            self.merger.stop()
+            self.merger.join()
 
     def start_gear_server(self):
         pipe_read, pipe_write = os.pipe()
@@ -191,6 +203,10 @@ class Server(object):
         if (self.config.has_option('gearman_server', 'start') and
             self.config.getboolean('gearman_server', 'start')):
             self.start_gear_server()
+
+        if (self.config.has_option('merger_server', 'start') and
+            self.config.getboolean('merger_server', 'start')):
+            self.start_merger_server()
 
         self.setup_logging('zuul', 'log_config')
         self.log = logging.getLogger("zuul.Server")
