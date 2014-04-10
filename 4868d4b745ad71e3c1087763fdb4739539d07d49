@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAW3//1Z8\u003d",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-10T03:58:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAUH/9mbg\u003d",
+      "revId": "4868d4b745ad71e3c1087763fdb4739539d07d49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUH/9meo\u003d",
         "filename": "zuul/reporter/mysql.py",
         "patchSetId": 10
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAW3//1aA\u003d",
+        "filename": "zuul/reporter/mysql.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-10T03:58:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAUH/9meo\u003d",
+      "revId": "4868d4b745ad71e3c1087763fdb4739539d07d49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAUH/9mcs\u003d",
         "filename": "zuul/reporter/mysql.py",
         "patchSetId": 10
@@ -47,6 +83,24 @@
       "writtenOn": "2014-02-05T18:46:28Z",
       "side": 1,
       "message": "You can use the safe interpolation by interpolating the table name into the string without interpolating the values.  Then you\u0027ll end up with \"insert into tablename ... values (%s, ...)\", and can pass in the values as the second arg to execute.",
+      "revId": "4868d4b745ad71e3c1087763fdb4739539d07d49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAW3//1Zo\u003d",
+        "filename": "zuul/reporter/mysql.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-10T03:58:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAUH/9mcs\u003d",
       "revId": "4868d4b745ad71e3c1087763fdb4739539d07d49",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
