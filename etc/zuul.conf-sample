@@ -1,5 +1,6 @@
 [gearman]
 server=127.0.0.1
+register_check=true
 
 [gearman_server]
 start=true

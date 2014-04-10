@@ -164,6 +164,10 @@ class Gearman(object):
             port = config.get('gearman', 'port')
         else:
             port = 4730
+        if config.has_option('gearman', 'register_check'):
+            self.register_check = config.getboolean('gearman', 'register_check')
+        else:
+            self.register_check = True
 
         self.gearman = ZuulGearmanClient(self)
         self.gearman.addServer(server, port)
@@ -185,6 +189,9 @@ class Gearman(object):
         self.log.debug("Stopped")
 
     def isJobRegistered(self, name):
+        if self.register_check is False:
+            self.log.debug('Skip function %s registered check' % name)
+            return True
         if self.function_cache_time:
             for connection in self.gearman.active_connections:
                 if connection.connect_time > self.function_cache_time:
