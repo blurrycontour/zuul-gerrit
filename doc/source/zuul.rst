@@ -176,6 +176,31 @@ smtp
   This can be overridden by individual pipelines.
   ``default_to=you@example.com``
 
+mysql
+"""""
+Optionally provide credentials to MySQL for reporting job results.
+
+**host**
+  The MySQL host.
+  ``host=localhost`` (default)
+
+**host**
+  The MySQL port.
+  ``port=3306`` (default)
+
+**user**
+  The MySQL username.
+
+**password**
+  The MySQL password for user.
+
+**database**
+  The MySQL database.
+
+**table**
+  The name of the table to use. This is configurable to allow easy
+  warehousing as the tables grow.
+
 .. _swift:
 
 swift
