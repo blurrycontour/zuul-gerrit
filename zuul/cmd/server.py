@@ -52,6 +52,7 @@ class Server(object):
         self.args = None
         self.config = None
         self.gear_server_pid = None
+        self.merger_server = None
 
     def parse_arguments(self):
         parser = argparse.ArgumentParser(description='Project gating system.')
@@ -61,6 +62,8 @@ class Server(object):
                             help='specify the layout file')
         parser.add_argument('-d', dest='nodaemon', action='store_true',
                             help='do not run as a daemon')
+        parser.add_argument('-m', '--with-merger', action='store_true',
+                            help='also run a merger with zuul-server')
         parser.add_argument('-t', dest='validate', nargs='?', const=True,
                             metavar='JOB_LIST',
                             help='validate layout file syntax (optionally '
@@ -109,6 +112,9 @@ class Server(object):
         signal.signal(signal.SIGUSR1, signal.SIG_IGN)
         self.sched.exit()
         self.sched.join()
+        if self.merger_server:
+            self.merger.stop()
+            self.merger.join()
         self.stop_gear_server()
 
     def term_handler(self, signum, frame):
@@ -175,7 +181,7 @@ class Server(object):
         if self.gear_server_pid:
             os.kill(self.gear_server_pid, signal.SIGKILL)
 
-    def main(self):
+    def main(self, with_merger=False):
         # See comment at top of file about zuul imports
         import zuul.scheduler
         import zuul.launcher.gearman
@@ -233,6 +239,12 @@ class Server(object):
         self.log.info('Starting RPC')
         rpc.start()
 
+        if with_merger:
+            import zuul.merger.server
+            self.log.info('Starting merger server')
+            self.merger_server = zuul.merger.server.MergeServer(self.config)
+            self.merger_server.start()
+
         signal.signal(signal.SIGHUP, self.reconfigure_handler)
         signal.signal(signal.SIGUSR1, self.exit_handler)
         signal.signal(signal.SIGUSR2, stack_dump_handler)
@@ -267,10 +279,10 @@ def main():
     pid = pid_file_module.TimeoutPIDLockFile(pid_fn, 10)
 
     if server.args.nodaemon:
-        server.main()
+        server.main(self.args.with_merger)
     else:
         with daemon.DaemonContext(pidfile=pid):
-            server.main()
+            server.main(self.args.with_merger)
 
 
 if __name__ == "__main__":
