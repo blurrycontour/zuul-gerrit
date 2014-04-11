@@ -114,12 +114,25 @@ zuul
   starting jobs for a change.  Used by zuul-server only.
   ``status_url=https://zuul.example.com/status``
 
+  status_url is being passed the change and pipeline objects to further
+  customize the URL:
+
+  .. code-block:: ini
+
+    status_url=https://zuul.example.com/status/#{pipeline.name}-{change.number},{change.patchset}
+
 **url_pattern**
   If you are storing build logs external to the system that originally
   ran jobs and wish to link to those logs when Zuul makes comments on
   Gerrit changes for completed jobs this setting configures what the
   URLs for those links should be.  Used by zuul-server only.
-  ``http://logs.example.com/{change.number}/{change.patchset}/{pipeline.name}/{job.name}/{build.number}``
+
+  url_pattern is being passed the change, pipeline, job and build
+  objects to futher customize the URL:
+
+  .. code-block:: ini
+
+    url_pattern=http://logs.example.com/{change.number}/{change.patchset}/{pipeline.name}/{job.name}/{build.number}
 
 **job_name_in_report**
   Boolean value (``true`` or ``false``) that indicates whether the
