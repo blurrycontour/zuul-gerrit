@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAW3//myo\u003d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 6808
+      },
+      "writtenOn": "2014-04-11T19:43:32Z",
+      "side": 1,
+      "message": "The way I ended up using it is \"#change-{change.number},{change.patchset}\" (corresponding to the \u0027\u003cdiv id\u003d\"change-\u0027 + change.id + \u0027\"\u003e\u0027 build by zuul/statisjs).\n\nThe number,patchset format isn\u0027t actually concatenated by our script though, that is done by Zuul as part of JSON status API, it gives change objects inside the pipeline list as { id: \u002712345,2\u0027 }.\n\nIdeally we\u0027d have a placeholder here like {change.id} that does this so that we don\u0027t have to hardcode the fact that it uses \"number,patchset\" as id.\n\nDoes {change.id} exist?",
+      "revId": "a2e26d7c1bada4149a88e4ccc9ac799c646ffa50",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
