@@ -1029,7 +1029,10 @@ class BasePipelineManager(object):
                           (self.pipeline.start_actions, change))
             msg = "Starting %s jobs." % self.pipeline.name
             if self.sched.config.has_option('zuul', 'status_url'):
-                msg += "\n" + self.sched.config.get('zuul', 'status_url')
+                msg += "\n%s" % (
+                    self.sched.config.get('zuul', 'status_url').format(
+                        change=change,
+                        pipeline=self.pipeline))
             ret = self.sendReport(self.pipeline.start_actions,
                                   change, msg)
             if ret:
