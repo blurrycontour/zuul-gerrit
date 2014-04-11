@@ -1745,6 +1745,31 @@ class TestScheduler(ZuulTestCase):
         self.worker.release()
         self.waitUntilSettled()
 
+    def test_status_url_pattern_formatting(self):
+        self.config.set('zuul', 'layout_config',
+                        'tests/fixtures/layout-smtp.yaml')
+        self.config.set('zuul', 'status_url',
+                        'http://zuul.example.org/#{pipeline.name}-'
+                        '{change.number},{change.patchset}')
+        self.sched.reconfigure(self.config)
+
+        self.assertTrue(self.sched.config.has_option('zuul', 'status_url'),
+                        'zuul.status_url must have been set by the test')
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.waitUntilSettled()
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.smtp_messages), 2)
+
+        self.assertEqual(
+            'Starting check jobs.\nhttp://zuul.example.org/#check-1,1',
+            self.smtp_messages[0]['body'],
+            'zuul.status_url formatted with pipeline and change informations'
+        )
+
     def test_zuul_url_return(self):
         "Test if ZUUL_URL is returning when zuul_url is set in zuul.conf"
         self.assertTrue(self.sched.config.has_option('merger', 'zuul_url'))
