@@ -16,6 +16,41 @@
       "revId": "a2e26d7c1bada4149a88e4ccc9ac799c646ffa50",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAW3//hEs\u003d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-14T02:25:18Z",
+      "side": 1,
+      "message": "This isn\u0027t hardcoded though, it\u0027s an example configuration. The idea is to be able to substitute any change or pipeline object parameters.\n\n{change.id} does not exist.",
+      "parentUuid": "AAAAW3//myo\u003d",
+      "revId": "a2e26d7c1bada4149a88e4ccc9ac799c646ffa50",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAW3//hEg\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 988,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-14T02:25:18Z",
+      "side": 1,
+      "message": "You\u0027re adding the message before the line break here where as it used to be after the line break",
+      "revId": "a2e26d7c1bada4149a88e4ccc9ac799c646ffa50",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
