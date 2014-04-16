@@ -17,4 +17,4 @@
 
 import pbr.version
 
-version_info = pbr.version.VersionInfo('zuul')
+version_info = pbr.version.VersionInfo('zuul').release_string()
