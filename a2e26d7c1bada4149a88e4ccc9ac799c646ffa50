@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAXH//8k8\u003d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-04-16T10:29:01Z",
+      "side": 1,
+      "message": "The Change object has a _id() method which returns the change#, patchset# though.  I dont think it is too much of a trouble to fill them explicitly with {change.number},{change.patchset}",
+      "parentUuid": "AAAAW3//hEs\u003d",
+      "revId": "a2e26d7c1bada4149a88e4ccc9ac799c646ffa50",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAW3//hEg\u003d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 1
@@ -48,6 +66,24 @@
       "writtenOn": "2014-04-14T02:25:18Z",
       "side": 1,
       "message": "You\u0027re adding the message before the line break here where as it used to be after the line break",
+      "revId": "a2e26d7c1bada4149a88e4ccc9ac799c646ffa50",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAXH//8ks\u003d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 988,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-04-16T10:29:01Z",
+      "side": 1,
+      "message": "Good catch. Done!",
+      "parentUuid": "AAAAW3//hEg\u003d",
       "revId": "a2e26d7c1bada4149a88e4ccc9ac799c646ffa50",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
