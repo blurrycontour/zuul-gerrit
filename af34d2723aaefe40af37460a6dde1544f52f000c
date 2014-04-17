@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAXH//ymc\u003d",
+        "filename": "zuul/webapp.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-04-17T12:53:10Z",
+      "side": 1,
+      "message": "Since the content payload will vary depending on the client accept-encoding header, you need to add a Vary header to instructs potential intermediates caches to maintain a cached copy for each value of accept-encoding.\n\nSimply always add:\n\n response.headers[\u0027Vary\u0027] \u003d \u0027Accept-Encoding\u0027\n\nMy use case is that our Zuul server has a private IP and is being a reverse proxy which does cache responses.",
+      "revId": "af34d2723aaefe40af37460a6dde1544f52f000c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
