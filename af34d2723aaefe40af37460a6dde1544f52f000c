@@ -16,6 +16,24 @@
       "revId": "af34d2723aaefe40af37460a6dde1544f52f000c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAXH//xS8\u003d",
+        "filename": "zuul/webapp.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 708
+      },
+      "writtenOn": "2014-04-17T15:24:52Z",
+      "side": 1,
+      "message": "Nice catch. Fixed.",
+      "parentUuid": "AAAAXH//ymc\u003d",
+      "revId": "af34d2723aaefe40af37460a6dde1544f52f000c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
