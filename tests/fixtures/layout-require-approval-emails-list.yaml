@@ -1,0 +1,25 @@
+pipelines:
+  - name: check
+    manager: IndependentPipelineManager
+    trigger:
+      gerrit:
+        - event: comment-added
+          require-approval:
+            - email-filter:
+              - ^alloweduser@example\.com
+              - ^user@example\.com
+          approval:
+            - code-review: 1
+
+    success:
+      gerrit:
+        verified: 1
+    failure:
+      gerrit:
+        verified: -1
+
+projects:
+  - name: org/project
+    merge-mode: cherry-pick
+    check:
+      - project-check
