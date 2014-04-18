@@ -999,7 +999,7 @@ class BaseFilter(object):
                 if k == 'username':
                     pass
                 elif k in ['email', 'email-filter']:
-                    a['email'] = re.compile(v)
+                    a['email'] = self.compile_email_filters(v)
                 elif k == 'newer-than':
                     a[k] = time_to_seconds(v)
                 elif k == 'older-than':
@@ -1024,7 +1024,8 @@ class BaseFilter(object):
                         if (by.get('username', '') != v):
                             found_approval = False
                     elif k == 'email':
-                        if (not v.search(by.get('email', ''))):
+                        if not self.match_email_filters(
+                                v, by.get('email', '')):
                             found_approval = False
                     elif k == 'newer-than':
                         t = now - v
@@ -1064,7 +1065,7 @@ class EventFilter(BaseFilter):
         self.branches = [re.compile(x) for x in branches]
         self.refs = [re.compile(x) for x in refs]
         self.comments = [re.compile(x) for x in comments]
-        self.emails = [re.compile(x) for x in emails]
+        self.emails = self.compile_email_filters(emails)
         self.usernames = [re.compile(x) for x in usernames]
         self.pipelines = [re.compile(x) for x in pipelines]
         self.event_approvals = event_approvals
@@ -1098,6 +1099,19 @@ class EventFilter(BaseFilter):
         ret += '>'
 
         return ret
+
+    def compile_email_filters(self, filter):
+        return [re.compile(x) for x in filter]
+
+    def match_email_filters(self, email_filters, email):
+        if email is None or email is '':
+            return False
+
+        for email_filter in email_filters:
+            if email_filter.search(email):
+                return True
+
+        return False
 
     def matches(self, event, change):
         # event types are ORed
@@ -1146,14 +1160,12 @@ class EventFilter(BaseFilter):
         # email filtering.
         if event.account is not None:
             account_email = event.account.get('email')
+
             # emails are ORed
-            matches_email_re = False
-            for email_re in self.emails:
-                if (account_email is not None and
-                    email_re.search(account_email)):
-                    matches_email_re = True
-            if self.emails and not matches_email_re:
-                return False
+            if self.email_filters:
+                if not self.match_email_filters(
+                        self.email_filters, account_email):
+                    return False
 
             # usernames are ORed
             account_username = event.account.get('username')

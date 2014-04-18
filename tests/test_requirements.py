@@ -163,6 +163,30 @@ class TestRequirements(ZuulTestCase):
         self.assertEqual(len(self.history), 1)
         self.assertEqual(self.history[0].name, job)
 
+    def test_required_approval_emails_list(self):
+        "Test emails can be passed as a list with email-filter"
+        self.config.set(
+            'zuul', 'layout_config',
+            'tests/fixtures/layout-require-approval-emails-list.yaml')
+        self.sched.reconfigure(self.config)
+        self.registerJobs()
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+
+        self.fake_gerrit.addEvent(
+            A.addApproval('CRVW', 1, username='unmatcheduser'))
+        self.waitUntilSettled()
+        # No job run
+        self.assertEqual(len(self.history), 0)
+
+        self.fake_gerrit.addEvent(
+            A.addApproval('CRVW', 1, username='alloweduser'))
+        self.waitUntilSettled()
+
+        # Should have run the check job
+        self.assertEqual(len(self.history), 1)
+        self.assertEqual(self.history[0].name, 'project-check')
+
     def test_pipeline_require_approval_vote1(self):
         "Test pipeline requirement: approval vote with one value"
         return self._test_require_approval_vote1('org/project1',

@@ -38,8 +38,8 @@ class LayoutSchema(object):
     variable_dict = v.Schema({}, extra=True)
 
     require_approval = v.Schema({'username': str,
-                                 'email-filter': str,
-                                 'email': str,
+                                 'email-filter': toList(str),
+                                 'email': toList(str),
                                  'older-than': str,
                                  'newer-than': str,
                                  }, extra=True)
