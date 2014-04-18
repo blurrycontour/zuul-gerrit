@@ -2859,6 +2859,30 @@ class TestScheduler(testtools.TestCase):
         for pipeline in self.sched.layout.pipelines.values():
             pipeline.trigger.maintainCache([])
 
+    def test_required_approval_emails_list(self):
+        "Test emails can be passed as a list with email-filter"
+        self.config.set(
+            'zuul', 'layout_config',
+            'tests/fixtures/layout-require-approval-emails-list.yaml')
+        self.sched.reconfigure(self.config)
+        self.registerJobs()
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+
+        self.fake_gerrit.addEvent(
+            A.addApproval('CRVW', 1, username='unmatcheduser'))
+        self.waitUntilSettled()
+        # No job run
+        self.assertEqual(len(self.history), 0)
+
+        self.fake_gerrit.addEvent(
+            A.addApproval('CRVW', 1, username='alloweduser'))
+        self.waitUntilSettled()
+
+        # Should have run the check job
+        self.assertEqual(len(self.history), 1)
+        self.assertEqual(self.history[0].name, 'project-check')
+
     def test_rerun_on_error(self):
         "Test that if a worker fails to run a job, it is run again"
         self.worker.hold_jobs_in_build = True
