@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAXH//loQ\u003d",
+        "filename": "Makefile",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 6039
+      },
+      "writtenOn": "2014-04-19T00:06:38Z",
+      "side": 1,
+      "message": "Do you mean s/Make/may/?",
+      "revId": "0a0bca4b9b25d43291c45cdf1530ddbda3f0f0cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
