@@ -16,6 +16,24 @@
       "revId": "0a0bca4b9b25d43291c45cdf1530ddbda3f0f0cd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAXH//cqc\u003d",
+        "filename": "Makefile",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-04-21T17:46:34Z",
+      "side": 1,
+      "message": "I think I meant \"make Make\". But that is confusing too. Something like \"anything python related will fail fast in the case of that version of python not existing\" is probably better.",
+      "parentUuid": "AAAAXH//loQ\u003d",
+      "revId": "0a0bca4b9b25d43291c45cdf1530ddbda3f0f0cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
