@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAXH//auo\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 7
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 9717
+      },
+      "writtenOn": "2014-04-21T23:43:30Z",
+      "side": 1,
+      "message": "Inline styles are generally bad juju, especially when combined with classes. Is it possible to add this style to one of the classes - panel, panel-default, zuul-change?",
+      "revId": "28770deff4c2e26497b0ba1eb87e979b724d94d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAXH//at4\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 7
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 9717
+      },
+      "writtenOn": "2014-04-21T23:43:30Z",
+      "side": 1,
+      "message": "Are you accessing private parameters here?",
+      "revId": "28770deff4c2e26497b0ba1eb87e979b724d94d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
