@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAXH//bsw\u003d",
+        "filename": "doc/source/reporters.rst",
+        "patchSetId": 14
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-04-21T20:45:39Z",
+      "side": 1,
+      "message": "(nit) Actually the code will create the table if it doesn\u0027t exist (and the user has perms).",
+      "revId": "4f27b5d0971246545cf452be951c5b2b79380d1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAXH//c/k\u003d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 14
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-04-21T20:45:39Z",
+      "side": 1,
+      "message": "(-1) host -\u003e port",
+      "revId": "4f27b5d0971246545cf452be951c5b2b79380d1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAXH//bwk\u003d",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-04-21T20:45:39Z",
+      "side": 1,
+      "message": "(nit) This is still slightly redundant because the .exception method prints the whole traceback, including the exception.  To match the rest of Zuul, you\u0027d probably do something like:\n\n  log.exception(\u0027Unable to configure mysql reporter:\u0027)\n\n(Without the string interpolation.)  But at least the data are there now, so consider this a nit that you might want to address in a subsequent revision.",
+      "revId": "4f27b5d0971246545cf452be951c5b2b79380d1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAXH//bvc\u003d",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-04-21T20:45:39Z",
+      "side": 1,
+      "message": "(-1) This isn\u0027t documented and I can\u0027t figure out what it\u0027s for.",
+      "revId": "4f27b5d0971246545cf452be951c5b2b79380d1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAXH//btI\u003d",
+        "filename": "zuul/reporter/mysql.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-04-21T20:45:39Z",
+      "side": 1,
+      "message": "(suggestion) It would be nice if this check didn\u0027t have to happen on every insert.",
+      "revId": "4f27b5d0971246545cf452be951c5b2b79380d1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
