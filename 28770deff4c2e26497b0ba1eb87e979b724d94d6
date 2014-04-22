@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAXH//Z1A\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 7
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-22T03:02:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAXH//auo\u003d",
+      "revId": "28770deff4c2e26497b0ba1eb87e979b724d94d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAXH//at4\u003d",
         "filename": "etc/status/public_html/app.js",
         "patchSetId": 7
@@ -30,6 +48,24 @@
       "writtenOn": "2014-04-21T23:43:30Z",
       "side": 1,
       "message": "Are you accessing private parameters here?",
+      "revId": "28770deff4c2e26497b0ba1eb87e979b724d94d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAXH//Z04\u003d",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 7
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-04-22T03:02:54Z",
+      "side": 1,
+      "message": "This is coming from the create_tree function below which is added to the change element. It\u0027s not meant to be private.",
+      "parentUuid": "AAAAXH//at4\u003d",
       "revId": "28770deff4c2e26497b0ba1eb87e979b724d94d6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
