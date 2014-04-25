@@ -1,0 +1,9 @@
+Verified+2: Jenkins
+Approved+1: Sergey Lukjanov <slukjanov@mirantis.com>
+Code-Review+2: Sergey Lukjanov <slukjanov@mirantis.com>
+Code-Review+1: Michael Krotscheck <krotscheck@gmail.com>
+Submitted-by: Jenkins
+Submitted-at: Fri, 25 Apr 2014 08:58:44 +0000
+Reviewed-on: https://review.openstack.org/84314
+Project: openstack-infra/zuul
+Branch: refs/heads/master
