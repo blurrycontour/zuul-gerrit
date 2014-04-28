@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAXX//ufY\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 3922,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-04-28T12:40:07Z",
+      "side": 1,
+      "message": "Made it a debug log. Might not be needed later on indeed.",
+      "parentUuid": "AAAAWH/9X0o\u003d",
+      "revId": "ec570a9fa368bf1aef867064d3b7117753a018ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAWH/9X0s\u003d",
         "filename": "tests/test_scheduler.py",
         "patchSetId": 8
@@ -30,6 +48,24 @@
       "writtenOn": "2014-04-05T02:11:56Z",
       "side": 1,
       "message": "should use self.log.debug for these print statements",
+      "revId": "ec570a9fa368bf1aef867064d3b7117753a018ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAXX//ufQ\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 3930,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-04-28T12:40:07Z",
+      "side": 1,
+      "message": "I created a local logger named zuul.test.cloner (easy to grep).",
+      "parentUuid": "AAAAWH/9X0s\u003d",
       "revId": "ec570a9fa368bf1aef867064d3b7117753a018ba",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAXX//uek\u003d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 3931,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-04-28T12:40:07Z",
+      "side": 1,
+      "message": "\u003e can\u0027t see how this is testing the cloner? Shouldn\u0027t you use the cloner object to fetch the patchset given the zuul parameters and then check that a_zuul_ref exists in there?\n\nthe test_cloner doesn\u0027t test anything really :-(  Will look at using your suggestion to write a proper test.",
+      "parentUuid": "AAAAWH/9X0c\u003d",
+      "revId": "ec570a9fa368bf1aef867064d3b7117753a018ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAWH/9X0Y\u003d",
         "filename": "zuul/cmd/cloner.py",
         "patchSetId": 8
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAXX//uhs\u003d",
+        "filename": "zuul/cmd/cloner.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-04-28T12:40:07Z",
+      "side": 1,
+      "message": "Moved to zuul/lib/cloner.py",
+      "parentUuid": "AAAAWH/9X0Y\u003d",
+      "revId": "ec570a9fa368bf1aef867064d3b7117753a018ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAWH/9X0U\u003d",
         "filename": "zuul/cmd/cloner.py",
         "patchSetId": 8
@@ -81,6 +153,24 @@
       "writtenOn": "2014-04-05T02:11:56Z",
       "side": 1,
       "message": "ditto",
+      "revId": "ec570a9fa368bf1aef867064d3b7117753a018ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAXX//uho\u003d",
+        "filename": "zuul/cmd/cloner.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-04-28T12:40:07Z",
+      "side": 1,
+      "message": "Moved to zuul/lib/clonemapper.py",
+      "parentUuid": "AAAAWH/9X0U\u003d",
       "revId": "ec570a9fa368bf1aef867064d3b7117753a018ba",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
