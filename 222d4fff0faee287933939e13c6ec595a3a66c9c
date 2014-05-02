@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9ad9bd40_ec20974b",
+        "filename": "doc/source/cloner.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-02T14:10:21Z",
+      "side": 1,
+      "message": "(nit) superfluous \"it\" here.",
+      "revId": "222d4fff0faee287933939e13c6ec595a3a66c9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_4c16e3f2",
+        "filename": "doc/source/cloner.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-02T14:10:21Z",
+      "side": 1,
+      "message": "(nit) s/let/lets",
+      "revId": "222d4fff0faee287933939e13c6ec595a3a66c9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_acde8f3d",
+        "filename": "doc/source/cloner.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-02T14:10:21Z",
+      "side": 1,
+      "message": "(nit) s/such as the plugins/such that the plugins/",
+      "revId": "222d4fff0faee287933939e13c6ec595a3a66c9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_6cbba7e5",
+        "filename": "doc/source/cloner.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-02T14:10:21Z",
+      "side": 1,
+      "message": "(nit) It might be just me, but I would have ordered this the other way around.. That is to say \"$project will go into $folder\".\n\nAlso might want to make it \u0027./\u0027 rather than absolute.",
+      "revId": "222d4fff0faee287933939e13c6ec595a3a66c9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_ecced782",
+        "filename": "doc/source/cloner.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-02T14:10:21Z",
+      "side": 1,
+      "message": "(nit) s/environnement/environment",
+      "revId": "222d4fff0faee287933939e13c6ec595a3a66c9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_2cc99f78",
+        "filename": "doc/source/cloner.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-02T14:10:21Z",
+      "side": 1,
+      "message": "(nit) ditto",
+      "revId": "222d4fff0faee287933939e13c6ec595a3a66c9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_4cc0a32a",
+        "filename": "tests/test_clonemapper.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-02T14:10:21Z",
+      "side": 1,
+      "message": "Should an exception be raised here?",
+      "revId": "222d4fff0faee287933939e13c6ec595a3a66c9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_6c2c8703",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 4037,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-02T14:10:21Z",
+      "side": 1,
+      "message": "This should probably be dropped",
+      "revId": "222d4fff0faee287933939e13c6ec595a3a66c9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_0c505b5d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 4081,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-02T14:10:21Z",
+      "side": 1,
+      "message": "-1: Is this WIP?",
+      "revId": "222d4fff0faee287933939e13c6ec595a3a66c9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
