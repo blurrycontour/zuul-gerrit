@@ -364,6 +364,8 @@ class Gerrit(object):
 
         change.approvals = data['currentPatchSet'].get('approvals', [])
 
+        change.open = data['open']
+
         return change
 
     def getGitUrl(self, project):
