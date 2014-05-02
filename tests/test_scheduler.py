@@ -3997,3 +3997,14 @@ For CI problems and help debugging, contact ci@example.org"""
             self.getJobFromHistory('experimental-project-test').result,
             'SUCCESS')
         self.assertEqual(A.reported, 1)
+
+    def test_closed_change(self):
+        "Test that a closed change is skipped"
+
+        A = self.fake_gerrit.addFakeChange('org/experimental-project',
+                                           'master', 'A')
+        self.data['open'] = False
+        self.fake_gerrit.addEvent(A.getCommentAddedEvent(1))
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 0)
+        self.assertEqual(len(self.builds), 0)

@@ -1079,6 +1079,10 @@ class BasePipelineManager(object):
             self.log.debug("Change %s is already in queue, ignoring" % change)
             return True
 
+        if not change.open:
+            self.log.debug("Change %s is not open, ignoring" % change)
+            return False
+
         if not self.isChangeReadyToBeEnqueued(change):
             self.log.debug("Change %s is not ready to be enqueued, ignoring" %
                            change)
