@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "9ad9bd40_d70ee531",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-03T09:37:25Z",
+      "side": 1,
+      "message": "Ideally a warning should be logged when require-approval is used.",
+      "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ad9bd40_cb6806bd",
         "filename": "doc/source/zuul.rst",
         "patchSetId": 2
@@ -13,6 +30,142 @@
       "writtenOn": "2014-05-02T23:41:36Z",
       "side": 1,
       "message": "establishes",
+      "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_5703b50c",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 447,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-03T09:37:25Z",
+      "side": 1,
+      "message": "So I understand this is what gerrit calls it, but would it make more sense for this section to be named \"comment\" or something clearer?",
+      "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_d73505dc",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 452,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-03T09:37:25Z",
+      "side": 1,
+      "message": "It\u0027s not clear here that approval is a list.",
+      "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_770a7922",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 473,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-03T09:37:25Z",
+      "side": 1,
+      "message": "(nit) I\u0027m not a big fan of \"any other field\" type validation. Perhaps given the new format of comments in gerrit we could have something like: \"category: verfieid+1\"",
+      "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_17304de7",
+        "filename": "tests/fixtures/layout-pipeline-requirements.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-03T09:37:25Z",
+      "side": 1,
+      "message": "Won\u0027t this make it impossible to ever run a check since this won\u0027t be satisfied until a check has been run?",
+      "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_7721999e",
+        "filename": "tests/fixtures/layout-pipeline-requirements.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-03T09:37:25Z",
+      "side": 1,
+      "message": "I think you need a \"- approved: 1\" requirement here (see below)",
+      "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_572ad57e",
+        "filename": "tests/fixtures/layout-pipeline-requirements.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-03T09:37:25Z",
+      "side": 1,
+      "message": "I think this will trigger the gate as soon as the check leaves a +1 even if no approved+1\u0027s exist.",
+      "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_f71da967",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1840,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-03T09:37:25Z",
+      "side": 1,
+      "message": "It\u0027d be good to also test the case where, for some reason, you want jobs triggered on closed changes.",
+      "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_970d3d3a",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-03T09:37:25Z",
+      "side": 1,
+      "message": "should we make this not camelCase in line with the above method?",
       "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
