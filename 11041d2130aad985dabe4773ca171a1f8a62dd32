@@ -194,6 +194,24 @@
     },
     {
       "key": {
+        "uuid": "9ad9bd40_870161b1",
+        "filename": "tests/fixtures/layout-pipeline-requirements.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-05T23:14:33Z",
+      "side": 1,
+      "message": "Actually I\u0027m kind of concerned here. I think the fact that the tests pass with this file shows that the purpose isn\u0027t being exercised correctly. Unless I\u0027m misreading the file it looks like it is impossible for a check job to launch. I think that we need to have every comment added as a gerritEvent rather than just the comments we /expect/ to trigger anything.",
+      "parentUuid": "9ad9bd40_cfb46d84",
+      "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ad9bd40_7721999e",
         "filename": "tests/fixtures/layout-pipeline-requirements.yaml",
         "patchSetId": 2
@@ -263,6 +281,23 @@
     },
     {
       "key": {
+        "uuid": "9ad9bd40_0725515b",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2822,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-05T23:14:33Z",
+      "side": 1,
+      "message": "All of these changes should be added as events to fake_gerrit\n\neg self.fake_gerrit.addEvent(A.addApproval(\u0027CRVW\u0027, 2))",
+      "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ad9bd40_970d3d3a",
         "filename": "zuul/model.py",
         "patchSetId": 2
@@ -292,6 +327,24 @@
       "side": 1,
       "message": "Looking through other files in this project, a random assortment of camelCase and under_score names are used. This looks consistently inconsistent to me, so I\u0027m not sure there\u0027s much benefit to changing it.",
       "parentUuid": "9ad9bd40_970d3d3a",
+      "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_8718811f",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-05T23:14:33Z",
+      "side": 1,
+      "message": "It appears camelCase is used in classes, but outside here could be lowercase.",
+      "parentUuid": "9ad9bd40_cf246d62",
       "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
