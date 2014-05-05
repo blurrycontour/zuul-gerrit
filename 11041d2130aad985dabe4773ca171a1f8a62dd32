@@ -295,6 +295,40 @@
       "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_d83fd185",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1167,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-05-05T16:52:55Z",
+      "side": 1,
+      "message": "Should the conditions here be a stronger equality check rather than a substring check?\n\nThis applies to the 2 checks below as well.",
+      "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_78a88577",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1111,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-05-05T16:52:55Z",
+      "side": 1,
+      "message": "isChangeAlreadyInQueue is checked twice. Is that because enqueue changes ahead may enqueue this change? Perhpas we should do some reordering here to make this less repetitive. But this isn\u0027t related to the change under review.",
+      "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
