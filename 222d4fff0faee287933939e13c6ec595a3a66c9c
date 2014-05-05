@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9ad9bd40_440bdc29",
+        "filename": "doc/source/cloner.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-05-05T19:42:03Z",
+      "side": 1,
+      "message": "removed superfluous it.",
+      "parentUuid": "9ad9bd40_ec20974b",
+      "revId": "222d4fff0faee287933939e13c6ec595a3a66c9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ad9bd40_4c16e3f2",
         "filename": "doc/source/cloner.rst",
         "patchSetId": 13
@@ -30,6 +48,24 @@
       "writtenOn": "2014-05-02T14:10:21Z",
       "side": 1,
       "message": "(nit) s/let/lets",
+      "revId": "222d4fff0faee287933939e13c6ec595a3a66c9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_64046018",
+        "filename": "doc/source/cloner.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-05-05T19:42:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ad9bd40_4c16e3f2",
       "revId": "222d4fff0faee287933939e13c6ec595a3a66c9c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "9ad9bd40_3553686c",
+        "filename": "doc/source/cloner.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-05-05T19:42:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ad9bd40_acde8f3d",
+      "revId": "222d4fff0faee287933939e13c6ec595a3a66c9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ad9bd40_6cbba7e5",
         "filename": "doc/source/cloner.rst",
         "patchSetId": 13
@@ -64,6 +118,24 @@
       "writtenOn": "2014-05-02T14:10:21Z",
       "side": 1,
       "message": "(nit) It might be just me, but I would have ordered this the other way around.. That is to say \"$project will go into $folder\".\n\nAlso might want to make it \u0027./\u0027 rather than absolute.",
+      "revId": "222d4fff0faee287933939e13c6ec595a3a66c9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_f5a2e049",
+        "filename": "doc/source/cloner.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-05-05T19:42:03Z",
+      "side": 1,
+      "message": "The directory tree example is reversed compared to the YAML clonemap definition above.  That will be clearer indeed.  I am prefixing the paths with a dot as suggest, will make it obvious it is not the Gerrit project name.\n\nThanks!",
+      "parentUuid": "9ad9bd40_6cbba7e5",
       "revId": "222d4fff0faee287933939e13c6ec595a3a66c9c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "9ad9bd40_35afe82b",
+        "filename": "doc/source/cloner.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-05-05T19:42:03Z",
+      "side": 1,
+      "message": "French word. Done.",
+      "parentUuid": "9ad9bd40_ecced782",
+      "revId": "222d4fff0faee287933939e13c6ec595a3a66c9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ad9bd40_2cc99f78",
         "filename": "doc/source/cloner.rst",
         "patchSetId": 13
@@ -98,6 +188,24 @@
       "writtenOn": "2014-05-02T14:10:21Z",
       "side": 1,
       "message": "(nit) ditto",
+      "revId": "222d4fff0faee287933939e13c6ec595a3a66c9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_f57020de",
+        "filename": "doc/source/cloner.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-05-05T19:42:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ad9bd40_2cc99f78",
       "revId": "222d4fff0faee287933939e13c6ec595a3a66c9c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "9ad9bd40_445d9c46",
+        "filename": "tests/test_clonemapper.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-05-05T19:42:03Z",
+      "side": 1,
+      "message": "Definitely.  I have added some code in zuul/lib/clonemapper.py to detect any project sharing the same destination directory. It now throws an exception.\n\nI have added a test (test_cant_dupe_destinations()) that maps two projects to the same dir and assertRaises().\n\nThanks!",
+      "parentUuid": "9ad9bd40_4cc0a32a",
+      "revId": "222d4fff0faee287933939e13c6ec595a3a66c9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ad9bd40_6c2c8703",
         "filename": "tests/test_scheduler.py",
         "patchSetId": 13
@@ -138,6 +264,24 @@
     },
     {
       "key": {
+        "uuid": "9ad9bd40_a41ae87a",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 4037,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-05-05T19:42:03Z",
+      "side": 1,
+      "message": "I am keeping the copying of Zuul test repositories while this patch is still in WIP.  That is helpful from time to time to inspect the repositories.",
+      "parentUuid": "9ad9bd40_6c2c8703",
+      "revId": "222d4fff0faee287933939e13c6ec595a3a66c9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ad9bd40_0c505b5d",
         "filename": "tests/test_scheduler.py",
         "patchSetId": 13
@@ -149,6 +293,24 @@
       "writtenOn": "2014-05-02T14:10:21Z",
       "side": 1,
       "message": "-1: Is this WIP?",
+      "revId": "222d4fff0faee287933939e13c6ec595a3a66c9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_240ed83b",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 4081,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-05-05T19:42:03Z",
+      "side": 1,
+      "message": "Yup sorry Joshua, that is the lame state of my local directory.  I am not sure how to verify the repositories are properly cloned, still have to figure it out.",
+      "parentUuid": "9ad9bd40_0c505b5d",
       "revId": "222d4fff0faee287933939e13c6ec595a3a66c9c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
