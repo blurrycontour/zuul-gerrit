@@ -315,6 +315,24 @@
     },
     {
       "key": {
+        "uuid": "9ad9bd40_e3b22a05",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1167,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-05-05T17:28:53Z",
+      "side": 1,
+      "message": "Ignore this comment. This is actually checking list membership not substr in str.",
+      "parentUuid": "9ad9bd40_d83fd185",
+      "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ad9bd40_78a88577",
         "filename": "zuul/scheduler.py",
         "patchSetId": 2
