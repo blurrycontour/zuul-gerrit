@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "9ad9bd40_67cd3d85",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-05-05T23:25:31Z",
+      "side": 1,
+      "message": "I\u0027m not sure this has made it into a release, so it might be a short deprecation cycle.",
+      "parentUuid": "9ad9bd40_4f9dbd65",
+      "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ad9bd40_cb6806bd",
         "filename": "doc/source/zuul.rst",
         "patchSetId": 2
@@ -83,6 +101,24 @@
       "side": 1,
       "message": "Maybe, though this is also consistent with the terminology zuul has been using up to now. And really, I\u0027m not sure \"comment\" is any less confusing of a name for it anyway.",
       "parentUuid": "9ad9bd40_5703b50c",
+      "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_07aab184",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 447,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-05-05T23:25:31Z",
+      "side": 1,
+      "message": "Yeah, approval is clear and is in alignment with the only extant trigger that\u0027s relevant.",
+      "parentUuid": "9ad9bd40_af8f2929",
       "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -159,6 +195,24 @@
     },
     {
       "key": {
+        "uuid": "9ad9bd40_0798f168",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 473,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-05-05T23:25:31Z",
+      "side": 1,
+      "message": "The category names are not hard-coded in Gerrit, so they certainly can\u0027t be hard-coded in Zuul.  I don\u0027t see a way to do off-line validation (which is the only kind of validation I care about).  With the new gerrit rest api, we can do on-line, but that carries a whole new set of problems.",
+      "parentUuid": "9ad9bd40_cf81cdc4",
+      "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ad9bd40_17304de7",
         "filename": "tests/fixtures/layout-pipeline-requirements.yaml",
         "patchSetId": 2
@@ -206,6 +260,24 @@
       "side": 1,
       "message": "Actually I\u0027m kind of concerned here. I think the fact that the tests pass with this file shows that the purpose isn\u0027t being exercised correctly. Unless I\u0027m misreading the file it looks like it is impossible for a check job to launch. I think that we need to have every comment added as a gerritEvent rather than just the comments we /expect/ to trigger anything.",
       "parentUuid": "9ad9bd40_cfb46d84",
+      "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_a7bf45a9",
+        "filename": "tests/fixtures/layout-pipeline-requirements.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-05-05T23:25:31Z",
+      "side": 1,
+      "message": "I agree that the test should better represent what we\u0027re testing; since they were copied from a slightly different scenario, I don\u0027t think that their passing necessarily illustrates a bug, just that, as you say, the test process is not realistic.  And I do want it to be so we should fix it.",
+      "parentUuid": "9ad9bd40_870161b1",
       "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -351,6 +423,24 @@
     },
     {
       "key": {
+        "uuid": "9ad9bd40_07fd516e",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-05-05T23:25:31Z",
+      "side": 1,
+      "message": "yeah, lowercase would be good.  it was briefly a class method.",
+      "parentUuid": "9ad9bd40_8718811f",
+      "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ad9bd40_d83fd185",
         "filename": "zuul/model.py",
         "patchSetId": 2
@@ -415,6 +505,24 @@
       "side": 1,
       "message": "I agree this looks redundant (maybe cut/paste cruft from an earlier refactor?). I don\u0027t see anything in isChangeReadyToBeEnqueued() which would modify the result of isChangeAlreadyInQueue() between the first and second time it\u0027s called, so one of the invocations can probably be removed.",
       "parentUuid": "9ad9bd40_78a88577",
+      "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_47faf975",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1111,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-05-05T23:25:31Z",
+      "side": 1,
+      "message": "yeah i noticed that too and agree; didn\u0027t want to further confuse this change though",
+      "parentUuid": "9ad9bd40_e3e5cadc",
       "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
