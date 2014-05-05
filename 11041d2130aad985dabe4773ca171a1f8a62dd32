@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9ad9bd40_4f9dbd65",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2014-05-05T15:26:51Z",
+      "side": 1,
+      "message": "I completely agree. Any objection to adding it in a follow-on change?",
+      "parentUuid": "9ad9bd40_d70ee531",
+      "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ad9bd40_cb6806bd",
         "filename": "doc/source/zuul.rst",
         "patchSetId": 2
@@ -53,6 +71,24 @@
     },
     {
       "key": {
+        "uuid": "9ad9bd40_af8f2929",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 447,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2014-05-05T15:26:51Z",
+      "side": 1,
+      "message": "Maybe, though this is also consistent with the terminology zuul has been using up to now. And really, I\u0027m not sure \"comment\" is any less confusing of a name for it anyway.",
+      "parentUuid": "9ad9bd40_5703b50c",
+      "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ad9bd40_d73505dc",
         "filename": "doc/source/zuul.rst",
         "patchSetId": 2
@@ -64,6 +100,24 @@
       "writtenOn": "2014-05-03T09:37:25Z",
       "side": 1,
       "message": "It\u0027s not clear here that approval is a list.",
+      "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_cf80edf9",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 452,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2014-05-05T15:26:51Z",
+      "side": 1,
+      "message": "Agreed, this should mention it\u0027s a list type, for clarity.",
+      "parentUuid": "9ad9bd40_d73505dc",
       "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -87,6 +141,24 @@
     },
     {
       "key": {
+        "uuid": "9ad9bd40_cf81cdc4",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 473,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2014-05-05T15:26:51Z",
+      "side": 1,
+      "message": "I agree it makes it easier for configuration errors to go unnoticed, and also for named parameter conflicts to arise later between existing configuration and new features, however this is the construct used previously under the former name so keeping it similar makes porting existing configuration files easier.\n\nPerhaps a separate patch to deprecate unrecognized names here in favor of a separate category key would be in order?",
+      "parentUuid": "9ad9bd40_770a7922",
+      "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ad9bd40_17304de7",
         "filename": "tests/fixtures/layout-pipeline-requirements.yaml",
         "patchSetId": 2
@@ -98,6 +170,24 @@
       "writtenOn": "2014-05-03T09:37:25Z",
       "side": 1,
       "message": "Won\u0027t this make it impossible to ever run a check since this won\u0027t be satisfied until a check has been run?",
+      "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_cfb46d84",
+        "filename": "tests/fixtures/layout-pipeline-requirements.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2014-05-05T15:26:51Z",
+      "side": 1,
+      "message": "I took the examples in this file to be somewhat contrived and not necessarily representative of a real-world configuration. Perhaps they can be improved, but I think they at least exercise the parameters we want tested for now.",
+      "parentUuid": "9ad9bd40_17304de7",
       "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -155,6 +245,24 @@
     },
     {
       "key": {
+        "uuid": "9ad9bd40_0fb2d593",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1840,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2014-05-05T15:26:51Z",
+      "side": 1,
+      "message": "Agreed, though that could also be added in a follow-on patch.",
+      "parentUuid": "9ad9bd40_f71da967",
+      "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ad9bd40_970d3d3a",
         "filename": "zuul/model.py",
         "patchSetId": 2
@@ -166,6 +274,24 @@
       "writtenOn": "2014-05-03T09:37:25Z",
       "side": 1,
       "message": "should we make this not camelCase in line with the above method?",
+      "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_cf246d62",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2014-05-05T15:26:51Z",
+      "side": 1,
+      "message": "Looking through other files in this project, a random assortment of camelCase and under_score names are used. This looks consistently inconsistent to me, so I\u0027m not sure there\u0027s much benefit to changing it.",
+      "parentUuid": "9ad9bd40_970d3d3a",
       "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
