@@ -213,6 +213,24 @@
     },
     {
       "key": {
+        "uuid": "9ad9bd40_27d5f5b8",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 473,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2014-05-05T23:31:49Z",
+      "side": 1,
+      "message": "Oh, I just meant maybe it would make sense to have\n\n  approval:\n    - category: workflow +1\n\nrather than\n\n  approval:\n    - workflow: +1\n\nso that it\u0027s possible to add further approval keys later without risk of colliding with someone\u0027s existing category names. I agree that the categories themselves still must be arbitrary.",
+      "parentUuid": "9ad9bd40_0798f168",
+      "revId": "11041d2130aad985dabe4773ca171a1f8a62dd32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ad9bd40_17304de7",
         "filename": "tests/fixtures/layout-pipeline-requirements.yaml",
         "patchSetId": 2
