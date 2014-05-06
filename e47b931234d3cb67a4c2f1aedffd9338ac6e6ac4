@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9ad9bd40_dd3ed68b",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2864,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-06T00:58:03Z",
+      "side": 1,
+      "message": "This should add an event to gerrit",
+      "revId": "e47b931234d3cb67a4c2f1aedffd9338ac6e6ac4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_3d4d023f",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2872,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-06T00:58:03Z",
+      "side": 1,
+      "message": "ditto (although perhaps this should move above)",
+      "revId": "e47b931234d3cb67a4c2f1aedffd9338ac6e6ac4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_7d530ae2",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2915,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-06T00:58:03Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "e47b931234d3cb67a4c2f1aedffd9338ac6e6ac4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_9d50ced5",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2916,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-06T00:58:03Z",
+      "side": 1,
+      "message": "This looks like a bug here where the above line was meant to set crvw",
+      "revId": "e47b931234d3cb67a4c2f1aedffd9338ac6e6ac4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_bd6032a6",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2922,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-06T00:58:03Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "e47b931234d3cb67a4c2f1aedffd9338ac6e6ac4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
