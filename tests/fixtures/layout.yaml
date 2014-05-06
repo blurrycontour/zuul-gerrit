@@ -149,6 +149,8 @@ projects:
       - project-test1
     dup2:
       - project-test1
+    dup3:
+      - project-test1
 
   - name: org/project1
     check:
