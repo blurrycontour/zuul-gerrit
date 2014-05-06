@@ -208,6 +208,19 @@ class FakeChange(object):
                  "uploader": {"name": "User Name"}}
         return event
 
+    def getDraftPublishedEvent(self, patchset):
+        event = {"type": "draft-published",
+                 "change": {"project": self.project,
+                            "branch": self.branch,
+                            "id": "I5459869c07352a31bfb1e7a8cac379cabfcb25af",
+                            "number": str(self.number),
+                            "subject": self.subject,
+                            "owner": {"name": "User Name"},
+                            "url": "https://hostname/3"},
+                 "patchSet": self.patchsets[patchset - 1],
+                 "uploader": {"name": "User Name"}}
+        return event
+
     def getChangeRestoredEvent(self):
         event = {"type": "change-restored",
                  "change": {"project": self.project,
@@ -2555,6 +2568,50 @@ class TestScheduler(testtools.TestCase):
         self.assertEqual(D.reported, 2)
         self.assertEqual(len(self.history), 9)  # 3 each for A, B, D.
 
+    def test_new_draft_dequeues_old(self):
+        "Test that a new draft causes the old to be dequeued"
+        # D -> C (depends on B) -> B (depends on A) -> A -> M
+        self.worker.hold_jobs_in_build = True
+        M = self.fake_gerrit.addFakeChange('org/project', 'master', 'M')
+        M.setMerged()
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+        D = self.fake_gerrit.addFakeChange('org/project', 'master', 'D')
+        A.addApproval('CRVW', 2)
+        B.addApproval('CRVW', 2)
+        C.addApproval('CRVW', 2)
+        D.addApproval('CRVW', 2)
+
+        C.setDependsOn(B, 1)
+        B.setDependsOn(A, 1)
+        A.setDependsOn(M, 1)
+
+        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(D.addApproval('APRV', 1))
+        self.waitUntilSettled()
+
+        B.addPatchset()
+        self.fake_gerrit.addEvent(B.getDraftPublishedEvent(2))
+        self.waitUntilSettled()
+
+        self.worker.hold_jobs_in_build = False
+        self.worker.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(B.data['status'], 'NEW')
+        self.assertEqual(B.reported, 2)
+        self.assertEqual(C.data['status'], 'NEW')
+        self.assertEqual(C.reported, 2)
+        self.assertEqual(D.data['status'], 'MERGED')
+        self.assertEqual(D.reported, 2)
+        self.assertEqual(len(self.history), 7)  # 3 each for A, B, D.
+
     def test_zuul_url_return(self):
         "Test if ZUUL_URL is returning when zuul_url is set in zuul.conf"
         self.assertTrue(self.sched.config.has_option('merger', 'zuul_url'))
@@ -2616,6 +2673,49 @@ class TestScheduler(testtools.TestCase):
         self.assertEqual(D.reported, 2)
         self.assertEqual(len(self.history), 7)
 
+    def test_new_draft_dequeues_old_on_head(self):
+        "Test that a new draft causes the old to be dequeued (at head)"
+        # D -> C (depends on B) -> B (depends on A) -> A -> M
+        self.worker.hold_jobs_in_build = True
+        M = self.fake_gerrit.addFakeChange('org/project', 'master', 'M')
+        M.setMerged()
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+        D = self.fake_gerrit.addFakeChange('org/project', 'master', 'D')
+        A.addApproval('CRVW', 2)
+        B.addApproval('CRVW', 2)
+        C.addApproval('CRVW', 2)
+        D.addApproval('CRVW', 2)
+
+        C.setDependsOn(B, 1)
+        B.setDependsOn(A, 1)
+        A.setDependsOn(M, 1)
+
+        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(D.addApproval('APRV', 1))
+        self.waitUntilSettled()
+
+        A.addPatchset()
+        self.fake_gerrit.addEvent(A.getDraftPublishedEvent(2))
+        self.waitUntilSettled()
+
+        self.worker.hold_jobs_in_build = False
+        self.worker.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'NEW')
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(B.data['status'], 'NEW')
+        self.assertEqual(B.reported, 2)
+        self.assertEqual(C.data['status'], 'NEW')
+        self.assertEqual(C.reported, 2)
+        self.assertEqual(D.data['status'], 'MERGED')
+        self.assertEqual(D.reported, 2)
+        self.assertEqual(len(self.history), 5)
+
     def test_new_patchset_dequeues_old_without_dependents(self):
         "Test that a new patchset causes only the old to be dequeued"
         self.worker.hold_jobs_in_build = True
@@ -2673,6 +2773,34 @@ class TestScheduler(testtools.TestCase):
         self.assertEqual(C.data['status'], 'NEW')
         self.assertEqual(C.reported, 1)
         self.assertEqual(len(self.history), 10)
+        self.assertEqual(self.countJobResults(self.history, 'ABORTED'), 1)
+
+    def test_new_draft_dequeues_old_independent_queue(self):
+        "Test that a new draft causes the old to be dequeued (independent)"
+        self.worker.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+        self.fake_gerrit.addEvent(A.getDraftPublishedEvent(1))
+        self.fake_gerrit.addEvent(B.getDraftPublishedEvent(1))
+        self.fake_gerrit.addEvent(C.getDraftPublishedEvent(1))
+        self.waitUntilSettled()
+
+        B.addPatchset()
+        self.fake_gerrit.addEvent(B.getDraftPublishedEvent(2))
+        self.waitUntilSettled()
+
+        self.worker.hold_jobs_in_build = False
+        self.worker.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'NEW')
+        self.assertEqual(A.reported, 1)
+        self.assertEqual(B.data['status'], 'NEW')
+        self.assertEqual(B.reported, 1)
+        self.assertEqual(C.data['status'], 'NEW')
+        self.assertEqual(C.reported, 1)
+        self.assertEqual(len(self.history), 4)
         self.assertEqual(self.countJobResults(self.history, 'ABORTED'), 1)
 
     def test_noop_job(self):

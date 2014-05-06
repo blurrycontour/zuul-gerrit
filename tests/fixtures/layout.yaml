@@ -74,6 +74,18 @@ pipelines:
       gerrit:
         verified: -1
 
+  - name: dup3
+    manager: IndependentPipelineManager
+    trigger:
+      gerrit:
+        - event: draft-published
+    success:
+      gerrit:
+        verified: 1
+    failure:
+      gerrit:
+        verified: -1
+
   - name: conflict
     manager: DependentPipelineManager
     failure-message: Build failed.  For information on how to proceed, see http://wiki.example.org/Test_Failures
@@ -148,6 +160,8 @@ projects:
     dup1:
       - project-test1
     dup2:
+      - project-test1
+    dup3:
       - project-test1
 
   - name: org/project1
