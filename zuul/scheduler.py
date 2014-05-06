@@ -762,7 +762,7 @@ class Scheduler(threading.Thread):
             for pipeline in self.layout.pipelines.values():
                 change = event.getChange(project,
                                          self.triggers.get(event.trigger_name))
-                if event.type == 'patchset-created':
+                if event.type == 'patchset-created' or event.type == 'draft-published':
                     pipeline.manager.removeOldVersionsOfChange(change)
                 if pipeline.manager.eventMatches(event, change):
                     self.log.info("Adding %s, %s to %s" %
