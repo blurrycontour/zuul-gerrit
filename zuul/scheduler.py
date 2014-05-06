@@ -811,7 +811,7 @@ class Scheduler(threading.Thread):
             for pipeline in self.layout.pipelines.values():
                 change = event.getChange(project,
                                          self.triggers.get(event.trigger_name))
-                if event.type == 'patchset-created':
+                if (event.type == 'patchset-created'):
                     pipeline.manager.removeOldVersionsOfChange(change)
                 elif event.type == 'change-abandoned':
                     pipeline.manager.removeAbandonedChange(change)
