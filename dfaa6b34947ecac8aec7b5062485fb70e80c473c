@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9ad9bd40_c1b99416",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1837,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-06T01:50:07Z",
+      "side": 1,
+      "message": "(nit) It\u0027d be good to have that comment for why you\u0027re doing this here",
+      "revId": "dfaa6b34947ecac8aec7b5062485fb70e80c473c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
