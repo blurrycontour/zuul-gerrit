@@ -4,15 +4,15 @@ includes:
 pipelines:
   - name: check
     manager: IndependentPipelineManager
-    require:
-      approval:
-        - email-filter: jenkins@example.com
-          older-than: 48h
-      open: True
     trigger:
       gerrit:
         - event: patchset-created
         - event: comment-added
+          require:
+            approval:
+              - username: jenkins
+                older-than: 72h
+            open: True
     success:
       gerrit:
         verified: 1
@@ -23,21 +23,25 @@ pipelines:
   - name: gate
     manager: DependentPipelineManager
     failure-message: Build failed.  For information on how to proceed, see http://wiki.example.org/Test_Failures
-    require:
-      status:
-        - NEW
-      approval:
-        - verified: 1
-          username: jenkins
-          newer-than: 48h
     trigger:
       gerrit:
         - event: comment-added
           approval:
             - approved: 1
+          require:
+            status:
+              - NEW
+            approval:
+              - verified: 1
+                username: jenkins
+                newer-than: 24h
         - event: comment-added
           approval:
             - verified: 1
+          username_filter: jenkins
+          require:
+            status:
+              - NEW
     success:
       gerrit:
         verified: 2
