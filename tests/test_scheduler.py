@@ -1814,11 +1814,35 @@ class TestScheduler(testtools.TestCase):
         self.assertTrue(trigger.canMerge(a, mgr.getSubmitAllowNeeds()))
         trigger.maintainCache([])
 
+    def test_open_pipeline_requirement(self):
+        "Test that the 'open' pipeline requirement is effective"
+        self.config.set('zuul', 'layout_config',
+                        'tests/fixtures/layout-pipeline-requirement-open.yaml')
+        self.sched.reconfigure(self.config)
+        self.registerJobs()
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           status='MERGED')
+        self.fake_gerrit.addEvent(A.addApproval('CRVW', 2))
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 0)
+        self.assertEqual(len(self.builds), 0)
+
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        self.fake_gerrit.addEvent(B.addApproval('CRVW', 2))
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 1)
+        self.assertEqual(len(self.builds), 0)
+
+        for pipeline in self.sched.layout.pipelines.values():
+            pipeline.trigger.maintainCache([])
+
     def test_pipeline_requirements_closed_change(self):
         "Test that pipeline requirements for closed changes are effective"
         self.config.set('zuul', 'layout_config',
                         'tests/fixtures/layout-pipeline-requirements.yaml')
         self.sched.reconfigure(self.config)
+        self.registerJobs()
 
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
                                            status='MERGED')
