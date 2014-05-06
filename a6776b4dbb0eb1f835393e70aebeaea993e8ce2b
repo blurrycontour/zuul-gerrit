@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9ad9bd40_be0acc23",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2613,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-05-06T23:31:04Z",
+      "side": 1,
+      "message": "The comment here should say 3 for A, 3 for D and 1 for B coming from the dup3 pipeline.",
+      "parentUuid": "9ad9bd40_c3aedd2d",
+      "revId": "a6776b4dbb0eb1f835393e70aebeaea993e8ce2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ad9bd40_2365c91d",
         "filename": "tests/test_scheduler.py",
         "patchSetId": 3
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "9ad9bd40_99144245",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2717,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-05-06T23:31:04Z",
+      "side": 1,
+      "message": "I\u0027m not quite sure on the math here. I believe one test is from A, three are from D, and for the fifth I don\u0027t know.",
+      "parentUuid": "9ad9bd40_2365c91d",
+      "revId": "a6776b4dbb0eb1f835393e70aebeaea993e8ce2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ad9bd40_436acdee",
         "filename": "tests/test_scheduler.py",
         "patchSetId": 3
@@ -47,6 +83,24 @@
       "writtenOn": "2014-05-06T22:34:28Z",
       "side": 1,
       "message": "Not sure if these asserts make sense, please double check.",
+      "revId": "a6776b4dbb0eb1f835393e70aebeaea993e8ce2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad9bd40_591e3a60",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2804,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-05-06T23:31:04Z",
+      "side": 1,
+      "message": "Again a little fuzzy on the math here. I think we can account for at least 3 jobs (one each per change) in the dup3 pipeline but unsure where the fourth comes from.",
+      "parentUuid": "9ad9bd40_436acdee",
       "revId": "a6776b4dbb0eb1f835393e70aebeaea993e8ce2b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
