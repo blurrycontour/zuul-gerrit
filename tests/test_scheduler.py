@@ -2820,6 +2820,7 @@ class TestScheduler(testtools.TestCase):
     def _test_required_approval_check_and_gate(self):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         A.addApproval('CRVW', 2)
+        self.fake_gerrit.addEvent(A.addApproval('CRVW', 2))
         # Add a too-old +1
         A.addApproval('VRFY', 1, granted_on=time.time() - 72 * 60 * 60)
 
