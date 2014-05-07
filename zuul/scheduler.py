@@ -888,6 +888,9 @@ class Scheduler(threading.Thread):
         data['trigger_event_queue'] = {}
         data['trigger_event_queue']['length'] = \
             self.trigger_event_queue.qsize()
+        data['management_event_queue'] = {}
+        data['management_event_queue']['length'] = \
+            self.management_event_queue.qsize()
         data['result_event_queue'] = {}
         data['result_event_queue']['length'] = \
             self.result_event_queue.qsize()

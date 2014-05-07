@@ -171,6 +171,9 @@
     "trigger_event_queue": {
         "length": 0
     },
+    "management_event_queue": {
+        "length": 0
+    },
     "result_event_queue": {
         "length": 0
     },

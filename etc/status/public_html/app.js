@@ -20,7 +20,7 @@
 
 (function ($) {
     var $container, $msg, $indicator, $queueInfo, $queueEventsNum,
-        $queueResultsNum, $pipelines, $jq;
+        $queueManagementNum, $queueResultsNum, $pipelines, $jq;
     var xhr, zuul,
         current_filter = '',
         demo = location.search.match(/[?&]demo=([^?&]*)/),
@@ -102,6 +102,10 @@
                     $queueEventsNum.text(
                         data.trigger_event_queue ?
                             data.trigger_event_queue.length : '0'
+                    );
+                    $queueManagementNum.text(
+                        data.management_event_queue ?
+                            data.result_management_queue.length : '0'
                     );
                     $queueResultsNum.text(
                         data.result_event_queue ?
@@ -819,8 +823,10 @@
                        '<span class="glyphicon glyphicon-refresh"></span>' +
                        '</button>');
         $queueInfo = $('<p>Queue lengths: <span>0</span> events, ' +
+                       '<span>0</span> management, ' +
                        '<span>0</span> results.</p>');
         $queueEventsNum = $queueInfo.find('span').eq(0);
+        $queueManagementNum = $queueManagementNum.next();
         $queueResultsNum = $queueEventsNum.next();
 
         var $control_form = zuul.format.control_form();
