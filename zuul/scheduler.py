@@ -983,6 +983,8 @@ class BasePipelineManager(object):
                 return True
             else:
                 return False
+        if not change.is_current_patchset:
+            return False
         for ef in self.event_filters:
             if ef.matches(event, change):
                 return True
