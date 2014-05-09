@@ -221,6 +221,23 @@ class FakeChange(object):
                  "reason": ""}
         return event
 
+    def getChangeCommentEvent(self, patchset):
+        event = {"type": "comment-added",
+                 "change": {"project": self.project,
+                            "branch": self.branch,
+                            "id": "I5459869c07352a31bfb1e7a8cac379cabfcb25af",
+                            "number": str(self.number),
+                            "subject": self.subject,
+                            "owner": {"name": "User Name"},
+                            "url": "https://hostname/3"},
+                 "patchSet": self.patchsets[patchset - 1],
+                 "author": {"name": "User Name"},
+                 "approvals": [{"type": "Code-Review",
+                                "description": "Code-Review",
+                                "value": "0"}],
+                 "comment": "This is a comment",}
+        return event
+
     def addApproval(self, category, value, username='jenkins',
                     granted_on=None):
         if not granted_on:
@@ -4063,3 +4080,34 @@ For CI problems and help debugging, contact ci@example.org"""
             self.getJobFromHistory('experimental-project-test').result,
             'SUCCESS')
         self.assertEqual(A.reported, 1)
+
+    def test_old_patchset_doesnt_trigger(self):
+        "Test that jobs never run against old patchsets"
+        # Create two patchsets and let their tests settle out. Then
+        # comment on first patchset and check that no additional
+        # jobs are run.
+        self.worker.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('CRVW', 2)
+        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        self.waitUntilSettled()
+
+        A.addPatchset()
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(2))
+        self.waitUntilSettled()
+
+        self.worker.hold_jobs_in_build = False
+        self.worker.release()
+        self.waitUntilSettled()
+
+        old_history_count = len(self.history)
+        self.worker.hold_jobs_in_build = True
+        self.fake_gerrit.addEvent(A.getChangeCommentEvent(1))
+        self.worker.hold_jobs_in_build = False
+        self.worker.release()
+        self.waitUntilSettled()
+
+        # Assert no new jobs ran after event for old patchset.
+        self.assertEqual(len(self.history), old_history_count)
+
+        print self.gerrit._change_cache.keys()
