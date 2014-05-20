@@ -990,6 +990,14 @@ class BasePipelineManager(object):
                 return True
         return False
 
+    def areAllChangesAlreadyInQueue(self, changes):
+        found_changes = True
+        for c in changes:
+            found_changes = all(
+                [found_changes,
+                 self.isChangeAlreadyInQueue(c)])
+        return found_changes
+
     def isChangeAlreadyInQueue(self, change):
         for c in self.pipeline.getChangesInQueue():
             if change.equals(c):
@@ -1039,7 +1047,7 @@ class BasePipelineManager(object):
     def checkForChangesNeededBy(self, change):
         return True
 
-    def getFailingDependentItem(self, item):
+    def getFailingDependentItems(self, item):
         return None
 
     def getDependentItems(self, item):
@@ -1257,7 +1265,7 @@ class BasePipelineManager(object):
             except MergeFailure:
                 pass
             return (True, nnfi, ready_ahead)
-        dep_item = self.getFailingDependentItem(item)
+        dep_item = self.getFailingDependentItems(item)
         actionable = change_queue.isActionable(item)
         item.active = actionable
         ready = False
@@ -1756,11 +1764,11 @@ class DependentPipelineManager(BasePipelineManager):
         if not change.needs_change.is_current_patchset:
             self.log.debug("  Needed change is not the current patchset")
             return False
-        if self.isChangeAlreadyInQueue(change.needs_change):
+        if self.areAllChangesAlreadyInQueue(change.needs_change):
             self.log.debug("  Needed change is already ahead in the queue")
             return True
-        if self.pipeline.trigger.canMerge(change.needs_change,
-                                          self.getSubmitAllowNeeds()):
+        if self.pipeline.trigger.canMergeAll(change.needs_change,
+                                             self.getSubmitAllowNeeds()):
             self.log.debug("  Change %s is needed" %
                            change.needs_change)
             return change.needs_change
@@ -1769,14 +1777,14 @@ class DependentPipelineManager(BasePipelineManager):
                        change.needs_change)
         return False
 
-    def getFailingDependentItem(self, item):
+    def getFailingDependentItems(self, item):
         if not hasattr(item.change, 'needs_change'):
             return None
         if not item.change.needs_change:
             return None
-        needs_item = self.getItemForChange(item.change.needs_change)
-        if not needs_item:
-            return None
-        if needs_item.current_build_set.failing_reasons:
-            return needs_item
-        return None
+        deps = []
+        for c in item.change.needs_change:
+            dep = self.getItemForChange(c)
+            if dep and dep.current_build_set.failing_reasons:
+                deps.add(dep)
+        return deps

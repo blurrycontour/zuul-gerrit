@@ -17,7 +17,7 @@ import threading
 import time
 import urllib2
 from zuul.lib import gerrit
-from zuul.model import TriggerEvent, Change
+from zuul.model import TriggerEvent, Change, Dependencies
 
 
 class GerritEventConnector(threading.Thread):
@@ -240,6 +240,12 @@ class Gerrit(object):
             return True
         return False
 
+    def canMergeAll(self, changes, allow_needs):
+        mergable = True
+        for c in changes:
+            mergable = all([mergable, self.canMerge(c, allow_needs)])
+        return mergable
+
     def canMerge(self, change, allow_needs):
         if not change.number:
             self.log.debug("Change has no number; considering it merged")
@@ -345,13 +351,17 @@ class Gerrit(object):
             # for dependencies.
             return change
 
-        change.needs_change = None
+        change.needs_change = Dependencies()
         if 'dependsOn' in data:
             parts = data['dependsOn'][0]['ref'].split('/')
             dep_num, dep_ps = parts[3], parts[4]
             dep = self.getChange(dep_num, dep_ps)
             if not dep.is_merged:
-                change.needs_change = dep
+                change.needs_change.append(dep)
+
+        # Collect dependencies from commit message Depends-On
+        for c in self.gerrit.deps_from_message(data):
+            change.needs_change.append(c)
 
         change.needed_by_changes = []
         if 'neededBy' in data:
@@ -361,6 +371,12 @@ class Gerrit(object):
                 dep = self.getChange(dep_num, dep_ps)
                 if not dep.is_merged and dep.is_current_patchset:
                     change.needed_by_changes.append(dep)
+
+        # Forward search for changes which include Depends-On for this change
+        found_needed_by = self.gerrit.needed_by_by_id(data['id'])
+        for found in found_needed_by:
+            if not found.is_merged:
+                change.needed_by_changes.append(found)
 
         change.approvals = data['currentPatchSet'].get('approvals', [])
         change.open = data['open']
