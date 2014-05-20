@@ -990,6 +990,14 @@ class BasePipelineManager(object):
                 return True
         return False
 
+    def areAllChangesAlreadyInQueue(self, changes):
+        found_changes = True
+        for c in changes:
+            found_changes = all(
+                [found_changes,
+                 self.isChangeAlreadyInQueue(c)])
+        return found_changes
+
     def isChangeAlreadyInQueue(self, change):
         for c in self.pipeline.getChangesInQueue():
             if change.equals(c):
@@ -1756,11 +1764,11 @@ class DependentPipelineManager(BasePipelineManager):
         if not change.needs_change.is_current_patchset:
             self.log.debug("  Needed change is not the current patchset")
             return False
-        if self.isChangeAlreadyInQueue(change.needs_change):
+        if self.areAllChangesAlreadyInQueue(change.needs_change):
             self.log.debug("  Needed change is already ahead in the queue")
             return True
-        if self.pipeline.trigger.canMerge(change.needs_change,
-                                          self.getSubmitAllowNeeds()):
+        if self.pipeline.trigger.canMergeAll(change.needs_change,
+                                             self.getSubmitAllowNeeds()):
             self.log.debug("  Change %s is needed" %
                            change.needs_change)
             return change.needs_change
