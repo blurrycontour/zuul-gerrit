@@ -16,6 +16,7 @@
 import threading
 import select
 import json
+import re
 import time
 import Queue
 import paramiko
@@ -143,6 +144,30 @@ class Gerrit(object):
         self.log.debug("Received data from Gerrit query: \n%s" %
                        (pprint.pformat(data)))
         return data
+
+    def deps_from_message(self, data):
+        """Given Depends-On in the commit message, return changes."""
+        changes = []
+        if 'message' not in data:
+            return changes
+
+        m = re.search('\bDepends-On: (I[0-9a-f]{40})\b', data['message'])
+        if m:
+            for change_id in m.groups():
+                changes.append(self.query(change_id))
+        return changes
+
+    def needed_by_by_id(self, change_id):
+        """Discover additional needed by values by searching.
+
+        Gerrit doesn't do well with searching for Depends-On as a string,
+        however we can search for the idempotent id, and filter out any
+        hits that aren't actually the Depends-On string we expect in the
+        commit message.
+        """
+        changes = self.query("message:%s" % change_id)
+        depends = "Depends-On: %s" % change_id
+        return [c for c in changes if depends in c['message']]
 
     def _open(self):
         client = paramiko.SSHClient()
