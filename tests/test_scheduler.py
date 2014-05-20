@@ -398,6 +398,12 @@ class FakeGerrit(object):
     def startWatching(self, *args, **kw):
         pass
 
+    def deps_from_message(self, *args, **kw):
+        return []
+
+    def needed_by_by_id(self, *args, **kw):
+        return []
+
 
 class BuildHistory(object):
     def __init__(self, **kw):
@@ -924,7 +930,8 @@ class TestScheduler(testtools.TestCase):
 
     def assertFinalState(self):
         # Make sure that the change cache is cleared
-        self.assertEqual(len(self.gerrit._change_cache.keys()), 0)
+        self.assertEqual(len(self.gerrit._change_cache.keys()), 0,
+                         "Change cache: %s" % self.gerrit._change_cache)
         # Make sure that git.Repo objects have been garbage collected.
         repos = []
         gc.collect()

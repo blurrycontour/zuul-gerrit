@@ -832,6 +832,20 @@ class Changeish(object):
         return set()
 
 
+class Dependencies(list):
+    def _is_merged(self):
+        return all([d.is_merged for d in self])
+
+    def _is_current_patchset(self):
+        return all([d.is_current_patchset for d in self])
+
+    def __getattr__(self, name):
+        if name == 'is_merged':
+            return self._is_merged()
+        if name == 'is_current_patchset':
+            return self._is_current_patchset()
+
+
 class Change(Changeish):
     def __init__(self, project):
         super(Change, self).__init__(project)
@@ -874,8 +888,8 @@ class Change(Changeish):
 
     def getRelatedChanges(self):
         related = set()
-        if self.needs_change:
-            related.add(self.needs_change)
+        for c in self.needs_change:
+            related.add(c)
         for c in self.needed_by_changes:
             related.add(c)
             related.update(c.getRelatedChanges())
