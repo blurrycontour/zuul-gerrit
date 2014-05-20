@@ -832,6 +832,18 @@ class Changeish(object):
         return set()
 
 
+class Dependencies(list):
+    def _is_merged(self):
+        return all([d.is_merged for d in self])
+
+    def _is_current_patchset(self):
+        return all([d.is_current_patchset for d in self])
+
+    def __getattr__(self, name):
+        if name == 'is_merged':
+            return self._is_merged()
+
+
 class Change(Changeish):
     def __init__(self, project):
         super(Change, self).__init__(project)
