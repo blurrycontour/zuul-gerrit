@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7adec928_8093844e",
+        "filename": "tests/fixtures/zuul.conf",
+        "patchSetId": 4
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-21T07:11:04Z",
+      "side": 1,
+      "message": "Setting this here has broken the start message for other jobs. Might be easiest to update those, or otherwise look at rebasing off the base test class Clark put together (probably the neater solution) https://review.openstack.org/#/c/85204/",
+      "revId": "6ea389dc578942e6243dafc591f0f53cc60b33fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
