@@ -2158,6 +2158,44 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(A.reported, 2)
         self.assertEqual(r, True)
 
+    def test_client_dequeue(self):
+        "Test that the RPC client can dequeue a change"
+
+        self.worker.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+
+        C.setDependsOn(B, 1)
+        B.setDependsOn(A, 1)
+
+        A.addApproval('CRVW', 2)
+        B.addApproval('CRVW', 2)
+        C.addApproval('CRVW', 2)
+
+        # Promote to 'gate' pipeline
+        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
+        self.waitUntilSettled()
+
+        # Dequeue A
+        client = zuul.rpcclient.RPCClient('127.0.0.1',
+                                          self.gearman_server.port)
+        r = client.dequeue(pipeline='gate', change='1,1')
+        self.waitUntilSettled()
+
+        self.worker.release()
+        self.waitUntilSettled()
+
+        # Because C depends on B and B depends on A, all should be aborted
+        # when A gets dequeued from the 'gate' pipeline
+        # FIXME: This is failing, B and C are not getting dequeued
+        self.assertEqual(self.countJobResults(self.history, 'ABORTED'), 3)
+
+        client.shutdown()
+        self.assertEqual(r, True)
+
     def test_client_enqueue_negative(self):
         "Test that the RPC client returns errors"
         client = zuul.rpcclient.RPCClient('127.0.0.1',

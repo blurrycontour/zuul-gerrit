@@ -47,6 +47,7 @@ class RPCListener(object):
         self.register()
 
     def register(self):
+        self.worker.registerFunction("zuul:dequeue")
         self.worker.registerFunction("zuul:enqueue")
         self.worker.registerFunction("zuul:promote")
         self.worker.registerFunction("zuul:get_running_jobs")
@@ -82,6 +83,22 @@ class RPCListener(object):
                     job.sendWorkFail()
             except Exception:
                 self.log.exception("Exception while getting job")
+
+    def handle_dequeue(self, job):
+        args = json.loads(job.arguments)
+        errors = ''
+        pipeline = self.sched.layout.pipelines.get(args['pipeline'])
+        if not pipeline:
+            errors += 'Invalid pipeline: %s\n' % (args['pipeline'],)
+        else:
+            change = pipeline.source._getChange(*args['change'].split(','))
+            if not change:
+                errors += 'Invalid change: %s\n' % args['change']
+        if errors:
+            job.sendWorkException(errors.encode('utf8'))
+        else:
+            pipeline.manager.removeChange(change)
+            job.sendWorkComplete()
 
     def handle_enqueue(self, job):
         args = json.loads(job.arguments)
