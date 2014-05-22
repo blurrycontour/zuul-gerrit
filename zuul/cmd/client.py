@@ -56,6 +56,17 @@ class Client(zuul.cmd.ZuulApp):
                                  required=True)
         cmd_enqueue.set_defaults(func=self.enqueue)
 
+        cmd_dequeue = subparsers.add_parser('dequeue', help='dequeue a change')
+        cmd_dequeue.add_argument('--trigger', help='trigger name',
+                                 required=True)
+        cmd_dequeue.add_argument('--pipeline', help='pipeline name',
+                                 required=True)
+        cmd_dequeue.add_argument('--project', help='project name',
+                                 required=True)
+        cmd_dequeue.add_argument('--change', help='change id',
+                                 required=True)
+        cmd_dequeue.set_defaults(func=self.dequeue)
+
         cmd_promote = subparsers.add_parser('promote',
                                             help='promote one or more changes')
         cmd_promote.add_argument('--pipeline', help='pipeline name',
@@ -107,6 +118,14 @@ class Client(zuul.cmd.ZuulApp):
     def enqueue(self):
         client = zuul.rpcclient.RPCClient(self.server, self.port)
         r = client.enqueue(pipeline=self.args.pipeline,
+                           project=self.args.project,
+                           trigger=self.args.trigger,
+                           change=self.args.change)
+        return r
+
+    def dequeue(self):
+        client = zuul.rpcclient.RPCClient(self.server, self.port)
+        r = client.dequeue(pipeline=self.args.pipeline,
                            project=self.args.project,
                            trigger=self.args.trigger,
                            change=self.args.change)
