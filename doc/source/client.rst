@@ -22,6 +22,16 @@ The general options that apply to all subcommands are:
 
 The following subcommands are supported:
 
+Dequeue
+^^^^^^^
+.. program-output:: zuul dequeue --help
+
+Example::
+
+  zuul dequeue --pipeline check --changes 12345,1 13336,3
+
+Note that the format of changes id is <number>,<patchset>.
+
 Enqueue
 ^^^^^^^
 .. program-output:: zuul enqueue --help

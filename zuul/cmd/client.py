@@ -74,6 +74,14 @@ class Client(zuul.cmd.ZuulApp):
             default='0000000000000000000000000000000000000000')
         cmd_enqueue.set_defaults(func=self.enqueue_ref)
 
+        cmd_dequeue = subparsers.add_parser('dequeue',
+                                            help='dequeue one or more changes')
+        cmd_dequeue.add_argument('--pipeline', help='pipeline name',
+                                 required=True)
+        cmd_dequeue.add_argument('--changes', help='change ids',
+                                 required=True, nargs='+')
+        cmd_dequeue.set_defaults(func=self.dequeue)
+
         cmd_promote = subparsers.add_parser('promote',
                                             help='promote one or more changes')
         cmd_promote.add_argument('--pipeline', help='pipeline name',
@@ -141,6 +149,12 @@ class Client(zuul.cmd.ZuulApp):
                                ref=self.args.ref,
                                oldrev=self.args.oldrev,
                                newrev=self.args.newrev)
+        return r
+
+    def dequeue(self):
+        client = zuul.rpcclient.RPCClient(self.server, self.port)
+        r = client.dequeue(pipeline=self.args.pipeline,
+                           change_ids=self.args.changes)
         return r
 
     def promote(self):

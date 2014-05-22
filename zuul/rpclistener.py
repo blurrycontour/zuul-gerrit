@@ -47,6 +47,7 @@ class RPCListener(object):
         self.register()
 
     def register(self):
+        self.worker.registerFunction("zuul:dequeue")
         self.worker.registerFunction("zuul:enqueue")
         self.worker.registerFunction("zuul:enqueue_ref")
         self.worker.registerFunction("zuul:promote")
@@ -83,6 +84,13 @@ class RPCListener(object):
                     job.sendWorkFail()
             except Exception:
                 self.log.exception("Exception while getting job")
+
+    def handle_dequeue(self, job):
+        args = json.loads(job.arguments)
+        pipeline_name = args['pipeline']
+        change_ids = args['change_ids']
+        self.sched.dequeue(pipeline_name, change_ids)
+        job.sendWorkComplete()
 
     def _common_enqueue(self, job):
         args = json.loads(job.arguments)
