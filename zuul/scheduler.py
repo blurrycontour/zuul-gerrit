@@ -110,6 +110,18 @@ class PromoteEvent(ManagementEvent):
         self.change_ids = change_ids
 
 
+class DequeueEvent(ManagementEvent):
+    """Dequeue a change into a pipeline
+
+    :arg TriggerEvent trigger_event: a TriggerEvent describing the
+        trigger, pipeline, and change to dequeue
+    """
+
+    def __init__(self, trigger_event):
+        super(DequeueEvent, self).__init__()
+        self.trigger_event = trigger_event
+
+
 class EnqueueEvent(ManagementEvent):
     """Enqueue a change into a pipeline
 
@@ -588,6 +600,14 @@ class Scheduler(threading.Thread):
         event.wait()
         self.log.debug("Promotion complete")
 
+    def dequeue(self, trigger_event):
+        event = DequeueEvent(trigger_event)
+        self.management_event_queue.put(event)
+        self.wake_event.set()
+        self.log.debug("Waiting for dequeue")
+        event.wait()
+        self.log.debug("Dequeue complete")
+
     def enqueue(self, trigger_event):
         event = EnqueueEvent(trigger_event)
         self.management_event_queue.put(event)
@@ -773,6 +793,15 @@ class Scheduler(threading.Thread):
                 quiet=True,
                 ignore_requirements=True)
 
+    def _doDequeueEvent(self, event):
+        project = self.layout.projects.get(event.project_name)
+        pipeline = self.layout.pipelines[event.pipeline]
+        change = pipeline.source.getChange(event, project)
+        item = pipeline.manager.getItemForChange(change)
+        self.log.info("Removing %s, %s to %s" %
+                      (project, change, pipeline))
+        pipeline.manager.removeItem(item)
+
     def _doEnqueueEvent(self, event):
         project = self.layout.projects.get(event.project_name)
         pipeline = self.layout.pipelines[event.forced_pipeline]
@@ -887,6 +916,8 @@ class Scheduler(threading.Thread):
                 self._doReconfigureEvent(event)
             elif isinstance(event, PromoteEvent):
                 self._doPromoteEvent(event)
+            elif isinstance(event, DequeueEvent):
+                self._doDequeueEvent(event.trigger_event)
             elif isinstance(event, EnqueueEvent):
                 self._doEnqueueEvent(event.trigger_event)
             else:

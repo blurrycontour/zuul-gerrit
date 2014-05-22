@@ -47,6 +47,7 @@ class RPCListener(object):
         self.register()
 
     def register(self):
+        self.worker.registerFunction("zuul:dequeue")
         self.worker.registerFunction("zuul:enqueue")
         self.worker.registerFunction("zuul:enqueue_ref")
         self.worker.registerFunction("zuul:promote")
@@ -83,6 +84,42 @@ class RPCListener(object):
                     job.sendWorkFail()
             except Exception:
                 self.log.exception("Exception while getting job")
+
+    def handle_dequeue(self, job):
+        args = json.loads(job.arguments)
+        event = model.TriggerEvent()
+        errors = ''
+
+        trigger = self.sched.triggers.get(args['trigger'])
+        if trigger:
+            event.trigger_name = args['trigger']
+        else:
+            errors += 'Invalid trigger: %s\n' % (args['trigger'],)
+
+        project = self.sched.layout.projects.get(args['project'])
+        if project:
+            event.project_name = args['project']
+        else:
+            errors += 'Invalid project: %s\n' % (args['project'],)
+
+        pipeline = self.sched.layout.pipelines.get(args['pipeline'])
+        if pipeline:
+            event.pipeline = args['pipeline']
+        else:
+            errors += 'Invalid pipeline: %s\n' % (args['pipeline'],)
+
+        if not errors:
+            event.change_number, event.patch_number = args['change'].split(',')
+            try:
+                pipeline.source.getChange(event, project)
+            except Exception:
+                errors += 'Invalid change: %s\n' % (args['change'],)
+
+        if errors:
+            job.sendWorkException(errors.encode('utf8'))
+        else:
+            self.sched.dequeue(event)
+            job.sendWorkComplete()
 
     def _common_enqueue(self, job):
         args = json.loads(job.arguments)
