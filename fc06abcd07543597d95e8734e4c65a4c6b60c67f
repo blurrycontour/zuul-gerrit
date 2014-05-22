@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7adec928_ecb96c7a",
+        "filename": "etc/status/public_html/index.html",
+        "patchSetId": 3
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-05-22T18:31:45Z",
+      "side": 1,
+      "message": "Would it be possible to still support having the js app do everything needed to the zuul-container?  Part of the idea is that people should be able to drop it into their existing site and the more code that we ask they insert, the harder it is for us to change things later.",
+      "revId": "fc06abcd07543597d95e8734e4c65a4c6b60c67f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7adec928_0cb0588a",
+        "filename": "etc/status/public_html/index.html",
+        "patchSetId": 3
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-05-22T18:31:45Z",
+      "side": 1,
+      "message": "This is an aweful lot of javascript to have outside of the app.  I think it would be much better to just call a single function and pass the important parameters.  We can use a different function in gerrit that handles a single change.",
+      "revId": "fc06abcd07543597d95e8734e4c65a4c6b60c67f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7adec928_ccb6708a",
+        "filename": "etc/status/public_html/zuul.app.js",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-05-22T18:31:45Z",
+      "side": 1,
+      "message": "(i\u0027m testing something else about gerrit here)",
+      "revId": "fc06abcd07543597d95e8734e4c65a4c6b60c67f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
