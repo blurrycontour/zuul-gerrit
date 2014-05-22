@@ -117,6 +117,21 @@ class PromoteEvent(ManagementEvent):
         self.change_ids = change_ids
 
 
+class DequeueEvent(ManagementEvent):
+    """Dequeue a change from a pipeline
+
+    :arg str pipeline_name: the name of the pipeline
+    :arg list change_ids: a list of strings of change ids in the form
+        1234,1
+    """
+
+    def __init__(self, tenant_name, pipeline_name, change_ids):
+        super(DequeueEvent, self).__init__()
+        self.tenant_name = tenant_name
+        self.pipeline_name = pipeline_name
+        self.change_ids = change_ids
+
+
 class EnqueueEvent(ManagementEvent):
     """Enqueue a change into a pipeline
 
@@ -461,6 +476,14 @@ class Scheduler(threading.Thread):
         self.log.debug("Waiting for promotion")
         event.wait()
         self.log.debug("Promotion complete")
+
+    def dequeue(self, tenant_name, pipeline_name, change_ids):
+        event = DequeueEvent(tenant_name, pipeline_name, change_ids)
+        self.management_event_queue.put(event)
+        self.wake_event.set()
+        self.log.debug("Waiting for dequeue")
+        event.wait()
+        self.log.debug("Dequeue complete")
 
     def enqueue(self, trigger_event):
         event = EnqueueEvent(trigger_event)
@@ -826,6 +849,37 @@ class Scheduler(threading.Thread):
                 quiet=True,
                 ignore_requirements=True)
 
+    def _doDequeueEvent(self, event):
+        pipeline = self.layout.pipelines[event.pipeline_name]
+        change_ids = [c.split(',') for c in event.change_ids]
+        items_to_dequeue = []
+        change_queue = None
+        for shared_queue in pipeline.queues:
+            if change_queue:
+                break
+            for item in shared_queue.queue:
+                if (item.change.number == change_ids[0][0] and
+                        item.change.patchset == change_ids[0][1]):
+                    change_queue = shared_queue
+                    break
+        if not change_queue:
+            raise Exception("Unable to find shared change queue for %s" %
+                            event.change_ids[0])
+        for number, patchset in change_ids:
+            found = False
+            for item in change_queue.queue:
+                if (item.change.number == number and
+                        item.change.patchset == patchset):
+                    found = True
+                    items_to_dequeue.append(item)
+                    break
+            if not found:
+                raise Exception("Unable to find %s,%s in queue %s" %
+                                (number, patchset, change_queue))
+
+        for item in items_to_dequeue:
+            pipeline.manager.removeItem(item)
+
     def _doEnqueueEvent(self, event):
         tenant = self.abide.tenants.get(event.tenant_name)
         (trusted, project) = tenant.getProject(event.project_name)
@@ -979,6 +1033,8 @@ class Scheduler(threading.Thread):
                 self._doTenantReconfigureEvent(event)
             elif isinstance(event, PromoteEvent):
                 self._doPromoteEvent(event)
+            elif isinstance(event, DequeueEvent):
+                self._doDequeueEvent(event)
             elif isinstance(event, EnqueueEvent):
                 self._doEnqueueEvent(event.trigger_event)
             else:
