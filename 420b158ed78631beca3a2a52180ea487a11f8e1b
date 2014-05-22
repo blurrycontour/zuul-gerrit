@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7adec928_c6473d4a",
+        "filename": "zuul/lib/gerrit.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-22T12:25:00Z",
+      "side": 1,
+      "message": "I wonder if this should be configurable. At the very least it should probably be case insensitive.",
+      "revId": "420b158ed78631beca3a2a52180ea487a11f8e1b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7adec928_46bb2d72",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 858,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-22T12:25:00Z",
+      "side": 1,
+      "message": "Should we set this to Dependencies?\n\nMight also be nice to rename to needs_changes or even dependencies",
+      "revId": "420b158ed78631beca3a2a52180ea487a11f8e1b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7adec928_417317b1",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1268,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-22T12:25:00Z",
+      "side": 1,
+      "message": "Should probably be dep_items",
+      "revId": "420b158ed78631beca3a2a52180ea487a11f8e1b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
