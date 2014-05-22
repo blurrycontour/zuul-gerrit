@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7adec928_b1633f40",
+        "filename": "zuul/reporter/mysql.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-05-22T17:57:24Z",
+      "side": 1,
+      "message": "If there is an error (eg, the db is restarted and the connection is reset) it will never recover.  I\u0027d suggest setting cursor to None here, and at the start of this method, try to reconnect if there is no cursor.  That will at least give it a chance to recover, though you would lose at least one report.  If you want to avoid that, you\u0027d need to retry after the first failure (losing a report doesn\u0027t bother me as much as never being able to recover).",
+      "revId": "5fe59b443018ed412f7aa6fc3ba9906226252469",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
