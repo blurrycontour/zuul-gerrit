@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7adec928_739c545e",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2014-05-22T23:17:29Z",
+      "side": 1,
+      "message": "I think a call to removeChange() would be better here (cancels the running Jenkins jobs as well).",
+      "revId": "e8420961e39244af2d9e6dc4558f9c64fbee6297",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
