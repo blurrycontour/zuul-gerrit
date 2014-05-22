@@ -1168,11 +1168,12 @@ class BasePipelineManager(object):
         change_queue = self.pipeline.getQueue(item.change.project)
         change_queue.dequeueItem(item)
 
-    def removeChange(self, change):
+    def removeChange(self, change, remove_related=False):
         # Remove a change from the queue, probably because it has been
         # superseded by another change.
+        related_changes = ([], change.getRelatedChanges())[remove_related]
         for item in self.pipeline.getAllItems():
-            if item.change == change:
+            if item.change == change or item.change in related_changes:
                 self.log.debug("Canceling builds behind change: %s "
                                "because it is being removed." % item.change)
                 self.cancelJobs(item)

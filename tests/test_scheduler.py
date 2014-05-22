@@ -2158,6 +2158,28 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(A.reported, 2)
         self.assertEqual(r, True)
 
+    def test_client_dequeue(self):
+        "Test that the RPC client can dequeue a change"
+        self.worker.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+        C.setDependsOn(B, 1)
+        B.setDependsOn(A, 1)
+        self.waitUntilSettled()
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        client = zuul.rpcclient.RPCClient('127.0.0.1',
+                                          self.gearman_server.port)
+        r = client.dequeue(pipeline='check', change='1,1')
+        client.shutdown()
+
+        self.assertEqual(r, True)
+        self.assertEqual(self.countJobResults(self.history, 'ABORTED'), 3)
+
     def test_client_enqueue_negative(self):
         "Test that the RPC client returns errors"
         client = zuul.rpcclient.RPCClient('127.0.0.1',
