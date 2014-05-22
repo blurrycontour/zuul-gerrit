@@ -83,6 +83,13 @@ class RPCListener(object):
             except Exception:
                 self.log.exception("Exception while getting job")
 
+    def handle_dequeue(self, job):
+        args = json.loads(job.arguments)
+        pipeline = self.sched.layout.pipelines.get(args['pipeline'])
+        change = args['change']
+        item = model.QueueItem(self, pipeline, change)
+        self.sched.removeChange(item)
+
     def handle_enqueue(self, job):
         args = json.loads(job.arguments)
         event = model.TriggerEvent()
