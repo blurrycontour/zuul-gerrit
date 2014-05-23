@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7adec928_7e297b36",
+        "filename": "etc/status/public_html/index.html",
+        "patchSetId": 3
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-23T00:09:20Z",
+      "side": 1,
+      "message": "So this breaks it into sections a little more so people can just display the pipelines without the controls or loading boxes etc. Having this here also lets them arrange the DOM to suit their page they are dropping it into.\n\nIn my opinion this isn\u0027t really that much to add to get the full app.",
+      "parentUuid": "7adec928_ecb96c7a",
+      "revId": "fc06abcd07543597d95e8734e4c65a4c6b60c67f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7adec928_0cb0588a",
         "filename": "etc/status/public_html/index.html",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2014-05-22T18:31:45Z",
       "side": 1,
       "message": "This is an aweful lot of javascript to have outside of the app.  I think it would be much better to just call a single function and pass the important parameters.  We can use a different function in gerrit that handles a single change.",
+      "revId": "fc06abcd07543597d95e8734e4c65a4c6b60c67f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7adec928_5edd9f41",
+        "filename": "etc/status/public_html/index.html",
+        "patchSetId": 3
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-23T00:09:20Z",
+      "side": 1,
+      "message": "Right. This is necessary to break up the app into components so we don\u0027t have to consume it all if we don\u0027t want to.\n\nWe could have a method that takes parameters to decide what is loaded, although I\u0027d put that into a different js file as the current one is now more or less a jquery plugin.\n\nIn my opinion though it\u0027s pretty normal to have the app bootstrapping inline in this. It looks like a lot of js but if you remove the comments and extra URL handling it\u0027s not much.",
+      "parentUuid": "7adec928_0cb0588a",
       "revId": "fc06abcd07543597d95e8734e4c65a4c6b60c67f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
