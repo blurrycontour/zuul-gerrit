@@ -16,6 +16,24 @@
       "revId": "5fe59b443018ed412f7aa6fc3ba9906226252469",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7adec928_ee395640",
+        "filename": "zuul/reporter/mysql.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-23T03:42:21Z",
+      "side": 1,
+      "message": "Nice catch and good suggestion :-)",
+      "parentUuid": "7adec928_b1633f40",
+      "revId": "5fe59b443018ed412f7aa6fc3ba9906226252469",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
