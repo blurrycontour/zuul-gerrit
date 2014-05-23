@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7adec928_dd1b6bc8",
+        "filename": "etc/status/public_html/app.js",
+        "patchSetId": 8
+      },
+      "lineNbr": 904,
+      "author": {
+        "id": 6786
+      },
+      "writtenOn": "2014-05-23T10:07:06Z",
+      "side": 1,
+      "message": "Why it\u0027s commented?",
+      "revId": "9d013546a3638cf4a7be7a13abc1e8187edc3777",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
