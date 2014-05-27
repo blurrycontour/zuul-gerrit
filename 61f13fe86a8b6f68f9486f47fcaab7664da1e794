@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3ae8d1ca_30185084",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2573,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-27T04:33:17Z",
+      "side": 1,
+      "message": "For consistency you should note that A depends on M here",
+      "revId": "61f13fe86a8b6f68f9486f47fcaab7664da1e794",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3ae8d1ca_6b090d2c",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2678,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-27T04:33:17Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "61f13fe86a8b6f68f9486f47fcaab7664da1e794",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3ae8d1ca_cb0f812d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2717,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-05-27T04:33:17Z",
+      "side": 1,
+      "message": "Where does this number come from?",
+      "revId": "61f13fe86a8b6f68f9486f47fcaab7664da1e794",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
