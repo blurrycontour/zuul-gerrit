@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3ae8d1ca_5f996f6d",
+        "filename": "etc/status/public_html/zuul.app.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2014-05-27T00:42:08Z",
+      "side": 1,
+      "message": "This is a move from the other file, so I think it should also carry the copyright headers from that file as well.",
+      "revId": "7daa2b570aee307ed9a3bd398ac201acb5a974d4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
