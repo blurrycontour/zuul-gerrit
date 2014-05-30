@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1ae5cdf2_5e06a821",
+        "filename": "etc/status/fetch-dependencies.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2014-05-30T20:35:18Z",
+      "side": 1,
+      "message": "I think you\u0027ll also want to modify etc/status/public_html/index.html to use this new filename.",
+      "revId": "f2703b0220270c47ee285222771d5bc9ff5f630d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
