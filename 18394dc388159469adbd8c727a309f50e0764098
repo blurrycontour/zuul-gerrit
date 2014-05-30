@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1ae5cdf2_ed3b48e9",
+        "filename": "etc/status/fetch-dependencies.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2014-05-30T23:04:32Z",
+      "side": 1,
+      "message": "After discussing in IRC with James, it sounds like we should probably add a yui-compressor call here to minify this and adjust the documentation to mention that you need to install that tool before running this script.",
+      "revId": "18394dc388159469adbd8c727a309f50e0764098",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ae5cdf2_0d187480",
+        "filename": "etc/status/public_html/index.html",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2014-05-30T23:04:32Z",
+      "side": 1,
+      "message": "If we add a yui-compressor step like I mentioned in my comment on the fetch script, then this filename won\u0027t need to change here.",
+      "revId": "18394dc388159469adbd8c727a309f50e0764098",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
