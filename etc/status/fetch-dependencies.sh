@@ -6,7 +6,10 @@ echo "Fetching jquery.min.js..."
 curl --silent http://code.jquery.com/jquery.min.js > $BASE_DIR/public_html/jquery.min.js
 
 echo "Fetching jquery-visibility.min.js..."
-curl --silent https://raw.github.com/mathiasbynens/jquery-visibility/master/jquery-visibility.min.js > $BASE_DIR/public_html/jquery-visibility.min.js
+wget -q https://codeload.github.com/mathiasbynens/jquery-visibility/zip/master -O jquery-visibility.zip
+unzip -q -o jquery-visibility
+yui-compressor -o $BASE_DIR/public_html/jquery-visibility.min.js jquery-visibility-master/jquery-visibility.js
+rm -R jquery-visibility.zip jquery-visibility-master
 
 echo "Fetching jquery.graphite.js..."
 curl -L --silent https://github.com/prestontimmons/graphitejs/archive/master.zip > jquery-graphite.zip

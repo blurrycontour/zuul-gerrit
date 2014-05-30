@@ -23,5 +23,6 @@ can undo undo this optimisation by removing the 9 lines using this on the
 bottom of ``app.js``
 
 To automatically fetch the latest versions of jQuery, the Page Visibility
-plugin and Twitter Boostrap, run the ``fetch-dependencies.sh`` script.
+plugin and Twitter Boostrap, you need to install yui-compressor tools go to
+run the ``fetch-dependencies.sh`` script. 
 The default ``index.html`` references these.
