@@ -249,7 +249,7 @@ class Gerrit(object):
         data = change._data
         if not data:
             return False
-        if not 'submitRecords' in data:
+        if 'submitRecords' not in data:
             return False
         try:
             for sr in data['submitRecords']:
