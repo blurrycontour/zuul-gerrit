@@ -2962,3 +2962,24 @@ For CI problems and help debugging, contact ci@example.org"""
         # clean it up so it does not fail the test.
         for pipeline in self.sched.layout.pipelines.values():
             pipeline.trigger.maintainCache([])
+
+    def test_gerrit_pipeline_credentials_multiple_users(self):
+        "Test supplying a different user to a pipeline to report to gerrit"
+        self.config.set('zuul', 'layout_config',
+                        'tests/fixtures/layout-gerrit-pipelines.yaml')
+        self.sched.reconfigure(self.config)
+        self.registerJobs()
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        verified_by = []
+        for approval in A.patchsets[-1]['approvals']:
+            if approval['type'] == 'verified':
+                verified_by.append(approval['by']['username'])
+
+        # jenkins and another_user should have both posted a verified approval
+        # back to gerrit
+        self.assertIn('jenkins', verified_by)
+        self.assertIn('another_user', verified_by)
