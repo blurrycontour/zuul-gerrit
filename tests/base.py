@@ -82,9 +82,9 @@ class ChangeReference(git.Reference):
 
 
 class FakeChange(object):
-    categories = {'APRV': ('Approved', -1, 1),
-                  'CRVW': ('Code-Review', -2, 2),
-                  'VRFY': ('Verified', -2, 2)}
+    categories = {'approved': ('Approved', -1, 1),
+                  'code-review': ('Code-Review', -2, 2),
+                  'verified': ('Verified', -2, 2)}
 
     def __init__(self, gerrit, number, project, branch, subject,
                  status='NEW', upstream_root=None):
@@ -230,8 +230,8 @@ class FakeChange(object):
                  "comment": "This is a comment"}
         return event
 
-    def addApproval(self, category, value, username='jenkins',
-                    granted_on=None):
+    def addApproval(self, category, value, username='reviewer_john',
+                    granted_on=None, message=''):
         if not granted_on:
             granted_on = time.time()
         approval = {'description': self.categories[category][0],
@@ -247,20 +247,20 @@ class FakeChange(object):
                 del self.patchsets[-1]['approvals'][i]
         self.patchsets[-1]['approvals'].append(approval)
         event = {'approvals': [approval],
-                 'author': {'email': 'user@example.com',
-                            'name': 'User Name',
-                            'username': 'username'},
+                 'author': {'email': 'author@example.com',
+                            'name': 'Patchset Author',
+                            'username': 'author_phil'},
                  'change': {'branch': self.branch,
                             'id': 'Iaa69c46accf97d0598111724a38250ae76a22c87',
                             'number': str(self.number),
-                            'owner': {'email': 'user@example.com',
-                                      'name': 'User Name',
-                                      'username': 'username'},
+                            'owner': {'email': 'owner@example.com',
+                                      'name': 'Change Owner',
+                                      'username': 'owner_jane'},
                             'project': self.project,
                             'subject': self.subject,
                             'topic': 'master',
                             'url': 'https://hostname/459'},
-                 'comment': '',
+                 'comment': message,
                  'patchSet': self.patchsets[-1],
                  'type': 'comment-added'}
         self.data['submitRecords'] = self.getSubmitRecords()
@@ -374,7 +374,27 @@ class FakeGerrit(object):
     def review(self, project, changeid, message, action):
         number, ps = changeid.split(',')
         change = self.changes[int(number)]
+
+        category = None
+        value = None
+        for cat in ['code-review', 'verified']:
+            if cat in action:
+                category = cat
+                value = action[cat]
+
+        if category is None and 'label' in action:
+            parts = action['label'].split('=')
+            category = parts[0]
+            value = parts[1]
+
+        if category is not None:
+            # We can't add this approval event into the queue as it stops jobs
+            # from checking what happens before this event is triggered. If a
+            # job needs to see what happens they can add their own verified
+            # event into the queue.
+            change.addApproval(category, value)
         change.messages.append(message)
+
         if 'submit' in action:
             change.setMerged()
         if message:
@@ -874,6 +894,7 @@ class ZuulTestCase(testtools.TestCase):
             return FakeSMTP(*args, **kw)
 
         zuul.lib.gerrit.Gerrit = FakeGerrit
+
         self.useFixture(fixtures.MonkeyPatch('smtplib.SMTP', FakeSMTPFactory))
 
         self.gerrit = FakeGerritTrigger(
