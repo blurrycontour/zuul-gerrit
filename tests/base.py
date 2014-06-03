@@ -367,11 +367,16 @@ class FakeChange(object):
 
 
 class FakeGerrit(object):
-    def __init__(self, *args, **kw):
+    def __init__(self, hostname, username, port=29418, keyfile=None,
+                 changes_dbs={}):
+        self.hostname = hostname
+        self.username = username
+        self.port = port
+        self.keyfile = keyfile
         self.event_queue = Queue.Queue()
         self.fixture_dir = os.path.join(FIXTURE_DIR, 'gerrit')
         self.change_number = 0
-        self.changes = {}
+        self.changes = changes_dbs[hostname]
         self.queries = []
 
     def addFakeChange(self, project, branch, subject, status='NEW'):
@@ -412,7 +417,7 @@ class FakeGerrit(object):
             # from checking what happens before this event is triggered. If a
             # job needs to see what happens they can add their own verified
             # event into the queue.
-            change.addApproval(category, value)
+            change.addApproval(category, value, username=self.username)
         change.messages.append(message)
 
         if 'submit' in action:
@@ -928,7 +933,18 @@ class ZuulTestCase(testtools.TestCase):
             args = [self.smtp_messages] + list(args)
             return FakeSMTP(*args, **kw)
 
-        zuul.lib.gerrit.Gerrit = FakeGerrit
+        # Set a changes database so multiple FakeGerrit's can report back to
+        # a virtual canonical database given by the configured hostname
+        self.gerrit_changes_dbs = {
+            self.config.get('gerrit', 'server'): {}
+        }
+
+        def FakeGerritFactory(*args, **kw):
+            kw['changes_dbs'] = self.gerrit_changes_dbs
+            return FakeGerrit(*args, **kw)
+
+        self.useFixture(fixtures.MonkeyPatch('zuul.lib.gerrit.Gerrit',
+                                             FakeGerritFactory))
 
         self.useFixture(fixtures.MonkeyPatch('smtplib.SMTP', FakeSMTPFactory))
 

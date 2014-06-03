@@ -13,6 +13,7 @@
 # under the License.
 
 import logging
+from zuul.lib import gerrit
 
 
 class Reporter(object):
@@ -23,7 +24,7 @@ class Reporter(object):
 
     def __init__(self, trigger):
         """Set up the reporter."""
-        self.gerrit = trigger.gerrit
+        self.default_gerrit = trigger.gerrit
         self.trigger = trigger
 
     def report(self, change, message, params):
@@ -33,8 +34,24 @@ class Reporter(object):
         changeid = '%s,%s' % (change.number, change.patchset)
         change._ref_sha = self.trigger.getRefSha(change.project.name,
                                                  'refs/heads/' + change.branch)
-        return self.gerrit.review(change.project.name, changeid, message,
-                                  params)
+
+        if any(x in params for x in ['gerrit_server', 'gerrit_user',
+                                     'gerrit_port', 'gerrit_keyfile']):
+            # This reporter is configured to report as a different user back
+            # into gerrit. Create a new session.
+            # We'll inherit the default connection parameters (such as host and
+            # sshkey) if they aren't set explicitly for this user.
+            report_gerrit = gerrit.Gerrit(
+                params.get('gerrit_server', self.default_gerrit.hostname),
+                params.get('gerrit_user', self.default_gerrit.username),
+                params.get('gerrit_port', self.default_gerrit.port),
+                params.get('gerrit_keyfile', self.default_gerrit.keyfile)
+            )
+        else:
+            report_gerrit = self.default_gerrit
+
+        return report_gerrit.review(change.project.name, changeid, message,
+                                    params)
 
     def getSubmitAllowNeeds(self, params):
         """Get a list of code review labels that are allowed to be
