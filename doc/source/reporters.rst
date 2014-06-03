@@ -25,6 +25,33 @@ with a value. For example, ``verified: 1`` becomes ``gerrit review
 --verified 1`` and ``submit: true`` becomes ``gerrit review
 --submit``.
 
+By default the gerrit credentials defined in :ref:`zuulconf` are used
+to connect and leave an approval under that user. However if you wish
+to send back a report as a different user than to the one watching
+the event stream you can supply the credentials in the report
+prefixed by ``gerrit_``. For example, ::
+
+  pipelines:
+    - name: check-non-binding
+      manager: IndependentPipelineManager
+      trigger:
+        gerrit:
+          - event: patchset-created
+      success:
+        gerrit:
+          verified: 1
+          gerrit_user: another_user
+          gerrit_sshkey: /prv/ssh.key
+      failure:
+        gerrit:
+          verified: -1
+          gerrit_user: another_user
+          gerrit_sshkey: /prv/ssh.key
+
+When one of ``gerrit_server``, ``gerrit_port``, ``gerrit_user`` or
+``gerrit_sshkey`` is not provided it is inherited from the
+:ref:`zuulconf`
+
 Gerrit Configuration
 ~~~~~~~~~~~~~~~~~~~~
 
