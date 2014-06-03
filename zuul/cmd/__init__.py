@@ -15,12 +15,14 @@
 # under the License.
 
 import ConfigParser
+import cStringIO
 import logging
 import logging.config
 import os
 import signal
 import sys
 import traceback
+import yappi
 
 # No zuul imports here because they pull in paramiko which must not be
 # imported until after the daemonization.
@@ -36,6 +38,15 @@ def stack_dump_handler(signum, frame):
         log_str += "".join(traceback.format_stack(stack_frame))
     log = logging.getLogger("zuul.stack_dump")
     log.debug(log_str)
+    if not yappi.is_running():
+        yappi.start()
+    else:
+        yappi.stop()
+        yappi_out = cStringIO.StringIO()
+        yappi.get_func_stats().print_all(out=yappi_out)
+        yappi.get_thread_stats().print_all(out=yappi_out)
+        log.debug(yappi_out.getvalue())
+        yappi_out.close()
     signal.signal(signal.SIGUSR2, stack_dump_handler)
 
 
