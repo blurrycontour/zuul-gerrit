@@ -182,8 +182,8 @@ swift
 """""
 
 To send (optional) swift upload instructions this section must be
-present. Multiple destinations can be defined in the :ref:`jobs`
-section of the layout.
+present and you need the python-swiftclient module installed. Multiple
+destinations can be defined in the :ref:`jobs` section of the layout.
 
 **X-Account-Meta-Temp-Url-Key** (optional)
   This is the key used to sign the HMAC message. If you do not set a
