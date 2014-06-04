@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1ae5cdf2_3210c4a7",
+        "filename": "zuul/webapp.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-06-04T00:16:48Z",
+      "side": 1,
+      "message": "Should make this configurable. So\n\n  (cur_time - self.cache_time) \u003e self.cache_expiry",
+      "revId": "06c4e9b184e7e0f65acdf85a3a5fed7c89014b2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ae5cdf2_d262403d",
+        "filename": "zuul/webapp.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-06-04T00:16:48Z",
+      "side": 1,
+      "message": "should we use time.time() again here since the formatStatusJSON could take a while",
+      "revId": "06c4e9b184e7e0f65acdf85a3a5fed7c89014b2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
