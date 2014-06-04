@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1ae5cdf2_109d7b0b",
+        "filename": "etc/clonemap.yaml-sample",
+        "patchSetId": 17
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 11764
+      },
+      "writtenOn": "2014-06-04T05:48:38Z",
+      "side": 1,
+      "message": "specified",
+      "revId": "6e890b3ea4576f7f4e40c95ff2d60bf4aaf78503",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ae5cdf2_30f27706",
+        "filename": "zuul/lib/clonemapper.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 11764
+      },
+      "writtenOn": "2014-06-04T05:48:38Z",
+      "side": 1,
+      "message": "dict comprehension\u0027s are a python 2.7+ feature (pep-0274). Use the dict() constructor with a generator expression:\n\n    dupes \u003d dict((d, p) for (d, p) in check.iteritems() if len(p) \u003e 1)",
+      "revId": "6e890b3ea4576f7f4e40c95ff2d60bf4aaf78503",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ae5cdf2_eb3902a5",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 11764
+      },
+      "writtenOn": "2014-06-04T05:48:38Z",
+      "side": 1,
+      "message": "s/that/this/",
+      "revId": "6e890b3ea4576f7f4e40c95ff2d60bf4aaf78503",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
