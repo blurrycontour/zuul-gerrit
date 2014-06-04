@@ -967,4 +967,6 @@ recheck changes for the gate and check pipelines respectively::
 
 If you send a SIGUSR2 to the zuul-server process, Zuul will dump a stack
 trace for each running thread into its debug log. This is useful for
-tracking down deadlock or otherwise slow threads.
+tracking down deadlock or otherwise slow threads. When `yappi
+<https://code.google.com/p/yappi/>`_ (Yet Another Python Profiler) is
+available, additionals functions and threads stats are emitted as well.
