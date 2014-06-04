@@ -15,6 +15,7 @@
 
 import logging
 import threading
+import time
 from paste import httpserver
 import webob
 from webob import dec
@@ -27,6 +28,8 @@ class WebApp(threading.Thread):
         threading.Thread.__init__(self)
         self.scheduler = scheduler
         self.port = port
+        self.cache_time = 0
+        self.cache = None
         self.daemon = True
         self.server = httpserver.serve(dec.wsgify(self.app), host='0.0.0.0',
                                        port=self.port, start_loop=False)
@@ -40,11 +43,15 @@ class WebApp(threading.Thread):
     def app(self, request):
         if request.path != '/status.json':
             raise webob.exc.HTTPNotFound()
-        try:
-            ret = self.scheduler.formatStatusJSON()
-        except:
-            self.log.exception("Exception formatting status:")
-            raise
-        response = webob.Response(body=ret, content_type='application/json')
+        cur_time = time.time()
+        if not self.cache or (cur_time - self.cache_time) > 1:
+            try:
+                self.cache = self.scheduler.formatStatusJSON()
+                self.cache_time = cur_time
+            except:
+                self.log.exception("Exception formatting status:")
+                raise
+        response = webob.Response(body=self.cache,
+                                  content_type='application/json')
         response.headers['Access-Control-Allow-Origin'] = '*'
         return response
