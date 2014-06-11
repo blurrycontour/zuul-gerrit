@@ -245,7 +245,7 @@ class Gearman(object):
                 elif self.config.has_option('swift',
                                             'default_logserver_prefix'):
                     swift_instructions['LOGSERVER_PREFIX'] = \
-                        s_config['logserver_prefix']
+                        s_config['default_logserver_prefix']
 
                 # Create a set of zuul instructions for each instruction-set
                 # given  in the form of NAME_PARAMETER=VALUE
