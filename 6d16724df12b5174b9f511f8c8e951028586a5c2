@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1ae5cdf2_60116303",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-06-12T23:26:04Z",
+      "side": 1,
+      "message": "You don\u0027t necessarily need it installed.\n\nPerhaps something like \"If you are sending the \u0027\u0027temp-url-key\u0027\u0027 or fetching the \u0027\u0027x-storage-url\u0027\u0027 you need the python-swiftclient module installed\"",
+      "revId": "6d16724df12b5174b9f511f8c8e951028586a5c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ae5cdf2_2032fba6",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-06-12T23:26:04Z",
+      "side": 1,
+      "message": "You do need it installed if this is True",
+      "revId": "6d16724df12b5174b9f511f8c8e951028586a5c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ae5cdf2_00d6df27",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-06-12T23:26:04Z",
+      "side": 1,
+      "message": "You also need it if you don\u0027t set the X-Storage-URL by hand",
+      "revId": "6d16724df12b5174b9f511f8c8e951028586a5c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
