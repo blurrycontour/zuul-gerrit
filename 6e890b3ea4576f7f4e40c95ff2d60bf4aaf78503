@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1ae5cdf2_3ba6c154",
+        "filename": "etc/clonemap.yaml-sample",
+        "patchSetId": 17
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-06-19T13:51:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1ae5cdf2_109d7b0b",
+      "revId": "6e890b3ea4576f7f4e40c95ff2d60bf4aaf78503",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1ae5cdf2_30f27706",
         "filename": "zuul/lib/clonemapper.py",
         "patchSetId": 17
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "1ae5cdf2_1b5bc554",
+        "filename": "zuul/lib/clonemapper.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-06-19T13:51:31Z",
+      "side": 1,
+      "message": "Thanks! Would have taken me a while to figure out :-)",
+      "parentUuid": "1ae5cdf2_30f27706",
+      "revId": "6e890b3ea4576f7f4e40c95ff2d60bf4aaf78503",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1ae5cdf2_eb3902a5",
         "filename": "zuul/lib/cloner.py",
         "patchSetId": 17
@@ -47,6 +83,24 @@
       "writtenOn": "2014-06-04T05:48:38Z",
       "side": 1,
       "message": "s/that/this/",
+      "revId": "6e890b3ea4576f7f4e40c95ff2d60bf4aaf78503",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ae5cdf2_fb2459c7",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-06-19T13:51:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1ae5cdf2_eb3902a5",
       "revId": "6e890b3ea4576f7f4e40c95ff2d60bf4aaf78503",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
