@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1ae5cdf2_7bb136df",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-06-19T07:19:25Z",
+      "side": 1,
+      "message": "This is already set in ZuulTestCase",
+      "revId": "2cde56406c25a2c9644bb61383a0d30bf23aa6e4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ae5cdf2_7bff7666",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1444,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-06-19T07:19:25Z",
+      "side": 1,
+      "message": "s/build/built",
+      "revId": "2cde56406c25a2c9644bb61383a0d30bf23aa6e4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ae5cdf2_bb3bbe36",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1450,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-06-19T07:19:25Z",
+      "side": 1,
+      "message": "Is this still necessary or just left over from development? Perhaps worth commenting out?",
+      "revId": "2cde56406c25a2c9644bb61383a0d30bf23aa6e4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
