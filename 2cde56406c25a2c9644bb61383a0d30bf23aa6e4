@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1ae5cdf2_51a7fbbb",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-06-19T08:25:32Z",
+      "side": 1,
+      "message": "I am not the best rebaser around. Good catch, thanks.",
+      "parentUuid": "1ae5cdf2_7bb136df",
+      "revId": "2cde56406c25a2c9644bb61383a0d30bf23aa6e4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1ae5cdf2_7bff7666",
         "filename": "tests/test_scheduler.py",
         "patchSetId": 10
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "1ae5cdf2_d19a2b6e",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1444,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-06-19T08:25:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1ae5cdf2_7bff7666",
+      "revId": "2cde56406c25a2c9644bb61383a0d30bf23aa6e4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1ae5cdf2_bb3bbe36",
         "filename": "tests/test_scheduler.py",
         "patchSetId": 10
@@ -47,6 +83,41 @@
       "writtenOn": "2014-06-19T07:19:25Z",
       "side": 1,
       "message": "Is this still necessary or just left over from development? Perhaps worth commenting out?",
+      "revId": "2cde56406c25a2c9644bb61383a0d30bf23aa6e4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ae5cdf2_31bb4fc5",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1450,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-06-19T08:25:32Z",
+      "side": 1,
+      "message": "I commented it out.  While writing the patch, I found the output to be very helpful.",
+      "parentUuid": "1ae5cdf2_bb3bbe36",
+      "revId": "2cde56406c25a2c9644bb61383a0d30bf23aa6e4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ae5cdf2_f1a5679f",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1464,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-06-19T08:25:32Z",
+      "side": 1,
+      "message": "removed that commented out line as well.",
       "revId": "2cde56406c25a2c9644bb61383a0d30bf23aa6e4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
