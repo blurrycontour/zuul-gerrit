@@ -1000,12 +1000,18 @@ class EventFilter(object):
         self.timespecs = timespecs
 
         for a in self.require_approvals:
-            if 'older-than' in a:
-                a['older-than'] = time_to_seconds(a['older-than'])
-            if 'newer-than' in a:
-                a['newer-than'] = time_to_seconds(a['newer-than'])
-            if 'email-filter' in a:
-                a['email-filter'] = re.compile(a['email-filter'])
+            for k, v in a.items():
+                if k == 'username':
+                    pass
+                elif k == 'email-filter':
+                    a[k] = re.compile(v)
+                elif k == 'newer-than':
+                    a[k] = time_to_seconds(v)
+                elif k == 'older-than':
+                    a[k] = time_to_seconds(v)
+                else:
+                    if not isinstance(v, list):
+                        a[k] = [v]
 
     def __repr__(self):
         ret = '<EventFilter'
@@ -1130,7 +1136,7 @@ class EventFilter(object):
                             found_approval = False
                     else:
                         if (normalizeCategory(approval['description']) != k or
-                            int(approval['value']) != v):
+                            int(approval['value']) not in v):
                             found_approval = False
                 if found_approval:
                     matches_approval = True
@@ -1158,12 +1164,18 @@ class ChangeishFilter(object):
         self.approvals = approvals
 
         for a in self.approvals:
-            if 'older-than' in a:
-                a['older-than'] = time_to_seconds(a['older-than'])
-            if 'newer-than' in a:
-                a['newer-than'] = time_to_seconds(a['newer-than'])
-            if 'email-filter' in a:
-                a['email-filter'] = re.compile(a['email-filter'])
+            for k, v in a.items():
+                if k == 'username':
+                    pass
+                elif k == 'email-filter':
+                    a[k] = re.compile(v)
+                elif k == 'newer-than':
+                    a[k] = time_to_seconds(v)
+                elif k == 'older-than':
+                    a[k] = time_to_seconds(v)
+                else:
+                    if not isinstance(v, list):
+                        a[k] = [v]
 
     def __repr__(self):
         ret = '<ChangeishFilter'
@@ -1222,7 +1234,7 @@ class ChangeishFilter(object):
                             found_approval = False
                     else:
                         if (normalizeCategory(approval['description']) != k or
-                            int(approval['value']) != v):
+                            int(approval['value']) not in v):
                             found_approval = False
                 if found_approval:
                     matches_approval = True
