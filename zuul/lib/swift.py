@@ -120,6 +120,9 @@ class Swift(object):
         for key, default in six.iteritems(settings):
             if key in kwargs:
                 settings[key] = kwargs[key]
+            altkey = key.replace('_', '-')
+            if altkey in kwargs:
+                settings[key] = kwargs[altkey]
             elif self.config.has_option('swift', 'default_' + key):
                 settings[key] = self.config.get('swift', 'default_' + key)
 
