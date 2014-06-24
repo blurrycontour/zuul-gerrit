@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1ae5cdf2_cbbcbcde",
+        "filename": "zuul/lib/swift.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-06-24T01:44:42Z",
+      "side": 1,
+      "message": "Should add a note here why this is done (ie due to depreciated format). And perhaps a todo to eventually remove this one day",
+      "revId": "6013b3b6944a49750de576738b2d1bf054844e6b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
