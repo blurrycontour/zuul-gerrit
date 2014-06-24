@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1ae5cdf2_2dd99922",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-06-24T16:11:24Z",
+      "side": 1,
+      "message": "I work at HP now.",
+      "parentUuid": "1ae5cdf2_4b450c14",
+      "revId": "53b7c3053ec223e6dbced25546241a59862c5dc7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1ae5cdf2_abd0502c",
         "filename": "zuul/layoutvalidator.py",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2014-06-24T01:42:58Z",
       "side": 1,
       "message": "If both comment_filter and comment are set (for some weird reason) only \u0027comment\u0027 is used. Perhaps this should be noted in the documentation. Better still, I think we should use a V.Any to make sure somebody doesn\u0027t double-specify by accident.",
+      "revId": "53b7c3053ec223e6dbced25546241a59862c5dc7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ae5cdf2_0d9cdd5a",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-06-24T16:11:24Z",
+      "side": 1,
+      "message": "I don\u0027t think v.Any will work that way.  Voluptuous has a new Exclusive tag in git master which I think would work nicely, but it\u0027s not in a released version yet.  I don\u0027t want to over-engineer the backwards compat, so I\u0027ll just update the docs.",
+      "parentUuid": "1ae5cdf2_abd0502c",
       "revId": "53b7c3053ec223e6dbced25546241a59862c5dc7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
