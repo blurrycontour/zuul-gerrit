@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1ae5cdf2_cbd2fc5a",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1178,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-06-24T01:33:43Z",
+      "side": 1,
+      "message": "In the documentation the require filter and require-approval filters use the same syntax. As such I think they should use the same code. Perhaps we could have a Filter base object that EventFilter and ChangeishFilter could inherit on that has this common code?",
+      "revId": "29d72d3288759fe4a1cef6681d13514095d3da0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
