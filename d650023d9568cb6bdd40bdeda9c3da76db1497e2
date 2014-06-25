@@ -16,6 +16,23 @@
       "revId": "d650023d9568cb6bdd40bdeda9c3da76db1497e2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ae5cdf2_2666e5ee",
+        "filename": "zuul/lib/swift.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-06-25T20:00:03Z",
+      "side": 1,
+      "message": "Its a bit confusing that the internal key uses underscores but that is because python. I am fine with that and your comment helps a lot.",
+      "revId": "d650023d9568cb6bdd40bdeda9c3da76db1497e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
