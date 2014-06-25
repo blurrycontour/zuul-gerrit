@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1ae5cdf2_71d1a955",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 786,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-06-25T03:11:47Z",
+      "side": 1,
+      "message": "Should we note that the defaults in zuul.conf have underscores and the values in layout.yaml have dashes?",
+      "revId": "d650023d9568cb6bdd40bdeda9c3da76db1497e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
