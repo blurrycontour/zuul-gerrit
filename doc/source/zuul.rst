@@ -471,7 +471,12 @@ explanation of each of the parameters::
     of approval be present for the current patchset of the change (the
     approval could be added by the event in question).  It follows the
     same syntax as the :ref:`"approval" pipeline requirement below
-    <pipeline-require-approval>`.
+    <pipeline-require-approval>`. The matching approval must match all
+    of the specified criteria.
+
+    *require-all-approvals*
+    This takes a list of approvals in the same format as
+    *require-any-approval* but requires all approvals match all the rules.
 
   **timer**
     This trigger will run based on a cron-style time specification.
@@ -552,6 +557,20 @@ explanation of each of the parameters::
     be for a +1 vote in the "Verified" column.  The value may either
     be a single value or a list: ``verified: [1, 2]`` would match
     either a +1 or +2 vote.
+
+    You can also match negative conditions by starting with an
+    exclamation mark (!). This requires the value to be a string.
+    Example: ``verified: '![-1, -2]'``
+
+  This takes a list of approvals in the same format as above. It
+  requires that any approval on a change can meet all the specified
+  criteria.
+
+  **all-approvals**
+  This takes a list of approvals in the same format as *approval* but
+  requires all approvals match the rules. For example, you can stop any
+  new changes from queueing when there is a negative vote by requiring
+  all approves to not have a -1.
 
   **open**
   A boolean value (``true`` or ``false``) that indicates whether the change
