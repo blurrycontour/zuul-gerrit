@@ -323,3 +323,46 @@ class TestRequirements(ZuulTestCase):
         self.fake_gerrit.addEvent(B.addApproval('CRVW', 2))
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 1)
+
+    def test_pipeline_require_negative_username(self):
+        "Test negative pipeline requirement: no comment from jenkins"
+        return self._test_require_negative_username('org/project1',
+                                                    'project1-pipeline')
+
+    def test_trigger_require_negative_username(self):
+        "Test negative trigger requirement: no comment from jenkins"
+        return self._test_require_negative_username('org/project2',
+                                                    'project2-trigger')
+
+    def _test_require_negative_username(self, project, job):
+        "Test negative username's match"
+        # Should only trigger if Jenkins hasn't voted.
+        self.config.set(
+            'zuul', 'layout_config',
+            'tests/fixtures/layout-requirement-negative-username.yaml')
+        self.sched.reconfigure(self.config)
+        self.registerJobs()
+
+        # add in a change with no comments
+        A = self.fake_gerrit.addFakeChange(project, 'master', 'A')
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 0)
+
+        # add in a comment that will trigger
+        self.fake_gerrit.addEvent(A.addApproval('CRVW', 1,
+                                                username='reviewer'))
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 1)
+        self.assertEqual(self.history[0].name, job)
+
+        # add in a comment from jenkins user which shouldn't trigger
+        self.fake_gerrit.addEvent(A.addApproval('VRFY', 1, username='jenkins'))
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 1)
+
+        # Check future reviews also won't trigger as a 'jenkins' user has
+        # commented previously
+        self.fake_gerrit.addEvent(A.addApproval('CRVW', 1,
+                                                username='reviewer'))
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 1)
