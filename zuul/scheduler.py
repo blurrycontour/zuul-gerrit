@@ -321,13 +321,16 @@ class Scheduler(threading.Thread):
             pipeline.setManager(manager)
             layout.pipelines[conf_pipeline['name']] = pipeline
 
-            if 'require' in conf_pipeline:
-                require = conf_pipeline['require']
+            if 'require' in conf_pipeline or 'reject' in conf_pipeline:
+                require = conf_pipeline.get('require', {})
+                reject = conf_pipeline.get('reject', {})
                 f = ChangeishFilter(
                     open=require.get('open'),
                     current_patchset=require.get('current-patchset'),
                     statuses=toList(require.get('status')),
-                    required_approvals=toList(require.get('approval')))
+                    required_approvals=toList(require.get('approval')),
+                    reject_approvals=toList(reject.get('approval'))
+                )
                 manager.changeish_filters.append(f)
 
             # TODO: move this into triggers (may require pluggable
@@ -357,9 +360,12 @@ class Scheduler(threading.Thread):
                         comments=comments,
                         emails=emails,
                         usernames=usernames,
-                        required_approvals=toList(
-                            trigger.get('require-approval')
-                        )
+                        required_approvals=(
+                            toList(trigger.get('require-approval'))
+                        ),
+                        reject_approvals=toList(
+                            trigger.get('reject-approval')
+                        ),
                     )
                     manager.event_filters.append(f)
             if 'timer' in conf_pipeline['trigger']:
@@ -374,9 +380,12 @@ class Scheduler(threading.Thread):
                         trigger=self.triggers['zuul'],
                         types=toList(trigger['event']),
                         pipelines=toList(trigger.get('pipeline')),
-                        required_approvals=toList(
-                            trigger.get('require-approval')
-                        )
+                        required_approvals=(
+                            toList(trigger.get('require-approval'))
+                        ),
+                        reject_approvals=toList(
+                            trigger.get('reject-approval')
+                        ),
                     )
                     manager.event_filters.append(f)
 
