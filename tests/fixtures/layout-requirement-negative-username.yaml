@@ -1,0 +1,20 @@
+pipelines:
+  - name: check
+    manager: IndependentPipelineManager
+    trigger:
+      gerrit:
+        - event: comment-added
+          require-approval-all:
+            - username: '!jenkins'
+    success:
+      gerrit:
+        verified: 1
+    failure:
+      gerrit:
+        verified: -1
+
+
+projects:
+  - name: org/project
+    check:
+      - project-check

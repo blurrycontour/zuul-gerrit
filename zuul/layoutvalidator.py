@@ -59,6 +59,8 @@ class LayoutSchema(object):
                       'branch': toList(str),
                       'ref': toList(str),
                       'approval': toList(variable_dict),
+                      'require-approval-all': toList(require_approval),
+                      'require-approval-any': toList(require_approval),
                       'require-approval': toList(require_approval),
                       }
 
@@ -74,7 +76,9 @@ class LayoutSchema(object):
                                },
                       }
 
-    require = {'approval': toList(require_approval),
+    require = {'approval-all': toList(require_approval),
+               'approval-any': toList(require_approval),
+               'approval': toList(require_approval),
                'open': bool,
                'current-patchset': bool,
                'status': toList(str)}

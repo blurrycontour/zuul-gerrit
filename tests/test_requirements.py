@@ -321,3 +321,35 @@ class TestRequirements(ZuulTestCase):
         self.fake_gerrit.addEvent(B.addApproval('CRVW', 2))
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 1)
+
+    def test_require_negative_username(self):
+        "Test negative username's match"
+        # Should only trigger if Jenkins hasn't voted.
+        self.config.set(
+            'zuul', 'layout_config',
+            'tests/fixtures/layout-requirement-negative-username.yaml')
+        self.sched.reconfigure(self.config)
+        self.registerJobs()
+
+        # add in a change with no comments
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 0)
+
+        # add in a comment that will trigger
+        self.fake_gerrit.addEvent(A.addApproval('CRVW', 1,
+                                                username='reviewer'))
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 1)
+
+        # add in a comment from jenkins user which shouldn't trigger
+        self.fake_gerrit.addEvent(A.addApproval('VRFY', 1))
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 1)
+
+        # Check future reviews also won't trigger as a 'jenkins' user has
+        # commented previously
+        self.fake_gerrit.addEvent(A.addApproval('CRVW', 1,
+                                                username='reviewer'))
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 1)
