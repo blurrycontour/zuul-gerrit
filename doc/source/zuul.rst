@@ -458,11 +458,19 @@ explanation of each of the parameters::
     A deprecated alternate spelling of *comment*.  Only one of *comment* or
     *comment_filter* should be used.
 
-    *require-approval*
+    *require-approval-any*
     This may be used for any event.  It requires that a certain kind
     of approval be present for the current patchset of the change (the
     approval could be added by the event in question).  It follows the
     same syntax as the "approval" pipeline requirement below.
+
+    *require-approval-all*
+    This takes a list of approvals in the same format as
+    require-approval-any but requires all approvals match the rules.
+
+    **require-approval** (depreciated)
+    A deprecated alternate spelling of *require-approval-any*. This will
+    be joined with *require-approval-any* if both are present.
 
   **timer**
     This trigger will run based on a cron-style time specification.
@@ -507,7 +515,7 @@ explanation of each of the parameters::
   the conditions specified here must be met or the item will not be
   enqueued.
 
-  **approval**
+  **approval-any**
   This requires that a certain kind of approval be present for the
   current patchset of the change (the approval could be added by the
   event in question).  It takes several sub-parameters, all of which
@@ -540,6 +548,24 @@ explanation of each of the parameters::
     be for a +1 vote in the "Verified" column.  The value may either
     be a single value or a list: ``verified: [1, 2]`` would match
     either a +1 or +2 vote.
+
+    You can also match negative conditions by starting with an
+    exclamation mark (!). This requires the values being a string.
+    Example: ``verified: '![-1, -2]'``
+
+  This takes a list of approvals in the same format as above. It
+  requires that any approval on a change can meet the specified
+  criteria.
+
+  **approval-all**
+  This takes a list of approvals in the same format as approval-any but
+  requires all approvals match the rules. For example, you can stop any
+  new changes from queueing when there is a negative vote by requiring
+  all approves to not have a -1.
+
+  **approval** (depreciated)
+  A deprecated alternate spelling of *approval-any*. This will be
+  joined with *approval-any* if both are present.
 
   **open**
   A boolean value (``true`` or ``false``) that indicates whether the change
