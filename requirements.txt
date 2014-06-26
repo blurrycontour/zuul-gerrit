@@ -1,10 +1,10 @@
-pbr>=0.5.21,<1.0
+pbr>=0.6,!=0.7,<1.0
 
 argparse
 PyYAML>=3.1.0
 Paste
-WebOb>=1.2.3,<1.3
-paramiko>=1.8.0
+WebOb>=1.2.3
+paramiko>=1.13.0
 GitPython>=0.3.2.RC1
 lockfile>=0.8
 ordereddict
@@ -14,8 +14,8 @@ statsd>=1.0.0,<3.0
 voluptuous>=0.7
 gear>=0.5.4,<1.0.0
 apscheduler>=2.1.1,<3.0
-python-swiftclient>=1.6
+python-swiftclient>=2.0.2
 python-keystoneclient>=0.4.2
-PrettyTable>=0.6,<0.8
+PrettyTable>=0.7,<0.8
 babel
-six>=1.6.0
+six>=1.7.0
