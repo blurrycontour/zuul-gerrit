@@ -63,6 +63,7 @@ class LayoutSchema(object):
                       'ref': toList(str),
                       'approval': toList(variable_dict),
                       'require-approval': toList(require_approval),
+                      'require-all-approvals': toList(require_approval),
                       }
 
     timer_trigger = {v.Required('time'): str}
@@ -86,6 +87,7 @@ class LayoutSchema(object):
                       }
 
     require = {'approval': toList(require_approval),
+               'all-approvals': toList(require_approval),
                'open': bool,
                'current-patchset': bool,
                'status': toList(str)}
