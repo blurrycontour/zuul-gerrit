@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1ae5cdf2_bb557153",
+        "filename": "doc/source/cloner.rst",
+        "patchSetId": 21
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-06-27T06:18:28Z",
+      "side": 1,
+      "message": "s/process/processes\n\nperhaps \"in the order supplied\"",
+      "revId": "c2c581783eeaf533ae71752e5ccf2e9c5c9ccbec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ae5cdf2_7604e0c5",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-06-27T06:18:28Z",
+      "side": 1,
+      "message": "I think you need to check if the fallback is the same as the override and if it is don\u0027t try fetching it again.",
+      "revId": "c2c581783eeaf533ae71752e5ccf2e9c5c9ccbec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
