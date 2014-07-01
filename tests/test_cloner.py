@@ -68,8 +68,8 @@ class TestCloner(ZuulTestCase):
 
         self.worker.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
-        A.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
 
         self.waitUntilSettled()
 
@@ -123,10 +123,10 @@ class TestCloner(ZuulTestCase):
         projects = ['org/project1', 'org/project2']
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
 
         self.waitUntilSettled()
 
@@ -179,12 +179,12 @@ class TestCloner(ZuulTestCase):
         B = self.fake_gerrit.addFakeChange('org/project2', 'stable/havana',
                                            'B')
         C = self.fake_gerrit.addFakeChange('org/project3', 'master', 'C')
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
-        C.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+        C.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('approved', 1))
 
         self.waitUntilSettled()
 
@@ -254,16 +254,16 @@ class TestCloner(ZuulTestCase):
         D = self.fake_gerrit.addFakeChange('org/project3', 'master', 'D')
         E = self.fake_gerrit.addFakeChange('org/project4', 'stable/havana',
                                            'E')
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
-        C.addApproval('CRVW', 2)
-        D.addApproval('CRVW', 2)
-        E.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(D.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(E.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+        C.addApproval('code-review', 2)
+        D.addApproval('code-review', 2)
+        E.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(D.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(E.addApproval('approved', 1))
 
         self.waitUntilSettled()
 
@@ -430,14 +430,14 @@ class TestCloner(ZuulTestCase):
         C = self.fake_gerrit.addFakeChange('org/project2', 'master', 'C')
         D = self.fake_gerrit.addFakeChange('org/project3', 'stable/havana',
                                            'D')
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
-        C.addApproval('CRVW', 2)
-        D.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(D.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+        C.addApproval('code-review', 2)
+        D.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(D.addApproval('approved', 1))
 
         self.waitUntilSettled()
 
