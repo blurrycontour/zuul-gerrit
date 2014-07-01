@@ -42,17 +42,17 @@ class TestZuulTrigger(ZuulTestCase):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         B1 = self.fake_gerrit.addFakeChange('org/project', 'master', 'B1')
         B2 = self.fake_gerrit.addFakeChange('org/project', 'master', 'B2')
-        A.addApproval('CRVW', 2)
-        B1.addApproval('CRVW', 2)
-        B2.addApproval('CRVW', 2)
-        A.addApproval('VRFY', 1)    # required by gate
-        B1.addApproval('VRFY', -1)  # should go to check
-        B2.addApproval('VRFY', 1)   # should go to gate
-        B1.addApproval('APRV', 1)
-        B2.addApproval('APRV', 1)
+        A.addApproval('code-review', 2)
+        B1.addApproval('code-review', 2)
+        B2.addApproval('code-review', 2)
+        A.addApproval('verified', 1)    # required by gate
+        B1.addApproval('verified', -1)  # should go to check
+        B2.addApproval('verified', 1)   # should go to gate
+        B1.addApproval('approved', 1)
+        B2.addApproval('approved', 1)
         B1.setDependsOn(A, 1)
         B2.setDependsOn(A, 1)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
         # Jobs are being held in build to make sure that 3,1 has time
         # to enqueue behind 1,1 so that the test is more
         # deterministic.
@@ -88,8 +88,8 @@ class TestZuulTrigger(ZuulTestCase):
         C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
         A.addPatchset(['conflict'])
         B.addPatchset(['conflict'])
-        A.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
         self.waitUntilSettled()
 
         self.assertEqual(len(self.history), 1)
