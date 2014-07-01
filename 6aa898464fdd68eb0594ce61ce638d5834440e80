@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baada198_943747b0",
+        "filename": "doc/source/client.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-07-01T05:08:06Z",
+      "side": 1,
+      "message": "This actually doesn\u0027t say what \u0027zuul promote\u0027 does. Perhaps it\u0027s implied by the name but perhaps we could add a line like\n\n  Promotes changes in a pipeline to the top to get preference for next available workers. Intelligently re-organizes dependant pipelines to ensure merge order is preserved.\n\nActually, does this have any effect on non dependant pipelines? Won\u0027t the jobs already be queued into gearman?",
+      "revId": "6aa898464fdd68eb0594ce61ce638d5834440e80",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baada198_b4636bb0",
+        "filename": "doc/source/client.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-07-01T05:08:06Z",
+      "side": 1,
+      "message": "\u0027zuul show\u0027 isn\u0027t really a command like \u0027zuul promote\u0027 is.. perhaps this section should be \u0027show running-jobs\u0027. Then a description like\n\n  Output the jobs currently running to help track workers.\n\nor something like that..",
+      "revId": "6aa898464fdd68eb0594ce61ce638d5834440e80",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
