@@ -44,8 +44,8 @@ class TestScheduler(ZuulTestCase):
         "Test that jobs are launched and a change is merged"
 
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
         self.waitUntilSettled()
         self.assertEqual(self.getJobFromHistory('project-merge').result,
                          'SUCCESS')
@@ -109,13 +109,13 @@ class TestScheduler(ZuulTestCase):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
         C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
-        C.addApproval('CRVW', 2)
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+        C.addApproval('code-review', 2)
 
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('approved', 1))
 
         self.waitUntilSettled()
         self.assertEqual(len(self.builds), 1)
@@ -185,13 +185,13 @@ class TestScheduler(ZuulTestCase):
 
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
 
         self.worker.addFailTest('project-test1', A)
 
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
         self.waitUntilSettled()
 
         self.worker.release('.*-merge')
@@ -216,13 +216,13 @@ class TestScheduler(ZuulTestCase):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
         C = self.fake_gerrit.addFakeChange('org/project2', 'master', 'C')
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
-        C.addApproval('CRVW', 2)
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+        C.addApproval('code-review', 2)
 
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('approved', 1))
 
         self.waitUntilSettled()
 
@@ -263,15 +263,15 @@ class TestScheduler(ZuulTestCase):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
         C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
-        C.addApproval('CRVW', 2)
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+        C.addApproval('code-review', 2)
 
         self.worker.addFailTest('project-test1', A)
 
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('approved', 1))
 
         self.waitUntilSettled()
 
@@ -321,15 +321,15 @@ class TestScheduler(ZuulTestCase):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
         C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
-        C.addApproval('CRVW', 2)
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+        C.addApproval('code-review', 2)
 
         self.worker.addFailTest('project-test1', B)
 
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('approved', 1))
 
         self.waitUntilSettled()
 
@@ -397,15 +397,15 @@ class TestScheduler(ZuulTestCase):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
         C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
-        C.addApproval('CRVW', 2)
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+        C.addApproval('code-review', 2)
 
         self.worker.addFailTest('project-test1', A)
 
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('approved', 1))
 
         self.waitUntilSettled()
         queue = self.gearman_server.getQueue()
@@ -459,16 +459,16 @@ class TestScheduler(ZuulTestCase):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
         C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
-        C.addApproval('CRVW', 2)
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+        C.addApproval('code-review', 2)
 
         self.worker.addFailTest('project-test1', A)
         self.worker.addFailTest('project-test1', B)
 
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('approved', 1))
         self.waitUntilSettled()
 
         self.worker.release('.*-merge')
@@ -562,9 +562,9 @@ class TestScheduler(ZuulTestCase):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
         C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
-        C.addApproval('CRVW', 2)
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+        C.addApproval('code-review', 2)
 
         M2 = self.fake_gerrit.addFakeChange('org/project', 'master', 'M2')
         M1 = self.fake_gerrit.addFakeChange('org/project', 'master', 'M1')
@@ -581,7 +581,7 @@ class TestScheduler(ZuulTestCase):
         A.setDependsOn(M1, 1)
         M1.setDependsOn(M2, 1)
 
-        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(C.addApproval('approved', 1))
 
         self.waitUntilSettled()
 
@@ -589,8 +589,8 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(B.data['status'], 'NEW')
         self.assertEqual(C.data['status'], 'NEW')
 
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
 
         self.waitUntilSettled()
         self.assertEqual(M2.queried, 0)
@@ -608,8 +608,8 @@ class TestScheduler(ZuulTestCase):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
         X = self.fake_gerrit.addFakeChange('org/project', 'master', 'X')
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
 
         M1 = self.fake_gerrit.addFakeChange('org/project', 'master', 'M1')
         M1.setMerged()
@@ -617,7 +617,7 @@ class TestScheduler(ZuulTestCase):
         B.setDependsOn(A, 1)
         A.setDependsOn(M1, 1)
 
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
         self.fake_gerrit.addEvent(X.getPatchsetCreatedEvent(1))
 
         self.waitUntilSettled()
@@ -631,7 +631,7 @@ class TestScheduler(ZuulTestCase):
                 build.release()
         self.waitUntilSettled()
 
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
         self.waitUntilSettled()
 
         self.log.debug("len %s" % self.gerrit._change_cache.keys())
@@ -656,11 +656,11 @@ class TestScheduler(ZuulTestCase):
         mgr = self.sched.layout.pipelines['gate'].manager
         self.assertFalse(trigger.canMerge(a, mgr.getSubmitAllowNeeds()))
 
-        A.addApproval('CRVW', 2)
+        A.addApproval('code-review', 2)
         a = trigger.getChange(1, 2, refresh=True)
         self.assertFalse(trigger.canMerge(a, mgr.getSubmitAllowNeeds()))
 
-        A.addApproval('APRV', 1)
+        A.addApproval('approved', 1)
         a = trigger.getChange(1, 2, refresh=True)
         self.assertTrue(trigger.canMerge(a, mgr.getSubmitAllowNeeds()))
         trigger.maintainCache([])
@@ -672,12 +672,12 @@ class TestScheduler(ZuulTestCase):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
         C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
-        C.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+        C.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('approved', 1))
         self.waitUntilSettled()
 
         self.gearman_server.release('.*-merge')
@@ -711,12 +711,12 @@ class TestScheduler(ZuulTestCase):
         B.addPatchset(['conflict'])
         C = self.fake_gerrit.addFakeChange('org/conflict-project',
                                            'master', 'C')
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
-        C.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+        C.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('approved', 1))
         self.waitUntilSettled()
 
         self.assertEqual(A.reported, 1)
@@ -773,12 +773,12 @@ class TestScheduler(ZuulTestCase):
         A = self.fake_gerrit.addFakeChange('org/project', 'mp', 'A')
         B = self.fake_gerrit.addFakeChange('org/project', 'mp', 'B')
         C = self.fake_gerrit.addFakeChange('org/project', 'mp', 'C')
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
-        C.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+        C.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('approved', 1))
         self.waitUntilSettled()
 
         self.gearman_server.release('.*-merge')
@@ -817,12 +817,12 @@ class TestScheduler(ZuulTestCase):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project', 'mp', 'B')
         C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
-        C.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+        C.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('approved', 1))
         self.waitUntilSettled()
         queue = self.gearman_server.getQueue()
         job_A = None
@@ -898,10 +898,10 @@ class TestScheduler(ZuulTestCase):
                                            'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/one-job-project',
                                            'master', 'B')
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
         self.waitUntilSettled()
 
         self.assertEqual(A.data['status'], 'MERGED')
@@ -949,9 +949,9 @@ class TestScheduler(ZuulTestCase):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
         C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
-        C.addApproval('CRVW', 2)
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+        C.addApproval('code-review', 2)
 
         M1 = self.fake_gerrit.addFakeChange('org/project', 'master', 'M1')
         M1.setMerged()
@@ -964,9 +964,9 @@ class TestScheduler(ZuulTestCase):
 
         self.worker.addFailTest('project-merge', A)
 
-        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(C.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
 
         self.waitUntilSettled()
 
@@ -986,11 +986,11 @@ class TestScheduler(ZuulTestCase):
         C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
         D = self.fake_gerrit.addFakeChange('org/project', 'master', 'D')
         E = self.fake_gerrit.addFakeChange('org/project', 'master', 'E')
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
-        C.addApproval('CRVW', 2)
-        D.addApproval('CRVW', 2)
-        E.addApproval('CRVW', 2)
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+        C.addApproval('code-review', 2)
+        D.addApproval('code-review', 2)
+        E.addApproval('code-review', 2)
 
         # E, D -> C -> B, A
 
@@ -999,11 +999,11 @@ class TestScheduler(ZuulTestCase):
 
         self.worker.addFailTest('project-test1', B)
 
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(D.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(E.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(D.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(E.addApproval('approved', 1))
 
         self.waitUntilSettled()
         self.worker.release('.*-merge')
@@ -1047,17 +1047,17 @@ class TestScheduler(ZuulTestCase):
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
         C = self.fake_gerrit.addFakeChange('org/project1', 'master', 'C')
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
-        C.addApproval('CRVW', 2)
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+        C.addApproval('code-review', 2)
 
         self.worker.addFailTest('project1-test1', A)
         self.worker.addFailTest('project1-test2', A)
         self.worker.addFailTest('project1-project2-integration', A)
 
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('approved', 1))
 
         self.waitUntilSettled()
 
@@ -1108,9 +1108,9 @@ class TestScheduler(ZuulTestCase):
 
         A = self.fake_gerrit.addFakeChange('org/nonvoting-project',
                                            'master', 'A')
-        A.addApproval('CRVW', 2)
+        A.addApproval('code-review', 2)
         self.worker.addFailTest('nonvoting-project-test2', A)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
 
         self.waitUntilSettled()
 
@@ -1175,21 +1175,21 @@ class TestScheduler(ZuulTestCase):
         F = self.fake_gerrit.addFakeChange('org/project3', 'master', 'F')
         D.setDependsOn(C, 1)
         E.setDependsOn(D, 1)
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
-        C.addApproval('CRVW', 2)
-        D.addApproval('CRVW', 2)
-        E.addApproval('CRVW', 2)
-        F.addApproval('CRVW', 2)
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+        C.addApproval('code-review', 2)
+        D.addApproval('code-review', 2)
+        E.addApproval('code-review', 2)
+        F.addApproval('code-review', 2)
 
         A.fail_merge = True
 
         # Change object re-use in the gerrit trigger is hidden if
         # changes are added in quick succession; waiting makes it more
         # like real life.
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
         self.waitUntilSettled()
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
         self.waitUntilSettled()
 
         self.worker.release('.*-merge')
@@ -1197,13 +1197,13 @@ class TestScheduler(ZuulTestCase):
         self.worker.release('.*-merge')
         self.waitUntilSettled()
 
-        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(C.addApproval('approved', 1))
         self.waitUntilSettled()
-        self.fake_gerrit.addEvent(D.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(D.addApproval('approved', 1))
         self.waitUntilSettled()
-        self.fake_gerrit.addEvent(E.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(E.addApproval('approved', 1))
         self.waitUntilSettled()
-        self.fake_gerrit.addEvent(F.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(F.addApproval('approved', 1))
         self.waitUntilSettled()
 
         self.worker.release('.*-merge')
@@ -1251,8 +1251,8 @@ class TestScheduler(ZuulTestCase):
         "Test that the merger works after a repack"
 
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
         self.waitUntilSettled()
         self.assertEqual(self.getJobFromHistory('project-merge').result,
                          'SUCCESS')
@@ -1269,8 +1269,8 @@ class TestScheduler(ZuulTestCase):
         print repack_repo(path)
 
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
         self.waitUntilSettled()
         self.assertEqual(self.getJobFromHistory('project-merge').result,
                          'SUCCESS')
@@ -1295,8 +1295,8 @@ class TestScheduler(ZuulTestCase):
         path = os.path.join(self.git_root, "org/project1")
         print repack_repo(path)
 
-        A.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
         self.waitUntilSettled()
         self.assertEqual(self.getJobFromHistory('project1-merge').result,
                          'SUCCESS')
@@ -1314,8 +1314,8 @@ class TestScheduler(ZuulTestCase):
         self.launcher.negative_function_cache_ttl = 0
 
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
         # There may be a thread about to report a lost change
         while A.reported < 2:
             self.waitUntilSettled()
@@ -1328,8 +1328,8 @@ class TestScheduler(ZuulTestCase):
         # Make sure things still work:
         self.registerJobs()
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
         self.waitUntilSettled()
         self.assertEqual(self.getJobFromHistory('project-merge').result,
                          'SUCCESS')
@@ -1374,19 +1374,19 @@ class TestScheduler(ZuulTestCase):
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
         C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
         D = self.fake_gerrit.addFakeChange('org/project', 'master', 'D')
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
-        C.addApproval('CRVW', 2)
-        D.addApproval('CRVW', 2)
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+        C.addApproval('code-review', 2)
+        D.addApproval('code-review', 2)
 
         C.setDependsOn(B, 1)
         B.setDependsOn(A, 1)
         A.setDependsOn(M, 1)
 
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(D.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(D.addApproval('approved', 1))
         self.waitUntilSettled()
 
         B.addPatchset()
@@ -1443,8 +1443,8 @@ class TestScheduler(ZuulTestCase):
         self.worker.hold_jobs_in_build = True
 
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
         self.waitUntilSettled()
 
         self.assertEqual(len(self.builds), 1)
@@ -1465,19 +1465,19 @@ class TestScheduler(ZuulTestCase):
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
         C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
         D = self.fake_gerrit.addFakeChange('org/project', 'master', 'D')
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
-        C.addApproval('CRVW', 2)
-        D.addApproval('CRVW', 2)
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+        C.addApproval('code-review', 2)
+        D.addApproval('code-review', 2)
 
         C.setDependsOn(B, 1)
         B.setDependsOn(A, 1)
         A.setDependsOn(M, 1)
 
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(D.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(D.addApproval('approved', 1))
         self.waitUntilSettled()
 
         A.addPatchset()
@@ -1504,13 +1504,13 @@ class TestScheduler(ZuulTestCase):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
         C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
-        C.addApproval('CRVW', 2)
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+        C.addApproval('code-review', 2)
 
-        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(C.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
         self.waitUntilSettled()
 
         B.addPatchset()
@@ -1560,8 +1560,8 @@ class TestScheduler(ZuulTestCase):
     def test_noop_job(self):
         "Test that the internal noop job works"
         A = self.fake_gerrit.addFakeChange('org/noop-project', 'master', 'A')
-        A.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
         self.waitUntilSettled()
 
         self.assertEqual(len(self.gearman_server.getQueue()), 0)
@@ -1582,14 +1582,14 @@ class TestScheduler(ZuulTestCase):
         B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
         C = self.fake_gerrit.addFakeChange('org/project2', 'master', 'C')
         D = self.fake_gerrit.addFakeChange('org/project2', 'master', 'D')
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
-        C.addApproval('CRVW', 2)
-        D.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(D.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+        C.addApproval('code-review', 2)
+        D.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(D.addApproval('approved', 1))
 
         self.waitUntilSettled()
         self.worker.release('.*-merge')
@@ -1661,8 +1661,8 @@ class TestScheduler(ZuulTestCase):
         "Test that if a worker fails to run a job, it is run again"
         self.worker.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
         self.waitUntilSettled()
 
         self.builds[0].run_error = True
@@ -1692,8 +1692,8 @@ class TestScheduler(ZuulTestCase):
         self.worker.registerFunction('build:gate-noop')
         self.gearman_server.hold_jobs_in_queue = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
         self.waitUntilSettled()
         self.assertEqual(len(self.gearman_server.getQueue()), 1)
 
@@ -1716,10 +1716,10 @@ class TestScheduler(ZuulTestCase):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         A.addPatchset(['pip-requires'])
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
         self.waitUntilSettled()
 
         testfile_jobs = [x for x in self.history
@@ -1745,8 +1745,8 @@ class TestScheduler(ZuulTestCase):
                                      self.worker.worker_id)
 
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
         self.waitUntilSettled()
         desc = self.history[0].description
         self.log.debug("Description: %s" % desc)
@@ -1779,8 +1779,8 @@ class TestScheduler(ZuulTestCase):
         self.worker.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
-        A.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
 
         self.waitUntilSettled()
         self.gearman_server.hold_jobs_in_queue = False
@@ -1806,8 +1806,8 @@ class TestScheduler(ZuulTestCase):
         "Test that we can retrieve JSON status info"
         self.worker.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
         self.waitUntilSettled()
 
         port = self.webapp.server.socket.getsockname()[1]
@@ -1856,8 +1856,8 @@ class TestScheduler(ZuulTestCase):
         self.worker.registerFunction('build:node-project-test1:debian')
 
         A = self.fake_gerrit.addFakeChange('org/node-project', 'master', 'A')
-        A.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
         self.waitUntilSettled()
 
         self.assertIsNone(self.getJobFromHistory('node-project-merge').node)
@@ -1869,8 +1869,8 @@ class TestScheduler(ZuulTestCase):
         "Test that live reconfiguration works"
         self.worker.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
         self.waitUntilSettled()
 
         self.sched.reconfigure(self.config)
@@ -1892,8 +1892,8 @@ class TestScheduler(ZuulTestCase):
         self.worker.registerFunction('build:node-project-test1:debian')
         self.worker.registerFunction('build:node-project-test1:wheezy')
         A = self.fake_gerrit.addFakeChange('org/node-project', 'master', 'A')
-        A.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
         self.waitUntilSettled()
 
         self.assertIsNone(self.getJobFromHistory('node-project-merge').node)
@@ -1908,8 +1908,8 @@ class TestScheduler(ZuulTestCase):
         self.worker.build_history = []
 
         B = self.fake_gerrit.addFakeChange('org/node-project', 'master', 'B')
-        B.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
+        B.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
         self.waitUntilSettled()
 
         self.assertIsNone(self.getJobFromHistory('node-project-merge').node)
@@ -1925,8 +1925,8 @@ class TestScheduler(ZuulTestCase):
         self.init_repo("org/new-project")
         A = self.fake_gerrit.addFakeChange('org/new-project', 'master', 'A')
 
-        A.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
         self.waitUntilSettled()
         self.assertEqual(self.getJobFromHistory('project-merge').result,
                          'SUCCESS')
@@ -1945,8 +1945,8 @@ class TestScheduler(ZuulTestCase):
         self.init_repo("org/delete-project")
         A = self.fake_gerrit.addFakeChange('org/delete-project', 'master', 'A')
 
-        A.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
         self.waitUntilSettled()
         self.assertEqual(self.getJobFromHistory('project-merge').result,
                          'SUCCESS')
@@ -1962,8 +1962,8 @@ class TestScheduler(ZuulTestCase):
 
         B = self.fake_gerrit.addFakeChange('org/delete-project', 'master', 'B')
 
-        B.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
+        B.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
         self.waitUntilSettled()
         self.assertEqual(self.getJobFromHistory('project-merge').result,
                          'SUCCESS')
@@ -2131,8 +2131,8 @@ class TestScheduler(ZuulTestCase):
     def test_client_enqueue(self):
         "Test that the RPC client can enqueue a change"
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addApproval('CRVW', 2)
-        A.addApproval('APRV', 1)
+        A.addApproval('code-review', 2)
+        A.addApproval('approved', 1)
 
         client = zuul.rpcclient.RPCClient('127.0.0.1',
                                           self.gearman_server.port)
@@ -2201,13 +2201,13 @@ class TestScheduler(ZuulTestCase):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
         C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
-        C.addApproval('CRVW', 2)
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+        C.addApproval('code-review', 2)
 
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('approved', 1))
 
         self.waitUntilSettled()
 
@@ -2279,13 +2279,13 @@ class TestScheduler(ZuulTestCase):
 
         C.setDependsOn(B, 1)
 
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
-        C.addApproval('CRVW', 2)
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+        C.addApproval('code-review', 2)
 
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('approved', 1))
 
         self.waitUntilSettled()
 
@@ -2339,8 +2339,8 @@ class TestScheduler(ZuulTestCase):
         "Test that the RPC client returns errors for promotion"
         self.worker.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
         self.waitUntilSettled()
 
         client = zuul.rpcclient.RPCClient('127.0.0.1',
@@ -2375,13 +2375,13 @@ class TestScheduler(ZuulTestCase):
         C.setDependsOn(B, 1)
         self.worker.addFailTest('project-test1', A)
 
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
-        C.addApproval('CRVW', 2)
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+        C.addApproval('code-review', 2)
 
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('approved', 1))
         self.waitUntilSettled()
 
         # Only A and B will have their merge jobs queued because
@@ -2467,13 +2467,13 @@ class TestScheduler(ZuulTestCase):
 
         self.worker.addFailTest('project-test1', A)
 
-        A.addApproval('CRVW', 2)
-        B.addApproval('CRVW', 2)
-        C.addApproval('CRVW', 2)
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+        C.addApproval('code-review', 2)
 
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('approved', 1))
         self.waitUntilSettled()
 
         # Only A and B will have their merge jobs queued because
@@ -2531,8 +2531,8 @@ class TestScheduler(ZuulTestCase):
         self.worker.hold_jobs_in_build = True
 
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
         self.waitUntilSettled()
 
         self.assertEqual(len(self.launcher.builds), 1)
@@ -2572,14 +2572,14 @@ class TestScheduler(ZuulTestCase):
         self.registerJobs()
 
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addApproval('CRVW', 2)
+        A.addApproval('code-review', 2)
         self.worker.addFailTest('test1', A)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
         self.waitUntilSettled()
 
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
-        B.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
+        B.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
         self.waitUntilSettled()
 
         self.assertEqual(2, len(self.smtp_messages))
@@ -2658,9 +2658,9 @@ For CI problems and help debugging, contact ci@example.org"""
 
         # Check a test failure isn't reported to SMTP
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addApproval('CRVW', 2)
+        A.addApproval('code-review', 2)
         self.worker.addFailTest('project-test1', A)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
         self.waitUntilSettled()
 
         self.assertEqual(3, len(self.history))  # 3 jobs
@@ -2672,10 +2672,10 @@ For CI problems and help debugging, contact ci@example.org"""
         B.addPatchset(['conflict'])
         C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
         C.addPatchset(['conflict'])
-        B.addApproval('CRVW', 2)
-        C.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
-        self.fake_gerrit.addEvent(C.addApproval('APRV', 1))
+        B.addApproval('code-review', 2)
+        C.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('approved', 1))
         self.waitUntilSettled()
 
         self.assertEqual(6, len(self.history))  # A and B jobs
@@ -2693,8 +2693,8 @@ For CI problems and help debugging, contact ci@example.org"""
         self.worker.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
 
-        A.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
         self.waitUntilSettled()
 
         self.assertEqual(
@@ -2732,8 +2732,8 @@ For CI problems and help debugging, contact ci@example.org"""
         "Test that the RPC client can get a list of running jobs"
         self.worker.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        A.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
         self.waitUntilSettled()
 
         client = zuul.rpcclient.RPCClient('127.0.0.1',
