@@ -19,6 +19,40 @@
     },
     {
       "key": {
+        "uuid": "baada198_1fc14be4",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-07-02T16:39:19Z",
+      "side": 1,
+      "message": "I\u0027d prefer to make the internal API specify the actual arguments it needs -- eg, git_base_url, zuul_url, clone_map_file, rather than just taking \u0027args\u0027.",
+      "revId": "c2c581783eeaf533ae71752e5ccf2e9c5c9ccbec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baada198_3fb8cf75",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-07-02T16:39:19Z",
+      "side": 1,
+      "message": "The rest of zuul uses camelCase for method names.  Would you mind adopting the prevaling style?",
+      "revId": "c2c581783eeaf533ae71752e5ccf2e9c5c9ccbec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1ae5cdf2_7604e0c5",
         "filename": "zuul/lib/cloner.py",
         "patchSetId": 21
@@ -30,6 +64,23 @@
       "writtenOn": "2014-06-27T06:18:28Z",
       "side": 1,
       "message": "I think you need to check if the fallback is the same as the override and if it is don\u0027t try fetching it again.",
+      "revId": "c2c581783eeaf533ae71752e5ccf2e9c5c9ccbec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baada198_5fbbc371",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-07-02T16:39:19Z",
+      "side": 1,
+      "message": "\"Falling back to branch\" might read better.",
       "revId": "c2c581783eeaf533ae71752e5ccf2e9c5c9ccbec",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
