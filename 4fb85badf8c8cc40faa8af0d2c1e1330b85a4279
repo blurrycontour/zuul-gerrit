@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baada198_236deacc",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-07-03T17:11:33Z",
+      "side": 1,
+      "message": "Would be nice to use the prevaling camelCase style for method names.",
+      "revId": "4fb85badf8c8cc40faa8af0d2c1e1330b85a4279",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
