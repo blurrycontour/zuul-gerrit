@@ -84,3 +84,26 @@ class TestCloneMapper(testtools.TestCase):
             {'plugins/PluginInBasePath': {
                 'dest': '/basepath/PluginInBasePath'}},
             cmap.expand('/basepath'))
+
+    def test_branch_override_with_no_dest(self):
+        cmap = CloneMapper(
+            [{'name': 'integration/tests',
+              'branch-override': 'qa-approved'}],
+            ['integration/tests'])
+        self.assertEqual(
+            {'integration/tests': {
+                'dest': '/basepath/integration/tests',
+                'branch-override': 'qa-approved'}},
+            cmap.expand('/basepath'))
+
+    def test_branch_override_with_dest(self):
+        cmap = CloneMapper(
+            [{'name': 'integration/tests',
+              'dest': 'tests',
+              'branch-override': 'qa-approved'}],
+            ['integration/tests'])
+        self.assertEqual(
+            {'integration/tests': {
+                'dest': '/basepath/tests',
+                'branch-override': 'qa-approved'}},
+            cmap.expand('/basepath'))

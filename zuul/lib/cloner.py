@@ -60,7 +60,7 @@ class Cloner(object):
 
         self.log.info("Preparing %s repositories", len(dests))
         for project, dest in dests.iteritems():
-            self.prepareRepo(project, dest)
+            self.prepareRepo(project, dest, override_branch=None)
         self.log.info("Prepared all repositories")
 
     def cloneUpstream(self, project, dest):
@@ -90,14 +90,16 @@ class Cloner(object):
                            project, ref)
             return False
 
-    def prepareRepo(self, project, dest):
+    def prepareRepo(self, project, dest, override_branch=None):
         """Clone a repository for project at dest and apply a reference
         suitable for testing. The reference lookup is attempted in this order:
 
-         1) Zuul reference for the indicated branch
-         2) Zuul reference for the master branch
-         3) The tip of the indicated branch
-         4) The tip of the master branch
+         1) Zuul reference for the override_branch if specified
+         2) Zuul reference for the indicated branch (ZUUL_BRANCH)
+         3) Zuul reference for the master branch
+         4) The tip of the override_branch if specified
+         5) The tip of the indicated branch (ZUUL_BRANCH
+         6) The tip of the master branch
         """
 
         repo = self.cloneUpstream(project, dest)
@@ -112,16 +114,17 @@ class Cloner(object):
         fallback_zuul_ref = re.sub(self.zuul_branch, fallback_branch,
                                    self.zuul_ref)
 
-        if self.branch:
-            override_zuul_ref = re.sub(self.zuul_branch, self.branch,
+        override_branch = override_branch or self.branch
+        if override_branch:
+            override_zuul_ref = re.sub(self.zuul_branch, override_branch,
                                        self.zuul_ref)
-            if repo.hasBranch(self.branch):
-                self.log.debug("upstream repo has branch %s", self.branch)
-                fallback_branch = self.branch
+            if repo.hasBranch(override_branch):
+                self.log.debug("upstream repo has branch %s", override_branch)
+                fallback_branch = override_branch
                 fallback_zuul_ref = self.zuul_ref
             else:
                 self.log.exception("upstream repo is missing branch %s",
-                                   self.branch)
+                                   override_branch)
 
         if (self.fetchFromZuul(repo, project, override_zuul_ref)
             or (fallback_zuul_ref != override_zuul_ref and

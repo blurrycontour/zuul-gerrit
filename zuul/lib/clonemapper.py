@@ -36,24 +36,37 @@ class CloneMapper(object):
         is_valid = True
         ret = OrderedDict()
         for project in self.projects:
-            dests = []
+            project_params = {
+                'dest': [],
+                'branch-override': [],
+            }
             for mapping in self.clonemap:
-                if re.match(r'^%s$' % mapping['name'],
-                            project):
-                    # Might be matched more than one time
-                    dests.append(
-                        re.sub(mapping['name'], mapping['dest'], project))
+                if re.match(r'^%s$' % mapping['name'], project):
+                    # Projects might be matched more than one time
+                    if 'dest' in mapping:
+                        project_params['dest'].append(
+                            re.sub(mapping['name'], mapping['dest'], project))
+                    if 'branch-override' in mapping:
+                        project_params['branch-override'].append(
+                            mapping.get('branch-override'))
 
-            if len(dests) > 1:
-                self.log.error("Duplicate destinations for %s: %s.",
-                               project, dests)
-                is_valid = False
-            elif len(dests) == 0:
-                self.log.debug("Using %s as destination (unmatched)",
+            # Validate expansion and set default values
+            ret[project] = {}
+            for (param, val) in project_params.iteritems():
+                if len(val) > 1:
+                    self.log.error("Duplicate values found for parameter %s "
+                                   "of project %s: %s.",
+                                   param, project, val)
+                    is_valid = False
+                elif len(val) == 0:
+                    break
+                else:
+                    ret[project][param] = val
+
+            if len(project_params['dest']) == 0:
+                self.log.debug("Using %s as default destination (unmatched)",
                                project)
-                ret[project] = {'dest': [project]}
-            else:
-                ret[project] = {'dest': dests}
+                ret[project]['dest'] = [project]
 
         if not is_valid:
             raise Exception("Expansion error. Check error messages above")
