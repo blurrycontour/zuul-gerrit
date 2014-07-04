@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "baada198_d92321a5",
+        "filename": "doc/source/cloner.rst",
+        "patchSetId": 21
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-07-04T13:19:24Z",
+      "side": 1,
+      "message": ".. This happens *whenever* cloning ...",
+      "revId": "c2c581783eeaf533ae71752e5ccf2e9c5c9ccbec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baada198_362d0aa9",
+        "filename": "doc/source/cloner.rst",
+        "patchSetId": 21
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-07-04T13:19:24Z",
+      "side": 1,
+      "message": "Fixed typo directorty -\u003e directory",
+      "revId": "c2c581783eeaf533ae71752e5ccf2e9c5c9ccbec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1ae5cdf2_bb557153",
         "filename": "doc/source/cloner.rst",
         "patchSetId": 21
@@ -13,6 +47,41 @@
       "writtenOn": "2014-06-27T06:18:28Z",
       "side": 1,
       "message": "s/process/processes\n\nperhaps \"in the order supplied\"",
+      "revId": "c2c581783eeaf533ae71752e5ccf2e9c5c9ccbec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baada198_39325df2",
+        "filename": "doc/source/cloner.rst",
+        "patchSetId": 21
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-07-04T13:19:24Z",
+      "side": 1,
+      "message": "I feel obliged. Done!",
+      "parentUuid": "1ae5cdf2_bb557153",
+      "revId": "c2c581783eeaf533ae71752e5ccf2e9c5c9ccbec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baada198_9c543700",
+        "filename": "zuul/cmd/cloner.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-07-04T13:19:24Z",
+      "side": 1,
+      "message": "renamed gitbaseurl to git_base_url for consistency with the zuul.lib.cloner class.",
       "revId": "c2c581783eeaf533ae71752e5ccf2e9c5c9ccbec",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -36,6 +105,24 @@
     },
     {
       "key": {
+        "uuid": "baada198_79c93525",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-07-04T13:19:24Z",
+      "side": 1,
+      "message": "I originally did that to avoid having to pass all the Zuul parameters.  I agree it is nicer to have all the parameters explicitly passed and thus updated the calls to Cloner().",
+      "parentUuid": "baada198_1fc14be4",
+      "revId": "c2c581783eeaf533ae71752e5ccf2e9c5c9ccbec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "baada198_3fb8cf75",
         "filename": "zuul/lib/cloner.py",
         "patchSetId": 21
@@ -47,6 +134,75 @@
       "writtenOn": "2014-07-02T16:39:19Z",
       "side": 1,
       "message": "The rest of zuul uses camelCase for method names.  Would you mind adopting the prevaling style?",
+      "revId": "c2c581783eeaf533ae71752e5ccf2e9c5c9ccbec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baada198_19e67915",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-07-04T13:19:24Z",
+      "side": 1,
+      "message": "Definitely! I probably went with underscore because of the devstack-gate bash script. I have made the adjustments.\n\nI have Left setup_logging() and parse_arguments() in zuul/cmd/cloner.py to be consistent with the other commands.",
+      "parentUuid": "baada198_3fb8cf75",
+      "revId": "c2c581783eeaf533ae71752e5ccf2e9c5c9ccbec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baada198_b9582d8b",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-07-04T13:19:24Z",
+      "side": 1,
+      "message": "This was opening the non expanded version of the file :/\n\n - clone_map_file \u003d open(self.args.clone_map_file)\n + clone_map_file \u003d open(clone_map_file)",
+      "revId": "c2c581783eeaf533ae71752e5ccf2e9c5c9ccbec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baada198_79069587",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-07-04T13:19:24Z",
+      "side": 1,
+      "message": "The remote pruning comes from https://review.openstack.org/#/c/5561/\n\nThe method is to the Repo object in parent change https://review.openstack.org/#/c/92141/\n\nI have added a comment written by Monty in the bash script:\n\n # Ensure that we don\u0027t have stale remotes around",
+      "revId": "c2c581783eeaf533ae71752e5ccf2e9c5c9ccbec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baada198_39741d35",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-07-04T13:19:24Z",
+      "side": 1,
+      "message": "Changed has_branch() to hasBranch()  (renamed while iterating one of the parent changes).",
       "revId": "c2c581783eeaf533ae71752e5ccf2e9c5c9ccbec",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -70,6 +226,24 @@
     },
     {
       "key": {
+        "uuid": "baada198_3c8ecb79",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-07-04T13:19:24Z",
+      "side": 1,
+      "message": "The devstack-gate shell probably does the same. I harnessed fetching the fallback branch with a:\n\n (fallback_zuul_ref !\u003d override_zuul_ref and self.fetch_from_zuul(repo, project, fallback_zuul_ref) )",
+      "parentUuid": "1ae5cdf2_7604e0c5",
+      "revId": "c2c581783eeaf533ae71752e5ccf2e9c5c9ccbec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "baada198_5fbbc371",
         "filename": "zuul/lib/cloner.py",
         "patchSetId": 21
@@ -81,6 +255,41 @@
       "writtenOn": "2014-07-02T16:39:19Z",
       "side": 1,
       "message": "\"Falling back to branch\" might read better.",
+      "revId": "c2c581783eeaf533ae71752e5ccf2e9c5c9ccbec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baada198_79913546",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-07-04T13:19:24Z",
+      "side": 1,
+      "message": "Sure thing. Done.",
+      "parentUuid": "baada198_5fbbc371",
+      "revId": "c2c581783eeaf533ae71752e5ccf2e9c5c9ccbec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baada198_b924ad60",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-07-04T13:19:24Z",
+      "side": 1,
+      "message": "I have camel cased fetch_from() to fetchFrom() and updated the caller.",
       "revId": "c2c581783eeaf533ae71752e5ccf2e9c5c9ccbec",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
