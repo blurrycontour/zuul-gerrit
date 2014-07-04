@@ -35,8 +35,8 @@ class TestCloneMapper(testtools.TestCase):
             ])
 
         self.assertEqual(
-            {'project1': '/basepath/project1',
-             'plugins/plugin1': '/basepath/plugins/plugin1'},
+            {'project1': {'dest': '/basepath/project1'},
+             'plugins/plugin1': {'dest': '/basepath/plugins/plugin1'}},
             cmap.expand('/basepath')
         )
 
@@ -46,7 +46,7 @@ class TestCloneMapper(testtools.TestCase):
             [{'name': 'mediawiki/core', 'dest': '.'}],
             ['mediawiki/core'])
         self.assertEqual(
-            {'mediawiki/core': '/basepath'},
+            {'mediawiki/core': {'dest': '/basepath'}},
             cmap.expand('/basepath'))
 
     def test_map_using_regex(self):
@@ -55,7 +55,8 @@ class TestCloneMapper(testtools.TestCase):
             [{'name': 'plugins/(.*)', 'dest': 'project/plugins/\\1'}],
             ['plugins/PluginFirst'])
         self.assertEqual(
-            {'plugins/PluginFirst': '/basepath/project/plugins/PluginFirst'},
+            {'plugins/PluginFirst': {
+                'dest': '/basepath/project/plugins/PluginFirst'}},
             cmap.expand('/basepath'))
 
     def test_map_discarding_regex_group(self):
@@ -63,7 +64,7 @@ class TestCloneMapper(testtools.TestCase):
             [{'name': 'plugins/(.*)', 'dest': 'project/'}],
             ['plugins/Plugin_1'])
         self.assertEqual(
-            {'plugins/Plugin_1': '/basepath/project'},
+            {'plugins/Plugin_1': {'dest': '/basepath/project'}},
             cmap.expand('/basepath'))
 
     def test_cant_dupe_destinations(self):
@@ -80,5 +81,6 @@ class TestCloneMapper(testtools.TestCase):
             [{'name': 'plugins/(.*)', 'dest': './\\1'}],
             ['plugins/PluginInBasePath'])
         self.assertEqual(
-            {'plugins/PluginInBasePath': '/basepath/PluginInBasePath'},
+            {'plugins/PluginInBasePath': {
+                'dest': '/basepath/PluginInBasePath'}},
             cmap.expand('/basepath'))

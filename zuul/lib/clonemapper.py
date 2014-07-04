@@ -51,22 +51,24 @@ class CloneMapper(object):
             elif len(dests) == 0:
                 self.log.debug("Using %s as destination (unmatched)",
                                project)
-                ret[project] = [project]
+                ret[project] = {'dest': [project]}
             else:
-                ret[project] = dests
+                ret[project] = {'dest': dests}
 
         if not is_valid:
             raise Exception("Expansion error. Check error messages above")
 
         self.log.info("Mapping projects to workspace...")
-        for project, dest in ret.iteritems():
-            dest = os.path.normpath(os.path.join(workspace, dest[0]))
-            ret[project] = dest
+        for project, params in ret.iteritems():
+            dest = os.path.normpath(os.path.join(workspace,
+                                                 params.get('dest')[0]))
+            ret[project]['dest'] = dest
             self.log.info("  %s -> %s", project, dest)
 
         self.log.debug("Checking overlap in destination directories...")
         check = defaultdict(list)
-        for project, dest in ret.iteritems():
+        for project, params in ret.iteritems():
+            dest = params.get('dest')
             check[dest].append(project)
 
         dupes = dict((d, p) for (d, p) in check.iteritems() if len(p) > 1)
