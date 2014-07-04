@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baada198_201e99bb",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-07-04T18:30:13Z",
+      "side": 1,
+      "message": "In previous patchset I forgot to update this call to fetch the dest. It was previously directly available as value, it is now a dict of parameters.\n\nAlso renamed \u0027dests\u0027 to \u0027projects\u0027.",
+      "revId": "966ab4e477419be71b9c72b93024bb93640da69b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
