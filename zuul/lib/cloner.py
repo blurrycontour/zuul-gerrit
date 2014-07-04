@@ -56,11 +56,11 @@ class Cloner(object):
 
     def execute(self):
         mapper = CloneMapper(self.clone_map, self.projects)
-        dests = mapper.expand(workspace=self.workspace)
+        projects = mapper.expand(workspace=self.workspace)
 
-        self.log.info("Preparing %s repositories", len(dests))
-        for project, dest in dests.iteritems():
-            self.prepareRepo(project, dest)
+        self.log.info("Preparing %s repositories", len(projects))
+        for project, params in projects.iteritems():
+            self.prepareRepo(project, params.get('dest'))
         self.log.info("Prepared all repositories")
 
     def cloneUpstream(self, project, dest):
