@@ -15,7 +15,7 @@
 
 import apscheduler.scheduler
 import logging
-from zuul.model import TriggerEvent
+from zuul.models import TriggerEvent
 
 
 class Timer(object):

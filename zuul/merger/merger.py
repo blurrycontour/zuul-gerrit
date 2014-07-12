@@ -17,7 +17,7 @@ import git
 import os
 import logging
 
-import zuul.model
+import zuul.models
 
 
 class ZuulReference(git.Reference):
@@ -208,11 +208,11 @@ class Merger(object):
 
         try:
             mode = item['merge_mode']
-            if mode == zuul.model.MERGER_MERGE:
+            if mode == zuul.models.MERGER_MERGE:
                 commit = repo.merge(item['refspec'])
-            elif mode == zuul.model.MERGER_MERGE_RESOLVE:
+            elif mode == zuul.models.MERGER_MERGE_RESOLVE:
                 commit = repo.merge(item['refspec'], 'resolve')
-            elif mode == zuul.model.MERGER_CHERRY_PICK:
+            elif mode == zuul.models.MERGER_CHERRY_PICK:
                 commit = repo.cherryPick(item['refspec'])
             else:
                 raise Exception("Unsupported merge mode: %s" % mode)

@@ -17,7 +17,7 @@ import threading
 import time
 import urllib2
 from zuul.lib import gerrit
-from zuul.model import TriggerEvent, Change
+from zuul.models import TriggerEvent, Change
 
 
 class GerritEventConnector(threading.Thread):

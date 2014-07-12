@@ -21,7 +21,7 @@ import traceback
 import gear
 import six
 
-import model
+import models
 
 
 class RPCListener(object):
@@ -85,7 +85,7 @@ class RPCListener(object):
 
     def handle_enqueue(self, job):
         args = json.loads(job.arguments)
-        event = model.TriggerEvent()
+        event = models.TriggerEvent()
         errors = ''
 
         trigger = self.sched.triggers.get(args['trigger'])

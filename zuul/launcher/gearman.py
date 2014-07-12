@@ -21,8 +21,8 @@ import time
 import threading
 from uuid import uuid4
 
-import zuul.model
-from zuul.model import Build
+import zuul.models
+from zuul.models import Build
 
 
 class GearmanCleanup(threading.Thread):
@@ -353,11 +353,11 @@ class Gearman(object):
             self.onBuildCompleted(gearman_job, 'NOT_REGISTERED')
             return build
 
-        if pipeline.precedence == zuul.model.PRECEDENCE_NORMAL:
+        if pipeline.precedence == zuul.models.PRECEDENCE_NORMAL:
             precedence = gear.PRECEDENCE_NORMAL
-        elif pipeline.precedence == zuul.model.PRECEDENCE_HIGH:
+        elif pipeline.precedence == zuul.models.PRECEDENCE_HIGH:
             precedence = gear.PRECEDENCE_HIGH
-        elif pipeline.precedence == zuul.model.PRECEDENCE_LOW:
+        elif pipeline.precedence == zuul.models.PRECEDENCE_LOW:
             precedence = gear.PRECEDENCE_LOW
 
         try:
