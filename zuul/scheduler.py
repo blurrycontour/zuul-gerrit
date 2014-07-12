@@ -28,9 +28,9 @@ import time
 import yaml
 
 import layoutvalidator
-import model
-from model import ActionReporter, Pipeline, Project, ChangeQueue
-from model import EventFilter, ChangeishFilter
+import models
+from models import ActionReporter, Pipeline, Project, ChangeQueue
+from models import EventFilter, ChangeishFilter
 from zuul import version as zuul_version
 
 statsd = extras.try_import('statsd.statsd')
@@ -188,7 +188,7 @@ class Scheduler(threading.Thread):
         self.trigger_event_queue = Queue.Queue()
         self.result_event_queue = Queue.Queue()
         self.management_event_queue = Queue.Queue()
-        self.layout = model.Layout()
+        self.layout = models.Layout()
 
         self.zuul_version = zuul_version.version_info.version_string()
         self.last_reconfigured = None
@@ -201,7 +201,7 @@ class Scheduler(threading.Thread):
         return self._parseConfig(config_path)
 
     def _parseConfig(self, config_path):
-        layout = model.Layout()
+        layout = models.Layout()
         project_templates = {}
 
         def toList(item):
@@ -235,7 +235,7 @@ class Scheduler(threading.Thread):
         for conf_pipeline in data.get('pipelines', []):
             pipeline = Pipeline(conf_pipeline['name'])
             pipeline.description = conf_pipeline.get('description')
-            precedence = model.PRECEDENCE_MAP[conf_pipeline.get('precedence')]
+            precedence = models.PRECEDENCE_MAP[conf_pipeline.get('precedence')]
             pipeline.precedence = precedence
             pipeline.failure_message = conf_pipeline.get('failure-message',
                                                          "Build failed.")
@@ -427,7 +427,7 @@ class Scheduler(threading.Thread):
 
             layout.projects[config_project['name']] = project
             mode = config_project.get('merge-mode', 'merge-resolve')
-            project.merge_mode = model.MERGER_MAP[mode]
+            project.merge_mode = models.MERGER_MAP[mode]
             for pipeline in layout.pipelines.values():
                 if pipeline.name in config_project:
                     job_tree = pipeline.addProject(project)
