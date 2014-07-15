@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baada198_d952f6dc",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1472,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-07-15T14:29:25Z",
+      "side": 1,
+      "message": "It would be better if we could still format the rest of the message with just the failing substitutions missing.",
+      "revId": "25d4c4f79ef5883694b47290dfbee574f1f71829",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
