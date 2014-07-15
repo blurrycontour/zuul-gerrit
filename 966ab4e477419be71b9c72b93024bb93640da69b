@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "baada198_b9e38203",
+        "filename": "zuul/lib/clonemapper.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-07-15T14:33:11Z",
+      "side": 1,
+      "message": "If the dest doesn\u0027t exist this will fail here. Not sure if you want to catch that exception?",
+      "revId": "966ab4e477419be71b9c72b93024bb93640da69b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "baada198_201e99bb",
         "filename": "zuul/lib/cloner.py",
         "patchSetId": 2
