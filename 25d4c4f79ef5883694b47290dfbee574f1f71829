@@ -34,6 +34,24 @@
       "revId": "25d4c4f79ef5883694b47290dfbee574f1f71829",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baada198_bf05bf15",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1472,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-07-17T15:06:41Z",
+      "side": 1,
+      "message": "The best solution I can think of, short of rewriting format, would be to remove the variable from the format options on failure. This would mean you\u0027d have to loop until the message succeeds though.\n\nI agree with your point though, so +1",
+      "parentUuid": "baada198_9c401009",
+      "revId": "25d4c4f79ef5883694b47290dfbee574f1f71829",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
