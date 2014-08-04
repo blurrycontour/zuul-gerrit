@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baada198_c4f6988f",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1468,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-08-04T23:46:28Z",
+      "side": 1,
+      "message": "why not make this an elif and collapse the else below. Something like:\n\n  elif self.pipelinedidAllJobsSucceed(item):\n    ret+\u003d thing\n  else:\n    ret +\u003d otherthing\n  ret+\u003d self.formatReportJobs(item)\n\nThis makes it slightly easier to read.",
+      "revId": "b78f83bce3b9dce3f48866be68f675eb23325068",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
