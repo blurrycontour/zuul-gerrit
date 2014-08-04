@@ -16,6 +16,23 @@
       "revId": "b78f83bce3b9dce3f48866be68f675eb23325068",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baada198_847e60e1",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1468,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-08-04T23:49:14Z",
+      "side": 1,
+      "message": "Because it would reintroduce the bug this patch fixes.",
+      "revId": "b78f83bce3b9dce3f48866be68f675eb23325068",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
