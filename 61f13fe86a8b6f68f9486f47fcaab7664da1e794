@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "baada198_53b6ac26",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2571,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-08-05T17:23:43Z",
+      "side": 1,
+      "message": "If a change was in a queue, and a draft was published, that suggests that zuul had access to the change in its draft state.  In that case, I\u0027m not certain that a draft should cause a dequeue.\n\nIn fact, even if a change is uploaded as a draft, I believe that gerrit emits the patchset-created event, which _is_ the thing that should cause a draft to be dequeued.",
+      "revId": "61f13fe86a8b6f68f9486f47fcaab7664da1e794",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3ae8d1ca_30185084",
         "filename": "tests/test_scheduler.py",
         "patchSetId": 4
