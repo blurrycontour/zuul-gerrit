@@ -1,0 +1,11 @@
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Jenkins
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Code-Review-1: Joshua Hesketh <joshua.hesketh@rackspace.com>
+Code-Review+1: Matthew Oliver <matt@oliver.net.au>
+Submitted-by: Jenkins
+Submitted-at: Thu, 07 Aug 2014 09:33:13 +0000
+Reviewed-on: https://review.openstack.org/103639
+Project: openstack-infra/zuul
+Branch: refs/heads/master
