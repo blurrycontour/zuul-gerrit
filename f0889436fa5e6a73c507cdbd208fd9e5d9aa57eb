@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baada198_80dbba1f",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 406,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-08-12T06:26:41Z",
+      "side": 1,
+      "message": "s/openchanges/open changes/",
+      "revId": "f0889436fa5e6a73c507cdbd208fd9e5d9aa57eb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baada198_a0643e21",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1049,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-08-12T06:26:41Z",
+      "side": 1,
+      "message": "Duplicate here?",
+      "revId": "f0889436fa5e6a73c507cdbd208fd9e5d9aa57eb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baada198_1b61dbd3",
+        "filename": "zuul/trigger/zuultrigger.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-08-12T06:26:41Z",
+      "side": 1,
+      "message": "These lines are too long",
+      "revId": "f0889436fa5e6a73c507cdbd208fd9e5d9aa57eb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baada198_5b57d3f4",
+        "filename": "zuul/trigger/zuultrigger.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-08-12T06:26:41Z",
+      "side": 1,
+      "message": "and here",
+      "revId": "f0889436fa5e6a73c507cdbd208fd9e5d9aa57eb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
