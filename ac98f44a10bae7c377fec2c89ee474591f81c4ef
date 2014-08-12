@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baada198_044f9336",
+        "filename": "doc/source/reporters.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-08-12T22:20:28Z",
+      "side": 1,
+      "message": "I think that the user information, particularly the private key, shouldn\u0027t be in the layout.yaml, but rather in the config.  I was going to suggest that instead of this, you could define gerrit \"users\" in the config file, but I think your suggestion in https://review.openstack.org/#/c/112410/ of actually defining the trigger itself in terms of driver+url+user+etc in the config file and referring to it by name here is even better.  So I\u0027m imagining something vaguely like:\n\n  [connector \"openstack-gerrit\"]\n  driver\u003dgerrit\n  server\u003d..\n  user\u003d...\n  sshkey\u003d...\n\n(Maybe we call the union of sources/triggers/reporters \u0027connectors\u0027?)\n\nand then:\n\n  source:\n    openstack-gerrit\n  trigger:\n    openstack-gerrit:\n      - event: patchset-created\n  success:\n    openstack-gerrit:\n      verified: 1",
+      "revId": "ac98f44a10bae7c377fec2c89ee474591f81c4ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
