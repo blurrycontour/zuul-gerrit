@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baada198_95c85a22",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-08-12T05:55:53Z",
+      "side": 1,
+      "message": "Isn\u0027t this required?",
+      "revId": "c0dedf8b3ff39ab90ce5c44acc03ed027851e584",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
