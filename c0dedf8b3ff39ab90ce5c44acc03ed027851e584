@@ -16,6 +16,24 @@
       "revId": "c0dedf8b3ff39ab90ce5c44acc03ed027851e584",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baada198_e21b7782",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-08-12T21:57:45Z",
+      "side": 1,
+      "message": "Not yet, in order for backwards-compat continuous deployment.",
+      "parentUuid": "baada198_95c85a22",
+      "revId": "c0dedf8b3ff39ab90ce5c44acc03ed027851e584",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
