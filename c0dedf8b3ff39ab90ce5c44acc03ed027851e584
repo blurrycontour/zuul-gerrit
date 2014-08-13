@@ -34,6 +34,23 @@
       "revId": "c0dedf8b3ff39ab90ce5c44acc03ed027851e584",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_f78c2082",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-08-13T18:39:21Z",
+      "side": 1,
+      "message": "If I read this correctly the source: gerrit specification in the layout.yaml is merely a placeholder to enable us to be backward and forward compatible while this line here gets sorted out. Since it apepars that we hard set you to gerrit regardless of what you say in layout.yaml.",
+      "revId": "c0dedf8b3ff39ab90ce5c44acc03ed027851e584",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
