@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7ac7a964_59b0a7dd",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2571,
+      "author": {
+        "id": 6987
+      },
+      "writtenOn": "2014-08-13T21:54:41Z",
+      "side": 1,
+      "message": "Ok,  I was confused.  I thought the draft-publish event occurs when a draft patch gets pushed to gerrit (i.e. git push origin HEAD:refs/drafts/master) that\u0027s why I thought it should cause a dequeue.\n\nYou are right, pushing a draft only triggers the patchset-created event, not the draft-publish event.   The draft publish event only occurs when users push the \"publish\" button for the change (in the gerrit UI).  In this case I agree that a dequeue should not happen.",
+      "parentUuid": "baada198_53b6ac26",
+      "revId": "61f13fe86a8b6f68f9486f47fcaab7664da1e794",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3ae8d1ca_30185084",
         "filename": "tests/test_scheduler.py",
         "patchSetId": 4
