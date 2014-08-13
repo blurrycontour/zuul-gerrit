@@ -51,6 +51,23 @@
       "revId": "c0dedf8b3ff39ab90ce5c44acc03ed027851e584",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ac7a964_1c261dbb",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-08-13T22:05:46Z",
+      "side": 1,
+      "message": "No -- we default to gerrit, otherwise use what you put in source.",
+      "revId": "c0dedf8b3ff39ab90ce5c44acc03ed027851e584",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
