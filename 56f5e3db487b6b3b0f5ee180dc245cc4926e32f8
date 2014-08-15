@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7ac7a964_623b8d9c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1561
+      },
+      "writtenOn": "2014-08-15T19:23:41Z",
+      "side": 1,
+      "message": "minor typo here: attributes",
+      "revId": "56f5e3db487b6b3b0f5ee180dc245cc4926e32f8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ac7a964_a245a518",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1561
+      },
+      "writtenOn": "2014-08-15T19:23:41Z",
+      "side": 1,
+      "message": "Generally these sorts of commit message tags go at the end by the Change-Id",
+      "revId": "56f5e3db487b6b3b0f5ee180dc245cc4926e32f8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
