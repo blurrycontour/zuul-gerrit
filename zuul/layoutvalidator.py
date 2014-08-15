@@ -252,10 +252,22 @@ class LayoutValidator(object):
                                 path + [i])
             items.append(item['name'])
 
+    def checkMisplacedRef(self, data):
+      if not 'gerrit' in data:
+        return
+      events_with_ref = ('ref-updated', )
+      for event in data['gerrit']:
+        if event['event'] not in events_with_ref and event.get('ref', False):
+            raise v.Invalid(
+                "The event %s does not include ref information, Zuul cannot "
+                "use ref filter 'ref: %s'" % (event['event'], event['ref']))
+
     def validate(self, data):
         schema = LayoutSchema().getSchema(data)
         schema(data)
         self.checkDuplicateNames(data['pipelines'], ['pipelines'])
+        for pipeline in data['pipelines']:
+            self.checkMisplacedRef(pipeline['trigger'])
         if 'jobs' in data:
             self.checkDuplicateNames(data['jobs'], ['jobs'])
         self.checkDuplicateNames(data['projects'], ['projects'])
