@@ -18,6 +18,7 @@
 import voluptuous as v
 import string
 
+from zuul import trigger as zuul_triggers
 
 # Several forms accept either a single item or a list, this makes
 # specifying that in the schema easy (and explicit).
@@ -262,3 +263,7 @@ class LayoutValidator(object):
         if 'project-templates' in data:
             self.checkDuplicateNames(
                 data['project-templates'], ['project-templates'])
+        for pipeline in data['pipelines']:
+            if 'gerrit' in pipeline['trigger']:
+                zuul_triggers.gerrit.validate_trigger(pipeline['trigger'])
+
