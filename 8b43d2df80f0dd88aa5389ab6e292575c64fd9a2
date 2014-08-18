@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1abeadc6_b1736c4c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2014-08-18T16:00:03Z",
+      "side": 1,
+      "message": "Maybe amend the commit and s/even/event for added clarity?",
+      "revId": "8b43d2df80f0dd88aa5389ab6e292575c64fd9a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
