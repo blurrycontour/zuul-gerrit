@@ -151,11 +151,11 @@ class LayoutSchema(object):
 
     def validateJob(self, value, path=[]):
         if isinstance(value, list):
-            for (i, v) in enumerate(value):
-                self.validateJob(v, path + [i])
+            for (i, val) in enumerate(value):
+                self.validateJob(val, path + [i])
         elif isinstance(value, dict):
-            for k, v in value.items():
-                self.validateJob(v, path + [k])
+            for k, val in value.items():
+                self.validateJob(val, path + [k])
         else:
             self.job_name.schema(value)
 
