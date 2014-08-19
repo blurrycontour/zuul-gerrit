@@ -337,11 +337,20 @@ class Gerrit(object):
     def updateChange(self, change):
         self.log.info("Updating information for %s,%s" %
                       (change.number, change.patchset))
-        data = self.gerrit.query(change.number)
-        change._data = data
+        for x in range(300):
+            data = self.gerrit.query(change.number)
+            change._data = data
 
-        if change.patchset is None:
-            change.patchset = data['currentPatchSet']['number']
+            if change.patchset is None:
+                change.patchset = data['currentPatchSet']['number']
+
+            if 'project' not in data:
+                self.log.debug("Change %s,%s not found, retrying" %
+                               (change.number,
+                                change.patchset))
+                time.sleep(1)
+            else:
+                break
 
         if 'project' not in data:
             raise Exception("Change %s,%s not found" % (change.number,
