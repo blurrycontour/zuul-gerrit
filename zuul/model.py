@@ -266,8 +266,8 @@ class Pipeline(object):
                     j_changes = []
                 j_changes.append(e.formatJSON())
                 if (len(j_changes) > 1 and
-                    (j_changes[-2]['remaining_time'] is not None) and
-                    (j_changes[-1]['remaining_time'] is not None)):
+                        (j_changes[-2]['remaining_time'] is not None) and
+                        (j_changes[-1]['remaining_time'] is not None)):
                     j_changes[-1]['remaining_time'] = max(
                         j_changes[-2]['remaining_time'],
                         j_changes[-1]['remaining_time'])
@@ -340,7 +340,7 @@ class ChangeQueue(object):
             for job in self._jobs:
                 if job.queue_name:
                     if (self.assigned_name and
-                        job.queue_name != self.assigned_name):
+                            job.queue_name != self.assigned_name):
                         raise Exception("More than one name assigned to "
                                         "change queue: %s != %s" %
                                         (self.assigned_name, job.queue_name))
@@ -915,8 +915,8 @@ class Ref(Changeish):
 
     def equals(self, other):
         if (self.project == other.project
-            and self.ref == other.ref
-            and self.newrev == other.newrev):
+                and self.ref == other.ref
+                and self.newrev == other.newrev):
             return True
         return False
 
@@ -1031,7 +1031,7 @@ class BaseFilter(object):
                             found_approval = False
                     else:
                         if (normalizeCategory(approval['description']) != k or
-                            int(approval['value']) not in v):
+                                int(approval['value']) not in v):
                             found_approval = False
                 if found_approval:
                     matches_approval = True
@@ -1131,7 +1131,7 @@ class EventFilter(BaseFilter):
         matches_comment_re = False
         for comment_re in self.comments:
             if (event.comment is not None and
-                comment_re.search(event.comment)):
+                    comment_re.search(event.comment)):
                 matches_comment_re = True
         if self.comments and not matches_comment_re:
             return False
@@ -1144,7 +1144,7 @@ class EventFilter(BaseFilter):
             matches_email_re = False
             for email_re in self.emails:
                 if (account_email is not None and
-                    email_re.search(account_email)):
+                        email_re.search(account_email)):
                     matches_email_re = True
             if self.emails and not matches_email_re:
                 return False
@@ -1154,7 +1154,7 @@ class EventFilter(BaseFilter):
             matches_username_re = False
             for username_re in self.usernames:
                 if (account_username is not None and
-                    username_re.search(account_username)):
+                        username_re.search(account_username)):
                     matches_username_re = True
             if self.usernames and not matches_username_re:
                 return False
@@ -1164,7 +1164,7 @@ class EventFilter(BaseFilter):
             matches_approval = False
             for eapproval in event.approvals:
                 if (normalizeCategory(eapproval['description']) == category and
-                    int(eapproval['value']) == int(value)):
+                        int(eapproval['value']) == int(value)):
                     matches_approval = True
             if not matches_approval:
                 return False
