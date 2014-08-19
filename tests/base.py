@@ -408,7 +408,7 @@ class FakeGerrit(object):
         # project
         self.queries.append(query)
         l = [change.query() for change in self.changes.values()]
-        l.append({"type":"stats","rowCount":1,"runTimeMilliseconds":3})
+        l.append({"type": "stats", "rowCount": 1, "runTimeMilliseconds": 3})
         return l
 
     def startWatching(self, *args, **kw):
