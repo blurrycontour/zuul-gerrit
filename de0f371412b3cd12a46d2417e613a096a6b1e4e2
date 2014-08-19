@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1abeadc6_8400cf02",
+        "filename": "etc/status/fetch-dependencies.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-08-19T09:56:55Z",
+      "side": 1,
+      "message": "Nit: to avoid repeating the options everywhere, maybe they could be put in a variable such as $CURL_OPTS  :-D",
+      "revId": "de0f371412b3cd12a46d2417e613a096a6b1e4e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
