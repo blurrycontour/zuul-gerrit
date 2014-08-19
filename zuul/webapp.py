@@ -45,7 +45,7 @@ class WebApp(threading.Thread):
         if request.path != '/status.json':
             raise webob.exc.HTTPNotFound()
         if (not self.cache or
-            (time.time() - self.cache_time) > self.cache_expiry):
+                (time.time() - self.cache_time) > self.cache_expiry):
             try:
                 self.cache = self.scheduler.formatStatusJSON()
                 # Call time.time() again because formatting above may take

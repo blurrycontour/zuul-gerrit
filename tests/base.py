@@ -251,14 +251,16 @@ class FakeChange(object):
                     granted_on=None):
         if not granted_on:
             granted_on = time.time()
-        approval = {'description': self.categories[category][0],
-                    'type': category,
-                    'value': str(value),
-                    'by': {
-                        'username': username,
-                        'email': username + '@example.com',
-                    },
-                    'grantedOn': int(granted_on)}
+        approval = {
+            'description': self.categories[category][0],
+            'type': category,
+            'value': str(value),
+            'by': {
+                'username': username,
+                'email': username + '@example.com',
+            },
+            'grantedOn': int(granted_on)
+        }
         for i, x in enumerate(self.patchsets[-1]['approvals'][:]):
             if x['by']['username'] == username and x['type'] == category:
                 del self.patchsets[-1]['approvals'][i]
@@ -348,7 +350,7 @@ class FakeChange(object):
 
     def setMerged(self):
         if (self.depends_on_change and
-            self.depends_on_change.data['status'] != 'MERGED'):
+                self.depends_on_change.data['status'] != 'MERGED'):
             return
         if self.fail_merge:
             return
@@ -409,7 +411,7 @@ class FakeGerrit(object):
         # project
         self.queries.append(query)
         l = [change.query() for change in self.changes.values()]
-        l.append({"type":"stats","rowCount":1,"runTimeMilliseconds":3})
+        l.append({"type": "stats", "rowCount": 1, "runTimeMilliseconds": 3})
         return l
 
     def startWatching(self, *args, **kw):
@@ -809,15 +811,15 @@ class ZuulTestCase(testtools.TestCase):
             self.useFixture(fixtures.Timeout(test_timeout, gentle=False))
 
         if (os.environ.get('OS_STDOUT_CAPTURE') == 'True' or
-            os.environ.get('OS_STDOUT_CAPTURE') == '1'):
+                os.environ.get('OS_STDOUT_CAPTURE') == '1'):
             stdout = self.useFixture(fixtures.StringStream('stdout')).stream
             self.useFixture(fixtures.MonkeyPatch('sys.stdout', stdout))
         if (os.environ.get('OS_STDERR_CAPTURE') == 'True' or
-            os.environ.get('OS_STDERR_CAPTURE') == '1'):
+                os.environ.get('OS_STDERR_CAPTURE') == '1'):
             stderr = self.useFixture(fixtures.StringStream('stderr')).stream
             self.useFixture(fixtures.MonkeyPatch('sys.stderr', stderr))
         if (os.environ.get('OS_LOG_CAPTURE') == 'True' or
-            os.environ.get('OS_LOG_CAPTURE') == '1'):
+                os.environ.get('OS_LOG_CAPTURE') == '1'):
             self.useFixture(fixtures.FakeLogger(
                 level=logging.DEBUG,
                 format='%(asctime)s %(name)-32s '
@@ -923,7 +925,8 @@ class ZuulTestCase(testtools.TestCase):
         self.sched.registerTrigger(self.gerrit)
         self.timer = zuul.trigger.timer.Timer(self.config, self.sched)
         self.sched.registerTrigger(self.timer)
-        self.zuultrigger = zuul.trigger.zuultrigger.ZuulTrigger(self.config, self.sched)
+        self.zuultrigger = zuul.trigger.zuultrigger.ZuulTrigger(self.config,
+                                                                self.sched)
         self.sched.registerTrigger(self.zuultrigger)
 
         self.sched.registerReporter(
@@ -1192,11 +1195,11 @@ class ZuulTestCase(testtools.TestCase):
                 self.sched.result_event_queue.join()
                 self.sched.run_handler_lock.acquire()
                 if (self.sched.trigger_event_queue.empty() and
-                    self.sched.result_event_queue.empty() and
-                    self.fake_gerrit.event_queue.empty() and
-                    not self.merge_client.build_sets and
-                    self.haveAllBuildsReported() and
-                    self.areAllBuildsWaiting()):
+                        self.sched.result_event_queue.empty() and
+                        self.fake_gerrit.event_queue.empty() and
+                        not self.merge_client.build_sets and
+                        self.haveAllBuildsReported() and
+                        self.areAllBuildsWaiting()):
                     self.sched.run_handler_lock.release()
                     self.worker.lock.release()
                     self.log.debug("...settled.")
