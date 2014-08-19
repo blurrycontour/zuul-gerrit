@@ -236,7 +236,8 @@ class Scheduler(threading.Thread):
             pipeline = Pipeline(conf_pipeline['name'])
             pipeline.description = conf_pipeline.get('description')
             # TODO(jeblair): remove backwards compatibility:
-            pipeline.source = self.triggers[conf_pipeline.get('source', 'gerrit')]
+            pipeline.source = self.triggers[conf_pipeline.get('source',
+                                                              'gerrit')]
             precedence = model.PRECEDENCE_MAP[conf_pipeline.get('precedence')]
             pipeline.precedence = precedence
             pipeline.failure_message = conf_pipeline.get('failure-message',
@@ -1161,7 +1162,8 @@ class BasePipelineManager(object):
                 item.enqueue_time = enqueue_time
             self.reportStats(item)
             self.enqueueChangesBehind(change, quiet, ignore_requirements)
-            self.sched.triggers['zuul'].onChangeEnqueued(item.change, self.pipeline)
+            self.sched.triggers['zuul'].onChangeEnqueued(item.change,
+                                                         self.pipeline)
         else:
             self.log.error("Unable to find change queue for project %s" %
                            change.project)
