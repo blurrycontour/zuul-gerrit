@@ -71,8 +71,8 @@ class Cloner(object):
         git_cache = '%s/%s' % (self.cache_dir, project)
         git_upstream = '%s/%s' % (self.git_url, project)
         if (self.cache_dir and
-            os.path.exists(git_cache) and
-            not os.path.exists(dest)):
+                os.path.exists(git_cache) and
+                not os.path.exists(dest)):
             # file:// tells git not to hard-link across repos
             git_cache = 'file://%s' % git_cache
             self.log.info("Creating repo %s from cache %s",
@@ -80,8 +80,7 @@ class Cloner(object):
             new_repo = git.Repo.clone_from(git_cache, dest)
             self.log.info("Updating origin remote in repo %s to %s",
                           project, git_upstream)
-            origin = new_repo.remotes.origin.config_writer.set(
-                'url', git_upstream)
+            new_repo.remotes.origin.config_writer.set('url', git_upstream)
         else:
             self.log.info("Creating repo %s from upstream %s",
                           project, git_upstream)

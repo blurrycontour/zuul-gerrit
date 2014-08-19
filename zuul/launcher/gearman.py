@@ -169,7 +169,7 @@ class Gearman(object):
         self.gearman.addServer(server, port)
 
         if (config.has_option('gearman_server', 'start') and
-            config.getboolean('gearman_server', 'start')):
+                config.getboolean('gearman_server', 'start')):
             self.gearman.waitForGearmanToSettle()
 
         self.cleanup_thread = GearmanCleanup(self)
@@ -195,7 +195,7 @@ class Gearman(object):
             self.log.debug("Function %s is registered" % name)
             return True
         if ((time.time() - self.function_cache_time) <
-            self.negative_function_cache_ttl):
+                self.negative_function_cache_ttl):
             self.log.debug("Function %s is not registered "
                            "(negative ttl in effect)" % name)
             return False

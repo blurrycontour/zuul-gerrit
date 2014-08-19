@@ -144,7 +144,7 @@ class Client(zuul.cmd.ZuulApp):
                         if hasattr(v, 'get'):
                             v = v.get(part, '')
                     if ('transform' in all_fields[f]
-                        and callable(all_fields[f]['transform'])):
+                            and callable(all_fields[f]['transform'])):
                         v = all_fields[f]['transform'](v)
                     if 'append' in all_fields[f]:
                         v += all_fields[f]['append']
