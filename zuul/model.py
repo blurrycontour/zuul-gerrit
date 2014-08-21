@@ -798,6 +798,8 @@ class Changeish(object):
 
     def __init__(self, project):
         self.project = project
+        self.start_datetime = time.strftime("%Y-%m-%d %H:%M:%S UTC",
+                                            time.gmtime())
 
     def getBasePath(self):
         base_path = ''
