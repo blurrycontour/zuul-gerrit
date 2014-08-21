@@ -6,4 +6,5 @@ projects:
   - name: foo
     check:
       - test
+      # Indentation is one level too deep here.
         - foo
