@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1abeadc6_a78637d9",
+        "filename": "tests/fixtures/layouts/bad_pipelines1.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2014-08-21T21:45:50Z",
+      "side": 1,
+      "message": "Instructive comments on what\u0027s missing would help.",
+      "revId": "2532dd65c853b9874f9647f6f085a1a3808cb88b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
