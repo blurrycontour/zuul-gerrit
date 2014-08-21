@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1abeadc6_4ede5bde",
+        "filename": "tests/fixtures/layouts/bad_pipelines7.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2014-08-21T22:56:20Z",
+      "side": 1,
+      "message": "Makes me wonder why we have both this and bad_pipelines2.yaml.",
+      "revId": "1ca2751faa70de31337df0db3aeac162e47d3fc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1abeadc6_4e573b58",
+        "filename": "tests/fixtures/layouts/bad_projects1.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2014-08-21T22:56:20Z",
+      "side": 1,
+      "message": "Does this dedent not violate YAML? It should be before the list item, right?",
+      "revId": "1ca2751faa70de31337df0db3aeac162e47d3fc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1abeadc6_ce98ab1e",
+        "filename": "tests/fixtures/layouts/bad_projects2.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2014-08-21T22:56:20Z",
+      "side": 1,
+      "message": "Also I worry that this comment dedent changes parsing of the following indent.",
+      "revId": "1ca2751faa70de31337df0db3aeac162e47d3fc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
