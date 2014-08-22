@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1abeadc6_18a9e023",
+        "filename": "tests/test_cloner.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-08-22T22:15:24Z",
+      "side": 1,
+      "message": "the d-g equivalent is that $BRANCH is set to stable/havana because we do that in the old part of the grenade job.",
+      "parentUuid": "1abeadc6_b8b2ace2",
+      "revId": "452d8971442b082e671a90527a3bcb78a85fdd8d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1abeadc6_d8ccc86c",
         "filename": "tests/test_cloner.py",
         "patchSetId": 2
