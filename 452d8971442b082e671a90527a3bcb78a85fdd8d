@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1abeadc6_b8b2ace2",
+        "filename": "tests/test_cloner.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-08-22T22:02:12Z",
+      "side": 1,
+      "message": "I am reading this and d-g setup_project to make sure I grok this. In d-g we first try refs/$BRANCH/ZSOMEREF if that fails we try refs/master/ZSOMEREF if that fails we checkout $BRANCH and if that fails we checkout master.\n\nThe only way for this to be stable/havana here is if zuul created a refs/stable/havana/ZSOMEREF that mapped to the stable/havana branch otherwise we should have checked out refs/master/ZSOMEREF and the ref here would be ZUUL_COMMIT because the second change is for project2.\n\nIs zuul creating refs/stable/havana/ZSOMEREF for us?",
+      "revId": "452d8971442b082e671a90527a3bcb78a85fdd8d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1abeadc6_d8ccc86c",
+        "filename": "tests/test_cloner.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-08-22T22:02:12Z",
+      "side": 1,
+      "message": "This is more what I expected, but branch \u003d\u003d master in this case so that makes sense.",
+      "revId": "452d8971442b082e671a90527a3bcb78a85fdd8d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
