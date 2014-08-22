@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1abeadc6_24c83c54",
+        "filename": "tests/test_cloner.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-08-22T21:23:28Z",
+      "side": 1,
+      "message": "Change number is redundant now that we are tracking builds.",
+      "revId": "c9b98fee332612482c6444d7554b92cc2ea57ebf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1abeadc6_44c37837",
+        "filename": "tests/test_cloner.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-08-22T21:23:28Z",
+      "side": 1,
+      "message": "This forces the cloner to reclone from scratch right? Is it worth also testing that it can update to the correct version? But that should probably be a new test in a new change.",
+      "revId": "c9b98fee332612482c6444d7554b92cc2ea57ebf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1abeadc6_64beb4af",
+        "filename": "tests/test_cloner.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-08-22T21:23:28Z",
+      "side": 1,
+      "message": "Change number is redundant now that we are tracking builds.",
+      "revId": "c9b98fee332612482c6444d7554b92cc2ea57ebf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1abeadc6_84e030ce",
+        "filename": "tests/test_cloner.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-08-22T21:23:28Z",
+      "side": 1,
+      "message": "See previous rmtree comment.",
+      "revId": "c9b98fee332612482c6444d7554b92cc2ea57ebf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
