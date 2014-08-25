@@ -1122,8 +1122,9 @@ class EventFilter(BaseFilter):
         # refs are ORed
         matches_ref = False
         for ref in self.refs:
-            if ref.match(event.ref):
-                matches_ref = True
+            if (event.ref is not None and
+                ref.match(event.ref)):
+                    matches_ref = True
         if self.refs and not matches_ref:
             return False
 
