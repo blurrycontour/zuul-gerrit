@@ -36,6 +36,23 @@
     },
     {
       "key": {
+        "uuid": "1abeadc6_58e16299",
+        "filename": "tests/test_cloner.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-08-25T17:09:06Z",
+      "side": 1,
+      "message": "Yes, it does do that.",
+      "revId": "c9b98fee332612482c6444d7554b92cc2ea57ebf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1abeadc6_64beb4af",
         "filename": "tests/test_cloner.py",
         "patchSetId": 1
