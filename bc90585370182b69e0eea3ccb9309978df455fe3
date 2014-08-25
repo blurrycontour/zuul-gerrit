@@ -16,6 +16,23 @@
       "revId": "bc90585370182b69e0eea3ccb9309978df455fe3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1abeadc6_7ac37138",
+        "filename": "zuul/cmd/cloner.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-08-25T18:20:40Z",
+      "side": 1,
+      "message": "Oops, just a note left in the code.  Removed.",
+      "revId": "bc90585370182b69e0eea3ccb9309978df455fe3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
