@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1abeadc6_e3b5197f",
+        "filename": "doc/source/cloner.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-08-25T22:52:24Z",
+      "side": 1,
+      "message": "Should be --cache-dir as the option (missing a \u0027-\u0027).",
+      "revId": "cacbcbf6b4f0ea5e2f02efc5d6ee07159aa1b8b8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
