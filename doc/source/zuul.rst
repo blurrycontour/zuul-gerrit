@@ -978,10 +978,11 @@ also be added::
      check:
       - foobar-extra-special-job
 
-The order of the jobs listed in the project (which only affects the
-order of jobs listed on the report) will be the jobs from each
-template in the order listed, followed by any jobs individually listed
-for the project.
+Optionally, individual jobs may be defined via the template in the
+check or gate operations.  The order of the jobs listed in the
+project (which only affects the order of jobs listed on the report)
+will be the jobs from each template in the order listed, followed
+by any jobs individually listed for the project.
 
 Note that if multiple templates are used for a project and one
 template specifies a job that is also specified in another template,
