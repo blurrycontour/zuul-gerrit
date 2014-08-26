@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1abeadc6_5a44ccb6",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-08-26T15:58:51Z",
+      "side": 1,
+      "message": "We could determine the indicated branch in Cloner.__init__() so it can be reused by other future methods. init currently has:\n\n zuul_branch\n branch\u003dNone\n\nCould add in a self.indicated_branch \u003d self.branch or self.zuul_branch  and then use indicated_branch everywhere instead of \u0027branch\u0027.\n\nOn a side note, I found \u0027branch\u0027 to be confusing as to what it is meant to do since the variable name carry little meaning.  Maybe we can rename it indicated_branch in init, and if None set it to zuul_branch in __init_.",
+      "revId": "5ff2bb8285663b669e1638a2308a7308acb5e3ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1abeadc6_7a31880a",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-08-26T15:58:51Z",
+      "side": 1,
+      "message": "That assignment is no more needed, it is assigned the line after.",
+      "revId": "5ff2bb8285663b669e1638a2308a7308acb5e3ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
