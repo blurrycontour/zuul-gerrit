@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1abeadc6_164948b7",
+        "filename": "etc/status/public_html/jquery.zuul.js",
+        "patchSetId": 6
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2014-08-26T19:48:00Z",
+      "side": 1,
+      "message": "Could we do 7 instead? This is what git uses for its default shortsha length, and many other tools copy that behavior as well.",
+      "revId": "3cae6857aaccbe3ace5fb25a72166b75cc982ac2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
