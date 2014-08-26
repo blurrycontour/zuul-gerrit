@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1abeadc6_16bf88ab",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1127,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-08-26T19:42:12Z",
+      "side": 1,
+      "message": "If event.ref is None, I guess the whole for loop should be skipped instead.",
+      "revId": "5590e7fcdfd7eddd2fed361aec2044f7ce2398be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
