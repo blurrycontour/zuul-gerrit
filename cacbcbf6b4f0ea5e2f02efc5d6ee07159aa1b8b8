@@ -16,6 +16,74 @@
       "revId": "cacbcbf6b4f0ea5e2f02efc5d6ee07159aa1b8b8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1abeadc6_93472a77",
+        "filename": "doc/source/cloner.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-08-26T19:33:32Z",
+      "side": 1,
+      "message": "I haven\u0027t investigated, but git clone might well create hardlink if --cache-dir and the destination directory are on the same device.   Might be worth looking at and mention it in the documentation.  Hardlink is I believe the default when doing a git clone and save up a lot of disk I/O.",
+      "revId": "cacbcbf6b4f0ea5e2f02efc5d6ee07159aa1b8b8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1abeadc6_f3fbfe44",
+        "filename": "tests/test_cloner.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-08-26T19:33:32Z",
+      "side": 1,
+      "message": "There I would add a commit to the upstream_repo_path which would thus not be in the cached repository (since it has  already be cloned).  You will end up with a lagged cache, that let you assert that the new commit has been fetched and checked out properly by the cloner.",
+      "revId": "cacbcbf6b4f0ea5e2f02efc5d6ee07159aa1b8b8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1abeadc6_93380a3f",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-08-26T19:33:32Z",
+      "side": 1,
+      "message": "Nit: maybe log an INFO message stating the URL is made to point to git_upstream.  Some user might end up whining about the cloner using a potentially obsolete cache dir.  Feel free to discard.",
+      "revId": "cacbcbf6b4f0ea5e2f02efc5d6ee07159aa1b8b8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1abeadc6_93ae4a97",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-08-26T19:33:32Z",
+      "side": 1,
+      "message": "That message should be the else case or your end up with the confusing info messages:\n\n zuul.Cloner INFO  Creating repo org/project1 from cache /tmp/zuul-test/cache/org/project1\n zuul.Cloner INFO  Creating repo org/project1 from upstream /tmp/zuul-test/upstream/org/project1\n zuul.Repo DEBUG  Updating repository /tmp/zuul-test/workspace/org/project1",
+      "revId": "cacbcbf6b4f0ea5e2f02efc5d6ee07159aa1b8b8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
