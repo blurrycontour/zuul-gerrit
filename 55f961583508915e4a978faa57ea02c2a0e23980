@@ -16,6 +16,23 @@
       "revId": "55f961583508915e4a978faa57ea02c2a0e23980",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1abeadc6_935aca28",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 982,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-08-26T19:08:22Z",
+      "side": 1,
+      "message": "Sounds to me it rephrase what is being said above:\n\n Individual jobs *may* also be added::\n\nMaybe that sentence could be rephrased as:\n\n Optionally, individual jobs may also be added to compliment the jobs defined via templates::",
+      "revId": "55f961583508915e4a978faa57ea02c2a0e23980",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
