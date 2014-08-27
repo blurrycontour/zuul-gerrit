@@ -36,6 +36,23 @@
     },
     {
       "key": {
+        "uuid": "1abeadc6_df125861",
+        "filename": "doc/source/cloner.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-08-27T16:50:08Z",
+      "side": 1,
+      "message": "Yes it will.  Let\u0027s resolve this by telling git not to do that when we clone.",
+      "revId": "cacbcbf6b4f0ea5e2f02efc5d6ee07159aa1b8b8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1abeadc6_f3fbfe44",
         "filename": "tests/test_cloner.py",
         "patchSetId": 2
@@ -47,6 +64,23 @@
       "writtenOn": "2014-08-26T19:33:32Z",
       "side": 1,
       "message": "There I would add a commit to the upstream_repo_path which would thus not be in the cached repository (since it has  already be cloned).  You will end up with a lagged cache, that let you assert that the new commit has been fetched and checked out properly by the cloner.",
+      "revId": "cacbcbf6b4f0ea5e2f02efc5d6ee07159aa1b8b8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1abeadc6_bf1bdc7e",
+        "filename": "tests/test_cloner.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-08-27T16:50:08Z",
+      "side": 1,
+      "message": "We\u0027d have to do that in another project that isn\u0027t in the queue.  Because project1 should just have the zuul commit checked out (which will not have that other change).  But if we add a project2 in, and add a commit to it after the cache is created, the cloner should update it to project2\u0027s upstream master.",
       "revId": "cacbcbf6b4f0ea5e2f02efc5d6ee07159aa1b8b8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -81,6 +115,23 @@
       "writtenOn": "2014-08-26T19:33:32Z",
       "side": 1,
       "message": "That message should be the else case or your end up with the confusing info messages:\n\n zuul.Cloner INFO  Creating repo org/project1 from cache /tmp/zuul-test/cache/org/project1\n zuul.Cloner INFO  Creating repo org/project1 from upstream /tmp/zuul-test/upstream/org/project1\n zuul.Repo DEBUG  Updating repository /tmp/zuul-test/workspace/org/project1",
+      "revId": "cacbcbf6b4f0ea5e2f02efc5d6ee07159aa1b8b8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1abeadc6_9f18e085",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-08-27T16:50:08Z",
+      "side": 1,
+      "message": "I did want to get both of those pieces of information into the log, but your idea of logging the upstream remote change is better.",
       "revId": "cacbcbf6b4f0ea5e2f02efc5d6ee07159aa1b8b8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
