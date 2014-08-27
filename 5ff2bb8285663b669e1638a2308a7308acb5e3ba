@@ -33,6 +33,23 @@
       "revId": "5ff2bb8285663b669e1638a2308a7308acb5e3ba",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1abeadc6_04af2995",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-08-27T16:12:19Z",
+      "side": 1,
+      "message": "Oops, you\u0027re right.",
+      "revId": "5ff2bb8285663b669e1638a2308a7308acb5e3ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
