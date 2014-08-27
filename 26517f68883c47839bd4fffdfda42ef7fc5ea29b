@@ -36,6 +36,23 @@
     },
     {
       "key": {
+        "uuid": "1abeadc6_5de2cba0",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-08-27T20:07:36Z",
+      "side": 1,
+      "message": "If it gets modified later, then the default argument would be modified too.  This way is better since we keep this around after the function ends.",
+      "revId": "26517f68883c47839bd4fffdfda42ef7fc5ea29b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1abeadc6_12f92280",
         "filename": "zuul/lib/cloner.py",
         "patchSetId": 5
@@ -64,6 +81,23 @@
       "writtenOn": "2014-08-27T19:39:36Z",
       "side": 1,
       "message": "We should then test whether the project branch exists in the repo.  If the branch does not exist, the code below will end up fallbacking to the hardcoded \u0027master\u0027 instead of self.branch.",
+      "revId": "26517f68883c47839bd4fffdfda42ef7fc5ea29b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1abeadc6_7ddf87d6",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-08-27T20:07:36Z",
+      "side": 1,
+      "message": "That\u0027s okay, and it follows the documentation.  We\u0027re only overriding the indicated branch.",
       "revId": "26517f68883c47839bd4fffdfda42ef7fc5ea29b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
