@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1abeadc6_bdd67f4d",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-08-27T19:53:57Z",
+      "side": 1,
+      "message": "I found out today I could use hardlinking :-D   Maybe the git clone behavior can be documented in the --cache-dir argparse documentation and in the rst file.  Something like:\n\n help\u003d\u0027cache dir is passed to git clone which might cause hardlinks to be created. To prevent this prefix the path with file://\u0027\n\nOr have two parameters:  --cache-dir  and --cache-dir-hardlink  but that might be overkill.",
+      "revId": "328b8eb5c4bfc909332b2ab4b6dc148e031436b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1abeadc6_3d70af71",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-08-27T19:53:57Z",
+      "side": 1,
+      "message": "Logging seems fine to me. Nice!",
+      "revId": "328b8eb5c4bfc909332b2ab4b6dc148e031436b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
