@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "1abeadc6_7d4307af",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-08-27T20:03:34Z",
+      "side": 1,
+      "message": "Well, then it\u0027s not cache-dir, it\u0027s cache-url, but it can only be a file url, and we have to parse it to find the directory.  We currently don\u0027t use hard-linking in openstack.  I feel like it\u0027s the safer behavior for zuul-cloner which is why I went with this, but if you disagree, we can do something else.",
+      "revId": "328b8eb5c4bfc909332b2ab4b6dc148e031436b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1abeadc6_3d70af71",
         "filename": "zuul/lib/cloner.py",
         "patchSetId": 5
