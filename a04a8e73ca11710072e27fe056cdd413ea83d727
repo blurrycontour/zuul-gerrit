@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1abeadc6_131e560c",
+        "filename": "doc/source/cloner.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-08-28T21:44:17Z",
+      "side": 1,
+      "message": "I don\u0027t know if we should expect the implied \"let git clone create hardlinks if the cached repo and destination repo are on the same filesystem\" to be clear to everyone. Do you think we should be explicit about that behavior here?",
+      "revId": "a04a8e73ca11710072e27fe056cdd413ea83d727",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
