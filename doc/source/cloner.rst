@@ -87,3 +87,7 @@ cloning any projects it processes from those found in that directory.
 The URL of origin remote of the resulting clone will be reset to use
 the ``git_base_url`` and then the remote will be updated so that the
 repository has all the information in the upstream repository.
+
+Zuul cloner forces git clone to copy the cached repositories. Pass
+``--cache-hardlink`` to lift the enforcement and let git clone
+create hardlinks.
