@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1abeadc6_c8598d36",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-08-28T21:00:32Z",
+      "side": 1,
+      "message": "I think this error message is not clear enough. It should say something like \"The event %s does not include ref information, Zuul cannot use ref filter \u0027ref: %s\u0027\" % (event[\u0027event\u0027], event[\u0027ref\u0027]).\n\nOtherwise its just an error without any of the why which is confusing to users.",
+      "revId": "30d7d68a8b1dd4ca903ee2c2fc129d920246ab5f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
