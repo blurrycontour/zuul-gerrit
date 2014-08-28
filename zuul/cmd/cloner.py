@@ -58,6 +58,9 @@ class Cloner(zuul.cmd.ZuulApp):
                             help=('a directory that holds cached copies of '
                                   'repos from which to make an initial clone.'
                                   ))
+        parser.add_argument('--cache-hardlink', dest='cache_hardlink',
+                            help=('let git clone potentially create hardlinks '
+                                  'the default is to force a copy from cache.'))
         parser.add_argument('git_base_url',
                             help='reference repo to clone from')
         parser.add_argument('projects', nargs='+',
@@ -147,6 +150,7 @@ class Cloner(zuul.cmd.ZuulApp):
             clone_map_file=self.args.clone_map_file,
             project_branches=project_branches,
             cache_dir=self.args.cache_dir,
+            cache_hardlink=self.args.cache_hardlink,
         )
         cloner.execute()
 
