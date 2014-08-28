@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "1abeadc6_b33e8289",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 969,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-08-28T21:39:35Z",
+      "side": 1,
+      "message": "What if we keep the old text in the below paragraph and do something like this up here:\n\nInstead of \"Individual jobs may also be added::\" have \"Templates and individual jobs for arbitrary pipelines may be mixed together under the same project. Listing individual jobs is only necessary if the desired jobs are not included by any templates. One example of adding an additional job to the check pipeline::",
+      "revId": "0f3ffc0bc5afb1b767ed05fe8b0e55596d26c10d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1abeadc6_333192ed",
         "filename": "doc/source/zuul.rst",
         "patchSetId": 2
