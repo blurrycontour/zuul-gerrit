@@ -16,6 +16,23 @@
       "revId": "3cae6857aaccbe3ace5fb25a72166b75cc982ac2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1abeadc6_cd0eff8b",
+        "filename": "etc/status/public_html/jquery.zuul.js",
+        "patchSetId": 6
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-08-28T20:47:00Z",
+      "side": 1,
+      "message": "I agree with fungi, we should go with 7 to be consistent with git.",
+      "revId": "3cae6857aaccbe3ace5fb25a72166b75cc982ac2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
