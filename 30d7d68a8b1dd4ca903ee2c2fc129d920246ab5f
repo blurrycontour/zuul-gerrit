@@ -16,6 +16,24 @@
       "revId": "30d7d68a8b1dd4ca903ee2c2fc129d920246ab5f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1abeadc6_ac9a8511",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 12100
+      },
+      "writtenOn": "2014-08-29T10:16:07Z",
+      "side": 1,
+      "message": "Done in patchset 4",
+      "parentUuid": "1abeadc6_c8598d36",
+      "revId": "30d7d68a8b1dd4ca903ee2c2fc129d920246ab5f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
