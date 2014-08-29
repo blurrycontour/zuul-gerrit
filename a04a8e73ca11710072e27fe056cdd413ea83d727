@@ -16,6 +16,24 @@
       "revId": "a04a8e73ca11710072e27fe056cdd413ea83d727",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1abeadc6_ce4c0245",
+        "filename": "doc/source/cloner.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-08-29T19:54:48Z",
+      "side": 1,
+      "message": "Zuul cloner should probably use git clone with the provided dir (i.e. do not silently prefix  \u0027file://\u0027 by default) and prevent hard linking via an option.\n\nThe thing that confuses me when reading the git-clone man page is that there are two options that apparently achieve the same (prevent hardlinks):\n\n --no-local\n --no-hardlinks\n\nMaybe we can have a --cache-no-hardlinks option that would be passed to git clone to prevent hard linking.  Could be added to James patch (parent of this one).",
+      "parentUuid": "1abeadc6_131e560c",
+      "revId": "a04a8e73ca11710072e27fe056cdd413ea83d727",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
