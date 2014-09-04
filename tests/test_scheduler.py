@@ -601,7 +601,7 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(B.reported, 2)
         self.assertEqual(C.reported, 2)
 
-    def test_trigger_cache(self):
+    def test_source_cache(self):
         "Test that the trigger cache operates correctly"
         self.worker.hold_jobs_in_build = True
 
@@ -634,9 +634,9 @@ class TestScheduler(ZuulTestCase):
         self.fake_gerrit.addEvent(B.addApproval('approved', 1))
         self.waitUntilSettled()
 
-        self.log.debug("len %s" % self.gerrit._change_cache.keys())
+        self.log.debug("len %s" % self.gerrit_source._change_cache.keys())
         # there should still be changes in the cache
-        self.assertNotEqual(len(self.gerrit._change_cache.keys()), 0)
+        self.assertNotEqual(len(self.gerrit_source._change_cache.keys()), 0)
 
         self.worker.hold_jobs_in_build = False
         self.worker.release()
@@ -1290,7 +1290,7 @@ class TestScheduler(ZuulTestCase):
         "Test that the merger works with large changes after a repack"
         # https://bugs.launchpad.net/zuul/+bug/1078946
         # This test assumes the repo is already cloned; make sure it is
-        url = self.sched.triggers['gerrit'].getGitUrl(
+        url = self.sched.sources['gerrit'].getGitUrl(
             self.sched.layout.projects['org/project1'])
         self.merge_server.merger.addProject('org/project1', url)
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
@@ -1740,6 +1740,7 @@ class TestScheduler(ZuulTestCase):
     def test_test_config(self):
         "Test that we can test the config"
         sched = zuul.scheduler.Scheduler()
+        sched.registerSource(None, 'gerrit')
         sched.registerTrigger(None, 'gerrit')
         sched.registerTrigger(None, 'timer')
         sched.registerTrigger(None, 'zuul')
