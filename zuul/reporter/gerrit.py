@@ -22,18 +22,18 @@ class Reporter(object):
     name = 'gerrit'
     log = logging.getLogger("zuul.reporter.gerrit.Reporter")
 
-    def __init__(self, trigger):
+    def __init__(self, gerrit):
         """Set up the reporter."""
-        self.default_gerrit = trigger.gerrit
-        self.trigger = trigger
+        # TODO: make default_gerrit come from a connection
+        self.default_gerrit = gerrit
 
-    def report(self, change, message, params):
+    def report(self, source, change, message, params):
         """Send a message to gerrit."""
         self.log.debug("Report change %s, params %s, message: %s" %
                        (change, params, message))
         changeid = '%s,%s' % (change.number, change.patchset)
-        change._ref_sha = self.trigger.getRefSha(change.project.name,
-                                                 'refs/heads/' + change.branch)
+        change._ref_sha = source.getRefSha(change.project.name,
+                                           'refs/heads/' + change.branch)
 
         if any(x in params for x in ['gerrit_server', 'gerrit_user',
                                      'gerrit_port', 'gerrit_keyfile']):
