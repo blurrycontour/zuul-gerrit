@@ -499,7 +499,7 @@ class FakeURLOpener(object):
         return ret
 
 
-class FakeGerritSource(zuul.source.gerrit.Gerrit):
+class FakeGerritSource(zuul.source.gerrit.GerritSource):
     name = 'gerrit'
 
     def __init__(self, upstream_root, *args):
