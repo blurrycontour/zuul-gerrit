@@ -18,9 +18,10 @@ import time
 import urllib2
 from zuul.lib import gerrit
 from zuul.model import Change, Ref, NullChange
+from zuul.source import BaseSource
 
 
-class Gerrit(object):
+class GerritSource(BaseSource):
     name = 'gerrit'
     log = logging.getLogger("zuul.source.Gerrit")
     replication_timeout = 300
