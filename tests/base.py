@@ -17,6 +17,7 @@
 from six.moves import configparser as ConfigParser
 import gc
 import hashlib
+import inspect
 import json
 import logging
 import os
@@ -1005,8 +1006,8 @@ class ZuulTestCase(testtools.TestCase):
     def register_reporters(self):
         # Register the available reporters
         self.sched.registerReporter(
-            zuul.reporter.gerrit.Reporter(self.fake_gerrit))
-        self.smtp_reporter = zuul.reporter.smtp.Reporter(
+            zuul.reporter.gerrit.GerritReporter(self.fake_gerrit))
+        self.smtp_reporter = zuul.reporter.smtp.SMTPReporter(
             self.config.get('smtp', 'default_from'),
             self.config.get('smtp', 'default_to'),
             self.config.get('smtp', 'server'))
@@ -1310,3 +1311,32 @@ class ZuulTestCase(testtools.TestCase):
 
         pprint.pprint(self.statsd.stats)
         raise Exception("Key %s not found in reported stats" % key)
+
+
+class BaseAPIHelper():
+    def assertPublicAPISignatures(self, child_class, base_class):
+        def get_public_apis(c):
+            methods = {}
+            for (name, value) in inspect.getmembers(c, inspect.ismethod):
+                if name.startswith("_"):
+                    continue
+                methods[name] = value
+            return methods
+
+        basemethods = get_public_apis(base_class)
+        implmethods = get_public_apis(child_class)
+
+        extranames = []
+        for name in sorted(implmethods.keys()):
+            if name not in basemethods:
+                extranames.append(name)
+
+        self.assertEqual([], extranames,
+                         "public APIs not listed in base class")
+
+        for name in sorted(implmethods.keys()):
+            baseargs = inspect.getargspec(basemethods[name])
+            implargs = inspect.getargspec(implmethods[name])
+
+            self.assertEqual(baseargs, implargs,
+                             "%s args don't match base" % name)
