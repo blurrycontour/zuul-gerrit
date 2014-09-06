@@ -15,9 +15,10 @@
 
 import logging
 from zuul.model import TriggerEvent
+from zuul.trigger import BaseTrigger
 
 
-class ZuulTrigger(object):
+class ZuulTrigger(BaseTrigger):
     name = 'zuul'
     log = logging.getLogger("zuul.ZuulTrigger")
 
