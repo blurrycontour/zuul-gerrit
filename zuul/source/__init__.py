@@ -45,7 +45,7 @@ class BaseSource(object):
     def getProjectOpenChanges(self, project):
         raise NotImplementedError()
 
-    def updateChange(self, change):
+    def updateChange(self, change, history=None):
         raise NotImplementedError()
 
     def getGitUrl(self, project):
