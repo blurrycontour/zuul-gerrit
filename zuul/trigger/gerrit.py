@@ -16,6 +16,7 @@ import logging
 import threading
 import voluptuous
 from zuul.model import TriggerEvent
+from zuul.trigger import BaseTrigger
 
 
 class GerritEventConnector(threading.Thread):
@@ -103,7 +104,7 @@ class GerritEventConnector(threading.Thread):
                 self.log.exception("Exception moving Gerrit event:")
 
 
-class Gerrit(object):
+class GerritTrigger(BaseTrigger):
     name = 'gerrit'
     log = logging.getLogger("zuul.trigger.Gerrit")
     replication_timeout = 300
