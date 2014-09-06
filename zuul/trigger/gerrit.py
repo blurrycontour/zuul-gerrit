@@ -16,6 +16,7 @@ import logging
 import threading
 import voluptuous
 from zuul.model import TriggerEvent
+from zuul.trigger import BaseTrigger
 
 
 class GerritEventConnector(threading.Thread):
@@ -104,7 +105,7 @@ class GerritEventConnector(threading.Thread):
                 self.gerrit.eventDone()
 
 
-class Gerrit(object):
+class GerritTrigger(BaseTrigger):
     name = 'gerrit'
     log = logging.getLogger("zuul.trigger.Gerrit")
 
@@ -126,6 +127,12 @@ class Gerrit(object):
         self.gerrit_connector.join()
 
     def postConfig(self):
+        pass
+
+    def onChangeMerged(self, change):
+        pass
+
+    def onChangeEnqueued(self, change, pipeline):
         pass
 
 
