@@ -16,9 +16,10 @@
 import apscheduler.scheduler
 import logging
 from zuul.model import TriggerEvent
+from zuul.trigger import BaseTrigger
 
 
-class Timer(object):
+class TimerTrigger(BaseTrigger):
     name = 'timer'
     log = logging.getLogger("zuul.Timer")
 
@@ -70,3 +71,9 @@ class Timer(object):
                                               second=second,
                                               args=(pipeline.name,
                                                     timespec,))
+
+    def onChangeMerged(self, change):
+        pass
+
+    def onChangeEnqueued(self, change, pipeline):
+        pass
