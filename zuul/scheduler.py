@@ -59,6 +59,20 @@ def deep_format(obj, paramdict):
     return ret
 
 
+def _callDriverMethod(driver_list, method, *args, **kwargs):
+    require_implemented = False
+    if 'require_implemented' in kwargs:
+        require_implemented = kwargs['require_implemented']
+        del kwargs['require_implemented']
+
+    for driver in driver_list.values():
+        try:
+            getattr(driver, method)(*args, **kwargs)
+        except (NotImplementedError, AttributeError):
+            if require_implemented:
+                raise
+
+
 class MergeFailure(Exception):
     pass
 
@@ -731,10 +745,9 @@ class Scheduler(threading.Thread):
                             "for change %s" % (build, item.change))
             self.layout = layout
             self.maintainTriggerCache()
-            for trigger in self.triggers.values():
-                trigger.postConfig()
-            for source in self.sources.values():
-                source.postConfig()
+            _callDriverMethod(self.triggers, 'postConfig')
+            _callDriverMethod(self.sources, 'postConfig')
+            _callDriverMethod(self.reporters, 'postConfig')
             if statsd:
                 try:
                     for pipeline in self.layout.pipelines.values():
@@ -866,8 +879,7 @@ class Scheduler(threading.Thread):
                 relevant.update(item.change.getRelatedChanges())
             self.log.debug("End maintain trigger cache for: %s" % pipeline)
         self.log.debug("Trigger cache size: %s" % len(relevant))
-        for source in self.sources.values():
-            source.maintainCache(relevant)
+        _callDriverMethod(self.sources, 'maintainCache', relevant)
 
     def process_event_queue(self):
         self.log.debug("Fetching trigger event")
@@ -1257,8 +1269,8 @@ class BasePipelineManager(object):
             self.reportStats(item)
             self.enqueueChangesBehind(change, quiet, ignore_requirements,
                                       change_queue)
-            self.sched.triggers['zuul'].onChangeEnqueued(item.change,
-                                                         self.pipeline)
+            _callDriverMethod(self.sched.triggers, 'onChangeEnqueued',
+                              item.change, self.pipeline)
             return True
 
     def dequeueItem(self, item):
@@ -1535,7 +1547,8 @@ class BasePipelineManager(object):
                 change_queue.increaseWindowSize()
                 self.log.debug("%s window size increased to %s" %
                                (change_queue, change_queue.window))
-                self.sched.triggers['zuul'].onChangeMerged(item.change)
+                _callDriverMethod(self.sched.triggers, 'onChangeMerged',
+                                  item.change)
 
     def _reportItem(self, item):
         self.log.debug("Reporting change %s" % item.change)

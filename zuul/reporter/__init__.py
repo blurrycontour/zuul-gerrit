@@ -40,3 +40,7 @@ class BaseReporter(object):
         this reporter itself is likely to set before submitting.
         """
         return []
+
+    def postConfig(self):
+        """Run tasks after configuration is reloaded"""
+        raise NotImplementedError()
