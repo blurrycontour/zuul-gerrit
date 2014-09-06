@@ -16,6 +16,7 @@ import logging
 import threading
 import voluptuous
 from zuul.model import TriggerEvent
+from zuul.trigger import BaseTrigger
 
 
 class GerritEventConnector(threading.Thread):
@@ -104,7 +105,7 @@ class GerritEventConnector(threading.Thread):
                 self.gerrit.eventDone()
 
 
-class Gerrit(object):
+class GerritTrigger(BaseTrigger):
     name = 'gerrit'
     log = logging.getLogger("zuul.trigger.Gerrit")
 
@@ -124,9 +125,6 @@ class Gerrit(object):
     def stop(self):
         self.gerrit_connector.stop()
         self.gerrit_connector.join()
-
-    def postConfig(self):
-        pass
 
 
 def validate_trigger(trigger_data):
