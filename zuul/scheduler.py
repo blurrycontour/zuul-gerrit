@@ -30,7 +30,7 @@ import yaml
 import layoutvalidator
 import model
 from model import ActionReporter, Pipeline, Project, ChangeQueue
-from model import EventFilter, ChangeishFilter
+from model import ChangeishFilter
 from zuul import version as zuul_version
 
 statsd = extras.try_import('statsd.statsd')
@@ -64,12 +64,14 @@ def _callDriverMethod(driver_list, method, *args, **kwargs):
         require_implemented = kwargs['require_implemented']
         del kwargs['require_implemented']
 
-    for driver in driver_list.values():
+    results = {}
+    for dname, driver in driver_list.items():
         try:
-            getattr(driver, method)(*args, **kwargs)
+            results[dname] = getattr(driver, method)(*args, **kwargs)
         except (NotImplementedError, AttributeError):
             if require_implemented:
                 raise
+    return results
 
 
 class MergeFailure(Exception):
@@ -314,63 +316,12 @@ class Scheduler(threading.Thread):
                     required_approvals_all=toList(require.get('approval-all')))
                 manager.changeish_filters.append(f)
 
-            # TODO: move this into triggers (may require pluggable
-            # configuration)
-            if 'gerrit' in conf_pipeline['trigger']:
-                for trigger in toList(conf_pipeline['trigger']['gerrit']):
-                    approvals = {}
-                    for approval_dict in toList(trigger.get('approval')):
-                        for k, v in approval_dict.items():
-                            approvals[k] = v
-                    # Backwards compat for *_filter versions of these args
-                    comments = toList(trigger.get('comment'))
-                    if not comments:
-                        comments = toList(trigger.get('comment_filter'))
-                    emails = toList(trigger.get('email'))
-                    if not emails:
-                        emails = toList(trigger.get('email_filter'))
-                    usernames = toList(trigger.get('username'))
-                    if not usernames:
-                        usernames = toList(trigger.get('username_filter'))
-                    f = EventFilter(
-                        trigger=self.triggers['gerrit'],
-                        types=toList(trigger['event']),
-                        branches=toList(trigger.get('branch')),
-                        refs=toList(trigger.get('ref')),
-                        event_approvals=approvals,
-                        comments=comments,
-                        emails=emails,
-                        usernames=usernames,
-                        required_approvals_any=(
-                            toList(trigger.get('require-approval-any'))
-                            + toList(trigger.get('require-approval'))
-                        ),
-                        required_approvals_all=toList(
-                            trigger.get('require-approval-all')
-                        ),
-                    )
-                    manager.event_filters.append(f)
-            if 'timer' in conf_pipeline['trigger']:
-                for trigger in toList(conf_pipeline['trigger']['timer']):
-                    f = EventFilter(trigger=self.triggers['timer'],
-                                    types=['timer'],
-                                    timespecs=toList(trigger['time']))
-                    manager.event_filters.append(f)
-            if 'zuul' in conf_pipeline['trigger']:
-                for trigger in toList(conf_pipeline['trigger']['zuul']):
-                    f = EventFilter(
-                        trigger=self.triggers['zuul'],
-                        types=toList(trigger['event']),
-                        pipelines=toList(trigger.get('pipeline')),
-                        required_approvals_any=(
-                            toList(trigger.get('require-approval-any'))
-                            + toList(trigger.get('require-approval'))
-                        ),
-                        required_approvals_all=toList(
-                            trigger.get('require-approval-all')
-                        ),
-                    )
-                    manager.event_filters.append(f)
+            # TODO(jhesketh): Allow multiple triggers per pipeline
+            efilters = _callDriverMethod(self.triggers, 'getEventFilters',
+                                         conf_pipeline['trigger'],
+                                         require_implemented=True)
+            for f in efilters.values():
+                manager.event_filters += f
 
         for project_template in data.get('project-templates', []):
             # Make sure the template only contains valid pipelines
