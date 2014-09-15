@@ -42,6 +42,7 @@ import six.moves.urllib.parse as urlparse
 import statsd
 import testtools
 
+import zuul.connection.gerrit
 import zuul.scheduler
 import zuul.webapp
 import zuul.rpclistener
@@ -368,18 +369,31 @@ class FakeChange(object):
         self.reported += 1
 
 
-class FakeGerrit(object):
-    def __init__(self, hostname, username, port=29418, keyfile=None,
-                 changes_dbs={}, queues_dbs={}):
-        self.hostname = hostname
-        self.username = username
-        self.port = port
-        self.keyfile = keyfile
-        self.event_queue = queues_dbs[hostname]
+class FakeGerritConnection(zuul.connection.gerrit.GerritConnection):
+    def __init__(self, connection_name, connection_config,
+                 changes_db=None, queues_db=None):
+        self.connection_name = connection_name
+        self.connection_config = connection_config
+        if 'server' not in self.connection_config:
+            raise Exception('server is required for gerrit connections in '
+                            '%s' % self.connection_name)
+        if 'user' not in self.connection_config:
+            raise Exception('user is required for gerrit connections in '
+                            '%s' % self.connection_name)
+
+        self.user = self.connection_config.get('user')
+        self.server = self.connection_config.get('server')
+        self.port = self.connection_config.get('port', 29418)
+        self.keyfile = self.connection_config.get('keyfile', None)
+        self.username = 'jenkins'
+        self.event_queue = queues_db
         self.fixture_dir = os.path.join(FIXTURE_DIR, 'gerrit')
         self.change_number = 0
-        self.changes = changes_dbs[hostname]
+        self.changes = changes_db
         self.queries = []
+
+        self.baseurl = self.connection_config.get('baseurl',
+                                                  'https://%s' % self.server)
 
     def addFakeChange(self, project, branch, subject, status='NEW'):
         self.change_number += 1
@@ -419,7 +433,7 @@ class FakeGerrit(object):
             # from checking what happens before this event is triggered. If a
             # job needs to see what happens they can add their own verified
             # event into the queue.
-            change.addApproval(category, value, username=self.username)
+            change.addApproval(category, value, username=self.user)
         change.messages.append(message)
 
         if 'submit' in action:
@@ -475,17 +489,6 @@ class FakeURLOpener(object):
             ret += '%04x%s' % (len(r) + 4, r)
         ret += '0000'
         return ret
-
-
-class FakeGerritSource(zuul.source.gerrit.GerritSource):
-    name = 'gerrit'
-
-    def __init__(self, upstream_root, *args):
-        super(FakeGerritSource, self).__init__(*args)
-        self.upstream_root = upstream_root
-
-    def getGitUrl(self, project):
-        return os.path.join(self.upstream_root, project.name)
 
 
 class FakeStatsd(threading.Thread):
@@ -909,11 +912,17 @@ class ZuulTestCase(testtools.TestCase):
         self.merge_server = zuul.merger.server.MergeServer(self.config)
         self.merge_server.start()
 
-        self.sched = zuul.scheduler.Scheduler()
+        self.sched = zuul.scheduler.Scheduler(self.config)
 
         self.useFixture(fixtures.MonkeyPatch('swiftclient.client.Connection',
                                              FakeSwiftClientConnection))
         self.swift = zuul.lib.swift.Swift(self.config)
+
+        # Set up connections and give out the default gerrit for testing
+        self._configure_connections()
+        self.sched._registerConnections(self.connections)
+        self.fake_gerrit = self.connections['gerrit']['_legacy']
+        self.fake_gerrit.upstream_root = self.upstream_root
 
         def URLOpenerFactory(*args, **kw):
             if isinstance(args[0], urllib2.Request):
@@ -924,31 +933,6 @@ class ZuulTestCase(testtools.TestCase):
         old_urlopen = urllib2.urlopen
         urllib2.urlopen = URLOpenerFactory
 
-        self.smtp_messages = []
-
-        def FakeSMTPFactory(*args, **kw):
-            args = [self.smtp_messages] + list(args)
-            return FakeSMTP(*args, **kw)
-
-        # Set a changes database so multiple FakeGerrit's can report back to
-        # a virtual canonical database given by the configured hostname
-        self.gerrit_queues_dbs = {
-            self.config.get('gerrit', 'server'): Queue.Queue()
-        }
-        self.gerrit_changes_dbs = {
-            self.config.get('gerrit', 'server'): {}
-        }
-
-        def FakeGerritFactory(*args, **kw):
-            kw['changes_dbs'] = self.gerrit_changes_dbs
-            kw['queues_dbs'] = self.gerrit_queues_dbs
-            return FakeGerrit(*args, **kw)
-
-        self.useFixture(fixtures.MonkeyPatch('zuul.lib.gerrit.Gerrit',
-                                             FakeGerritFactory))
-
-        self.useFixture(fixtures.MonkeyPatch('smtplib.SMTP', FakeSMTPFactory))
-
         self.launcher = zuul.launcher.gearman.Gearman(self.config, self.sched,
                                                       self.swift)
         self.merge_client = zuul.merger.client.MergeClient(
@@ -956,13 +940,6 @@ class ZuulTestCase(testtools.TestCase):
 
         self.sched.setLauncher(self.launcher)
         self.sched.setMerger(self.merge_client)
-
-        self.register_sources()
-        self.fake_gerrit = self.gerrit_source.gerrit
-        self.fake_gerrit.upstream_root = self.upstream_root
-
-        self.register_triggers()
-        self.register_reporters()
 
         self.webapp = zuul.webapp.WebApp(self.sched, port=0)
         self.rpc = zuul.rpclistener.RPCListener(self.config, self.sched)
@@ -980,38 +957,70 @@ class ZuulTestCase(testtools.TestCase):
         self.addCleanup(self.assertFinalState)
         self.addCleanup(self.shutdown)
 
-    def register_sources(self):
-        # Register the available sources
-        self.gerrit_source = FakeGerritSource(
-            self.upstream_root, self.config, self.sched)
-        self.gerrit_source.replication_timeout = 1.5
-        self.gerrit_source.replication_retry_interval = 0.5
+    def _configure_connections(self):
+        # Register connections from the config
 
-        self.sched.registerSource(self.gerrit_source)
+        import zuul.connection.smtp
 
-    def register_triggers(self):
-        # Register the available triggers
-        self.gerrit_trigger = zuul.trigger.gerrit.GerritTrigger(
-            self.fake_gerrit, self.config, self.sched, self.gerrit_source)
-        self.gerrit_trigger.replication_timeout = 1.5
-        self.gerrit_trigger.replication_retry_interval = 0.5
+        self.smtp_messages = []
 
-        self.sched.registerTrigger(self.gerrit_trigger)
-        self.timer = zuul.trigger.timer.TimerTrigger(self.config, self.sched)
-        self.sched.registerTrigger(self.timer)
-        self.zuultrigger = zuul.trigger.zuultrigger.ZuulTrigger(self.config,
-                                                                self.sched)
-        self.sched.registerTrigger(self.zuultrigger)
+        def FakeSMTPFactory(*args, **kw):
+            args = [self.smtp_messages] + list(args)
+            return FakeSMTP(*args, **kw)
 
-    def register_reporters(self):
-        # Register the available reporters
-        self.sched.registerReporter(
-            zuul.reporter.gerrit.GerritReporter(self.fake_gerrit))
-        self.smtp_reporter = zuul.reporter.smtp.SMTPReporter(
-            self.config.get('smtp', 'default_from'),
-            self.config.get('smtp', 'default_to'),
-            self.config.get('smtp', 'server'))
-        self.sched.registerReporter(self.smtp_reporter)
+        self.useFixture(fixtures.MonkeyPatch('smtplib.SMTP', FakeSMTPFactory))
+
+        # Set a changes database so multiple FakeGerrit's can report back to
+        # a virtual canonical database given by the configured hostname
+        self.gerrit_changes_dbs = {}
+        self.gerrit_queues_dbs = {}
+        self.connections = {'gerrit': {}, 'smtp': {}}
+
+        for section_name in self.config.sections():
+            con_match = re.match(r'^connection ([\'\"]?)(.*)(\1)$',
+                                 section_name, re.I)
+            if not con_match:
+                continue
+            con_name = con_match.group(2)
+            con_config = dict(self.config.items(section_name))
+
+            if 'driver' not in con_config:
+                raise Exception("No driver specified for connection %s."
+                                % con_name)
+
+            con_driver = con_config['driver']
+
+            # TODO(jhesketh): load the required class automatically
+            if con_driver == 'gerrit':
+                self.gerrit_changes_dbs[con_name] = {}
+                self.gerrit_queues_dbs[con_name] = Queue.Queue()
+                self.connections[con_driver][con_name] = FakeGerritConnection(
+                    con_name, con_config,
+                    changes_db=self.gerrit_changes_dbs[con_name],
+                    queues_db=self.gerrit_queues_dbs[con_name]
+                )
+            elif con_driver == 'smtp':
+                self.connections[con_driver][con_name] = \
+                    zuul.connection.smtp.SMTPConnection(con_name, con_config)
+            else:
+                raise Exception("Unknown driver, %s, for connection %s"
+                                % (con_config['driver'], con_name))
+
+        # If the [gerrit] or [smtp] sections still exist, load them in as the
+        # legacy connection.
+
+        if 'gerrit' in self.config.sections():
+            self.gerrit_changes_dbs['_legacy'] = {}
+            self.gerrit_queues_dbs['_legacy'] = Queue.Queue()
+            self.connections['gerrit']['_legacy'] = FakeGerritConnection(
+                '_legacy', dict(self.config.items('gerrit')),
+                changes_db=self.gerrit_changes_dbs['_legacy'],
+                queues_db=self.gerrit_queues_dbs['_legacy'])
+
+        if 'smtp' in self.config.sections():
+            self.connections['smtp']['_legacy'] = \
+                zuul.connection.smtp.SMTPConnection(
+                    '_legacy', dict(self.config.items('smtp')))
 
     def setup_config(self):
         """Per test config object. Override to set different config."""
@@ -1035,8 +1044,6 @@ class ZuulTestCase(testtools.TestCase):
         self.merge_server.join()
         self.merge_client.stop()
         self.worker.shutdown()
-        self.gerrit_trigger.stop()
-        self.timer.stop()
         self.sched.stop()
         self.sched.join()
         self.statsd.stop()
