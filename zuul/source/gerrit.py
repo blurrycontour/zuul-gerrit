@@ -14,8 +14,6 @@
 
 import logging
 import time
-import urllib2
-from zuul.lib import gerrit
 from zuul.model import Change, Ref, NullChange
 from zuul.source import BaseSource
 
@@ -26,70 +24,11 @@ class GerritSource(BaseSource):
     replication_timeout = 300
     replication_retry_interval = 5
 
-    def __init__(self, config, sched):
+    def __init__(self):
         self._change_cache = {}
-        self.sched = sched
-        self.config = config
-        self.server = config.get('gerrit', 'server')
-        if config.has_option('gerrit', 'baseurl'):
-            self.baseurl = config.get('gerrit', 'baseurl')
-        else:
-            self.baseurl = 'https://%s' % self.server
-        user = config.get('gerrit', 'user')
-        if config.has_option('gerrit', 'sshkey'):
-            sshkey = config.get('gerrit', 'sshkey')
-        else:
-            sshkey = None
-        if config.has_option('gerrit', 'port'):
-            port = int(config.get('gerrit', 'port'))
-        else:
-            port = 29418
-        self.gerrit = gerrit.Gerrit(self.server, user, port, sshkey)
-        self.gerrit.startWatching()
 
     def _getInfoRefs(self, project):
-        url = "%s/p/%s/info/refs?service=git-upload-pack" % (
-            self.baseurl, project)
-        try:
-            data = urllib2.urlopen(url).read()
-        except:
-            self.log.error("Cannot get references from %s" % url)
-            raise  # keeps urllib2 error informations
-        ret = {}
-        read_headers = False
-        read_advertisement = False
-        if data[4] != '#':
-            raise Exception("Gerrit repository does not support "
-                            "git-upload-pack")
-        i = 0
-        while i < len(data):
-            if len(data) - i < 4:
-                raise Exception("Invalid length in info/refs")
-            plen = int(data[i:i + 4], 16)
-            i += 4
-            # It's the length of the packet, including the 4 bytes of the
-            # length itself, unless it's null, in which case the length is
-            # not included.
-            if plen > 0:
-                plen -= 4
-            if len(data) - i < plen:
-                raise Exception("Invalid data in info/refs")
-            line = data[i:i + plen]
-            i += plen
-            if not read_headers:
-                if plen == 0:
-                    read_headers = True
-                continue
-            if not read_advertisement:
-                read_advertisement = True
-                continue
-            if plen == 0:
-                # The terminating null
-                continue
-            line = line.strip()
-            revision, ref = line.split()
-            ret[ref] = revision
-        return ret
+        self.connection._getInfoRefs(project)
 
     def getRefSha(self, project, ref):
         refs = {}
@@ -119,7 +58,7 @@ class GerritSource(BaseSource):
             # means it's merged.
             return True
 
-        data = self.gerrit.query(change.number)
+        data = self.connection.query(change.number)
         change._data = data
         change.is_merged = self._isMerged(change)
         if not head:
@@ -238,7 +177,7 @@ class GerritSource(BaseSource):
         query = "project:%s status:open" % (project.name,)
         self.log.debug("Running query %s to get project open changes" %
                        (query,))
-        data = self.gerrit.simpleQuery(query)
+        data = self.connection.simpleQuery(query)
         changes = []
         for record in data[:-1]:
             try:
@@ -253,7 +192,7 @@ class GerritSource(BaseSource):
     def updateChange(self, change):
         self.log.info("Updating information for %s,%s" %
                       (change.number, change.patchset))
-        data = self.gerrit.query(change.number)
+        data = self.connection.query(change.number)
         change._data = data
 
         if change.patchset is None:
@@ -309,17 +248,7 @@ class GerritSource(BaseSource):
         return change
 
     def getGitUrl(self, project):
-        server = self.config.get('gerrit', 'server')
-        user = self.config.get('gerrit', 'user')
-        if self.config.has_option('gerrit', 'port'):
-            port = int(self.config.get('gerrit', 'port'))
-        else:
-            port = 29418
-        url = 'ssh://%s@%s:%s/%s' % (user, server, port, project.name)
-        return url
+        self.connection.getGitUrl(project)
 
     def getGitwebUrl(self, project, sha=None):
-        url = '%s/gitweb?p=%s.git' % (self.baseurl, project)
-        if sha:
-            url += ';a=commitdiff;h=' + sha
-        return url
+        self.connection.getGitwebUrl(project, sha)

@@ -53,3 +53,9 @@ class BaseSource(object):
 
     def getGitwebUrl(self, project, sha=None):
         raise NotImplementedError()
+
+    def registerScheduler(self, sched):
+        self.sched = sched
+
+    def registerConnection(self, connection):
+        self.connection = connection

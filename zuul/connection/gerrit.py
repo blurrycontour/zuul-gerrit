@@ -21,6 +21,9 @@ from six.moves import queue as Queue
 import paramiko
 import logging
 import pprint
+import urllib2
+
+from zuul.connection import BaseConnection
 
 
 class GerritWatcher(threading.Thread):
@@ -81,24 +84,38 @@ class GerritWatcher(threading.Thread):
             self._run()
 
 
-class Gerrit(object):
-    log = logging.getLogger("gerrit.Gerrit")
+class GerritConnection(BaseConnection):
+    name = 'gerrit'
+    log = logging.getLogger("connection.gerrit")
 
-    def __init__(self, hostname, username, port=29418, keyfile=None):
-        self.username = username
-        self.hostname = hostname
-        self.port = port
-        self.keyfile = keyfile
+    def __init__(self, connection_name, connection_config):
+
+        super(GerritConnection, self).__init__(connection_name,
+                                               connection_config)
+        if 'server' not in self.connection_config:
+            raise Exception('server is required for gerrit connections in '
+                            '%s' % self.connection_name)
+        if 'user' not in self.connection_config:
+            raise Exception('user is required for gerrit connections in '
+                            '%s' % self.connection_name)
+
+        self.user = self.connection_config.get('user')
+        self.server = self.connection_config.get('server')
+        self.port = int(self.connection_config.get('port', 29418))
+        self.keyfile = self.connection_config.get('keyfile', None)
         self.watcher_thread = None
         self.event_queue = None
         self.client = None
+
+        self.baseurl = self.connection_config.get('baseurl',
+                                                  'https://%s' % self.server)
 
     def startWatching(self):
         self.event_queue = Queue.Queue()
         self.watcher_thread = GerritWatcher(
             self,
-            self.username,
-            self.hostname,
+            self.user,
+            self.server,
             self.port,
             keyfile=self.keyfile)
         self.watcher_thread.start()
@@ -165,8 +182,8 @@ class Gerrit(object):
         client = paramiko.SSHClient()
         client.load_system_host_keys()
         client.set_missing_host_key_policy(paramiko.WarningPolicy())
-        client.connect(self.hostname,
-                       username=self.username,
+        client.connect(self.server,
+                       username=self.user,
                        port=self.port,
                        key_filename=self.keyfile)
         self.client = client
@@ -193,3 +210,58 @@ class Gerrit(object):
         if ret:
             raise Exception("Gerrit error executing %s" % command)
         return (out, err)
+
+    def _getInfoRefs(self, project):
+        url = "%s/p/%s/info/refs?service=git-upload-pack" % (
+            self.baseurl, project)
+        try:
+            data = urllib2.urlopen(url).read()
+        except:
+            self.log.error("Cannot get references from %s" % url)
+            raise  # keeps urllib2 error informations
+        ret = {}
+        read_headers = False
+        read_advertisement = False
+        if data[4] != '#':
+            raise Exception("Gerrit repository does not support "
+                            "git-upload-pack")
+        i = 0
+        while i < len(data):
+            if len(data) - i < 4:
+                raise Exception("Invalid length in info/refs")
+            plen = int(data[i:i + 4], 16)
+            i += 4
+            # It's the length of the packet, including the 4 bytes of the
+            # length itself, unless it's null, in which case the length is
+            # not included.
+            if plen > 0:
+                plen -= 4
+            if len(data) - i < plen:
+                raise Exception("Invalid data in info/refs")
+            line = data[i:i + plen]
+            i += plen
+            if not read_headers:
+                if plen == 0:
+                    read_headers = True
+                continue
+            if not read_advertisement:
+                read_advertisement = True
+                continue
+            if plen == 0:
+                # The terminating null
+                continue
+            line = line.strip()
+            revision, ref = line.split()
+            ret[ref] = revision
+        return ret
+
+    def getGitUrl(self, project):
+        url = 'ssh://%s@%s:%s/%s' % (self.user, self.server, self.port,
+                                     project.name)
+        return url
+
+    def getGitwebUrl(self, project, sha=None):
+        url = '%s/gitweb?p=%s.git' % (self.baseurl, project)
+        if sha:
+            url += ';a=commitdiff;h=' + sha
+        return url

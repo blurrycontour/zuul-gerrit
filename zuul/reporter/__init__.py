@@ -37,3 +37,9 @@ class BaseReporter(object):
     def postConfig(self):
         """Run tasks after configuration is reloaded"""
         raise NotImplementedError()
+
+    def registerScheduler(self, sched):
+        self.sched = sched
+
+    def registerConnection(self, connection):
+        self.connection = connection
