@@ -16,6 +16,24 @@
       "revId": "7d4f4909d2413007ee68fd734b5659e5d8a72c6a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa98f980_48b8d8e8",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 12100
+      },
+      "writtenOn": "2014-09-16T16:48:16Z",
+      "side": 1,
+      "message": "Hmm, no idea how I missed the indentation... ok!\n\nBut where the check should be done has confused me. zuul.model.TriggerEvent isn\u0027t used at all in the validator right now. Are you saying we should instantiate a TriggerEvent and call a method on that? Or are you saying that there should be a function in the gerrit_trigger dictionary in LayoutValidator which we can call? Just want to make sure I get this in the right place :)",
+      "parentUuid": "fa98f980_2fec7e92",
+      "revId": "7d4f4909d2413007ee68fd734b5659e5d8a72c6a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
