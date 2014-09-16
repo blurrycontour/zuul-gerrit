@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa98f980_efd8b620",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-09-16T15:25:01Z",
+      "side": 1,
+      "message": "Zuul should never crash because of something like this.  If that\u0027s the case, we need to fix that.  However, I suspect you just mean to say that it logs a traceback.",
+      "revId": "16698876d8b5456623c39e3e7280cd57aeb0a54e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
