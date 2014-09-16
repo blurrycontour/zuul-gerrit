@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa98f980_6f6cc6d1",
+        "filename": "tests/base.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-09-16T15:13:44Z",
+      "side": 1,
+      "message": "Why are you making this change?  I understand that the code names are gone, replaced by just the regular names, however, both of them are completely user defined and arbitrary anyway.\n\nAt any rate, if we agree that it should be done, I think it should be a separate change, as it is quite substantial, and it requires that each line in this (large) diff be evaluated for whether it\u0027s just changing names, or actually changing the functionality described in the commit message.",
+      "revId": "0be7abdad39995940bea4fee6c27caf226bbcc53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa98f980_8f71eaaa",
+        "filename": "tests/base.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 400,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-09-16T15:13:44Z",
+      "side": 1,
+      "message": "Why not aprv?",
+      "revId": "0be7abdad39995940bea4fee6c27caf226bbcc53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa98f980_af65cee3",
+        "filename": "tests/base.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 415,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-09-16T15:13:44Z",
+      "side": 1,
+      "message": "I\u0027m trying to determine whether this is an improvement or not.  On the one hand, yes it behaves more like gerrit and may be convenient.  On the other hand, in the tests we set up a lot of simulations where we want to have full control over the environment.  I\u0027d like to know if anything changes because of this, but I\u0027m distracted by the spelling change.",
+      "revId": "0be7abdad39995940bea4fee6c27caf226bbcc53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
