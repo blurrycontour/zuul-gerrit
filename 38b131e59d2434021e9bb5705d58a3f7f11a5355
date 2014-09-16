@@ -1,0 +1,276 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa98f980_9cae8a97",
+        "filename": "tests/base.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1198,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-09-16T15:01:13Z",
+      "side": 1,
+      "message": "E125",
+      "revId": "38b131e59d2434021e9bb5705d58a3f7f11a5355",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa98f980_7ca9e68f",
+        "filename": "tests/test_cloner.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 481,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-09-16T15:01:13Z",
+      "side": 1,
+      "message": "Should remove the line.",
+      "revId": "38b131e59d2434021e9bb5705d58a3f7f11a5355",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa98f980_bc798e32",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-09-16T15:01:13Z",
+      "side": 1,
+      "message": "E125",
+      "revId": "38b131e59d2434021e9bb5705d58a3f7f11a5355",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa98f980_7c8006f8",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-09-16T15:01:13Z",
+      "side": 1,
+      "message": "E125",
+      "revId": "38b131e59d2434021e9bb5705d58a3f7f11a5355",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa98f980_dcc81278",
+        "filename": "zuul/launcher/gearman.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-09-16T15:01:13Z",
+      "side": 1,
+      "message": "E125",
+      "revId": "38b131e59d2434021e9bb5705d58a3f7f11a5355",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa98f980_fcc5d65c",
+        "filename": "zuul/launcher/gearman.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-09-16T15:01:13Z",
+      "side": 1,
+      "message": "E125",
+      "revId": "38b131e59d2434021e9bb5705d58a3f7f11a5355",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa98f980_9c85aa09",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-09-16T15:01:13Z",
+      "side": 1,
+      "message": "E125",
+      "revId": "38b131e59d2434021e9bb5705d58a3f7f11a5355",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa98f980_3c9f5e67",
+        "filename": "zuul/lib/swift.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-09-16T15:01:13Z",
+      "side": 1,
+      "message": "E125",
+      "revId": "38b131e59d2434021e9bb5705d58a3f7f11a5355",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa98f980_bc926e56",
+        "filename": "zuul/model.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 917,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-09-16T15:01:13Z",
+      "side": 1,
+      "message": "E125",
+      "revId": "38b131e59d2434021e9bb5705d58a3f7f11a5355",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa98f980_dc8f322d",
+        "filename": "zuul/model.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1033,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-09-16T15:01:13Z",
+      "side": 1,
+      "message": "E125",
+      "revId": "38b131e59d2434021e9bb5705d58a3f7f11a5355",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa98f980_fc9cf66c",
+        "filename": "zuul/model.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1133,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-09-16T15:01:13Z",
+      "side": 1,
+      "message": "E125",
+      "revId": "38b131e59d2434021e9bb5705d58a3f7f11a5355",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa98f980_1c9a9a6e",
+        "filename": "zuul/model.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1146,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-09-16T15:01:13Z",
+      "side": 1,
+      "message": "E125",
+      "revId": "38b131e59d2434021e9bb5705d58a3f7f11a5355",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa98f980_3c867e17",
+        "filename": "zuul/model.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1156,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-09-16T15:01:13Z",
+      "side": 1,
+      "message": "E125",
+      "revId": "38b131e59d2434021e9bb5705d58a3f7f11a5355",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa98f980_5c8b421e",
+        "filename": "zuul/model.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1166,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-09-16T15:01:13Z",
+      "side": 1,
+      "message": "E125",
+      "revId": "38b131e59d2434021e9bb5705d58a3f7f11a5355",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa98f980_5ca422b9",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1310,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-09-16T15:01:13Z",
+      "side": 1,
+      "message": "E125",
+      "revId": "38b131e59d2434021e9bb5705d58a3f7f11a5355",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa98f980_1cc37a58",
+        "filename": "zuul/webapp.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-09-16T15:01:13Z",
+      "side": 1,
+      "message": "E125",
+      "revId": "38b131e59d2434021e9bb5705d58a3f7f11a5355",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
