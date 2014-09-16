@@ -34,6 +34,23 @@
       "revId": "a04a8e73ca11710072e27fe056cdd413ea83d727",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa98f980_4fa462b9",
+        "filename": "doc/source/cloner.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-09-16T15:21:52Z",
+      "side": 1,
+      "message": "I like the idea that we should just do what git does.  What if we accepted either a path or file URL, just like git, and parsed the URL to determine its filesystem location (which we need to do in order to test whether the dir exists)?",
+      "revId": "a04a8e73ca11710072e27fe056cdd413ea83d727",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
