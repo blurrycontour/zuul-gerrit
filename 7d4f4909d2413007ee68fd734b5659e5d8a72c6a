@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa98f980_2fec7e92",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-09-16T15:27:31Z",
+      "side": 1,
+      "message": "This should be indented with 4 spaces.\n\nThis kind of check should not be done in the validator; it should be part of the Gerrit trigger.\nEg, the validator should call a method on the trigger that validates the trigger configuration.",
+      "revId": "7d4f4909d2413007ee68fd734b5659e5d8a72c6a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
