@@ -1850,6 +1850,67 @@ class TestScheduler(ZuulTestCase):
         self.assertIn('project-test1', status_jobs)
         self.assertIn('project-test2', status_jobs)
 
+    def test_webapp_change_filter(self):
+        "Test that we can filter to only certain changes in the webapp."
+        self.worker.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('CRVW', 2)
+        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
+        B.addApproval('CRVW', 2)
+        self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
+        self.waitUntilSettled()
+
+        port = self.webapp.server.socket.getsockname()[1]
+
+        # Test we filtered out change by change id
+        # (should return change A [1,1])
+        print 'go1'
+        req = urllib2.Request(
+            "http://localhost:%s/status.json?change_filter=1,1" % port)
+        f = urllib2.urlopen(req)
+        data = f.read()
+
+        data = json.loads(data)
+        for p in data['pipelines']:
+            for q in p['change_queues']:
+                for head in q['heads']:
+                    for change in head:
+                        self.assertEqual(change['id'], '1,1')
+
+        # Test we filtered out change by project name
+        # (should return change B [2,1])
+        print 'go2'
+        req = urllib2.Request(
+            "http://localhost:%s/status.json?change_filter=project1" % port)
+        f = urllib2.urlopen(req)
+        data = f.read()
+
+        data = json.loads(data)
+        for p in data['pipelines']:
+            for q in p['change_queues']:
+                for head in q['heads']:
+                    for change in head:
+                        self.assertEqual(change['id'], '2,1')
+
+        # Test we filtered out changes by project name
+        # (should match both projects, therefore return A and B)
+        print 'go3'
+        req = urllib2.Request(
+            "http://localhost:%s/status.json?change_filter=project" % port)
+        f = urllib2.urlopen(req)
+        data = f.read()
+
+        data = json.loads(data)
+        for p in data['pipelines']:
+            for q in p['change_queues']:
+                if q['name'] == 'check':
+                    self.assertEqual(2, len(q))
+
+        self.worker.hold_jobs_in_build = False
+        self.worker.release()
+        self.waitUntilSettled()
+
     def test_merging_queues(self):
         "Test that transitively-connected change queues are merged"
         self.config.set('zuul', 'layout_config',

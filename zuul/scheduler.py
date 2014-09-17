@@ -898,7 +898,7 @@ class Scheduler(threading.Thread):
             return
         pipeline.manager.onMergeCompleted(event)
 
-    def formatStatusJSON(self):
+    def formatStatusJSON(self, change_filter=None):
         data = {}
 
         data['zuul_version'] = self.zuul_version
@@ -924,7 +924,7 @@ class Scheduler(threading.Thread):
         pipelines = []
         data['pipelines'] = pipelines
         for pipeline in self.layout.pipelines.values():
-            pipelines.append(pipeline.formatStatusJSON())
+            pipelines.append(pipeline.formatStatusJSON(change_filter))
         return json.dumps(data)
 
 

@@ -246,11 +246,12 @@ class Pipeline(object):
             items.extend(shared_queue.queue)
         return items
 
-    def formatStatusJSON(self):
+    def formatStatusJSON(self, change_filter=None):
         j_pipeline = dict(name=self.name,
                           description=self.description)
         j_queues = []
         j_pipeline['change_queues'] = j_queues
+
         for queue in self.queues:
             j_queue = dict(name=queue.name)
             j_queues.append(j_queue)
@@ -260,6 +261,15 @@ class Pipeline(object):
 
             j_changes = []
             for e in queue.queue:
+                if change_filter and change_filter != '':
+                    # We have a change filter, we need to check if this change
+                    # should be skipped
+                    if (str(change_filter) not in str(e.change._id()) and
+                            str(change_filter) not in
+                            str(e.change.project.name)):
+                        # the given filter does not match a change id or
+                        # project. Skip this change.
+                        continue
                 if not e.item_ahead:
                     if j_changes:
                         j_queue['heads'].append(j_changes)

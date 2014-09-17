@@ -13,6 +13,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import cgi
 import logging
 import threading
 import time
@@ -44,17 +45,32 @@ class WebApp(threading.Thread):
     def app(self, request):
         if request.path != '/status.json':
             raise webob.exc.HTTPNotFound()
+
+        change_filter = None
+        parameters = cgi.parse_qs(request.query_string)
+        if 'change_filter' in parameters:
+            change_filter = cgi.escape(parameters['change_filter'][0])
+
+        update_cache = False
         if (not self.cache or
             (time.time() - self.cache_time) > self.cache_expiry):
+            update_cache = True
+
+        if update_cache or change_filter:
             try:
-                self.cache = self.scheduler.formatStatusJSON()
-                # Call time.time() again because formatting above may take
-                # longer than the cache timeout.
-                self.cache_time = time.time()
+                status_json = self.scheduler.formatStatusJSON(change_filter)
             except:
                 self.log.exception("Exception formatting status:")
                 raise
-        response = webob.Response(body=self.cache,
+            if update_cache:
+                self.cache = status_json
+                # Call time.time() again because formatting above may take
+                # longer than the cache timeout.
+                self.cache_time = time.time()
+        else:
+            status_json = self.cache
+
+        response = webob.Response(body=status_json,
                                   content_type='application/json')
         response.headers['Access-Control-Allow-Origin'] = '*'
         response.last_modified = self.cache_time
