@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "fa98f980_1c3a68e7",
+        "filename": "tests/base.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-09-18T05:34:33Z",
+      "side": 1,
+      "message": "This change is trying to bring out test suite closer into line with how we are using gerrit since those are typically the scenarios our tests are written for. I agree that it is arbitrary, but this - in my mine - makes it clearer given our workflow.\n\nI agree it makes it a large change, but if possible I\u0027d prefer not to have to refactor it out given the large dependency chain in these patchsets. If you need me to though I can :-)",
+      "parentUuid": "fa98f980_6f6cc6d1",
+      "revId": "0be7abdad39995940bea4fee6c27caf226bbcc53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa98f980_8f71eaaa",
         "filename": "tests/base.py",
         "patchSetId": 7
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "fa98f980_3c3f2cd8",
+        "filename": "tests/base.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 400,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-09-18T05:34:33Z",
+      "side": 1,
+      "message": "See above.",
+      "parentUuid": "fa98f980_8f71eaaa",
+      "revId": "0be7abdad39995940bea4fee6c27caf226bbcc53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa98f980_af65cee3",
         "filename": "tests/base.py",
         "patchSetId": 7
@@ -47,6 +83,24 @@
       "writtenOn": "2014-09-16T15:13:44Z",
       "side": 1,
       "message": "I\u0027m trying to determine whether this is an improvement or not.  On the one hand, yes it behaves more like gerrit and may be convenient.  On the other hand, in the tests we set up a lot of simulations where we want to have full control over the environment.  I\u0027d like to know if anything changes because of this, but I\u0027m distracted by the spelling change.",
+      "revId": "0be7abdad39995940bea4fee6c27caf226bbcc53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa98f980_370d8538",
+        "filename": "tests/base.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 415,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-09-18T05:34:33Z",
+      "side": 1,
+      "message": "In my opinion the improvement is that we keep our fake gerrit tracking the votes/reviews as would the real gerrit. This allows us to see an appropriate review was sent back by zuul when using a different gerrit user for results etc.",
+      "parentUuid": "fa98f980_af65cee3",
       "revId": "0be7abdad39995940bea4fee6c27caf226bbcc53",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
