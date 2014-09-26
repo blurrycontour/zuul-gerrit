@@ -13,7 +13,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import copy
 import logging
+import re
 import threading
 import time
 from paste import httpserver
@@ -41,9 +43,29 @@ class WebApp(threading.Thread):
     def stop(self):
         self.server.server_close()
 
+    def _status_for_change(self, rev):
+        status = []
+        for pipeline in self.cache['pipelines']:
+            for change_queue in pipeline['change_queues']:
+                for head in change_queue['heads']:
+                    for change in head:
+                        if change['id'] == rev:
+                            status.append(copy.deepcopy(change))
+        return status
+
+    def _normalize_path(self, path):
+        if path == '/status.json':
+            return "status"
+        m = re.match('/(\d+,\d+).json', path)
+        if m:
+            return m.group(1)
+        return None
+
     def app(self, request):
-        if request.path != '/status.json':
+        path = self._normalize_path(request.path)
+        if path is None:
             raise webob.exc.HTTPNotFound()
+
         if (not self.cache or
             (time.time() - self.cache_time) > self.cache_expiry):
             try:
@@ -54,8 +76,18 @@ class WebApp(threading.Thread):
             except:
                 self.log.exception("Exception formatting status:")
                 raise
-        response = webob.Response(body=self.cache,
-                                  content_type='application/json')
+
+        if path == 'status':
+            response = webob.Response(body=self.cache,
+                                      content_type='application/json')
+        else:
+            status = self._status_for_change(path)
+            if status:
+                response = webob.Response(body=status,
+                                          content_type='application/json')
+            else:
+                raise webob.exc.HTTPNotFound()
+
         response.headers['Access-Control-Allow-Origin'] = '*'
         response.last_modified = self.cache_time
         return response
