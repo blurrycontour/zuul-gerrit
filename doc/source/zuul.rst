@@ -924,7 +924,7 @@ return ``SUCCESS`` immediately.  This can be useful if you require
 that all changes be processed by a pipeline but a project has no jobs
 that can be run on it.
 
-.. seealso:: The OpenStack Zuul configuration for a comprehensive example: https://github.com/openstack-infra/config/blob/master/modules/openstack_project/files/zuul/layout.yaml
+.. seealso:: The OpenStack Zuul configuration for a comprehensive example: https://github.com/openstack-infra/project-config/blob/master/zuul/layout.yaml
 
 Project Templates
 """""""""""""""""
