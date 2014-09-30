@@ -14,6 +14,7 @@
 # under the License.
 
 import copy
+import cgi
 import json
 import logging
 import re
@@ -35,8 +36,13 @@ The supported urls are:
  - /status.json (backwards compatibility): same as /status
  - /status/change/X,Y: return status just for gerrit change X,Y
 
-When returning status for a single gerrit change you will get an 
-array of changes, they will not include the queue structure.
+In addition, /status can be filtered by parameters that will return an
+extracted subset of changes.
+
+ - project=PROJECTNAME
+
+In both the individual status, and filtering cases the changes are
+returned as a simple array, and not in the pipeline structure.
 """
 
 
@@ -84,6 +90,12 @@ class WebApp(threading.Thread):
             return change['id'] == rev
         return self._changes_by_func(func)
 
+    def _filter_by_project(self, project):
+        """Return changes that match a project exactly."""
+        def func(change):
+            return change['project'] == project
+        return self._changes_by_func(func)
+
     def _normalize_path(self, path):
         # support legacy status.json as well as new /status
         if path == '/status.json' or path == '/status':
@@ -91,6 +103,12 @@ class WebApp(threading.Thread):
         m = re.match('/status/change/(\d+,\d+)$', path)
         if m:
             return m.group(1)
+        return None
+
+    def _parse_project(self, qs):
+        parameters = cgi.parse_qs(qs)
+        if 'project' in parameters:
+            return parameters['project'][0]
         return None
 
     def app(self, request):
@@ -110,7 +128,12 @@ class WebApp(threading.Thread):
                 raise
 
         if path == 'status':
-            response = webob.Response(body=self.cache,
+            project = self._parse_project(request.query_string)
+            if project:
+                body = self._filter_by_project(project)
+            else:
+                body = self.cache
+            response = webob.Response(body=body,
                                       content_type='application/json')
         else:
             status = self._status_for_change(path)

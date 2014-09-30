@@ -83,3 +83,13 @@ class TestWebapp(ZuulTestCase):
 
         self.assertEqual(1, len(data), data)
         self.assertEqual("org/project1", data[0]['project'], data)
+
+    def test_webapp_filter_project(self):
+        # can we filter by project
+        req = urllib2.Request(
+            "http://localhost:%s/status?project=org/project" % self.port)
+        f = urllib2.urlopen(req)
+        data = json.loads(f.read())
+
+        self.assertEqual(1, len(data), data)
+        self.assertEqual("org/project", data[0]['project'], data)
