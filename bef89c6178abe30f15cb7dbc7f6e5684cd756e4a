@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa201ad_0764da20",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 927,
+      "author": {
+        "id": 6609
+      },
+      "writtenOn": "2014-09-30T17:40:26Z",
+      "side": 1,
+      "message": "I don\u0027t love that we\u0027re referencing github (rather than our own, open source, git.o.o) in this documentation, but there are a few places to fix so we can do that with another patch.",
+      "revId": "bef89c6178abe30f15cb7dbc7f6e5684cd756e4a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
