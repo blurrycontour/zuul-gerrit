@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa201ad_969565e6",
+        "filename": "zuul/webapp.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-09-30T11:43:29Z",
+      "side": 1,
+      "message": "stray white space",
+      "revId": "70c4460586915696215067e2874eda5911e4763d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
