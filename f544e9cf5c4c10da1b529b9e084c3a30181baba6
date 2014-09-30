@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "baa201ad_81f1a4cf",
+        "filename": "tests/test_webapp.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 2750
+      },
+      "writtenOn": "2014-09-30T10:00:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "baa201ad_6c775f03",
+      "revId": "f544e9cf5c4c10da1b529b9e084c3a30181baba6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "baa201ad_0c609331",
         "filename": "tests/test_webapp.py",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2014-09-30T03:01:32Z",
       "side": 1,
       "message": "So long as we\u0027re separating the TestWebApp stuff there are a few others that should be moved in here.\n\ntests.test_scheduler.TestScheduler.test_json_status\n\nProbably not this one but it uses the webapp..\ntests.test_scheduler.TestScheduler.test_timer",
+      "revId": "f544e9cf5c4c10da1b529b9e084c3a30181baba6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa201ad_a1eea8ea",
+        "filename": "tests/test_webapp.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 2750
+      },
+      "writtenOn": "2014-09-30T10:00:34Z",
+      "side": 1,
+      "message": "I think that\u0027s fine, but I\u0027d say that\u0027s a follow on patch.",
+      "parentUuid": "baa201ad_0c609331",
       "revId": "f544e9cf5c4c10da1b529b9e084c3a30181baba6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "baa201ad_611da00f",
+        "filename": "tests/test_webapp.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 2750
+      },
+      "writtenOn": "2014-09-30T10:00:34Z",
+      "side": 1,
+      "message": "So... honestly, the setup was pulled out because the tests were separated before. I can separate them again, in which case I don\u0027t think putting this in every function would make sense.",
+      "parentUuid": "baa201ad_4c51bb61",
+      "revId": "f544e9cf5c4c10da1b529b9e084c3a30181baba6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "baa201ad_acc78711",
         "filename": "tests/test_webapp.py",
         "patchSetId": 3
@@ -64,6 +118,24 @@
       "writtenOn": "2014-09-30T03:01:32Z",
       "side": 1,
       "message": "could be separate tests",
+      "revId": "f544e9cf5c4c10da1b529b9e084c3a30181baba6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa201ad_811a8415",
+        "filename": "tests/test_webapp.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 2750
+      },
+      "writtenOn": "2014-09-30T10:00:34Z",
+      "side": 1,
+      "message": "Agreed.",
+      "parentUuid": "baa201ad_acc78711",
       "revId": "f544e9cf5c4c10da1b529b9e084c3a30181baba6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "baa201ad_e1d8b055",
+        "filename": "tests/test_webapp.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 2750
+      },
+      "writtenOn": "2014-09-30T10:00:34Z",
+      "side": 1,
+      "message": "Do you have an example of what would do that? I\u0027m not sure testing cgi itself is useful.",
+      "parentUuid": "baa201ad_0ceed388",
+      "revId": "f544e9cf5c4c10da1b529b9e084c3a30181baba6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "baa201ad_2c02b73e",
         "filename": "zuul/webapp.py",
         "patchSetId": 3
@@ -98,6 +188,24 @@
       "writtenOn": "2014-09-30T03:01:32Z",
       "side": 1,
       "message": "probably want to escape this",
+      "revId": "f544e9cf5c4c10da1b529b9e084c3a30181baba6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa201ad_21e39808",
+        "filename": "zuul/webapp.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 2750
+      },
+      "writtenOn": "2014-09-30T10:00:34Z",
+      "side": 1,
+      "message": "why?",
+      "parentUuid": "baa201ad_2c02b73e",
       "revId": "f544e9cf5c4c10da1b529b9e084c3a30181baba6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
