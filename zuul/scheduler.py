@@ -238,15 +238,17 @@ class Scheduler(threading.Thread):
             pipeline.source = self.triggers[conf_pipeline.get('source', 'gerrit')]
             precedence = model.PRECEDENCE_MAP[conf_pipeline.get('precedence')]
             pipeline.precedence = precedence
-            pipeline.failure_message = conf_pipeline.get('failure-message',
-                                                         "Build failed.")
+            pipeline.failure_message = conf_pipeline.get(
+                'failure-message',
+                "Build failed. (% pipeline)" % conf_pipeline['name'])
             pipeline.merge_failure_message = conf_pipeline.get(
                 'merge-failure-message', "Merge Failed.\n\nThis change was "
                 "unable to be automatically merged with the current state of "
                 "the repository. Please rebase your change and upload a new "
                 "patchset.")
-            pipeline.success_message = conf_pipeline.get('success-message',
-                                                         "Build succeeded.")
+            pipeline.success_message = conf_pipeline.get(
+                'success-message',
+                "Build succeeded. (% pipeline)" % conf_pipeline['name'])
             pipeline.footer_message = conf_pipeline.get('footer-message', "")
             pipeline.dequeue_on_new_patchset = conf_pipeline.get(
                 'dequeue-on-new-patchset', True)
