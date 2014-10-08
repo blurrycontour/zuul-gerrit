@@ -18,9 +18,6 @@ class BaseSource(object):
 
     Defines the exact public methods that must be supplied."""
 
-    def __init__(self, config, sched):
-        raise NotImplementedError()
-
     def getRefSha(self, project, ref):
         raise NotImplementedError()
 
@@ -53,3 +50,9 @@ class BaseSource(object):
 
     def getGitwebUrl(self, project, sha=None):
         raise NotImplementedError()
+
+    def registerScheduler(self, sched):
+        self.sched = sched
+
+    def registerConnection(self, connection):
+        self.connection = connection

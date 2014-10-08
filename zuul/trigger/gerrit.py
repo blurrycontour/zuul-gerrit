@@ -23,22 +23,20 @@ class GerritEventConnector(threading.Thread):
 
     log = logging.getLogger("zuul.GerritEventConnector")
 
-    def __init__(self, gerrit, sched, trigger, source):
+    def __init__(self, trigger):
         super(GerritEventConnector, self).__init__()
         self.daemon = True
-        self.gerrit = gerrit
-        self.sched = sched
         self.trigger = trigger
-        self.source = source
         self._stopped = False
 
     def stop(self):
         self._stopped = True
-        self.gerrit.addEvent(None)
+        self.trigger.connection.addEvent(None)
 
     def _handleEvent(self):
-        data = self.gerrit.getEvent()
+        data = self.trigger.connection.getEvent()
         if self._stopped:
+            self.trigger.connection.eventDone()
             return
         event = TriggerEvent()
         event.type = data.get('type')
@@ -86,12 +84,12 @@ class GerritEventConnector(threading.Thread):
             # Call _getChange for the side effect of updating the
             # cache.  Note that this modifies Change objects outside
             # the main thread.
-            self.source._getChange(event.change_number,
-                                   event.patch_number,
-                                   refresh=True)
+            self.trigger.source._getChange(event.change_number,
+                                           event.patch_number,
+                                           refresh=True)
 
-        self.sched.addEvent(event)
-        self.gerrit.eventDone()
+        self.trigger.sched.addEvent(event)
+        self.trigger.connection.eventDone()
 
     def run(self):
         while True:
@@ -109,22 +107,21 @@ class GerritTrigger(BaseTrigger):
     replication_timeout = 300
     replication_retry_interval = 5
 
-    def __init__(self, gerrit, config, sched, source):
-        self.sched = sched
-        # TODO(jhesketh): Make 'gerrit' come from a connection (rather than the
-        #                 source)
-        # TODO(jhesketh): Remove the requirement for a gerrit source (currently
-        #                 it is needed so on a trigger event the cache is
-        #                 updated. However if we share a connection object the
-        #                 cache could be stored there)
-        self.config = config
-        self.gerrit_connector = GerritEventConnector(gerrit, sched, self,
-                                                     source)
-        self.gerrit_connector.start()
+    def __init__(self):
+        super(GerritTrigger, self).__init__()
+        self.gerrit_connector = None
 
     def stop(self):
-        self.gerrit_connector.stop()
-        self.gerrit_connector.join()
+        self._stop_event_connection()
+
+    def _stop_event_connector(self):
+        if self.gerrit_connector:
+            self.gerrit_connector.stop()
+            self.gerrit_connector.join()
+
+    def _start_event_connector(self):
+        self.gerrit_connector = GerritEventConnector(self)
+        self.gerrit_connector.start()
 
     def getEventFilters(self, trigger_conf):
         def toList(item):
@@ -173,4 +170,6 @@ class GerritTrigger(BaseTrigger):
         return efilters
 
     def postConfig(self):
-        pass
+        # Restart the gerrit connection after reconfigure
+        self._stop_event_connector()
+        self._start_event_connector()
