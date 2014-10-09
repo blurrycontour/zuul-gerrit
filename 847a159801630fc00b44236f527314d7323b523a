@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa201ad_8b671725",
+        "filename": "doc/source/reporters.rst",
+        "patchSetId": 19
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1849
+      },
+      "writtenOn": "2014-10-09T23:03:01Z",
+      "side": 1,
+      "message": "how would this work for periodic jobs? they are not run on specific patches.  I think this should take refs as well",
+      "revId": "847a159801630fc00b44236f527314d7323b523a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
