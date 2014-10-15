@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa201ad_b18596d0",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-10-15T22:00:20Z",
+      "side": 1,
+      "message": "%s perhaps?",
+      "revId": "1fffed0fc7f859ac14e73e67d47ce88fddd48030",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa201ad_d16dba33",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2014-10-15T22:00:20Z",
+      "side": 1,
+      "message": "\"",
+      "revId": "1fffed0fc7f859ac14e73e67d47ce88fddd48030",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
