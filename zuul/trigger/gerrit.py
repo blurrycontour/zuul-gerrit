@@ -14,10 +14,7 @@
 
 import logging
 import threading
-import time
-import urllib2
-from zuul.lib import gerrit
-from zuul.model import TriggerEvent, Change, Ref, NullChange
+from zuul.model import TriggerEvent
 
 
 class GerritEventConnector(threading.Thread):
@@ -25,12 +22,13 @@ class GerritEventConnector(threading.Thread):
 
     log = logging.getLogger("zuul.GerritEventConnector")
 
-    def __init__(self, gerrit, sched, trigger):
+    def __init__(self, gerrit, sched, trigger, source):
         super(GerritEventConnector, self).__init__()
         self.daemon = True
         self.gerrit = gerrit
         self.sched = sched
         self.trigger = trigger
+        self.source = source
         self._stopped = False
 
     def stop(self):
@@ -87,9 +85,9 @@ class GerritEventConnector(threading.Thread):
             # Call _getChange for the side effect of updating the
             # cache.  Note that this modifies Change objects outside
             # the main thread.
-            self.trigger._getChange(event.change_number,
-                                    event.patch_number,
-                                    refresh=True)
+            self.source._getChange(event.change_number,
+                                   event.patch_number,
+                                   refresh=True)
 
         self.sched.addEvent(event)
         self.gerrit.eventDone()
@@ -106,311 +104,26 @@ class GerritEventConnector(threading.Thread):
 
 class Gerrit(object):
     name = 'gerrit'
-    log = logging.getLogger("zuul.Gerrit")
+    log = logging.getLogger("zuul.trigger.Gerrit")
     replication_timeout = 300
     replication_retry_interval = 5
 
-    def __init__(self, config, sched):
-        self._change_cache = {}
+    def __init__(self, gerrit, config, sched, source):
         self.sched = sched
+        # TODO(jhesketh): Make 'gerrit' come from a connection (rather than the
+        #                 source)
+        # TODO(jhesketh): Remove the requirement for a gerrit source (currently
+        #                 it is needed so on a trigger event the cache is
+        #                 updated. However if we share a connection object the
+        #                 cache could be stored there)
         self.config = config
-        self.server = config.get('gerrit', 'server')
-        if config.has_option('gerrit', 'baseurl'):
-            self.baseurl = config.get('gerrit', 'baseurl')
-        else:
-            self.baseurl = 'https://%s' % self.server
-        user = config.get('gerrit', 'user')
-        if config.has_option('gerrit', 'sshkey'):
-            sshkey = config.get('gerrit', 'sshkey')
-        else:
-            sshkey = None
-        if config.has_option('gerrit', 'port'):
-            port = int(config.get('gerrit', 'port'))
-        else:
-            port = 29418
-        self.gerrit = gerrit.Gerrit(self.server, user, port, sshkey)
-        self.gerrit.startWatching()
-        self.gerrit_connector = GerritEventConnector(
-            self.gerrit, sched, self)
+        self.gerrit_connector = GerritEventConnector(gerrit, sched, self,
+                                                     source)
         self.gerrit_connector.start()
 
     def stop(self):
         self.gerrit_connector.stop()
         self.gerrit_connector.join()
 
-    def _getInfoRefs(self, project):
-        url = "%s/p/%s/info/refs?service=git-upload-pack" % (
-            self.baseurl, project)
-        try:
-            data = urllib2.urlopen(url).read()
-        except:
-            self.log.error("Cannot get references from %s" % url)
-            raise  # keeps urllib2 error informations
-        ret = {}
-        read_headers = False
-        read_advertisement = False
-        if data[4] != '#':
-            raise Exception("Gerrit repository does not support "
-                            "git-upload-pack")
-        i = 0
-        while i < len(data):
-            if len(data) - i < 4:
-                raise Exception("Invalid length in info/refs")
-            plen = int(data[i:i + 4], 16)
-            i += 4
-            # It's the length of the packet, including the 4 bytes of the
-            # length itself, unless it's null, in which case the length is
-            # not included.
-            if plen > 0:
-                plen -= 4
-            if len(data) - i < plen:
-                raise Exception("Invalid data in info/refs")
-            line = data[i:i + plen]
-            i += plen
-            if not read_headers:
-                if plen == 0:
-                    read_headers = True
-                continue
-            if not read_advertisement:
-                read_advertisement = True
-                continue
-            if plen == 0:
-                # The terminating null
-                continue
-            line = line.strip()
-            revision, ref = line.split()
-            ret[ref] = revision
-        return ret
-
-    def getRefSha(self, project, ref):
-        refs = {}
-        try:
-            refs = self._getInfoRefs(project)
-        except:
-            self.log.exception("Exception looking for ref %s" %
-                               ref)
-        sha = refs.get(ref, '')
-        return sha
-
-    def waitForRefSha(self, project, ref, old_sha=''):
-        # Wait for the ref to show up in the repo
-        start = time.time()
-        while time.time() - start < self.replication_timeout:
-            sha = self.getRefSha(project.name, ref)
-            if old_sha != sha:
-                return True
-            time.sleep(self.replication_retry_interval)
-        return False
-
-    def isMerged(self, change, head=None):
-        self.log.debug("Checking if change %s is merged" % change)
-        if not change.number:
-            self.log.debug("Change has no number; considering it merged")
-            # Good question.  It's probably ref-updated, which, ah,
-            # means it's merged.
-            return True
-
-        data = self.gerrit.query(change.number)
-        change._data = data
-        change.is_merged = self._isMerged(change)
-        if not head:
-            return change.is_merged
-        if not change.is_merged:
-            return False
-
-        ref = 'refs/heads/' + change.branch
-        self.log.debug("Waiting for %s to appear in git repo" % (change))
-        if self.waitForRefSha(change.project, ref, change._ref_sha):
-            self.log.debug("Change %s is in the git repo" %
-                           (change))
-            return True
-        self.log.debug("Change %s did not appear in the git repo" %
-                       (change))
-        return False
-
-    def _isMerged(self, change):
-        data = change._data
-        if not data:
-            return False
-        status = data.get('status')
-        if not status:
-            return False
-        self.log.debug("Change %s status: %s" % (change, status))
-        if status == 'MERGED':
-            return True
-        return False
-
-    def canMerge(self, change, allow_needs):
-        if not change.number:
-            self.log.debug("Change has no number; considering it merged")
-            # Good question.  It's probably ref-updated, which, ah,
-            # means it's merged.
-            return True
-        data = change._data
-        if not data:
-            return False
-        if 'submitRecords' not in data:
-            return False
-        try:
-            for sr in data['submitRecords']:
-                if sr['status'] == 'OK':
-                    return True
-                elif sr['status'] == 'NOT_READY':
-                    for label in sr['labels']:
-                        if label['status'] == 'OK':
-                            continue
-                        elif label['status'] in ['NEED', 'REJECT']:
-                            # It may be our own rejection, so we ignore
-                            if label['label'].lower() not in allow_needs:
-                                return False
-                            continue
-                        else:
-                            # IMPOSSIBLE
-                            return False
-                else:
-                    # CLOSED, RULE_ERROR
-                    return False
-        except:
-            self.log.exception("Exception determining whether change"
-                               "%s can merge:" % change)
-            return False
-        return True
-
-    def maintainCache(self, relevant):
-        # This lets the user supply a list of change objects that are
-        # still in use.  Anything in our cache that isn't in the supplied
-        # list should be safe to remove from the cache.
-        remove = []
-        for key, change in self._change_cache.items():
-            if change not in relevant:
-                remove.append(key)
-        for key in remove:
-            del self._change_cache[key]
-
     def postConfig(self):
         pass
-
-    def getChange(self, event, project):
-        if event.change_number:
-            change = self._getChange(event.change_number, event.patch_number)
-        elif event.ref:
-            change = Ref(project)
-            change.ref = event.ref
-            change.oldrev = event.oldrev
-            change.newrev = event.newrev
-            change.url = self.getGitwebUrl(project, sha=event.newrev)
-        else:
-            change = NullChange(project)
-        return change
-
-    def _getChange(self, number, patchset, refresh=False):
-        key = '%s,%s' % (number, patchset)
-        change = None
-        if key in self._change_cache:
-            change = self._change_cache.get(key)
-            if not refresh:
-                return change
-        if not change:
-            change = Change(None)
-            change.number = number
-            change.patchset = patchset
-        key = '%s,%s' % (change.number, change.patchset)
-        self._change_cache[key] = change
-        try:
-            self.updateChange(change)
-        except Exception:
-            del self._change_cache[key]
-            raise
-        return change
-
-    def getProjectOpenChanges(self, project):
-        # This is a best-effort function in case Gerrit is unable to return
-        # a particular change.  It happens.
-        query = "project:%s status:open" % (project.name,)
-        self.log.debug("Running query %s to get project open changes" %
-                       (query,))
-        data = self.gerrit.simpleQuery(query)
-        changes = []
-        for record in data[:-1]:
-            try:
-                changes.append(
-                    self._getChange(record['number'],
-                                    record['currentPatchSet']['number']))
-            except Exception:
-                self.log.exception("Unable to query change %s" %
-                                   (record.get('number'),))
-        return changes
-
-    def updateChange(self, change):
-        self.log.info("Updating information for %s,%s" %
-                      (change.number, change.patchset))
-        data = self.gerrit.query(change.number)
-        change._data = data
-
-        if change.patchset is None:
-            change.patchset = data['currentPatchSet']['number']
-
-        if 'project' not in data:
-            raise Exception("Change %s,%s not found" % (change.number,
-                                                        change.patchset))
-        change.project = self.sched.getProject(data['project'])
-        change.branch = data['branch']
-        change.url = data['url']
-        max_ps = 0
-        change.files = []
-        for ps in data['patchSets']:
-            if ps['number'] == change.patchset:
-                change.refspec = ps['ref']
-                for f in ps.get('files', []):
-                    change.files.append(f['file'])
-            if int(ps['number']) > int(max_ps):
-                max_ps = ps['number']
-        if max_ps == change.patchset:
-            change.is_current_patchset = True
-        else:
-            change.is_current_patchset = False
-
-        change.is_merged = self._isMerged(change)
-        change.approvals = data['currentPatchSet'].get('approvals', [])
-        change.open = data['open']
-        change.status = data['status']
-
-        if change.is_merged:
-            # This change is merged, so we don't need to look any further
-            # for dependencies.
-            return change
-
-        change.needs_change = None
-        if 'dependsOn' in data:
-            parts = data['dependsOn'][0]['ref'].split('/')
-            dep_num, dep_ps = parts[3], parts[4]
-            dep = self._getChange(dep_num, dep_ps)
-            if not dep.is_merged:
-                change.needs_change = dep
-
-        change.needed_by_changes = []
-        if 'neededBy' in data:
-            for needed in data['neededBy']:
-                parts = needed['ref'].split('/')
-                dep_num, dep_ps = parts[3], parts[4]
-                dep = self._getChange(dep_num, dep_ps)
-                if not dep.is_merged and dep.is_current_patchset:
-                    change.needed_by_changes.append(dep)
-
-        return change
-
-    def getGitUrl(self, project):
-        server = self.config.get('gerrit', 'server')
-        user = self.config.get('gerrit', 'user')
-        if self.config.has_option('gerrit', 'port'):
-            port = int(self.config.get('gerrit', 'port'))
-        else:
-            port = 29418
-        url = 'ssh://%s@%s:%s/%s' % (user, server, port, project.name)
-        return url
-
-    def getGitwebUrl(self, project, sha=None):
-        url = '%s/gitweb?p=%s.git' % (self.baseurl, project)
-        if sha:
-            url += ';a=commitdiff;h=' + sha
-        return url
