@@ -78,6 +78,9 @@ comment-added events):
   The target branch for the change that triggered this build.
 **ZUUL_CHANGE**
   The Gerrit change ID for the change that triggered this build.
+**ZUUL_CHANGES**
+  A "^" separated list of information on each commit included in this build.
+  Each entry takes the format "project name:branch:git refspec".
 **ZUUL_CHANGE_IDS**
   All of the Gerrit change IDs that are included in this build (useful
   when the DependentPipelineManager combines changes for testing).
