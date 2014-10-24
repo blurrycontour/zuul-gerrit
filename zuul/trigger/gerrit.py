@@ -44,6 +44,14 @@ class GerritEventConnector(threading.Thread):
         event = TriggerEvent()
         event.type = data.get('type')
         event.trigger_name = self.trigger.name
+        if event.type in ['ref-replicated', 'ref-replication-done']:
+            event.ref = data.get('ref')
+            event.project_name = data.get('project')
+            if event.type == 'ref-replicated':
+                event.replication_target = data.get('targetNode')
+                event.replication_status = data.get('status')
+            else:
+                event.replication_nodes_count = data.get('nodesCount')
         change = data.get('change')
         if change:
             event.project_name = change.get('project')
@@ -75,6 +83,8 @@ class GerritEventConnector(threading.Thread):
             'comment-added': 'author',
             'ref-updated': 'submitter',
             'reviewer-added': 'reviewer',  # Gerrit 2.5/2.6
+            'ref-replicated': None,  # Gerrit 2.9
+            'ref-replication-done': None,  # Gerrit 2.9
         }
         try:
             event.account = data.get(accountfield_from_type[event.type])
@@ -396,8 +406,10 @@ class Gerrit(object):
 
         return change
 
-    def getGitUrl(self, project):
+    def getGitUrl(self, project, push=False):
         server = self.config.get('gerrit', 'server')
+        if not push and self.config.has_option('gerrit', 'mirror'):
+            server = self.config.get('gerrit', 'mirror')
         user = self.config.get('gerrit', 'user')
         if self.config.has_option('gerrit', 'port'):
             port = int(self.config.get('gerrit', 'port'))

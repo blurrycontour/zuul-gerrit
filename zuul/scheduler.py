@@ -33,6 +33,8 @@ from model import ActionReporter, Pipeline, Project, ChangeQueue
 from model import EventFilter, ChangeishFilter
 from zuul import version as zuul_version
 
+OrderedDict = extras.try_imports(['collections.OrderedDict',
+                                  'ordereddict.OrderedDict'])
 statsd = extras.try_import('statsd.statsd')
 
 
@@ -165,6 +167,23 @@ class MergeCompletedEvent(ResultEvent):
         self.updated = updated
         self.commit = commit
 
+class AgeingLastUpdatedOrderedDict(OrderedDict):
+    """Store items in the order the keys were last added,
+    discard oldest item if maximum size is reached.
+
+    :arg int max_size: The maximum size for the dict
+    """
+
+    def __init__(self, max_size, *args, **kwds):
+       super(AgeingLastUpdatedOrderedDict, self).__init__(self, *args, **kwds)
+       self.max_size = max_size
+
+    def __setitem__(self, key, value):
+        if key in self:
+            del self[key]
+        if len(self) == self.max_size:
+            self.popitem(last=False)
+        super(AgeingLastUpdatedOrderedDict, self).__setitem__(self, key, value)
 
 class Scheduler(threading.Thread):
     log = logging.getLogger("zuul.Scheduler")
@@ -186,6 +205,7 @@ class Scheduler(threading.Thread):
 
         self.trigger_event_queue = Queue.Queue()
         self.result_event_queue = Queue.Queue()
+        self.events_waiting_for_replication = AgeingLastUpdatedOrderedDict(512)  #TODO: set from config
         self.management_event_queue = Queue.Queue()
         self.layout = model.Layout()
 
@@ -803,6 +823,61 @@ class Scheduler(threading.Thread):
         for trigger in self.triggers.values():
             trigger.maintainCache(relevant)
 
+    def _get_replication_target(self):
+        replication_target = None
+        if self.config.has_option('gerrit', 'replication_target'):
+            replication_target = self.config.get('gerrit', 'replication_target')
+        elif self.config.has_option('gerrit', 'mirror'):
+            replication_target = self.config.get('gerrit', 'mirror')
+        return replication_target
+
+    def _process_replication_if_enabled(self, event):
+        replication_target = self._get_replication_target()
+        if not replication_target:
+            if event.type in ['ref-replicated', 'ref-replication-done']:
+                return None
+            else:
+                return event
+
+        self.log.debug("Replication support enabled")
+        return self._process_replication(event)
+
+    def _queue_for_replication(self, event):
+        self.events_waiting_for_replication[ref] = event
+        self.log.debug("Queued ref %s waiting for replication, queue len %d",
+                       ref, len(self.events_waiting_for_replication))
+
+    def _process_replication(self, event):
+        ref = event.ref
+        if not ref:
+            ref = event.refspec
+
+        if event.type in ['patchset-created', 'draft-published',
+                          'change-merged', 'ref-updated']:
+            self._queue_for_replication(event)
+            return None
+        if event.type == 'ref-replication-done':  # unused, ignore
+            return None
+        if event.type != 'ref-replicated':  # unknown, pass through
+            return event
+
+        if event.replication_target != replication_target:
+            return None
+        self.log.debug("Received replication event for our mirror")
+
+        if event.replication_status == 'failed':
+            self.log.error("Replication failed for ref %s" % ref)
+            return None
+
+        try:
+            event = self.events_waiting_for_replication.pop(ref)
+        except KeyError:
+            self.log.warning("Event for ref %s not found in replication wait list" % ref)
+            return None
+
+        self.log.debug("Got event from replication queue for ref %s" % ref)
+        return event
+
     def process_event_queue(self):
         self.log.debug("Fetching trigger event")
         event = self.trigger_event_queue.get()
@@ -810,7 +885,11 @@ class Scheduler(threading.Thread):
         try:
             project = self.layout.projects.get(event.project_name)
             if not project:
-                self.log.warning("Project %s not found" % event.project_name)
+                self.log.debug("Project %s not found" % event.project_name)
+                return
+
+            event = self._process_replication_if_enabled(event)
+            if not event:
                 return
 
             for pipeline in self.layout.pipelines.values():
