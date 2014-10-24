@@ -186,6 +186,7 @@ class Scheduler(threading.Thread):
 
         self.trigger_event_queue = Queue.Queue()
         self.result_event_queue = Queue.Queue()
+        self.events_waiting_for_replication = dict()
         self.management_event_queue = Queue.Queue()
         self.layout = model.Layout()
 
@@ -803,6 +804,77 @@ class Scheduler(threading.Thread):
         for trigger in self.triggers.values():
             trigger.maintainCache(relevant)
 
+    def _get_replication_target(self):
+        replication_target = None
+        if self.config.has_option('gerrit', 'replication_target'):
+            replication_target = self.config.get('gerrit', 'replication_target')
+        elif self.config.has_option('gerrit', 'mirror'):
+            replication_target = self.config.get('gerrit', 'mirror')
+        return replication_target
+
+    def _process_replication_if_enabled(self, event):
+        replication_target = self._get_replication_target()
+        if not replication_target:
+            if event.type in ['ref-replicated', 'ref-replication-done']:
+                return None
+            else:
+                return event
+
+        self.log.debug("Replication support enabled")
+        return self._process_replication(event)
+
+    def _flush_aged_events_if_needed(self):
+        # TODO: configurable limits?
+        MAX_SIZE = 512
+        MAX_AGE = 3600
+        if len(self.events_waiting_for_replication) > MAX_SIZE:
+            to_be_deleted = []
+            limit_ts = time.time() - MAX_AGE
+            for ref, event in self.events_waiting_for_replication.iteritems():
+                if event.replication_ts < limit_ts:
+                    to_be_deleted.append(ref)
+            for ref in to_be_deleted:
+                self.log.warning("Deleting events from replication queue:",
+                        to_be_deleted)
+                del self.events_waiting_for_replication[ref]
+
+    def _queue_for_replication(self, event):
+        self._flush_aged_events_if_needed()
+        event.replication_ts = time.time()
+        self.events_waiting_for_replication[ref] = event
+        self.log.debug("Queued ref %s waiting for replication" % ref)
+
+    def _process_replication(self, event):
+        ref = event.ref
+        if not ref:
+            ref = event.refspec
+
+        if event.type in ['patchset-created', 'draft-published',
+                          'change-merged', 'ref-updated']:
+            self._queue_for_replication(event)
+            return None
+        if event.type == 'ref-replication-done':  # unused, ignore
+            return None
+        if event.type != 'ref-replicated':  # unknown, pass through
+            return event
+
+        if event.replication_target != replication_target:
+            return None
+        self.log.debug("Received replication event for our mirror")
+
+        if event.replication_status == 'failed':
+            self.log.error("Replication failed for ref %s" % ref)
+            return None
+
+        try:
+            event = self.events_waiting_for_replication.pop(ref)
+        except KeyError:
+            self.log.warning("Event for ref %s not found in replication wait list" % ref)
+            return None
+
+        self.log.debug("Got event from replication queue for ref %s" % ref)
+        return event
+
     def process_event_queue(self):
         self.log.debug("Fetching trigger event")
         event = self.trigger_event_queue.get()
@@ -810,7 +882,11 @@ class Scheduler(threading.Thread):
         try:
             project = self.layout.projects.get(event.project_name)
             if not project:
-                self.log.warning("Project %s not found" % event.project_name)
+                self.log.debug("Project %s not found" % event.project_name)
+                return
+
+            event = self._process_replication_if_enabled(event)
+            if not event:
                 return
 
             for pipeline in self.layout.pipelines.values():
