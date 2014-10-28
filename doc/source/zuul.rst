@@ -1042,6 +1042,8 @@ recheck changes for the gate and check pipelines respectively::
   ./tools/zuul-changes.py --review-host=review.openstack.org \
       http://zuul.openstack.org/ check 'recheck no bug'
 
-If you send a SIGUSR2 to the zuul-server process, Zuul will dump a stack
-trace for each running thread into its debug log. This is useful for
-tracking down deadlock or otherwise slow threads.
+If you send a SIGUSR2 to the zuul-server process, or the forked process that
+runs the Gearman daemon, Zuul will dump a stack trace for each running thread
+into its debug log. It is written under the log bucket ``zuul.stack_dump``.
+This is useful for tracking down deadlock or otherwise slow
+threads.
