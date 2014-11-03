@@ -43,6 +43,13 @@ class GerritEventConnector(threading.Thread):
             return
         event = TriggerEvent()
         event.type = data.get('type')
+        if event.type in [ 'heartbeat',
+                           'ref-replicated',
+                           'ref-replication-done' ]:
+            self.log.debug("Ignoring unsupported event: %s" % event.type)
+            self.gerrit.eventDone()
+            return
+
         event.trigger_name = self.trigger.name
         change = data.get('change')
         if change:
