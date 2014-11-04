@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a8c0949_6d2d6e46",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-11-04T09:02:54Z",
+      "side": 1,
+      "message": "You could even move that blacklist to lines above (before creating a TriggerEvent()).\n\nI would add comment that ref-replicated and ref-replication-done have been introduced by 2.9.1, for the sake of it.\n\nI could not find the heartbeat event in the code though.",
+      "revId": "6adc9aec27381a5c7da85a633aca19fff5b45f79",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a8c0949_6dd48e20",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-11-04T09:02:54Z",
+      "side": 1,
+      "message": "\"unsupported\" sounds me we need to add support for it, whereas we really don\u0027t care about those events at all.  I would rephrased the debug message to something like:\n\n \"Discarding unneeded event: %s\"",
+      "revId": "6adc9aec27381a5c7da85a633aca19fff5b45f79",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a8c0949_8dd7fa22",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-11-04T09:02:54Z",
+      "side": 1,
+      "message": "And there we log actually unsupported events that needs to be inspected/dealt with.",
+      "revId": "6adc9aec27381a5c7da85a633aca19fff5b45f79",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
