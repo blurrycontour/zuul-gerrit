@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "7a8c0949_b2ffad66",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 13718
+      },
+      "writtenOn": "2014-11-04T19:19:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a8c0949_6d2d6e46",
+      "revId": "6adc9aec27381a5c7da85a633aca19fff5b45f79",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a8c0949_6dd48e20",
         "filename": "zuul/trigger/gerrit.py",
         "patchSetId": 1
@@ -48,6 +66,24 @@
       "writtenOn": "2014-11-04T09:02:54Z",
       "side": 1,
       "message": "\"unsupported\" sounds me we need to add support for it, whereas we really don\u0027t care about those events at all.  I would rephrased the debug message to something like:\n\n \"Discarding unneeded event: %s\"",
+      "revId": "6adc9aec27381a5c7da85a633aca19fff5b45f79",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a8c0949_d202796e",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 13718
+      },
+      "writtenOn": "2014-11-04T19:19:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a8c0949_6dd48e20",
       "revId": "6adc9aec27381a5c7da85a633aca19fff5b45f79",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
