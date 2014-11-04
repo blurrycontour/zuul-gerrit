@@ -41,8 +41,18 @@ class GerritEventConnector(threading.Thread):
         data = self.gerrit.getEvent()
         if self._stopped:
             return
+        event_type = data.get('type')
+        if event_type in [
+                'heartbeat',
+                'ref-replicated', # Gerrit 2.9
+                'ref-replication-done' # Gerrit 2.9
+            ]:
+            self.log.debug("Discarding unneeded event: %s" % event_type)
+            self.gerrit.eventDone()
+            return
+
         event = TriggerEvent()
-        event.type = data.get('type')
+        event.type = event_type
         event.trigger_name = self.trigger.name
         change = data.get('change')
         if change:
