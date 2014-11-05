@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a8c0949_48ac15a1",
+        "filename": "tests/test_cloner.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 10731
+      },
+      "writtenOn": "2014-11-05T09:17:52Z",
+      "side": 1,
+      "message": "Remove this rather than commenting it out, as was done on lines 375 and 460?",
+      "range": {
+        "startLine": 331,
+        "startChar": 11,
+        "endLine": 331,
+        "endChar": 66
+      },
+      "revId": "75907b2b3d3af4bd923b72a6defb94b7becf5689",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
