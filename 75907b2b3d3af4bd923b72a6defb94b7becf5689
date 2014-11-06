@@ -22,6 +22,24 @@
       "revId": "75907b2b3d3af4bd923b72a6defb94b7becf5689",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a8c0949_7921974c",
+        "filename": "tests/test_cloner.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-11-06T09:13:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a8c0949_48ac15a1",
+      "revId": "75907b2b3d3af4bd923b72a6defb94b7becf5689",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
