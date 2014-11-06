@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a8c0949_bf567fd0",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-11-06T10:26:43Z",
+      "side": 1,
+      "message": "Our pep8 job is currently not running properly, but this line should be limited to 80cols please.",
+      "revId": "1195580a9160dd6d6ff91b5514dbe005141e453f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
