@@ -34,6 +34,24 @@
       "revId": "847a159801630fc00b44236f527314d7323b523a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a890539_4d6e39cb",
+        "filename": "doc/source/reporters.rst",
+        "patchSetId": 19
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-11-07T16:29:30Z",
+      "side": 1,
+      "message": "different reporter per pipeline should mean different table per pipeline imo.",
+      "parentUuid": "9aa7fdbe_a6ec49bc",
+      "revId": "847a159801630fc00b44236f527314d7323b523a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
