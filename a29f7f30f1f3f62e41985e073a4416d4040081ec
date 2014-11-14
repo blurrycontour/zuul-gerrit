@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a890539_de2a368f",
+        "filename": "zuul/webapp.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-11-14T13:29:15Z",
+      "side": 1,
+      "message": "In case I end up restoring this change:\n\n reponse -\u003e response",
+      "revId": "a29f7f30f1f3f62e41985e073a4416d4040081ec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
