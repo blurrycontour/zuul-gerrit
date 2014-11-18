@@ -709,6 +709,7 @@ class QueueItem(object):
         ret['project'] = changeish.project.name
         ret['enqueue_time'] = int(self.enqueue_time * 1000)
         ret['jobs'] = []
+        ret['owner'] = changeish.owner
         max_remaining = 0
         for job in self.pipeline.getJobs(changeish):
             now = time.time()
@@ -857,6 +858,7 @@ class Change(Changeish):
         self.approvals = []
         self.open = None
         self.status = None
+        self.owner = None
 
     def _id(self):
         return '%s,%s' % (self.number, self.patchset)
