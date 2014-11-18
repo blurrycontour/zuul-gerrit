@@ -1031,9 +1031,12 @@ class ZuulTestCase(testtools.TestCase):
     def ref_has_change(self, ref, change):
         path = os.path.join(self.git_root, change.project)
         repo = git.Repo(path)
-        for commit in repo.iter_commits(ref):
-            if commit.message.strip() == ('%s-1' % change.subject):
-                return True
+        try:
+            for commit in repo.iter_commits(ref):
+                if commit.message.strip() == ('%s-1' % change.subject):
+                    return True
+        except git.exc.GitCommandError:
+            pass
         return False
 
     def job_has_changes(self, *args):
