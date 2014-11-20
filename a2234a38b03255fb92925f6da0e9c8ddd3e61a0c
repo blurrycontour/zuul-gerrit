@@ -16,6 +16,24 @@
       "revId": "a2234a38b03255fb92925f6da0e9c8ddd3e61a0c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a890539_3fbc5c6c",
+        "filename": "zuul/lib/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 2750
+      },
+      "writtenOn": "2014-11-20T17:44:05Z",
+      "side": 1,
+      "message": "I believe you are correc",
+      "parentUuid": "5a890539_9f8630da",
+      "revId": "a2234a38b03255fb92925f6da0e9c8ddd3e61a0c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
