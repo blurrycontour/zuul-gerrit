@@ -19,6 +19,8 @@ import urllib2
 from zuul.lib import gerrit
 from zuul.model import TriggerEvent, Change, Ref, NullChange
 
+ZUUL_RETRY_COUNTER='zuul_retry_counter'
+
 
 class GerritEventConnector(threading.Thread):
     """Move events from Gerrit to the scheduler."""
@@ -31,6 +33,7 @@ class GerritEventConnector(threading.Thread):
         self.gerrit = gerrit
         self.sched = sched
         self.trigger = trigger
+        self._event = None
         self._stopped = False
 
     def stop(self):
@@ -38,9 +41,12 @@ class GerritEventConnector(threading.Thread):
         self.gerrit.addEvent(None)
 
     def _handleEvent(self):
-        data = self.gerrit.getEvent()
+        self._event = None
+        self._event = self.gerrit.getEvent()
         if self._stopped:
+            self.gerrit.eventDone()
             return
+        data = self._event
         event = TriggerEvent()
         event.type = data.get('type')
         event.trigger_name = self.trigger.name
@@ -101,7 +107,15 @@ class GerritEventConnector(threading.Thread):
             try:
                 self._handleEvent()
             except:
-                self.log.exception("Exception moving Gerrit event:")
+                self.log.exception("Exception moving Gerrit event.")
+                if self._event:
+                    if ZUUL_RETRY_COUNTER in self._event:
+                        self._event[ZUUL_RETRY_COUNTER] -= 1
+                    else:
+                        self._event[ZUUL_RETRY_COUNTER] = 5
+                    if self._event[ZUUL_RETRY_COUNTER] > 0:
+                        self.log.debug("Adding event back to the queue.")
+                        self.gerrit.addEvent(self._event)
 
 
 class Gerrit(object):
