@@ -116,12 +116,18 @@ class Server(zuul.cmd.ZuulApp):
             os.close(pipe_write)
             self.setup_logging('gearman_server', 'log_config')
             import gear
+            import inspect
             statsd_host = os.environ.get('STATSD_HOST')
             statsd_port = int(os.environ.get('STATSD_PORT', 8125))
+            kwargs = {}
+            if 'host' in inspect.getargspec(gear.Server.__init__).args:
+                kwargs['host'] = self.config.get('gearman', 'server')
             gear.Server(4730,
                         statsd_host=statsd_host,
                         statsd_port=statsd_port,
-                        statsd_prefix='zuul.geard')
+                        statsd_prefix='zuul.geard',
+                        **kwargs
+                       )
 
             # Keep running until the parent dies:
             pipe_read = os.fdopen(pipe_read)
