@@ -31,6 +31,7 @@ class GerritEventConnector(threading.Thread):
         self.gerrit = gerrit
         self.sched = sched
         self.trigger = trigger
+        self._event = None
         self._stopped = False
 
     def stop(self):
@@ -38,7 +39,8 @@ class GerritEventConnector(threading.Thread):
         self.gerrit.addEvent(None)
 
     def _handleEvent(self):
-        data = self.gerrit.getEvent()
+        self._event = self.gerrit.getEvent()
+        data = self._event.get('data')
         if self._stopped:
             return
         event = TriggerEvent()
@@ -102,6 +104,11 @@ class GerritEventConnector(threading.Thread):
                 self._handleEvent()
             except:
                 self.log.exception("Exception moving Gerrit event:")
+                if self._event.get('ttl') > 0:
+                    self.log.debug("Adding event back to the queue.")
+                    self.gerrit.addEvent(data = self._event.get('data'),
+                                         ttl = self._event.get('ttl') - 1)
+            self._event = None
 
 
 class Gerrit(object):

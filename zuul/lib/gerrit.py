@@ -103,8 +103,8 @@ class Gerrit(object):
             keyfile=self.keyfile)
         self.watcher_thread.start()
 
-    def addEvent(self, data):
-        return self.event_queue.put(data)
+    def addEvent(self, data, ttl=5):
+        return self.event_queue.put({'data': data, 'ttl': ttl})
 
     def getEvent(self):
         return self.event_queue.get()
