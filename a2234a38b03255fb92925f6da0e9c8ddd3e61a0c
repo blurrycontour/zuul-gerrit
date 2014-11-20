@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a890539_9f8630da",
+        "filename": "zuul/lib/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2014-11-20T17:42:48Z",
+      "side": 1,
+      "message": "I think the check for len(chunk) \u003e 1 is not correct for a similar reason that you removed the -1 slice in the other file. We are removing that last line of json output on line 159 of this file. Therefore we should loop as long as we have at least one entry in chunk.\n\nBecause chunk is a list you can just do:\n\n  while(chunk):\n\ninstead.",
+      "revId": "a2234a38b03255fb92925f6da0e9c8ddd3e61a0c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
