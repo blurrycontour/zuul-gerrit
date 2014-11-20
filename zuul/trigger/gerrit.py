@@ -31,6 +31,7 @@ class GerritEventConnector(threading.Thread):
         self.gerrit = gerrit
         self.sched = sched
         self.trigger = trigger
+        self._event = None
         self._stopped = False
 
     def stop(self):
@@ -38,7 +39,10 @@ class GerritEventConnector(threading.Thread):
         self.gerrit.addEvent(None)
 
     def _handleEvent(self):
-        data = self.gerrit.getEvent()
+        self._event = self.gerrit.getEvent()
+        if 'zuulTimeToLive' not in self._event.keys():
+            self._event['zuulTimeToLive'] = 5
+        data = self._event
         if self._stopped:
             return
         event = TriggerEvent()
@@ -102,6 +106,11 @@ class GerritEventConnector(threading.Thread):
                 self._handleEvent()
             except:
                 self.log.exception("Exception moving Gerrit event:")
+                if self._event['zuulTimeToLive'] > 0:
+                    self.log.debug("Adding event back to the queue.")
+                    self._event['zuulTimeToLive'] -= 1
+                    self.gerrit.addEvent(self._event)
+            self._event = None
 
 
 class Gerrit(object):
