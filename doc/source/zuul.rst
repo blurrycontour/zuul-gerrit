@@ -784,7 +784,11 @@ each job as it builds a list from the project specification.
 **branch (optional)**
   This job should only be run on matching branches.  This field is
   treated as a regular expression and multiple branches may be
-  listed.
+  listed. In case the job has been triggered by a ``ref-updated`` event,
+  the match is made against the Gerrit provided ref:
+
+  * the bare ref for branch names (e.g., ``master``)
+  * the full ref names for other kinds of refs (e.g., ``refs/tags/foo``)
 
 **files (optional)**
   This job should only be run if at least one of the files involved in
