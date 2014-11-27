@@ -23,6 +23,9 @@ class BaseTrigger(object):
     def stop(self):
         raise NotImplementedError()
 
+    def getEventFilters(self, trigger_conf):
+        raise NotImplementedError()
+
     def postConfig(self):
         raise NotImplementedError()
 
