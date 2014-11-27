@@ -366,7 +366,7 @@ class FakeChange(object):
 
 class FakeGerrit(object):
     def __init__(self, *args, **kw):
-        self.event_queue = Queue.Queue()
+        self.event_queue = kw.get('event_queue', Queue.Queue())
         self.fixture_dir = os.path.join(FIXTURE_DIR, 'gerrit')
         self.change_number = 0
         self.changes = {}
@@ -413,6 +413,9 @@ class FakeGerrit(object):
         return l
 
     def startWatching(self, *args, **kw):
+        pass
+
+    def stopWatching(self, *args, **kw):
         pass
 
 

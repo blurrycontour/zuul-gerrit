@@ -12,3 +12,4 @@ config
 doc/build/*
 zuul/versioninfo
 dist/
+.idea/
