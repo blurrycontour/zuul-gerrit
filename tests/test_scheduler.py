@@ -634,9 +634,9 @@ class TestScheduler(ZuulTestCase):
         self.fake_gerrit.addEvent(B.addApproval('APRV', 1))
         self.waitUntilSettled()
 
-        self.log.debug("len %s" % self.gerrit_source._change_cache.keys())
+        self.log.debug("len %s" % self.fake_gerrit._change_cache.keys())
         # there should still be changes in the cache
-        self.assertNotEqual(len(self.gerrit_source._change_cache.keys()), 0)
+        self.assertNotEqual(len(self.fake_gerrit._change_cache.keys()), 0)
 
         self.worker.hold_jobs_in_build = False
         self.worker.release()
@@ -1290,7 +1290,7 @@ class TestScheduler(ZuulTestCase):
         "Test that the merger works with large changes after a repack"
         # https://bugs.launchpad.net/zuul/+bug/1078946
         # This test assumes the repo is already cloned; make sure it is
-        url = self.sched.sources['gerrit'].getGitUrl(
+        url = self.fake_gerrit.getGitUrl(
             self.sched.layout.projects['org/project1'])
         self.merge_server.merger.addProject('org/project1', url)
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
@@ -2801,3 +2801,26 @@ For CI problems and help debugging, contact ci@example.org"""
             self.getJobFromHistory('experimental-project-test').result,
             'SUCCESS')
         self.assertEqual(A.reported, 1)
+
+    def test_gerrit_pipeline_credentials_multiple_users(self):
+        "Test supplying a different user to a pipeline to report to gerrit"
+        # TODO(jhesketh): Rewrite this with different connections
+        return
+        self.config.set('zuul', 'layout_config',
+                        'tests/fixtures/layout-gerrit-pipelines.yaml')
+        self.sched.reconfigure(self.config)
+        self.registerJobs()
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        verified_by = []
+        for approval in A.patchsets[-1]['approvals']:
+            if approval['type'] == 'verified':
+                verified_by.append(approval['by']['username'])
+
+        # jenkins and another_user should have both posted a verified approval
+        # back to gerrit
+        self.assertIn('jenkins', verified_by)
+        self.assertIn('another_user', verified_by)

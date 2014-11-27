@@ -22,9 +22,7 @@ class ZuulTrigger(BaseTrigger):
     name = 'zuul'
     log = logging.getLogger("zuul.ZuulTrigger")
 
-    def __init__(self, config, sched):
-        self.sched = sched
-        self.config = config
+    def __init__(self):
         self._handle_parent_change_enqueued_events = False
         self._handle_project_change_merged_events = False
 
@@ -79,7 +77,7 @@ class ZuulTrigger(BaseTrigger):
                     "%s in %s" % (change, pipeline))
 
     def _createProjectChangeMergedEvents(self, change):
-        changes = self.sched.sources['gerrit'].getProjectOpenChanges(
+        changes = self.source.getProjectOpenChanges(
             change.project)
         for open_change in changes:
             self._createProjectChangeMergedEvent(open_change)

@@ -88,10 +88,13 @@ class RPCListener(object):
         event = model.TriggerEvent()
         errors = ''
 
-        trigger = self.sched.triggers.get(args['trigger'])
-        if trigger:
+        # TODO(jhesketh): This assumes the default connection '_legacy'.
+        # We should probably also take a connection name parameter from
+        # rpcclient
+        try:
+            self.sched._getConnectionPair('trigger', args['trigger'])
             event.trigger_name = args['trigger']
-        else:
+        except KeyError:
             errors += 'Invalid trigger: %s\n' % (args['trigger'],)
 
         project = self.sched.layout.projects.get(args['project'])
