@@ -20,26 +20,39 @@ import logging
 import os
 import sys
 
+import extras
+
 import zuul.cmd
 import zuul.lib.cloner
 
-ZUUL_ENV_SUFFIXES = (
-    'branch',
-    'change',
-    'patchset',
+OrderedDict = extras.try_imports(['collections.OrderedDict',
+                                  'ordereddict.OrderedDict'])
+
+ZUUL_ENV_SUFFIXES = OrderedDict()
+ZUUL_ENV_SUFFIXES['commons'] = set([
+    'commit',
     'pipeline',
     'project',
     'ref',
     'url',
-)
-
+])
+ZUUL_ENV_SUFFIXES['change'] = set([
+    'branch',
+    'change',
+    'patchset',
+])
+ZUUL_ENV_SUFFIXES['ref'] = set([
+    'oldrev',
+    'newrev',
+])
 
 class Cloner(zuul.cmd.ZuulApp):
     log = logging.getLogger("zuul.Cloner")
 
-    def parse_arguments(self):
+    def parse_arguments(self,args):
         """Parse command line arguments and returns argparse structure"""
         parser = argparse.ArgumentParser(
+            prog='zuul-cloner',
             description='Zuul Project Gating System Cloner.')
         parser.add_argument('-m', '--map', dest='clone_map_file',
                             help='specifiy clone map file')
@@ -81,26 +94,46 @@ class Cloner(zuul.cmd.ZuulApp):
             )
 
         zuul_env = parser.add_argument_group(
-            'zuul environnement',
-            'Let you override $ZUUL_* environment variables.'
+            'Zuul parameters',
+            "Let you override $ZUUL_* environment variables. Requires all "
+            "parameters from 'common' and either 'change' or 'ref' parameters."
         )
-        for zuul_suffix in ZUUL_ENV_SUFFIXES:
-            env_name = 'ZUUL_%s' % zuul_suffix.upper()
-            zuul_env.add_argument(
-                '--zuul-%s' % zuul_suffix, metavar='$' + env_name,
-                default=os.environ.get(env_name)
-            )
+        for param_group in ZUUL_ENV_SUFFIXES.keys():
+            sub_group = parser.add_argument_group(param_group)
+            for zuul_suffix in ZUUL_ENV_SUFFIXES[param_group]:
+                env_name = 'ZUUL_%s' % zuul_suffix.upper()
+                sub_group.add_argument(
+                    '--zuul-%s' % zuul_suffix, metavar='$' + env_name,
+                    default=os.environ.get(env_name)
+                )
 
-        args = parser.parse_args()
+        args = parser.parse_args(args)
 
         # Validate ZUUL_* arguments
-        zuul_missing = [zuul_opt for zuul_opt, val in vars(args).items()
-                        if zuul_opt.startswith('zuul') and val is None]
-        if zuul_missing:
-            parser.error(("Some Zuul parameters are not set:\n\t%s\n"
-                          "Define them either via environment variables or "
-                          "using options above." %
-                          "\n\t".join(sorted(zuul_missing))))
+        zuul_params = set([zuul_opt[5:] for zuul_opt, val in vars(args).items()
+                           if zuul_opt.startswith('zuul') and val is not None])
+
+        commons = ZUUL_ENV_SUFFIXES['commons']
+        change = ZUUL_ENV_SUFFIXES['change']
+        ref = ZUUL_ENV_SUFFIXES['ref']
+
+        ref_params = (zuul_params - commons) & ref
+        change_params  = (zuul_params - commons) & change
+        if ref_params and change_params:
+            parser.error("Can not mix change and refupdate parameters")
+
+        if zuul_params != (commons | ref) and zuul_params != (commons | change):
+            if ref_params:
+                missing = (ref | commons) - zuul_params
+            elif change_params:
+                missing = (change | commons) - zuul_params
+            else:
+                missing = ['See --help for for list of parameters applying to either change of ref events']
+
+            parser.error("Some Zuul parameters are not set.\n"
+                         "Define them either via environment variables or "
+                         "using options above.\n\t%s" % (
+                             "\n\t".join(sorted(missing))))
         self.args = args
 
     def setup_logging(self, color=False, verbose=False):
@@ -129,7 +162,7 @@ class Cloner(zuul.cmd.ZuulApp):
                 logging.getLevelName(logging.CRITICAL))
 
     def main(self):
-        self.parse_arguments()
+        self.parse_arguments(sys.argv)
         self.setup_logging(color=self.args.color, verbose=self.args.verbose)
         project_branches = {}
         if self.args.project_branch:
