@@ -24,11 +24,6 @@ class GerritReporter(BaseReporter):
     name = 'gerrit'
     log = logging.getLogger("zuul.reporter.gerrit.Reporter")
 
-    def __init__(self, gerrit):
-        """Set up the reporter."""
-        # TODO: make default_gerrit come from a connection
-        self.default_gerrit = gerrit
-
     def report(self, source, change, message, params):
         """Send a message to gerrit."""
         self.log.debug("Report change %s, params %s, message: %s" %
@@ -36,8 +31,9 @@ class GerritReporter(BaseReporter):
         changeid = '%s,%s' % (change.number, change.patchset)
         change._ref_sha = source.getRefSha(change.project.name,
                                            'refs/heads/' + change.branch)
-        return self.default_gerrit.review(
-            change.project.name, changeid, message, params)
+
+        return self.connection.review(change.project.name, changeid, message,
+                                      params)
 
     def getSubmitAllowNeeds(self, params):
         """Get a list of code review labels that are allowed to be
