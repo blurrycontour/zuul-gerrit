@@ -22,10 +22,18 @@ class BaseTrigger(object):
     """Base class for triggers.
 
     Defines the exact public methods that must be supplied."""
-
     @abc.abstractmethod
-    def __init__(self, *args, **kwargs):
-        """Constructor."""
+    def __init__(self, trigger_config={}):
+        self.trigger_config = trigger_config
+
+    def registerScheduler(self, sched):
+        self.sched = sched
+
+    def registerConnection(self, connection):
+        self.connection = connection
+
+    def registerConfig(self, config):
+        self.config = config
 
     def stop(self):
         """Stop the trigger."""
@@ -39,7 +47,7 @@ class BaseTrigger(object):
         """Called after config is loaded."""
         pass
 
-    def onChangeMerged(self, change):
+    def onChangeMerged(self, change, source):
         """Called when a change has been merged."""
         pass
 

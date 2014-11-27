@@ -24,9 +24,19 @@ class BaseReporter(object):
     Defines the exact public methods that must be supplied.
     """
 
-    @abc.abstractmethod
-    def __init__(self, *args, **kwargs):
-        # TODO(jhesketh): Fix *args to just a connection
+    def __init__(self, reporter_config={}):
+        self.reporter_config = reporter_config
+
+    def registerScheduler(self, sched):
+        self.sched = sched
+
+    def registerConnection(self, connection):
+        self.connection = connection
+
+    def registerConfig(self, config):
+        self.config = config
+
+    def stop(self):
         pass
 
     @abc.abstractmethod
@@ -40,3 +50,6 @@ class BaseReporter(object):
         this reporter itself is likely to set before submitting.
         """
         return []
+
+    def postConfig(self):
+        """Run tasks after configuration is reloaded"""
