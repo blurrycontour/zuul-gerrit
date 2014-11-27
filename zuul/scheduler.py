@@ -58,20 +58,20 @@ def deep_format(obj, paramdict):
     return ret
 
 
-def _callDriverMethod(driver_list, method, *args, **kwargs):
+def _callDriverMethod(driver, method, *args, **kwargs):
     require_implemented = False
     if 'require_implemented' in kwargs:
         require_implemented = kwargs['require_implemented']
         del kwargs['require_implemented']
 
-    results = {}
-    for dname, driver in driver_list.items():
-        try:
-            results[dname] = getattr(driver, method)(*args, **kwargs)
-        except (NotImplementedError, AttributeError):
-            if require_implemented:
-                raise
-    return results
+    result = None
+    try:
+        result = getattr(driver, method)(*args, **kwargs)
+    except (NotImplementedError, AttributeError):
+        if require_implemented:
+            raise
+
+    return result
 
 
 class MergeFailure(Exception):
@@ -185,7 +185,7 @@ class MergeCompletedEvent(ResultEvent):
 class Scheduler(threading.Thread):
     log = logging.getLogger("zuul.Scheduler")
 
-    def __init__(self):
+    def __init__(self, config):
         threading.Thread.__init__(self)
         self.daemon = True
         self.wake_event = threading.Event()
@@ -196,10 +196,15 @@ class Scheduler(threading.Thread):
         self._stopped = False
         self.launcher = None
         self.merger = None
-        self.sources = dict()
+        self.connections = dict()
+        # Despite triggers being part of the pipeline, there is one trigger set
+        # per scheduler. The pipeline handles the trigger filters but since
+        # the events are handled by the schedule itself it needs to handle
+        # the loading of the triggers.
+        # self.triggers['connection_name'] = triggerObject
         self.triggers = dict()
-        self.reporters = dict()
-        self.config = None
+        # self.connection_pairs = {'trigger': {}, 'source': {}, 'reporter': {}}
+        self.config = config
 
         self.trigger_event_queue = Queue.Queue()
         self.result_event_queue = Queue.Queue()
@@ -210,11 +215,82 @@ class Scheduler(threading.Thread):
         self.last_reconfigured = None
 
     def stop(self):
+        self._unloadDrivers()
         self._stopped = True
         self.wake_event.set()
 
     def testConfig(self, config_path):
         return self._parseConfig(config_path)
+
+    def _registerConnections(self, connections):
+        self.connections = connections
+        for connection_name, connection in self.connections.items():
+            connection.registerScheduler(self)
+            connection.connect()
+
+    def _unloadDrivers(self):
+        for trigger in self.triggers.values():
+            _callDriverMethod(trigger, 'stop')
+        for pipeline in self.layout.pipelines.values():
+            _callDriverMethod(pipeline.source, 'stop')
+            for action in ['start_actions', 'success_actions',
+                           'failure_actions', 'merge_failure_actions']:
+                for action_reporter in pipeline.__getattribute__(action):
+                    _callDriverMethod(action_reporter.reporter,
+                                      'stop')
+
+    def _getDriver(self, dtype, connection_name, driver_config={}):
+        # Instantiate a driver such as a trigger, source or reporter
+        # TODO(jhesketh): Make this list dynamic or use entrypoints etc.
+        # Stevedore was not a good fit here due to the nature of triggers.
+        # Specifically we don't want to load a trigger per a pipeline as one
+        # trigger can listen to a stream (from gerrit, for example) and the
+        # scheduler decides which eventfilter to use. As such we want to load
+        # trigger+connection pairs uniquely.
+        drivers = {
+            'source': {
+                'gerrit': 'zuul.source.gerrit:GerritSource',
+            },
+            'trigger': {
+                'gerrit': 'zuul.trigger.gerrit:GerritTrigger',
+                'timer': 'zuul.trigger.timer:TimerTrigger',
+                'zuul': 'zuul.trigger.zuultrigger:ZuulTrigger',
+            },
+            'reporter': {
+                'gerrit': 'zuul.reporter.gerrit:GerritReporter',
+                'smtp': 'zuul.reporter.smtp:SMTPReporter',
+            },
+        }
+
+        # TODO(jhesketh): Check the connection_name exists
+        if connection_name in self.connections.keys():
+            driver_name = self.connections[connection_name].name
+        else:
+            # In some cases a driver may not be related to a connection. For
+            # example, the 'timer' or 'zuul' triggers.
+            driver_name = connection_name
+        driver = drivers[dtype][driver_name].split(':')
+        driver_instance = getattr(
+            __import__(driver[0], fromlist=['']), driver[1])(driver_config)
+
+        _callDriverMethod(driver_instance, 'registerScheduler', self)
+        _callDriverMethod(driver_instance, 'registerConfig', self.config)
+
+        if connection_name in self.connections.keys():
+            _callDriverMethod(driver_instance,
+                              'registerConnection',
+                              self.connections[connection_name])
+
+        return driver_instance
+
+    def _getSourceDriver(self, connection_name):
+        return self._getDriver('source', connection_name)
+
+    def _getReporterDriver(self, connection_name, driver_config={}):
+        return self._getDriver('reporter', connection_name, driver_config)
+
+    def _getTriggerDriver(self, connection_name, driver_config={}):
+        return self._getDriver('trigger', connection_name, driver_config)
 
     def _parseConfig(self, config_path):
         layout = model.Layout()
@@ -252,8 +328,8 @@ class Scheduler(threading.Thread):
             pipeline = Pipeline(conf_pipeline['name'])
             pipeline.description = conf_pipeline.get('description')
             # TODO(jeblair): remove backwards compatibility:
-            pipeline.source = self.sources[conf_pipeline.get('source',
-                                                             'gerrit')]
+            pipeline.source = self._getSourceDriver(
+                conf_pipeline.get('source', 'gerrit'))
             precedence = model.PRECEDENCE_MAP[conf_pipeline.get('precedence')]
             pipeline.precedence = precedence
             pipeline.failure_message = conf_pipeline.get('failure-message',
@@ -275,12 +351,9 @@ class Scheduler(threading.Thread):
                 if conf_pipeline.get(action):
                     for reporter_name, params \
                         in conf_pipeline.get(action).items():
-                        if reporter_name in self.reporters.keys():
-                            action_reporters[action].append(ActionReporter(
-                                self.reporters[reporter_name], params))
-                        else:
-                            self.log.error('Invalid reporter name %s' %
-                                           reporter_name)
+                        reporter = self._getReporterDriver(reporter_name)
+                        action_reporters[action].append(ActionReporter(
+                            reporter, params))
             pipeline.start_actions = action_reporters['start']
             pipeline.success_actions = action_reporters['success']
             pipeline.failure_actions = action_reporters['failure']
@@ -317,12 +390,19 @@ class Scheduler(threading.Thread):
                 )
                 manager.changeish_filters.append(f)
 
-            # TODO(jhesketh): Allow multiple triggers per pipeline
-            efilters = _callDriverMethod(self.triggers, 'getEventFilters',
-                                         conf_pipeline['trigger'],
-                                         require_implemented=True)
-            for f in efilters.values():
-                manager.event_filters += f
+            for trigger_name, trigger_config\
+                in conf_pipeline.get('trigger').items():
+                if trigger_name not in self.triggers.keys():
+                    self.triggers[trigger_name] = \
+                        self._getTriggerDriver(trigger_name, trigger_config)
+
+            for trigger in self.triggers.values():
+                efilters = _callDriverMethod(trigger,
+                                             'getEventFilters',
+                                             conf_pipeline['trigger'],
+                                             require_implemented=True)
+                for f in efilters:
+                    manager.event_filters.append(f)
 
         for project_template in data.get('project-templates', []):
             # Make sure the template only contains valid pipelines
@@ -441,21 +521,6 @@ class Scheduler(threading.Thread):
 
     def setMerger(self, merger):
         self.merger = merger
-
-    def registerSource(self, source, name=None):
-        if name is None:
-            name = source.name
-        self.sources[name] = source
-
-    def registerTrigger(self, trigger, name=None):
-        if name is None:
-            name = trigger.name
-        self.triggers[name] = trigger
-
-    def registerReporter(self, reporter, name=None):
-        if name is None:
-            name = reporter.name
-        self.reporters[name] = reporter
 
     def getProject(self, name):
         self.layout_lock.acquire()
@@ -607,6 +672,7 @@ class Scheduler(threading.Thread):
         self.config = event.config
         try:
             self.log.debug("Performing reconfiguration")
+            self._unloadDrivers()
             layout = self._parseConfig(
                 self.config.get('zuul', 'layout_config'))
             for name, new_pipeline in layout.pipelines.items():
@@ -656,9 +722,15 @@ class Scheduler(threading.Thread):
                             "for change %s" % (build, item.change))
             self.layout = layout
             self.maintainTriggerCache()
-            _callDriverMethod(self.triggers, 'postConfig')
-            _callDriverMethod(self.sources, 'postConfig')
-            _callDriverMethod(self.reporters, 'postConfig')
+            for trigger in self.triggers.values():
+                _callDriverMethod(trigger, 'postConfig')
+            for pipeline in self.layout.pipelines.values():
+                _callDriverMethod(pipeline.source, 'postConfig')
+                for action in ['start_actions', 'success_actions',
+                               'failure_actions', 'merge_failure_actions']:
+                    for action_reporter in pipeline.__getattribute__(action):
+                        _callDriverMethod(action_reporter.reporter,
+                                          'postConfig')
             if statsd:
                 try:
                     for pipeline in self.layout.pipelines.values():
@@ -788,9 +860,9 @@ class Scheduler(threading.Thread):
             for item in pipeline.getAllItems():
                 relevant.add(item.change)
                 relevant.update(item.change.getRelatedChanges())
+            _callDriverMethod(pipeline.source, 'maintainCache', relevant)
             self.log.debug("End maintain trigger cache for: %s" % pipeline)
         self.log.debug("Trigger cache size: %s" % len(relevant))
-        _callDriverMethod(self.sources, 'maintainCache', relevant)
 
     def process_event_queue(self):
         self.log.debug("Fetching trigger event")
@@ -1146,8 +1218,9 @@ class BasePipelineManager(object):
                 item.enqueue_time = enqueue_time
             self.reportStats(item)
             self.enqueueChangesBehind(change, quiet, ignore_requirements)
-            _callDriverMethod(self.sched.triggers, 'onChangeEnqueued',
-                              item.change, self.pipeline)
+            for trigger in self.sched.triggers.values():
+                _callDriverMethod(
+                    trigger, 'onChangeEnqueued', item.change, self.pipeline)
         else:
             self.log.error("Unable to find change queue for project %s" %
                            change.project)
@@ -1423,8 +1496,9 @@ class BasePipelineManager(object):
                 change_queue.increaseWindowSize()
                 self.log.debug("%s window size increased to %s" %
                                (change_queue, change_queue.window))
-                _callDriverMethod(self.sched.triggers, 'onChangeMerged',
-                                  item.change)
+                for trigger in self.sched.triggers.values():
+                    _callDriverMethod(trigger, 'onChangeMerged', item.change,
+                                      self.pipeline.source)
 
     def _reportItem(self, item):
         self.log.debug("Reporting change %s" % item.change)

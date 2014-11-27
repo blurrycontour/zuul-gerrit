@@ -17,8 +17,8 @@ class BaseTrigger(object):
     """Base class for triggers.
 
     Defines the exact public methods that must be supplied."""
-    def __init__(self, *args, **kwargs):
-        raise NotImplementedError()
+    def __init__(self, trigger_config={}):
+        self.trigger_config = trigger_config
 
     def stop(self):
         raise NotImplementedError()
@@ -29,8 +29,14 @@ class BaseTrigger(object):
     def postConfig(self):
         raise NotImplementedError()
 
-    def onChangeMerged(self, change):
+    def onChangeMerged(self, change, source):
         raise NotImplementedError()
 
     def onChangeEnqueued(self, change, pipeline):
         raise NotImplementedError()
+
+    def registerScheduler(self, sched):
+        self.sched = sched
+
+    def registerConnection(self, connection):
+        self.connection = connection

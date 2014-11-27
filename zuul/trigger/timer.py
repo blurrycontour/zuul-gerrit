@@ -23,9 +23,8 @@ class TimerTrigger(BaseTrigger):
     name = 'timer'
     log = logging.getLogger("zuul.Timer")
 
-    def __init__(self, config, sched):
-        self.sched = sched
-        self.config = config
+    def __init__(self, trigger_config={}):
+        super(TimerTrigger, self).__init__(trigger_config)
         self.apsched = apscheduler.scheduler.Scheduler()
         self.apsched.start()
 
@@ -39,8 +38,8 @@ class TimerTrigger(BaseTrigger):
             self.log.debug("Adding event %s" % event)
             self.sched.addEvent(event)
 
-    def stop(self):
-        self.apsched.shutdown()
+    def _shutdown(self):
+        self.apsched.stop()
 
     def getEventFilters(self, trigger_conf):
         def toList(item):

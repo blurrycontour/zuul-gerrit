@@ -80,9 +80,10 @@ class Pipeline(object):
         self.queues = []
         self.precedence = PRECEDENCE_NORMAL
         self.source = None
-        self.start_actions = None
-        self.success_actions = None
-        self.failure_actions = None
+        self.start_actions = []
+        self.success_actions = []
+        self.failure_actions = []
+        self.merge_failure_actions = []
         self.window = None
         self.window_floor = None
         self.window_increase_type = None
@@ -975,6 +976,9 @@ class TriggerEvent(object):
         # For events that arrive with a destination pipeline (eg, from
         # an admin command, etc):
         self.forced_pipeline = None
+
+        # Internal mechanism to track if the change needs a refresh from cache
+        self._needs_refresh = False
 
     def __repr__(self):
         ret = '<TriggerEvent %s %s' % (self.type, self.project_name)
