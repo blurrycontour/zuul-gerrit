@@ -20,6 +20,7 @@ import extras
 import logging
 import logging.config
 import os
+import re
 import signal
 import sys
 import traceback
@@ -59,6 +60,7 @@ class ZuulApp(object):
     def __init__(self):
         self.args = None
         self.config = None
+        self.connections = {}
 
     def _get_version(self):
         from zuul.version import version_info as zuul_version_info
@@ -86,3 +88,51 @@ class ZuulApp(object):
             logging.config.fileConfig(fp)
         else:
             logging.basicConfig(level=logging.DEBUG)
+
+    def _configure_connections(self):
+        # Register connections from the config
+
+        # TODO(jhesketh): Load connection modules dynamically
+        import zuul.connection.gerrit
+        import zuul.connection.smtp
+
+        self.connections = {'gerrit': {}, 'smtp': {}}
+
+        for section_name in self.config.sections():
+            con_match = re.match(r'^connection ([\'\"]?)(.*)(\1)$',
+                                 section_name, re.I)
+            if not con_match:
+                continue
+            con_name = con_match.group(2)
+            con_config = dict(self.config.items(section_name))
+
+            if 'driver' not in con_config:
+                raise Exception("No driver specified for connection %s."
+                                % con_name)
+
+            con_driver = con_config['driver']
+
+            # TODO(jhesketh): load the required class automatically
+            if con_driver == 'gerrit':
+                self.connections[con_name] = \
+                    zuul.connection.gerrit.GerritConnection(con_name,
+                                                            con_config)
+            elif con_driver == 'smtp':
+                self.connections[con_name] = \
+                    zuul.connection.smtp.SMTPConnection(con_name, con_config)
+            else:
+                raise Exception("Unknown driver, %s, for connection %s"
+                                % (con_config['driver'], con_name))
+
+        # If the [gerrit] or [smtp] sections still exist, load them in as a
+        # connection named 'gerrit' or 'smtp' respectfully
+
+        if 'gerrit' in self.config.sections():
+            self.connections['gerrit'] = \
+                zuul.connection.gerrit.GerritConnection(
+                    '_legacy', dict(self.config.items('gerrit')))
+
+        if 'smtp' in self.config.sections():
+            self.connections['smtp'] = \
+                zuul.connection.smtp.SMTPConnection(
+                    '_legacy', dict(self.config.items('smtp')))
