@@ -415,6 +415,9 @@ class FakeGerrit(object):
     def startWatching(self, *args, **kw):
         pass
 
+    def stopWatching(self, *args, **kw):
+        pass
+
 
 class BuildHistory(object):
     def __init__(self, **kw):
