@@ -83,6 +83,26 @@ gerrit
   Path to SSH key to use when logging into above server.
   ``sshkey=/home/zuul/.ssh/id_rsa``
 
+gerrit_whitelist
+""""""""""""""""
+
+This section defines a list of gerrit's events types which are allowed to enter zuul's processing queue.
+Every item of the list is a separate ``key = value`` pair, with unique item name.
+
+For example:
+
+::
+  [gerrit_whitelist]
+  item1 = patchset-created
+  item2 = draft-published
+  item3 = change-abandoned
+
+..
+
+Here, only events of types shown above will be processed.
+
+If this section is not defined, no filtering applied.
+
 zuul
 """"
 
