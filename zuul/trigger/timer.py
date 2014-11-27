@@ -23,9 +23,7 @@ class TimerTrigger(BaseTrigger):
     name = 'timer'
     log = logging.getLogger("zuul.Timer")
 
-    def __init__(self, config, sched):
-        self.sched = sched
-        self.config = config
+    def __init__(self):
         self.apsched = apscheduler.scheduler.Scheduler()
         self.apsched.start()
 
