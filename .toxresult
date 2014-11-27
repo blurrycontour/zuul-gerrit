@@ -1,0 +1,849 @@
+py27 create: /home/dim/Work/git/github.com/openstack-infra/zuul/.tox/py27
+py27 installdeps: -r/home/dim/Work/git/github.com/openstack-infra/zuul/requirements.txt, -r/home/dim/Work/git/github.com/openstack-infra/zuul/test-requirements.txt
+py27 develop-inst: /home/dim/Work/git/github.com/openstack-infra/zuul
+py27 runtests: commands[0] | python setup.py testr --slowest --testr-args=tests.test_scheduler.TestScheduler.test_can_merge
+running testr
+2014-12-02 19:03:24,356 gear.BaseClientServer DEBUG    Waiting for change in available connections to poll
+2014-12-02 19:03:24,357 gear.BaseClientServer.fake_worker DEBUG    Waiting for change in available connections to poll
+2014-12-02 19:03:24,358 gear.BaseClientServer.fake_worker DEBUG    Waiting for change in available servers to reconnect
+2014-12-02 19:03:24,359 gear.Worker.fake_worker DEBUG    Get job; number of threads waiting for jobs: 1
+2014-12-02 19:03:24,359 gear.Worker.fake_worker DEBUG    Adding server 127.0.0.1 port 59022
+2014-12-02 19:03:24,359 gear.Connection.fake_worker DEBUG    Setting state to: INIT
+2014-12-02 19:03:24,359 gear.Worker.fake_worker DEBUG    Waiting for change in available connections to poll
+2014-12-02 19:03:24,359 gear.Worker.fake_worker DEBUG    Checking if servers need to be reconnected
+2014-12-02 19:03:24,360 gear.Worker.fake_worker DEBUG    Trying to reconnect <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>
+2014-12-02 19:03:24,360 gear.Connection.fake_worker INFO     Disconnected from 127.0.0.1 port 59022
+2014-12-02 19:03:24,360 gear.Connection.fake_worker DEBUG    Setting state to: INIT
+2014-12-02 19:03:24,360 gear.Connection.fake_worker DEBUG    Connecting to 127.0.0.1 port 59022
+2014-12-02 19:03:24,360 gear.Connection.fake_worker INFO     Connected to 127.0.0.1 port 59022
+2014-12-02 19:03:24,360 gear.Server       DEBUG    Accepting new connection
+2014-12-02 19:03:24,360 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1691e5d0 type: SET_CLIENT_ID id: fake_worker>
+2014-12-02 19:03:24,361 gear.BaseClientServer.Zuul Merger DEBUG    Waiting for change in available connections to poll
+2014-12-02 19:03:24,361 gear.ServerConnection DEBUG    Setting state to: INIT
+2014-12-02 19:03:24,361 gear.Worker.Zuul Merger DEBUG    Adding server 127.0.0.1 port 59022
+2014-12-02 19:03:24,362 gear.Connection.fake_worker DEBUG    Setting state to: IDLE
+2014-12-02 19:03:24,362 gear.Worker.Zuul Merger DEBUG    Waiting for change in available servers to reconnect
+2014-12-02 19:03:24,362 gear.Server       INFO     Accepted connection <gear.ServerConnection 0x7f9f1691ec10 name: None host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,362 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1691e690 type: GRAB_JOB_UNIQ>
+2014-12-02 19:03:24,362 gear.Worker.fake_worker DEBUG    Preparing to poll
+2014-12-02 19:03:24,362 gear.Connection.Zuul Merger DEBUG    Setting state to: INIT
+2014-12-02 19:03:24,363 gear.Server       DEBUG    Preparing to poll
+2014-12-02 19:03:24,364 gear.Server       DEBUG    Polling 1 connections
+2014-12-02 19:03:24,363 gear.Worker.fake_worker DEBUG    Polling 1 connections
+2014-12-02 19:03:24,363 zuul.MergeServer  DEBUG    Waiting for server
+2014-12-02 19:03:24,363 gear.Worker.Zuul Merger DEBUG    Checking if servers need to be reconnected
+2014-12-02 19:03:24,363 gear.Worker.Zuul Merger DEBUG    Waiting for change in available connections to poll
+2014-12-02 19:03:24,363 gear.Connection.fake_worker DEBUG    Setting state to: GRAB_WAIT
+2014-12-02 19:03:24,364 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: None host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,364 gear.Worker.fake_worker DEBUG    Woken by pipe
+2014-12-02 19:03:24,364 gear.Worker.Zuul Merger DEBUG    Trying to reconnect <gear.Connection 0x7f9f1691e8d0 host: 127.0.0.1 port: 59022>
+2014-12-02 19:03:24,364 gear.Worker.Zuul Merger DEBUG    Waiting for at least one active connection
+2014-12-02 19:03:24,364 gear.Worker.fake_worker DEBUG    Waiting for change in available servers to reconnect
+2014-12-02 19:03:24,364 gear.Connection.Zuul Merger INFO     Disconnected from 127.0.0.1 port 59022
+2014-12-02 19:03:24,365 gear.Worker.fake_worker DEBUG    Preparing to poll
+2014-12-02 19:03:24,365 gear.Connection.Zuul Merger DEBUG    Setting state to: INIT
+2014-12-02 19:03:24,365 gear.Connection.Zuul Merger DEBUG    Connecting to 127.0.0.1 port 59022
+2014-12-02 19:03:24,365 gear.Worker.fake_worker DEBUG    Polling 1 connections
+2014-12-02 19:03:24,365 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: None host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1691e5d0 type: SET_CLIENT_ID id: fake_worker>
+2014-12-02 19:03:24,365 gear.Server       DEBUG    Accepting new connection
+2014-12-02 19:03:24,365 gear.Connection.Zuul Merger INFO     Connected to 127.0.0.1 port 59022
+2014-12-02 19:03:24,366 gear.Server       DEBUG    Woken by pipe
+2014-12-02 19:03:24,366 gear.ServerConnection DEBUG    Setting state to: INIT
+2014-12-02 19:03:24,366 gear.Connection.Zuul Merger INFO     Sending packet to <gear.Connection 0x7f9f1691e8d0 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1691e690 type: SET_CLIENT_ID id: Zuul Merger>
+2014-12-02 19:03:24,366 gear.Server       INFO     Accepted connection <gear.ServerConnection 0x7f9f1691ed10 name: None host: 127.0.0.1 port: 54813>
+2014-12-02 19:03:24,366 gear.Server       DEBUG    Preparing to poll
+2014-12-02 19:03:24,366 gear.Connection.Zuul Merger DEBUG    Setting state to: IDLE
+2014-12-02 19:03:24,366 gear.Server       DEBUG    Polling 2 connections
+2014-12-02 19:03:24,367 gear.Worker.Zuul Merger DEBUG    Preparing to poll
+2014-12-02 19:03:24,367 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,367 gear.Worker.Zuul Merger DEBUG    Active connection found
+2014-12-02 19:03:24,367 gear.Worker.Zuul Merger DEBUG    Polling 1 connections
+2014-12-02 19:03:24,367 gear.Worker.Zuul Merger DEBUG    Waiting for change in available servers to reconnect
+2014-12-02 19:03:24,367 gear.Worker.Zuul Merger DEBUG    Woken by pipe
+2014-12-02 19:03:24,367 zuul.MergeServer  DEBUG    Registering
+2014-12-02 19:03:24,368 gear.Worker.Zuul Merger DEBUG    Preparing to poll
+2014-12-02 19:03:24,368 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1691ecd0 type: GRAB_JOB_UNIQ>
+2014-12-02 19:03:24,368 gear.Worker.Zuul Merger DEBUG    Polling 1 connections
+2014-12-02 19:03:24,368 gear.Connection.Zuul Merger INFO     Sending packet to <gear.Connection 0x7f9f1691e8d0 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1691e650 type: CAN_DO function: merger:merge>
+2014-12-02 19:03:24,368 gear.ServerConnection INFO     Sending packet to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1691e6d0 type: NO_JOB>
+2014-12-02 19:03:24,368 gear.Connection.Zuul Merger INFO     Sending packet to <gear.Connection 0x7f9f1691e8d0 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1691e690 type: CAN_DO function: merger:update>
+2014-12-02 19:03:24,368 gear.Server       DEBUG    Woken by pipe
+2014-12-02 19:03:24,368 gear.Worker.fake_worker DEBUG    Processing input on <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>
+2014-12-02 19:03:24,369 zuul.MergeServer  DEBUG    Starting worker
+2014-12-02 19:03:24,369 gear.Server       DEBUG    Preparing to poll
+2014-12-02 19:03:24,369 gear.Server       DEBUG    Polling 2 connections
+2014-12-02 19:03:24,369 zuul.MergeServer  DEBUG    Starting merge listener
+2014-12-02 19:03:24,370 gear.Worker.Zuul Merger DEBUG    Get job; number of threads waiting for jobs: 1
+2014-12-02 19:03:24,371 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ed10 name: None host: 127.0.0.1 port: 54813>
+2014-12-02 19:03:24,371 gear.Connection.Zuul Merger INFO     Sending packet to <gear.Connection 0x7f9f1691e8d0 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f16928750 type: GRAB_JOB_UNIQ>
+2014-12-02 19:03:24,374 gear.BaseClientServer.unknown DEBUG    Waiting for change in available connections to poll
+2014-12-02 19:03:24,374 gear.Worker.fake_worker INFO     Received packet from <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f16928650 type: NO_JOB>
+2014-12-02 19:03:24,374 gear.Connection.Zuul Merger DEBUG    Setting state to: GRAB_WAIT
+2014-12-02 19:03:24,374 gear.Worker.fake_worker DEBUG    Sending PRE_SLEEP
+2014-12-02 19:03:24,374 gear.BaseClientServer.unknown DEBUG    Waiting for change in available servers to reconnect
+2014-12-02 19:03:24,375 gear.Client.unknown DEBUG    Adding server 127.0.0.1 port 59022
+2014-12-02 19:03:24,375 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f16928710 type: PRE_SLEEP>
+2014-12-02 19:03:24,375 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ed10 name: None host: 127.0.0.1 port: 54813>: <gear.Packet 0x7f9f16928c10 type: SET_CLIENT_ID id: Zuul Merger>
+2014-12-02 19:03:24,375 gear.Connection.fake_worker DEBUG    Setting state to: SLEEP
+2014-12-02 19:03:24,376 gear.Connection.unknown DEBUG    Setting state to: INIT
+2014-12-02 19:03:24,376 gear.Worker.fake_worker DEBUG    Polling 1 connections
+2014-12-02 19:03:24,376 gear.Client.unknown DEBUG    Checking if servers need to be reconnected
+2014-12-02 19:03:24,376 gear.Server       DEBUG    Polling 2 connections
+2014-12-02 19:03:24,376 gear.Client.unknown DEBUG    Waiting for change in available connections to poll
+2014-12-02 19:03:24,376 zuul.MergeClient  DEBUG    Connecting to gearman at 127.0.0.1:59022
+2014-12-02 19:03:24,377 gear.Client.unknown DEBUG    Trying to reconnect <gear.Connection 0x7f9f16928c50 host: 127.0.0.1 port: 59022>
+2014-12-02 19:03:24,377 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,377 gear.Connection.unknown INFO     Disconnected from 127.0.0.1 port 59022
+2014-12-02 19:03:24,377 gear.Connection.unknown DEBUG    Setting state to: INIT
+2014-12-02 19:03:24,377 gear.Connection.unknown DEBUG    Connecting to 127.0.0.1 port 59022
+2014-12-02 19:03:24,378 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f140b12d0 type: PRE_SLEEP>
+2014-12-02 19:03:24,378 gear.ServerConnection DEBUG    Setting state to: SLEEP
+2014-12-02 19:03:24,378 gear.BaseClientServer.unknown DEBUG    Waiting for change in available connections to poll
+2014-12-02 19:03:24,378 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ed10 name: Zuul Merger host: 127.0.0.1 port: 54813>
+2014-12-02 19:03:24,379 gear.Server       DEBUG    Accepting new connection
+2014-12-02 19:03:24,379 gear.Connection.unknown INFO     Connected to 127.0.0.1 port 59022
+2014-12-02 19:03:24,379 gear.Client.unknown DEBUG    Adding server 127.0.0.1 port 59022
+2014-12-02 19:03:24,379 gear.Client.unknown DEBUG    Waiting for change in available servers to reconnect
+2014-12-02 19:03:24,379 gear.ServerConnection DEBUG    Setting state to: INIT
+2014-12-02 19:03:24,379 gear.Client.unknown DEBUG    Waiting for change in available servers to reconnect
+2014-12-02 19:03:24,380 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ed10 name: Zuul Merger host: 127.0.0.1 port: 54813>: <gear.Packet 0x7f9f140b1410 type: CAN_DO function: merger:merge>
+2014-12-02 19:03:24,380 gear.Connection.unknown DEBUG    Setting state to: INIT
+2014-12-02 19:03:24,380 gear.Server       INFO     Accepted connection <gear.ServerConnection 0x7f9f16928c10 name: None host: 127.0.0.1 port: 54814>
+2014-12-02 19:03:24,380 gear.Client.unknown DEBUG    Preparing to poll
+2014-12-02 19:03:24,380 gear.Server       DEBUG    Adding function merger:merge to <gear.ServerConnection 0x7f9f1691ed10 name: Zuul Merger host: 127.0.0.1 port: 54813>
+2014-12-02 19:03:24,380 zuul.MergeClient  DEBUG    Waiting for gearman
+2014-12-02 19:03:24,380 gear.Client.unknown DEBUG    Checking if servers need to be reconnected
+2014-12-02 19:03:24,381 gear.Client.unknown DEBUG    Waiting for change in available connections to poll
+2014-12-02 19:03:24,381 gear.Client.unknown DEBUG    Polling 1 connections
+2014-12-02 19:03:24,381 gear.Server       DEBUG    Polling 3 connections
+2014-12-02 19:03:24,381 gear.Client.unknown DEBUG    Trying to reconnect <gear.Connection 0x7f9f140b15d0 host: 127.0.0.1 port: 59022>
+2014-12-02 19:03:24,381 gear.Client.unknown DEBUG    Waiting for at least one active connection
+2014-12-02 19:03:24,381 gear.Client.unknown DEBUG    Woken by pipe
+2014-12-02 19:03:24,381 gear.Server       DEBUG    Woken by pipe
+2014-12-02 19:03:24,381 gear.Connection.unknown INFO     Disconnected from 127.0.0.1 port 59022
+2014-12-02 19:03:24,382 gear.Client.unknown DEBUG    Preparing to poll
+2014-12-02 19:03:24,382 gear.Server       DEBUG    Preparing to poll
+2014-12-02 19:03:24,382 gear.Connection.unknown DEBUG    Setting state to: INIT
+2014-12-02 19:03:24,382 gear.Client.unknown DEBUG    Polling 1 connections
+2014-12-02 19:03:24,382 gear.Server       DEBUG    Polling 3 connections
+2014-12-02 19:03:24,382 gear.Connection.unknown DEBUG    Connecting to 127.0.0.1 port 59022
+2014-12-02 19:03:24,382 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ed10 name: Zuul Merger host: 127.0.0.1 port: 54813>
+2014-12-02 19:03:24,382 gear.Server       DEBUG    Accepting new connection
+2014-12-02 19:03:24,383 gear.Connection.unknown INFO     Connected to 127.0.0.1 port 59022
+2014-12-02 19:03:24,383 gear.ServerConnection DEBUG    Setting state to: INIT
+2014-12-02 19:03:24,383 gear.Server       INFO     Accepted connection <gear.ServerConnection 0x7f9f16928f50 name: None host: 127.0.0.1 port: 54815>
+2014-12-02 19:03:24,383 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ed10 name: Zuul Merger host: 127.0.0.1 port: 54813>: <gear.Packet 0x7f9f140b1690 type: CAN_DO function: merger:update>
+2014-12-02 19:03:24,383 gear.Client.unknown DEBUG    Active connection found
+2014-12-02 19:03:24,383 gear.Server       DEBUG    Adding function merger:update to <gear.ServerConnection 0x7f9f1691ed10 name: Zuul Merger host: 127.0.0.1 port: 54813>
+2014-12-02 19:03:24,384 gear.Server       DEBUG    Polling 4 connections
+2014-12-02 19:03:24,384 gear.Server       DEBUG    Woken by pipe
+2014-12-02 19:03:24,384 gear.Client.unknown DEBUG    Waiting for change in available servers to reconnect
+2014-12-02 19:03:24,385 gear.Server       DEBUG    Preparing to poll
+2014-12-02 19:03:24,385 gear.Client.unknown DEBUG    Preparing to poll
+2014-12-02 19:03:24,385 gear.Server       DEBUG    Polling 4 connections
+2014-12-02 19:03:24,385 gear.Client.unknown DEBUG    Polling 1 connections
+2014-12-02 19:03:24,386 gear.Client.unknown DEBUG    Woken by pipe
+2014-12-02 19:03:24,386 gear.Client.unknown DEBUG    Preparing to poll
+2014-12-02 19:03:24,385 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ed10 name: Zuul Merger host: 127.0.0.1 port: 54813>
+2014-12-02 19:03:24,386 gear.Client.unknown DEBUG    Polling 1 connections
+2014-12-02 19:03:24,386 paste.httpserver.ThreadPool DEBUG    Started new worker 140320314476288: Initial worker pool
+2014-12-02 19:03:24,387 paste.httpserver.ThreadPool DEBUG    Started new worker 140320306083584: Initial worker pool
+2014-12-02 19:03:24,387 paste.httpserver.ThreadPool DEBUG    Started new worker 140320297690880: Initial worker pool
+2014-12-02 19:03:24,387 paste.httpserver.ThreadPool DEBUG    Started new worker 140320289298176: Initial worker pool
+2014-12-02 19:03:24,387 paste.httpserver.ThreadPool DEBUG    Started new worker 140319802783488: Initial worker pool
+2014-12-02 19:03:24,388 paste.httpserver.ThreadPool DEBUG    Started new worker 140319794390784: Initial worker pool
+2014-12-02 19:03:24,390 paste.httpserver.ThreadPool DEBUG    Started new worker 140319785998080: Initial worker pool
+2014-12-02 19:03:24,390 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ed10 name: Zuul Merger host: 127.0.0.1 port: 54813>: <gear.Packet 0x7f9f140b1810 type: GRAB_JOB_UNIQ>
+2014-12-02 19:03:24,391 paste.httpserver.ThreadPool DEBUG    Started new worker 140319777605376: Initial worker pool
+2014-12-02 19:03:24,391 paste.httpserver.ThreadPool DEBUG    Started new worker 140319769212672: Initial worker pool
+2014-12-02 19:03:24,392 paste.httpserver.ThreadPool DEBUG    Started new worker 140319760819968: Initial worker pool
+2014-12-02 19:03:24,392 apscheduler.threadpool INFO     Started thread pool with 0 core threads and 20 maximum threads
+2014-12-02 19:03:24,392 gear.ServerConnection INFO     Sending packet to <gear.ServerConnection 0x7f9f1691ed10 name: Zuul Merger host: 127.0.0.1 port: 54813>: <gear.Packet 0x7f9f140c0b50 type: NO_JOB>
+2014-12-02 19:03:24,393 gear.Worker.Zuul Merger DEBUG    Processing input on <gear.Connection 0x7f9f1691e8d0 host: 127.0.0.1 port: 59022>
+2014-12-02 19:03:24,394 gear.Server       DEBUG    Polling 4 connections
+2014-12-02 19:03:24,394 apscheduler.scheduler INFO     Scheduler started
+2014-12-02 19:03:24,394 zuul.Scheduler    DEBUG    Statsd enabled
+2014-12-02 19:03:24,394 zuul.Scheduler    DEBUG    Prepare to reconfigure
+2014-12-02 19:03:24,394 apscheduler.scheduler DEBUG    Looking for jobs to run
+2014-12-02 19:03:24,395 zuul.Scheduler    DEBUG    Run handler sleeping
+2014-12-02 19:03:24,395 gear.Worker.Zuul Merger INFO     Received packet from <gear.Connection 0x7f9f1691e8d0 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f140ce190 type: NO_JOB>
+2014-12-02 19:03:24,395 zuul.Scheduler    DEBUG    Waiting for reconfiguration
+2014-12-02 19:03:24,395 apscheduler.scheduler DEBUG    No jobs; waiting until a job is added
+2014-12-02 19:03:24,395 zuul.Scheduler    DEBUG    Run handler awake
+2014-12-02 19:03:24,395 gear.Worker.Zuul Merger DEBUG    Sending PRE_SLEEP
+2014-12-02 19:03:24,396 gear.Connection.Zuul Merger INFO     Sending packet to <gear.Connection 0x7f9f1691e8d0 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f140b1410 type: PRE_SLEEP>
+2014-12-02 19:03:24,396 gear.Connection.Zuul Merger DEBUG    Setting state to: SLEEP
+2014-12-02 19:03:24,396 zuul.Scheduler    DEBUG    Fetching management event
+2014-12-02 19:03:24,396 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ed10 name: Zuul Merger host: 127.0.0.1 port: 54813>
+2014-12-02 19:03:24,396 gear.Worker.Zuul Merger DEBUG    Polling 1 connections
+2014-12-02 19:03:24,396 zuul.Scheduler    DEBUG    Processing management event <zuul.scheduler.ReconfigureEvent object at 0x7f9f140c0b50>
+2014-12-02 19:03:24,396 zuul.Scheduler    DEBUG    Performing reconfiguration
+2014-12-02 19:03:24,396 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ed10 name: Zuul Merger host: 127.0.0.1 port: 54813>: <gear.Packet 0x7f9f140b1410 type: PRE_SLEEP>
+2014-12-02 19:03:24,397 gear.ServerConnection DEBUG    Setting state to: SLEEP
+2014-12-02 19:03:24,404 gear.Server       DEBUG    Polling 4 connections
+2014-12-02 19:03:24,439 zuul.IndependentPipelineManager INFO     Configured Pipeline Manager check
+2014-12-02 19:03:24,439 zuul.IndependentPipelineManager INFO       Source: <tests.base.FakeGerritTrigger object at 0x7f9f140b1590>
+2014-12-02 19:03:24,439 zuul.IndependentPipelineManager INFO       Requirements:
+2014-12-02 19:03:24,439 zuul.IndependentPipelineManager INFO       Events:
+2014-12-02 19:03:24,439 zuul.IndependentPipelineManager INFO         <EventFilter types: patchset-created>
+2014-12-02 19:03:24,439 zuul.IndependentPipelineManager INFO       Projects:
+2014-12-02 19:03:24,439 zuul.IndependentPipelineManager INFO         org/nonvoting-project
+2014-12-02 19:03:24,439 zuul.IndependentPipelineManager INFO           <Job nonvoting-project-merge> [hold]
+2014-12-02 19:03:24,439 zuul.IndependentPipelineManager INFO             <Job nonvoting-project-test1>
+2014-12-02 19:03:24,439 zuul.IndependentPipelineManager INFO             <Job nonvoting-project-test2> [nonvoting]
+2014-12-02 19:03:24,439 zuul.IndependentPipelineManager INFO         org/templated-project
+2014-12-02 19:03:24,439 zuul.IndependentPipelineManager INFO           <Job project-test1>
+2014-12-02 19:03:24,439 zuul.IndependentPipelineManager INFO           <Job project-test2>
+2014-12-02 19:03:24,439 zuul.IndependentPipelineManager INFO         org/project1
+2014-12-02 19:03:24,440 zuul.IndependentPipelineManager INFO           <Job project1-merge> [hold]
+2014-12-02 19:03:24,440 zuul.IndependentPipelineManager INFO             <Job project1-test1>
+2014-12-02 19:03:24,440 zuul.IndependentPipelineManager INFO             <Job project1-test2>
+2014-12-02 19:03:24,440 zuul.IndependentPipelineManager INFO             <Job project1-project2-integration>
+2014-12-02 19:03:24,440 zuul.IndependentPipelineManager INFO         org/project2
+2014-12-02 19:03:24,440 zuul.IndependentPipelineManager INFO           <Job project2-merge> [hold]
+2014-12-02 19:03:24,440 zuul.IndependentPipelineManager INFO             <Job project2-test1>
+2014-12-02 19:03:24,440 zuul.IndependentPipelineManager INFO             <Job project2-test2>
+2014-12-02 19:03:24,440 zuul.IndependentPipelineManager INFO             <Job project1-project2-integration>
+2014-12-02 19:03:24,440 zuul.IndependentPipelineManager INFO         org/project3
+2014-12-02 19:03:24,440 zuul.IndependentPipelineManager INFO           <Job project3-merge> [hold]
+2014-12-02 19:03:24,440 zuul.IndependentPipelineManager INFO             <Job project3-test1>
+2014-12-02 19:03:24,440 zuul.IndependentPipelineManager INFO             <Job project3-test2>
+2014-12-02 19:03:24,440 zuul.IndependentPipelineManager INFO             <Job project1-project2-integration>
+2014-12-02 19:03:24,440 zuul.IndependentPipelineManager INFO         org/layered-project
+2014-12-02 19:03:24,440 zuul.IndependentPipelineManager INFO           <Job project-test1>
+2014-12-02 19:03:24,440 zuul.IndependentPipelineManager INFO           <Job project-test2>
+2014-12-02 19:03:24,440 zuul.IndependentPipelineManager INFO           <Job layered-project-test3>
+2014-12-02 19:03:24,440 zuul.IndependentPipelineManager INFO           <Job layered-project-test4>
+2014-12-02 19:03:24,440 zuul.IndependentPipelineManager INFO           <Job layered-project-foo-test5>
+2014-12-02 19:03:24,440 zuul.IndependentPipelineManager INFO           <Job project-test6>
+2014-12-02 19:03:24,440 zuul.IndependentPipelineManager INFO         org/one-job-project
+2014-12-02 19:03:24,440 zuul.IndependentPipelineManager INFO           <Job one-job-project-merge> [hold]
+2014-12-02 19:03:24,440 zuul.IndependentPipelineManager INFO         org/project
+2014-12-02 19:03:24,440 zuul.IndependentPipelineManager INFO           <Job project-merge> [hold]
+2014-12-02 19:03:24,440 zuul.IndependentPipelineManager INFO             <Job project-test1>
+2014-12-02 19:03:24,440 zuul.IndependentPipelineManager INFO             <Job project-test2>
+2014-12-02 19:03:24,440 zuul.IndependentPipelineManager INFO             <Job project-testfile> .*-requires
+2014-12-02 19:03:24,441 zuul.IndependentPipelineManager INFO       On start:
+2014-12-02 19:03:24,441 zuul.IndependentPipelineManager INFO         []
+2014-12-02 19:03:24,441 zuul.IndependentPipelineManager INFO       On success:
+2014-12-02 19:03:24,441 zuul.IndependentPipelineManager INFO         [<ActionReporter <zuul.reporter.gerrit.Reporter object at 0x7f9f140ce110>, {'verified': 1}>]
+2014-12-02 19:03:24,441 zuul.IndependentPipelineManager INFO       On failure:
+2014-12-02 19:03:24,441 zuul.IndependentPipelineManager INFO         [<ActionReporter <zuul.reporter.gerrit.Reporter object at 0x7f9f140ce110>, {'verified': -1}>]
+2014-12-02 19:03:24,441 zuul.IndependentPipelineManager INFO       On merge-failure:
+2014-12-02 19:03:24,441 zuul.IndependentPipelineManager INFO         [<ActionReporter <zuul.reporter.gerrit.Reporter object at 0x7f9f140ce110>, {'verified': -1}>]
+2014-12-02 19:03:24,441 zuul.IndependentPipelineManager INFO     Configured Pipeline Manager post
+2014-12-02 19:03:24,441 zuul.IndependentPipelineManager INFO       Source: <tests.base.FakeGerritTrigger object at 0x7f9f140b1590>
+2014-12-02 19:03:24,441 zuul.IndependentPipelineManager INFO       Requirements:
+2014-12-02 19:03:24,441 zuul.IndependentPipelineManager INFO       Events:
+2014-12-02 19:03:24,441 zuul.IndependentPipelineManager INFO         <EventFilter types: ref-updated refs: ^(?!refs/).*$>
+2014-12-02 19:03:24,441 zuul.IndependentPipelineManager INFO       Projects:
+2014-12-02 19:03:24,441 zuul.IndependentPipelineManager INFO         org/nonvoting-project
+2014-12-02 19:03:24,441 zuul.IndependentPipelineManager INFO           <Job nonvoting-project-post>
+2014-12-02 19:03:24,441 zuul.IndependentPipelineManager INFO         org/project1
+2014-12-02 19:03:24,441 zuul.IndependentPipelineManager INFO           <Job project1-post>
+2014-12-02 19:03:24,441 zuul.IndependentPipelineManager INFO         org/project2
+2014-12-02 19:03:24,441 zuul.IndependentPipelineManager INFO           <Job project2-post>
+2014-12-02 19:03:24,441 zuul.IndependentPipelineManager INFO         org/project3
+2014-12-02 19:03:24,441 zuul.IndependentPipelineManager INFO           <Job project3-post>
+2014-12-02 19:03:24,441 zuul.IndependentPipelineManager INFO         org/one-job-project
+2014-12-02 19:03:24,441 zuul.IndependentPipelineManager INFO           <Job one-job-project-post>
+2014-12-02 19:03:24,441 zuul.IndependentPipelineManager INFO         org/project
+2014-12-02 19:03:24,441 zuul.IndependentPipelineManager INFO           <Job project-post>
+2014-12-02 19:03:24,442 zuul.IndependentPipelineManager INFO       On start:
+2014-12-02 19:03:24,442 zuul.IndependentPipelineManager INFO         []
+2014-12-02 19:03:24,442 zuul.IndependentPipelineManager INFO       On success:
+2014-12-02 19:03:24,442 zuul.IndependentPipelineManager INFO         []
+2014-12-02 19:03:24,442 zuul.IndependentPipelineManager INFO       On failure:
+2014-12-02 19:03:24,442 zuul.IndependentPipelineManager INFO         []
+2014-12-02 19:03:24,442 zuul.IndependentPipelineManager INFO       On merge-failure:
+2014-12-02 19:03:24,442 zuul.IndependentPipelineManager INFO         []
+2014-12-02 19:03:24,442 zuul.DependentPipelineManager INFO     Configured Pipeline Manager gate
+2014-12-02 19:03:24,442 zuul.DependentPipelineManager INFO       Source: <tests.base.FakeGerritTrigger object at 0x7f9f140b1590>
+2014-12-02 19:03:24,442 zuul.DependentPipelineManager INFO       Requirements:
+2014-12-02 19:03:24,442 zuul.DependentPipelineManager INFO       Events:
+2014-12-02 19:03:24,442 zuul.DependentPipelineManager INFO         <EventFilter types: comment-added event_approvals: approved:1>
+2014-12-02 19:03:24,442 zuul.DependentPipelineManager INFO       Projects:
+2014-12-02 19:03:24,442 zuul.DependentPipelineManager INFO         org/nonvoting-project
+2014-12-02 19:03:24,442 zuul.DependentPipelineManager INFO           <Job nonvoting-project-merge> [hold]
+2014-12-02 19:03:24,442 zuul.DependentPipelineManager INFO             <Job nonvoting-project-test1>
+2014-12-02 19:03:24,442 zuul.DependentPipelineManager INFO             <Job nonvoting-project-test2> [nonvoting]
+2014-12-02 19:03:24,442 zuul.DependentPipelineManager INFO         org/node-project
+2014-12-02 19:03:24,442 zuul.DependentPipelineManager INFO           <Job node-project-merge> [hold]
+2014-12-02 19:03:24,442 zuul.DependentPipelineManager INFO             <Job node-project-test1>
+2014-12-02 19:03:24,442 zuul.DependentPipelineManager INFO             <Job node-project-test2>
+2014-12-02 19:03:24,442 zuul.DependentPipelineManager INFO         org/project1
+2014-12-02 19:03:24,442 zuul.DependentPipelineManager INFO           <Job project1-merge> [hold]
+2014-12-02 19:03:24,442 zuul.DependentPipelineManager INFO             <Job project1-test1>
+2014-12-02 19:03:24,442 zuul.DependentPipelineManager INFO             <Job project1-test2>
+2014-12-02 19:03:24,443 zuul.DependentPipelineManager INFO             <Job project1-project2-integration>
+2014-12-02 19:03:24,443 zuul.DependentPipelineManager INFO         org/project2
+2014-12-02 19:03:24,443 zuul.DependentPipelineManager INFO           <Job project2-merge> [hold]
+2014-12-02 19:03:24,443 zuul.DependentPipelineManager INFO             <Job project2-test1>
+2014-12-02 19:03:24,443 zuul.DependentPipelineManager INFO             <Job project2-test2>
+2014-12-02 19:03:24,443 zuul.DependentPipelineManager INFO             <Job project1-project2-integration>
+2014-12-02 19:03:24,443 zuul.DependentPipelineManager INFO         org/project3
+2014-12-02 19:03:24,443 zuul.DependentPipelineManager INFO           <Job project3-merge> [hold]
+2014-12-02 19:03:24,443 zuul.DependentPipelineManager INFO             <Job project3-test1>
+2014-12-02 19:03:24,443 zuul.DependentPipelineManager INFO             <Job project3-test2>
+2014-12-02 19:03:24,443 zuul.DependentPipelineManager INFO             <Job project1-project2-integration>
+2014-12-02 19:03:24,443 zuul.DependentPipelineManager INFO         org/one-job-project
+2014-12-02 19:03:24,443 zuul.DependentPipelineManager INFO           <Job one-job-project-merge> [hold]
+2014-12-02 19:03:24,443 zuul.DependentPipelineManager INFO         org/project
+2014-12-02 19:03:24,443 zuul.DependentPipelineManager INFO           <Job project-merge> [hold]
+2014-12-02 19:03:24,443 zuul.DependentPipelineManager INFO             <Job project-test1>
+2014-12-02 19:03:24,443 zuul.DependentPipelineManager INFO             <Job project-test2>
+2014-12-02 19:03:24,443 zuul.DependentPipelineManager INFO             <Job project-testfile> .*-requires
+2014-12-02 19:03:24,443 zuul.DependentPipelineManager INFO         org/noop-project
+2014-12-02 19:03:24,443 zuul.DependentPipelineManager INFO           <Job noop>
+2014-12-02 19:03:24,443 zuul.DependentPipelineManager INFO       On start:
+2014-12-02 19:03:24,443 zuul.DependentPipelineManager INFO         [<ActionReporter <zuul.reporter.gerrit.Reporter object at 0x7f9f140ce110>, {'verified': 0}>]
+2014-12-02 19:03:24,443 zuul.DependentPipelineManager INFO       On success:
+2014-12-02 19:03:24,443 zuul.DependentPipelineManager INFO         [<ActionReporter <zuul.reporter.gerrit.Reporter object at 0x7f9f140ce110>, {'verified': 2, 'submit': True}>]
+2014-12-02 19:03:24,443 zuul.DependentPipelineManager INFO       On failure:
+2014-12-02 19:03:24,443 zuul.DependentPipelineManager INFO         [<ActionReporter <zuul.reporter.gerrit.Reporter object at 0x7f9f140ce110>, {'verified': -2}>]
+2014-12-02 19:03:24,444 zuul.DependentPipelineManager INFO       On merge-failure:
+2014-12-02 19:03:24,444 zuul.DependentPipelineManager INFO         [<ActionReporter <zuul.reporter.gerrit.Reporter object at 0x7f9f140ce110>, {'verified': -2}>]
+2014-12-02 19:03:24,444 zuul.DependentPipelineManager DEBUG    Building shared change queues
+2014-12-02 19:03:24,444 zuul.DependentPipelineManager DEBUG    Created queue: <ChangeQueue gate: org/node-project>
+2014-12-02 19:03:24,444 zuul.DependentPipelineManager DEBUG    Created queue: <ChangeQueue gate: org/nonvoting-project>
+2014-12-02 19:03:24,444 zuul.DependentPipelineManager DEBUG    Created queue: <ChangeQueue gate: org/noop-project>
+2014-12-02 19:03:24,444 zuul.DependentPipelineManager DEBUG    Created queue: <ChangeQueue gate: org/one-job-project>
+2014-12-02 19:03:24,444 zuul.DependentPipelineManager DEBUG    Created queue: <ChangeQueue gate: org/project>
+2014-12-02 19:03:24,444 zuul.DependentPipelineManager DEBUG    Created queue: <ChangeQueue gate: integration>
+2014-12-02 19:03:24,444 zuul.DependentPipelineManager DEBUG    Created queue: <ChangeQueue gate: integration>
+2014-12-02 19:03:24,444 zuul.DependentPipelineManager DEBUG    Created queue: <ChangeQueue gate: integration>
+2014-12-02 19:03:24,444 zuul.DependentPipelineManager DEBUG    Combining shared queues
+2014-12-02 19:03:24,444 zuul.DependentPipelineManager DEBUG    Keeping queue <ChangeQueue gate: org/node-project>
+2014-12-02 19:03:24,444 zuul.DependentPipelineManager DEBUG    Keeping queue <ChangeQueue gate: org/nonvoting-project>
+2014-12-02 19:03:24,444 zuul.DependentPipelineManager DEBUG    Keeping queue <ChangeQueue gate: org/noop-project>
+2014-12-02 19:03:24,444 zuul.DependentPipelineManager DEBUG    Keeping queue <ChangeQueue gate: org/one-job-project>
+2014-12-02 19:03:24,444 zuul.DependentPipelineManager DEBUG    Keeping queue <ChangeQueue gate: org/project>
+2014-12-02 19:03:24,444 zuul.DependentPipelineManager DEBUG    Keeping queue <ChangeQueue gate: integration>
+2014-12-02 19:03:24,444 zuul.DependentPipelineManager DEBUG    Merging queue <ChangeQueue gate: integration> into <ChangeQueue gate: integration>
+2014-12-02 19:03:24,444 zuul.DependentPipelineManager DEBUG    Merging queue <ChangeQueue gate: integration> into <ChangeQueue gate: integration>
+2014-12-02 19:03:24,444 zuul.DependentPipelineManager DEBUG    Combining shared queues
+2014-12-02 19:03:24,444 zuul.DependentPipelineManager DEBUG    Keeping queue <ChangeQueue gate: org/node-project>
+2014-12-02 19:03:24,444 zuul.DependentPipelineManager DEBUG    Keeping queue <ChangeQueue gate: org/nonvoting-project>
+2014-12-02 19:03:24,444 zuul.DependentPipelineManager DEBUG    Keeping queue <ChangeQueue gate: org/noop-project>
+2014-12-02 19:03:24,444 zuul.DependentPipelineManager DEBUG    Keeping queue <ChangeQueue gate: org/one-job-project>
+2014-12-02 19:03:24,445 zuul.DependentPipelineManager DEBUG    Keeping queue <ChangeQueue gate: org/project>
+2014-12-02 19:03:24,445 zuul.DependentPipelineManager DEBUG    Keeping queue <ChangeQueue gate: integration>
+2014-12-02 19:03:24,445 zuul.DependentPipelineManager INFO       Shared change queues:
+2014-12-02 19:03:24,445 zuul.DependentPipelineManager INFO         <ChangeQueue gate: org/node-project> containing org/node-project
+2014-12-02 19:03:24,445 zuul.DependentPipelineManager INFO         <ChangeQueue gate: org/nonvoting-project> containing org/nonvoting-project
+2014-12-02 19:03:24,445 zuul.DependentPipelineManager INFO         <ChangeQueue gate: org/noop-project> containing org/noop-project
+2014-12-02 19:03:24,445 zuul.DependentPipelineManager INFO         <ChangeQueue gate: org/one-job-project> containing org/one-job-project
+2014-12-02 19:03:24,445 zuul.DependentPipelineManager INFO         <ChangeQueue gate: org/project> containing org/project
+2014-12-02 19:03:24,445 zuul.DependentPipelineManager INFO         <ChangeQueue gate: integration> containing org/project1, org/project2, org/project3
+2014-12-02 19:03:24,445 zuul.IndependentPipelineManager INFO     Configured Pipeline Manager unused
+2014-12-02 19:03:24,445 zuul.IndependentPipelineManager INFO       Source: <tests.base.FakeGerritTrigger object at 0x7f9f140b1590>
+2014-12-02 19:03:24,445 zuul.IndependentPipelineManager INFO       Requirements:
+2014-12-02 19:03:24,445 zuul.IndependentPipelineManager INFO       Events:
+2014-12-02 19:03:24,445 zuul.IndependentPipelineManager INFO         <EventFilter types: comment-added event_approvals: approved:1>
+2014-12-02 19:03:24,445 zuul.IndependentPipelineManager INFO       Projects:
+2014-12-02 19:03:24,445 zuul.IndependentPipelineManager INFO       On start:
+2014-12-02 19:03:24,445 zuul.IndependentPipelineManager INFO         []
+2014-12-02 19:03:24,445 zuul.IndependentPipelineManager INFO       On success:
+2014-12-02 19:03:24,445 zuul.IndependentPipelineManager INFO         []
+2014-12-02 19:03:24,445 zuul.IndependentPipelineManager INFO       On failure:
+2014-12-02 19:03:24,445 zuul.IndependentPipelineManager INFO         []
+2014-12-02 19:03:24,445 zuul.IndependentPipelineManager INFO       On merge-failure:
+2014-12-02 19:03:24,445 zuul.IndependentPipelineManager INFO         []
+2014-12-02 19:03:24,445 zuul.IndependentPipelineManager INFO     Configured Pipeline Manager dup1
+2014-12-02 19:03:24,445 zuul.IndependentPipelineManager INFO       Source: <tests.base.FakeGerritTrigger object at 0x7f9f140b1590>
+2014-12-02 19:03:24,445 zuul.IndependentPipelineManager INFO       Requirements:
+2014-12-02 19:03:24,445 zuul.IndependentPipelineManager INFO       Events:
+2014-12-02 19:03:24,445 zuul.IndependentPipelineManager INFO         <EventFilter types: change-restored>
+2014-12-02 19:03:24,445 zuul.IndependentPipelineManager INFO       Projects:
+2014-12-02 19:03:24,446 zuul.IndependentPipelineManager INFO         org/project
+2014-12-02 19:03:24,446 zuul.IndependentPipelineManager INFO           <Job project-test1>
+2014-12-02 19:03:24,446 zuul.IndependentPipelineManager INFO       On start:
+2014-12-02 19:03:24,446 zuul.IndependentPipelineManager INFO         []
+2014-12-02 19:03:24,446 zuul.IndependentPipelineManager INFO       On success:
+2014-12-02 19:03:24,446 zuul.IndependentPipelineManager INFO         [<ActionReporter <zuul.reporter.gerrit.Reporter object at 0x7f9f140ce110>, {'verified': 1}>]
+2014-12-02 19:03:24,446 zuul.IndependentPipelineManager INFO       On failure:
+2014-12-02 19:03:24,446 zuul.IndependentPipelineManager INFO         [<ActionReporter <zuul.reporter.gerrit.Reporter object at 0x7f9f140ce110>, {'verified': -1}>]
+2014-12-02 19:03:24,446 zuul.IndependentPipelineManager INFO       On merge-failure:
+2014-12-02 19:03:24,446 zuul.IndependentPipelineManager INFO         [<ActionReporter <zuul.reporter.gerrit.Reporter object at 0x7f9f140ce110>, {'verified': -1}>]
+2014-12-02 19:03:24,446 zuul.IndependentPipelineManager INFO     Configured Pipeline Manager dup2
+2014-12-02 19:03:24,446 zuul.IndependentPipelineManager INFO       Source: <tests.base.FakeGerritTrigger object at 0x7f9f140b1590>
+2014-12-02 19:03:24,446 zuul.IndependentPipelineManager INFO       Requirements:
+2014-12-02 19:03:24,446 zuul.IndependentPipelineManager INFO       Events:
+2014-12-02 19:03:24,446 zuul.IndependentPipelineManager INFO         <EventFilter types: change-restored>
+2014-12-02 19:03:24,446 zuul.IndependentPipelineManager INFO       Projects:
+2014-12-02 19:03:24,446 zuul.IndependentPipelineManager INFO         org/project
+2014-12-02 19:03:24,446 zuul.IndependentPipelineManager INFO           <Job project-test1>
+2014-12-02 19:03:24,446 zuul.IndependentPipelineManager INFO       On start:
+2014-12-02 19:03:24,446 zuul.IndependentPipelineManager INFO         []
+2014-12-02 19:03:24,446 zuul.IndependentPipelineManager INFO       On success:
+2014-12-02 19:03:24,446 zuul.IndependentPipelineManager INFO         [<ActionReporter <zuul.reporter.gerrit.Reporter object at 0x7f9f140ce110>, {'verified': 1}>]
+2014-12-02 19:03:24,446 zuul.IndependentPipelineManager INFO       On failure:
+2014-12-02 19:03:24,446 zuul.IndependentPipelineManager INFO         [<ActionReporter <zuul.reporter.gerrit.Reporter object at 0x7f9f140ce110>, {'verified': -1}>]
+2014-12-02 19:03:24,446 zuul.IndependentPipelineManager INFO       On merge-failure:
+2014-12-02 19:03:24,446 zuul.IndependentPipelineManager INFO         [<ActionReporter <zuul.reporter.gerrit.Reporter object at 0x7f9f140ce110>, {'verified': -1}>]
+2014-12-02 19:03:24,446 zuul.DependentPipelineManager INFO     Configured Pipeline Manager conflict
+2014-12-02 19:03:24,447 zuul.DependentPipelineManager INFO       Source: <tests.base.FakeGerritTrigger object at 0x7f9f140b1590>
+2014-12-02 19:03:24,447 zuul.DependentPipelineManager INFO       Requirements:
+2014-12-02 19:03:24,447 zuul.DependentPipelineManager INFO       Events:
+2014-12-02 19:03:24,447 zuul.DependentPipelineManager INFO         <EventFilter types: comment-added event_approvals: approved:1>
+2014-12-02 19:03:24,447 zuul.DependentPipelineManager INFO       Projects:
+2014-12-02 19:03:24,447 zuul.DependentPipelineManager INFO         org/conflict-project
+2014-12-02 19:03:24,447 zuul.DependentPipelineManager INFO           <Job conflict-project-merge> [hold]
+2014-12-02 19:03:24,447 zuul.DependentPipelineManager INFO             <Job conflict-project-test1>
+2014-12-02 19:03:24,447 zuul.DependentPipelineManager INFO             <Job conflict-project-test2>
+2014-12-02 19:03:24,447 zuul.DependentPipelineManager INFO       On start:
+2014-12-02 19:03:24,447 zuul.DependentPipelineManager INFO         [<ActionReporter <zuul.reporter.gerrit.Reporter object at 0x7f9f140ce110>, {'verified': 0}>]
+2014-12-02 19:03:24,447 zuul.DependentPipelineManager INFO       On success:
+2014-12-02 19:03:24,447 zuul.DependentPipelineManager INFO         [<ActionReporter <zuul.reporter.gerrit.Reporter object at 0x7f9f140ce110>, {'verified': 2, 'submit': True}>]
+2014-12-02 19:03:24,447 zuul.DependentPipelineManager INFO       On failure:
+2014-12-02 19:03:24,447 zuul.DependentPipelineManager INFO         [<ActionReporter <zuul.reporter.gerrit.Reporter object at 0x7f9f140ce110>, {'verified': -2}>]
+2014-12-02 19:03:24,447 zuul.DependentPipelineManager INFO       On merge-failure:
+2014-12-02 19:03:24,447 zuul.DependentPipelineManager INFO         [<ActionReporter <zuul.reporter.gerrit.Reporter object at 0x7f9f140ce110>, {'verified': -2}>]
+2014-12-02 19:03:24,447 zuul.DependentPipelineManager DEBUG    Building shared change queues
+2014-12-02 19:03:24,447 zuul.DependentPipelineManager DEBUG    Created queue: <ChangeQueue conflict: org/conflict-project>
+2014-12-02 19:03:24,447 zuul.DependentPipelineManager DEBUG    Combining shared queues
+2014-12-02 19:03:24,447 zuul.DependentPipelineManager DEBUG    Keeping queue <ChangeQueue conflict: org/conflict-project>
+2014-12-02 19:03:24,447 zuul.DependentPipelineManager INFO       Shared change queues:
+2014-12-02 19:03:24,447 zuul.DependentPipelineManager INFO         <ChangeQueue conflict: org/conflict-project> containing org/conflict-project
+2014-12-02 19:03:24,447 zuul.IndependentPipelineManager INFO     Configured Pipeline Manager experimental
+2014-12-02 19:03:24,447 zuul.IndependentPipelineManager INFO       Source: <tests.base.FakeGerritTrigger object at 0x7f9f140b1590>
+2014-12-02 19:03:24,447 zuul.IndependentPipelineManager INFO       Requirements:
+2014-12-02 19:03:24,447 zuul.IndependentPipelineManager INFO       Events:
+2014-12-02 19:03:24,448 zuul.IndependentPipelineManager INFO         <EventFilter types: patchset-created>
+2014-12-02 19:03:24,448 zuul.IndependentPipelineManager INFO       Projects:
+2014-12-02 19:03:24,448 zuul.IndependentPipelineManager INFO         org/experimental-project
+2014-12-02 19:03:24,448 zuul.IndependentPipelineManager INFO           <Job experimental-project-test>
+2014-12-02 19:03:24,448 zuul.IndependentPipelineManager INFO       On start:
+2014-12-02 19:03:24,448 zuul.IndependentPipelineManager INFO         []
+2014-12-02 19:03:24,448 zuul.IndependentPipelineManager INFO       On success:
+2014-12-02 19:03:24,448 zuul.IndependentPipelineManager INFO         [<ActionReporter <zuul.reporter.gerrit.Reporter object at 0x7f9f140ce110>, {}>]
+2014-12-02 19:03:24,448 zuul.IndependentPipelineManager INFO       On failure:
+2014-12-02 19:03:24,448 zuul.IndependentPipelineManager INFO         [<ActionReporter <zuul.reporter.gerrit.Reporter object at 0x7f9f140ce110>, {}>]
+2014-12-02 19:03:24,448 zuul.IndependentPipelineManager INFO       On merge-failure:
+2014-12-02 19:03:24,448 zuul.IndependentPipelineManager INFO         [<ActionReporter <zuul.reporter.gerrit.Reporter object at 0x7f9f140ce110>, {}>]
+2014-12-02 19:03:24,448 zuul.Scheduler    DEBUG    Start maintain trigger cache for: <Pipeline check>
+2014-12-02 19:03:24,448 zuul.Scheduler    DEBUG    End maintain trigger cache for: <Pipeline check>
+2014-12-02 19:03:24,448 zuul.Scheduler    DEBUG    Start maintain trigger cache for: <Pipeline post>
+2014-12-02 19:03:24,448 zuul.Scheduler    DEBUG    End maintain trigger cache for: <Pipeline post>
+2014-12-02 19:03:24,448 zuul.Scheduler    DEBUG    Start maintain trigger cache for: <Pipeline gate>
+2014-12-02 19:03:24,448 zuul.Scheduler    DEBUG    End maintain trigger cache for: <Pipeline gate>
+2014-12-02 19:03:24,448 zuul.Scheduler    DEBUG    Start maintain trigger cache for: <Pipeline unused>
+2014-12-02 19:03:24,448 zuul.Scheduler    DEBUG    End maintain trigger cache for: <Pipeline unused>
+2014-12-02 19:03:24,448 zuul.Scheduler    DEBUG    Start maintain trigger cache for: <Pipeline dup1>
+2014-12-02 19:03:24,448 zuul.Scheduler    DEBUG    End maintain trigger cache for: <Pipeline dup1>
+2014-12-02 19:03:24,448 zuul.Scheduler    DEBUG    Start maintain trigger cache for: <Pipeline dup2>
+2014-12-02 19:03:24,448 zuul.Scheduler    DEBUG    End maintain trigger cache for: <Pipeline dup2>
+2014-12-02 19:03:24,448 zuul.Scheduler    DEBUG    Start maintain trigger cache for: <Pipeline conflict>
+2014-12-02 19:03:24,448 zuul.Scheduler    DEBUG    End maintain trigger cache for: <Pipeline conflict>
+2014-12-02 19:03:24,448 zuul.Scheduler    DEBUG    Start maintain trigger cache for: <Pipeline experimental>
+2014-12-02 19:03:24,448 zuul.Scheduler    DEBUG    End maintain trigger cache for: <Pipeline experimental>
+2014-12-02 19:03:24,449 zuul.Scheduler    DEBUG    Trigger cache size: 0
+2014-12-02 19:03:24,449 zuul.Scheduler    DEBUG    Reconfiguration complete
+2014-12-02 19:03:24,449 zuul.IndependentPipelineManager DEBUG    Starting queue processor: check
+2014-12-02 19:03:24,449 zuul.Scheduler    DEBUG    No queue file found
+2014-12-02 19:03:24,449 zuul.IndependentPipelineManager DEBUG    Finished queue processor: check (changed: False)
+2014-12-02 19:03:24,449 zuul.Scheduler    DEBUG    Resuming queue processing
+2014-12-02 19:03:24,449 zuul.IndependentPipelineManager DEBUG    Starting queue processor: post
+2014-12-02 19:03:24,450 zuul.IndependentPipelineManager DEBUG    Finished queue processor: post (changed: False)
+2014-12-02 19:03:24,450 zuul.DependentPipelineManager DEBUG    Starting queue processor: gate
+2014-12-02 19:03:24,450 gear.BaseClientServer.Zuul RPC Listener DEBUG    Waiting for change in available connections to poll
+2014-12-02 19:03:24,450 zuul.DependentPipelineManager DEBUG    Finished queue processor: gate (changed: False)
+2014-12-02 19:03:24,450 gear.BaseClientServer.Zuul RPC Listener DEBUG    Waiting for change in available servers to reconnect
+2014-12-02 19:03:24,450 gear.Worker.Zuul RPC Listener DEBUG    Adding server 127.0.0.1 port 59022
+2014-12-02 19:03:24,450 gear.Connection.Zuul RPC Listener DEBUG    Setting state to: INIT
+2014-12-02 19:03:24,450 zuul.IndependentPipelineManager DEBUG    Starting queue processor: unused
+2014-12-02 19:03:24,451 gear.Worker.Zuul RPC Listener DEBUG    Waiting for change in available connections to poll
+2014-12-02 19:03:24,452 gear.Worker.Zuul RPC Listener DEBUG    Checking if servers need to be reconnected
+2014-12-02 19:03:24,452 zuul.IndependentPipelineManager DEBUG    Finished queue processor: unused (changed: False)
+2014-12-02 19:03:24,452 gear.Worker.Zuul RPC Listener DEBUG    Trying to reconnect <gear.Connection 0x7f9f1a4d6d10 host: 127.0.0.1 port: 59022>
+2014-12-02 19:03:24,452 zuul.IndependentPipelineManager DEBUG    Starting queue processor: dup1
+2014-12-02 19:03:24,452 zuul.RPCListener  DEBUG    Starting RPC listener
+2014-12-02 19:03:24,452 gear.Worker.Zuul RPC Listener DEBUG    Waiting for at least one active connection
+2014-12-02 19:03:24,452 gear.Connection.Zuul RPC Listener INFO     Disconnected from 127.0.0.1 port 59022
+2014-12-02 19:03:24,452 zuul.IndependentPipelineManager DEBUG    Finished queue processor: dup1 (changed: False)
+2014-12-02 19:03:24,452 gear.Worker.Zuul RPC Listener DEBUG    Get job; number of threads waiting for jobs: 1
+2014-12-02 19:03:24,452 gear.Connection.Zuul RPC Listener DEBUG    Setting state to: INIT
+2014-12-02 19:03:24,452 zuul.IndependentPipelineManager DEBUG    Starting queue processor: dup2
+2014-12-02 19:03:24,453 gear.Connection.Zuul RPC Listener DEBUG    Connecting to 127.0.0.1 port 59022
+2014-12-02 19:03:24,453 zuul.IndependentPipelineManager DEBUG    Finished queue processor: dup2 (changed: False)
+2014-12-02 19:03:24,453 zuul.DependentPipelineManager DEBUG    Starting queue processor: conflict
+2014-12-02 19:03:24,453 zuul.DependentPipelineManager DEBUG    Finished queue processor: conflict (changed: False)
+2014-12-02 19:03:24,453 zuul.IndependentPipelineManager DEBUG    Starting queue processor: experimental
+2014-12-02 19:03:24,453 gear.Connection.Zuul RPC Listener INFO     Connected to 127.0.0.1 port 59022
+2014-12-02 19:03:24,453 zuul.IndependentPipelineManager DEBUG    Finished queue processor: experimental (changed: False)
+2014-12-02 19:03:24,453 gear.Server       DEBUG    Accepting new connection
+2014-12-02 19:03:24,453 gear.Connection.Zuul RPC Listener INFO     Sending packet to <gear.Connection 0x7f9f1a4d6d10 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4e5dd0 type: SET_CLIENT_ID id: Zuul RPC Listener>
+2014-12-02 19:03:24,453 zuul.Scheduler    DEBUG    Run handler sleeping
+2014-12-02 19:03:24,453 gear.ServerConnection DEBUG    Setting state to: INIT
+2014-12-02 19:03:24,453 gear.Connection.Zuul RPC Listener DEBUG    Setting state to: IDLE
+2014-12-02 19:03:24,453 zuul.Scheduler    DEBUG    Run handler awake
+2014-12-02 19:03:24,453 gear.Server       INFO     Accepted connection <gear.ServerConnection 0x7f9f1a4e5e10 name: None host: 127.0.0.1 port: 54816>
+2014-12-02 19:03:24,453 gear.Worker.Zuul RPC Listener DEBUG    Active connection found
+2014-12-02 19:03:24,454 gear.Connection.Zuul RPC Listener INFO     Sending packet to <gear.Connection 0x7f9f1a4d6d10 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4e5f50 type: GRAB_JOB_UNIQ>
+2014-12-02 19:03:24,454 zuul.IndependentPipelineManager DEBUG    Starting queue processor: check
+2014-12-02 19:03:24,454 gear.Server       DEBUG    Woken by pipe
+2014-12-02 19:03:24,454 gear.Connection.Zuul RPC Listener INFO     Sending packet to <gear.Connection 0x7f9f1a4d6d10 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4e5d90 type: CAN_DO function: zuul:enqueue>
+2014-12-02 19:03:24,454 gear.Worker.Zuul RPC Listener DEBUG    Preparing to poll
+2014-12-02 19:03:24,454 gear.Connection.Zuul RPC Listener DEBUG    Setting state to: GRAB_WAIT
+2014-12-02 19:03:24,454 zuul.IndependentPipelineManager DEBUG    Finished queue processor: check (changed: False)
+2014-12-02 19:03:24,454 gear.Server       DEBUG    Preparing to poll
+2014-12-02 19:03:24,454 gear.Worker.Zuul RPC Listener DEBUG    Polling 1 connections
+2014-12-02 19:03:24,454 gear.Worker.Zuul RPC Listener DEBUG    Waiting for change in available servers to reconnect
+2014-12-02 19:03:24,455 gear.Connection.Zuul RPC Listener INFO     Sending packet to <gear.Connection 0x7f9f1a4d6d10 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4e5dd0 type: CAN_DO function: zuul:promote>
+2014-12-02 19:03:24,455 zuul.IndependentPipelineManager DEBUG    Starting queue processor: post
+2014-12-02 19:03:24,455 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,455 gear.Worker.Zuul RPC Listener DEBUG    Woken by pipe
+2014-12-02 19:03:24,455 gear.Connection.Zuul RPC Listener INFO     Sending packet to <gear.Connection 0x7f9f1a4d6d10 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4e5f90 type: CAN_DO function: zuul:get_running_jobs>
+2014-12-02 19:03:24,455 zuul.IndependentPipelineManager DEBUG    Finished queue processor: post (changed: False)
+2014-12-02 19:03:24,455 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1a4e5e10 name: None host: 127.0.0.1 port: 54816>
+2014-12-02 19:03:24,455 gear.Worker.Zuul RPC Listener DEBUG    Preparing to poll
+2014-12-02 19:03:24,455 gear.Client.unknown DEBUG    Active connection found
+2014-12-02 19:03:24,455 zuul.DependentPipelineManager DEBUG    Starting queue processor: gate
+2014-12-02 19:03:24,455 gear.Worker.Zuul RPC Listener DEBUG    Polling 1 connections
+2014-12-02 19:03:24,456 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b6090 type: CAN_DO function: build:project3-test2>
+2014-12-02 19:03:24,456 zuul.DependentPipelineManager DEBUG    Finished queue processor: gate (changed: False)
+2014-12-02 19:03:24,456 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b6090 type: CAN_DO function: build:project3-test1>
+2014-12-02 19:03:24,456 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b6090 type: CAN_DO function: build:nonvoting-project-post>
+2014-12-02 19:03:24,456 zuul.IndependentPipelineManager DEBUG    Starting queue processor: unused
+2014-12-02 19:03:24,456 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1a4e5e10 name: None host: 127.0.0.1 port: 54816>: <gear.Packet 0x7f9f1a4e5f10 type: SET_CLIENT_ID id: Zuul RPC Listener>
+2014-12-02 19:03:24,456 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b6150 type: CAN_DO function: build:project3-merge>
+2014-12-02 19:03:24,456 zuul.IndependentPipelineManager DEBUG    Finished queue processor: unused (changed: False)
+2014-12-02 19:03:24,456 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,457 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b61d0 type: CAN_DO function: build:layered-project-test4>
+2014-12-02 19:03:24,457 zuul.IndependentPipelineManager DEBUG    Starting queue processor: dup1
+2014-12-02 19:03:24,457 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1a4e5e10 name: Zuul RPC Listener host: 127.0.0.1 port: 54816>
+2014-12-02 19:03:24,457 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b62d0 type: CAN_DO function: build:layered-project-test3>
+2014-12-02 19:03:24,457 zuul.IndependentPipelineManager DEBUG    Finished queue processor: dup1 (changed: False)
+2014-12-02 19:03:24,457 zuul.IndependentPipelineManager DEBUG    Starting queue processor: dup2
+2014-12-02 19:03:24,457 zuul.IndependentPipelineManager DEBUG    Finished queue processor: dup2 (changed: False)
+2014-12-02 19:03:24,458 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b6350 type: CAN_DO function: build:project1-test1>
+2014-12-02 19:03:24,458 zuul.DependentPipelineManager DEBUG    Starting queue processor: conflict
+2014-12-02 19:03:24,458 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1a4e5e10 name: Zuul RPC Listener host: 127.0.0.1 port: 54816>: <gear.Packet 0x7f9f1a4e5e90 type: GRAB_JOB_UNIQ>
+2014-12-02 19:03:24,458 gear.ServerConnection INFO     Sending packet to <gear.ServerConnection 0x7f9f1a4e5e10 name: Zuul RPC Listener host: 127.0.0.1 port: 54816>: <gear.Packet 0x7f9f1a4e5f10 type: NO_JOB>
+2014-12-02 19:03:24,458 gear.Worker.Zuul RPC Listener DEBUG    Processing input on <gear.Connection 0x7f9f1a4d6d10 host: 127.0.0.1 port: 59022>
+2014-12-02 19:03:24,458 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b6110 type: CAN_DO function: build:project1-test2>
+2014-12-02 19:03:24,458 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,458 gear.Worker.Zuul RPC Listener INFO     Received packet from <gear.Connection 0x7f9f1a4d6d10 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b64d0 type: NO_JOB>
+2014-12-02 19:03:24,459 gear.Worker.Zuul RPC Listener DEBUG    Sending PRE_SLEEP
+2014-12-02 19:03:24,458 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b6590 type: CAN_DO function: build:node-project-merge>
+2014-12-02 19:03:24,459 gear.Connection.Zuul RPC Listener INFO     Sending packet to <gear.Connection 0x7f9f1a4d6d10 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4e5f10 type: PRE_SLEEP>
+2014-12-02 19:03:24,459 gear.Connection.Zuul RPC Listener DEBUG    Setting state to: SLEEP
+2014-12-02 19:03:24,459 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b6590 type: CAN_DO function: build:conflict-project-merge>
+2014-12-02 19:03:24,459 gear.Worker.Zuul RPC Listener DEBUG    Polling 1 connections
+2014-12-02 19:03:24,459 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6610 type: CAN_DO function: build:project3-test2>
+2014-12-02 19:03:24,459 gear.Server       DEBUG    Adding function build:project3-test2 to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,459 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4e5f10 type: CAN_DO function: build:project-test1>
+2014-12-02 19:03:24,460 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,458 zuul.DependentPipelineManager DEBUG    Finished queue processor: conflict (changed: False)
+2014-12-02 19:03:24,460 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b63d0 type: CAN_DO function: build:project-merge>
+2014-12-02 19:03:24,460 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1a4e5e10 name: Zuul RPC Listener host: 127.0.0.1 port: 54816>
+2014-12-02 19:03:24,460 zuul.IndependentPipelineManager DEBUG    Starting queue processor: experimental
+2014-12-02 19:03:24,460 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b6450 type: CAN_DO function: build:project-test2>
+2014-12-02 19:03:24,460 zuul.IndependentPipelineManager DEBUG    Finished queue processor: experimental (changed: False)
+2014-12-02 19:03:24,460 zuul.Scheduler    DEBUG    Run handler sleeping
+2014-12-02 19:03:24,460 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b6190 type: CAN_DO function: build:noop>
+2014-12-02 19:03:24,461 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f140b1410 type: CAN_DO function: build:project-test6>
+2014-12-02 19:03:24,461 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f140c0e10 type: CAN_DO function: build:project1-post>
+2014-12-02 19:03:24,461 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1a4e5e10 name: Zuul RPC Listener host: 127.0.0.1 port: 54816>: <gear.Packet 0x7f9f1a4b6510 type: CAN_DO function: zuul:enqueue>
+2014-12-02 19:03:24,461 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b6550 type: CAN_DO function: build:one-job-project-post>
+2014-12-02 19:03:24,461 gear.Server       DEBUG    Adding function zuul:enqueue to <gear.ServerConnection 0x7f9f1a4e5e10 name: Zuul RPC Listener host: 127.0.0.1 port: 54816>
+2014-12-02 19:03:24,461 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,461 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b6550 type: CAN_DO function: build:experimental-project-test>
+2014-12-02 19:03:24,461 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b6690 type: CAN_DO function: build:project3-post>
+2014-12-02 19:03:24,461 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b6490 type: CAN_DO function: build:one-job-project-merge>
+2014-12-02 19:03:24,462 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b66d0 type: CAN_DO function: build:project-testfile>
+2014-12-02 19:03:24,462 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b67d0 type: CAN_DO function: build:project2-test2>
+2014-12-02 19:03:24,462 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6810 type: CAN_DO function: build:project3-test1>
+2014-12-02 19:03:24,462 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b6850 type: CAN_DO function: build:project2-merge>
+2014-12-02 19:03:24,462 gear.Server       DEBUG    Adding function build:project3-test1 to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,462 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b6990 type: CAN_DO function: build:project2-test1>
+2014-12-02 19:03:24,462 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,462 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b6990 type: CAN_DO function: build:project-post>
+2014-12-02 19:03:24,462 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1a4e5e10 name: Zuul RPC Listener host: 127.0.0.1 port: 54816>
+2014-12-02 19:03:24,463 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b68d0 type: CAN_DO function: build:project1-project2-integration>
+2014-12-02 19:03:24,463 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b68d0 type: CAN_DO function: build:nonvoting-project-test1>
+2014-12-02 19:03:24,463 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b69d0 type: CAN_DO function: build:conflict-project-test2>
+2014-12-02 19:03:24,463 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b6910 type: CAN_DO function: build:conflict-project-test1>
+2014-12-02 19:03:24,463 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b6ad0 type: CAN_DO function: build:node-project-test1>
+2014-12-02 19:03:24,463 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1a4e5e10 name: Zuul RPC Listener host: 127.0.0.1 port: 54816>: <gear.Packet 0x7f9f1a4b6c10 type: CAN_DO function: zuul:promote>
+2014-12-02 19:03:24,463 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b6ad0 type: CAN_DO function: build:nonvoting-project-merge>
+2014-12-02 19:03:24,463 gear.Server       DEBUG    Adding function zuul:promote to <gear.ServerConnection 0x7f9f1a4e5e10 name: Zuul RPC Listener host: 127.0.0.1 port: 54816>
+2014-12-02 19:03:24,463 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b6b90 type: CAN_DO function: build:node-project-test2>
+2014-12-02 19:03:24,464 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,464 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b6b50 type: CAN_DO function: build:project1-merge>
+2014-12-02 19:03:24,464 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b6b50 type: CAN_DO function: build:nonvoting-project-test2>
+2014-12-02 19:03:24,464 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b6cd0 type: CAN_DO function: build:project2-post>
+2014-12-02 19:03:24,464 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b6d50 type: CAN_DO function: build:layered-project-foo-test5>
+2014-12-02 19:03:24,464 gear.Connection.fake_worker INFO     Sending packet to <gear.Connection 0x7f9f1691e150 host: 127.0.0.1 port: 59022>: <gear.Packet 0x7f9f1a4b6d50 type: CAN_DO function: stop:fake_worker>
+2014-12-02 19:03:24,464 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6d50 type: CAN_DO function: build:nonvoting-project-post>
+2014-12-02 19:03:24,464 gear.Server       DEBUG    Adding function build:nonvoting-project-post to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,465 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,465 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1a4e5e10 name: Zuul RPC Listener host: 127.0.0.1 port: 54816>
+2014-12-02 19:03:24,465 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1a4e5e10 name: Zuul RPC Listener host: 127.0.0.1 port: 54816>: <gear.Packet 0x7f9f1a4b6810 type: CAN_DO function: zuul:get_running_jobs>
+2014-12-02 19:03:24,465 gear.Server       DEBUG    Adding function zuul:get_running_jobs to <gear.ServerConnection 0x7f9f1a4e5e10 name: Zuul RPC Listener host: 127.0.0.1 port: 54816>
+2014-12-02 19:03:24,465 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,465 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6c90 type: CAN_DO function: build:project3-merge>
+2014-12-02 19:03:24,465 gear.Server       DEBUG    Adding function build:project3-merge to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,465 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,465 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1a4e5e10 name: Zuul RPC Listener host: 127.0.0.1 port: 54816>
+2014-12-02 19:03:24,466 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1a4e5e10 name: Zuul RPC Listener host: 127.0.0.1 port: 54816>: <gear.Packet 0x7f9f1a4b6810 type: PRE_SLEEP>
+2014-12-02 19:03:24,466 gear.ServerConnection DEBUG    Setting state to: SLEEP
+2014-12-02 19:03:24,466 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,466 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6d10 type: CAN_DO function: build:layered-project-test4>
+2014-12-02 19:03:24,466 gear.Server       DEBUG    Adding function build:layered-project-test4 to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,466 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,467 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,467 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6d90 type: CAN_DO function: build:layered-project-test3>
+2014-12-02 19:03:24,467 gear.Server       DEBUG    Adding function build:layered-project-test3 to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,467 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,467 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,467 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6bd0 type: CAN_DO function: build:project1-test1>
+2014-12-02 19:03:24,467 gear.Server       DEBUG    Adding function build:project1-test1 to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,468 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,468 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,468 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6dd0 type: CAN_DO function: build:project1-test2>
+2014-12-02 19:03:24,468 gear.Server       DEBUG    Adding function build:project1-test2 to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,468 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,468 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,468 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6e10 type: CAN_DO function: build:node-project-merge>
+2014-12-02 19:03:24,468 gear.Server       DEBUG    Adding function build:node-project-merge to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,468 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,468 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,468 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6dd0 type: CAN_DO function: build:conflict-project-merge>
+2014-12-02 19:03:24,469 gear.Server       DEBUG    Adding function build:conflict-project-merge to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,469 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,469 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,469 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6e10 type: CAN_DO function: build:project-test1>
+2014-12-02 19:03:24,469 gear.Server       DEBUG    Adding function build:project-test1 to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,469 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,469 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,469 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6dd0 type: CAN_DO function: build:project-merge>
+2014-12-02 19:03:24,469 gear.Server       DEBUG    Adding function build:project-merge to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,469 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,469 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,469 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6e10 type: CAN_DO function: build:project-test2>
+2014-12-02 19:03:24,470 gear.Server       DEBUG    Adding function build:project-test2 to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,470 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,470 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,470 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6e50 type: CAN_DO function: build:noop>
+2014-12-02 19:03:24,470 gear.Server       DEBUG    Adding function build:noop to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,470 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,470 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,470 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6e10 type: CAN_DO function: build:project-test6>
+2014-12-02 19:03:24,470 gear.Server       DEBUG    Adding function build:project-test6 to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,470 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,470 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,470 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6e50 type: CAN_DO function: build:project1-post>
+2014-12-02 19:03:24,470 gear.Server       DEBUG    Adding function build:project1-post to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,470 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,470 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,471 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6dd0 type: CAN_DO function: build:one-job-project-post>
+2014-12-02 19:03:24,471 gear.Server       DEBUG    Adding function build:one-job-project-post to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,471 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,471 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,471 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6e50 type: CAN_DO function: build:experimental-project-test>
+2014-12-02 19:03:24,471 gear.Server       DEBUG    Adding function build:experimental-project-test to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,471 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,471 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,471 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6dd0 type: CAN_DO function: build:project3-post>
+2014-12-02 19:03:24,471 gear.Server       DEBUG    Adding function build:project3-post to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,471 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,472 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,472 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6e90 type: CAN_DO function: build:one-job-project-merge>
+2014-12-02 19:03:24,472 gear.Server       DEBUG    Adding function build:one-job-project-merge to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,472 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,472 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,472 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6ed0 type: CAN_DO function: build:project-testfile>
+2014-12-02 19:03:24,472 gear.Server       DEBUG    Adding function build:project-testfile to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,472 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,472 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,472 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6f10 type: CAN_DO function: build:project2-test2>
+2014-12-02 19:03:24,472 gear.Server       DEBUG    Adding function build:project2-test2 to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,473 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,473 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,473 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6f50 type: CAN_DO function: build:project2-merge>
+2014-12-02 19:03:24,473 gear.Server       DEBUG    Adding function build:project2-merge to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,473 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,473 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,473 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6f90 type: CAN_DO function: build:project2-test1>
+2014-12-02 19:03:24,473 gear.Server       DEBUG    Adding function build:project2-test1 to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,473 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,473 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,473 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6f50 type: CAN_DO function: build:project-post>
+2014-12-02 19:03:24,473 gear.Server       DEBUG    Adding function build:project-post to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,474 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,474 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,474 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6f90 type: CAN_DO function: build:project1-project2-integration>
+2014-12-02 19:03:24,474 gear.Server       DEBUG    Adding function build:project1-project2-integration to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,474 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,474 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,474 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6f50 type: CAN_DO function: build:nonvoting-project-test1>
+2014-12-02 19:03:24,474 gear.Server       DEBUG    Adding function build:nonvoting-project-test1 to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,474 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,474 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,474 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6f90 type: CAN_DO function: build:conflict-project-test2>
+2014-12-02 19:03:24,475 gear.Server       DEBUG    Adding function build:conflict-project-test2 to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,475 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,475 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,475 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6f50 type: CAN_DO function: build:conflict-project-test1>
+2014-12-02 19:03:24,475 gear.Server       DEBUG    Adding function build:conflict-project-test1 to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,475 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,475 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,475 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6fd0 type: CAN_DO function: build:node-project-test1>
+2014-12-02 19:03:24,475 gear.Server       DEBUG    Adding function build:node-project-test1 to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,475 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,475 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,476 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b6f50 type: CAN_DO function: build:nonvoting-project-merge>
+2014-12-02 19:03:24,476 gear.Server       DEBUG    Adding function build:nonvoting-project-merge to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,476 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,476 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,476 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b1090 type: CAN_DO function: build:node-project-test2>
+2014-12-02 19:03:24,476 gear.Server       DEBUG    Adding function build:node-project-test2 to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,476 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,476 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,477 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b1310 type: CAN_DO function: build:project1-merge>
+2014-12-02 19:03:24,477 gear.Server       DEBUG    Adding function build:project1-merge to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,477 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,477 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,477 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b1090 type: CAN_DO function: build:nonvoting-project-test2>
+2014-12-02 19:03:24,478 gear.Server       DEBUG    Adding function build:nonvoting-project-test2 to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,478 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,478 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,478 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b1390 type: CAN_DO function: build:project2-post>
+2014-12-02 19:03:24,478 gear.Server       DEBUG    Adding function build:project2-post to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,478 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,478 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,480 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b1090 type: CAN_DO function: build:layered-project-foo-test5>
+2014-12-02 19:03:24,480 gear.Server       DEBUG    Adding function build:layered-project-foo-test5 to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,480 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,480 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,481 gear.Server       INFO     Received packet from <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>: <gear.Packet 0x7f9f1a4b1390 type: CAN_DO function: stop:fake_worker>
+2014-12-02 19:03:24,481 gear.Server       DEBUG    Adding function stop:fake_worker to <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,481 gear.Server       DEBUG    Polling 5 connections
+2014-12-02 19:03:24,528 zuul.Gerrit       INFO     Updating information for 1,2
+2014-12-02 19:03:24,529 zuul.Gerrit       DEBUG    Change <Change 0x7f9f1a4b6f50 1,2> status: NEW
+2014-12-02 19:03:24,529 zuul.Gerrit       INFO     Updating information for 1,2
+2014-12-02 19:03:24,529 zuul.Gerrit       DEBUG    Change <Change 0x7f9f1a4b6f50 1,2> status: NEW
+2014-12-02 19:03:24,529 zuul.Gerrit       INFO     Updating information for 1,2
+2014-12-02 19:03:24,529 zuul.Gerrit       DEBUG    Change <Change 0x7f9f1a4b6f50 1,2> status: NEW
+2014-12-02 19:03:24,530 zuul.test         DEBUG    Shutting down after tests
+2014-12-02 19:03:24,530 zuul.Gearman      DEBUG    Stopping
+2014-12-02 19:03:24,549 gear.Client.unknown DEBUG    Beginning shutdown
+2014-12-02 19:03:24,549 gear.Client.unknown DEBUG    Woken by pipe
+2014-12-02 19:03:24,549 gear.Client.unknown DEBUG    Beginning cleanup
+2014-12-02 19:03:24,549 gear.Client.unknown DEBUG    Checking if servers need to be reconnected
+2014-12-02 19:03:24,550 gear.Connection.unknown INFO     Disconnected from 127.0.0.1 port 59022
+2014-12-02 19:03:24,550 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f16928c10 name: None host: 127.0.0.1 port: 54814>
+2014-12-02 19:03:24,550 gear.Connection.unknown DEBUG    Setting state to: INIT
+2014-12-02 19:03:24,550 gear.Server       DEBUG    Received no data on <gear.ServerConnection 0x7f9f16928c10 name: None host: 127.0.0.1 port: 54814>
+2014-12-02 19:03:24,550 gear.Server       INFO     Marking <gear.ServerConnection 0x7f9f16928c10 name: None host: 127.0.0.1 port: 54814> as disconnected
+2014-12-02 19:03:24,550 gear.Client.unknown DEBUG    Finished shutdown
+2014-12-02 19:03:24,550 gear.Server       DEBUG    Preparing to poll
+2014-12-02 19:03:24,550 zuul.Gearman      DEBUG    Stopped
+2014-12-02 19:03:24,551 gear.Server       DEBUG    Polling 4 connections
+2014-12-02 19:03:24,551 zuul.MergeServer  DEBUG    Stopping
+2014-12-02 19:03:24,551 gear.Worker.Zuul Merger DEBUG    Beginning shutdown
+2014-12-02 19:03:24,551 gear.Connection.Zuul Merger DEBUG    Setting state to: IDLE
+2014-12-02 19:03:24,551 gear.Worker.Zuul Merger DEBUG    Woken by pipe
+2014-12-02 19:03:24,551 gear.Worker.Zuul Merger DEBUG    Checking if servers need to be reconnected
+2014-12-02 19:03:24,551 gear.Worker.Zuul Merger DEBUG    Received job: None
+2014-12-02 19:03:24,551 gear.Worker.Zuul Merger DEBUG    Beginning cleanup
+2014-12-02 19:03:24,551 zuul.MergeServer  ERROR    Exception while getting job
+Traceback (most recent call last):
+  File "zuul/merger/server.py", line 90, in run
+    job = self.worker.getJob()
+  File "/home/dim/Work/git/github.com/openstack-infra/zuul/.tox/py27/local/lib/python2.7/site-packages/gear/__init__.py", line 1803, in getJob
+    raise InterruptedError()
+InterruptedError
+2014-12-02 19:03:24,551 gear.Connection.Zuul Merger INFO     Disconnected from 127.0.0.1 port 59022
+2014-12-02 19:03:24,552 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ed10 name: Zuul Merger host: 127.0.0.1 port: 54813>
+2014-12-02 19:03:24,552 gear.Connection.Zuul Merger DEBUG    Setting state to: INIT
+2014-12-02 19:03:24,552 gear.Server       DEBUG    Received no data on <gear.ServerConnection 0x7f9f1691ed10 name: Zuul Merger host: 127.0.0.1 port: 54813>
+2014-12-02 19:03:24,552 gear.Server       INFO     Marking <gear.ServerConnection 0x7f9f1691ed10 name: Zuul Merger host: 127.0.0.1 port: 54813> as disconnected
+2014-12-02 19:03:24,552 gear.Server       DEBUG    Preparing to poll
+2014-12-02 19:03:24,553 gear.Server       DEBUG    Polling 3 connections
+2014-12-02 19:03:24,552 gear.Worker.Zuul Merger DEBUG    Finished shutdown
+2014-12-02 19:03:24,553 zuul.MergeServer  DEBUG    Stopped
+2014-12-02 19:03:24,553 gear.Client.unknown DEBUG    Beginning shutdown
+2014-12-02 19:03:24,553 gear.Client.unknown DEBUG    Beginning cleanup
+2014-12-02 19:03:24,553 gear.Client.unknown DEBUG    Woken by pipe
+2014-12-02 19:03:24,553 gear.Client.unknown DEBUG    Checking if servers need to be reconnected
+2014-12-02 19:03:24,553 gear.Connection.unknown INFO     Disconnected from 127.0.0.1 port 59022
+2014-12-02 19:03:24,553 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f16928f50 name: None host: 127.0.0.1 port: 54815>
+2014-12-02 19:03:24,553 gear.Connection.unknown DEBUG    Setting state to: INIT
+2014-12-02 19:03:24,553 gear.Server       DEBUG    Received no data on <gear.ServerConnection 0x7f9f16928f50 name: None host: 127.0.0.1 port: 54815>
+2014-12-02 19:03:24,553 gear.Server       INFO     Marking <gear.ServerConnection 0x7f9f16928f50 name: None host: 127.0.0.1 port: 54815> as disconnected
+2014-12-02 19:03:24,553 gear.Client.unknown DEBUG    Finished shutdown
+2014-12-02 19:03:24,554 gear.Server       DEBUG    Preparing to poll
+2014-12-02 19:03:24,554 gear.Worker.fake_worker DEBUG    Beginning shutdown
+2014-12-02 19:03:24,554 gear.Server       DEBUG    Polling 2 connections
+2014-12-02 19:03:24,554 gear.Worker.fake_worker DEBUG    Woken by pipe
+2014-12-02 19:03:24,554 gear.Worker.fake_worker DEBUG    Received job: None
+2014-12-02 19:03:24,554 gear.Connection.fake_worker DEBUG    Setting state to: IDLE
+2014-12-02 19:03:24,554 gear.Worker.fake_worker DEBUG    Checking if servers need to be reconnected
+2014-12-02 19:03:24,554 gear.Worker.fake_worker DEBUG    Beginning cleanup
+2014-12-02 19:03:24,554 gear.Connection.fake_worker INFO     Disconnected from 127.0.0.1 port 59022
+2014-12-02 19:03:24,554 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,555 gear.Connection.fake_worker DEBUG    Setting state to: INIT
+2014-12-02 19:03:24,555 gear.Server       DEBUG    Received no data on <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812>
+2014-12-02 19:03:24,555 gear.Server       INFO     Marking <gear.ServerConnection 0x7f9f1691ec10 name: fake_worker host: 127.0.0.1 port: 54812> as disconnected
+2014-12-02 19:03:24,555 gear.Worker.fake_worker DEBUG    Finished shutdown
+2014-12-02 19:03:24,555 gear.Server       DEBUG    Preparing to poll
+2014-12-02 19:03:24,555 gear.Server       DEBUG    Polling 1 connections
+2014-12-02 19:03:24,555 root              INFO     Shutting down thread pool
+2014-12-02 19:03:24,555 apscheduler.scheduler INFO     Scheduler has been shut down
+2014-12-02 19:03:24,555 zuul.Scheduler    DEBUG    Run handler stopping
+2014-12-02 19:03:24,556 paste.httpserver.ThreadPool INFO     Shutting down threadpool
+2014-12-02 19:03:24,556 paste.httpserver.ThreadPool DEBUG    Worker 140320297690880 asked to SHUTDOWN
+2014-12-02 19:03:24,556 paste.httpserver.ThreadPool DEBUG    Worker 140320314476288 asked to SHUTDOWN
+2014-12-02 19:03:24,556 paste.httpserver.ThreadPool DEBUG    Worker 140320289298176 asked to SHUTDOWN
+2014-12-02 19:03:24,556 paste.httpserver.ThreadPool DEBUG    Worker 140320306083584 asked to SHUTDOWN
+2014-12-02 19:03:24,556 paste.httpserver.ThreadPool DEBUG    Worker 140319794390784 asked to SHUTDOWN
+2014-12-02 19:03:24,556 paste.httpserver.ThreadPool DEBUG    Worker 140319802783488 asked to SHUTDOWN
+2014-12-02 19:03:24,556 paste.httpserver.ThreadPool DEBUG    Worker 140319785998080 asked to SHUTDOWN
+2014-12-02 19:03:24,556 paste.httpserver.ThreadPool DEBUG    Worker 140319777605376 asked to SHUTDOWN
+2014-12-02 19:03:24,556 paste.httpserver.ThreadPool DEBUG    Worker 140319769212672 asked to SHUTDOWN
+2014-12-02 19:03:24,557 paste.httpserver.ThreadPool DEBUG    Worker 140319760819968 asked to SHUTDOWN
+2014-12-02 19:03:24,558 paste.httpserver.ThreadPool INFO     All workers stopped
+2014-12-02 19:03:25,451 paste.httpserver.ThreadPool INFO     Shutting down threadpool
+2014-12-02 19:03:25,451 paste.httpserver.ThreadPool INFO     All workers stopped
+2014-12-02 19:03:25,451 zuul.RPCListener  DEBUG    Stopping
+2014-12-02 19:03:25,451 gear.Worker.Zuul RPC Listener DEBUG    Beginning shutdown
+2014-12-02 19:03:25,452 gear.Worker.Zuul RPC Listener DEBUG    Woken by pipe
+2014-12-02 19:03:25,452 gear.Connection.Zuul RPC Listener DEBUG    Setting state to: IDLE
+2014-12-02 19:03:25,452 gear.Worker.Zuul RPC Listener DEBUG    Received job: None
+2014-12-02 19:03:25,452 gear.Worker.Zuul RPC Listener DEBUG    Checking if servers need to be reconnected
+2014-12-02 19:03:25,452 gear.Worker.Zuul RPC Listener DEBUG    Beginning cleanup
+2014-12-02 19:03:25,452 zuul.RPCListener  ERROR    Exception while getting job
+Traceback (most recent call last):
+  File "zuul/rpclistener.py", line 67, in run
+    job = self.worker.getJob()
+  File "/home/dim/Work/git/github.com/openstack-infra/zuul/.tox/py27/local/lib/python2.7/site-packages/gear/__init__.py", line 1803, in getJob
+    raise InterruptedError()
+InterruptedError
+2014-12-02 19:03:25,453 gear.Connection.Zuul RPC Listener INFO     Disconnected from 127.0.0.1 port 59022
+2014-12-02 19:03:25,453 gear.Server       DEBUG    Processing input on <gear.ServerConnection 0x7f9f1a4e5e10 name: Zuul RPC Listener host: 127.0.0.1 port: 54816>
+2014-12-02 19:03:25,454 gear.Connection.Zuul RPC Listener DEBUG    Setting state to: INIT
+2014-12-02 19:03:25,454 gear.Server       DEBUG    Received no data on <gear.ServerConnection 0x7f9f1a4e5e10 name: Zuul RPC Listener host: 127.0.0.1 port: 54816>
+2014-12-02 19:03:25,454 gear.Worker.Zuul RPC Listener DEBUG    Finished shutdown
+2014-12-02 19:03:25,454 gear.Server       INFO     Marking <gear.ServerConnection 0x7f9f1a4e5e10 name: Zuul RPC Listener host: 127.0.0.1 port: 54816> as disconnected
+2014-12-02 19:03:25,454 zuul.RPCListener  DEBUG    Stopped
+2014-12-02 19:03:25,454 gear.Server       DEBUG    Waiting for change in available connections to poll
+2014-12-02 19:03:25,455 gear.Server       DEBUG    Beginning shutdown
+2014-12-02 19:03:25,455 gear.Server       DEBUG    Preparing to poll
+2014-12-02 19:03:25,455 gear.Server       DEBUG    Accept woken by pipe
+2014-12-02 19:03:25,455 gear.Server       DEBUG    Beginning cleanup
+2014-12-02 19:03:25,456 gear.Server       DEBUG    Finished shutdown
+2014-12-02 19:03:25,496 paste.httpserver.ThreadPool INFO     Shutting down threadpool
+2014-12-02 19:03:25,496 paste.httpserver.ThreadPool INFO     All workers stopped
+running=OS_STDOUT_CAPTURE=${OS_STDOUT_CAPTURE:-1} OS_STDERR_CAPTURE=${OS_STDERR_CAPTURE:-1} OS_LOG_CAPTURE=${OS_LOG_CAPTURE:-1} ${PYTHON:-python} -m subunit.run discover -t ./ tests --list 
+running=OS_STDOUT_CAPTURE=${OS_STDOUT_CAPTURE:-1} OS_STDERR_CAPTURE=${OS_STDERR_CAPTURE:-1} OS_LOG_CAPTURE=${OS_LOG_CAPTURE:-1} ${PYTHON:-python} -m subunit.run discover -t ./ tests  --load-list /tmp/tmpekJNce
+Ran 1 tests in 1.985s (-0.096s)
+PASSED (id=11)
+Slowest Tests
+Test id                                            Runtime (s)
+-------------------------------------------------  -----------
+tests.test_scheduler.TestScheduler.test_can_merge  1.984
+___________________________________ summary ____________________________________
+  py27: commands succeeded
+  congratulations :)

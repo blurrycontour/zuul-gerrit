@@ -366,7 +366,7 @@ class FakeChange(object):
 
 class FakeGerrit(object):
     def __init__(self, *args, **kw):
-        self.event_queue = Queue.Queue()
+        self.event_queue = kw.get('event_queue')
         self.fixture_dir = os.path.join(FIXTURE_DIR, 'gerrit')
         self.change_number = 0
         self.changes = {}
@@ -415,6 +415,9 @@ class FakeGerrit(object):
     def startWatching(self, *args, **kw):
         pass
 
+    def stopWatching(self, *args, **kw):
+        pass
+
 
 class BuildHistory(object):
     def __init__(self, **kw):
@@ -457,6 +460,9 @@ class FakeGerritTrigger(zuul.trigger.gerrit.Gerrit):
 
     def getGitUrl(self, project):
         return os.path.join(self.upstream_root, project.name)
+
+    def postConfig(self):
+        pass
 
 
 class FakeStatsd(threading.Thread):
