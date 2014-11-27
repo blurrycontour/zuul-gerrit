@@ -26,19 +26,24 @@ import pprint
 class GerritWatcher(threading.Thread):
     log = logging.getLogger("gerrit.GerritWatcher")
 
-    def __init__(self, gerrit, username, hostname, port=29418, keyfile=None):
+    def __init__(self, gerrit, username, hostname, port=29418, keyfile=None,
+                 whitelist=None):
         threading.Thread.__init__(self)
         self.username = username
         self.keyfile = keyfile
         self.hostname = hostname
         self.port = port
         self.gerrit = gerrit
+        self.whitelist = whitelist
 
     def _read(self, fd):
         l = fd.readline()
         data = json.loads(l)
         self.log.debug("Received data from Gerrit event stream: \n%s" %
                        pprint.pformat(data))
+        if self.whitelist:
+            if data.get('type') not in self.whitelist:
+                return
         self.gerrit.addEvent(data)
 
     def _listen(self, stdout, stderr):
@@ -84,7 +89,8 @@ class GerritWatcher(threading.Thread):
 class Gerrit(object):
     log = logging.getLogger("gerrit.Gerrit")
 
-    def __init__(self, hostname, username, port=29418, keyfile=None):
+    def __init__(self, hostname, username, port=29418, keyfile=None,
+                 whitelist=None):
         self.username = username
         self.hostname = hostname
         self.port = port
@@ -92,6 +98,7 @@ class Gerrit(object):
         self.watcher_thread = None
         self.event_queue = None
         self.client = None
+        self.whitelist = whitelist
 
     def startWatching(self):
         self.event_queue = Queue.Queue()
@@ -100,7 +107,8 @@ class Gerrit(object):
             self.username,
             self.hostname,
             self.port,
-            keyfile=self.keyfile)
+            keyfile=self.keyfile,
+            whitelist=self.whitelist)
         self.watcher_thread.start()
 
     def addEvent(self, data):

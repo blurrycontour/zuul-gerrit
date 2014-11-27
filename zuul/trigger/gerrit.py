@@ -115,24 +115,40 @@ class Gerrit(object):
         self._change_cache = {}
         self.sched = sched
         self.config = config
+        self.read_config()
+        self.start()
+
+    def read_config(self):
         self.server = config.get('gerrit', 'server')
+
         if config.has_option('gerrit', 'baseurl'):
             self.baseurl = config.get('gerrit', 'baseurl')
         else:
             self.baseurl = 'https://%s' % self.server
-        user = config.get('gerrit', 'user')
+
+        self.user = config.get('gerrit', 'user')
+
         if config.has_option('gerrit', 'sshkey'):
-            sshkey = config.get('gerrit', 'sshkey')
+            self.sshkey = config.get('gerrit', 'sshkey')
         else:
-            sshkey = None
+            self.sshkey = None
+
         if config.has_option('gerrit', 'port'):
-            port = int(config.get('gerrit', 'port'))
+            self.port = int(config.get('gerrit', 'port'))
         else:
-            port = 29418
-        self.gerrit = gerrit.Gerrit(self.server, user, port, sshkey)
+            self.port = 29418
+
+        if config.has_option('gerrit', 'whitelist'):
+            self.whitelist = config.get('gerrit', 'whitelist').split(',')
+        else:
+            self.whitelist = None
+
+    def start(self):
+        self.gerrit = gerrit.Gerrit(self.server, self.user, self.port, self.sshkey,
+                                    self.whitelist)
         self.gerrit.startWatching()
         self.gerrit_connector = GerritEventConnector(
-            self.gerrit, sched, self)
+            self.gerrit, self.sched, self)
         self.gerrit_connector.start()
 
     def stop(self):
@@ -289,7 +305,9 @@ class Gerrit(object):
             del self._change_cache[key]
 
     def postConfig(self):
-        pass
+        self.stop()
+        self.read_config()
+        self.start()
 
     def getChange(self, event, project):
         if event.change_number:
