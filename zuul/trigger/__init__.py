@@ -31,6 +31,10 @@ class BaseTrigger(object):
         """Stop the trigger."""
         pass
 
+    @abc.abstractmethod
+    def getEventFilters(self, trigger_conf):
+        raise NotImplementedError()
+
     def postConfig(self):
         """Called after config is loaded."""
         pass
