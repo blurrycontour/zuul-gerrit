@@ -18,9 +18,8 @@ class BaseReporter(object):
 
     Defines the exact public methods that must be supplied."""
 
-    def __init__(self, *args, **kwargs):
-        # TODO(jhesketh): Fix *args to just a connection
-        pass
+    def __init__(self, reporter_config={}):
+        self.reporter_config = reporter_config
 
     def report(self, source, change, message, params):
         """Send the compiled report message."""
@@ -37,3 +36,9 @@ class BaseReporter(object):
     def postConfig(self):
         """Run tasks after configuration is reloaded"""
         raise NotImplementedError()
+
+    def registerScheduler(self, sched):
+        self.sched = sched
+
+    def registerConnection(self, connection):
+        self.connection = connection
