@@ -17,6 +17,7 @@ import threading
 import time
 import urllib2
 import voluptuous
+from six.moves import queue as Queue
 from zuul.lib import gerrit
 from zuul.model import TriggerEvent, Change, Ref, NullChange
 
@@ -27,8 +28,7 @@ class GerritEventConnector(threading.Thread):
     log = logging.getLogger("zuul.GerritEventConnector")
 
     def __init__(self, gerrit, sched, trigger):
-        super(GerritEventConnector, self).__init__()
-        self.daemon = True
+        threading.Thread.__init__(self)
         self.gerrit = gerrit
         self.sched = sched
         self.trigger = trigger
@@ -41,6 +41,7 @@ class GerritEventConnector(threading.Thread):
     def _handleEvent(self):
         data = self.gerrit.getEvent()
         if self._stopped:
+            self.gerrit.eventDone()
             return
         event = TriggerEvent()
         event.type = data.get('type')
@@ -98,6 +99,7 @@ class GerritEventConnector(threading.Thread):
     def run(self):
         while True:
             if self._stopped:
+                #self.gerrit.eventDone()
                 return
             try:
                 self._handleEvent()
@@ -113,31 +115,61 @@ class Gerrit(object):
 
     def __init__(self, config, sched):
         self._change_cache = {}
+        self.event_queue = Queue.Queue()
         self.sched = sched
         self.config = config
-        self.server = config.get('gerrit', 'server')
-        if config.has_option('gerrit', 'baseurl'):
-            self.baseurl = config.get('gerrit', 'baseurl')
+        self.read_config()
+        self.start()
+
+    def read_config(self):
+        self.server = self.config.get('gerrit', 'server')
+
+        if self.config.has_option('gerrit', 'baseurl'):
+            self.baseurl = self.config.get('gerrit', 'baseurl')
         else:
             self.baseurl = 'https://%s' % self.server
-        user = config.get('gerrit', 'user')
-        if config.has_option('gerrit', 'sshkey'):
-            sshkey = config.get('gerrit', 'sshkey')
+
+        self.user = self.config.get('gerrit', 'user')
+
+        if self.config.has_option('gerrit', 'sshkey'):
+            self.sshkey = self.config.get('gerrit', 'sshkey')
         else:
-            sshkey = None
-        if config.has_option('gerrit', 'port'):
-            port = int(config.get('gerrit', 'port'))
+            self.sshkey = None
+
+        if self.config.has_option('gerrit', 'port'):
+            self.port = int(self.config.get('gerrit', 'port'))
         else:
-            port = 29418
-        self.gerrit = gerrit.Gerrit(self.server, user, port, sshkey)
-        self.gerrit.startWatching()
+            self.port = 29418
+
+        if self.config.has_option('gerrit', 'whitelist'):
+            self.whitelist = [x.strip() for x in self.config.get(
+                'gerrit', 'whitelist').split(',')]
+        else:
+            self.whitelist = []
+
+    def start(self):
+        self.startGerritWatcher()
         self.gerrit_connector = GerritEventConnector(
-            self.gerrit, sched, self)
+            self.gerrit, self.sched, self)
         self.gerrit_connector.start()
 
     def stop(self):
+        self.stopGerritWatcher()
         self.gerrit_connector.stop()
         self.gerrit_connector.join()
+
+    def startGerritWatcher(self):
+        self.gerrit = gerrit.Gerrit(
+            self.server,
+            self.user,
+            self.port,
+            self.sshkey,
+            whitelist=self.whitelist,
+            event_queue=self.event_queue)
+        self.gerrit.startWatching()
+
+    def stopGerritWatcher(self):
+        self.gerrit.stopWatching()
 
     def _getInfoRefs(self, project):
         url = "%s/p/%s/info/refs?service=git-upload-pack" % (
@@ -289,7 +321,9 @@ class Gerrit(object):
             del self._change_cache[key]
 
     def postConfig(self):
-        pass
+        self.stopGerritWatcher()
+        self.read_config()
+        self.startGerritWatcher()
 
     def getChange(self, event, project):
         if event.change_number:

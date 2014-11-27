@@ -665,6 +665,15 @@ class TestScheduler(ZuulTestCase):
         self.assertTrue(source.canMerge(a, mgr.getSubmitAllowNeeds()))
         source.maintainCache([])
 
+    def test_whitelist_filter(self):
+        n, a = self.fake_gerrit.addFakeEvent()
+        A = self.fake_gerrit.getFakeEvent(n)
+        self.assertEqual(a, A)
+
+        n, b = self.fake_gerrit.addFakeEvent(type='ref-replicated')
+        B = self.fake_gerrit.getFakeEvent(n)
+        self.assertNotEqual(b, B)
+
     def test_build_configuration(self):
         "Test that zuul merges the right commits for testing"
 
