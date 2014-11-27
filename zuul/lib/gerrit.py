@@ -17,7 +17,6 @@ import threading
 import select
 import json
 import time
-from six.moves import queue as Queue
 import paramiko
 import logging
 import pprint
@@ -26,30 +25,39 @@ import pprint
 class GerritWatcher(threading.Thread):
     log = logging.getLogger("gerrit.GerritWatcher")
 
-    def __init__(self, gerrit, username, hostname, port=29418, keyfile=None):
+    def __init__(self, gerrit, username=None, hostname=None, port=29418,
+                 keyfile=None, whitelist=None):
         threading.Thread.__init__(self)
         self.username = username
         self.keyfile = keyfile
         self.hostname = hostname
         self.port = port
         self.gerrit = gerrit
+        self.whitelist = whitelist
+        self._stopped = False
 
     def _read(self, fd):
+        self.log.debug("Entering _read()")
         l = fd.readline()
         data = json.loads(l)
         self.log.debug("Received data from Gerrit event stream: \n%s" %
                        pprint.pformat(data))
+        if self.whitelist:
+            if data.get('type') not in self.whitelist:
+                return
         self.gerrit.addEvent(data)
 
     def _listen(self, stdout, stderr):
+        self.log.debug("Entering _listen()")
         poll = select.poll()
         poll.register(stdout.channel)
-        while True:
-            ret = poll.poll()
+        while not self._stopped:
+            ret = poll.poll(100)
             for (fd, event) in ret:
                 if fd == stdout.channel.fileno():
                     if event == select.POLLIN:
-                        self._read(stdout)
+                        self.log.debug("Calling _read()")
+                        self._read(stdout.channel)
                     else:
                         raise Exception("event on ssh connection")
 
@@ -67,6 +75,10 @@ class GerritWatcher(threading.Thread):
 
             self._listen(stdout, stderr)
 
+            if self._stopped:
+                client.close()
+                return
+
             ret = stdout.channel.recv_exit_status()
             self.log.debug("SSH exit status: %s" % ret)
 
@@ -77,14 +89,17 @@ class GerritWatcher(threading.Thread):
             time.sleep(5)
 
     def run(self):
-        while True:
+        while not self._stopped:
             self._run()
 
+    def stop(self):
+        self._stopped = True
 
 class Gerrit(object):
     log = logging.getLogger("gerrit.Gerrit")
 
-    def __init__(self, hostname, username, port=29418, keyfile=None):
+    def __init__(self, hostname, username, port=29418, keyfile=None,
+                 whitelist=None, event_queue=None):
         self.username = username
         self.hostname = hostname
         self.port = port
@@ -92,16 +107,22 @@ class Gerrit(object):
         self.watcher_thread = None
         self.event_queue = None
         self.client = None
+        self.whitelist = whitelist
+        self.event_queue = event_queue
 
     def startWatching(self):
-        self.event_queue = Queue.Queue()
         self.watcher_thread = GerritWatcher(
             self,
             self.username,
             self.hostname,
             self.port,
-            keyfile=self.keyfile)
+            keyfile=self.keyfile,
+            whitelist=self.whitelist)
         self.watcher_thread.start()
+
+    def stopWatching(self):
+        self.watcher_thread.stop()
+        self.watcher_thread.join()
 
     def addEvent(self, data):
         return self.event_queue.put(data)

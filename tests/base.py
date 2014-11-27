@@ -21,7 +21,6 @@ import json
 import logging
 import os
 import pprint
-from six.moves import queue as Queue
 import random
 import re
 import select
@@ -39,6 +38,7 @@ import gear
 import fixtures
 import six.moves.urllib.parse as urlparse
 import statsd
+import tempfile
 import testtools
 
 import zuul.scheduler
@@ -364,13 +364,54 @@ class FakeChange(object):
         self.reported += 1
 
 
-class FakeGerrit(object):
-    def __init__(self, *args, **kw):
-        self.event_queue = Queue.Queue()
+class FakeChannel(object):
+    def __init__(self, channel=None):
+        self.channel = channel
+
+
+class FakeGerritWatcher(zuul.lib.gerrit.GerritWatcher):
+    def __init__(self, *args, **kwargs):
+        super(FakeGerritWatcher, self).__init__(*args, **kwargs)
+
+    def _run(self):
+        try:
+            _, self.event_stream_file = tempfile.mkstemp()
+            cmd = ['tail', '-f', self.event_stream_file]
+            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+
+            stdout = FakeChannel(proc.stdout)
+            stderr = FakeChannel()
+
+            self._listen(stdout, stderr)
+
+            if self._stopped:
+                proc.kill()
+                os.remove(self.event_stream_file)
+                return
+
+            ret = stdout.channel.recv_exit_status()
+            self.log.debug("FakeChannel exit status: %s" % ret)
+
+            if ret:
+                raise Exception("FakeChannel exited with non-zero")
+        except:
+            self.log.exception("Exception on FakeChannel event stream")
+            time.sleep(5)
+
+    def send_event(self, event):
+        with open(self.event_stream_file, 'w+') as f:
+            f.write("%s\n" % json.dumps(event))
+
+
+class FakeGerrit(zuul.lib.gerrit.Gerrit):
+    def __init__(self, *args, **kwargs):
+        super(FakeGerrit, self).__init__(*args, **kwargs)
+
         self.fixture_dir = os.path.join(FIXTURE_DIR, 'gerrit')
         self.change_number = 0
         self.changes = {}
         self.queries = []
+        self.events = {}
 
     def addFakeChange(self, project, branch, subject, status='NEW'):
         self.change_number += 1
@@ -380,14 +421,26 @@ class FakeGerrit(object):
         self.changes[self.change_number] = c
         return c
 
-    def addEvent(self, data):
-        return self.event_queue.put(data)
+    def addFakeEvent(self, type='patchset-created'):
+        self.change_number += 1
+        event = {
+            'type': type,
+            'number': self.change_number,
+            'id': 'I' + random_sha1(),
+        }
+        self.watcher_thread.send_event(event)
+        return self.change_number, event
 
-    def getEvent(self):
-        return self.event_queue.get()
-
-    def eventDone(self):
-        self.event_queue.task_done()
+    def getFakeEvent(self, number):
+        timeout = 1.0
+        event = self.events.get(int(number), None)
+        while not event:
+            if timeout < 0:
+                return None
+            timeout -= 0.1
+            time.sleep(0.1)
+            event = self.events.get(int(number), None)
+        return event
 
     def review(self, project, changeid, message, action):
         number, ps = changeid.split(',')
@@ -412,8 +465,32 @@ class FakeGerrit(object):
         l.append({"type":"stats","rowCount":1,"runTimeMilliseconds":3})
         return l
 
-    def startWatching(self, *args, **kw):
-        pass
+
+class FakeGerritTrigger(zuul.trigger.gerrit.Gerrit):
+    name = 'gerrit'
+
+    def __init__(self, upstream_root, *args):
+        super(FakeGerritTrigger, self).__init__(*args)
+        self.upstream_root = upstream_root
+
+    def getGitUrl(self, project):
+        return os.path.join(self.upstream_root, project.name)
+
+#    def postConfig(self):
+#        pass
+
+
+class FakeGerritEventConnector(zuul.trigger.gerrit.GerritEventConnector):
+    def __init__(self, *args):
+        super(FakeGerritEventConnector, self).__init__(*args)
+
+    def _handleEvent(self):
+        data = self.gerrit.getEvent()
+        if self._stopped:
+            return
+        number = data.get('number', None)
+        if number:
+            self.gerrit.events[int(number)] = data
 
 
 class BuildHistory(object):
@@ -446,17 +523,6 @@ class FakeURLOpener(object):
             ret += '%04x%s' % (len(r) + 4, r)
         ret += '0000'
         return ret
-
-
-class FakeGerritTrigger(zuul.trigger.gerrit.Gerrit):
-    name = 'gerrit'
-
-    def __init__(self, upstream_root, *args):
-        super(FakeGerritTrigger, self).__init__(*args)
-        self.upstream_root = upstream_root
-
-    def getGitUrl(self, project):
-        return os.path.join(self.upstream_root, project.name)
 
 
 class FakeStatsd(threading.Thread):
@@ -906,6 +972,9 @@ class ZuulTestCase(testtools.TestCase):
             return FakeSMTP(*args, **kw)
 
         zuul.lib.gerrit.Gerrit = FakeGerrit
+        zuul.lib.gerrit.GerritWatcher = FakeGerritWatcher
+        zuul.trigger.gerrit.GerritEventConnector = FakeGerritEventConnector
+
         self.useFixture(fixtures.MonkeyPatch('smtplib.SMTP', FakeSMTPFactory))
 
         self.gerrit = FakeGerritTrigger(
