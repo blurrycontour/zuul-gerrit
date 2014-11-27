@@ -24,8 +24,8 @@ class BaseSource(object):
     Defines the exact public methods that must be supplied."""
 
     @abc.abstractmethod
-    def __init__(self, config, sched):
-        """Constructor."""
+    def __init__(self, source_config={}):
+        self.source_config = source_config
 
     @abc.abstractmethod
     def getRefSha(self, project, ref):
@@ -68,3 +68,12 @@ class BaseSource(object):
     @abc.abstractmethod
     def getGitwebUrl(self, project, sha=None):
         """Get the git-web url for a project."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def registerScheduler(self, sched):
+        self.sched = sched
+
+    @abc.abstractmethod
+    def registerConnection(self, connection):
+        self.connection = connection

@@ -22,10 +22,9 @@ class BaseTrigger(object):
     """Base class for triggers.
 
     Defines the exact public methods that must be supplied."""
-
     @abc.abstractmethod
-    def __init__(self, *args, **kwargs):
-        """Constructor."""
+    def __init__(self, trigger_config={}):
+        self.trigger_config = trigger_config
 
     @abc.abstractmethod
     def stop(self):
@@ -40,9 +39,18 @@ class BaseTrigger(object):
         """Called after config is loaded."""
 
     @abc.abstractmethod
-    def onChangeMerged(self, change):
-        """Called when a change has been merged."""
+    def onChangeMerged(self, change, source):
+        raise NotImplementedError()
 
     @abc.abstractmethod
     def onChangeEnqueued(self, change, pipeline):
         """Called when a change has been enqueued."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def registerScheduler(self, sched):
+        self.sched = sched
+
+    @abc.abstractmethod
+    def registerConnection(self, connection):
+        self.connection = connection
