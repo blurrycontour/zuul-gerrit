@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a890539_1cb5f3cf",
+        "filename": "tests/base.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1324,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-12-01T11:01:31Z",
+      "side": 1,
+      "message": "Maybe we can use the `abc` built-in python module for that? https://docs.python.org/2/library/abc.html . It lets one decorate a method with @abstractmethod to enforce their definition.\n\nSome StackOverflow example: http://programmers.stackexchange.com/questions/209437/",
+      "revId": "3f0cd7ce139b7b9713c4d8fa7a8f72fc4e811a72",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
