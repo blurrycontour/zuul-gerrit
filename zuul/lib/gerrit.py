@@ -156,7 +156,7 @@ class Gerrit(object):
             lines = out.split('\n')
             if not lines:
                 return False
-            data = [json.loads(line) for line in lines[:-1]]
+            data = [json.loads(line) for line in lines[:-2]]
             if not data:
                 return False
             self.log.debug("Received data from Gerrit query: \n%s" %
