@@ -94,6 +94,7 @@ class TestCloner(ZuulTestCase):
                 projects=projects,
                 workspace=self.workspace_root,
                 zuul_branch=build.parameters['ZUUL_BRANCH'],
+                zuul_project=build.parameters['ZUUL_PROJECT'],
                 zuul_ref=build.parameters['ZUUL_REF'],
                 zuul_url=self.git_root,
                 cache_dir=cache_root,
@@ -150,6 +151,7 @@ class TestCloner(ZuulTestCase):
                 projects=projects,
                 workspace=self.workspace_root,
                 zuul_branch=build.parameters['ZUUL_BRANCH'],
+                zuul_project=build.parameters['ZUUL_PROJECT'],
                 zuul_ref=build.parameters['ZUUL_REF'],
                 zuul_url=self.git_root,
                 )
@@ -168,6 +170,41 @@ class TestCloner(ZuulTestCase):
         self.worker.hold_jobs_in_build = False
         self.worker.release()
         self.waitUntilSettled()
+
+    def test_ref_update(self):
+        self.worker.hold_jobs_in_build = True
+
+        M = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        M.setMerged()
+        refupdate_event = M.getRefUpdatedEvent()
+        self.fake_gerrit.addEvent(refupdate_event)
+
+        self.waitUntilSettled()
+
+        self.assertEquals(1, len(self.builds), 'One build is running')
+
+        for number, build in enumerate(self.builds):
+            self.log.debug("Build parameters: %s", build.parameters)
+            cloner = zuul.lib.cloner.Cloner(
+                git_base_url=self.upstream_root,
+                projects=['org/project1'],
+                workspace=self.workspace_root,
+                zuul_branch=None,  # ref-updated events have no branch
+                zuul_project=build.parameters['ZUUL_PROJECT'],
+                zuul_ref=build.parameters['ZUUL_REF'],
+                zuul_url=self.git_root
+                )
+            cloner.execute()
+
+        workspace = self.getWorkspaceRepos(['org/project1'])
+        self.assertEquals(
+            refupdate_event['refUpdate']['newRev'],
+            str(workspace['org/project1'].commit('HEAD')))
+
+        self.worker.hold_jobs_in_build = False
+        self.worker.release()
+        self.waitUntilSettled()
+
 
     def test_multi_branch(self):
         self.worker.hold_jobs_in_build = True
@@ -219,6 +256,7 @@ class TestCloner(ZuulTestCase):
                 projects=projects,
                 workspace=self.workspace_root,
                 zuul_branch=build.parameters['ZUUL_BRANCH'],
+                zuul_project=build.parameters['ZUUL_PROJECT'],
                 zuul_ref=build.parameters['ZUUL_REF'],
                 zuul_url=self.git_root,
                 )
@@ -316,6 +354,7 @@ class TestCloner(ZuulTestCase):
                 projects=projects,
                 workspace=self.workspace_root,
                 zuul_branch=build.parameters['ZUUL_BRANCH'],
+                zuul_project=build.parameters['ZUUL_PROJECT'],
                 zuul_ref=build.parameters['ZUUL_REF'],
                 zuul_url=self.git_root,
                 branch='stable/havana', # Old branch for upgrade
@@ -379,6 +418,7 @@ class TestCloner(ZuulTestCase):
                 projects=projects,
                 workspace=self.workspace_root,
                 zuul_branch=build.parameters['ZUUL_BRANCH'],
+                zuul_project=build.parameters['ZUUL_PROJECT'],
                 zuul_ref=build.parameters['ZUUL_REF'],
                 zuul_url=self.git_root,
                 branch='master', # New branch for upgrade
@@ -464,6 +504,7 @@ class TestCloner(ZuulTestCase):
                 projects=projects,
                 workspace=self.workspace_root,
                 zuul_branch=build.parameters['ZUUL_BRANCH'],
+                zuul_project=build.parameters['ZUUL_PROJECT'],
                 zuul_ref=build.parameters['ZUUL_REF'],
                 zuul_url=self.git_root,
                 project_branches={'org/project4': 'master'},
