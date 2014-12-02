@@ -28,8 +28,8 @@ class Cloner(object):
     log = logging.getLogger("zuul.Cloner")
 
     def __init__(self, git_base_url, projects, workspace, zuul_branch,
-                 zuul_ref, zuul_url, branch=None, clone_map_file=None,
-                 project_branches=None, cache_dir=None):
+                 zuul_project, zuul_ref, zuul_url, branch=None,
+                 clone_map_file=None, project_branches=None, cache_dir=None):
 
         self.clone_map = []
         self.dests = None
@@ -40,6 +40,7 @@ class Cloner(object):
         self.projects = projects
         self.workspace = workspace
         self.zuul_branch = zuul_branch
+        self.zuul_project = zuul_project
         self.zuul_ref = zuul_ref
         self.zuul_url = zuul_url
         self.project_branches = project_branches or {}
@@ -62,8 +63,21 @@ class Cloner(object):
         dests = mapper.expand(workspace=self.workspace)
 
         self.log.info("Preparing %s repositories", len(dests))
+
+        repos={}
         for project, dest in dests.iteritems():
-            self.prepareRepo(project, dest)
+            repo = self.cloneUpstream(project, dest)
+            repos[project] = repo
+            # ref-updates are lacking ZUUL_BRANCH which we need for branch
+            # fallbacking.
+            if self.zuul_branch is None and project == self.zuul_project:
+                self.zuul_branch = repo.createRepoObject().git.branch('--contains', self.zuul_ref, '-r')
+                self.log.info("Ref %s contained by %s branch of %s" %(
+                              self.zuul_ref, self.zuul_branch, project))
+
+        for project, dest in dests.iteritems():
+            self.applyZuulState(repos[project], project, dest)
+
         self.log.info("Prepared all repositories")
 
     def cloneUpstream(self, project, dest):
@@ -94,6 +108,10 @@ class Cloner(object):
         if not repo.isInitialized():
             raise Exception("Error cloning %s to %s" % (git_upstream, dest))
 
+        repo.update()
+        # Ensure that we don't have stale remotes around
+        repo.prune()
+
         return repo
 
     def fetchFromZuul(self, repo, project, ref):
@@ -108,9 +126,11 @@ class Cloner(object):
                            project, ref)
             return False
 
-    def prepareRepo(self, project, dest):
-        """Clone a repository for project at dest and apply a reference
-        suitable for testing. The reference lookup is attempted in this order:
+
+    def applyZuulState(self, repo, project, dest):
+        """Apply a reference suitable for testing.
+
+        The reference lookup is attempted in this order:
 
          1) Zuul reference for the indicated branch
          2) Zuul reference for the master branch
@@ -123,12 +143,6 @@ class Cloner(object):
          B) The user specified branch (from the branch arg)
          C) ZUUL_BRANCH (from the zuul_branch arg)
         """
-
-        repo = self.cloneUpstream(project, dest)
-
-        repo.update()
-        # Ensure that we don't have stale remotes around
-        repo.prune()
 
         indicated_branch = self.branch or self.zuul_branch
         if project in self.project_branches:
