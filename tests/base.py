@@ -247,6 +247,21 @@ class FakeChange(object):
                  "comment": "This is a comment"}
         return event
 
+    def getRefUpdatedEvent(self):
+        if self.data['status'] != 'MERGED':
+            raise Exception("Change is not merged")
+
+        event = {"type": "ref-updated",
+                 "submitter": {"name": "User Name"},
+                 "refUpdate": {
+                     "oldRev": None,
+                     "newRev": self.patchsets[-1]['revision'],
+                     "refName": self.branch,
+                     "project": self.project,
+                     }
+                 }
+        return event
+
     def addApproval(self, category, value, username='jenkins',
                     granted_on=None):
         if not granted_on:
@@ -915,7 +930,7 @@ class ZuulTestCase(testtools.TestCase):
         self.fake_gerrit = self.gerrit.gerrit
         self.fake_gerrit.upstream_root = self.upstream_root
 
-        self.webapp = zuul.webapp.WebApp(self.sched, port=0)
+        #self.webapp = zuul.webapp.WebApp(self.sched, port=0)
         self.rpc = zuul.rpclistener.RPCListener(self.config, self.sched)
 
         self.sched.setLauncher(self.launcher)
@@ -937,7 +952,7 @@ class ZuulTestCase(testtools.TestCase):
         self.sched.start()
         self.sched.reconfigure(self.config)
         self.sched.resume()
-        self.webapp.start()
+        #self.webapp.start()
         self.rpc.start()
         self.launcher.gearman.waitForServer()
         self.registerJobs()
@@ -975,8 +990,8 @@ class ZuulTestCase(testtools.TestCase):
         self.sched.join()
         self.statsd.stop()
         self.statsd.join()
-        self.webapp.stop()
-        self.webapp.join()
+        #self.webapp.stop()
+        #self.webapp.join()
         self.rpc.stop()
         self.rpc.join()
         self.gearman_server.shutdown()
