@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a890539_6da7ccbc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-12-03T12:16:53Z",
+      "side": 1,
+      "message": "Do you know why it is lost after the first exception? Perhaps we should find this out before we retry an event lots of times.",
+      "revId": "599198e200a58da4c74e336020d0889f194306c3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
