@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a890539_56ff0601",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 6133
+      },
+      "writtenOn": "2014-12-03T10:46:11Z",
+      "side": 1,
+      "message": "can you move that to some constant until it\u0027s set from config?",
+      "revId": "e3b3e4c5ecb4d5858a0080a2c6f9bca5dafe63de",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
