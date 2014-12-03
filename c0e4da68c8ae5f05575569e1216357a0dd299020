@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a890539_db06a3cd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 12
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 13718
+      },
+      "writtenOn": "2014-12-03T19:34:17Z",
+      "side": 1,
+      "message": "Update this to describe the comma separated format",
+      "revId": "c0e4da68c8ae5f05575569e1216357a0dd299020",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
