@@ -16,6 +16,23 @@
       "revId": "599198e200a58da4c74e336020d0889f194306c3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a890539_7c2ca902",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 6133
+      },
+      "writtenOn": "2014-12-04T10:42:15Z",
+      "side": 1,
+      "message": "could we make that a constant?",
+      "revId": "599198e200a58da4c74e336020d0889f194306c3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
