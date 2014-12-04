@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "5a890539_6d7951c4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 7562
+      },
+      "writtenOn": "2014-12-04T12:25:51Z",
+      "side": 1,
+      "message": "It\u0027s not a network issue. Here is a message received from gerrit when the exception occurs:\n\n2014-11-20 12:39:48,265 DEBUG gerrit.Gerrit: Received data from Gerrit query:\n{u\u0027rowCount\u0027: 0, u\u0027runTimeMilliseconds\u0027: 1, u\u0027type\u0027: u\u0027stats\u0027}",
+      "parentUuid": "5a890539_a24ee893",
+      "revId": "599198e200a58da4c74e336020d0889f194306c3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a890539_7c2ca902",
         "filename": "zuul/trigger/gerrit.py",
         "patchSetId": 2
@@ -102,6 +120,24 @@
       "side": 1,
       "message": "A constant is a good idea. I think to also indicate this is an internal mechanism it should be prefixed by an underscore. ie: \u0027_zuulTimeToLive\u0027",
       "parentUuid": "5a890539_7f61fb37",
+      "revId": "599198e200a58da4c74e336020d0889f194306c3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a890539_4d55751c",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 7562
+      },
+      "writtenOn": "2014-12-04T12:25:51Z",
+      "side": 1,
+      "message": "Ok",
+      "parentUuid": "5a890539_e25ab080",
       "revId": "599198e200a58da4c74e336020d0889f194306c3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
