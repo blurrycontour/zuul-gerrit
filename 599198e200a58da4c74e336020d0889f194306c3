@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5a890539_9f7dc7e9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 7562
+      },
+      "writtenOn": "2014-12-04T11:11:57Z",
+      "side": 1,
+      "message": "Well, in my case it\u0027s a strange reply from gerrit.\n\nWhen a new event enters _handleEvent its details are queried in gerrit (using function _getChange). For some reason the change from the event might not be found at the moment:\n\nTraceback (most recent call last):\n  File \"/usr/local/lib/python2.7/dist-packages/zuul/trigger/gerrit.py\", line 108, in run\n    class Gerrit(object):\n  File \"/usr/local/lib/python2.7/dist-packages/zuul/trigger/gerrit.py\", line 98, in _handleEvent\n    def run(self):\n  File \"/usr/local/lib/python2.7/dist-packages/zuul/trigger/gerrit.py\", line 368, in _getChange\n    else:\n  File \"/usr/local/lib/python2.7/dist-packages/zuul/trigger/gerrit.py\", line 400, in updateChange\n\nException: Change 1191,1 not found\n\nIf zuul would try to fetch that data again it succeeds, a valid data is returned.\n\nBut with the exception the event is lost and it won\u0027t be requested again, until a new patchset or comment are added.",
+      "parentUuid": "5a890539_6da7ccbc",
+      "revId": "599198e200a58da4c74e336020d0889f194306c3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a890539_7c2ca902",
         "filename": "zuul/trigger/gerrit.py",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2014-12-04T10:42:15Z",
       "side": 1,
       "message": "could we make that a constant?",
+      "revId": "599198e200a58da4c74e336020d0889f194306c3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a890539_7f61fb37",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 7562
+      },
+      "writtenOn": "2014-12-04T11:11:57Z",
+      "side": 1,
+      "message": "Yes, I think, but would it be reasonable?",
+      "parentUuid": "5a890539_7c2ca902",
       "revId": "599198e200a58da4c74e336020d0889f194306c3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
