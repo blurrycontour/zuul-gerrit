@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "5a890539_a24ee893",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-12-04T11:49:22Z",
+      "side": 1,
+      "message": "Right, so I think we should try and determine why this is. I haven\u0027t seen any patches miss out being queued in openstack\u0027s gerrit. Perhaps it\u0027s a network thing?\n\nIf it is a network issue, seems like the better place for a TTL might be in getChange.",
+      "parentUuid": "5a890539_9f7dc7e9",
+      "revId": "599198e200a58da4c74e336020d0889f194306c3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a890539_7c2ca902",
         "filename": "zuul/trigger/gerrit.py",
         "patchSetId": 2
@@ -66,6 +84,24 @@
       "side": 1,
       "message": "Yes, I think, but would it be reasonable?",
       "parentUuid": "5a890539_7c2ca902",
+      "revId": "599198e200a58da4c74e336020d0889f194306c3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a890539_e25ab080",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-12-04T11:49:22Z",
+      "side": 1,
+      "message": "A constant is a good idea. I think to also indicate this is an internal mechanism it should be prefixed by an underscore. ie: \u0027_zuulTimeToLive\u0027",
+      "parentUuid": "5a890539_7f61fb37",
       "revId": "599198e200a58da4c74e336020d0889f194306c3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
