@@ -16,6 +16,24 @@
       "revId": "6ea389dc578942e6243dafc591f0f53cc60b33fc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_2d00fba9",
+        "filename": "tests/fixtures/zuul.conf",
+        "patchSetId": 4
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2014-12-08T09:58:26Z",
+      "side": 1,
+      "message": "Indeed. Instead of updating the global zuul.conf fixtures, I rewrote the test to inject the needed setting.  A bit more robust and less invasive.",
+      "parentUuid": "7adec928_8093844e",
+      "revId": "6ea389dc578942e6243dafc591f0f53cc60b33fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
