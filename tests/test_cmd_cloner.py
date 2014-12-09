@@ -15,8 +15,8 @@
 
 import sys
 
-import fixtures
 import testtools
+from testtools.testcase import ExpectedException
 
 from zuul.cmd.cloner import Cloner
 
@@ -35,7 +35,8 @@ class ZuulCmdClonerTests(testtools.TestCase):
     ]
 
     def test_change_params(self):
-        parse = Cloner().parse_arguments(
+        cmd = Cloner()
+        cmd.parse_arguments(
             self.common_opts
             + [
                 '--zuul-patchset', '1',
@@ -46,7 +47,8 @@ class ZuulCmdClonerTests(testtools.TestCase):
         )
 
     def test_ref_params(self):
-        Cloner().parse_arguments(
+        cmd = Cloner()
+        cmd.parse_arguments(
             self.common_opts
             + [
                 '--zuul-oldrev', '1234',
@@ -56,18 +58,14 @@ class ZuulCmdClonerTests(testtools.TestCase):
         )
 
     def test_missing_change_or_ref_params(self):
-
-        stderr = self.useFixture(fixtures.StringStream('stderr')).stream
-        self.useFixture(fixtures.MonkeyPatch('sys.stderr', stderr))
-
         self.assertRaises(SystemExit, Cloner().parse_arguments,
                           self.common_opts + self.common_posargs)
 
+    def test_missing_change_or_ref_params_2(self):
+        with ExpectedException(SystemExit, ""):
+            Cloner().parse_arguments(self.common_opts + self.common_posargs)
+
     def test_mixing_change_or_ref_params(self):
-
-        stderr = self.useFixture(fixtures.StringStream('stderr')).stream
-        self.useFixture(fixtures.MonkeyPatch('sys.stderr', stderr))
-
         self.assertRaises(SystemExit, Cloner().parse_arguments,
                           self.common_opts
                           + [
@@ -75,3 +73,13 @@ class ZuulCmdClonerTests(testtools.TestCase):
                               '--zuul-change', '12345',
                           ]
                           + self.common_posargs)
+
+    def test_mixing_change_or_ref_params_2(self):
+        with ExpectedException(SystemExit, ""):
+            Cloner().parse_arguments(
+              self.common_opts
+              + [
+                  '--zuul-newrev', '777BCD',
+                  '--zuul-change', '12345',
+              ]
+              + self.common_posargs)
