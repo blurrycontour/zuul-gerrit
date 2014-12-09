@@ -35,7 +35,8 @@ class ZuulCmdClonerTests(testtools.TestCase):
     ]
 
     def test_change_params(self):
-        parse = Cloner().parse_arguments(
+        cmd = Cloner()
+        cmd.parse_arguments(
             self.common_opts
             + [
                 '--zuul-patchset', '1',
@@ -46,7 +47,8 @@ class ZuulCmdClonerTests(testtools.TestCase):
         )
 
     def test_ref_params(self):
-        Cloner().parse_arguments(
+        cmd = Cloner()
+        cmd.parse_arguments(
             self.common_opts
             + [
                 '--zuul-oldrev', '1234',
