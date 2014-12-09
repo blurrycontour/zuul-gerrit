@@ -120,7 +120,9 @@ class Cloner(zuul.cmd.ZuulApp):
         ref_params = (zuul_params - commons) & ref
         change_params  = (zuul_params - commons) & change
         if ref_params and change_params:
-            parser.error("Can not mix change and refupdate parameters")
+            parser.error("Can not mix change and refupdate parameters" \
+                         "args: %s\nrefs: %s\nchange: %s" % (
+                         args, ref_params, change_params))
 
         if zuul_params != (commons | ref) and zuul_params != (commons | change):
             if ref_params:
