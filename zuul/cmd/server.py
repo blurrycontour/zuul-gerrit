@@ -138,6 +138,7 @@ class Server(zuul.cmd.ZuulApp):
 
     def main(self):
         # See comment at top of file about zuul imports
+        statsd = extras.try_import('statsd.statsd')
         import zuul.scheduler
         import zuul.launcher.gearman
         import zuul.merger.client
@@ -183,6 +184,12 @@ class Server(zuul.cmd.ZuulApp):
             self.config.get('smtp', 'port')
             if self.config.has_option('smtp', 'port') else 25
         )
+
+        if statsd:
+            stats_client = statsd.StatsClient(
+                    os.environ.get('STATSD_HOST'),
+                    int(os.environ.get('STATSD_PORT', 8125)))
+            self.sched.setStatsClient(stats_client)
 
         self.sched.setLauncher(gearman)
         self.sched.setMerger(merger)
