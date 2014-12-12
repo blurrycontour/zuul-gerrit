@@ -460,6 +460,8 @@ class FakeGerritTrigger(zuul.trigger.gerrit.Gerrit):
 
 
 class FakeStatsd(threading.Thread):
+    log = logging.getLogger("zuul.test")
+
     def __init__(self):
         threading.Thread.__init__(self)
         self.daemon = True
@@ -468,6 +470,7 @@ class FakeStatsd(threading.Thread):
         self.port = self.sock.getsockname()[1]
         self.wake_read, self.wake_write = os.pipe()
         self.stats = []
+        self.log.debug("Started FakeStatsd on port %s" % self.port)
 
     def run(self):
         while True:
@@ -861,12 +864,7 @@ class ZuulTestCase(testtools.TestCase):
         self.init_repo("org/experimental-project")
 
         self.statsd = FakeStatsd()
-        os.environ['STATSD_HOST'] = 'localhost'
-        os.environ['STATSD_PORT'] = str(self.statsd.port)
         self.statsd.start()
-        # the statsd client object is configured in the statsd module import
-        reload(statsd)
-        reload(zuul.scheduler)
 
         self.gearman_server = FakeGearmanServer()
 
@@ -880,6 +878,9 @@ class ZuulTestCase(testtools.TestCase):
         self.merge_server.start()
 
         self.sched = zuul.scheduler.Scheduler()
+        self.log.info("Pointing scheduler to statsd 127.0.0.1:%s" % self.statsd.port)
+        self.sched.setStatsClient(statsd.StatsClient('127.0.0.1',
+                                                     int(self.statsd.port)))
 
         self.useFixture(fixtures.MonkeyPatch('swiftclient.client.Connection',
                                              FakeSwiftClientConnection))
