@@ -1680,7 +1680,10 @@ class TestScheduler(ZuulTestCase):
     def test_statsd(self):
         "Test each of the statsd methods used in the scheduler"
         import extras
-        statsd = extras.try_import('statsd.statsd')
+        try:
+            from statsd.defaults.env import statsd  # >3.0
+        except ImportError:
+            import statsd  # <3.0
         statsd.incr('test-incr')
         statsd.timing('test-timing', 3)
         statsd.gauge('test-gauge', 12)

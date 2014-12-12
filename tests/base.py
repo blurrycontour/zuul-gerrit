@@ -38,7 +38,6 @@ import git
 import gear
 import fixtures
 import six.moves.urllib.parse as urlparse
-import statsd
 import testtools
 
 import zuul.scheduler
@@ -53,6 +52,12 @@ import zuul.reporter.smtp
 import zuul.trigger.gerrit
 import zuul.trigger.timer
 import zuul.trigger.zuultrigger
+
+try:
+    from statsd.defaults.env import statsd  # >3.0
+except ImportError:
+    import statsd  # <3.0
+
 
 FIXTURE_DIR = os.path.join(os.path.dirname(__file__),
                            'fixtures')

@@ -33,7 +33,12 @@ from model import ActionReporter, Pipeline, Project, ChangeQueue
 from model import EventFilter, ChangeishFilter
 from zuul import version as zuul_version
 
-statsd = extras.try_import('statsd.statsd')
+try:
+    from statsd.defaults.env import statsd  # >3.0
+except ImportError:
+    import statsd  # <3.0
+except ImportError:
+    statsd = None
 
 
 def deep_format(obj, paramdict):
