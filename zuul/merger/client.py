@@ -82,14 +82,15 @@ class MergeClient(object):
         return False
 
     def submitJob(self, name, data, build_set,
-                  precedence=zuul.model.PRECEDENCE_NORMAL):
+                  precedence=zuul.model.PRECEDENCE_NORMAL)
         uuid = str(uuid4().hex)
         self.log.debug("Submitting job %s with data %s" % (name, data))
         job = gear.Job(name,
                        json.dumps(data),
                        unique=uuid)
         self.build_sets[uuid] = build_set
-        self.gearman.submitJob(job, precedence=precedence)
+        self.gearman.submitJob(job, precedence=precedence,
+                               timeout=300)
 
     def mergeChanges(self, items, build_set,
                      precedence=zuul.model.PRECEDENCE_NORMAL):
