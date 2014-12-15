@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a961159_a9afa67b",
+        "filename": "tests/base.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 409,
+      "author": {
+        "id": 6133
+      },
+      "writtenOn": "2014-12-15T08:53:53Z",
+      "side": 1,
+      "message": "why self.username here and self.user in the next line?",
+      "revId": "7c1bd640d8018ad1315bf4791f0fc77ae0e929da",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
