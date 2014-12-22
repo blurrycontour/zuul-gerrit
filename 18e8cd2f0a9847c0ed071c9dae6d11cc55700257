@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a961159_c67fb815",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-12-22T03:19:35Z",
+      "side": 1,
+      "message": "I think what we meant was for the retry amount to be a constant. eg:\n\nZUUL_EVENT_FETCH_RETRIES \u003d 5\n\nThe dictionary name can just be entered.",
+      "revId": "18e8cd2f0a9847c0ed071c9dae6d11cc55700257",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_067d401c",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-12-22T03:19:35Z",
+      "side": 1,
+      "message": "This is a workaround for an issue communicating with gerrit. We should add a comment here to note the issue.",
+      "revId": "18e8cd2f0a9847c0ed071c9dae6d11cc55700257",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
