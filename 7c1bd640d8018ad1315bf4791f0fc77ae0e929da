@@ -16,6 +16,24 @@
       "revId": "7c1bd640d8018ad1315bf4791f0fc77ae0e929da",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_1b6e792f",
+        "filename": "tests/base.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 409,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2014-12-22T01:26:31Z",
+      "side": 1,
+      "message": "Good catch, this was a mistake. I started using self.user rather than self.username to match the config held in connections better.",
+      "parentUuid": "3a961159_a9afa67b",
+      "revId": "7c1bd640d8018ad1315bf4791f0fc77ae0e929da",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
