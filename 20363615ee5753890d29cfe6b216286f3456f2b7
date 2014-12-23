@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a961159_2d23c905",
+        "filename": "tox.ini",
+        "patchSetId": 15
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 6987
+      },
+      "writtenOn": "2014-12-23T20:34:37Z",
+      "side": 1,
+      "message": "JJB has this disclaimer, might be valuable to add?\n\n\"These are ignored intentionally in openstack-infra projects; please don\u0027t submit patches that solely correct them or enable them.\"",
+      "revId": "20363615ee5753890d29cfe6b216286f3456f2b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
