@@ -1,0 +1,11 @@
+Verified+2: Jenkins
+Code-Review+1: Antoine Musso <hashar@free.fr>
+Code-Review+2: Sergey Lukjanov <slukjanov@mirantis.com>
+Workflow+1: Sergey Lukjanov <slukjanov@mirantis.com>
+Code-Review+2: Joshua Hesketh <joshua.hesketh@rackspace.com>
+Code-Review+1: David Pursehouse <david.pursehouse@sonymobile.com>
+Submitted-by: Jenkins
+Submitted-at: Wed, 24 Dec 2014 19:10:48 +0000
+Reviewed-on: https://review.openstack.org/132245
+Project: openstack-infra/zuul
+Branch: refs/heads/master
