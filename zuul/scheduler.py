@@ -1794,7 +1794,6 @@ class DependentPipelineManager(BasePipelineManager):
             self.log.debug("  No changes needed")
             return True
         changes_needed = []
-        # TODO (jeblair): this is only correct for a list of 1 element
         for needed_change in change.needs_changes:
             self.log.debug("  Change %s needs change %s:" % (
                 change, needed_change))
