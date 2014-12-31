@@ -638,11 +638,15 @@ class Scheduler(threading.Thread):
                 self.log.debug("Re-enqueueing changes for pipeline %s" % name)
                 items_to_remove = []
                 builds_to_remove = []
+                last_head = None
                 for shared_queue in old_pipeline.queues:
                     for item in shared_queue.queue:
+                        if not item.item_ahead:
+                            last_head = item
                         item.item_ahead = None
                         item.items_behind = []
                         item.pipeline = None
+                        item.queue = None
                         project = layout.projects.get(item.change.project.name)
                         if not project:
                             self.log.warning("Unable to find project for "
@@ -658,7 +662,8 @@ class Scheduler(threading.Thread):
                                 build.job = job
                             else:
                                 builds_to_remove.append(build)
-                        if not new_pipeline.manager.reEnqueueItem(item):
+                        if not new_pipeline.manager.reEnqueueItem(item,
+                                                                  last_head):
                             items_to_remove.append(item)
                 for item in items_to_remove:
                     for build in item.current_build_set.getBuilds():
@@ -1064,7 +1069,8 @@ class BasePipelineManager(object):
     def isChangeReadyToBeEnqueued(self, change):
         return True
 
-    def enqueueChangesAhead(self, change, quiet, ignore_requirements):
+    def enqueueChangesAhead(self, change, quiet, ignore_requirements,
+                            change_queue):
         return True
 
     def enqueueChangesBehind(self, change, quiet, ignore_requirements):
@@ -1112,8 +1118,11 @@ class BasePipelineManager(object):
         self.log.debug("Change %s abandoned, removing." % change)
         self.removeChange(change)
 
-    def reEnqueueItem(self, item):
-        change_queue = self.pipeline.getQueue(item.change.project)
+    def reEnqueueItem(self, item, last_head):
+        if last_head.queue:
+            change_queue = last_head.queue
+        else:
+            change_queue = self.getChangeQueue(item.change)
         if change_queue:
             self.log.debug("Re-enqueing change %s in queue %s" %
                            (item.change, change_queue))
@@ -1126,7 +1135,8 @@ class BasePipelineManager(object):
             return False
 
     def addChange(self, change, quiet=False, enqueue_time=None,
-                  ignore_requirements=False):
+                  ignore_requirements=False, live=True,
+                  change_queue=None):
         self.log.debug("Considering adding change %s" % change)
         if self.isChangeAlreadyInQueue(change):
             self.log.debug("Change %s is already in queue, ignoring" % change)
@@ -1144,7 +1154,15 @@ class BasePipelineManager(object):
                                    "requirement %s" % (change, f))
                     return False
 
-        if not self.enqueueChangesAhead(change, quiet, ignore_requirements):
+        if not change_queue:
+            change_queue = self.getChangeQueue(change)
+            if not change_queue:
+                self.log.error("Unable to find change queue for project %s" %
+                               change.project)
+                return False
+
+        if not self.enqueueChangesAhead(change, quiet, ignore_requirements,
+                                        change_queue):
             self.log.debug("Failed to enqueue changes ahead of %s" % change)
             return False
 
@@ -1152,29 +1170,24 @@ class BasePipelineManager(object):
             self.log.debug("Change %s is already in queue, ignoring" % change)
             return True
 
-        change_queue = self.pipeline.getQueue(change.project)
-        if change_queue:
-            self.log.debug("Adding change %s to queue %s" %
-                           (change, change_queue))
-            if not quiet:
-                if len(self.pipeline.start_actions) > 0:
-                    self.reportStart(change)
-            item = change_queue.enqueueChange(change)
-            if enqueue_time:
-                item.enqueue_time = enqueue_time
-            self.reportStats(item)
-            self.enqueueChangesBehind(change, quiet, ignore_requirements)
-            self.sched.triggers['zuul'].onChangeEnqueued(item.change,
-                                                         self.pipeline)
-        else:
-            self.log.error("Unable to find change queue for project %s" %
-                           change.project)
-            return False
+        self.log.debug("Adding change %s to queue %s" %
+                       (change, change_queue))
+        if not quiet:
+            if len(self.pipeline.start_actions) > 0:
+                self.reportStart(change)
+        item = change_queue.enqueueChange(change)
+        if enqueue_time:
+            item.enqueue_time = enqueue_time
+        item.live = live
+        self.reportStats(item)
+        self.enqueueChangesBehind(change, quiet, ignore_requirements)
+        self.sched.triggers['zuul'].onChangeEnqueued(item.change,
+                                                     self.pipeline)
+        return True
 
     def dequeueItem(self, item):
         self.log.debug("Removing change %s from queue" % item.change)
-        change_queue = self.pipeline.getQueue(item.change.project)
-        change_queue.dequeueItem(item)
+        item.queue.dequeueItem(item)
 
     def removeChange(self, change):
         # Remove a change from the queue, probably because it has been
@@ -1285,7 +1298,9 @@ class BasePipelineManager(object):
     def _processOneItem(self, item, nnfi, ready_ahead):
         changed = False
         item_ahead = item.item_ahead
-        change_queue = self.pipeline.getQueue(item.change.project)
+        if item_ahead and (not item_ahead.live):
+            item_ahead = None
+        change_queue = item.queue
         failing_reasons = []  # Reasons this item is failing
 
         if self.checkForChangesNeededBy(item.change) is not True:
@@ -1309,8 +1324,7 @@ class BasePipelineManager(object):
             self.cancelJobs(item, prime=False)
         else:
             item_ahead_merged = False
-            if ((item_ahead and item_ahead.change.is_merged) or
-                not change_queue.dependent):
+            if (item_ahead and item_ahead.change.is_merged):
                 item_ahead_merged = True
             if (item_ahead != nnfi and not item_ahead_merged):
                 # Our current base is different than what we expected,
@@ -1333,6 +1347,10 @@ class BasePipelineManager(object):
             changed = True
         if self.pipeline.didAnyJobFail(item):
             failing_reasons.append("at least one job failed")
+        if (not item.live) and (not item.items_behind):
+            failing_reasons.append("is a non-live item with no items behind")
+            self.dequeueItem(item)
+            changed = True
         if (not item_ahead) and self.pipeline.areAllJobsComplete(item):
             try:
                 self.reportItem(item)
@@ -1345,7 +1363,7 @@ class BasePipelineManager(object):
                     self.cancelJobs(item_behind)
             self.dequeueItem(item)
             changed = True
-        elif not failing_reasons:
+        elif not failing_reasons and item.live:
             nnfi = item
         item.current_build_set.failing_reasons = failing_reasons
         if failing_reasons:
@@ -1429,7 +1447,7 @@ class BasePipelineManager(object):
                                                        item.change.branch)
             self.log.info("Reported change %s status: all-succeeded: %s, "
                           "merged: %s" % (item.change, succeeded, merged))
-            change_queue = self.pipeline.getQueue(item.change.project)
+            change_queue = item.queue
             if not (succeeded and merged):
                 self.log.debug("Reported change %s failed tests or failed "
                                "to merge" % (item.change))
@@ -1686,11 +1704,74 @@ class IndependentPipelineManager(BasePipelineManager):
     def _postConfig(self, layout):
         super(IndependentPipelineManager, self)._postConfig(layout)
 
-        change_queue = ChangeQueue(self.pipeline, dependent=False)
-        for project in self.pipeline.getProjects():
-            change_queue.addProject(project)
-
+    def getChangeQueue(self, change):
+        # creates a new change queue for every change
+        if change.project not in self.pipeline.getProjects():
+            return None
+        change_queue = ChangeQueue(self.pipeline)
+        change_queue.addProject(change.project)
         self.pipeline.addQueue(change_queue)
+        return change_queue
+
+    def enqueueChangesAhead(self, change, quiet, ignore_requirements,
+                            change_queue):
+        ret = self.checkForChangesNeededBy(change)
+        if ret in [True, False]:
+            return ret
+        self.log.debug("  Changes %s must be merged ahead of %s" %
+                       (ret, change))
+        for needed_change in ret:
+            # This differs from the dependent pipeline by enqueuing
+            # changes ahead as "not live", that is, not intended to
+            # have jobs run.  Also, pipeline requirements are always
+            # ignored (which is safe because the changes are not
+            # live).
+            r = self.addChange(needed_change, quiet=True,
+                               ignore_requirements=True,
+                               live=False, change_queue=change_queue)
+            if not r:
+                return False
+        return True
+
+    def checkForChangesNeededBy(self, change):
+        self.log.debug("Checking for changes needed by %s:" % change)
+        # Return true if okay to proceed enqueing this change,
+        # false if the change should not be enqueued.
+        if not hasattr(change, 'needs_changes'):
+            self.log.debug("  Changeish does not support dependencies")
+            return True
+        if not change.needs_changes:
+            self.log.debug("  No changes needed")
+            return True
+        changes_needed = []
+        for needed_change in change.needs_changes:
+            self.log.debug("  Change %s needs change %s:" % (
+                change, needed_change))
+            if needed_change.is_merged:
+                self.log.debug("  Needed change is merged")
+                continue
+            if not needed_change.is_current_patchset:
+                self.log.debug("  Needed change is not the current patchset")
+                return False
+            if self.isChangeAlreadyInQueue(needed_change):
+                self.log.debug("  Needed change is already ahead in the queue")
+                continue
+            self.log.debug("  Change %s is needed" % needed_change)
+            if needed_change not in changes_needed:
+                changes_needed.append(needed_change)
+                continue
+            # This differs from the dependent pipeline check in not
+            # verifying that the dependent change is mergable.
+        if changes_needed:
+            return changes_needed
+        return True
+
+    def dequeueItem(self, item):
+        super(IndependentPipelineManager, self).dequeueItem(item)
+        # An independent pipeline manager dynamically removes empty
+        # queues
+        if not item.queue.queue:
+            self.pipeline.removeQueue(item.queue)
 
 
 class DependentPipelineManager(BasePipelineManager):
@@ -1752,6 +1833,9 @@ class DependentPipelineManager(BasePipelineManager):
                 new_change_queues.append(a)
         return new_change_queues
 
+    def getChangeQueue(self, change):
+        return self.pipeline.getQueue(change.project)
+
     def isChangeReadyToBeEnqueued(self, change):
         if not self.pipeline.source.canMerge(change,
                                              self.getSubmitAllowNeeds()):
@@ -1778,13 +1862,18 @@ class DependentPipelineManager(BasePipelineManager):
             self.addChange(other_change, quiet=quiet,
                            ignore_requirements=ignore_requirements)
 
-    def enqueueChangesAhead(self, change, quiet, ignore_requirements):
+    def enqueueChangesAhead(self, change, quiet, ignore_requirements,
+                            change_queue):
         ret = self.checkForChangesNeededBy(change)
         if ret in [True, False]:
             return ret
-        self.log.debug("  Change %s must be merged ahead of %s" %
+        self.log.debug("  Changes %s must be merged ahead of %s" %
                        (ret, change))
         for needed_change in ret:
+            # change_queue is ignored, so that addChange must look up
+            # the queue for a project each time.  This will prevent
+            # unmerged cross-project dependencies from being enqueued
+            # in the wrong queue.
             r = self.addChange(needed_change, quiet=quiet,
                                ignore_requirements=ignore_requirements)
             if not r:
