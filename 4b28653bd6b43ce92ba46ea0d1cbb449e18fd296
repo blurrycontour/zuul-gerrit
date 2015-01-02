@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a961159_424f896a",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 6039
+      },
+      "writtenOn": "2015-01-02T15:53:53Z",
+      "side": 0,
+      "message": "Is this here to work around some bug? Should we be keeping this when we query all open changes?",
+      "revId": "4b28653bd6b43ce92ba46ea0d1cbb449e18fd296",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
