@@ -16,6 +16,23 @@
       "revId": "ab4abb0dd9c62e2afcda745d9c940fa843bd4a10",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_fccb99a1",
+        "filename": "doc/source/reporters.rst",
+        "patchSetId": 20
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-01-05T18:04:35Z",
+      "side": 1,
+      "message": "Why the switch to changeid?  number + patchset seems to match zuul\u0027s internal conception better.  Not to mention gerrit\u0027s.",
+      "revId": "ab4abb0dd9c62e2afcda745d9c940fa843bd4a10",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
