@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a961159_96fc2cb7",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1709,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-01-05T21:41:36Z",
+      "side": 1,
+      "message": "I think there should be a wait until settled here, and then also verify that jobs actually get run.\n\nWithout waitUntilSettled, I think the end of this test could be a little racy (maybe the cleanup assertions will wait appropriately, but even if they do, I don\u0027t want to count on them).",
+      "revId": "3bfe4dff40432e40c3b1ae30d55465b641620bf5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
