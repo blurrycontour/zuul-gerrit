@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a961159_fcac79a1",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 2797,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-01-05T18:12:06Z",
+      "side": 0,
+      "message": "Why are we deleting this test?",
+      "revId": "20363615ee5753890d29cfe6b216286f3456f2b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
