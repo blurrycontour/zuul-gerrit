@@ -16,6 +16,24 @@
       "revId": "4b28653bd6b43ce92ba46ea0d1cbb449e18fd296",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_d981a04e",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-01-05T02:28:00Z",
+      "side": 0,
+      "message": "This is just in the test suite to return a resultset similar to a real query. But I agree, we should keep it. (-1)",
+      "parentUuid": "3a961159_424f896a",
+      "revId": "4b28653bd6b43ce92ba46ea0d1cbb449e18fd296",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
