@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a961159_62a62256",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 1075,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-01-05T19:51:21Z",
+      "side": 1,
+      "message": "can we just use \"self.pipeline.source\" here and avoid the extra arg?",
+      "revId": "151dc071753ae509b2ad8cd39ad669261299e452",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
