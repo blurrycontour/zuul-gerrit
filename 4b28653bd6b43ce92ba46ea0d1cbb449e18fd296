@@ -34,6 +34,23 @@
       "revId": "4b28653bd6b43ce92ba46ea0d1cbb449e18fd296",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_46613dd2",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-01-05T17:20:36Z",
+      "side": 0,
+      "message": "This actually makes the return value match what we do in simpleQuery in zuul/lib/gerrit.  I believe that previously whatever used this just ignored the junk at the end (as in, it tried to treat it as a change, errored, logged the error, and continued).  The code path I am adding is not quite as generous.",
+      "revId": "4b28653bd6b43ce92ba46ea0d1cbb449e18fd296",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
