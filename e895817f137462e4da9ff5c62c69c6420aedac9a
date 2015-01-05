@@ -16,6 +16,23 @@
       "revId": "e895817f137462e4da9ff5c62c69c6420aedac9a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_26dfc73b",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1153,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-01-05T23:06:34Z",
+      "side": 1,
+      "message": "Oh, no -- first is \u0027get an initial change queue since none was specified\u0027; second is \u0027if there is no change queue, then we have an error\u0027.  This probably warrants a comment.  :)",
+      "revId": "e895817f137462e4da9ff5c62c69c6420aedac9a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
