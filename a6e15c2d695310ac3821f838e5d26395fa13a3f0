@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a961159_9c18d585",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 16
+      },
+      "lineNbr": 471,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2015-01-05T19:34:08Z",
+      "side": 1,
+      "message": "I\u0027m not sure what the convention is, but should we use (strong) emphasis here as well when referencing \u0027require-approval-any\u0027?",
+      "revId": "a6e15c2d695310ac3821f838e5d26395fa13a3f0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_3c8601ba",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 16
+      },
+      "lineNbr": 557,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2015-01-05T19:34:08Z",
+      "side": 1,
+      "message": "This sounds a little awkward.  What about \"This requires the value to be a string.\"",
+      "revId": "a6e15c2d695310ac3821f838e5d26395fa13a3f0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_bf04a315",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 16
+      },
+      "lineNbr": 565,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2015-01-05T19:34:08Z",
+      "side": 1,
+      "message": "I\u0027m not sure what the convention is, but should we use (strong) emphasis here as well when referencing \u0027approval-any\u0027?",
+      "revId": "a6e15c2d695310ac3821f838e5d26395fa13a3f0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_5c02ed0c",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 16
+      },
+      "lineNbr": 571,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2015-01-05T19:34:08Z",
+      "side": 1,
+      "message": "Emphasis is used here.  Should it be strong, e.g. **approval-any**",
+      "revId": "a6e15c2d695310ac3821f838e5d26395fa13a3f0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_7cffa902",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 16
+      },
+      "lineNbr": 573,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2015-01-05T19:34:08Z",
+      "side": 1,
+      "message": "Ditto.",
+      "revId": "a6e15c2d695310ac3821f838e5d26395fa13a3f0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_1f8937ca",
+        "filename": "zuul/model.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 1033,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2015-01-05T19:34:08Z",
+      "side": 1,
+      "message": "Won\u0027t a value like \u0027! foo\u0027 make it this far? Would be useful to either strip() whitespace (either here or in the tidy_approvals function?) or fail here with some sort of validation error message, perhaps?",
+      "revId": "a6e15c2d695310ac3821f838e5d26395fa13a3f0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
