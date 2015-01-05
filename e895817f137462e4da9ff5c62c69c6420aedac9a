@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a961159_59c3f089",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1153,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-01-05T02:45:26Z",
+      "side": 1,
+      "message": "(nit) could be indented",
+      "revId": "e895817f137462e4da9ff5c62c69c6420aedac9a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
