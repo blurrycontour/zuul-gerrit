@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "3a961159_d4bdc2b2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2015-01-06T05:44:16Z",
+      "side": 1,
+      "message": "s/equeued/enqueued/",
+      "revId": "f119d1e750784936bf3ddf43480957d60632a04d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a961159_5995b086",
         "filename": "zuul/trigger/gerrit.py",
         "patchSetId": 1
@@ -13,6 +30,40 @@
       "writtenOn": "2015-01-05T02:28:00Z",
       "side": 1,
       "message": "I think this should be case-insensitive",
+      "revId": "f119d1e750784936bf3ddf43480957d60632a04d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_37236859",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 406,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2015-01-06T05:44:16Z",
+      "side": 1,
+      "message": "Your exception message below specifies dep_num",
+      "revId": "f119d1e750784936bf3ddf43480957d60632a04d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_77e7b012",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 410,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2015-01-06T05:44:16Z",
+      "side": 1,
+      "message": "In the conditional below you do not wrap the not dep.is_merged in ()\u0027s",
       "revId": "f119d1e750784936bf3ddf43480957d60632a04d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
