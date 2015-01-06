@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "3a961159_9c652ab1",
+        "filename": "tests/base.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 353,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-01-06T00:13:40Z",
+      "side": 1,
+      "message": "This is fixing E125 which we typically ignore.",
+      "revId": "20363615ee5753890d29cfe6b216286f3456f2b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a961159_2d23c905",
         "filename": "tox.ini",
         "patchSetId": 15
@@ -13,6 +30,91 @@
       "writtenOn": "2014-12-23T20:34:37Z",
       "side": 1,
       "message": "JJB has this disclaimer, might be valuable to add?\n\n\"These are ignored intentionally in openstack-infra projects; please don\u0027t submit patches that solely correct them or enable them.\"",
+      "revId": "20363615ee5753890d29cfe6b216286f3456f2b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_7ceebeb6",
+        "filename": "zuul/model.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-01-06T00:13:40Z",
+      "side": 1,
+      "message": "I think this is E126 which like E125 can probably be ignored.",
+      "revId": "20363615ee5753890d29cfe6b216286f3456f2b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_9ceb6aa3",
+        "filename": "zuul/model.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 343,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-01-06T00:13:40Z",
+      "side": 1,
+      "message": "This is E125 iirc.",
+      "revId": "20363615ee5753890d29cfe6b216286f3456f2b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_bc2bc6e9",
+        "filename": "zuul/model.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 1153,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-01-06T00:13:40Z",
+      "side": 1,
+      "message": "And another E125",
+      "revId": "20363615ee5753890d29cfe6b216286f3456f2b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_1c377a4e",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 702,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-01-06T00:13:40Z",
+      "side": 1,
+      "message": "E125?",
+      "revId": "20363615ee5753890d29cfe6b216286f3456f2b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_3c3fd626",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 712,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-01-06T00:13:40Z",
+      "side": 1,
+      "message": "E125?",
       "revId": "20363615ee5753890d29cfe6b216286f3456f2b7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
