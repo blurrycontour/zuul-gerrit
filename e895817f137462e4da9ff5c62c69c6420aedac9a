@@ -51,6 +51,23 @@
       "revId": "e895817f137462e4da9ff5c62c69c6420aedac9a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_ef3659e6",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1153,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-01-06T17:49:48Z",
+      "side": 1,
+      "message": "Oh, got it.  Agreed.",
+      "revId": "e895817f137462e4da9ff5c62c69c6420aedac9a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
