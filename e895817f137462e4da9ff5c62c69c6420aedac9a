@@ -33,6 +33,24 @@
       "revId": "e895817f137462e4da9ff5c62c69c6420aedac9a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_17fbd37b",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1153,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-01-06T00:48:04Z",
+      "side": 1,
+      "message": "oh yeah, I followed that. I meant the whole block (including the if part) could be indented which might make this clearer and reduce the need for a comment.",
+      "parentUuid": "3a961159_26dfc73b",
+      "revId": "e895817f137462e4da9ff5c62c69c6420aedac9a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
