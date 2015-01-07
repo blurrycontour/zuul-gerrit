@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a961159_11d80352",
+        "filename": "tests/test_cloner.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 448,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-01-07T19:44:59Z",
+      "side": 1,
+      "message": "Same for all of these.",
+      "revId": "cbe0d818cc50dec71bc2e8a259e96b6dfd33ff25",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_5127eb62",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 2803,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-01-07T19:44:59Z",
+      "side": 1,
+      "message": "Was it this test that was deleted in an earlier change?  Maybe there was a rebase accident or something?",
+      "revId": "cbe0d818cc50dec71bc2e8a259e96b6dfd33ff25",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_7121474c",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 2808,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-01-07T19:44:59Z",
+      "side": 1,
+      "message": "Probably could just omit this test from this change, yeah?",
+      "revId": "cbe0d818cc50dec71bc2e8a259e96b6dfd33ff25",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_911cf314",
+        "filename": "zuul/reporter/smtp.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-01-07T19:44:59Z",
+      "side": 1,
+      "message": "Why the leading underscore for send_mail?  Also, maybe \"sendMail\" for internal zuul consistency?",
+      "revId": "cbe0d818cc50dec71bc2e8a259e96b6dfd33ff25",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_b1172fed",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-01-07T19:44:59Z",
+      "side": 1,
+      "message": "This is confusing.  I\u0027ve been trying to figure out what the \u0027pair\u0027 is in this.  It seems like this is a combination of driver+connection.  So for instance, the gerrit driver with the openstack connection that\u0027s used as a trigger:\n\nconnection_pairs[\u0027trigger\u0027][\u0027gerrit\u0027][\u0027openstack\u0027] \u003d zuul.trigger.gerrit.GerritTrigger(openstack_gerrit_connection)\n\nYou might call this a \"connector\" (connector \u003d driver+connection).",
+      "revId": "cbe0d818cc50dec71bc2e8a259e96b6dfd33ff25",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_d112fbfb",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-01-07T19:44:59Z",
+      "side": 1,
+      "message": "So this looks like you would need to use it with:\n\n  success:\n    gerrit:\n      connection: openstack-gerrit\n      verified: 1\n\nWhich seems unecessarily verbose.  What about the syntax I described here?  https://review.openstack.org/#/c/97391/3/doc/source/reporters.rst\n\nThen the connection(connector, whatever) becomes the keyword, so you get:\n\n  success:\n    openstack-gerrit:\n      verified: 1",
+      "revId": "cbe0d818cc50dec71bc2e8a259e96b6dfd33ff25",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_f1d45721",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 416,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-01-07T19:44:59Z",
+      "side": 1,
+      "message": "The confusion around connection_pairs is making this hard for me to read.  I would imagine something like \"self.getReporter(reporter_name)\" would be easier to read.",
+      "revId": "cbe0d818cc50dec71bc2e8a259e96b6dfd33ff25",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
