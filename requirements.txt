@@ -8,6 +8,7 @@ paramiko>=1.8.0
 GitPython>=0.3.2.1
 lockfile>=0.8
 ordereddict
+docutils # Required by python-daemon
 python-daemon
 extras
 statsd>=1.0.0,<3.0
