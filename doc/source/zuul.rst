@@ -800,6 +800,23 @@ each job as it builds a list from the project specification.
   file patterns listed here.  This field is treated as a regular
   expression and multiple expressions may be listed.
 
+**skip-if (optional)**
+  This job should not be run if all the patterns specified by the
+  optional fields listed below match on their targets.
+
+  *project* (optional)
+    The regular expression to match against the project of the change.
+
+  *all-files-match* (optional)
+    A list of regular expressions intended to match the files involved
+    in the change.  This parameter will be considered matching a
+    change only if all files in a change match at least one of these
+    expressions.
+
+    The pattern for '/COMMIT_MSG' is always matched on and does not
+    have to be included.
+
+
 **voting (optional)**
   Boolean value (``true`` or ``false``) that indicates whatever
   a job is voting or not.  Default: ``true``.
