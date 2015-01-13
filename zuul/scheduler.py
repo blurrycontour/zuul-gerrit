@@ -31,6 +31,7 @@ import layoutvalidator
 import model
 from model import ActionReporter, Pipeline, Project, ChangeQueue
 from model import EventFilter, ChangeishFilter
+from zuul import change_matcher
 from zuul import version as zuul_version
 
 statsd = extras.try_import('statsd.statsd')
@@ -166,6 +167,14 @@ class MergeCompletedEvent(ResultEvent):
         self.commit = commit
 
 
+def toList(item):
+    if not item:
+        return []
+    if isinstance(item, list):
+        return item
+    return [item]
+
+
 class Scheduler(threading.Thread):
     log = logging.getLogger("zuul.Scheduler")
 
@@ -199,16 +208,37 @@ class Scheduler(threading.Thread):
     def testConfig(self, config_path):
         return self._parseConfig(config_path)
 
+    def _parseSkipIf(self, config_job):
+        cm = change_matcher
+        skip_matchers = []
+
+        for config_skip in config_job.get('skip-if', []):
+            nested_matchers = []
+
+            project_regex = config_skip.get('project')
+            if project_regex:
+                nested_matchers.append(cm.ProjectMatcher(project_regex))
+
+            branch_regex = config_skip.get('branch')
+            if branch_regex:
+                nested_matchers.append(cm.BranchMatcher(branch_regex))
+
+            file_regexes = toList(config_skip.get('all-files-match'))
+            if file_regexes:
+                file_matchers = [cm.FileMatcher(x) for x in file_regexes]
+                all_files_matcher = cm.MatchAllFiles(file_matchers)
+                nested_matchers.append(all_files_matcher)
+
+            # All patterns need to match a given skip-if predicate
+            skip_matchers.append(cm.MatchOnAll(nested_matchers))
+
+        if skip_matchers:
+            # Any skip-if predicate can be matched to trigger a skip
+            return cm.MatchOnAny(skip_matchers)
+
     def _parseConfig(self, config_path):
         layout = model.Layout()
         project_templates = {}
-
-        def toList(item):
-            if not item:
-                return []
-            if isinstance(item, list):
-                return item
-            return [item]
 
         if config_path:
             config_path = os.path.expanduser(config_path)
@@ -388,6 +418,7 @@ class Scheduler(threading.Thread):
             if files:
                 job._files = files
                 job.files = [re.compile(x) for x in files]
+            job.skip_if_matcher = self._parseSkipIf(config_job)
             swift = toList(config_job.get('swift'))
             if swift:
                 for s in swift:
@@ -965,6 +996,8 @@ class BasePipelineManager(object):
                     efilters += str(b)
                 for f in tree.job._files:
                     efilters += str(f)
+                if tree.job.skip_if_matcher:
+                    efilters += str(tree.job.skip_if_matcher)
                 if efilters:
                     efilters = ' ' + efilters
                 hold = ''
