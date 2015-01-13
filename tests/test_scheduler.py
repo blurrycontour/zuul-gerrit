@@ -22,20 +22,60 @@ import shutil
 import time
 import urllib
 import urllib2
+import yaml
 
 import git
 import testtools
 
+import zuul.change_matcher
 import zuul.scheduler
 import zuul.rpcclient
 import zuul.reporter.gerrit
 import zuul.reporter.smtp
 
-from tests.base import ZuulTestCase, repack_repo
+from tests.base import (
+    BaseTestCase,
+    ZuulTestCase,
+    repack_repo,
+)
 
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(name)-32s '
                     '%(levelname)-8s %(message)s')
+
+
+class TestSchedulerConfigParsing(BaseTestCase):
+
+    def test_parse_skip_if(self):
+        job_yaml = """
+jobs:
+  - name: job_name
+    skip-if:
+      - project: ^project_name$
+        branch: ^stable/icehouse$
+        all-files-match:
+          - ^filename$
+      - project: ^project2_name$
+        all-files-match:
+          - ^filename2$
+    """.strip()
+        data = yaml.load(job_yaml)
+        config_job = data.get('jobs')[0]
+        sched = zuul.scheduler.Scheduler()
+        cm = zuul.change_matcher
+        expected = cm.MatchAny([
+            cm.MatchAll([
+                cm.ProjectMatcher('^project_name$'),
+                cm.BranchMatcher('^stable/icehouse$'),
+                cm.MatchAllFiles([cm.FileMatcher('^filename$')]),
+            ]),
+            cm.MatchAll([
+                cm.ProjectMatcher('^project2_name$'),
+                cm.MatchAllFiles([cm.FileMatcher('^filename2$')]),
+            ]),
+        ])
+        matcher = sched._parseSkipIf(config_job)
+        self.assertEqual(expected, matcher)
 
 
 class TestScheduler(ZuulTestCase):
@@ -1736,6 +1776,76 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(A.reported, 2)
         self.assertEqual(B.data['status'], 'MERGED')
         self.assertEqual(B.reported, 2)
+
+    def test_skip_if_jobs(self):
+        "Test that jobs with a skip-if filter run only when appropriate"
+        change_configs = [
+            dict(
+                project='org/project',
+                branch='mp',
+                subject='match on project, branch and files',
+                files=['skip-project-branch'],
+                job_should_skip=True,
+            ),
+            dict(
+                project='org/project',
+                branch='master',
+                subject='match on project and files, no match on branch',
+                files=['skip-project-branch'],
+                job_should_skip=False,
+            ),
+            dict(
+                project='org/project1',
+                branch='master',
+                subject='match on project and files',
+                files=['skip-project'],
+                job_should_skip=True,
+            ),
+            dict(
+                project='org/project',
+                branch='master',
+                subject='match on files and branch, no match on project',
+                files=['skip-project'],
+                job_should_skip=False,
+            ),
+            dict(
+                project='org/project',
+                branch='master',
+                subject='match on files',
+                files=['foo.skip-ext'],
+                job_should_skip=True,
+            ),
+            dict(
+                project='org/project',
+                branch='master',
+                subject='no match on all files',
+                files=['skip-no-match', 'foo.skip-ext'],
+                job_should_skip=False,
+            ),
+        ]
+
+        changes = []
+        for cfg in change_configs:
+            change = self.fake_gerrit.addFakeChange(cfg['project'],
+                                                    cfg['branch'],
+                                                    cfg['subject'])
+            change.addPatchset(cfg['files'])
+            change.addApproval('CRVW', 2)
+            self.fake_gerrit.addEvent(change.addApproval('APRV', 1))
+            changes.append(change)
+
+        self.waitUntilSettled()
+
+        tested_changes = [x.changes[0] for x in self.history
+                          if x.name == 'project-test-skip-if']
+        expected_tested_changes = []
+        for cfg, change in zip(change_configs, changes):
+            self.assertEqual(change.data['status'], 'MERGED')
+            self.assertEqual(change.reported, 2)
+            if not cfg['job_should_skip']:
+                expected_tested_changes.append(change.data['number'])
+
+        self.assertEqual(expected_tested_changes, tested_changes)
 
     def test_test_config(self):
         "Test that we can test the config"

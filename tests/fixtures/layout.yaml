@@ -112,6 +112,20 @@ jobs:
   - name: project-testfile
     files:
       - '.*-requires'
+  - name: project-test-skip-if
+    skip-if:
+      - project: ^org/project$
+        branch: ^mp$
+        all-files-match:
+          - ^skip-project-branch$
+          - ^README$
+      - project: ^org/project1$
+        all-files-match:
+          - ^skip-project$
+          - ^README$
+      - all-files-match:
+          - ^.*\.skip-ext$
+          - ^README$
   - name: node-project-test1
     parameter-function: select_debian_node
   - name: project1-project2-integration
@@ -138,11 +152,13 @@ projects:
         - project-test1
         - project-test2
         - project-testfile
+        - project-test-skip-if
     gate:
       - project-merge:
         - project-test1
         - project-test2
         - project-testfile
+        - project-test-skip-if
     post:
       - project-post
     dup1:
@@ -156,11 +172,13 @@ projects:
         - project1-test1
         - project1-test2
         - project1-project2-integration
+        - project-test-skip-if
     gate:
       - project1-merge:
         - project1-test1
         - project1-test2
         - project1-project2-integration
+        - project-test-skip-if
     post:
       - project1-post
 
