@@ -435,6 +435,45 @@ class Project(object):
         return '<Project %s>' % (self.name)
 
 
+class SkipIfOnlyRule(object):
+    """
+    Matches a change if the change's project name matches that
+    provided and all files in the change match at least one of the
+    specified file regexes.
+    """
+
+    def __init__(self, project_name, file_regexes):
+        self.project_name = project_name
+        self._file_regexes = file_regexes
+        self.file_regexes = [re.compile(x) for x in file_regexes]
+
+    def __eq__(self, other):
+        return (self.project_name == other.project_name and
+                set(self._file_regexes) == set(other._file_regexes))
+
+    def __str__(self):
+        return '{SkipIfOnly[%s]:%s}' % (self.project_name,
+                                        ''.join(self._file_regexes))
+
+    def __repr__(self):
+        return '<SkipIfOnlyRule %s>' % (self.project_name)
+
+    def matches(self, change):
+        if not getattr(change, 'files', None):
+            return False
+        if not self.project_name == str(change.project):
+            return False
+        for file_ in change.files:
+            matched_file = False
+            for regex in self.file_regexes:
+                if regex.match(file_):
+                    matched_file = True
+                    break
+            if not matched_file:
+                return False
+        return True
+
+
 class Job(object):
     def __init__(self, name):
         # If you add attributes here, be sure to add them to the copy method.
@@ -451,6 +490,7 @@ class Job(object):
         self._branches = []
         self.files = []
         self._files = []
+        self.skip_if_only_rules = []
         self.swift = {}
 
     def __str__(self):
@@ -476,6 +516,8 @@ class Job(object):
         if other.files:
             self.files = other.files[:]
             self._files = other._files[:]
+        if other.skip_if_only_rules:
+            self.skip_if_only_rules = other.skip_if_only_rules[:]
         if other.swift:
             self.swift.update(other.swift)
         self.hold_following_changes = other.hold_following_changes
@@ -499,6 +541,10 @@ class Job(object):
                         matches_file = True
         if self.files and not matches_file:
             return False
+
+        for rule in self.skip_if_only_rules:
+            if rule.matches(change):
+                return False
 
         return True
 

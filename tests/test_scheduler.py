@@ -22,20 +22,46 @@ import shutil
 import time
 import urllib
 import urllib2
+import yaml
 
 import git
 import testtools
 
+import zuul.model
 import zuul.scheduler
 import zuul.rpcclient
 import zuul.reporter.gerrit
 import zuul.reporter.smtp
 
-from tests.base import ZuulTestCase, repack_repo
+from tests.base import (
+    BaseTestCase,
+    ZuulTestCase,
+    repack_repo,
+)
 
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(name)-32s '
                     '%(levelname)-8s %(message)s')
+
+
+class TestSchedulerConfigParsing(BaseTestCase):
+
+    def test_parse_skip_if_only_for_job(self):
+        job_yaml = """
+jobs:
+  # tempest-dsvm-neutron jobs should be conditionally skipped
+  - name: ^.*tempest-dsvm-neutron.*$
+    skip-if-only:
+      - project: 'openstack/neutron'
+        files:
+          - '^/COMMIT_MSG$'
+    """.strip()
+        data = yaml.load(job_yaml)
+        sched = zuul.scheduler.Scheduler()
+        config_job = data.get('jobs')[0]
+        rules = sched._parseSkipIfOnlyForJob(config_job)
+        expected = zuul.model.SkipIfOnlyRule('openstack/neutron', ['^/COMMIT_MSG$'])
+        self.assertEqual([expected], rules)
 
 
 class TestScheduler(ZuulTestCase):

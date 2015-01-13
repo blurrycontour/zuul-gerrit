@@ -166,6 +166,14 @@ class MergeCompletedEvent(ResultEvent):
         self.commit = commit
 
 
+def toList(item):
+    if not item:
+        return []
+    if isinstance(item, list):
+        return item
+    return [item]
+
+
 class Scheduler(threading.Thread):
     log = logging.getLogger("zuul.Scheduler")
 
@@ -199,16 +207,18 @@ class Scheduler(threading.Thread):
     def testConfig(self, config_path):
         return self._parseConfig(config_path)
 
+    def _parseSkipIfOnlyForJob(self, config_job):
+        rules = []
+        for config_skip_if_only in config_job.get('skip-if-only', []):
+            project = config_skip_if_only.get('project')
+            file_regexes = toList(config_skip_if_only.get('files'))
+            rule = model.SkipIfOnlyRule(project, file_regexes)
+            rules.append(rule)
+        return rules
+
     def _parseConfig(self, config_path):
         layout = model.Layout()
         project_templates = {}
-
-        def toList(item):
-            if not item:
-                return []
-            if isinstance(item, list):
-                return item
-            return [item]
 
         if config_path:
             config_path = os.path.expanduser(config_path)
@@ -388,6 +398,7 @@ class Scheduler(threading.Thread):
             if files:
                 job._files = files
                 job.files = [re.compile(x) for x in files]
+            job.skip_if_only_rules = self._parseSkipIfOnlyForJob(config_job)
             swift = toList(config_job.get('swift'))
             if swift:
                 for s in swift:
@@ -965,6 +976,8 @@ class BasePipelineManager(object):
                     efilters += str(b)
                 for f in tree.job._files:
                     efilters += str(f)
+                for r in tree.job.skip_if_only_rulesets:
+                    efilters += str(r)
                 if efilters:
                     efilters = ' ' + efilters
                 hold = ''
