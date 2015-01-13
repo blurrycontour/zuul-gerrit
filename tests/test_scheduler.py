@@ -22,20 +22,60 @@ import shutil
 import time
 import urllib
 import urllib2
+import yaml
 
 import git
 import testtools
 
+import zuul.change_matcher
 import zuul.scheduler
 import zuul.rpcclient
 import zuul.reporter.gerrit
 import zuul.reporter.smtp
 
-from tests.base import ZuulTestCase, repack_repo
+from tests.base import (
+    BaseTestCase,
+    ZuulTestCase,
+    repack_repo,
+)
 
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(name)-32s '
                     '%(levelname)-8s %(message)s')
+
+
+class TestSchedulerConfigParsing(BaseTestCase):
+
+    def test_parse_skip_if(self):
+        job_yaml = """
+jobs:
+  - name: job_name
+    skip-if:
+      - project: ^project_name$
+        branch: ^stable/icehouse$
+        all-files-match:
+          - ^filename$
+      - project: ^project2_name$
+        all-files-match:
+          - ^filename2$
+    """.strip()
+        data = yaml.load(job_yaml)
+        config_job = data.get('jobs')[0]
+        sched = zuul.scheduler.Scheduler()
+        cm = zuul.change_matcher
+        expected = cm.MatchOnAny([
+            cm.MatchOnAll([
+                cm.ProjectMatcher('^project_name$'),
+                cm.BranchMatcher('^stable/icehouse$'),
+                cm.MatchAllFiles([cm.FileMatcher('^filename$')]),
+            ]),
+            cm.MatchOnAll([
+                cm.ProjectMatcher('^project2_name$'),
+                cm.MatchAllFiles([cm.FileMatcher('^filename2$')]),
+            ]),
+        ])
+        matcher = sched._parseSkipIf(config_job)
+        self.assertEqual(expected, matcher)
 
 
 class TestScheduler(ZuulTestCase):
