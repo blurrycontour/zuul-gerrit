@@ -1,0 +1,60 @@
+pipelines:
+  - name: check
+    manager: IndependentPipelineManager
+    trigger:
+      gerrit:
+        - event: patchset-created
+    success:
+      gerrit:
+        verified: 1
+    failure:
+      gerrit:
+        verified: -1
+
+
+jobs:
+  - name: ^.*-merge$
+    failure-message: Unable to merge change
+    hold-following-changes: true
+  - name: nonvoting-project-test2
+    voting: false
+  - name: project-testfile
+    files:
+      - '.*-requires'
+  - name: project-test-skip-if
+    skip-if:
+      - project: ^org/project$
+        branch: ^mp$
+        all-files-match:
+          - ^skip-project-branch$
+          - ^README$
+      - project: ^org/project1$
+        all-files-match:
+          - ^skip-project$
+          - ^README$
+      - all-files-match:
+          - ^.*\.skip-ext$
+          - ^README$
+  - name: node-project-test1
+    parameter-function: select_debian_node
+  - name: project1-project2-integration
+    queue-name: integration
+
+
+projects:
+  - name: org/project
+    merge-mode: cherry-pick
+    check:
+      - project-merge:
+        - project-test1
+        - project-test2
+        - project-testfile
+        - project-test-skip-if
+
+  - name: org/project1
+    check:
+      - project1-merge:
+        - project1-test1
+        - project1-test2
+        - project1-project2-integration
+        - project-test-skip-if
