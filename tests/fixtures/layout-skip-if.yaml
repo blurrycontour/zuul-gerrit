@@ -1,0 +1,51 @@
+pipelines:
+  - name: check
+    manager: IndependentPipelineManager
+    trigger:
+      gerrit:
+        - event: patchset-created
+    success:
+      gerrit:
+        verified: 1
+    failure:
+      gerrit:
+        verified: -1
+
+
+jobs:
+  - name: project-test-skip-if
+    skip-if:
+      - project: ^org/project[1]?$
+        branch: ^master$
+        all-files-match:
+          - ^skip-project-branch$
+          - ^README$
+      - project: ^org/project2$
+        all-files-match:
+          - ^skip-project$
+          - ^README$
+      - all-files-match:
+          - ^.*\.skip-ext$
+          - ^README$
+
+projects:
+  # Use a project per-scenario to avoid potential merge conflicts
+  - name: org/project
+    check:
+      - project-test-skip-if
+
+  - name: org/project1
+    check:
+      - project-test-skip-if
+
+  - name: org/project3
+    check:
+      - project-test-skip-if
+
+  - name: org/project4
+    check:
+      - project-test-skip-if
+
+  - name: org/project5
+    check:
+      - project-test-skip-if
