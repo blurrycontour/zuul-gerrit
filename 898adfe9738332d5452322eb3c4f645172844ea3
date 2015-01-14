@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3a961159_94217ab6",
+        "filename": "tests/test_change_matcher.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 2035
+      },
+      "writtenOn": "2015-01-14T22:07:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a961159_51ff2466",
+      "revId": "898adfe9738332d5452322eb3c4f645172844ea3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a961159_114f5c93",
         "filename": "tests/test_scheduler.py",
         "patchSetId": 3
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "3a961159_94ca5a6c",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 2035
+      },
+      "writtenOn": "2015-01-14T22:07:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a961159_114f5c93",
+      "revId": "898adfe9738332d5452322eb3c4f645172844ea3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a961159_111d9c73",
         "filename": "zuul/model.py",
         "patchSetId": 3
@@ -47,6 +83,24 @@
       "writtenOn": "2015-01-14T21:40:58Z",
       "side": 1,
       "message": "Unused?",
+      "revId": "898adfe9738332d5452322eb3c4f645172844ea3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_34d9a656",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 2035
+      },
+      "writtenOn": "2015-01-14T22:07:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a961159_111d9c73",
       "revId": "898adfe9738332d5452322eb3c4f645172844ea3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
