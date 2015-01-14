@@ -49,13 +49,24 @@ class Repo(object):
                                                       self.local_path))
             git.Repo.clone_from(self.remote_url, self.local_path)
         repo = git.Repo(self.local_path)
-        if self.email:
-            repo.config_writer().set_value('user', 'email',
-                                           self.email)
-        if self.username:
-            repo.config_writer().set_value('user', 'name',
-                                           self.username)
-        repo.config_writer().write()
+        if self.email or self.username:
+            config_writer = repo.config_writer()
+            try:
+                if self.email:
+                    config_writer.set_value('user', 'email', self.email)
+                if self.username:
+                    config_writer.set_value('user', 'name', self.username)
+                config_writer.write()
+            finally:
+                # GitConfigParser.write() acquires a lock but does not release
+                # it. The lock is released in the object's __del__ method,
+                # which is invoked when the object is about to be dereferenced.
+                # This is not a reliable means of ensuring the lock is
+                # released, because it can break if there is a circular
+                # reference keeping the object alive, or if another
+                # GitConfigParser object for the same repository is initiated
+                # while a reference to the existing one is still held.
+                config_writer._lock._release_lock()
         self._initialized = True
 
     def isInitialized(self):
