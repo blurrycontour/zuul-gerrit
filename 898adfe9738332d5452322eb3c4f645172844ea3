@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a961159_51ff2466",
+        "filename": "tests/test_change_matcher.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2015-01-14T21:40:58Z",
+      "side": 1,
+      "message": "How about adding an additional matching filename to the files parameter above to ensure that the matcher returns False when any file in the list doesn\u0027t match? So....\n\n self._test_matches(False, files\u003d[\u0027docs/foo\u0027, \u0027foo/bar\u0027])",
+      "revId": "898adfe9738332d5452322eb3c4f645172844ea3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_114f5c93",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2015-01-14T21:40:58Z",
+      "side": 1,
+      "message": "AFAICT, zuul.model isn\u0027t used anywhere here?",
+      "revId": "898adfe9738332d5452322eb3c4f645172844ea3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_111d9c73",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2015-01-14T21:40:58Z",
+      "side": 1,
+      "message": "Unused?",
+      "revId": "898adfe9738332d5452322eb3c4f645172844ea3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
