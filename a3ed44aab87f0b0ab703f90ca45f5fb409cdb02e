@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3a961159_ce18ca78",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 105
+      },
+      "writtenOn": "2015-01-15T02:50:55Z",
+      "side": 1,
+      "message": "Agree with Armando here, this would be useful.",
+      "parentUuid": "3a961159_2895c931",
+      "revId": "a3ed44aab87f0b0ab703f90ca45f5fb409cdb02e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a961159_a84459b8",
         "filename": "/COMMIT_MSG",
         "patchSetId": 5
