@@ -108,6 +108,24 @@
     },
     {
       "key": {
+        "uuid": "3a961159_449bd916",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 2035
+      },
+      "writtenOn": "2015-01-15T04:50:13Z",
+      "side": 1,
+      "message": "Does the change to zuul.rst make sense at least?",
+      "parentUuid": "3a961159_24f32d74",
+      "revId": "a3ed44aab87f0b0ab703f90ca45f5fb409cdb02e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a961159_e849018f",
         "filename": "zuul/change_matcher.py",
         "patchSetId": 5
