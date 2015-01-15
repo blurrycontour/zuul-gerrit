@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a961159_2895c931",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 748
+      },
+      "writtenOn": "2015-01-15T00:18:50Z",
+      "side": 1,
+      "message": "would it make sense to have different rules for different branches?",
+      "revId": "a3ed44aab87f0b0ab703f90ca45f5fb409cdb02e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_a84459b8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 748
+      },
+      "writtenOn": "2015-01-15T00:18:50Z",
+      "side": 1,
+      "message": "so if I read this I would tempted to interpret this so that \u0027all-files-match are\u0027 in OR, whereas the regexes under all-files-match are in AND.\n\nso this is can be read as:\n\nskip if all-file-match (regex-A AND regex-B, ...) OR all-file-match (regex-X AND regex-Y, ...), ...\n\nBut I think I am mistaken, the semantic is actually:\n\nskip if all-file-match regex-A OR regex-B OR ...\n\nSo what is the need of grouping the regexes, if it\u0027s a flat OR? Could you clarify?",
+      "revId": "a3ed44aab87f0b0ab703f90ca45f5fb409cdb02e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_e849018f",
+        "filename": "zuul/change_matcher.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 748
+      },
+      "writtenOn": "2015-01-15T00:18:50Z",
+      "side": 1,
+      "message": "perhaps, this could be:\n\n  matched_file \u003d self.commit_regex.match(file_)",
+      "revId": "a3ed44aab87f0b0ab703f90ca45f5fb409cdb02e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
