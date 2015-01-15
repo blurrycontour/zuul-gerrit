@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "3a961159_c4c34956",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 2035
+      },
+      "writtenOn": "2015-01-15T04:45:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a961159_ce18ca78",
+      "revId": "a3ed44aab87f0b0ab703f90ca45f5fb409cdb02e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a961159_a84459b8",
         "filename": "/COMMIT_MSG",
         "patchSetId": 5
@@ -54,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "3a961159_89f79c8b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 2035
+      },
+      "writtenOn": "2015-01-15T04:45:25Z",
+      "side": 1,
+      "message": "The semantic is \nskip-if \n or \n   and \n     project_regex, file_regex1, file_regex2\n   and\n     file_regex3\n\nSo, all items identified by a dash nested under skip-if are OR, and all regexes within a dash nested under skip-if are AND.\n\nDoes that make sense?",
+      "parentUuid": "3a961159_a84459b8",
+      "revId": "a3ed44aab87f0b0ab703f90ca45f5fb409cdb02e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a961159_e849018f",
         "filename": "zuul/change_matcher.py",
         "patchSetId": 5
@@ -65,6 +101,24 @@
       "writtenOn": "2015-01-15T00:18:50Z",
       "side": 1,
       "message": "perhaps, this could be:\n\n  matched_file \u003d self.commit_regex.match(file_)",
+      "revId": "a3ed44aab87f0b0ab703f90ca45f5fb409cdb02e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a961159_c49a696e",
+        "filename": "zuul/change_matcher.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 2035
+      },
+      "writtenOn": "2015-01-15T04:45:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a961159_e849018f",
       "revId": "a3ed44aab87f0b0ab703f90ca45f5fb409cdb02e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
