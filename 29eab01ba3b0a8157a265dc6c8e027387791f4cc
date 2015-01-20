@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a961159_af1cd867",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-01-20T03:46:51Z",
+      "side": 1,
+      "message": "(nit) could comment on why this is separate to the other signal registers",
+      "revId": "29eab01ba3b0a8157a265dc6c8e027387791f4cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
