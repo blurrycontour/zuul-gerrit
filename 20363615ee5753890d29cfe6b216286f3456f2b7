@@ -16,6 +16,24 @@
       "revId": "20363615ee5753890d29cfe6b216286f3456f2b7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a930d6b_99a4d658",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 2797,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-01-21T08:32:56Z",
+      "side": 0,
+      "message": "seems to be an omission somehow.",
+      "parentUuid": "3a961159_fcac79a1",
+      "revId": "20363615ee5753890d29cfe6b216286f3456f2b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
