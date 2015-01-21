@@ -842,6 +842,7 @@ class Scheduler(threading.Thread):
             event.done()
         except Exception as e:
             event.exception(e, sys.exc_info()[2])
+            self.log.exception(e)
         self.management_event_queue.task_done()
 
     def process_result_queue(self):
