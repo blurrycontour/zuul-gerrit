@@ -16,6 +16,24 @@
       "revId": "151dc071753ae509b2ad8cd39ad669261299e452",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a930d6b_a0ddd644",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 1075,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-01-21T09:35:02Z",
+      "side": 1,
+      "message": "This is mostly in prep for giving a reporter a connection rather than a source. ie a reporter isn\u0027t necessarily tied to the same source as the pipeline.",
+      "parentUuid": "3a961159_62a62256",
+      "revId": "151dc071753ae509b2ad8cd39ad669261299e452",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
