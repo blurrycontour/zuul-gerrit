@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1a930d6b_953c7631",
+        "filename": "tests/test_cloner.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 448,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-01-26T23:47:20Z",
+      "side": 1,
+      "message": "I think you\u0027re missing a comment?",
+      "parentUuid": "3a961159_11d80352",
+      "revId": "cbe0d818cc50dec71bc2e8a259e96b6dfd33ff25",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a961159_5127eb62",
         "filename": "tests/test_scheduler.py",
         "patchSetId": 11
@@ -30,6 +48,24 @@
       "writtenOn": "2015-01-07T19:44:59Z",
       "side": 1,
       "message": "Was it this test that was deleted in an earlier change?  Maybe there was a rebase accident or something?",
+      "revId": "cbe0d818cc50dec71bc2e8a259e96b6dfd33ff25",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a930d6b_f5121ab3",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 2803,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-01-26T23:47:20Z",
+      "side": 1,
+      "message": "Yep, I suspect so. Added this back in earlier.",
+      "parentUuid": "3a961159_5127eb62",
       "revId": "cbe0d818cc50dec71bc2e8a259e96b6dfd33ff25",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "1a930d6b_55604e32",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 2808,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-01-26T23:47:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a961159_7121474c",
+      "revId": "cbe0d818cc50dec71bc2e8a259e96b6dfd33ff25",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a961159_911cf314",
         "filename": "zuul/reporter/smtp.py",
         "patchSetId": 11
@@ -64,6 +118,24 @@
       "writtenOn": "2015-01-07T19:44:59Z",
       "side": 1,
       "message": "Why the leading underscore for send_mail?  Also, maybe \"sendMail\" for internal zuul consistency?",
+      "revId": "cbe0d818cc50dec71bc2e8a259e96b6dfd33ff25",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a930d6b_b54ed2bf",
+        "filename": "zuul/reporter/smtp.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-01-26T23:47:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a961159_911cf314",
       "revId": "cbe0d818cc50dec71bc2e8a259e96b6dfd33ff25",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
