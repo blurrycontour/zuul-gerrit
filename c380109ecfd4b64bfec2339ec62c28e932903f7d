@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa81d914_e25c3528",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 808,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-01-28T06:17:07Z",
+      "side": 1,
+      "message": "An example of how this looks would be helpful as being able to supply multiple skip-if\u0027s is confusing",
+      "revId": "c380109ecfd4b64bfec2339ec62c28e932903f7d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa81d914_9fbf56d0",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 825,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-01-28T06:17:07Z",
+      "side": 1,
+      "message": "Could be cool to have an option to skip on a commit message regex",
+      "revId": "c380109ecfd4b64bfec2339ec62c28e932903f7d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa81d914_bf6dfa06",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-01-28T06:17:07Z",
+      "side": 1,
+      "message": "Should put this as a fixture and reload it into the scheduler config",
+      "revId": "c380109ecfd4b64bfec2339ec62c28e932903f7d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
