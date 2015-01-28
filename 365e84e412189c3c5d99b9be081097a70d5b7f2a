@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa81d914_ad407357",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2896,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-01-28T05:47:07Z",
+      "side": 1,
+      "message": "It might be worth checking the job.changes is correct too.",
+      "revId": "365e84e412189c3c5d99b9be081097a70d5b7f2a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa81d914_cd6cc739",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1351,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-01-28T05:47:07Z",
+      "side": 1,
+      "message": "can we see a test for this state as I\u0027m not sure how this would occur..",
+      "revId": "365e84e412189c3c5d99b9be081097a70d5b7f2a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa81d914_cd5da74a",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1754,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-01-28T05:47:07Z",
+      "side": 1,
+      "message": "I\u0027m confused. How would this happen? And if it does, shouldn\u0027t we fetch the newest patchset?",
+      "revId": "365e84e412189c3c5d99b9be081097a70d5b7f2a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
