@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa81d914_dff8eee7",
+        "filename": "requirements.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-01-28T05:53:51Z",
+      "side": 1,
+      "message": "you have !\u003d2.0 twice here.\n\nShould we just require \u003e\u003d2.0.4",
+      "revId": "41a2d42241bc6f893e1c8ecf7336ae9103a12f21",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
