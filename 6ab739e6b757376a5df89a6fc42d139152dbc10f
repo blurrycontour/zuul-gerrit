@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa81d914_cd6767e9",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2849,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-01-28T05:27:33Z",
+      "side": 1,
+      "message": "I wonder if we can drop this approval event to see if A still gets queued correctly?",
+      "revId": "6ab739e6b757376a5df89a6fc42d139152dbc10f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa81d914_edab4bd4",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2879,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-01-28T05:27:33Z",
+      "side": 1,
+      "message": "We should check the log to see if the cycle was noticed",
+      "revId": "6ab739e6b757376a5df89a6fc42d139152dbc10f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa81d914_8d41ef0d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-01-28T05:27:33Z",
+      "side": 1,
+      "message": "This might end up with multiple copies of the one dependency. We should possibly sanitise for duplicate depends-on lines in case things break trying to enqueue a dependant change twice",
+      "revId": "6ab739e6b757376a5df89a6fc42d139152dbc10f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
