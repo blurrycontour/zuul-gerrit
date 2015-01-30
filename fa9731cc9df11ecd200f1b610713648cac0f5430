@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa81d914_8f2a558e",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 1837,
+      "author": {
+        "id": 2035
+      },
+      "writtenOn": "2015-01-30T04:40:48Z",
+      "side": 1,
+      "message": "Adding files via addPatchset worked fine when I was approving the changes for merge (see PS12), but this new approach does not add them correctly.  I\u0027ve debugged Job.changeMatches and found that none of the changes include the files that should be added by this line.  This means that each change only has has the commit message and readme files.  Since these files are matched by all skip rules, the job never runs.",
+      "revId": "fa9731cc9df11ecd200f1b610713648cac0f5430",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
