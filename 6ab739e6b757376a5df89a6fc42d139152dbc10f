@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "da86d52c_bd699727",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2849,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-01-30T21:58:46Z",
+      "side": 1,
+      "message": "No because we do not currently do a reverse query to see if any changes have \"Depends-On:\" lines pointing to a particular change.  In other words, for that to work, we would need to ask gerrit to search for \"Depends-on: \u003cchangeid of B\u003e\" when it fetched information about B.  That might be possible, but I think the one-way lookup will suffice for now, and if we deem it worth the extra code complexity and query time, we can add it.\n\nWe can, however, drop the approval of B and make sure that A pulls in B.",
+      "revId": "6ab739e6b757376a5df89a6fc42d139152dbc10f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa81d914_edab4bd4",
         "filename": "tests/test_scheduler.py",
         "patchSetId": 3
@@ -36,6 +53,23 @@
     },
     {
       "key": {
+        "uuid": "da86d52c_dd764b06",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2879,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-01-30T21:58:46Z",
+      "side": 1,
+      "message": "I\u0027m not thrilled with the idea of testing for log messages.  I think the right thing to do is eventually have it report the cycle to gerrit, but that will take some further work.  I\u0027m happy enough for now that this test shows that we don\u0027t go into an infinite loop.",
+      "revId": "6ab739e6b757376a5df89a6fc42d139152dbc10f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa81d914_8d41ef0d",
         "filename": "zuul/trigger/gerrit.py",
         "patchSetId": 3
@@ -47,6 +81,23 @@
       "writtenOn": "2015-01-28T05:27:33Z",
       "side": 1,
       "message": "This might end up with multiple copies of the one dependency. We should possibly sanitise for duplicate depends-on lines in case things break trying to enqueue a dependant change twice",
+      "revId": "6ab739e6b757376a5df89a6fc42d139152dbc10f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da86d52c_fd730f13",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-01-30T21:58:46Z",
+      "side": 1,
+      "message": "You mean if a user puts two identical depends-on headers in the same change?  I guess we could handle that.",
       "revId": "6ab739e6b757376a5df89a6fc42d139152dbc10f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
