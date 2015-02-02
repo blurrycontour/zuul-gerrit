@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da86d52c_8e89b228",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-02-02T22:38:22Z",
+      "side": 1,
+      "message": "I think this is the wrong place to handle this error.  This is the fallback exception handler for when something completely unexpected happens.  However, the exception being handled is (somewhat) expected.  Perhaps a better place would be right after the query method.  You could test for whether no data were returned when querying a change we know should exist, and just retry that 5 times (after maybe a short sleep?).  I\u0027m also not sure I like the fact that this puts events back out of order.",
+      "revId": "b9030010412ac64b8a04a80ddf8e663712c792d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
