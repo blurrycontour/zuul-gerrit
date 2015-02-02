@@ -16,6 +16,40 @@
       "revId": "c42360d10983fb1de977da9353176ea1255193a1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da86d52c_9ab1f9e3",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2944,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-02-02T18:35:16Z",
+      "side": 1,
+      "message": "This releases the first merge job and allows the test jobs to calculate which changes should be co-tested.  Then the same for the second change in the queue.  Because calculating the dependent changes for a test run is a race with the completion of previous runs and their changes potentially merging, it is necessary to use this pattern since we are going to check that value later. (see below)",
+      "revId": "c42360d10983fb1de977da9353176ea1255193a1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da86d52c_bab4fdd1",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2956,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-02-02T18:35:16Z",
+      "side": 1,
+      "message": "In other words, if we didn\u0027t do the double-wait-until-settled above, this might be \"1,1\" if 2,1 ran its job and merged before 1,1 managed to do its calculations for what changes to test with (that\u0027s still correct -- it would be 1,1 tested against HEAD where HEAD is now 2,1, but it\u0027s just an annoying race condition for the tests to have to handle).",
+      "revId": "c42360d10983fb1de977da9353176ea1255193a1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
