@@ -104,6 +104,24 @@
     },
     {
       "key": {
+        "uuid": "da86d52c_c579f694",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1754,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-02-02T04:08:42Z",
+      "side": 1,
+      "message": "So in this scenario what happens? Are no tests ran on B,1 because A has been updated to a second patchset? Do we need to wait for gerrit to rebase?\n\nPerhaps we can do a new fetch of the latest patchet for A?",
+      "parentUuid": "da86d52c_1d79c3fc",
+      "revId": "365e84e412189c3c5d99b9be081097a70d5b7f2a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da86d52c_3d7e87e5",
         "filename": "zuul/scheduler.py",
         "patchSetId": 3
