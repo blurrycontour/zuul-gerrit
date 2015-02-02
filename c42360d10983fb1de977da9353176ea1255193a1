@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da86d52c_2a58e055",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2944,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-02-02T02:43:34Z",
+      "side": 1,
+      "message": "(nit) why is this here twice? I\u0027m assuming it\u0027s needed to calculate the dependencies properly? We\u0027re not checking anything between the releases so should we just remove these, take jobs out of hold and wait for everything to settle?",
+      "revId": "c42360d10983fb1de977da9353176ea1255193a1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
