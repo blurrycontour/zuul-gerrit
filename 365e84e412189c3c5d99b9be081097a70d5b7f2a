@@ -122,6 +122,23 @@
     },
     {
       "key": {
+        "uuid": "da86d52c_fa84b5b2",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1754,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-02-02T18:40:02Z",
+      "side": 1,
+      "message": "That\u0027s a good point.  Perhaps the most desirable behavior, and most consistent with current behavior, is to ignore this condition in independent pipelines.  So the older dependent commit will be used.  I will remove this check.",
+      "revId": "365e84e412189c3c5d99b9be081097a70d5b7f2a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da86d52c_3d7e87e5",
         "filename": "zuul/scheduler.py",
         "patchSetId": 3
