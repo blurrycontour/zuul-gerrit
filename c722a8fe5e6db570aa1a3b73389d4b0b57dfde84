@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da86d52c_0a86bcb9",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 635,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-02-02T02:32:29Z",
+      "side": 1,
+      "message": "In your example you lay out the scenario for approving C, yet it seems like you\u0027re testing against adding D?\n\nAlso if it is C that is added, given your above tree, wouldn\u0027t the queue be:\nABCEFG? In fact, isn\u0027t everything below C kinda irrelevant? (ie no D int the queue)",
+      "revId": "c722a8fe5e6db570aa1a3b73389d4b0b57dfde84",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
