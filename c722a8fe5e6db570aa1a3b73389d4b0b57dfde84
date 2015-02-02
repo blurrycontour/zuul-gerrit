@@ -16,6 +16,23 @@
       "revId": "c722a8fe5e6db570aa1a3b73389d4b0b57dfde84",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da86d52c_a646adbd",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 635,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-02-02T17:15:25Z",
+      "side": 1,
+      "message": "Oops.  Fixed.\n\nAnd D is still relevant because Zuul walks up and down the tree looking for changes to enqueue (that way when you approve something at the top of a stack, changes that were previously approved behind it are enqueued as well).",
+      "revId": "c722a8fe5e6db570aa1a3b73389d4b0b57dfde84",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
