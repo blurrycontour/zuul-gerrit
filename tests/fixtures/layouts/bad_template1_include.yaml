@@ -1,0 +1,6 @@
+# _parseConfig is going to fail here for nested includes
+
+includes:
+  - layout-file: bad_template1_include.yaml
+
+# validator is going to fail because no pipelines are defined

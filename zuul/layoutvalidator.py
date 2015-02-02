@@ -28,7 +28,7 @@ def toList(x):
 
 
 class LayoutSchema(object):
-    include = {'python-file': str}
+    include = {'python-file': str, 'layout-file': str}
     includes = [include]
 
     manager = v.Any('IndependentPipelineManager',

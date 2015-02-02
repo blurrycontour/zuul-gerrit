@@ -58,6 +58,18 @@ def deep_format(obj, paramdict):
     return ret
 
 
+def yaml_merge(dest, src):
+    """Simple *IN PLACE* yaml dictionary merger."""
+    for key in src:
+        if key in dest:
+            if isinstance(dest[key], list) and isinstance(src[key], list):
+                dest[key] += src[key]
+            else:
+                raise Exception("Could not include item %s" % key)
+        else:
+            dest[key] = src[key]
+
+
 class MergeFailure(Exception):
     pass
 
@@ -210,6 +222,12 @@ class Scheduler(threading.Thread):
                 return item
             return [item]
 
+        def expandPath(fn):
+            if not os.path.isabs(fn):
+                base = os.path.dirname(os.path.realpath(config_path))
+                fn = os.path.join(base, fn)
+            return os.path.expanduser(fn)
+
         if config_path:
             config_path = os.path.expanduser(config_path)
             if not os.path.exists(config_path):
@@ -218,18 +236,21 @@ class Scheduler(threading.Thread):
         config_file = open(config_path)
         data = yaml.load(config_file)
 
-        validator = layoutvalidator.LayoutValidator()
-        validator.validate(data)
-
         config_env = {}
         for include in data.get('includes', []):
             if 'python-file' in include:
-                fn = include['python-file']
-                if not os.path.isabs(fn):
-                    base = os.path.dirname(os.path.realpath(config_path))
-                    fn = os.path.join(base, fn)
-                fn = os.path.expanduser(fn)
+                fn = expandPath(include['python-file'])
                 execfile(fn, config_env)
+            elif 'layout-file' in include:
+                fn = expandPath(include['layout-file'])
+                included_data = yaml.load(open(fn))
+                if 'includes' in included_data:
+                    raise Exception(
+                        "Nested includes are not supported at %s" % fn)
+                yaml_merge(data, included_data)
+
+        validator = layoutvalidator.LayoutValidator()
+        validator.validate(data)
 
         for conf_pipeline in data.get('pipelines', []):
             pipeline = Pipeline(conf_pipeline['name'])

@@ -22,6 +22,7 @@ import voluptuous
 import yaml
 
 import zuul.layoutvalidator
+import zuul.scheduler
 
 FIXTURE_DIR = os.path.join(os.path.dirname(__file__),
                            'fixtures')
@@ -57,8 +58,27 @@ class TestLayoutValidator(testtools.TestCase):
                     error = str(e)
                     print '  ', error
                     if error in errors:
+                        for e in errors:
+                            print e
                         raise Exception("Error has already been tested: %s" %
                                         error)
                     else:
                         errors.append(error)
                     pass
+
+    def test_testConfig(self):
+        """Test config parser for include tests"""
+        print
+        scheduler = zuul.scheduler.Scheduler()
+        scheduler.registerTrigger(None, 'gerrit')
+        good_fn = os.path.join(FIXTURE_DIR, 'layouts',
+                               'good_template1_include.yaml')
+        print good_fn
+        layout = scheduler.testConfig(good_fn)
+        self.assertIn('projectx', layout.projects)
+        self.assertIn('post', layout.pipelines)
+
+        bad_fn = os.path.join(FIXTURE_DIR, 'layouts',
+                              'bad_template1_include.yaml')
+        print bad_fn
+        self.assertRaises(Exception, scheduler.testConfig, bad_fn)

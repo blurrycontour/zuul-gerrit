@@ -1,0 +1,7 @@
+pipelines:
+  - name: post
+    manager: IndependentPipelineManager
+    trigger:
+      gerrit:
+        - event: ref-updated
+          ref: ^(?!refs/).*$
