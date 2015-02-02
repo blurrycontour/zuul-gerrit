@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da86d52c_d3b8b7e7",
+        "filename": "tests/test_cloner.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-02-02T22:10:58Z",
+      "side": 1,
+      "message": "This change is kind of a red flag.  IIRC, you encountered a race condition here.  I\u0027d like to understand why this is necessary, because it does not seem like it should be.",
+      "revId": "d16e906bd19ac9d74576940fdda6fb2df7b3ea08",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da86d52c_f3ce9b82",
+        "filename": "tests/test_cloner.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 449,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-02-02T22:10:58Z",
+      "side": 1,
+      "message": "Same here.",
+      "revId": "d16e906bd19ac9d74576940fdda6fb2df7b3ea08",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da86d52c_b3b503f0",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-02-02T22:10:58Z",
+      "side": 1,
+      "message": "Commented out code.",
+      "revId": "d16e906bd19ac9d74576940fdda6fb2df7b3ea08",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
