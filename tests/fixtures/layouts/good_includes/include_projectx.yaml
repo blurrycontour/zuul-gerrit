@@ -1,0 +1,5 @@
+projects:
+  - name: projectx
+    template:
+      - name: template-generic
+        project: 'projectx'

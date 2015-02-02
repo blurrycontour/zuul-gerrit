@@ -268,18 +268,25 @@ Includes
 
 Custom functions to be used in Zuul's configuration may be provided
 using the ``includes`` directive.  It accepts a list of files to
-include, and currently supports one type of inclusion, a python file::
+include (either absolute paths or relative to the directory name of
+:ref:`layout_config <layout_config>`)::
 
   includes:
     - python-file: local_functions.py
+    - layout-dir: layouts_directory
 
 **python-file**
-  The path to a python file (either an absolute path or relative to the
-  directory name of :ref:`layout_config <layout_config>`).  The
-  file will be loaded and objects that it defines will be placed in a
-  special environment which can be referenced in the Zuul configuration.
-  Currently only the parameter-function attribute of a Job uses this
-  feature.
+  The path to a python file. The file will be loaded and objects that
+  it defines will be placed in a special environment which can be
+  referenced in the Zuul configuration. Currently only the
+  parameter-function attribute of a Job uses this feature.
+
+**layout-dir**
+  The path to a directory that will be recursively crawled for layout
+  files. Files will be loaded and merged with the :ref:`layout_config <layout_config>`.
+  This can be used to break down configurations into smaller, project
+  specifics layout. Currently only addition is supported and duplicated
+  entries will be detected by the layout validator.
 
 Pipelines
 """""""""

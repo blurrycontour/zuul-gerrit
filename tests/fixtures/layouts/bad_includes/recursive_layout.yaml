@@ -1,0 +1,4 @@
+# _parseConfig is going to fail here for nested includes
+
+includes:
+  - layout-dir: .

@@ -59,6 +59,26 @@ def deep_format(obj, paramdict):
     return ret
 
 
+def yaml_merge(dest, src):
+    """Simple *IN PLACE* yaml dictionary merger."""
+    for key in src:
+        if key in dest:
+            if isinstance(dest[key], list) and isinstance(src[key], list):
+                dest[key] += src[key]
+            else:
+                raise Exception("Could not include item %s" % key)
+        else:
+            dest[key] = src[key]
+
+
+def recurse_path(basepath):
+    """Return list of files present in a directory"""
+    filelist = []
+    for root, dirs, files in os.walk(basepath, topdown=True):
+        filelist.extend([os.path.join(root, path) for path in files])
+    return filelist
+
+
 class MergeFailure(Exception):
     pass
 
@@ -175,6 +195,13 @@ def toList(item):
     return [item]
 
 
+def expandPath(fn, base_path):
+    if not os.path.isabs(fn):
+        base = os.path.dirname(os.path.realpath(base_path))
+        fn = os.path.join(base, fn)
+    return os.path.expanduser(fn)
+
+
 class Scheduler(threading.Thread):
     log = logging.getLogger("zuul.Scheduler")
 
@@ -248,18 +275,22 @@ class Scheduler(threading.Thread):
         config_file = open(config_path)
         data = yaml.load(config_file)
 
-        validator = layoutvalidator.LayoutValidator()
-        validator.validate(data)
-
         config_env = {}
         for include in data.get('includes', []):
             if 'python-file' in include:
-                fn = include['python-file']
-                if not os.path.isabs(fn):
-                    base = os.path.dirname(os.path.realpath(config_path))
-                    fn = os.path.join(base, fn)
-                fn = os.path.expanduser(fn)
+                fn = expandPath(include['python-file'], config_path)
                 execfile(fn, config_env)
+            elif 'layout-dir' in include:
+                dn = expandPath(include['layout-dir'], config_path)
+                for fn in recurse_path(dn):
+                    included_data = yaml.load(open(fn))
+                    if 'includes' in included_data:
+                        raise Exception(
+                            "Nested includes are not supported at %s" % fn)
+                    yaml_merge(data, included_data)
+
+        validator = layoutvalidator.LayoutValidator()
+        validator.validate(data)
 
         for conf_pipeline in data.get('pipelines', []):
             pipeline = Pipeline(conf_pipeline['name'])

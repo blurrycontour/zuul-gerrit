@@ -1,0 +1,4 @@
+includes:
+  - layout-dir: bad_includes
+
+# validator is going to fail because no pipelines are defined
