@@ -16,6 +16,23 @@
       "revId": "29eab01ba3b0a8157a265dc6c8e027387791f4cc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da86d52c_0edea26d",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-02-02T22:33:22Z",
+      "side": 1,
+      "message": "As long as we don\u0027t move the signal registration before this point it should be fine (daemonization clears out signal handlers).",
+      "revId": "29eab01ba3b0a8157a265dc6c8e027387791f4cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
