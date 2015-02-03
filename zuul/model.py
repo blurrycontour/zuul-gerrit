@@ -81,12 +81,15 @@ class Pipeline(object):
         self.start_actions = None
         self.success_actions = None
         self.failure_actions = None
+        self.disabled_actions = None
         self.window = None
         self.window_floor = None
         self.window_increase_type = None
         self.window_increase_factor = None
         self.window_decrease_type = None
         self.window_decrease_factor = None
+        self.window_disable_at = None
+        self._disabled = False
 
     def __repr__(self):
         return '<Pipeline %s>' % self.name
@@ -425,6 +428,8 @@ class ChangeQueue(object):
                 self.window = max(
                     self.window_floor,
                     self.window / self.window_decrease_factor)
+        if self.window <= self.pipeline.window_disable_at:
+            self.pipeline._disabled = True
 
 
 class Project(object):
