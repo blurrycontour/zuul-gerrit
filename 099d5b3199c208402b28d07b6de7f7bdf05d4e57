@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da86d52c_bf35c1dc",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 18
+      },
+      "lineNbr": 818,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-02-03T00:24:46Z",
+      "side": 1,
+      "message": "If we were to sync this with jhesketh\u0027s change, we might name it \"all-files-match-any\".",
+      "revId": "099d5b3199c208402b28d07b6de7f7bdf05d4e57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da86d52c_9f3abdcb",
+        "filename": "tests/test_change_matcher.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-02-03T00:24:46Z",
+      "side": 1,
+      "message": "Just so you know I\u0027m not completely a downer on unit tests, this file is really useful (exhaustively test all different ways it can be constructed).",
+      "revId": "099d5b3199c208402b28d07b6de7f7bdf05d4e57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da86d52c_df3435e0",
+        "filename": "tests/test_model.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-02-03T00:24:46Z",
+      "side": 1,
+      "message": "This is the kind of test coverage that generally I\u0027d prefer to get through functional testing.  That is to say that the functional test ought to test that change matcher both matches something and doesn\u0027t match something else.",
+      "revId": "099d5b3199c208402b28d07b6de7f7bdf05d4e57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da86d52c_5f21259e",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 1780,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-02-03T00:24:46Z",
+      "side": 1,
+      "message": "Is there a reason we can\u0027t do normal scenario testing?  I think that would address the concurrency problem that you solved with multiple projects.",
+      "revId": "099d5b3199c208402b28d07b6de7f7bdf05d4e57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da86d52c_7f2429af",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 1839,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-02-03T00:24:46Z",
+      "side": 1,
+      "message": "You could also solve the intra-test concurrency problem by using waitUntilSettled() within the loop.\n\nOne of the reasons zuul is functional-test heavy is because it\u0027s quite difficult to run interactively and test changes, so interactive development is generally running one of the tests.  Even though this solution may now work for this test, I think that if you ran this test in the foreground to watch the log output, it would be difficult to work with because of the internal races.  So it might be worth adding moving the wait regardless.  (If I had to debug this test, the first thing I would do is move both the wait and assert into the loop (and make the assert print the failed test info)).",
+      "revId": "099d5b3199c208402b28d07b6de7f7bdf05d4e57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da86d52c_ff2f3986",
+        "filename": "zuul/change_matcher.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-02-03T00:24:46Z",
+      "side": 1,
+      "message": "(-1) Docs say: \"Using this decorator requires that the class’s metaclass is ABCMeta or is derived from it.\"\n\nIs it really worth it to use abc?  I\u0027m happy with NIE.",
+      "revId": "099d5b3199c208402b28d07b6de7f7bdf05d4e57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
