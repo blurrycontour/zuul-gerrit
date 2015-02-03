@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "da86d52c_855c2cef",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2970,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-02-03T01:47:01Z",
+      "side": 1,
+      "message": "sigh, I fail, ignore",
+      "parentUuid": "da86d52c_62456e6f",
+      "revId": "be87cb2d5c46c0c93553c3baffa7680449cc00be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da86d52c_421cea77",
         "filename": "tests/test_scheduler.py",
         "patchSetId": 6
@@ -30,6 +48,24 @@
       "writtenOn": "2015-02-03T01:40:01Z",
       "side": 1,
       "message": "So we need a new event once a dependency has merged?\n\nIt\u0027s perhaps getting into the complex scenario we looked at before, but perhaps its worth doing a reverse lookup on merge to see if dependant patches can be merged once a potential dependency is?",
+      "revId": "be87cb2d5c46c0c93553c3baffa7680449cc00be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da86d52c_c56d449b",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2990,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-02-03T01:47:01Z",
+      "side": 1,
+      "message": "ditto",
+      "parentUuid": "da86d52c_421cea77",
       "revId": "be87cb2d5c46c0c93553c3baffa7680449cc00be",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
