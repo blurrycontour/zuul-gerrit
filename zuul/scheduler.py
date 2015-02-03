@@ -273,7 +273,10 @@ class Scheduler(threading.Thread):
             else:
                 pipeline.merge_failure_actions = action_reporters['failure']
 
-            pipeline.window = conf_pipeline.get('window', 20)
+            default_window_size = 0
+            if conf_pipeline['manager'] == 'DependentPipelineManager':
+                default_window_size = 20
+            pipeline.window = conf_pipeline.get('window', default_window_size)
             pipeline.window_floor = conf_pipeline.get('window-floor', 3)
             pipeline.window_increase_type = conf_pipeline.get(
                 'window-increase-type', 'linear')
@@ -1711,7 +1714,14 @@ class IndependentPipelineManager(BasePipelineManager):
         # creates a new change queue for every change
         if change.project not in self.pipeline.getProjects():
             return None
-        change_queue = ChangeQueue(self.pipeline)
+        change_queue = ChangeQueue(
+            self.pipeline,
+            window=self.pipeline.window,
+            window_floor=self.pipeline.window_floor,
+            window_increase_type=self.pipeline.window_increase_type,
+            window_increase_factor=self.pipeline.window_increase_factor,
+            window_decrease_type=self.pipeline.window_decrease_type,
+            window_decrease_factor=self.pipeline.window_decrease_factor)
         change_queue.addProject(change.project)
         self.pipeline.addQueue(change_queue)
         return change_queue
