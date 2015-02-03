@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da86d52c_852a6c2a",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2970,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-02-03T01:51:19Z",
+      "side": 1,
+      "message": "Do you mean that A is unable to enqueue B (and therefore, A is unable to be enqueued)?",
+      "revId": "51884e382f77b8f8b3748da34e4d0892a5237d2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da86d52c_05167cf1",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2990,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-02-03T01:51:19Z",
+      "side": 1,
+      "message": "So we need a new event once a dependency has merged?\n\nIt\u0027s perhaps getting into the complex scenario we looked at before, but perhaps its worth doing a reverse lookup on merge to see if dependant patches can be merged once a potential dependency is?\n\nI suspect as it is this will cause confusion as to why a change hasn\u0027t entered the pipeline yet.\n\nMaybe where projects do not share a queue we should make them share a queue due to the dependency. Then we could queue both of them into the gate. (if that makes sense)",
+      "revId": "51884e382f77b8f8b3748da34e4d0892a5237d2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
