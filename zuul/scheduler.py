@@ -253,7 +253,8 @@ class Scheduler(threading.Thread):
                 'dequeue-on-new-patchset', True)
 
             action_reporters = {}
-            for action in ['start', 'success', 'failure', 'merge-failure']:
+            for action in ['start', 'success', 'failure', 'merge-failure',
+                           'disabled']:
                 action_reporters[action] = []
                 if conf_pipeline.get(action):
                     for reporter_name, params \
@@ -267,6 +268,7 @@ class Scheduler(threading.Thread):
             pipeline.start_actions = action_reporters['start']
             pipeline.success_actions = action_reporters['success']
             pipeline.failure_actions = action_reporters['failure']
+            pipeline.disabled_actions = action_reporters['disabled']
             if len(action_reporters['merge-failure']) > 0:
                 pipeline.merge_failure_actions = \
                     action_reporters['merge-failure']
@@ -286,6 +288,8 @@ class Scheduler(threading.Thread):
                 'window-decrease-type', 'exponential')
             pipeline.window_decrease_factor = conf_pipeline.get(
                 'window-decrease-factor', 2)
+            pipeline.window_disable_at = conf_pipeline.get('window-disable-at',
+                                                           0)
 
             manager = globals()[conf_pipeline['manager']](self, pipeline)
             pipeline.setManager(manager)
@@ -1001,6 +1005,8 @@ class BasePipelineManager(object):
         self.log.info("    %s" % self.pipeline.failure_actions)
         self.log.info("  On merge-failure:")
         self.log.info("    %s" % self.pipeline.merge_failure_actions)
+        self.log.info("  When disabled:")
+        self.log.info("    %s" % self.pipeline.disabled_actions)
 
     def getSubmitAllowNeeds(self):
         # Get a list of code review labels that are allowed to be
@@ -1459,6 +1465,8 @@ class BasePipelineManager(object):
         else:
             actions = self.pipeline.failure_actions
             item.setReportedResult('FAILURE')
+        if self.pipeline._disabled:
+            actions = self.pipeline.disabled_actions
         if actions:
             report = self.formatReport(item)
             try:

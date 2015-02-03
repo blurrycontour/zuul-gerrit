@@ -594,6 +594,10 @@ explanation of each of the parameters::
   do when a change is added to the pipeline manager.  This can be used,
   for example, to reset the value of the Verified review category.
 
+**disabled**
+  Uses the same syntax as **success**, but describes what Zuul should
+  do when a pipeline is disabled. See ``window-disable-at``.
+
 **precedence**
   Indicates how the build scheduler should prioritize jobs for
   different pipelines.  Each pipeline may have one precedence, jobs
@@ -642,6 +646,18 @@ explanation of each of the parameters::
   The value to be subtracted or divided against the previous window
   value to determine the new window after unsuccessful change merges.
   Default: ``2``.
+
+**window-disable-at**
+  If a window falls below this value the pipeline will enter into a
+  disabled state. When disabled the pipeline will stop reporting to
+  either the success, failure or merge-failure reporters. Instead the
+  pipeline will send all results to the ``disabled`` reporters. This
+  can be used to disable flooding reporters with votes if something
+  breaks. This should at least be as big as the ``window-floor`` or
+  else is effectively not used. The disabled state is reset when a
+  HUP signal (reload) is
+  received.
+  Default: ``0``.
 
 Some example pipeline configurations are included in the sample layout
 file.  The first is called a *check* pipeline::
