@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "da86d52c_2a2a1790",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2970,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-02-04T18:03:34Z",
+      "side": 1,
+      "message": "Yep.",
+      "revId": "51884e382f77b8f8b3748da34e4d0892a5237d2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da86d52c_05167cf1",
         "filename": "tests/test_scheduler.py",
         "patchSetId": 6
@@ -30,6 +47,23 @@
       "writtenOn": "2015-02-03T01:51:19Z",
       "side": 1,
       "message": "So we need a new event once a dependency has merged?\n\nIt\u0027s perhaps getting into the complex scenario we looked at before, but perhaps its worth doing a reverse lookup on merge to see if dependant patches can be merged once a potential dependency is?\n\nI suspect as it is this will cause confusion as to why a change hasn\u0027t entered the pipeline yet.\n\nMaybe where projects do not share a queue we should make them share a queue due to the dependency. Then we could queue both of them into the gate. (if that makes sense)",
+      "revId": "51884e382f77b8f8b3748da34e4d0892a5237d2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da86d52c_4a1aeb7d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2990,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-02-04T18:03:34Z",
+      "side": 1,
+      "message": "Yes, we need a new event to pull in reverse cross-repo dependencies.  And yes, I would like it if it were automatic, but as I mentioned, it involves querying gerrit based on search strings which is complex and unproven.  I think this is a good first step and the incidences of us being disappointed by this will be small.  We can tackle that later.\n\nCombining change queues means potentially restarting jobs, and then remembering to remove them later.  I\u0027d rather not make this so complicated.",
       "revId": "51884e382f77b8f8b3748da34e4d0892a5237d2d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
