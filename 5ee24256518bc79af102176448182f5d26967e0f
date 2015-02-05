@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da86d52c_f540ba08",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1766,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-02-05T16:30:33Z",
+      "side": 1,
+      "message": "Perhaps get change Queue should just go in the BasePipelineManager to avoid code duplication?",
+      "revId": "5ee24256518bc79af102176448182f5d26967e0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da86d52c_35fb327a",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-02-05T16:30:33Z",
+      "side": 1,
+      "message": "Small not pick but does gerrit ignore the case of the \u0027I\u0027 prefix in the changeid? Not sure if that poses an issue.\n\nAlso why multi line?",
+      "revId": "5ee24256518bc79af102176448182f5d26967e0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
