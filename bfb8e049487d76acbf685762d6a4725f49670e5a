@@ -53,6 +53,23 @@
     },
     {
       "key": {
+        "uuid": "da86d52c_38ea42ac",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 649,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-02-05T18:33:28Z",
+      "side": 1,
+      "message": "It is not; see below.",
+      "revId": "bfb8e049487d76acbf685762d6a4725f49670e5a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da86d52c_de59138f",
         "filename": "zuul/scheduler.py",
         "patchSetId": 7
@@ -87,6 +104,23 @@
     },
     {
       "key": {
+        "uuid": "da86d52c_58d456eb",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1124,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-02-05T18:33:28Z",
+      "side": 1,
+      "message": "Here\u0027s what happens:\n\n* the head change calls this with (ChangeA, ChangeA) that is to say it is the last head itself.  ChangeA.queue is None, so it calls getChangeQueue and gets a queue.  enqueueItem sets ChangeA.queue to be QueueA (due to line 363).\n\n* the next change calls this with (ChangeB, ChangeA) because ChangeA is still the last head.  ChangeA.queue is QueueA due to the previous call, so the first part of the conditional applies and ChangeB.queue is set to QueueA.\n\nI believe that is all as desired and 649 is not a bug.",
+      "revId": "bfb8e049487d76acbf685762d6a4725f49670e5a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da86d52c_7e002702",
         "filename": "zuul/scheduler.py",
         "patchSetId": 7
@@ -115,6 +149,23 @@
       "writtenOn": "2015-02-05T17:59:06Z",
       "side": 1,
       "message": "They should not be.  I will that to the test.",
+      "revId": "bfb8e049487d76acbf685762d6a4725f49670e5a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da86d52c_78cf5a56",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1357,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-02-05T18:33:28Z",
+      "side": 1,
+      "message": "Oh, it was already in the test.  The reason the next block does not execute is that areAllJobsComplete is false (since they never start).  We could still add \"and item.live\" to this to be more explicit (and in case we change non-live items to not have jobs (which is sensible)).",
       "revId": "bfb8e049487d76acbf685762d6a4725f49670e5a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
