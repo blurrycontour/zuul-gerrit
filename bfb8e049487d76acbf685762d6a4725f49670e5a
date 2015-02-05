@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da86d52c_e3aac083",
+        "filename": "zuul/model.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-02-05T17:32:57Z",
+      "side": 1,
+      "message": "Items are created with pipeline and queue attributes. These two lines should be redundant.",
+      "revId": "bfb8e049487d76acbf685762d6a4725f49670e5a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da86d52c_de59138f",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1124,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-02-05T17:32:57Z",
+      "side": 1,
+      "message": "According to grep _doReconfigureEvent is the only place that calls this function and last_head.queue will always be None due to line 649 of this change. Which should mean we always hit the else below, log an error then return False?",
+      "revId": "bfb8e049487d76acbf685762d6a4725f49670e5a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da86d52c_7e002702",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1357,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-02-05T17:32:57Z",
+      "side": 1,
+      "message": "Assuming the previous if block was executed we would dequeue the non live item, then if that item had no items ahead (it shouldn\u0027t if it is not live) we would check this block, all jobs should be complete because there are no jobs then we would try reporting this item.\n\nI don\u0027t think that is correct behavior. Non live items should not be reported right?",
+      "revId": "bfb8e049487d76acbf685762d6a4725f49670e5a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
