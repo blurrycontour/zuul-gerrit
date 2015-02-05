@@ -19,6 +19,40 @@
     },
     {
       "key": {
+        "uuid": "da86d52c_e40e46e4",
+        "filename": "zuul/model.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-02-05T17:59:06Z",
+      "side": 1,
+      "message": "Yeah, it\u0027s sort of a safety.  If an item is reenqueued, it is certain to have the correct values.",
+      "revId": "bfb8e049487d76acbf685762d6a4725f49670e5a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da86d52c_04127a08",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 649,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-02-05T17:59:06Z",
+      "side": 1,
+      "message": "This line, and the line above, may now be a bug.",
+      "revId": "bfb8e049487d76acbf685762d6a4725f49670e5a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da86d52c_de59138f",
         "filename": "zuul/scheduler.py",
         "patchSetId": 7
@@ -36,6 +70,23 @@
     },
     {
       "key": {
+        "uuid": "da86d52c_24fcdeb7",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1124,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-02-05T17:59:06Z",
+      "side": 1,
+      "message": "Yes, line 649 may be a bug, especially in light of the protection afforded by line 363.",
+      "revId": "bfb8e049487d76acbf685762d6a4725f49670e5a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da86d52c_7e002702",
         "filename": "zuul/scheduler.py",
         "patchSetId": 7
@@ -47,6 +98,23 @@
       "writtenOn": "2015-02-05T17:32:57Z",
       "side": 1,
       "message": "Assuming the previous if block was executed we would dequeue the non live item, then if that item had no items ahead (it shouldn\u0027t if it is not live) we would check this block, all jobs should be complete because there are no jobs then we would try reporting this item.\n\nI don\u0027t think that is correct behavior. Non live items should not be reported right?",
+      "revId": "bfb8e049487d76acbf685762d6a4725f49670e5a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da86d52c_44f712d3",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1357,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-02-05T17:59:06Z",
+      "side": 1,
+      "message": "They should not be.  I will that to the test.",
       "revId": "bfb8e049487d76acbf685762d6a4725f49670e5a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
