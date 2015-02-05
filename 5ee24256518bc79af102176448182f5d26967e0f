@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "da86d52c_d88e8b2d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1766,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-02-05T16:34:31Z",
+      "side": 1,
+      "message": "This is about to change, sorry (this change was written with knowledge of the next one).",
+      "revId": "5ee24256518bc79af102176448182f5d26967e0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da86d52c_35fb327a",
         "filename": "zuul/trigger/gerrit.py",
         "patchSetId": 7
@@ -30,6 +47,23 @@
       "writtenOn": "2015-02-05T16:30:33Z",
       "side": 1,
       "message": "Small not pick but does gerrit ignore the case of the \u0027I\u0027 prefix in the changeid? Not sure if that poses an issue.\n\nAlso why multi line?",
+      "revId": "5ee24256518bc79af102176448182f5d26967e0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da86d52c_f8818ffb",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-02-05T16:34:31Z",
+      "side": 1,
+      "message": "Er, istr was needed to dtrt with how we iterate over multiple entries.",
       "revId": "5ee24256518bc79af102176448182f5d26967e0f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
