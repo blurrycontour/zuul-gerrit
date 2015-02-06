@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "da86d52c_32e5f208",
+        "filename": "tests/test_cloner.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-02-06T02:38:32Z",
+      "side": 1,
+      "message": "I\u0027m not getting the races in my new implementation. Must have been something specific to my older method.",
+      "parentUuid": "da86d52c_d3b8b7e7",
+      "revId": "d16e906bd19ac9d74576940fdda6fb2df7b3ea08",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da86d52c_f3ce9b82",
         "filename": "tests/test_cloner.py",
         "patchSetId": 13
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "da86d52c_52f0a6c8",
+        "filename": "tests/test_cloner.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 449,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-02-06T02:38:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da86d52c_f3ce9b82",
+      "revId": "d16e906bd19ac9d74576940fdda6fb2df7b3ea08",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da86d52c_b3b503f0",
         "filename": "zuul/scheduler.py",
         "patchSetId": 13
@@ -47,6 +83,24 @@
       "writtenOn": "2015-02-02T22:10:58Z",
       "side": 1,
       "message": "Commented out code.",
+      "revId": "d16e906bd19ac9d74576940fdda6fb2df7b3ea08",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da86d52c_b232c2a4",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-02-06T02:38:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da86d52c_b3b503f0",
       "revId": "d16e906bd19ac9d74576940fdda6fb2df7b3ea08",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
