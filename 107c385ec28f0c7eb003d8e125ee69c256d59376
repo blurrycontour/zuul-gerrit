@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da86d52c_ecaa6dd1",
+        "filename": "etc/status/public_html/jquery.zuul.js",
+        "patchSetId": 3
+      },
+      "lineNbr": 376,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2015-02-07T18:55:05Z",
+      "side": 1,
+      "message": "I know what this means and after a couple minutes couldn\u0027t come up with anything better while staying terse, though I\u0027m curious to see how many questions we get about it.",
+      "revId": "107c385ec28f0c7eb003d8e125ee69c256d59376",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
