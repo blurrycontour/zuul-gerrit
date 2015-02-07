@@ -89,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "da86d52c_9ab3eb09",
+        "filename": "tests/test_model.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-02-07T04:50:50Z",
+      "side": 1,
+      "message": "I disagree that the scenario testing obviates the need. At least not in full. I don\u0027t think we can ever be too careful, so if you wanted to add this back in I\u0027d support that. Scenario testing often misses things that detailed testing like these can find.",
+      "parentUuid": "da86d52c_5facc5a0",
+      "revId": "099d5b3199c208402b28d07b6de7f7bdf05d4e57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da86d52c_5f21259e",
         "filename": "tests/test_scheduler.py",
         "patchSetId": 18
