@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da86d52c_ba86ef11",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 24
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-02-07T05:01:21Z",
+      "side": 1,
+      "message": "(nit) In zuul/trigger/gerrit.py you\u0027re just checking if this option is set and then using the url. If somebody enters\n  fetch_url\u003dNone\nexpecting it to disable this feature that will break things.\n\nConsider rewording this to something like \"if omitted items will be fetched from gerrit\".",
+      "revId": "ed653cc3133de6623377a64ab4a028f2bb651d08",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
