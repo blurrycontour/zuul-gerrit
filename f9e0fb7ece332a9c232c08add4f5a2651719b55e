@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "da86d52c_8e5e12e8",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1741,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-02-09T21:34:55Z",
+      "side": 1,
+      "message": "This is to support the idiom:\n  if change_queue is None:\n     change_queue \u003d getChangeQueue()\n  do_something_with(change_queue)\n\nThis was to help map that to a context manager, since the result of getChangeQueue is a context manager, but change_queue is not.\n\nThe alternatives to this I have considered are:\n\n1) add the test in this change but nothing else and count on testing to expose any code paths that might leak queues in the future\n2) add the test but also add a periodic cleanup (like how we maintain the trigger cache after each run) that would remove any that happened to leak.\n\nThere might be another way to have the guaranteed cleanup that we get with context managers but not have the awkward logic around using existing values in recursive functions.  I\u0027m open to suggestions.",
+      "revId": "f9e0fb7ece332a9c232c08add4f5a2651719b55e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da86d52c_33067321",
         "filename": "zuul/scheduler.py",
         "patchSetId": 2
