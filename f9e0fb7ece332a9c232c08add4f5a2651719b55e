@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da86d52c_1307af1e",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1741,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-02-09T21:28:50Z",
+      "side": 1,
+      "message": "I am not a huge fan of using the default without checking that the thing you are looking for exists first. This change the typical semantics of dict.get(\u0027some-key\u0027, default) in a way that isn\u0027t immediately obvious. Would it be better to not support a default at all here and just instantiate a DynamicChangeQueueContextManager with the default value when appropriate?",
+      "revId": "f9e0fb7ece332a9c232c08add4f5a2651719b55e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da86d52c_33067321",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1879,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-02-09T21:28:50Z",
+      "side": 1,
+      "message": "See above comment.",
+      "revId": "f9e0fb7ece332a9c232c08add4f5a2651719b55e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
