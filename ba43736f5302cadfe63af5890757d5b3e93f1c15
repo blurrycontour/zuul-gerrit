@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da86d52c_90663528",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1653,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-02-09T21:01:53Z",
+      "side": 1,
+      "message": "Should B be transitively soft abandoned as far as zuul is concerned? It doesn\u0027t hurt to test it but this may be a small optimization that can be performed.\n\nI don\u0027t think zuul did that prior to the queue per independent pipeline change so doesn\u0027t need to be done in this change.",
+      "revId": "ba43736f5302cadfe63af5890757d5b3e93f1c15",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
