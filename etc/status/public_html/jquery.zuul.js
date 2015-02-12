@@ -316,9 +316,12 @@
                 var $enqueue_time = $('<small />').addClass('time')
                     .attr('title', 'Elapsed Time').html(enqueue_time);
 
-                var $right = $('<div />')
+                var $right = $('<div />');
+		if (change.live === true) {
+		    var $right = $right
                     .addClass('col-xs-4 text-right')
                     .append($remaining_time, $('<br />'), $enqueue_time);
+		}
 
                 var $header = $('<div />')
                     .addClass('row')
