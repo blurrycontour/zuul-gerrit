@@ -16,6 +16,24 @@
       "revId": "bfd8f2ae58e3e7f16d820d66e1d421a91a045914",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da86d52c_4c15743e",
+        "filename": "tests/test_merger_repo.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2015-02-12T15:44:22Z",
+      "side": 1,
+      "message": "Well I wrote that back in 2014, 2015 has seen almost no worthwhile change :-D",
+      "parentUuid": "da86d52c_3396384d",
+      "revId": "bfd8f2ae58e3e7f16d820d66e1d421a91a045914",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
