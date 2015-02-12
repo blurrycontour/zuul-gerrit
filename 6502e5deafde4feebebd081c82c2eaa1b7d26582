@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da86d52c_67d34e04",
+        "filename": "etc/status/public_html/jquery.zuul.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-02-12T04:03:24Z",
+      "side": 1,
+      "message": "$right has already been declared so you don\u0027t need to use \u0027var\u0027. In fact, you can just call the object directly. ie:\n\n  $right.addClass().append(); etc\n\nHowever, to make this change simpler I think you can put the whole $right div into the if block.",
+      "revId": "6502e5deafde4feebebd081c82c2eaa1b7d26582",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
