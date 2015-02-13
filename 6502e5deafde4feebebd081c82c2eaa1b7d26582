@@ -16,6 +16,23 @@
       "revId": "6502e5deafde4feebebd081c82c2eaa1b7d26582",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da86d52c_6615be9a",
+        "filename": "etc/status/public_html/jquery.zuul.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-02-13T16:56:47Z",
+      "side": 1,
+      "message": "The var statement was in keeping with the pattern established above.  As was the reassignment.\n\nBut you\u0027re right, I can just $right.add... However, I think the empty div needs to be outside the conditional so that it can be used below in the header regardless.",
+      "revId": "6502e5deafde4feebebd081c82c2eaa1b7d26582",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
