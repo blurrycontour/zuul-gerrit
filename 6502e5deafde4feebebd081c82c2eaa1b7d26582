@@ -33,6 +33,24 @@
       "revId": "6502e5deafde4feebebd081c82c2eaa1b7d26582",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da86d52c_ce24ae62",
+        "filename": "etc/status/public_html/jquery.zuul.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-02-14T05:17:45Z",
+      "side": 1,
+      "message": "Okay, as I understand it the \u0027var\u0027 notation is only used when first declaring the variable. Subsequent uses do not use \u0027var\u0027.\n\nAh, I see. you could re-work the if clause to append to the header, but there\u0027s no real point",
+      "parentUuid": "da86d52c_6615be9a",
+      "revId": "6502e5deafde4feebebd081c82c2eaa1b7d26582",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
