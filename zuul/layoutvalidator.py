@@ -16,13 +16,58 @@
 # under the License.
 
 import voluptuous as v
+import os
 import string
+import yaml
 
 
 # Several forms accept either a single item or a list, this makes
 # specifying that in the schema easy (and explicit).
 def toList(x):
     return v.Any([x], x)
+
+
+def loadConfig(config_path):
+    """Load layout configuration whenever it is a single file or a directory.
+       If it's a directory, this will walk through each .yaml file and performs
+       a simple yaml merge"""
+    config_path = os.path.expanduser(config_path)
+    if not os.path.exists(config_path):
+        raise Exception("Unable to read layout config path at %s" %
+                        config_path)
+
+    # Discover all files in config_path
+    paths = []
+    if os.path.isdir(config_path):
+        for root, dirs, files in os.walk(config_path, topdown=True):
+            paths.extend([os.path.join(root, path) for path in files])
+    else:
+        paths.append(config_path)
+
+    # Keeps only .yaml files
+    paths = filter(lambda x: x.endswith('.yaml'), paths)
+
+    final_data = {}
+    for path in paths:
+        data = yaml.load(open(path))
+        # fix include relative paths
+        for include in data.get('includes', []):
+            for key, fn in include.items():
+                if not os.path.isabs(fn):
+                    base = os.path.dirname(os.path.realpath(path))
+                    fn = os.path.join(base, fn)
+                include[key] = fn
+        # Merge document
+        for key in data:
+            if key in final_data:
+                try:
+                    final_data[key] += data[key]
+                except:
+                    raise v.Invalid("Could not merge '%s' from %s" %
+                                    (key, path))
+            else:
+                final_data[key] = data[key]
+    return final_data
 
 
 class LayoutSchema(object):

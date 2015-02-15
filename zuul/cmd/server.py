@@ -45,7 +45,7 @@ class Server(zuul.cmd.ZuulApp):
         parser.add_argument('-c', dest='config',
                             help='specify the config file')
         parser.add_argument('-l', dest='layout',
-                            help='specify the layout file')
+                            help='specify the layout file or directory')
         parser.add_argument('-d', dest='nodaemon', action='store_true',
                             help='do not run as a daemon')
         parser.add_argument('-t', dest='validate', nargs='?', const=True,
