@@ -19,13 +19,12 @@ import re
 
 import testtools
 import voluptuous
-import yaml
 
 import zuul.layoutvalidator
 
 FIXTURE_DIR = os.path.join(os.path.dirname(__file__),
                            'fixtures')
-LAYOUT_RE = re.compile(r'^(good|bad)_.*\.yaml$')
+LAYOUT_RE = re.compile(r'^(good|bad)_.*\.(yaml|yaml.d)$')
 
 
 class TestLayoutValidator(testtools.TestCase):
@@ -33,16 +32,18 @@ class TestLayoutValidator(testtools.TestCase):
         """Test layout file validation"""
         print
         errors = []
-        for fn in os.listdir(os.path.join(FIXTURE_DIR, 'layouts')):
+        file_lists = os.listdir(os.path.join(FIXTURE_DIR, 'layouts'))
+        file_lists.sort()
+        for fn in file_lists:
             m = LAYOUT_RE.match(fn)
             if not m:
                 continue
             print fn
             layout = os.path.join(FIXTURE_DIR, 'layouts', fn)
-            data = yaml.load(open(layout))
             validator = zuul.layoutvalidator.LayoutValidator()
             if m.group(1) == 'good':
                 try:
+                    data = zuul.layoutvalidator.loadConfig(layout)
                     validator.validate(data)
                 except voluptuous.Invalid as e:
                     raise Exception(
@@ -50,6 +51,7 @@ class TestLayoutValidator(testtools.TestCase):
                         (fn, str(e)))
             else:
                 try:
+                    data = zuul.layoutvalidator.loadConfig(layout)
                     validator.validate(data)
                     raise Exception("Expected a YAML syntax error in %s." %
                                     fn)
@@ -62,3 +64,20 @@ class TestLayoutValidator(testtools.TestCase):
                     else:
                         errors.append(error)
                     pass
+
+    def test_loadConfig(self):
+        """Test config parser for split tests"""
+        print
+        good_fn = os.path.join(FIXTURE_DIR, 'layouts',
+                               'good_split.yaml.d')
+        print good_fn
+        data = zuul.layoutvalidator.loadConfig(good_fn)
+        self.assertIsNotNone(filter(lambda x: x['name'] == 'test-org/projecta',
+                                    data['projects']))
+        self.assertIsNotNone(filter(lambda x: x['name'] == 'post',
+                                    data['pipelines']))
+
+        bad_fn = os.path.join(FIXTURE_DIR, 'layouts',
+                              'unknown_file')
+        print bad_fn
+        self.assertRaises(Exception, zuul.layoutvalidator.loadConfig, bad_fn)

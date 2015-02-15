@@ -1,0 +1,37 @@
+pipelines:
+  - name: check
+    manager: IndependentPipelineManager
+    trigger:
+      gerrit:
+        - event: patchset-created
+    success:
+      gerrit:
+        verified: 1
+    failure:
+      gerrit:
+        verified: -1
+
+  - name: gate
+    manager: DependentPipelineManager
+    success-message: Your change is awesome.
+    failure-message: Build failed.  For information on how to proceed, see http://wiki.example.org/Test_Failures
+    trigger:
+      gerrit:
+        - event: comment-added
+          approval:
+            - approved: 1
+    start:
+      gerrit:
+        verified: 0
+    success:
+      gerrit:
+        verified: 2
+        code-review: 1
+        submit: true
+    failure:
+      gerrit:
+        verified: -2
+        workinprogress: true
+
+jobs:
+  - name: test-thing
