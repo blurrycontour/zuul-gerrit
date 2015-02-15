@@ -1,0 +1,56 @@
+pipelines:
+  - name: check
+    manager: IndependentPipelineManager
+    require:
+      open: True
+      current-patchset: True
+    trigger:
+      review_gerrit:
+        - event: patchset-created
+        - event: comment-added
+          require-approval:
+            - verified: [-1, -2]
+              username: jenkins
+          approval:
+            - workflow: 1
+    success:
+      review_gerrit:
+        verified: 1
+    failure:
+      review_gerrit:
+        verified: -1
+
+  - name: gate
+    manager: DependentPipelineManager
+    success-message: Your change is awesome.
+    failure-message: Build failed.  For information on how to proceed, see http://wiki.example.org/Test_Failures
+    require:
+      open: True
+      current-patchset: True
+      approval:
+        - verified: [1, 2]
+          username: jenkins
+        - workflow: 1
+    reject:
+      approval:
+        - code-review: [-1, -2]
+    trigger:
+      review_gerrit:
+        - event: comment-added
+          approval:
+            - approved: 1
+    start:
+      review_gerrit:
+        verified: 0
+    success:
+      review_gerrit:
+        verified: 2
+        code-review: 1
+        submit: true
+    failure:
+      review_gerrit:
+        verified: -2
+        workinprogress: true
+
+jobs:
+  - name: test-thing

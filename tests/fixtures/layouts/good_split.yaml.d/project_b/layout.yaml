@@ -1,0 +1,20 @@
+includes:
+  - python-file: projectb_functions.py
+
+pipelines:
+  - name: post
+    manager: IndependentPipelineManager
+    trigger:
+      review_gerrit:
+        - event: ref-updated
+          ref: ^(?!refs/).*$
+          ignore-deletes: True
+
+
+projects:
+  - name: test-org/projectb
+    merge-mode: cherry-pick
+    check:
+      - test-thing
+    gate:
+      - test-thing

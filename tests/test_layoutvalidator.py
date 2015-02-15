@@ -20,14 +20,13 @@ import re
 
 import testtools
 import voluptuous
-import yaml
 
 import zuul.layoutvalidator
 import zuul.lib.connections
 
 FIXTURE_DIR = os.path.join(os.path.dirname(__file__),
                            'fixtures')
-LAYOUT_RE = re.compile(r'^(good|bad)_.*\.yaml$')
+LAYOUT_RE = re.compile(r'^(good|bad)_.*\.(yaml|yaml.d)$')
 
 
 class TestLayoutValidator(testtools.TestCase):
@@ -35,7 +34,9 @@ class TestLayoutValidator(testtools.TestCase):
         """Test layout file validation"""
         print
         errors = []
-        for fn in os.listdir(os.path.join(FIXTURE_DIR, 'layouts')):
+        files_list = os.listdir(os.path.join(FIXTURE_DIR, 'layouts'))
+        files_list.sort()
+        for fn in files_list:
             m = LAYOUT_RE.match(fn)
             if not m:
                 continue
@@ -53,10 +54,10 @@ class TestLayoutValidator(testtools.TestCase):
             connections = zuul.lib.connections.configure_connections(config)
 
             layout = os.path.join(FIXTURE_DIR, 'layouts', fn)
-            data = yaml.load(open(layout))
             validator = zuul.layoutvalidator.LayoutValidator()
             if m.group(1) == 'good':
                 try:
+                    data = zuul.layoutvalidator.loadConfig(layout)
                     validator.validate(data, connections)
                 except voluptuous.Invalid as e:
                     raise Exception(
@@ -64,6 +65,7 @@ class TestLayoutValidator(testtools.TestCase):
                         (fn, str(e)))
             else:
                 try:
+                    data = zuul.layoutvalidator.loadConfig(layout)
                     validator.validate(data, connections)
                     raise Exception("Expected a YAML syntax error in %s." %
                                     fn)
@@ -71,8 +73,26 @@ class TestLayoutValidator(testtools.TestCase):
                     error = str(e)
                     print '  ', error
                     if error in errors:
+                        print "Error already in ", layout
                         raise Exception("Error has already been tested: %s" %
                                         error)
                     else:
                         errors.append(error)
                     pass
+
+    def test_loadConfig(self):
+        """Test config parser for split tests"""
+        print
+        good_fn = os.path.join(FIXTURE_DIR, 'layouts',
+                               'good_split.yaml.d')
+        print good_fn
+        data = zuul.layoutvalidator.loadConfig(good_fn)
+        self.assertIsNotNone(filter(lambda x: x['name'] == 'test-org/projecta',
+                                    data['projects']))
+        self.assertIsNotNone(filter(lambda x: x['name'] == 'post',
+                                    data['pipelines']))
+
+        bad_fn = os.path.join(FIXTURE_DIR, 'layouts',
+                              'unknown_file')
+        print bad_fn
+        self.assertRaises(Exception, zuul.layoutvalidator.loadConfig, bad_fn)
