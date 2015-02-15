@@ -25,7 +25,6 @@ import re
 import sys
 import threading
 import time
-import yaml
 
 import layoutvalidator
 import model
@@ -240,13 +239,7 @@ class Scheduler(threading.Thread):
         layout = model.Layout()
         project_templates = {}
 
-        if config_path:
-            config_path = os.path.expanduser(config_path)
-            if not os.path.exists(config_path):
-                raise Exception("Unable to read layout config file at %s" %
-                                config_path)
-        config_file = open(config_path)
-        data = yaml.load(config_file)
+        data = layoutvalidator.loadConfig(config_path)
 
         validator = layoutvalidator.LayoutValidator()
         validator.validate(data)
@@ -255,10 +248,6 @@ class Scheduler(threading.Thread):
         for include in data.get('includes', []):
             if 'python-file' in include:
                 fn = include['python-file']
-                if not os.path.isabs(fn):
-                    base = os.path.dirname(os.path.realpath(config_path))
-                    fn = os.path.join(base, fn)
-                fn = os.path.expanduser(fn)
                 execfile(fn, config_env)
 
         for conf_pipeline in data.get('pipelines', []):

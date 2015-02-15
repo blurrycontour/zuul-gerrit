@@ -1,0 +1,16 @@
+includes:
+  - python-file: projecta_functions.py
+
+jobs:
+  - name: post-projecta
+
+projects:
+  - name: test-org/projecta
+    merge-mode: cherry-pick
+    check:
+      - test-thing
+    gate:
+      - test-thing
+    post:
+      - post-projecta
+
