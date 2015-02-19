@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da86d52c_470d6a8e",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 25
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-02-19T01:52:12Z",
+      "side": 1,
+      "message": "You\u0027ve left the defaults to None sentence in and now it\u0027s more confusing\n\nIn zuul/trigger/gerrit.py you\u0027re just checking if this option is set and then using the url. If somebody enters\nfetch_url\u003dNone\nexpecting it to disable this feature that will break things.",
+      "revId": "7efe136c9fc418d527935fc0b8e01b6be5c2f6ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
