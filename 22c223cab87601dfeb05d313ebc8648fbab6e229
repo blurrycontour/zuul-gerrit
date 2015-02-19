@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba7be1f8_51b406f2",
+        "filename": "zuul/launcher/gearman.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 10035
+      },
+      "writtenOn": "2015-02-19T23:34:34Z",
+      "side": 1,
+      "message": "Not python3 compat but apparently thats not a problem",
+      "revId": "22c223cab87601dfeb05d313ebc8648fbab6e229",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
