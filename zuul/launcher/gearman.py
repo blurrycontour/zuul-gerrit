@@ -229,8 +229,12 @@ class Gearman(object):
             for name, s in job.swift.items():
                 swift_instructions = {}
                 s_config = {}
+                # Note we coerce all items to strings here as some items
+                # expiry will be represented as ints in the layout.
                 s_config.update((k, v.format(item=item, job=job,
                                              change=item.change))
+                                if isinstance(v, basestring)
+                                else (k, v)
                                 for k, v in s.items())
 
                 (swift_instructions['URL'],
