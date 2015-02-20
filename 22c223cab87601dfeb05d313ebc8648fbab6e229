@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "ba7be1f8_77e2da04",
+        "filename": "zuul/launcher/gearman.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-02-20T00:37:18Z",
+      "side": 1,
+      "message": "umm, this comment isn\u0027t true I don\u0027t think.",
+      "revId": "22c223cab87601dfeb05d313ebc8648fbab6e229",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba7be1f8_51b406f2",
         "filename": "zuul/launcher/gearman.py",
         "patchSetId": 1
