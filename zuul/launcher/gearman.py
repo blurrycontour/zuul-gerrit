@@ -345,6 +345,7 @@ class Gearman(object):
         gearman_job = gear.Job(name, json.dumps(params),
                                unique=uuid)
         build.__gearman_job = gearman_job
+        build.__gearman_manager = getJobData(gearman_job).get('manager')
         self.builds[uuid] = build
 
         if not self.isJobRegistered(gearman_job.name):
