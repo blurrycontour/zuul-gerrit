@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba7be1f8_300a9e79",
+        "filename": "zuul/lib/swift.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-03-03T04:42:42Z",
+      "side": 1,
+      "message": "probably don\u0027t need the int() around it all, but no harm",
+      "revId": "897d9cf13d3a3ac527d98cccb570fd96e8b67ff8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
