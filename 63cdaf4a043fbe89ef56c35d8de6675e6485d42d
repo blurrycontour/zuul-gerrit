@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba7be1f8_e3c49b93",
+        "filename": "tests/base.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 388,
+      "author": {
+        "id": 10035
+      },
+      "writtenOn": "2015-03-03T22:11:46Z",
+      "side": 1,
+      "message": "This has the same issue as its grandparent - this should probably be queues_dbs.get(hostname, {}) or not be a default arg of {}.",
+      "revId": "63cdaf4a043fbe89ef56c35d8de6675e6485d42d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
