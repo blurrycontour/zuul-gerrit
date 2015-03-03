@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba7be1f8_497021a4",
+        "filename": "tests/base.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1364,
+      "author": {
+        "id": 10035
+      },
+      "writtenOn": "2015-03-03T22:28:11Z",
+      "side": 1,
+      "message": "I am pretty sure this test is equivilent to ensuring base_class is in child_class\u0027s MRO - if this is true any method defined in base_class will be included in the inspect.getmembers for child_class. This basically makes this test a big no-op unless im missing something?",
+      "revId": "a89f5bdec1a2138b4dd6f501ad2ab49827fd0461",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
