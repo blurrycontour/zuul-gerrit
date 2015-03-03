@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba7be1f8_6dd41c20",
+        "filename": "tests/base.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 10035
+      },
+      "writtenOn": "2015-03-03T18:48:20Z",
+      "side": 1,
+      "message": "this seems like itll fail in the default case? do you want this to be changes_dbs.get(hostname, {})? If not, then theres really no reason to create a default value for changes_dbs.",
+      "revId": "e43a5786c15591701929d98dbddda059019317f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
