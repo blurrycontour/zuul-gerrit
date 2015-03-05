@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a80dd14_6a1c4e14",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-03-05T22:10:54Z",
+      "side": 1,
+      "message": "This condition has me worried. The solution provided calls a private method to forcefully remove the lock, but the line above implies that any new config parser would expect the lock to be valid.\n\nSee comment in merger.py for why this bothers me more :)",
+      "revId": "d31f86cf6918054f05b2f42759ae41a0a8c4a15e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a80dd14_4a214a4c",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-03-05T22:10:54Z",
+      "side": 1,
+      "message": "The scope of this repo object and therefore its config writer should be to the end of this method. At that point __del__ should be called to free up the lock. However the commit message implies this doesn\u0027t work when another config write has been instantiated for the same repo.\n\nI would not expect the normal case to fail here which implies that the second case with another config writer is the one causing problems. But if we remove the lock file out from under that writer what happens?\n\nAt the very least I think we need to better justify how this solves the problem because right now I think it just introduces more bugs.",
+      "revId": "d31f86cf6918054f05b2f42759ae41a0a8c4a15e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
