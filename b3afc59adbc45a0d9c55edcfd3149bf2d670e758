@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a80dd14_4f93264f",
+        "filename": "zuul/trigger/__init__.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 10035
+      },
+      "writtenOn": "2015-03-05T18:44:09Z",
+      "side": 1,
+      "message": "This isnt needed if its an abstractmethod - the class will fail to instantiate if this method is not defined in a subclass if it is an abstractmethod.",
+      "revId": "b3afc59adbc45a0d9c55edcfd3149bf2d670e758",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
