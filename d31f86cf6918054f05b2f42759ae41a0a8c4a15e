@@ -67,6 +67,24 @@
       "revId": "d31f86cf6918054f05b2f42759ae41a0a8c4a15e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a80dd14_8d56fcd0",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 10035
+      },
+      "writtenOn": "2015-03-05T22:35:50Z",
+      "side": 1,
+      "message": "Actually, I take that back, release() has the guarding needed for this, so yet another reason we need to use release().",
+      "parentUuid": "9a80dd14_ededb826",
+      "revId": "d31f86cf6918054f05b2f42759ae41a0a8c4a15e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
