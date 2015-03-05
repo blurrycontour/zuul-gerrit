@@ -50,6 +50,23 @@
       "revId": "d31f86cf6918054f05b2f42759ae41a0a8c4a15e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a80dd14_ededb826",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 10035
+      },
+      "writtenOn": "2015-03-05T22:33:42Z",
+      "side": 1,
+      "message": "Both of these solutions are going to cause one of two errors to happen - Looks like config_writer uses a file based lock, so when config_writer eventually falls out of scope itll either error because its trying to release a lock that doesnt exist or even worse itll release a lock for another config_writer.\n\nIf we *really* want to do this, we need to monkeypatch the release method to do nothing along with this and maybe even monkey patch the acquire method to raise an error in case another write occurs.\n\nBasically, this problem is not fun :(",
+      "revId": "d31f86cf6918054f05b2f42759ae41a0a8c4a15e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
