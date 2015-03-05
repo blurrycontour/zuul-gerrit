@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a80dd14_d405e17a",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1509,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-03-05T21:39:09Z",
+      "side": 1,
+      "message": "I am guessing that this if isn\u0027t rolled into the previous set of if elifs because you want to properly count the consecutive failures?",
+      "revId": "304090fc2cff09c347f4cae02b58147951b3bcd9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
