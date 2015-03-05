@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a80dd14_eb05ad7a",
+        "filename": "tests/test_trigger.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 10035
+      },
+      "writtenOn": "2015-03-05T22:55:01Z",
+      "side": 1,
+      "message": "(notaminusone) we shouldnt need the #noqa anymore now that trigger \u003d is removed.",
+      "revId": "5df65eab889b3d8c2467a2113e61e31d7c8187ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a80dd14_2b00a566",
+        "filename": "tests/test_trigger.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 10035
+      },
+      "writtenOn": "2015-03-05T22:55:01Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "5df65eab889b3d8c2467a2113e61e31d7c8187ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a80dd14_4d8a44c0",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 10035
+      },
+      "writtenOn": "2015-03-05T22:55:01Z",
+      "side": 1,
+      "message": "Why are these methods private if we have to call into them from outside the class?",
+      "revId": "5df65eab889b3d8c2467a2113e61e31d7c8187ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a80dd14_c819c27a",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 10035
+      },
+      "writtenOn": "2015-03-05T22:55:01Z",
+      "side": 1,
+      "message": "Same here, this shouldnt be private if were having to call it in our parent class. Maybe for now lets just keep it in this class and move it up into the parent if its useful there?",
+      "revId": "5df65eab889b3d8c2467a2113e61e31d7c8187ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a80dd14_742195b3",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 10035
+      },
+      "writtenOn": "2015-03-05T22:55:01Z",
+      "side": 1,
+      "message": "Can we get a blurb about what a connection *is*. It took me quite a while to understand the goal here (mostly because the missing delete for lib/*) and a short blurb like \"A connection is a shared object that reporters and sources can use to speak with a remote API.\" would go a long way :).",
+      "revId": "5df65eab889b3d8c2467a2113e61e31d7c8187ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a80dd14_ce51d7d9",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 10035
+      },
+      "writtenOn": "2015-03-05T22:55:01Z",
+      "side": 1,
+      "message": "Looks like this doesnt need to be an abstractmethod?",
+      "revId": "5df65eab889b3d8c2467a2113e61e31d7c8187ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a80dd14_34a47d56",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 10035
+      },
+      "writtenOn": "2015-03-05T22:55:01Z",
+      "side": 1,
+      "message": "I think connect/disconnect is not a great choice for our API here. Connecting or disconnecting are actions that a posisble implementation (gerrit) could take based on a hook into a connection lifecycle. Really we should be describing the point in the connection lifecycle these hooks are called at and then leaving the implementation decisions up to the subclasses. Maybe a better option here is onRegister or onLoad?",
+      "revId": "5df65eab889b3d8c2467a2113e61e31d7c8187ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a80dd14_748515ac",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 10035
+      },
+      "writtenOn": "2015-03-05T22:55:01Z",
+      "side": 1,
+      "message": "AFAICT this is never actually called? Maybe we could make this onStop and call it from there?",
+      "revId": "5df65eab889b3d8c2467a2113e61e31d7c8187ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a80dd14_d7896327",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 10035
+      },
+      "writtenOn": "2015-03-05T22:55:01Z",
+      "side": 1,
+      "message": "I dont agree with this, but I also dont think its necessary since were not actually using dynamic plugin loading. Can we hold off on nixing stevedore / commenting on it not working until were actually implementing dynamic plugin loading?",
+      "revId": "5df65eab889b3d8c2467a2113e61e31d7c8187ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
