@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a80dd14_974febbc",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 534,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-03-05T21:59:02Z",
+      "side": 1,
+      "message": "Why not deal with the exception here or in callers of reconfigure? that pushes handling closer to where the issue can be dealt with and logged rather than potentially logging twice.",
+      "revId": "346ca3eb8559a4bf240f5e5119f20204c026be40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
