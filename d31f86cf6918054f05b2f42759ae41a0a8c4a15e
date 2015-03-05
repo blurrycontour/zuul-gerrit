@@ -33,6 +33,23 @@
       "revId": "d31f86cf6918054f05b2f42759ae41a0a8c4a15e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a80dd14_2aedf68b",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-03-05T22:22:04Z",
+      "side": 1,
+      "message": "Reading the docs for GitPython there is a release() method to release the lock. At the very least we should use that method if it works since that is a public interface.",
+      "revId": "d31f86cf6918054f05b2f42759ae41a0a8c4a15e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
