@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9a80dd14_665ac251",
+        "filename": "tests/test_trigger.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-03-06T04:19:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a80dd14_eb05ad7a",
+      "revId": "5df65eab889b3d8c2467a2113e61e31d7c8187ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a80dd14_2b00a566",
         "filename": "tests/test_trigger.py",
         "patchSetId": 20
@@ -30,6 +48,24 @@
       "writtenOn": "2015-03-05T22:55:01Z",
       "side": 1,
       "message": "ditto",
+      "revId": "5df65eab889b3d8c2467a2113e61e31d7c8187ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a80dd14_8659765c",
+        "filename": "tests/test_trigger.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-03-06T04:19:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a80dd14_2b00a566",
       "revId": "5df65eab889b3d8c2467a2113e61e31d7c8187ee",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "9a80dd14_71351ad9",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-03-06T04:19:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a80dd14_4d8a44c0",
+      "revId": "5df65eab889b3d8c2467a2113e61e31d7c8187ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a80dd14_c819c27a",
         "filename": "zuul/cmd/server.py",
         "patchSetId": 20
@@ -64,6 +118,24 @@
       "writtenOn": "2015-03-05T22:55:01Z",
       "side": 1,
       "message": "Same here, this shouldnt be private if were having to call it in our parent class. Maybe for now lets just keep it in this class and move it up into the parent if its useful there?",
+      "revId": "5df65eab889b3d8c2467a2113e61e31d7c8187ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a80dd14_d151660f",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-03-06T04:19:20Z",
+      "side": 1,
+      "message": "I like having it in the parent class as it will be needed by other children in the future. I\u0027ll amend the name.",
+      "parentUuid": "9a80dd14_c819c27a",
       "revId": "5df65eab889b3d8c2467a2113e61e31d7c8187ee",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "9a80dd14_f1cbcaa2",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-03-06T04:19:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a80dd14_742195b3",
+      "revId": "5df65eab889b3d8c2467a2113e61e31d7c8187ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a80dd14_ce51d7d9",
         "filename": "zuul/connection/__init__.py",
         "patchSetId": 20
@@ -98,6 +188,24 @@
       "writtenOn": "2015-03-05T22:55:01Z",
       "side": 1,
       "message": "Looks like this doesnt need to be an abstractmethod?",
+      "revId": "5df65eab889b3d8c2467a2113e61e31d7c8187ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a80dd14_11cf7eb1",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-03-06T04:19:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a80dd14_ce51d7d9",
       "revId": "5df65eab889b3d8c2467a2113e61e31d7c8187ee",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "9a80dd14_ec5931ff",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-03-06T04:19:20Z",
+      "side": 1,
+      "message": "Feels a bit systematical, but okay.",
+      "parentUuid": "9a80dd14_34a47d56",
+      "revId": "5df65eab889b3d8c2467a2113e61e31d7c8187ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a80dd14_748515ac",
         "filename": "zuul/connection/__init__.py",
         "patchSetId": 20
@@ -132,6 +258,24 @@
       "writtenOn": "2015-03-05T22:55:01Z",
       "side": 1,
       "message": "AFAICT this is never actually called? Maybe we could make this onStop and call it from there?",
+      "revId": "5df65eab889b3d8c2467a2113e61e31d7c8187ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a80dd14_2c734981",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-03-06T04:19:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a80dd14_748515ac",
       "revId": "5df65eab889b3d8c2467a2113e61e31d7c8187ee",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "9a80dd14_8c16f5ef",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-03-06T04:19:20Z",
+      "side": 1,
+      "message": "I don\u0027t think this means we can\u0027t use stevedore/etc in the future, just at this stage of investigating they didn\u0027t fit the needs. I see no harm in leaving this here as a comment for when we return to it (at which point we may discover stevedore can be a good fit etc).",
+      "parentUuid": "9a80dd14_d7896327",
+      "revId": "5df65eab889b3d8c2467a2113e61e31d7c8187ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a80dd14_7d917198",
         "filename": "zuul/source/__init__.py",
         "patchSetId": 20
@@ -172,6 +334,24 @@
     },
     {
       "key": {
+        "uuid": "9a80dd14_8cc0b52b",
+        "filename": "zuul/source/__init__.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-03-06T04:19:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a80dd14_7d917198",
+      "revId": "5df65eab889b3d8c2467a2113e61e31d7c8187ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a80dd14_7dba5124",
         "filename": "zuul/trigger/__init__.py",
         "patchSetId": 20
@@ -183,6 +363,24 @@
       "writtenOn": "2015-03-06T00:41:10Z",
       "side": 1,
       "message": "Can we make the scheduler and connection not be an async process and rather part of the constructor? Otherwise instances of this need to perform checking logic to know whether self.sched and self.connection exists.",
+      "revId": "5df65eab889b3d8c2467a2113e61e31d7c8187ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a80dd14_cce1cdd1",
+        "filename": "zuul/trigger/__init__.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-03-06T04:19:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a80dd14_7dba5124",
       "revId": "5df65eab889b3d8c2467a2113e61e31d7c8187ee",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
