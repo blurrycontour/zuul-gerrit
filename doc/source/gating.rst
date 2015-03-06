@@ -33,7 +33,7 @@ Testing in parallel
 
 A particular focus of Zuul is ensuring correctly ordered testing of
 changes in parallel.  A gating system should always test each change
-applied to the tip of the branch exactly as it is going to be merged.
+applied to the top of the branch exactly as it is going to be merged.
 A simple way to do that would be to test one change at a time, and
 merge it only if it passes tests.  That works very well, but if
 changes take a long time to test, developers may have to wait a long
