@@ -13,7 +13,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import apscheduler.scheduler
+import apscheduler.schedulers.background
 import logging
 from zuul.model import TriggerEvent
 
@@ -25,7 +25,7 @@ class Timer(object):
     def __init__(self, config, sched):
         self.sched = sched
         self.config = config
-        self.apsched = apscheduler.scheduler.Scheduler()
+        self.apsched = apscheduler.schedulers.background.BackgroundScheduler()
         self.apsched.start()
 
     def _onTrigger(self, pipeline_name, timespec):
