@@ -80,7 +80,7 @@ jobs:
 
 class TestScheduler(ZuulTestCase):
 
-    def test_jobs_launched(self):
+    def test_gerrit_jobs_launched(self):
         "Test that jobs are launched and a change is merged"
 
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')

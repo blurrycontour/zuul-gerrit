@@ -67,6 +67,8 @@ class LayoutSchema(object):
                       'require-approval': toList(require_approval),
                       }
 
+    github_trigger = {v.Required('event'): toList(v.Any('pull-request'))}
+
     timer_trigger = {v.Required('time'): str}
 
     zuul_trigger = {v.Required('event'):
@@ -77,6 +79,7 @@ class LayoutSchema(object):
                     }
 
     trigger = v.Required({'gerrit': toList(gerrit_trigger),
+                          'github': toList(github_trigger),
                           'timer': toList(timer_trigger),
                           'zuul': toList(zuul_trigger)})
 

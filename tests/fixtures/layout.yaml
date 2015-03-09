@@ -103,6 +103,12 @@ pipelines:
     failure:
       gerrit: {}
 
+  - name: github-check
+    manager: IndependentPipelineManager
+    trigger:
+      github:
+        - event: pull-request
+
 jobs:
   - name: ^.*-merge$
     failure-message: Unable to merge change
