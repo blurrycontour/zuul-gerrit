@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a80dd14_1a0c973a",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 10035
+      },
+      "writtenOn": "2015-03-09T17:16:07Z",
+      "side": 1,
+      "message": "This seems like something that should be added to layoutvalidator and also have some minimal amount of testing (add one of these connections to fixtures/layout.yaml)?",
+      "revId": "206965c04eeb89060c1fa8a259fe7c8be270a67d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
