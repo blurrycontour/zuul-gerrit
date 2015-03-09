@@ -44,6 +44,7 @@ from git import GitCommandError
 
 import zuul.connection.gerrit
 import zuul.connection.smtp
+import zuul.connection.github
 import zuul.scheduler
 import zuul.webapp
 import zuul.rpclistener
@@ -461,6 +462,11 @@ class FakeGerritConnection(zuul.connection.gerrit.GerritConnection):
 
     def getGitUrl(self, project):
         return os.path.join(self.upstream_root, project.name)
+
+
+class FakeGithubConnection(zuul.connection.github.GithubConnection):
+    def startWebhookListener(self):
+        pass
 
 
 class BuildHistory(object):
@@ -1017,6 +1023,9 @@ class ZuulTestCase(BaseTestCase):
             elif con_driver == 'smtp':
                 self.connections[con_name] = \
                     zuul.connection.smtp.SMTPConnection(con_name, con_config)
+            elif con_driver == 'github':
+                self.connectoins[con_name] = FakeGithubConnection(con_name,
+                                                                  con_config)
             else:
                 raise Exception("Unknown driver, %s, for connection %s"
                                 % (con_config['driver'], con_name))
@@ -1036,6 +1045,11 @@ class ZuulTestCase(BaseTestCase):
             self.connections['smtp'] = \
                 zuul.connection.smtp.SMTPConnection(
                     '_legacy_smtp', dict(self.config.items('smtp')))
+
+        if 'github' in self.config.sections():
+            self.connections['github'] = \
+                zuul.connection.github.GithubConnection(
+                    'github', dict(self.config.items('github')))
 
     def setup_config(self, config_file='zuul.conf'):
         """Per test config object. Override to set different config."""

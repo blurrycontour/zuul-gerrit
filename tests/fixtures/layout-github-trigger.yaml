@@ -1,0 +1,7 @@
+pipelines:
+  - name: github-check
+    manager: IndependentPipelineManager
+    trigger:
+      github:
+        - event: pull-request
+
