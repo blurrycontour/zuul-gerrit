@@ -16,6 +16,40 @@
       "revId": "206965c04eeb89060c1fa8a259fe7c8be270a67d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a80dd14_8b5cbb1a",
+        "filename": "zuul/connection/gerrit.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 10035
+      },
+      "writtenOn": "2015-03-09T18:43:09Z",
+      "side": 1,
+      "message": "This is being accesed in the gerrit source in several places, so it needs to be made public or have a public getter/setter.",
+      "revId": "206965c04eeb89060c1fa8a259fe7c8be270a67d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a80dd14_cb531315",
+        "filename": "zuul/source/gerrit.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 10035
+      },
+      "writtenOn": "2015-03-09T18:43:09Z",
+      "side": 1,
+      "message": "This method needs to be made public",
+      "revId": "206965c04eeb89060c1fa8a259fe7c8be270a67d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
