@@ -112,9 +112,12 @@ class Repo(object):
 
     def checkout(self, ref):
         repo = self.createRepoObject()
-        self.log.debug("Checking out %s" % ref)
-        repo.head.reference = ref
-        repo.head.reset(index=True, working_tree=True)
+        if repo.head.reference != ref:
+            self.log.debug("Checking out %s" % ref)
+            repo.head.reference = ref
+            repo.head.reset(index=True, working_tree=True)
+        else:
+            self.log.debug("Repo is already at %s" % ref)
 
     def cherryPick(self, ref):
         repo = self.createRepoObject()
