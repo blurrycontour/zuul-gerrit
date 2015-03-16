@@ -16,6 +16,24 @@
       "revId": "304090fc2cff09c347f4cae02b58147951b3bcd9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a80dd14_1bc1ef7f",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1509,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-03-16T03:21:29Z",
+      "side": 1,
+      "message": "Yep. After a pipeline is disabled there could still be successful runs. The count at this point doesn\u0027t matter but we still want the correct SUCCESS/FAILURE message to go back to whatever reporter is configured when disabled.\n\nWe could put the below IF that actually turns on _disabled \u003d True next to the above _consecutive_failures +\u003d 1 but it wouldn\u0027t gain much and would still be tested every time there is a failure. (It\u0027ll bail pretty early due to the check that it\u0027s not already disabled).",
+      "parentUuid": "9a80dd14_d405e17a",
+      "revId": "304090fc2cff09c347f4cae02b58147951b3bcd9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
