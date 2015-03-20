@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a80dd14_be79b183",
+        "filename": "contrib/zuul_clear_refs.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6987
+      },
+      "writtenOn": "2015-03-20T17:40:11Z",
+      "side": 1,
+      "message": "was wondering why you created a contrib folder for this file?  Not that there\u0027s anything wrong with that but there is already a tools folder for this kinda stuff right?",
+      "revId": "ba76a075782c99ae89c81f87e43e810423b0503e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a80dd14_9e514d10",
+        "filename": "contrib/zuul_clear_refs.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 6987
+      },
+      "writtenOn": "2015-03-20T17:40:11Z",
+      "side": 1,
+      "message": "maybe give this logger a name?",
+      "revId": "ba76a075782c99ae89c81f87e43e810423b0503e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a80dd14_be7ff115",
+        "filename": "contrib/zuul_clear_refs.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 6987
+      },
+      "writtenOn": "2015-03-20T17:40:11Z",
+      "side": 1,
+      "message": "maybe add a comment on why you are ignoring this exception?",
+      "revId": "ba76a075782c99ae89c81f87e43e810423b0503e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a80dd14_deb66588",
+        "filename": "contrib/zuul_clear_refs.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 6987
+      },
+      "writtenOn": "2015-03-20T17:40:11Z",
+      "side": 1,
+      "message": "might be nicer if it\u0027s \n  \n  log.debug(\"%s at %s is %3s days old\", ref.commit, ref.path, commit_age)",
+      "revId": "ba76a075782c99ae89c81f87e43e810423b0503e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
