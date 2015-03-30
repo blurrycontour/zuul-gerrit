@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "da9b358b_8e46ecbd",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 22
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-03-30T06:19:33Z",
+      "side": 1,
+      "message": "The scheduler has only ever parsed the layout.yaml, not the zuul.conf where this is coming from.",
+      "parentUuid": "da9b358b_ae76503c",
+      "revId": "f74512b536b5b68ac30322104b42edca5c042c88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da9b358b_3b260469",
         "filename": "zuul/cmd/__init__.py",
         "patchSetId": 22
@@ -47,6 +65,24 @@
       "writtenOn": "2015-03-30T06:06:03Z",
       "side": 1,
       "message": "Is there a reason for this being a runtime import as well? this is a really bad antipattern and should be avoided unless required",
+      "revId": "f74512b536b5b68ac30322104b42edca5c042c88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da9b358b_ce23d404",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 22
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-03-30T06:19:33Z",
+      "side": 1,
+      "message": "I think the only reason is that I wanted to import these modules dynamically. So creating a new connection type wouldn\u0027t require editing this file. I can still have this as a TODO and not have them here though if you\u0027d like (ditto the tests/base.py)",
+      "parentUuid": "da9b358b_3b260469",
       "revId": "f74512b536b5b68ac30322104b42edca5c042c88",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -82,6 +118,24 @@
       "side": 1,
       "message": "We chatted in IRC and sounds like this change is just not needed. So im not -1 on this part now (I was just worried we might have a bad config loading race).",
       "parentUuid": "da9b358b_5b9ae815",
+      "revId": "f74512b536b5b68ac30322104b42edca5c042c88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da9b358b_0e889ce6",
+        "filename": "zuul/model.py",
+        "patchSetId": 22
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-03-30T06:19:33Z",
+      "side": 1,
+      "message": "Yep, not needed but tidying up for clarity.",
+      "parentUuid": "da9b358b_0e9e5c56",
       "revId": "f74512b536b5b68ac30322104b42edca5c042c88",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
