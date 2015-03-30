@@ -54,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "da9b358b_4b820002",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 22
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 10035
+      },
+      "writtenOn": "2015-03-30T16:25:09Z",
+      "side": 1,
+      "message": "ah! ok, thanks.",
+      "parentUuid": "da9b358b_8e46ecbd",
+      "revId": "f74512b536b5b68ac30322104b42edca5c042c88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da9b358b_3b260469",
         "filename": "zuul/cmd/__init__.py",
         "patchSetId": 22
@@ -83,6 +101,24 @@
       "side": 1,
       "message": "I think the only reason is that I wanted to import these modules dynamically. So creating a new connection type wouldn\u0027t require editing this file. I can still have this as a TODO and not have them here though if you\u0027d like (ditto the tests/base.py)",
       "parentUuid": "da9b358b_3b260469",
+      "revId": "f74512b536b5b68ac30322104b42edca5c042c88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da9b358b_6bbb84c5",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 22
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 10035
+      },
+      "writtenOn": "2015-03-30T16:25:09Z",
+      "side": 1,
+      "message": "Yep, that would be better. When we do end up with dynamic loading we should be careful to put all the dynamic loading in one place otherwise we can end up with really bad circular import issues that are not fun to debug.",
+      "parentUuid": "da9b358b_ce23d404",
       "revId": "f74512b536b5b68ac30322104b42edca5c042c88",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
