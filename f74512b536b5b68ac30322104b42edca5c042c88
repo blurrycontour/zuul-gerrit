@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da9b358b_1b5d80e9",
+        "filename": "tests/base.py",
+        "patchSetId": 22
+      },
+      "lineNbr": 964,
+      "author": {
+        "id": 10035
+      },
+      "writtenOn": "2015-03-30T06:06:03Z",
+      "side": 1,
+      "message": "Is there a reason this is a runtime import? I would *really* prefer this not to be, but if there is a reason it is a must then a comment is necessary.",
+      "revId": "f74512b536b5b68ac30322104b42edca5c042c88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da9b358b_ae76503c",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 22
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 10035
+      },
+      "writtenOn": "2015-03-30T06:06:03Z",
+      "side": 1,
+      "message": "This being outside of the scheduler is still really breaking my brain. Were now moving to a system where some of the config is parsed in the scheduler parse config method to a system where other runners are injecting configuration into the scheduler\u0027s properties, which seems like a path to impossible to debug code.\n\nIm not going to -1 for this though, I might propose a change to move it later on though :).",
+      "revId": "f74512b536b5b68ac30322104b42edca5c042c88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da9b358b_3b260469",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 22
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 10035
+      },
+      "writtenOn": "2015-03-30T06:06:03Z",
+      "side": 1,
+      "message": "Is there a reason for this being a runtime import as well? this is a really bad antipattern and should be avoided unless required",
+      "revId": "f74512b536b5b68ac30322104b42edca5c042c88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da9b358b_5b9ae815",
+        "filename": "zuul/model.py",
+        "patchSetId": 22
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 10035
+      },
+      "writtenOn": "2015-03-30T06:06:03Z",
+      "side": 1,
+      "message": "Is there a reason this (and the few below) changes are needed? Theres nothing inherently wrong with them, but I cant find anything obvious and if it is a requirement were likely referencing these actions before the config is loaded, which would be a race issue.",
+      "revId": "f74512b536b5b68ac30322104b42edca5c042c88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
