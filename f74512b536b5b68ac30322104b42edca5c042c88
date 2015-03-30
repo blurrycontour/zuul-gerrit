@@ -67,6 +67,24 @@
       "revId": "f74512b536b5b68ac30322104b42edca5c042c88",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da9b358b_0e9e5c56",
+        "filename": "zuul/model.py",
+        "patchSetId": 22
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 10035
+      },
+      "writtenOn": "2015-03-30T06:07:14Z",
+      "side": 1,
+      "message": "We chatted in IRC and sounds like this change is just not needed. So im not -1 on this part now (I was just worried we might have a bad config loading race).",
+      "parentUuid": "da9b358b_5b9ae815",
+      "revId": "f74512b536b5b68ac30322104b42edca5c042c88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
