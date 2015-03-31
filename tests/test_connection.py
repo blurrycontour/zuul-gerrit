@@ -17,6 +17,8 @@ import testtools
 
 import zuul.connection.gerrit
 
+from tests.base import ZuulTestCase
+
 
 class TestGerritConnection(testtools.TestCase):
     log = logging.getLogger("zuul.test_connection")
@@ -24,3 +26,35 @@ class TestGerritConnection(testtools.TestCase):
     def test_driver_name(self):
         self.assertEqual('gerrit',
                          zuul.connection.gerrit.GerritConnection.driver_name)
+
+
+class TestConnections(ZuulTestCase):
+    def setup_config(self, config_file='zuul-connections.conf'):
+        super(TestConnections, self).setup_config(config_file)
+        self.fake_gerrit_connection = 'review_gerrit'
+
+    def test_multiple_connections(self):
+        "Test multiple connections to the one gerrit"
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+
+        self.waitUntilSettled()
+
+        self.assertEqual(len(A.patchsets[-1]['approvals']), 1)
+        self.assertEqual(A.patchsets[-1]['approvals'][0]['type'], 'VRFY')
+        self.assertEqual(A.patchsets[-1]['approvals'][0]['value'], '1')
+        self.assertEqual(A.patchsets[-1]['approvals'][0]['by']['username'],
+                         'jenkins')
+
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        self.worker.addFailTest('project-test2', B)
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+
+        self.waitUntilSettled()
+
+        self.assertEqual(len(B.patchsets[-1]['approvals']), 1)
+        self.assertEqual(B.patchsets[-1]['approvals'][0]['type'], 'VRFY')
+        self.assertEqual(B.patchsets[-1]['approvals'][0]['value'], '-1')
+        self.assertEqual(B.patchsets[-1]['approvals'][0]['by']['username'],
+                         'civoter')
