@@ -318,7 +318,7 @@
                     .attr('title', 'Elapsed Time').html(enqueue_time);
 
                 var $right = $('<div />');
-                if (change.live === true) {
+                if (change.live === undefined || change.live === true) {
                     $right.addClass('col-xs-4 text-right')
                         .append($remaining_time, $('<br />'), $enqueue_time);
                 }
@@ -373,7 +373,7 @@
                     icon_title = 'Waiting until closer to head of queue to' +
                         ' start jobs';
                 }
-                else if (change.live !== true) {
+                else if (change.live !== undefined && change.live !== true) {
                     // Grey icon
                     icon_name = 'grey.png';
                     icon_title = 'Dependent change independently tested';
@@ -843,7 +843,7 @@
                     });
                     $.each(change_queue.heads, function(head_i, head) {
                         $.each(head, function(change_i, change) {
-                            if (change.live === true) {
+                            if (change.live === undefined || change.live === true) {
                                 count += 1;
                             }
                             var idx = tree.indexOf(change.id);
