@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_594f8092",
+        "filename": "zuul/webapp.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2015-04-02T12:22:17Z",
+      "side": 1,
+      "message": "cache_control is an object. This should be:\n\nresponse.cache_control.public\u003dTrue\nresponse.cache_control.max_age\u003dself.cache_expiry",
+      "revId": "b51f64f624ad2345f88084648d9ca4208a4c2743",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
