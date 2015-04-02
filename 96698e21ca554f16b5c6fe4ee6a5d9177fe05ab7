@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_8e0feee0",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 383,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-04-02T18:56:30Z",
+      "side": 1,
+      "message": "Couldn\u0027t you use a set of results instead of using a set for keys and a list of records? Might simplify the code a bit.",
+      "revId": "96698e21ca554f16b5c6fe4ee6a5d9177fe05ab7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa041b7_eee43a3c",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 476,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-04-02T18:56:30Z",
+      "side": 1,
+      "message": "Is this dep.is_current_patchset check required? _getNeededByFromCommit should always return the latest patchset right?",
+      "revId": "96698e21ca554f16b5c6fe4ee6a5d9177fe05ab7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
