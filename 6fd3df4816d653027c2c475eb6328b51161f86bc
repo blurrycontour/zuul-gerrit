@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_9146f821",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 372,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2015-04-02T15:00:15Z",
+      "side": 1,
+      "message": "Looks like you\u0027re missing indentation inside the for loop.",
+      "revId": "6fd3df4816d653027c2c475eb6328b51161f86bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
