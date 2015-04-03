@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_5ba0629f",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 1095,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-04-03T16:52:37Z",
+      "side": 1,
+      "message": "This should read:\n\n  this would give you a list of zuul-enqueue commands to\n  requeue changes for the gate and check pipelines respectively.\n\nSince the output is no longer a set of gerrit comment commands.",
+      "revId": "551a11fe66fcda7dac6e9ae842f37865851e342f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
