@@ -34,6 +34,24 @@
       "revId": "f15139b789d32aef361075487b1b7495a9807b05",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa041b7_76fe9b39",
+        "filename": "zuul/launcher/gearman.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 407,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-04-03T17:38:06Z",
+      "side": 1,
+      "message": "You are correct, this method short circuits if it finds the build.number and only sleeps if build.number is not set. I did not catch that during my first review. Thank you for pointing this out.\n\nThis effectively means that we should only sleep when necessary to catch up which is what I was looking for in my original comment.",
+      "parentUuid": "baa041b7_167aaff1",
+      "revId": "f15139b789d32aef361075487b1b7495a9807b05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
