@@ -683,6 +683,9 @@
                         );
                     })
                     .fail(function (err, jqXHR, errMsg) {
+                        if (err.textStatus === 'abort') {
+                            return;
+                        }
                         $msg.text(options.source + ': ' + errMsg)
                             .addClass('alert-danger')
                             .removeClass('zuul-msg-wrap-off')
