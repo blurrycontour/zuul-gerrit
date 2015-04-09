@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9aa53dc9_a10b908d",
+        "filename": "etc/status/.jshintrc",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-04-09T11:25:48Z",
+      "side": 1,
+      "message": "We prefer spaces (4) if possible",
+      "revId": "9e678dc5d1a810c73c306f5727c08f00a6ff5366",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
