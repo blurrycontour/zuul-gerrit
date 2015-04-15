@@ -16,6 +16,24 @@
       "revId": "01a5b4381297116144d8d4ecf41917b6661b820e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5aa745d1_d1b5d47e",
+        "filename": "etc/status/public_html/jquery.zuul.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 685,
+      "author": {
+        "id": 6808
+      },
+      "writtenOn": "2015-04-15T20:30:19Z",
+      "side": 1,
+      "message": "Yeah. Three changes:\n\n* The arguments were labeled wrong. jqXHR is the first argument, not the second. The first two were both unused previously so went unnoticed. See http://api.jquery.com/jQuery.ajax/#jqXHR for the callback arguments. It\u0027s jqXHR, statusText and errorThrown.\n* statusText is jqXHR.statusText.\n* errorThrown defaults to statusText unless a more exact error message is available. In case of abort it\u0027s the same though.\n* The other arguments were unused, so I omitted them (per jshint).\n\nActually, I\u0027ll add errMsg back since that\u0027s better fitted to display to the user.",
+      "parentUuid": "7aaa499b_dc91fb9a",
+      "revId": "01a5b4381297116144d8d4ecf41917b6661b820e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
