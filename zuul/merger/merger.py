@@ -15,6 +15,7 @@
 
 import git
 import os
+import re
 import logging
 
 import zuul.model
@@ -172,11 +173,12 @@ class Repo(object):
 class Merger(object):
     log = logging.getLogger("zuul.Merger")
 
-    def __init__(self, working_root, sshkey, email, username):
+    def __init__(self, working_root, sshuser, sshkey, email, username):
         self.repos = {}
         self.working_root = working_root
         if not os.path.exists(working_root):
             os.makedirs(working_root)
+        self.sshuser = sshuser
         if sshkey:
             self._makeSSHWrapper(sshkey)
         self.email = email
@@ -194,8 +196,10 @@ class Merger(object):
     def addProject(self, project, url):
         repo = None
         try:
-            path = os.path.join(self.working_root, project)
-            repo = Repo(url, path, self.email, self.username)
+            repo_path = os.path.join(self.working_root, project)
+            # Username should comply with ssh key. Replace it in url
+            repo_url = re.sub(r"(?<=//).+?(?=@)", self.sshuser, url)
+            repo = Repo(repo_url, repo_path, self.email, self.username)
 
             self.repos[project] = repo
         except Exception:

@@ -44,12 +44,17 @@ class MergeServer(object):
         else:
             merge_name = None
 
+        if self.config.has_option('gerrit', 'user'):
+            sshuser = self.config.get('gerrit', 'user')
+        else:
+            sshuser = None
+
         if self.config.has_option('gerrit', 'sshkey'):
             sshkey = self.config.get('gerrit', 'sshkey')
         else:
             sshkey = None
 
-        self.merger = merger.Merger(merge_root, sshkey,
+        self.merger = merger.Merger(merge_root, sshuser, sshkey,
                                     merge_email, merge_name)
 
     def start(self):
