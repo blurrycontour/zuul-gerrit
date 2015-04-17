@@ -44,12 +44,21 @@ class MergeServer(object):
         else:
             merge_name = None
 
+        gerrit_server = self.config.get('gerrit', 'server')
+        gerrit_user = self.config.get('gerrit', 'user')
+
+        if self.config.has_option('gerrit', 'port'):
+            gerrit_port = self.config.get('gerrit', 'port')
+        else:
+            gerrit_port = 29418
+
         if self.config.has_option('gerrit', 'sshkey'):
             sshkey = self.config.get('gerrit', 'sshkey')
         else:
             sshkey = None
 
-        self.merger = merger.Merger(merge_root, sshkey,
+        self.merger = merger.Merger(merge_root, gerrit_server, gerrit_port,
+                                    gerrit_user, sshkey,
                                     merge_email, merge_name)
 
     def start(self):
