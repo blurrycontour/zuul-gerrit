@@ -1437,7 +1437,7 @@ class BasePipelineManager(object):
             nnfi = None  # Nearest non-failing item
             ready_ahead = True  # All build sets ahead are ready
             for item in queue.queue[:]:
-                item_changed, nnfi, ready_ahhead = self._processOneItem(
+                item_changed, nnfi, ready_ahead = self._processOneItem(
                     item, nnfi, ready_ahead)
                 if item_changed:
                     queue_changed = True
