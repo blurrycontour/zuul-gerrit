@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dac4157f_91ad0734",
+        "filename": "etc/status/public_html/jquery.zuul.js",
+        "patchSetId": 3
+      },
+      "lineNbr": 686,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-04-20T05:44:20Z",
+      "side": 1,
+      "message": "It\u0027s a little bit nit-picky, but jqXHR.statusText is only for backward compatibility with XMLHttpRequest. This isn\u0027t an issue in itself, but we are accepting statusText as an attribute so it looks like this is wrong. I can imagine we\u0027ll get a question about accessing the jqXHR object when statusText is already there, so maybe we should just use it to begin with to be neater?",
+      "revId": "499097c8961b334971f59ea7c008793a19331e42",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
