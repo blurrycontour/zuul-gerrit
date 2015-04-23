@@ -1,7 +1,8 @@
 pbr>=1.1.0
 
+Github3.py
 PyYAML>=3.1.0
-Paste
+Paste<2.0
 WebOb>=1.2.3
 paramiko>=1.8.0,<2.0.0
 GitPython>=0.3.3
