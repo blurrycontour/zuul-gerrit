@@ -1,0 +1,17 @@
+pipelines:
+  - name: check
+    manager: IndependentPipelineManager
+    source: github
+    trigger:
+      github:
+        - event:
+            - pr-open
+            - pr-change
+            - pr-reopen
+
+projects:
+  - name: org/project
+    check:
+      - project-merge:
+        - project-test1
+        - project-test2
