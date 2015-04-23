@@ -17,6 +17,7 @@
 
 import voluptuous as v
 import string
+import logging
 
 
 # Several forms accept either a single item or a list, this makes
@@ -26,6 +27,8 @@ def toList(x):
 
 
 class LayoutSchema(object):
+    log = logging.getLogger("zuul.layoutvalidator.LayoutSchema")
+
     include = {'python-file': str}
     includes = [include]
 
@@ -157,6 +160,7 @@ class LayoutSchema(object):
         connection_drivers = {
             'trigger': {
                 'gerrit': 'zuul.trigger.gerrit',
+                'github': 'zuul.trigger.github',
             },
             'reporter': {
                 'gerrit': 'zuul.reporter.gerrit',
@@ -175,6 +179,9 @@ class LayoutSchema(object):
         for connection_name, connection in connections.items():
             for dname, dmod in connection_drivers.get(dtype, {}).items():
                 if connection.driver_name == dname:
+                    logging.debug("connection_name: {0}".format(connection_name))
+                    logging.debug("dtype: {0}".format(dtype))
+                    logging.debug("dname: {0}".format(dname))
                     schema[connection_name] = toList(__import__(
                         connection_drivers[dtype][dname],
                         fromlist=['']).getSchema())
@@ -273,6 +280,8 @@ class LayoutSchema(object):
 
 
 class LayoutValidator(object):
+    log = logging.getLogger("zuul.layoutvalidator.LayoutValidator")
+
     def checkDuplicateNames(self, data, path):
         items = []
         for i, item in enumerate(data):
@@ -320,6 +329,7 @@ class LayoutValidator(object):
 
     def validate(self, data, connections=None):
         schema = LayoutSchema().getSchema(data, connections)
+        self.log.debug(str(schema))
         schema(data)
         self.checkDuplicateNames(data['pipelines'], ['pipelines'])
         if 'jobs' in data:
