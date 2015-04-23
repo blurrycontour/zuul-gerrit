@@ -26,6 +26,7 @@ def toList(x):
 
 
 class LayoutSchema(object):
+
     include = {'python-file': str}
     includes = [include]
 
@@ -158,6 +159,7 @@ class LayoutSchema(object):
         connection_drivers = {
             'trigger': {
                 'gerrit': 'zuul.trigger.gerrit',
+                'github': 'zuul.trigger.github',
             },
             'reporter': {
                 'gerrit': 'zuul.reporter.gerrit',
@@ -274,6 +276,7 @@ class LayoutSchema(object):
 
 
 class LayoutValidator(object):
+
     def checkDuplicateNames(self, data, path):
         items = []
         for i, item in enumerate(data):
