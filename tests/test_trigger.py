@@ -29,6 +29,17 @@ class TestGerritTrigger(testtools.TestCase):
         self.assertEqual('gerrit', zuul.trigger.gerrit.GerritTrigger.name)
 
 
+class TestGithubTrigger(testtools.TestCase):
+    log = logging.getLogger("zuul.test_trigger")
+
+    def test_trigger_abc(self):
+        # We only need to instantiate a class for this
+        zuul.trigger.github.GithubTrigger({})
+
+    def test_trigger_name(self):
+        self.assertEqual('github', zuul.trigger.github.GithubTrigger.name)
+
+
 class TestTimerTrigger(testtools.TestCase):
     log = logging.getLogger("zuul.test_trigger")
 
