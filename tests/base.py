@@ -43,6 +43,7 @@ import testtools
 from git import GitCommandError
 
 import zuul.connection.gerrit
+import zuul.connection.github
 import zuul.connection.smtp
 import zuul.scheduler
 import zuul.webapp
@@ -55,7 +56,9 @@ import zuul.merger.server
 import zuul.reporter.gerrit
 import zuul.reporter.smtp
 import zuul.source.gerrit
+import zuul.source.github
 import zuul.trigger.gerrit
+import zuul.trigger.github
 import zuul.trigger.timer
 import zuul.trigger.zuultrigger
 
