@@ -23,3 +23,10 @@ class TestGerritSource(testtools.TestCase):
 
     def test_source_name(self):
         self.assertEqual('gerrit', zuul.source.gerrit.GerritSource.name)
+
+
+class TestGithubSource(testtools.TestCase):
+    log = logging.getLogger("zuul.test_source")
+
+    def test_source_name(self):
+        self.assertEqual('github', zuul.source.github.GithubSource.name)
