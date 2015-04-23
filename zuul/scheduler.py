@@ -316,6 +316,7 @@ class Scheduler(threading.Thread):
     def registerConnections(self, connections, webapp):
         self.connections = connections
         for connection_name, connection in self.connections.items():
+            logging.debug("Connection: {0}".format(connection_name))
             connection.registerScheduler(self)
             connection.registerWebapp(webapp)
             connection.onLoad()
@@ -345,9 +346,11 @@ class Scheduler(threading.Thread):
         drivers = {
             'source': {
                 'gerrit': 'zuul.source.gerrit:GerritSource',
+                'github': 'zuul.source.github:GithubSource',
             },
             'trigger': {
                 'gerrit': 'zuul.trigger.gerrit:GerritTrigger',
+                'github': 'zuul.trigger.github:GithubTrigger',
                 'timer': 'zuul.trigger.timer:TimerTrigger',
                 'zuul': 'zuul.trigger.zuultrigger:ZuulTrigger',
             },
