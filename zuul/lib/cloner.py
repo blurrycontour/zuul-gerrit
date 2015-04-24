@@ -107,13 +107,29 @@ class Cloner(object):
                            project, ref)
             return False
 
+    def parseFetchHead(self, repo, dest):
+        # Work around a bug in GitPython which can not parse FETCH_HEAD
+        gitcmd = git.Git(dest)
+        fetch_head = gitcmd.rev_parse('FETCH_HEAD')
+        repo.checkout(fetch_head)
+        return ("commit %s" % fetch_head)
+
+    def useFallbackBranch(self, repo, fallback_branch):
+        self.log.debug("Falling back to branch %s", fallback_branch)
+        try:
+            repo.checkout('remotes/origin/%s' % fallback_branch)
+        except (ValueError, GitCommandError):
+            self.log.exception("Fallback branch not found: %s",
+                               fallback_branch)
+        return ("branch %s" % fallback_branch)
+
     def prepareRepo(self, project, dest):
         """Clone a repository for project at dest and apply a reference
         suitable for testing. The reference lookup is attempted in this order:
 
          1) Zuul reference for the indicated branch
-         2) Zuul reference for the master branch
-         3) The tip of the indicated branch
+         2) The tip of the indicated branch
+         3) Zuul reference for the master branch
          4) The tip of the master branch
 
         The "indicated branch" is one of the following:
@@ -136,35 +152,26 @@ class Cloner(object):
         override_zuul_ref = re.sub(self.zuul_branch, indicated_branch,
                                    self.zuul_ref)
 
-        if repo.hasBranch(indicated_branch):
+        if (self.fetchFromZuul(repo, project, override_zuul_ref)):
+            # Zuul reference for the indicated branch
+            prepared_with = self.parseFetchHead(repo, dest)
+        elif repo.hasBranch(indicated_branch):
+            # The tip of the indicated branch
             self.log.debug("upstream repo has branch %s", indicated_branch)
-            fallback_branch = indicated_branch
+            prepared_with = self.useFallbackBranch(repo, indicated_branch)
         else:
-            self.log.debug("upstream repo is missing branch %s",
-                           self.branch)
             # FIXME should be origin HEAD branch which might not be 'master'
             fallback_branch = 'master'
+            self.log.debug("upstream repo is missing branch %s, using" +
+                           " fallback %s" % indicated_branch, fallback_branch)
+            fallback_zuul_ref = re.sub(self.zuul_branch, fallback_branch,
+                                       self.zuul_ref)
+            if (fallback_zuul_ref != override_zuul_ref and
+                self.fetchFromZuul(repo, project, fallback_zuul_ref)):
+                # Zuul reference for the master branch
+                prepared_with = self.parseFetchHead(repo, dest)
+            else:
+                # The tip of the master branch
+                prepared_with = self.useFallbackBranch(repo, 'master')
 
-        fallback_zuul_ref = re.sub(self.zuul_branch, fallback_branch,
-                                   self.zuul_ref)
-
-        if (self.fetchFromZuul(repo, project, override_zuul_ref)
-            or (fallback_zuul_ref != override_zuul_ref and
-                self.fetchFromZuul(repo, project, fallback_zuul_ref))
-            ):
-            # Work around a bug in GitPython which can not parse FETCH_HEAD
-            gitcmd = git.Git(dest)
-            fetch_head = gitcmd.rev_parse('FETCH_HEAD')
-            repo.checkout(fetch_head)
-            self.log.info("Prepared %s repo with commit %s",
-                          project, fetch_head)
-        else:
-            # Checkout branch
-            self.log.debug("Falling back to branch %s", fallback_branch)
-            try:
-                repo.checkout('remotes/origin/%s' % fallback_branch)
-            except (ValueError, GitCommandError):
-                self.log.exception("Fallback branch not found: %s",
-                                   fallback_branch)
-            self.log.info("Prepared %s repo with branch %s",
-                          project, fallback_branch)
+        self.log.info("Prepared %s repo with %s", project, prepared_with)
