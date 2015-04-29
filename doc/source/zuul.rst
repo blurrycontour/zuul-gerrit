@@ -422,6 +422,12 @@ explanation of each of the parameters::
     provides.  This field is treated as a regular expression, and
     multiple refs may be listed.
 
+    *delete-ignores*
+    When a branch is deleted, a ref-updated event is emitted with a newrev
+    of all zeros specified. The ``delete-ignores`` field is a boolean value
+    that can be set to ``True`` in order to not trigger these ref-updated events
+    with a newrev of all zeros.
+
     *approval*
     This is only used for ``comment-added`` events.  It only matches if
     the event has a matching approval associated with it.  Example:
