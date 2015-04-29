@@ -1077,7 +1077,8 @@ class BaseFilter(object):
 class EventFilter(BaseFilter):
     def __init__(self, trigger, types=[], branches=[], refs=[],
                  event_approvals={}, comments=[], emails=[], usernames=[],
-                 timespecs=[], required_approvals=[], pipelines=[]):
+                 timespecs=[], required_approvals=[], pipelines=[],
+                 ignore_deletes=True):
         super(EventFilter, self).__init__(
             required_approvals=required_approvals)
         self.trigger = trigger
@@ -1097,6 +1098,7 @@ class EventFilter(BaseFilter):
         self.pipelines = [re.compile(x) for x in pipelines]
         self.event_approvals = event_approvals
         self.timespecs = timespecs
+        self.ignore_deletes = ignore_deletes
 
     def __repr__(self):
         ret = '<EventFilter'
@@ -1109,6 +1111,8 @@ class EventFilter(BaseFilter):
             ret += ' branches: %s' % ', '.join(self._branches)
         if self._refs:
             ret += ' refs: %s' % ', '.join(self._refs)
+        if self.ignore_deletes:
+            ret += ' ignore_deletes: %s' % self.ignore_deletes
         if self.event_approvals:
             ret += ' event_approvals: %s' % ', '.join(
                 ['%s:%s' % a for a in self.event_approvals.items()])
@@ -1128,6 +1132,8 @@ class EventFilter(BaseFilter):
         return ret
 
     def matches(self, event, change):
+        all_zeros = '0' * 40
+
         # event types are ORed
         matches_type = False
         for etype in self.types:
@@ -1157,6 +1163,10 @@ class EventFilter(BaseFilter):
         if event.ref is not None:
             for ref in self.refs:
                 if ref.match(event.ref):
+                    if self.ignore_deletes and event.newrev == all_zeros:
+                        # If the updated ref has a new git hash of all 0s,
+                        # then the ref is being deleted
+                        continue
                     matches_ref = True
         if self.refs and not matches_ref:
             return False
