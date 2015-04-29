@@ -204,5 +204,5 @@ class Gerrit(object):
         err = stderr.read()
         self.log.debug("SSH received stderr:\n%s" % err)
         if ret:
-            raise Exception("Gerrit error executing %s" % command)
+            raise Exception("Gerrit error executing %s:\n%s" % (command, err))
         return (out, err)
