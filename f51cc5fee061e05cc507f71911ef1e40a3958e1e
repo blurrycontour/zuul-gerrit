@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3acd31a7_030edf3a",
+        "filename": "tests/fixtures/layouts/good_split.yaml.d/project_a/layout.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 8984
+      },
+      "writtenOn": "2015-05-04T19:14:59Z",
+      "side": 1,
+      "message": "Should this fail if the python-file does not exists?",
+      "revId": "f51cc5fee061e05cc507f71911ef1e40a3958e1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
