@@ -16,6 +16,24 @@
       "revId": "499097c8961b334971f59ea7c008793a19331e42",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3acd31a7_6ffaee76",
+        "filename": "etc/status/public_html/jquery.zuul.js",
+        "patchSetId": 3
+      },
+      "lineNbr": 686,
+      "author": {
+        "id": 6808
+      },
+      "writtenOn": "2015-05-05T20:55:03Z",
+      "side": 1,
+      "message": "I did it because I was concerned about the actual value being different. It looked like statusText was set by XHR/browser/user and the jqXHR normalised by jQuery.ajax to \"abort\".\n\nThere\u0027s some funkiness going on with nativeStatusText (assigned to jqXHR.statusText) vs. jQuery\u0027s own statusText (passed as second argument). However I see now that jQuery\u0027s own statusText also defaults to nativeStatusText if available. (Where in case of abort, native \u003d jQuery\u0027s strAbort).",
+      "parentUuid": "dac4157f_91ad0734",
+      "revId": "499097c8961b334971f59ea7c008793a19331e42",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
