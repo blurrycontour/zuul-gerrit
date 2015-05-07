@@ -16,6 +16,23 @@
       "revId": "0a81987aa815fff39cc8b308917e3a5c76208bb4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1aca2d91_f6abc787",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3405,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-05-07T18:54:04Z",
+      "side": 1,
+      "message": "hold _in_queue holds jobs in the gearman queue, hold _in_build holds the builds.  So this is adding the second.  It is necessary because it determines the order in which the builds appear in the build history, which was the nature of the race.  Perhaps holding in the queue is no longer necessary though.",
+      "revId": "0a81987aa815fff39cc8b308917e3a5c76208bb4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
