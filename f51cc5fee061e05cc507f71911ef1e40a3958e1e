@@ -16,6 +16,24 @@
       "revId": "f51cc5fee061e05cc507f71911ef1e40a3958e1e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1aca2d91_6cfda839",
+        "filename": "tests/fixtures/layouts/good_split.yaml.d/project_a/layout.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2015-05-07T19:51:31Z",
+      "side": 1,
+      "message": "Includes files are not tested in unit-tests.",
+      "parentUuid": "3acd31a7_030edf3a",
+      "revId": "f51cc5fee061e05cc507f71911ef1e40a3958e1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
