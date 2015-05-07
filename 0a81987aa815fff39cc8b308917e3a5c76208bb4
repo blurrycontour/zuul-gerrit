@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1aca2d91_b6730f80",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3405,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-05-07T18:51:53Z",
+      "side": 1,
+      "message": "Is this necessary here? the hold_jobs_in_queue above then subsequent release should let everything through.",
+      "revId": "0a81987aa815fff39cc8b308917e3a5c76208bb4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
