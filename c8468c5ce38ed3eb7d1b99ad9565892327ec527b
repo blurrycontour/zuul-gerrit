@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9af37de9_ac777ad3",
+        "filename": "zuul/source/__init__.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-05-11T04:59:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3acd31a7_27ae8481",
+      "revId": "c8468c5ce38ed3eb7d1b99ad9565892327ec527b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3acd31a7_e7740c69",
         "filename": "zuul/source/__init__.py",
         "patchSetId": 21
@@ -30,6 +48,24 @@
       "writtenOn": "2015-05-04T20:29:41Z",
       "side": 1,
       "message": "\"project\" here is simply the string identifier used in layout.yaml?",
+      "revId": "c8468c5ce38ed3eb7d1b99ad9565892327ec527b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9af37de9_6c2f52a2",
+        "filename": "zuul/source/__init__.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-05-11T04:59:30Z",
+      "side": 1,
+      "message": "Yes",
+      "parentUuid": "3acd31a7_e7740c69",
       "revId": "c8468c5ce38ed3eb7d1b99ad9565892327ec527b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "9af37de9_a713155c",
+        "filename": "zuul/source/__init__.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-05-11T04:59:30Z",
+      "side": 1,
+      "message": "It\u0027s a change. Clarified the head part in the docstring.",
+      "parentUuid": "3acd31a7_672ebc44",
+      "revId": "c8468c5ce38ed3eb7d1b99ad9565892327ec527b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3acd31a7_07cdc8b6",
         "filename": "zuul/source/__init__.py",
         "patchSetId": 21
@@ -64,6 +118,24 @@
       "writtenOn": "2015-05-04T20:29:41Z",
       "side": 1,
       "message": "It\u0027s not clear unless reading code that calls this function what \"relevant\" is. It\u0027d be helpful here to indicate that this function should take a list of \"Changeish\" items.",
+      "revId": "c8468c5ce38ed3eb7d1b99ad9565892327ec527b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9af37de9_072b0184",
+        "filename": "zuul/source/__init__.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-05-11T04:59:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3acd31a7_07cdc8b6",
       "revId": "c8468c5ce38ed3eb7d1b99ad9565892327ec527b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "9af37de9_c724d9b0",
+        "filename": "zuul/source/__init__.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-05-11T04:59:30Z",
+      "side": 1,
+      "message": "This is called after the layout.yaml is processed (due to reconfig etc). ie it is only called once",
+      "parentUuid": "3acd31a7_27db2451",
+      "revId": "c8468c5ce38ed3eb7d1b99ad9565892327ec527b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3acd31a7_c7cd9086",
         "filename": "zuul/source/__init__.py",
         "patchSetId": 21
@@ -104,6 +194,24 @@
     },
     {
       "key": {
+        "uuid": "9af37de9_a73af5cb",
+        "filename": "zuul/source/__init__.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-05-11T04:59:30Z",
+      "side": 1,
+      "message": "either git://, ssh:// or even https://. A way of fetching the item basically.",
+      "parentUuid": "3acd31a7_c7cd9086",
+      "revId": "c8468c5ce38ed3eb7d1b99ad9565892327ec527b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3acd31a7_c7aeb0e5",
         "filename": "zuul/source/__init__.py",
         "patchSetId": 21
@@ -115,6 +223,24 @@
       "writtenOn": "2015-05-04T20:29:41Z",
       "side": 1,
       "message": "As far as I can tell, this is specific to gerrit. The only usages I see of it after all is merged and done (up to the github integration work I am doing) is within the gerrit source which simply delegates to a method of the same name in the GerritConnection class.\n\nWhile working on the GithubSource class I can\u0027t think of any reason to implement it.\n\nHowever, if this were named \"getHttpUrl\" it would make a little more sense, but the value still isn\u0027t really clear given that its current usage in the zuul codebase is constrained to gerrit-specific routines.",
+      "revId": "c8468c5ce38ed3eb7d1b99ad9565892327ec527b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9af37de9_274de572",
+        "filename": "zuul/source/__init__.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-05-11T04:59:30Z",
+      "side": 1,
+      "message": "This provides a link back to the change so that the zuul dashboard can link to it etc.",
+      "parentUuid": "3acd31a7_c7aeb0e5",
       "revId": "c8468c5ce38ed3eb7d1b99ad9565892327ec527b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
