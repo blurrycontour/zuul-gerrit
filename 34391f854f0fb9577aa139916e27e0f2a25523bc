@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9af37de9_63b633de",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 425,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2015-05-11T13:58:05Z",
+      "side": 1,
+      "message": "I believe you mean ignore-deletes",
+      "revId": "34391f854f0fb9577aa139916e27e0f2a25523bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9af37de9_43bb2fc5",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 427,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2015-05-11T13:58:05Z",
+      "side": 1,
+      "message": "here too",
+      "revId": "34391f854f0fb9577aa139916e27e0f2a25523bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
