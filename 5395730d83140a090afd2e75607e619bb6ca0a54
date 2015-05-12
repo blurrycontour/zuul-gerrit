@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a0c5dc1_ed59ef8f",
+        "filename": "zuul/cmd/cloner.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2015-05-12T12:29:48Z",
+      "side": 1,
+      "message": "That shows in the help as:\n\n    --cache-no-hardlinks CACHE_NO_HARDLINKS\n\nIt should be a flip, i.e. action\u003d\u0027store_true\u0027",
+      "revId": "5395730d83140a090afd2e75607e619bb6ca0a54",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
