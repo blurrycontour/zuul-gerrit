@@ -36,6 +36,41 @@
     },
     {
       "key": {
+        "uuid": "9a0c5dc1_5b79ba92",
+        "filename": "contrib/zuul_clear_refs.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2015-05-12T20:52:11Z",
+      "side": 1,
+      "message": "Named it zuul_clear_refs :)",
+      "parentUuid": "9a80dd14_9e514d10",
+      "revId": "ba76a075782c99ae89c81f87e43e810423b0503e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a0c5dc1_80bc636d",
+        "filename": "contrib/zuul_clear_refs.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2015-05-12T20:52:11Z",
+      "side": 1,
+      "message": "Made it to only catch LookupError exceptions.",
+      "revId": "ba76a075782c99ae89c81f87e43e810423b0503e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a80dd14_be7ff115",
         "filename": "contrib/zuul_clear_refs.py",
         "patchSetId": 3
@@ -53,6 +88,24 @@
     },
     {
       "key": {
+        "uuid": "9a0c5dc1_60c16fe4",
+        "filename": "contrib/zuul_clear_refs.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2015-05-12T20:52:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a80dd14_be7ff115",
+      "revId": "ba76a075782c99ae89c81f87e43e810423b0503e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a80dd14_deb66588",
         "filename": "contrib/zuul_clear_refs.py",
         "patchSetId": 3
@@ -64,6 +117,24 @@
       "writtenOn": "2015-03-20T17:40:11Z",
       "side": 1,
       "message": "might be nicer if it\u0027s \n  \n  log.debug(\"%s at %s is %3s days old\", ref.commit, ref.path, commit_age)",
+      "revId": "ba76a075782c99ae89c81f87e43e810423b0503e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a0c5dc1_604f2f93",
+        "filename": "contrib/zuul_clear_refs.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2015-05-12T20:52:11Z",
+      "side": 1,
+      "message": "That change it from:\n\n DEBUG:root:202b6a766525ccdebaef37c460383f79fee0fba3   5 days refs/zuul/REL1_25/Z68c1ae431aa549cd805dfce22178b161\n\nTo:\n\n DEBUG:zuul_clear_ref:93fdaac8690c832432ec00d6387b38c5e61cd7ff at refs/zuul/REL1_25/Z004a37930c254ccda7fcdd71b2836000 is  22 days old\n\nThat indeed make it easier to spot the commit age. Thanks!",
+      "parentUuid": "9a80dd14_deb66588",
       "revId": "ba76a075782c99ae89c81f87e43e810423b0503e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
