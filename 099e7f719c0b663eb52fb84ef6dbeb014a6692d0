@@ -16,6 +16,24 @@
       "revId": "099e7f719c0b663eb52fb84ef6dbeb014a6692d0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a0c5dc1_6473bab2",
+        "filename": "zuul/cmd/cloner.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-05-13T00:40:10Z",
+      "side": 0,
+      "message": "I misunderstood -- these are not actually used.",
+      "parentUuid": "9a0c5dc1_89b6c788",
+      "revId": "099e7f719c0b663eb52fb84ef6dbeb014a6692d0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
