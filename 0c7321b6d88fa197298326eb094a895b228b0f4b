@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a0c5dc1_09abf71e",
+        "filename": "zuul/cmd/cloner.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-05-13T00:29:43Z",
+      "side": 1,
+      "message": "Checking by count seems likely to be subject to error.",
+      "revId": "0c7321b6d88fa197298326eb094a895b228b0f4b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
