@@ -379,17 +379,19 @@ class Gerrit(object):
                        (query,))
         results = self.gerrit.simpleQuery(query)
         for result in results:
-            for match in self.depends_on_re.findall(
-                result['commitMessage']):
-                if match != change_id:
-                    continue
-                key = (result['number'], result['currentPatchSet']['number'])
-                if key in seen:
-                    continue
-                self.log.debug("Found change %s,%s needs %s from commit" %
-                               (key[0], key[1], change_id))
-                seen.add(key)
-                records.append(result)
+            if 'commitMessage' in result:
+                for match in self.depends_on_re.findall(
+                    result['commitMessage']):
+                    if match != change_id:
+                        continue
+                    key = (result['number'],
+                           result['currentPatchSet']['number'])
+                    if key in seen:
+                        continue
+                    self.log.debug("Found change %s,%s needs %s from commit" %
+                                   (key[0], key[1], change_id))
+                    seen.add(key)
+                    records.append(result)
         return records
 
     def updateChange(self, change, history=None):
