@@ -1522,9 +1522,14 @@ class BasePipelineManager(object):
         self.log.debug("Reporting change %s" % item.change)
         ret = True  # Means error as returned by trigger.report
         if self.pipeline.didAllJobsSucceed(item):
-            self.log.debug("success %s" % (self.pipeline.success_actions))
-            actions = self.pipeline.success_actions
-            item.setReportedResult('SUCCESS')
+            if self.pipeline.getJobs(item):
+                self.log.debug("success %s" % (self.pipeline.success_actions))
+                actions = self.pipeline.success_actions
+                item.setReportedResult('SUCCESS')
+            else:
+                self.log.debug("Don't report, no jobs for change %s" %
+                               item.change)
+                actions = []
         elif not self.pipeline.didMergerSucceed(item):
             actions = self.pipeline.merge_failure_actions
             item.setReportedResult('MERGER_FAILURE')
