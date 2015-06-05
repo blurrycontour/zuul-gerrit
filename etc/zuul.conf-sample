@@ -18,6 +18,7 @@ state_dir=/var/lib/zuul
 status_url=https://jenkins.example.com/zuul/status
 
 [merger]
+start_with_scheduler=false
 git_dir=/var/lib/zuul/git
 ;git_user_email=zuul@example.com
 ;git_user_name=zuul

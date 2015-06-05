@@ -38,6 +38,7 @@ import zuul.cmd
 class Server(zuul.cmd.ZuulApp):
     def __init__(self):
         super(Server, self).__init__()
+        self.merger_server_pid = None
         self.gear_server_pid = None
 
     def parse_arguments(self):
@@ -69,9 +70,11 @@ class Server(zuul.cmd.ZuulApp):
         signal.signal(signal.SIGUSR1, signal.SIG_IGN)
         self.sched.exit()
         self.sched.join()
+        self.stop_merger_server()
         self.stop_gear_server()
 
     def term_handler(self, signum, frame):
+        self.stop_merger_server()
         self.stop_gear_server()
         os._exit(0)
 
@@ -136,6 +139,27 @@ class Server(zuul.cmd.ZuulApp):
         if self.gear_server_pid:
             os.kill(self.gear_server_pid, signal.SIGKILL)
 
+    def start_merger_server(self):
+        pipe_read, pipe_write = os.pipe()
+        child_pid = os.fork()
+        if child_pid == 0:
+            os.close(pipe_write)
+            import zuul.merger.server
+            self.merger_server = zuul.merger.server.MergeServer(self.config)
+            self.merger_server.start()
+            # Keep running until the parent dies:
+            pipe_read = os.fdopen(pipe_read)
+            pipe_read.read()
+            os._exit(0)
+        else:
+            os.close(pipe_read)
+            self.merger_server_pid = child_pid
+            self.merger_pipe_write = pipe_write
+
+    def stop_merger_server(self):
+        if self.merger_server_pid:
+            os.kill(self.merger_server_pid, signal.SIGKILL)
+
     def main(self):
         # See comment at top of file about zuul imports
         import zuul.scheduler
@@ -154,6 +178,11 @@ class Server(zuul.cmd.ZuulApp):
         if (self.config.has_option('gearman_server', 'start') and
             self.config.getboolean('gearman_server', 'start')):
             self.start_gear_server()
+
+        if (self.config.has_section('merger') and
+            self.config.has_option('merger', 'start_with_scheduler') and
+            self.config.getboolean('merger', 'start_with_scheduler')):
+            self.start_merger_server()
 
         self.setup_logging('zuul', 'log_config')
         self.log = logging.getLogger("zuul.Server")

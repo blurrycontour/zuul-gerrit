@@ -137,6 +137,12 @@ zuul
 merger
 """"""
 
+**start_with_scheduler**
+  If true, a merger child process will be spawned when running the main
+  zuul server. This is useful when you don't need to scale out your
+  mergers and want to run everything with one command. Defaults to
+  ``false``.
+
 **git_dir**
   Directory that Zuul should clone local git repositories to.
   ``git_dir=/var/lib/zuul/git``
@@ -1061,17 +1067,19 @@ Starting Zuul
 
 To start Zuul, run **zuul-server**::
 
-  usage: zuul-server [-h] [-c CONFIG] [-l LAYOUT] [-d] [-t] [--version]
+  usage: zuul-server [-h] [-c CONFIG] [-l LAYOUT] [-d] [-t [JOB_LIST]]
+                     [--version]
 
   Project gating system.
 
   optional arguments:
-    -h, --help  show this help message and exit
-    -c CONFIG   specify the config file
-    -l LAYOUT   specify the layout file
-    -d          do not run as a daemon
-    -t          validate layout file syntax
-    --version   show zuul version
+    -h, --help         show this help message and exit
+    -c CONFIG          specify the config file
+    -l LAYOUT          specify the layout file
+    -d                 do not run as a daemon
+    -t [JOB_LIST]      validate layout file syntax (optionally providing the
+                       path to a file with a list of available job names)
+    --version          show zuul version
 
 You may want to use the ``-d`` argument while you are initially setting
 up Zuul so you can detect any configuration errors quickly.  Under
