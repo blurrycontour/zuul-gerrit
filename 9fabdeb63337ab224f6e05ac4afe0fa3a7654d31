@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3afb71cf_4eb0ebdd",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1525,
+      "author": {
+        "id": 6735
+      },
+      "writtenOn": "2015-06-05T14:55:03Z",
+      "side": 1,
+      "message": "I would rather skip posting if there were no jobs defined _before_ we test if all jobs succeeded.\n\nIf there are no jobs then we don\u0027t care if this CI cannot merge.  Also, if there are no jobs then a -1 due to a transient failure to merge (or some other CI error) cannot be removed by rechecking as we won\u0027t post a +1.",
+      "revId": "9fabdeb63337ab224f6e05ac4afe0fa3a7654d31",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
