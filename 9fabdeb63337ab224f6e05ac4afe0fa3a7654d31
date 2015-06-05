@@ -16,6 +16,24 @@
       "revId": "9fabdeb63337ab224f6e05ac4afe0fa3a7654d31",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afb71cf_8e31430e",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1525,
+      "author": {
+        "id": 12408
+      },
+      "writtenOn": "2015-06-05T15:02:49Z",
+      "side": 1,
+      "message": "Hm. Seems reasonable. Agree with Bob.",
+      "parentUuid": "3afb71cf_4eb0ebdd",
+      "revId": "9fabdeb63337ab224f6e05ac4afe0fa3a7654d31",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
