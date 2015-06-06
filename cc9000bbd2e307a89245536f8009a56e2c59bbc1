@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3afb71cf_c1881725",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1528,
+      "author": {
+        "id": 6133
+      },
+      "writtenOn": "2015-06-06T07:43:01Z",
+      "side": 1,
+      "message": "i\u0027d just remove the Don\u0027t report, and say \"No jobs for change\"",
+      "revId": "cc9000bbd2e307a89245536f8009a56e2c59bbc1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
