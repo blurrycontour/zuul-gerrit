@@ -738,6 +738,7 @@ class QueueItem(object):
         ret['project'] = changeish.project.name
         ret['enqueue_time'] = int(self.enqueue_time * 1000)
         ret['jobs'] = []
+        ret['pipeline'] = self.pipeline.name
         if hasattr(changeish, 'owner'):
             ret['owner'] = changeish.owner
         else:
