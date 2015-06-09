@@ -85,6 +85,12 @@ class LayoutSchema(object):
                                },
                       }
 
+    http_save_method = v.Any('PUT', 'POST')
+    log_results = {'json_http': {v.Required('url'): str,
+                                 v.Required('method'): http_save_method,
+                                },
+                  }
+
     require = {'approval': toList(require_approval),
                'open': bool,
                'current-patchset': bool,
@@ -112,6 +118,7 @@ class LayoutSchema(object):
                 'failure': report_actions,
                 'merge-failure': report_actions,
                 'start': report_actions,
+                'log-results': log_results,
                 'window': window,
                 'window-floor': window_floor,
                 'window-increase-type': window_type,

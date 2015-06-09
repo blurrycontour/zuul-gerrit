@@ -82,6 +82,7 @@ class Pipeline(object):
         self.start_actions = None
         self.success_actions = None
         self.failure_actions = None
+        self.result_loggers = None
         self.window = None
         self.window_floor = None
         self.window_increase_type = None
@@ -305,6 +306,22 @@ class ActionReporter(object):
         """Gets the submit allow needs from the reporter based off the
         parameters."""
         return self.reporter.getSubmitAllowNeeds(self.params)
+
+
+class ResultLogger(object):
+    """A ResultLogger has a result logger and its configured parameters"""
+
+    def __repr__(self):
+        return '<ResultLogger %s>' % (self.result_logger)
+
+    def __init__(self, result_logger, params):
+        self.result_logger = result_logger.get(params)
+
+    def save(self, item):
+        """Saves the machine-readable log of a QueueItem to the configured
+        logger. Takes the change and message and adds the configured parameters.
+        """
+        return self.result_logger.save(item)
 
 
 class ChangeQueue(object):

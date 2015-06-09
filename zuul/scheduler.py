@@ -31,6 +31,7 @@ import layoutvalidator
 import model
 from model import ActionReporter, Pipeline, Project, ChangeQueue
 from model import EventFilter, ChangeishFilter
+from model import ResultLogger
 from zuul import change_matcher
 from zuul import version as zuul_version
 
@@ -191,6 +192,7 @@ class Scheduler(threading.Thread):
         self.merger = None
         self.triggers = dict()
         self.reporters = dict()
+        self.result_loggers = dict()
         self.config = None
 
         self.trigger_event_queue = Queue.Queue()
@@ -304,6 +306,18 @@ class Scheduler(threading.Thread):
                     action_reporters['merge-failure']
             else:
                 pipeline.merge_failure_actions = action_reporters['failure']
+
+            pipeline.result_loggers = []
+            if conf_pipeline.get('log-results'):
+                for logger_name, params \
+                    in conf_pipeline.get('log-results').items():
+                    if logger_name in self.result_loggers.keys():
+                        pipeline.result_loggers.append(
+                            ResultLogger(self.result_loggers[logger_name],
+                                         params))
+                    else:
+                        self.log.error('Invalid result logger name %s' %
+                                       logger_name)
 
             pipeline.window = conf_pipeline.get('window', 20)
             pipeline.window_floor = conf_pipeline.get('window-floor', 3)
@@ -509,6 +523,11 @@ class Scheduler(threading.Thread):
         if name is None:
             name = reporter.name
         self.reporters[name] = reporter
+
+    def registerResultLogger(self, result_logger, name=None):
+        if name is None:
+            name = result_logger.name
+        self.result_loggers[name] = result_logger
 
     def getProject(self, name):
         self.layout_lock.acquire()
@@ -1040,6 +1059,8 @@ class BasePipelineManager(object):
         self.log.info("    %s" % self.pipeline.failure_actions)
         self.log.info("  On merge-failure:")
         self.log.info("    %s" % self.pipeline.merge_failure_actions)
+        self.log.info("  Result loggers:")
+        self.log.info("    %s" % self.pipeline.result_loggers)
 
     def getSubmitAllowNeeds(self):
         # Get a list of code review labels that are allowed to be
@@ -1496,6 +1517,8 @@ class BasePipelineManager(object):
         if not item.reported:
             # _reportItem() returns True if it failed to report.
             item.reported = not self._reportItem(item)
+            for logger in self.pipeline.result_loggers:
+                logger.save(item)
         if self.changes_merge:
             succeeded = self.pipeline.didAllJobsSucceed(item)
             merged = item.reported

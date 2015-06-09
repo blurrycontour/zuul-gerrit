@@ -88,6 +88,7 @@ class Server(zuul.cmd.ZuulApp):
         self.sched.registerTrigger(None, 'gerrit')
         self.sched.registerTrigger(None, 'timer')
         self.sched.registerTrigger(None, 'zuul')
+        self.sched.registerResultLogger(None, 'json_http')
         layout = self.sched.testConfig(self.config.get('zuul',
                                                        'layout_config'))
         if not job_list_path:
@@ -148,6 +149,7 @@ class Server(zuul.cmd.ZuulApp):
         import zuul.trigger.gerrit
         import zuul.trigger.timer
         import zuul.trigger.zuultrigger
+        import zuul.result_logger.json_http
         import zuul.webapp
         import zuul.rpclistener
 
@@ -186,6 +188,7 @@ class Server(zuul.cmd.ZuulApp):
             self.config.get('smtp', 'port')
             if self.config.has_option('smtp', 'port') else 25
         )
+        json_http_result_logger = zuul.result_logger.json_http.ResultLogger()
 
         self.sched.setLauncher(gearman)
         self.sched.setMerger(merger)
@@ -194,6 +197,7 @@ class Server(zuul.cmd.ZuulApp):
         self.sched.registerTrigger(zuultrigger)
         self.sched.registerReporter(gerrit_reporter)
         self.sched.registerReporter(smtp_reporter)
+        self.sched.registerResultLogger(json_http_result_logger)
 
         self.log.info('Starting scheduler')
         self.sched.start()
