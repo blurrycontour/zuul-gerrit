@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3afb71cf_cecd9e5e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 23
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 6133
+      },
+      "writtenOn": "2015-06-09T06:41:45Z",
+      "side": 1,
+      "message": "minor typo if you add more patchsets",
+      "revId": "8c01a343c8058752ec07632869eced5c654c1c13",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
