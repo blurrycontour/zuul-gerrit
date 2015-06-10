@@ -107,8 +107,13 @@ class RPCListener(object):
             errors += 'Invalid pipeline: %s\n' % (args['pipeline'],)
 
         if not errors:
-            event.change_number, event.patch_number = args['change'].split(',')
             try:
+                if args['change'].startswith('ref-updated,'):
+                    event.ref, event.oldrev, event.newrev = \
+                        args['change'].split(',')[1:]
+                else:
+                    event.change_number, event.patch_number = \
+                        args['change'].split(',')
                 pipeline.source.getChange(event, project)
             except Exception:
                 errors += 'Invalid change: %s\n' % (args['change'],)
