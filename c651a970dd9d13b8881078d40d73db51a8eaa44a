@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3afb71cf_5d37cdfe",
+        "filename": "zuul/result_logger/json_http.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 13413
+      },
+      "writtenOn": "2015-06-10T16:53:05Z",
+      "side": 1,
+      "message": "I *think* I have to perform a deep copy here. This is because the pipeline-specific params are set at __init__ time rather than at send()/save() time (contrary to Reporters).",
+      "revId": "c651a970dd9d13b8881078d40d73db51a8eaa44a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
