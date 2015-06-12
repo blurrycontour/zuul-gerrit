@@ -15,7 +15,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import copy
 import extras
+import itertools
 import json
 import logging
 import os
@@ -580,17 +582,40 @@ class Scheduler(threading.Thread):
             project = Project(config_project['name'])
             shortname = config_project['name'].split('/')[-1]
 
+            raw_requested_templates = config_project.get('template', [])
+
+            requested_templates = []
+
+            # Here we expand the requested templates for any key in the project
+            # that is a list to create a "matrix" of jobs for this project.
+            for raw_template in raw_requested_templates:
+                dimensions = []
+
+                for (k, v) in raw_template.items():
+                    if isinstance(v, list):
+                        dimensions.append(zip([k] * len(v), v))
+
+                if len(dimensions) == 0:
+                    requested_templates.append(raw_template)
+                    continue
+
+                for values in itertools.product(*dimensions):
+                    template = copy.deepcopy(raw_template)
+                    for (k, v) in values:
+                        template[k] = v
+                    requested_templates.append(template)
+
             # This is reversed due to the prepend operation below, so
             # the ultimate order is templates (in order) followed by
             # statically defined jobs.
-            for requested_template in reversed(
-                config_project.get('template', [])):
+            for requested_template in reversed(requested_templates):
                 # Fetch the template from 'project-templates'
                 tpl = project_templates.get(
                     requested_template.get('name'))
                 # Expand it with the project context
                 requested_template['name'] = shortname
                 expanded = deep_format(tpl, requested_template)
+
                 # Finally merge the expansion with whatever has been
                 # already defined for this project.  Prepend our new
                 # jobs to existing ones (which may have been
