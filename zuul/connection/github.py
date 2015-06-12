@@ -84,7 +84,27 @@ class GithubWebhookListener(threading.Thread):
             self.connection.sched.addEvent(event)
 
     def _event_push(self, request):
-        pass
+        body = request.json_body
+        base_repo = body.get('repository')
+
+        event = TriggerEvent()
+        event.trigger_name = 'github'
+        event.project_name = base_repo.get('full_name')
+
+        event.ref = body.get('ref')
+        event.url = self.connection.getGitUrl(event.project_name)
+        event.newrev = body.get('after')
+
+        ref_parts = event.ref.split('/')  # ie, ['refs', 'heads', 'master']
+
+        if ref_parts[1] == "heads":
+            event.type = 'push'
+        elif ref_parts[1] == "tags":
+            event.type = 'tag'
+        else:
+            return None
+
+        return event
 
     def _event_pull_request(self, request):
         body = request.json_body
