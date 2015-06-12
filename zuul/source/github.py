@@ -14,7 +14,7 @@
 
 import logging
 
-from zuul.model import Change, NullChange
+from zuul.model import Change, NullChange, Ref
 from zuul.source import BaseSource
 
 
@@ -54,6 +54,12 @@ class GithubSource(BaseSource):
             change.refspec = event.refspec
             change.branch = event.branch
             change.url = event.change_url
+        elif event.ref:
+            change = Ref(project)
+            change.ref = event.ref
+            change.oldrev = event.oldrev
+            change.newrev = event.newrev
+            change.url = self.getGitwebUrl(project, sha=event.newrev)
         else:
             change = NullChange(project)
         return change
@@ -72,4 +78,4 @@ class GithubSource(BaseSource):
 
     def getGitwebUrl(self, project, sha=None):
         """Get the git-web url for a project."""
-        raise NotImplementedError()
+        return self.connection.getGitwebUrl(project, sha)
