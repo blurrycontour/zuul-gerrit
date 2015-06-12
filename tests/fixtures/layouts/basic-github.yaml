@@ -7,6 +7,10 @@
             - pr-open
             - pr-change
             - pr-reopen
+    success:
+      github: 'TEST PASSES'
+    failure:
+      github: 'TEST FAILED'
 
 - job:
     name: project-test1
