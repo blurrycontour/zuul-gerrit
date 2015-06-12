@@ -51,6 +51,10 @@ class GithubSource(BaseSource):
         change = Ref(project)
         change.ref = event.ref
         change.project = project
+        change.branch = event.branch
+        if event.type.startswith("pr-"):
+            change.patchset = event.change_number
+            change.number = event.change_number
         change.oldrev = event.oldrev
         change.newrev = event.newrev
         change.url = event.change_url
