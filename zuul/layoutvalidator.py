@@ -165,6 +165,7 @@ class LayoutSchema(object):
             'reporter': {
                 'gerrit': 'zuul.reporter.gerrit',
                 'smtp': 'zuul.reporter.smtp',
+                'github': 'zuul.reporter.github',
             },
         }
         standard_drivers = {
@@ -297,6 +298,7 @@ class LayoutValidator(object):
             'reporter': {
                 'gerrit': 'zuul.reporter.gerrit',
                 'smtp': 'zuul.reporter.smtp',
+                'github': 'zuul.reporter.github',
             },
         }
         standard_drivers = {
