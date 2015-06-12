@@ -846,6 +846,8 @@ class Changeish(object):
 
     def __init__(self, project):
         self.project = project
+        if not project:
+            raise Exception("Project is None")
 
     def getBasePath(self):
         base_path = ''
