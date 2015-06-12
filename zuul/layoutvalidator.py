@@ -222,7 +222,7 @@ class LayoutSchema(object):
                 if required_param == 'name':
                     continue
                 # add this template parameters as requirements:
-                schema.update({v.Required(required_param): str})
+                schema.update({v.Required(required_param): toList(str)})
 
             # Register the schema for validateTemplateCalls()
             self.templates_schemas[t_name] = v.Schema(schema)
