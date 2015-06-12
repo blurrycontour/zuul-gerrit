@@ -54,6 +54,7 @@ import zuul.merger.client
 import zuul.merger.merger
 import zuul.merger.server
 import zuul.reporter.gerrit
+import zuul.reporter.github
 import zuul.reporter.smtp
 import zuul.source.gerrit
 import zuul.source.github
