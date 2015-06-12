@@ -86,6 +86,7 @@ class GithubWebhookListener():
         event.account = None
 
         event.change_number = body.get('number')
+        event.branch = base.get('ref')
         event.ref = "refs/pull/" + str(pr_body.get('number')) + "/head"
         event.oldrev = base.get('sha')
         event.newrev = head.get('sha')
@@ -154,7 +155,7 @@ class GithubConnection(BaseConnection):
     def _authenticateGithubAPI(self):
         token = self.connection_config.get('api_token', None)
         if token is not None:
-            self.github = github3.login(token)
+            self.github = github3.login(token=token)
             self.log.info("Github API Authentication successful.")
         else:
             self.github = None
@@ -170,6 +171,17 @@ class GithubConnection(BaseConnection):
     def getGitUrl(self, project):
         url = 'https://%s/%s' % ("github.com", project)
         return url
+
+    def report(self, owner, project, pr_number, message, params=None):
+        if params is None:
+            params = {}
+
+        if self.github is None:
+            self._authenticateGithubAPI()
+
+        repository = self.github.repository(owner, project)
+        pull_request = repository.issue(pr_number)
+        pull_request.create_comment(message)
 
 
 def getSchema():
