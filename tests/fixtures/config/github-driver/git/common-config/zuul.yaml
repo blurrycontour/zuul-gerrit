@@ -14,6 +14,24 @@
     failure:
       github: 'TEST FAILED'
 
+- pipeline:
+    name: post
+    manager: independent
+    source:
+      github
+    trigger:
+      github:
+        - event: push
+
+- pipeline:
+    name: tag
+    manager: independent
+    source:
+      github
+    trigger:
+      github:
+        - event: tag
+
 - job:
     name: project-test1
 - job:
@@ -25,3 +43,9 @@
       jobs:
         - project-test1
         - project-test2
+    post:
+      jobs:
+        - project-test1
+    tag:
+      jobs:
+        - project-test1
