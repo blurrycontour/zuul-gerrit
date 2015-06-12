@@ -54,6 +54,8 @@ def getSchema():
         v.Required('event'):
         toList(v.Any('pr-open',
                      'pr-change',
+                     'push',
+                     'tag',
                      )),
     }
 
