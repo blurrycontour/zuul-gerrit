@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa32b979_c2d84556",
+        "filename": "zuul/reporter/__init__.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 13487
+      },
+      "writtenOn": "2015-06-15T17:05:53Z",
+      "side": 1,
+      "message": "Just to be clear about my top-level comment, in my opinion \"message\" here should be a simple map of success/failure information for each job reported that can be used by the Reporter to format a message for its particular medium.\n\nCurrently this method seems to expect an HTML string to be relayed to the reporter\u0027s connection object. Since it only takes HTML it is pretty much impossible to reformat the given info for alternate report types.",
+      "revId": "be641ccfa72a4af0043646444fe65398d8937a0c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
