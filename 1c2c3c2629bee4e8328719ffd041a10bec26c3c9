@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa32b979_f003ac0b",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 927,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-06-16T12:09:55Z",
+      "side": 1,
+      "message": "(nit) I would add commas around the new part",
+      "revId": "1c2c3c2629bee4e8328719ffd041a10bec26c3c9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
