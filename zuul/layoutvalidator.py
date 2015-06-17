@@ -106,6 +106,7 @@ class LayoutSchema(object):
                 'merge-failure-message': str,
                 'footer-message': str,
                 'dequeue-on-new-patchset': bool,
+                'dequeue-on-merge': bool,
                 'ignore-dependencies': bool,
                 'trigger': trigger,
                 'success': report_actions,
