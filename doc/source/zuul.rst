@@ -569,6 +569,11 @@ explanation of each of the parameters::
   well.  To suppress this behavior (and allow jobs to continue
   running), set this to ``false``.  Default: ``true``.
 
+**dequeue-on-merge**
+  Normally, after a patch is merged, any change running or queued will
+  remain in the queue and run when scheduled. To remove that entry and
+  abort any runs in progress, set this to ``true``. Default ``false``.
+
 **ignore-dependencies**
   In any kind of pipeline (dependent or independent), Zuul will
   attempt to enqueue all dependencies ahead of the current change so

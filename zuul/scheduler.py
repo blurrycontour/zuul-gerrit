@@ -281,6 +281,8 @@ class Scheduler(threading.Thread):
             pipeline.footer_message = conf_pipeline.get('footer-message', "")
             pipeline.dequeue_on_new_patchset = conf_pipeline.get(
                 'dequeue-on-new-patchset', True)
+            pipeline.dequeue_on_merge = conf_pipeline.get(
+                'dequeue-on-merge', False)
             pipeline.ignore_dependencies = conf_pipeline.get(
                 'ignore-dependencies', False)
 
@@ -864,6 +866,8 @@ class Scheduler(threading.Thread):
                 change = pipeline.source.getChange(event, project)
                 if event.type == 'patchset-created':
                     pipeline.manager.removeOldVersionsOfChange(change)
+                elif event.type == 'change-merged':
+                    pipeline.manager.removeMergedChange(change)
                 elif event.type == 'change-abandoned':
                     pipeline.manager.removeAbandonedChange(change)
                 if pipeline.manager.eventMatches(event, change):
@@ -1161,6 +1165,16 @@ class BasePipelineManager(object):
             self.log.debug("Change %s is a new version of %s, removing %s" %
                            (change, old_item.change, old_item))
             self.removeItem(old_item)
+
+    def removeMergedChange(self, change):
+        if not self.pipeline.dequeue_on_merge:
+            return
+        for item in self.pipeline.getAllItems():
+            if item.change.equals(change):
+                self.log.debug("Change %s merged, removing %s" %
+                               (change, item))
+                self.removeItem(item)
+
 
     def removeAbandonedChange(self, change):
         self.log.debug("Change %s abandoned, removing." % change)

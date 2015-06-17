@@ -1493,6 +1493,53 @@ class TestScheduler(ZuulTestCase):
 
         self.assertEqual(len(self.history), 0)
 
+    def test_patchset_merged_dequeues_current(self):
+        "Test that if a patchset is merged, any queue jobs are cancelled"
+
+        check_pipeline = self.sched.layout.pipelines['check']
+        #Override default and dequeue changes on a merge
+        check_pipeline.dequeue_on_merge = True
+
+        self.worker.hold_jobs_in_build = True
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        items = check_pipeline.getAllItems()
+        self.assertEqual(len(items), 1)
+
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.waitUntilSettled()
+
+        items = check_pipeline.getAllItems()
+        self.assertEqual(len(items), 0)
+
+        #Default case is to not dequeue on merge
+        check_pipeline.dequeue_on_merge = False
+
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        items = check_pipeline.getAllItems()
+        self.assertEqual(len(items), 1)
+
+        self.fake_gerrit.addEvent(B.getChangeMergedEvent())
+        self.waitUntilSettled()
+
+        items = check_pipeline.getAllItems()
+        self.assertEqual(len(items), 1)
+
+        self.worker.hold_jobs_in_build = False
+        self.worker.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 0)
+        self.assertEqual(B.data['status'], 'MERGED')
+        self.assertEqual(B.reported, 1)
+
     def test_new_patchset_dequeues_old(self):
         "Test that a new patchset causes the old to be dequeued"
         # D -> C (depends on B) -> B (depends on A) -> A -> M
