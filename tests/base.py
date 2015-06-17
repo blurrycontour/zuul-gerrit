@@ -227,6 +227,22 @@ class FakeChange(object):
                  "reason": ""}
         return event
 
+    def getChangeMergedEvent(self):
+        self.data["status"] = "MERGED"
+        event = {"type": "change-merged",
+                 "change": {"project": self.project,
+                            "branch": self.branch,
+                            "id": "I5459869c07352a31bfb1e7a8cac379cabfcb25af",
+                            "number": str(self.number),
+                            "status": "MERGED",
+                            "subject": self.subject,
+                            "owner": {"name": "User Name"},
+                            "url": "https://hostname/3"},
+
+                 "patchSet": self.patchsets[-1],
+                 "reason": ""}
+        return event
+
     def getChangeAbandonedEvent(self):
         event = {"type": "change-abandoned",
                  "change": {"project": self.project,
