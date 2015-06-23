@@ -1,0 +1,18 @@
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Jenkins
+Code-Review+1: Paul Belanger <pabelanger@redhat.com>
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Code-Review+1: yolanda.robla <info@ysoft.biz>
+Code-Review+1: Bob Ball <bob.ball@citrix.com>
+Code-Review+1: Mikhail S Medvedev <mihailmed@gmail.com>
+Code-Review+1: Ramy Asselin <ramy.asselin@hp.com>
+Code-Review+1: greghaynes <greg@greghaynes.net>
+Code-Review+1: Moshe Levi <moshele@mellanox.com>
+Code-Review+1: Maxim Nestratov <mnestratov@virtuozzo.com>
+Code-Review+1: Lenny Verkhovsky <lennyb@mellanox.com>
+Submitted-by: Jenkins
+Submitted-at: Tue, 23 Jun 2015 00:11:25 +0000
+Reviewed-on: https://review.openstack.org/188383
+Project: openstack-infra/zuul
+Branch: refs/heads/master
