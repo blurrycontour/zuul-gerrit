@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa32b979_84f402f1",
+        "filename": "zuul/cmd/cloner.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-06-24T16:50:02Z",
+      "side": 1,
+      "message": "If I read the code properly the comment should be:\n\n  If ref is provided then URL is required.\n\nI don\u0027t see any special handling for branch.",
+      "revId": "23916bceb1bd3b19b8cd4d06f075bc69139886d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
