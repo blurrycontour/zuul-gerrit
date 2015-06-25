@@ -18,7 +18,6 @@ import select
 import json
 import time
 from six.moves import queue as Queue
-from six.moves import urllib
 import paramiko
 import logging
 import pprint
@@ -348,6 +347,11 @@ class GerritConnection(BaseConnection):
             chunk, more_changes = _query_chunk("%s %s" % (query, resume))
         return alldata
 
+    def _uploadPack(self, project):
+        cmd = "git-upload-pack %s" % project
+        out, err = self._ssh(cmd, "0000")
+        return out
+
     def _open(self):
         client = paramiko.SSHClient()
         client.load_system_host_keys()
@@ -385,19 +389,14 @@ class GerritConnection(BaseConnection):
         return (out, err)
 
     def getInfoRefs(self, project):
-        url = "%s/p/%s/info/refs?service=git-upload-pack" % (
-            self.baseurl, project)
         try:
-            data = urllib.request.urlopen(url).read()
+            data = self._uploadPack(project)
         except:
-            self.log.error("Cannot get references from %s" % url)
-            raise  # keeps urllib error informations
+            self.log.error("Cannot get references from %s" % project)
+            raise  # keeps error information
         ret = {}
-        read_headers = False
+        read_headers = True
         read_advertisement = False
-        if data[4] != '#':
-            raise Exception("Gerrit repository does not support "
-                            "git-upload-pack")
         i = 0
         while i < len(data):
             if len(data) - i < 4:
