@@ -2092,24 +2092,6 @@ class TestScheduler(ZuulTestCase):
         sched.registerTrigger(None, 'zuul')
         sched.testConfig(self.config.get('zuul', 'layout_config'))
 
-    def test_build_description(self):
-        "Test that build descriptions update"
-        self.worker.registerFunction('set_description:' +
-                                     self.worker.worker_id)
-
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addApproval('CRVW', 2)
-        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
-        self.waitUntilSettled()
-        desc = self.history[0].description
-        self.log.debug("Description: %s" % desc)
-        self.assertTrue(re.search("Branch.*master", desc))
-        self.assertTrue(re.search("Pipeline.*gate", desc))
-        self.assertTrue(re.search("project-merge.*SUCCESS", desc))
-        self.assertTrue(re.search("project-test1.*SUCCESS", desc))
-        self.assertTrue(re.search("project-test2.*SUCCESS", desc))
-        self.assertTrue(re.search("Reported result.*SUCCESS", desc))
-
     def test_queue_names(self):
         "Test shared change queue names"
         project1 = self.sched.layout.projects['org/project1']

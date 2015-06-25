@@ -649,8 +649,6 @@ class FakeWorker(gear.Worker):
             self.handleBuild(job, name, node)
         elif cmd == 'stop':
             self.handleStop(job, name)
-        elif cmd == 'set_description':
-            self.handleSetDescription(job, name)
 
     def handleBuild(self, job, name, node):
         build = FakeBuild(self, job, self.build_counter, node)
@@ -670,24 +668,6 @@ class FakeWorker(gear.Worker):
             if build.name == name and build.number == number:
                 build.aborted = True
                 build.release()
-                job.sendWorkComplete()
-                return
-        job.sendWorkFail()
-
-    def handleSetDescription(self, job, name):
-        self.log.debug("handle set description")
-        parameters = json.loads(job.arguments)
-        name = parameters['name']
-        number = parameters['number']
-        descr = parameters['html_description']
-        for build in self.running_builds:
-            if build.name == name and build.number == number:
-                build.description = descr
-                job.sendWorkComplete()
-                return
-        for build in self.build_history:
-            if build.name == name and build.number == number:
-                build.description = descr
                 job.sendWorkComplete()
                 return
         job.sendWorkFail()

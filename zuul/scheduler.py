@@ -1454,19 +1454,8 @@ class BasePipelineManager(object):
                        (self.pipeline.name, changed))
         return changed
 
-    def updateBuildDescriptions(self, build_set):
-        for build in build_set.getBuilds():
-            desc = self.formatDescription(build)
-            self.sched.launcher.setBuildDescription(build, desc)
-
-        if build_set.previous_build_set:
-            for build in build_set.previous_build_set.getBuilds():
-                desc = self.formatDescription(build)
-                self.sched.launcher.setBuildDescription(build, desc)
-
     def onBuildStarted(self, build):
         self.log.debug("Build %s started" % build)
-        self.updateBuildDescriptions(build.build_set)
         return True
 
     def onBuildCompleted(self, build):
@@ -1476,7 +1465,6 @@ class BasePipelineManager(object):
         self.pipeline.setResult(item, build)
         self.log.debug("Item %s status is now:\n %s" %
                        (item, item.formatStatus()))
-        self.updateBuildDescriptions(build.build_set)
         return True
 
     def onMergeCompleted(self, event):
@@ -1549,7 +1537,6 @@ class BasePipelineManager(object):
             except:
                 self.log.exception("Exception while reporting:")
                 item.setReportedResult('ERROR')
-        self.updateBuildDescriptions(item.current_build_set)
         return ret
 
     def formatReport(self, item):
