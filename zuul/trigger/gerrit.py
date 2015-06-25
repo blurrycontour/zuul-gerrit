@@ -16,7 +16,6 @@ import logging
 import re
 import threading
 import time
-import urllib2
 import voluptuous
 from zuul.lib import gerrit
 from zuul.model import TriggerEvent, Change, Ref, NullChange
@@ -154,19 +153,14 @@ class Gerrit(object):
         self.gerrit_connector.join()
 
     def _getInfoRefs(self, project):
-        url = "%s/p/%s/info/refs?service=git-upload-pack" % (
-            self.baseurl, project)
         try:
-            data = urllib2.urlopen(url).read()
+            data = self.gerrit.uploadPack(project)
         except:
-            self.log.error("Cannot get references from %s" % url)
-            raise  # keeps urllib2 error informations
+            self.log.error("Cannot get references from %s" % project)
+            raise  # keeps error information
         ret = {}
-        read_headers = False
+        read_headers = True
         read_advertisement = False
-        if data[4] != '#':
-            raise Exception("Gerrit repository does not support "
-                            "git-upload-pack")
         i = 0
         while i < len(data):
             if len(data) - i < 4:

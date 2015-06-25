@@ -174,6 +174,11 @@ class Gerrit(object):
             chunk = _query_chunk("%s %s" % (query, sortkey))
         return alldata
 
+    def uploadPack(self, project):
+        cmd = "git-upload-pack %s" % project
+        out, err = self._ssh(cmd, "0000")
+        return out
+
     def _open(self):
         client = paramiko.SSHClient()
         client.load_system_host_keys()
