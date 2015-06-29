@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba3cc151_7add996f",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 428,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-06-29T04:36:16Z",
+      "side": 1,
+      "message": "I wonder if this should be True by default? What jobs would we want to run in these scenarios?",
+      "revId": "23bb192a82e568b45d584c5e67452680b019de3a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
