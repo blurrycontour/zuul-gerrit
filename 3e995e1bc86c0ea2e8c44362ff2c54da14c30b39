@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba3cc151_cfec2992",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1502,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-06-29T04:16:00Z",
+      "side": 1,
+      "message": "Why not load in a different config fixture like other tests? That would be a better test that the layout validator is working",
+      "revId": "3e995e1bc86c0ea2e8c44362ff2c54da14c30b39",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
