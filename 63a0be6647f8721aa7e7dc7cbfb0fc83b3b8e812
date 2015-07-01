@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba3cc151_a691599b",
+        "filename": "zuul/cmd/cloner.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-07-01T09:02:05Z",
+      "side": 1,
+      "message": "(nit) missing trailing comma for consistency",
+      "revId": "63a0be6647f8721aa7e7dc7cbfb0fc83b3b8e812",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
