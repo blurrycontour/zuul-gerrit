@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba3cc151_c6efabe7",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-07-01T14:35:04Z",
+      "side": 1,
+      "message": "I don\u0027t think we need logging here.",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba3cc151_e6ec2ff5",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-07-01T14:35:04Z",
+      "side": 1,
+      "message": "Same.",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba3cc151_86bc43dd",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-07-01T14:35:04Z",
+      "side": 1,
+      "message": "Leftover debugging.",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba3cc151_a6c14756",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-07-01T14:35:04Z",
+      "side": 1,
+      "message": "This looks like leftover debugging.",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba3cc151_66e01ffb",
+        "filename": "zuul/source/github.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-07-01T14:35:04Z",
+      "side": 1,
+      "message": "This should be a Change() object, that way Zuul wil perform a speculative merge of the change onto the current state of the repository.  As a Ref() object it will simply directly check out the commit.  The \"test the change as it lands\" is an important aspect of Zuul behavior, particularly it can help avoid a case where old pull requests report incorrect test results because of differences between the PR and master since the branch point.\n\nFortunately, PRs have their own refs just like gerrit changes: refs/pull/1234/head so the mapping to refspec should be fairly straightforward.",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba3cc151_06ea73db",
+        "filename": "zuul/trigger/github.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-07-01T14:35:04Z",
+      "side": 1,
+      "message": "logger name should be zuul.GithubTrigger",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba3cc151_26e77712",
+        "filename": "zuul/trigger/github.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-07-01T14:35:04Z",
+      "side": 1,
+      "message": "this looks like leftover debugging",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
