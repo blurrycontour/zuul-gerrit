@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba3cc151_c6ffbda8",
+        "filename": "doc/source/merger.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-07-01T09:18:19Z",
+      "side": 1,
+      "message": "(suggestion)\n\nreplace \u0027zuul-clear-refs.py tool script\u0027\n\nwith \u0027the tools/zuul-clear-refs.py script\u0027",
+      "revId": "3ee3fe9c1838d5cbbcb934e3bf131db5d26ca809",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba3cc151_c651fdd9",
+        "filename": "doc/source/merger.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-07-01T09:18:19Z",
+      "side": 1,
+      "message": "s/points/point\n\ns/commit/commits",
+      "revId": "3ee3fe9c1838d5cbbcb934e3bf131db5d26ca809",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
