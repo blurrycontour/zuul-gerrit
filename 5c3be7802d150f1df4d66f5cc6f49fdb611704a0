@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "ba3cc151_217761d4",
+        "filename": "zuul/connection/github.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-07-01T14:56:49Z",
+      "side": 1,
+      "message": "We could (probably should) use the existing httpserver run by the zuul webapp.",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba3cc151_c6efabe7",
         "filename": "zuul/layoutvalidator.py",
         "patchSetId": 6
