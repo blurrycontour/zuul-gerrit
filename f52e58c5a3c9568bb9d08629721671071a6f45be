@@ -34,6 +34,40 @@
       "revId": "f52e58c5a3c9568bb9d08629721671071a6f45be",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba3cc151_d4887173",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-07-02T16:39:52Z",
+      "side": 1,
+      "message": "This logline isn\u0027t always correct as self.branch may not be what we are checking against as it may be zuul_branch instead.\n\nI think you want to log this message using indicated branch as the missing branch then set it to master after.",
+      "revId": "f52e58c5a3c9568bb9d08629721671071a6f45be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba3cc151_74e645e9",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-07-02T16:39:52Z",
+      "side": 1,
+      "message": "Noting a subtle change in behavior from the old code here. Previously this code fetched the first zuul ref then the second if the first failed. Now we infer a single ref to attempt fetching of. Not sure if that matters (need to think about it a bit more) but pointing it out to help other reviewers.",
+      "revId": "f52e58c5a3c9568bb9d08629721671071a6f45be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
