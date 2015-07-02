@@ -176,6 +176,23 @@
       "revId": "f52e58c5a3c9568bb9d08629721671071a6f45be",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba3cc151_fa16b44a",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-07-02T21:09:27Z",
+      "side": 1,
+      "message": "I believe the answer to Jeremy\u0027s question 1 is no.  I think the answer to question 2 is yes.  If there is a change to nova master (and only that change is in the queue), there will be a zuul ref for master, but not for stable/kilo, the grenade job will set the indicated branch to stable/kilo to check out the old side, then set the indicated branch to master to check out the change.  The old checkout will see the scenario Jeremy described.  However, both the old and new processes work correctly in this situation.  (The old code will try indicated-zuul_ref, indicated-zuul_ref, indicated-branch_tip; the new code: indicated-zuul_ref, indicated-branch_tip.)\n\nIn short, while the situation described in question 2 can exist, I\u0027m not certain that it will end up being a behavior change in practice, and I think the new logic may be more clear and correct even so.",
+      "revId": "f52e58c5a3c9568bb9d08629721671071a6f45be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
