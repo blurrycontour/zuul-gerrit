@@ -54,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "ba3cc151_230ba27e",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 215
+      },
+      "writtenOn": "2015-07-02T18:01:02Z",
+      "side": 1,
+      "message": "Yes, I think you are right.  I\u0027ll push a new patch set with that change.",
+      "parentUuid": "ba3cc151_d4887173",
+      "revId": "f52e58c5a3c9568bb9d08629721671071a6f45be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba3cc151_74e645e9",
         "filename": "zuul/lib/cloner.py",
         "patchSetId": 6
@@ -101,6 +119,42 @@
       "side": 1,
       "message": "Er, the more I stare at this, the more I think the new priority order simplifies to just \"1, 3, 2, 4.\" My regression questions however remain the same.",
       "parentUuid": "ba3cc151_f42ed5a3",
+      "revId": "f52e58c5a3c9568bb9d08629721671071a6f45be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba3cc151_43dfc639",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 215
+      },
+      "writtenOn": "2015-07-02T18:01:02Z",
+      "side": 1,
+      "message": "This again makes my point as to why this change is needed.  This is the 3rd time it has been suggested that this code introduces a functional change, which it does not.\n\nThe order in which different fetches for refs are made is unchanged.  The unnecesary complexity of the previous code combined with the incorrect comment is causing this confusion, which is why I\u0027m attempting to clean it up.\n\nYou may be right in 1 in your example, but I do not know a way that Zuul could have a red for a non-existent branch.\n\nOn 2, of course there could be a zuul_ref on master and not on indicated branch. Why is that important here?  If indicated_branch exists, then that is what we want to use, whether there is an in-flight change or not. Otherwise during a stable branch gate we could end up pulling in master branch of a repo because there was a change in flight on it and not on indicated_branch...",
+      "parentUuid": "ba3cc151_5dbfa560",
+      "revId": "f52e58c5a3c9568bb9d08629721671071a6f45be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba3cc151_e34e1a3a",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 215
+      },
+      "writtenOn": "2015-07-02T18:01:02Z",
+      "side": 1,
+      "message": "@Clark It\u0027s not really a change, it just avoids pointless variables and pointless network operations.  If the indicated_branch exists then the fallback_branch is the same.  So if the first fetch fails then either the second will too, or it\u0027s a hidden network retry operation, which would be better explicitly coded as a retry in The fetchFromZuul function.\n\nIf the indicated_branch doesn\u0027t exist then the fallback_branch is master.  In this case there is no indicated_branch, so the first fetch will always fail and is a pointless operation.",
+      "parentUuid": "ba3cc151_74e645e9",
       "revId": "f52e58c5a3c9568bb9d08629721671071a6f45be",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
