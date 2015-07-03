@@ -97,10 +97,9 @@ class MergeClient(object):
         data = dict(items=items)
         self.submitJob('merger:merge', data, build_set, precedence)
 
-    def updateRepo(self, project, url, build_set,
+    def updateRepo(self, project, build_set,
                    precedence=zuul.model.PRECEDENCE_NORMAL):
-        data = dict(project=project,
-                    url=url)
+        data = dict(project=project)
         self.submitJob('merger:update', data, build_set, precedence)
 
     def onBuildCompleted(self, job):

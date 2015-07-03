@@ -85,8 +85,5 @@ class Timer(object):
     def getChange(self, event, project):
         raise Exception("Timer trigger does not support changes.")
 
-    def getGitUrl(self, project):
-        raise Exception("Timer trigger does not support changes.")
-
     def getGitwebUrl(self, project, sha=None):
         raise Exception("Timer trigger does not support changes.")
