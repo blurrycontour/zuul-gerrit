@@ -115,8 +115,5 @@ class ZuulTrigger(object):
     def getChange(self, number, patchset, refresh=False):
         raise Exception("Zuul trigger does not support changes.")
 
-    def getGitUrl(self, project):
-        raise Exception("Zuul trigger does not support changes.")
-
     def getGitwebUrl(self, project, sha=None):
         raise Exception("Zuul trigger does not support changes.")

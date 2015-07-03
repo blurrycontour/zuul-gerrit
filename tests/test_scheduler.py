@@ -1415,9 +1415,7 @@ class TestScheduler(ZuulTestCase):
         "Test that the merger works with large changes after a repack"
         # https://bugs.launchpad.net/zuul/+bug/1078946
         # This test assumes the repo is already cloned; make sure it is
-        url = self.sched.triggers['gerrit'].getGitUrl(
-            self.sched.layout.projects['org/project1'])
-        self.merge_server.merger.addProject('org/project1', url)
+        self.merge_server.merger.addProject('org/project1')
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
         A.addPatchset(large=True)
         path = os.path.join(self.upstream_root, "org/project1")

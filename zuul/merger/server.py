@@ -49,8 +49,16 @@ class MergeServer(object):
         else:
             sshkey = None
 
+        server = config.get('gerrit', 'server')
+        user = config.get('gerrit', 'user')
+        if config.has_option('gerrit', 'port'):
+            port = int(config.get('gerrit', 'port'))
+        else:
+            port = 29418
+        merge_giturl = 'ssh://%s@%s:%s' % (user, server, port)
+
         self.merger = merger.Merger(merge_root, sshkey,
-                                    merge_email, merge_name)
+                                    merge_email, merge_name, merge_giturl)
 
     def start(self):
         self._running = True
@@ -106,6 +114,8 @@ class MergeServer(object):
 
     def merge(self, job):
         args = json.loads(job.arguments)
+        for item in args['items']:
+            item['url'] = self.getGitUrl(item['project'])
         commit = self.merger.mergeChanges(args['items'])
         result = dict(merged=(commit is not None),
                       commit=commit,
@@ -114,7 +124,17 @@ class MergeServer(object):
 
     def update(self, job):
         args = json.loads(job.arguments)
-        self.merger.updateRepo(args['project'], args['url'])
+        self.merger.updateRepo(args['project'])
         result = dict(updated=True,
                       zuul_url=self.zuul_url)
         job.sendWorkComplete(json.dumps(result))
+
+    def getGitUrl(self, project_name):
+        server = self.config.get('gerrit', 'server')
+        user = self.config.get('gerrit', 'user')
+        if self.config.has_option('gerrit', 'port'):
+            port = int(self.config.get('gerrit', 'port'))
+        else:
+            port = 29418
+        url = 'ssh://%s@%s:%s/%s' % (user, server, port, project_name)
+        return url

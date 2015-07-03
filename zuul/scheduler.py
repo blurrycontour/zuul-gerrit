@@ -1269,8 +1269,6 @@ class BasePipelineManager(object):
             oldrev = item.change.oldrev
             newrev = item.change.newrev
         return dict(project=item.change.project.name,
-                    url=self.pipeline.source.getGitUrl(
-                        item.change.project),
                     merge_mode=item.change.project.merge_mode,
                     refspec=item.change.refspec,
                     branch=item.change.branch,
@@ -1302,10 +1300,8 @@ class BasePipelineManager(object):
                                            self.pipeline.precedence)
         else:
             self.log.debug("Preparing update repo for: %s" % item.change)
-            url = self.pipeline.source.getGitUrl(item.change.project)
             self.sched.merger.updateRepo(item.change.project.name,
-                                         url, build_set,
-                                         self.pipeline.precedence)
+                                         build_set, self.pipeline.precedence)
         return False
 
     def _launchJobs(self, item, jobs):

@@ -172,7 +172,7 @@ class Repo(object):
 class Merger(object):
     log = logging.getLogger("zuul.Merger")
 
-    def __init__(self, working_root, sshkey, email, username):
+    def __init__(self, working_root, sshkey, email, username, giturl):
         self.repos = {}
         self.working_root = working_root
         if not os.path.exists(working_root):
@@ -181,6 +181,7 @@ class Merger(object):
             self._makeSSHWrapper(sshkey)
         self.email = email
         self.username = username
+        self.giturl = giturl
 
     def _makeSSHWrapper(self, key):
         name = os.path.join(self.working_root, '.ssh_wrapper')
@@ -191,7 +192,8 @@ class Merger(object):
         os.chmod(name, 0755)
         os.environ['GIT_SSH'] = name
 
-    def addProject(self, project, url):
+    def addProject(self, project):
+        url = self.giturl + "/" + project
         repo = None
         try:
             path = os.path.join(self.working_root, project)
@@ -202,16 +204,13 @@ class Merger(object):
             self.log.exception("Unable to add project %s" % project)
         return repo
 
-    def getRepo(self, project, url):
+    def getRepo(self, project):
         if project in self.repos:
             return self.repos[project]
-        if not url:
-            raise Exception("Unable to set up repo for project %s"
-                            " without a url" % (project,))
-        return self.addProject(project, url)
+        return self.addProject(project)
 
-    def updateRepo(self, project, url):
-        repo = self.getRepo(project, url)
+    def updateRepo(self, project):
+        repo = self.getRepo(project)
         try:
             self.log.info("Updating local repository %s", project)
             repo.update()
@@ -219,7 +218,7 @@ class Merger(object):
             self.log.exception("Unable to update %s", project)
 
     def _mergeChange(self, item, ref):
-        repo = self.getRepo(item['project'], item['url'])
+        repo = self.getRepo(item['project'])
         try:
             repo.checkout(ref)
         except Exception:
@@ -251,7 +250,7 @@ class Merger(object):
         self.log.debug("Processing refspec %s for project %s / %s ref %s" %
                        (item['refspec'], item['project'], item['branch'],
                         item['ref']))
-        repo = self.getRepo(item['project'], item['url'])
+        repo = self.getRepo(item['project'])
         key = (item['project'], item['branch'])
         # See if we have a commit for this change already in this repo
         zuul_ref = item['branch'] + '/' + item['ref']
@@ -289,7 +288,7 @@ class Merger(object):
         for key, mrc in recent.items():
             project, branch = key
             try:
-                repo = self.getRepo(project, None)
+                repo = self.getRepo(project)
                 zuul_ref = branch + '/' + item['ref']
                 repo.createZuulRef(zuul_ref, mrc)
             except Exception:

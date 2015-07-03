@@ -476,13 +476,9 @@ class FakeURLOpener(object):
 class FakeGerritTrigger(zuul.trigger.gerrit.Gerrit):
     name = 'gerrit'
 
-    def __init__(self, upstream_root, *args):
+    def __init__(self, *args):
         super(FakeGerritTrigger, self).__init__(*args)
-        self.upstream_root = upstream_root
         self.gerrit_connector.delay = 0.0
-
-    def getGitUrl(self, project):
-        return os.path.join(self.upstream_root, project.name)
 
 
 class FakeStatsd(threading.Thread):
@@ -911,6 +907,7 @@ class ZuulTestCase(BaseTestCase):
         self.gearman_server.worker = self.worker
 
         self.merge_server = zuul.merger.server.MergeServer(self.config)
+        self.merge_server.merger.giturl = self.upstream_root
         self.merge_server.start()
 
         self.sched = zuul.scheduler.Scheduler()
@@ -942,8 +939,7 @@ class ZuulTestCase(BaseTestCase):
         zuul.lib.gerrit.Gerrit = FakeGerrit
         self.useFixture(fixtures.MonkeyPatch('smtplib.SMTP', FakeSMTPFactory))
 
-        self.gerrit = FakeGerritTrigger(
-            self.upstream_root, self.config, self.sched)
+        self.gerrit = FakeGerritTrigger(self.config, self.sched)
         self.gerrit.replication_timeout = 1.5
         self.gerrit.replication_retry_interval = 0.5
         self.fake_gerrit = self.gerrit.gerrit
