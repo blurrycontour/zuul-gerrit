@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba3cc151_d4fd476f",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-07-07T10:38:26Z",
+      "side": 1,
+      "message": "Should use os.path.join in case the giturl was supplied with a trailing slash\n\nedit: ah, I can see this is coded in server.py, however join() would still be neater",
+      "revId": "70d7ffd63b18e48f01e2a38994983aee3bbfa1ca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
