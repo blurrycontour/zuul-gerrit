@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9a41bdd9_c1d05056",
+        "filename": "doc/source/merger.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2015-07-13T08:55:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba3cc151_c6ffbda8",
+      "revId": "3ee3fe9c1838d5cbbcb934e3bf131db5d26ca809",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba3cc151_c651fdd9",
         "filename": "doc/source/merger.rst",
         "patchSetId": 6
@@ -30,6 +48,24 @@
       "writtenOn": "2015-07-01T09:18:19Z",
       "side": 1,
       "message": "s/points/point\n\ns/commit/commits",
+      "revId": "3ee3fe9c1838d5cbbcb934e3bf131db5d26ca809",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a41bdd9_61c2a487",
+        "filename": "doc/source/merger.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2015-07-13T08:55:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba3cc151_c651fdd9",
       "revId": "3ee3fe9c1838d5cbbcb934e3bf131db5d26ca809",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
