@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a41bdd9_c10fc7df",
+        "filename": "tools/zuul-clear-refs.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 6987
+      },
+      "writtenOn": "2015-07-13T22:03:40Z",
+      "side": 1,
+      "message": "nit: should this be \u0027zuul-clear-refs\u0027 (missing the \u0027s\u0027)?",
+      "revId": "dcf61e8a7eeff3ffd3d58292d97d60d1ef89f525",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a41bdd9_4177373a",
+        "filename": "tools/zuul-clear-refs.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 6987
+      },
+      "writtenOn": "2015-07-13T22:03:40Z",
+      "side": 1,
+      "message": "maybe surround this in try/except to make sure it\u0027s a valid path and a valid Git repository?",
+      "revId": "dcf61e8a7eeff3ffd3d58292d97d60d1ef89f525",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a41bdd9_e1d44bbe",
+        "filename": "tools/zuul-clear-refs.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 6987
+      },
+      "writtenOn": "2015-07-13T22:03:40Z",
+      "side": 1,
+      "message": "should we maybe log the ref.commit as well? in here and in the else case?",
+      "revId": "dcf61e8a7eeff3ffd3d58292d97d60d1ef89f525",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a41bdd9_9ce36205",
+        "filename": "tools/zuul-clear-refs.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 6987
+      },
+      "writtenOn": "2015-07-13T22:03:40Z",
+      "side": 1,
+      "message": "This does a git delete entire ref.path?  I\u0027m wondering if this needs to be more selective?  Can a ref.path contain multiple ref.commits where some would fall within the age range to delete and some fall outside of the range?",
+      "revId": "dcf61e8a7eeff3ffd3d58292d97d60d1ef89f525",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
