@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a41bdd9_65391441",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-07-14T08:35:54Z",
+      "side": 1,
+      "message": "Should use this logger to log the reconfiguration exceptions.",
+      "revId": "3700d9c62ba734574e972e8a897602b238938b93",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
