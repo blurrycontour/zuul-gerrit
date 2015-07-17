@@ -593,6 +593,7 @@ class Worker(object):
         self.fqdn = None
         self.program = None
         self.version = None
+        self.label = None
         self.extra = {}
 
     def updateFromData(self, data):
@@ -603,6 +604,7 @@ class Worker(object):
         self.fqdn = data.get('worker_fqdn', self.fqdn)
         self.program = data.get('worker_program', self.program)
         self.version = data.get('worker_version', self.version)
+        self.label = data.get('worker_label', self.label)
         self.extra = data.get('worker_extra', self.extra)
 
     def __repr__(self):
@@ -778,6 +780,7 @@ class QueueItem(object):
                     'fqdn': build.worker.fqdn,
                     'program': build.worker.program,
                     'version': build.worker.version,
+                    'label': build.worker.label,
                     'extra': build.worker.extra
                 }
             if remaining and remaining > max_remaining:

@@ -2913,6 +2913,7 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual("zuul.example.org", build.worker.fqdn)
         self.assertEqual("FakeBuilder", build.worker.program)
         self.assertEqual("v1.1", build.worker.version)
+        self.assertEqual("bare-necessities", build.worker.label)
         self.assertEqual({'something': 'else'}, build.worker.extra)
 
         self.worker.hold_jobs_in_build = False
