@@ -2913,6 +2913,7 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual("zuul.example.org", build.worker.fqdn)
         self.assertEqual("FakeBuilder", build.worker.program)
         self.assertEqual("v1.1", build.worker.version)
+        self.assertEqual("bare-necessities", build.worker.label)
         self.assertEqual({'something': 'else'}, build.worker.extra)
 
         self.worker.hold_jobs_in_build = False
@@ -3127,7 +3128,7 @@ For CI problems and help debugging, contact ci@example.org"""
                 self.assertEqual(False, job['retry'])
                 self.assertEqual('https://server/job/project-merge/0/',
                                  job['url'])
-                self.assertEqual(7, len(job['worker']))
+                self.assertEqual(8, len(job['worker']))
                 self.assertEqual(False, job['canceled'])
                 self.assertEqual(True, job['voting'])
                 self.assertEqual(None, job['result'])

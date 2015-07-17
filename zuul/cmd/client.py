@@ -245,11 +245,14 @@ class Client(zuul.cmd.ZuulApp):
             'worker.fqdn': {
                 'title': 'Worker Domain'
             },
-            'worker.progam': {
+            'worker.program': {
                 'title': 'Worker Program'
             },
             'worker.version': {
                 'title': 'Worker Version'
+            },
+            'worker.label': {
+                'title': 'Worker Label'
             },
             'worker.extra': {
                 'title': 'Worker Extra'
