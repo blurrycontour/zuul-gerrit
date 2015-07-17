@@ -317,6 +317,9 @@ metadata:
 **worker_version** (optional)
   The version of the software running the job.
 
+**worker_label** (optional)
+  The node label of the worker.  For example "bare-trusty"
+
 **worker_extra** (optional)
   A dictionary of any extra metadata you may want to pass along.
 
