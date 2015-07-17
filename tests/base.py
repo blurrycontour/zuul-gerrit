@@ -569,6 +569,7 @@ class FakeBuild(threading.Thread):
             'worker_fqdn': 'zuul.example.org',
             'worker_program': 'FakeBuilder',
             'worker_version': 'v1.1',
+            'worker_label': 'bare-necessities',
             'worker_extra': {'something': 'else'}
         }
 
