@@ -533,6 +533,16 @@ class Scheduler(threading.Thread):
     def onBuildStarted(self, build):
         self.log.debug("Adding start event for build: %s" % build)
         build.start_time = time.time()
+        try:
+            if statsd and build.pipeline:
+                jobname = build.job.name.replace('.', '_')
+                key = 'zuul.pipeline.%s.job.%s.wait_time' % (
+                    build.pipeline.name, jobname)
+                dt = int((build.start_time - build.launch_time) * 1000)
+                statsd.timing(key, dt)
+                statsd.incr(key)
+        except:
+            self.log.exception("Exception reporting runtime stats")
         event = BuildStartedEvent(build)
         self.result_event_queue.put(event)
         self.wake_event.set()
