@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a41bdd9_ddbb3174",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2294,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-07-18T00:23:55Z",
+      "side": 1,
+      "message": "it might be helpful to assert that the state is as expected at this point (before reconfiguring)",
+      "revId": "974217b0c16c11b61fe0a0ee6babf04eefbfab95",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a41bdd9_5d02c13f",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2365,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-07-18T00:23:55Z",
+      "side": 1,
+      "message": "I\u0027m not sure we can assume change B will also have it\u0027s project-merge ran in this order?",
+      "revId": "974217b0c16c11b61fe0a0ee6babf04eefbfab95",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
