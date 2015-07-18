@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "9a41bdd9_784f93be",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2294,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-07-18T01:01:17Z",
+      "side": 1,
+      "message": "Will do.",
+      "revId": "974217b0c16c11b61fe0a0ee6babf04eefbfab95",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a41bdd9_5d02c13f",
         "filename": "tests/test_scheduler.py",
         "patchSetId": 2
@@ -30,6 +47,23 @@
       "writtenOn": "2015-07-18T00:23:55Z",
       "side": 1,
       "message": "I\u0027m not sure we can assume change B will also have it\u0027s project-merge ran in this order?",
+      "revId": "974217b0c16c11b61fe0a0ee6babf04eefbfab95",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a41bdd9_184e87c1",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2365,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-07-18T01:01:17Z",
+      "side": 1,
+      "message": "We can because we release A\u0027s merge job, then create B, then release B\u0027s merge job, then release all remaining jobs.",
       "revId": "974217b0c16c11b61fe0a0ee6babf04eefbfab95",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
