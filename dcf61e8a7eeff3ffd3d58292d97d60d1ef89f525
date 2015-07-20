@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3a50d1a3_95ab6889",
+        "filename": "tools/zuul-clear-refs.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2015-07-20T16:57:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a41bdd9_c10fc7df",
+      "revId": "dcf61e8a7eeff3ffd3d58292d97d60d1ef89f525",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a41bdd9_4177373a",
         "filename": "tools/zuul-clear-refs.py",
         "patchSetId": 8
@@ -30,6 +48,24 @@
       "writtenOn": "2015-07-13T22:03:40Z",
       "side": 1,
       "message": "maybe surround this in try/except to make sure it\u0027s a valid path and a valid Git repository?",
+      "revId": "dcf61e8a7eeff3ffd3d58292d97d60d1ef89f525",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a50d1a3_95d128d0",
+        "filename": "tools/zuul-clear-refs.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2015-07-20T16:57:01Z",
+      "side": 1,
+      "message": "Yup good point. Did it by catching git.exc.InvalidGitRepositoryError and doing a sys.exit(1).",
+      "parentUuid": "9a41bdd9_4177373a",
       "revId": "dcf61e8a7eeff3ffd3d58292d97d60d1ef89f525",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "3a50d1a3_7587bcb5",
+        "filename": "tools/zuul-clear-refs.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2015-07-20T16:57:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a41bdd9_e1d44bbe",
+      "revId": "dcf61e8a7eeff3ffd3d58292d97d60d1ef89f525",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a41bdd9_9ce36205",
         "filename": "tools/zuul-clear-refs.py",
         "patchSetId": 8
@@ -64,6 +118,24 @@
       "writtenOn": "2015-07-13T22:03:40Z",
       "side": 1,
       "message": "This does a git delete entire ref.path?  I\u0027m wondering if this needs to be more selective?  Can a ref.path contain multiple ref.commits where some would fall within the age range to delete and some fall outside of the range?",
+      "revId": "dcf61e8a7eeff3ffd3d58292d97d60d1ef89f525",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a50d1a3_583bd7d1",
+        "filename": "tools/zuul-clear-refs.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2015-07-20T16:57:01Z",
+      "side": 1,
+      "message": "ref is yield by the iteration of all references (repo.references), and I don\u0027t think a ref can point to several commits.",
+      "parentUuid": "9a41bdd9_9ce36205",
       "revId": "dcf61e8a7eeff3ffd3d58292d97d60d1ef89f525",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
