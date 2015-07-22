@@ -9,7 +9,8 @@ configured to post a positive review back to Gerrit.
 
 There are three stages when a report can be handled. That is on:
 Start, Success or Failure. Each stage can have multiple reports.
-For example, you can set verified on Gerrit and send an email.
+For example, you can set the label ``Verified`` on Gerrit and send an
+email.
 
 Gerrit
 ------
@@ -21,9 +22,14 @@ Gerrit using SSH.
 The dictionary passed to the Gerrit reporter is used for ``gerrit
 review`` arguments, with the boolean value of ``true`` simply
 indicating that the argument should be present without following it
-with a value. For example, ``verified: 1`` becomes ``gerrit review
---verified 1`` and ``submit: true`` becomes ``gerrit review
+with a value. For example, ``Verified: 1`` becomes ``gerrit review
+--label Verified=1`` and ``submit: true`` becomes ``gerrit review
 --submit``.
+
+.. note::
+
+   The labels passed to the Gerrit command are case sensitive
+   (examples: ``Verified`` and ``Code-Review``.
 
 Gerrit Configuration
 ~~~~~~~~~~~~~~~~~~~~

@@ -304,9 +304,9 @@ explanation of each of the parameters::
       gerrit:
         - event: patchset-created
     success:
-      verified: 1
+      Verified: 1
     failure:
-      verified: -1
+      Verified: -1
 
 **name**
   This is used later in the project definition to indicate what jobs
@@ -425,7 +425,7 @@ explanation of each of the parameters::
     *approval*
     This is only used for ``comment-added`` events.  It only matches if
     the event has a matching approval associated with it.  Example:
-    ``code-review: 2`` matches a ``+2`` vote on the code review category.
+    ``Code-Review: 2`` matches a ``+2`` vote on the code review category.
     Multiple approvals may be listed.
 
     *email*
@@ -552,14 +552,14 @@ explanation of each of the parameters::
     to match.  Same format as "older-than".
 
     Any other field is interpreted as a review category and value
-    pair.  For example ``verified: 1`` would require that the approval
+    pair.  For example ``Verified: 1`` would require that the approval
     be for a +1 vote in the "Verified" column.  The value may either
-    be a single value or a list: ``verified: [1, 2]`` would match
+    be a single value or a list: ``Verified: [1, 2]`` would match
     either a +1 or +2 vote.
 
     You can also match negative conditions by starting with an
     exclamation mark (!). This requires the value to be a string.
-    Example: ``verified: '![-1, -2]'``
+    Example: ``Verified: '![-1, -2]'``
 
   This takes a list of approvals in the same format as above. It
   requires that any approval on a change can meet the specified
@@ -690,14 +690,14 @@ file.  The first is called a *check* pipeline::
       - event: patchset-created
     success:
       gerrit:
-        verified: 1
+        Verified: 1
     failure:
       gerrit:
-        verified: -1
+        Verified: -1
 
 This will trigger jobs each time a new patchset (or change) is
 uploaded to Gerrit, and report +/-1 values to Gerrit in the
-``verified`` review category. ::
+``vVrified`` review category. ::
 
   - name: gate
     manager: DependentPipelineManager
@@ -707,11 +707,11 @@ uploaded to Gerrit, and report +/-1 values to Gerrit in the
           - approved: 1
     success:
       gerrit:
-        verified: 2
+        Verified: 2
         submit: true
     failure:
       gerrit:
-        verified: -2
+        Verified: -2
 
 This will trigger jobs whenever a reviewer leaves a vote of ``1`` in the
 ``approved`` review category in Gerrit (a non-standard category).
@@ -753,7 +753,7 @@ development and not yet ready to be presented to developers. ::
 
 The ``change-merged`` events happen when a change has been merged in the git
 repository. The change is thus closed and Gerrit will not accept modifications
-to the review scoring such as ``code-review`` or ``verified``. By using the
+to the review scoring such as ``Code-review`` or ``Verified``. By using the
 ``force-message: True`` parameter, Zuul will pass ``--force-message`` to the
 ``gerrit review`` command, thus making sure the message is actually
 sent back to Gerrit regardless of approval scores.

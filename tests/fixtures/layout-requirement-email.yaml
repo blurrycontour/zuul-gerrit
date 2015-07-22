@@ -9,10 +9,10 @@ pipelines:
         - event: comment-added
     success:
       gerrit:
-        verified: 1
+        Verified: 1
     failure:
       gerrit:
-        verified: -1
+        Verified: -1
 
   - name: trigger
     manager: IndependentPipelineManager
@@ -23,10 +23,10 @@ pipelines:
             - email: jenkins@example.com
     success:
       gerrit:
-        verified: 1
+        Verified: 1
     failure:
       gerrit:
-        verified: -1
+        Verified: -1
 
 projects:
   - name: org/project1

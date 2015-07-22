@@ -421,7 +421,7 @@ class FakeGerrit(object):
         # zuul). However, we can't mimic this behaviour (by adding this
         # approval event into the queue) as it stops jobs from checking what
         # happens before this event is triggered. If a job needs to see what
-        # happens they can add their own verified event into the queue.
+        # happens they can add their own Verified event into the queue.
         # Nevertheless, we can update change with the new review in gerrit.
 
         for cat in ['CRVW', 'VRFY', 'APRV']:

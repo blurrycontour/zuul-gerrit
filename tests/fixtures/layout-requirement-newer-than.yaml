@@ -10,10 +10,10 @@ pipelines:
         - event: comment-added
     success:
       gerrit:
-        verified: 1
+        Verified: 1
     failure:
       gerrit:
-        verified: -1
+        Verified: -1
 
   - name: trigger
     manager: IndependentPipelineManager
@@ -25,10 +25,10 @@ pipelines:
               newer-than: 48h
     success:
       gerrit:
-        verified: 1
+        Verified: 1
     failure:
       gerrit:
-        verified: -1
+        Verified: -1
 
 projects:
   - name: org/project1
