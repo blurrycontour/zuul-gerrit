@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a50d1a3_088021f6",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2015-07-22T16:21:13Z",
+      "side": 1,
+      "message": "Why wouldn\u0027t this still be self.config.get(\u0027gearman\u0027, \u0027server\u0027)?",
+      "revId": "0ac452efda38adc214427952b76d45d8e33c8248",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
