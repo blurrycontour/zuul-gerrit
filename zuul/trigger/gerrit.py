@@ -395,7 +395,18 @@ class Gerrit(object):
     def updateChange(self, change, history=None):
         self.log.info("Updating information for %s,%s" %
                       (change.number, change.patchset))
+        attempt = 1
         data = self.gerrit.query(change.number)
+        while 'project' not in data:
+            time.sleep(1)
+            self.log.warning("updateChange: Change %s,%s not found, "
+                             "attempt %d" %
+                             (change.number, change.patchset, attempt))
+            data = self.gerrit.query(change.number)
+            if attempt > 10:
+                raise Exception("Change %s,%s not found" % (change.number,
+                                                            change.patchset))
+            attempt += 1
         change._data = data
 
         if change.patchset is None:
@@ -448,7 +459,14 @@ class Gerrit(object):
                     dep_num, history))
             self.log.debug("Getting git-dependent change %s,%s" %
                            (dep_num, dep_ps))
-            dep = self._getChange(dep_num, dep_ps, history=history)
+            try:
+                dep = self._getChange(dep_num, dep_ps, history=history)
+            except Exception:
+                self.log.error("Could not get dependency for %s,%s "
+                               "during processing of %s,%s" %
+                               (dep_num, dep_ps, change.number,
+                                change.patchset))
+                raise
             if (not dep.is_merged) and dep not in needs_changes:
                 needs_changes.append(dep)
 
@@ -470,9 +488,21 @@ class Gerrit(object):
             for needed in data['neededBy']:
                 parts = needed['ref'].split('/')
                 dep_num, dep_ps = parts[3], parts[4]
-                dep = self._getChange(dep_num, dep_ps)
-                if (not dep.is_merged) and dep.is_current_patchset:
-                    needed_by_changes.append(dep)
+                attempt = 1
+                while attempt < 10:
+                    try:
+                        dep = self._getChange(dep_num, dep_ps)
+                        if (not dep.is_merged) and dep.is_current_patchset:
+                            needed_by_changes.append(dep)
+                        break
+                    except Exception:
+                        self.log.warning("Could not get child patch %s,%s "
+                                         "during processing of %s,%s, "
+                                         "attempt " %
+                                         (dep_num, dep_ps, change.number,
+                                          change.patchset, attempt))
+                        attempt += 1
+                        time.sleep(1)
 
         for record in self._getNeededByFromCommit(data['id']):
             dep_num = record['number']
