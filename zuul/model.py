@@ -115,7 +115,8 @@ class Pipeline(object):
         return None
 
     def removeQueue(self, queue):
-        self.queues.remove(queue)
+        if queue in self.queues:
+            self.queues.remove(queue)
 
     def getJobTree(self, project):
         tree = self.job_trees.get(project)

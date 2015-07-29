@@ -709,6 +709,8 @@ class Scheduler(threading.Thread):
                                 build.job = job
                             else:
                                 builds_to_remove.append(build)
+                        self.log.debug("empty-jobs-debug ReEnqueueItem %s %s" %
+                                       (item, last_head))
                         if not new_pipeline.manager.reEnqueueItem(item,
                                                                   last_head):
                             items_to_remove.append(item)
@@ -1550,6 +1552,18 @@ class BasePipelineManager(object):
             # and the same for -1's (merge failures or transient errors)
             # as they cannot be followed by +1's
             self.log.debug("No jobs for change %s" % item.change)
+            self.log.debug("empty-jobs-debug pipeline %s" % self.pipeline)
+            self.log.debug("empty-jobs-debug item.live %s" % item.live)
+            self.log.debug("empty-jobs-debug item.item_ahead %s" % item.item_ahead)
+            self.log.debug("empty-jobs-debug item.change %s" % item.change)
+            if item.change:
+                self.log.debug("empty-jobs-debug item.change %s" % item.change.project)
+            tree = self.pipeline.getJobTree(item.change.project)
+            self.log.debug("empty-jobs-debug getJobTree %s" % tree)
+            self.log.debug("empty-jobs-debug getJobs %s" % tree.getJobs())
+            if item.change:
+                self.log.debug("empty-jobs-debug filterJobs %s" %
+                               item.change.filterJobs(tree.getJobs()))
             actions = []
         elif self.pipeline.didAllJobsSucceed(item):
             self.log.debug("success %s" % (self.pipeline.success_actions))
