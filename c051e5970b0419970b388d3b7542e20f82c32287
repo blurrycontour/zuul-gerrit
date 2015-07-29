@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a50d1a3_b4f6e9d4",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 697,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-07-29T16:52:16Z",
+      "side": 0,
+      "message": "If project is None coming into this, this will raise an AttributeError",
+      "revId": "c051e5970b0419970b388d3b7542e20f82c32287",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
