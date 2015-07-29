@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a50d1a3_f179f5c8",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 14807
+      },
+      "writtenOn": "2015-07-29T11:24:02Z",
+      "side": 1,
+      "message": "can you print the reason of exception for better troubleshooting?",
+      "revId": "0051cd48f2f7a80c038f50c1772bb63dbf8f4e37",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
