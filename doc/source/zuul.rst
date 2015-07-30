@@ -835,6 +835,14 @@ each job as it builds a list from the project specification.
   file patterns listed here.  This field is treated as a regular
   expression and multiple expressions may be listed.
 
+**retries (optional)**
+  The maximum number of times that this job will be automatically
+  re-run if it fails, until the limit is reached or the job succeeds.
+  Values of ``None`` and ``0``  both disable retries. However, the two
+  act differently when applied to multiple jobs via regex: ``None``
+  will not overwrite previous settings, but ``0`` (or any other
+  integer) will change any job it is applied to.  Default: ``None``.
+
 **skip-if (optional)**
 
   This job should not be run if all the patterns specified by the

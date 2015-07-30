@@ -152,6 +152,7 @@ class LayoutSchema(object):
            'success-pattern': str,
            'hold-following-changes': bool,
            'voting': bool,
+           'retries': int,
            'parameter-function': str,
            'branch': toList(str),
            'files': toList(str),

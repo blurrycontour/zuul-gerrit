@@ -2108,6 +2108,33 @@ class TestScheduler(ZuulTestCase):
     def test_skip_if_no_match_runs_job(self):
         self._test_skip_if_jobs(branch='mp', should_skip=False)
 
+    def test_retry_job_succeeded(self):
+        "Test that jobs set to retry actually do."
+        self.fail_count = 0
+
+        def shouldFailTest(name, ref):
+            if self.fail_count == 0:
+                self.fail_count += 1
+                return True
+            return False
+
+        self.worker.shouldFailTest = shouldFailTest
+
+        self.config.set('zuul', 'layout_config',
+                        'tests/fixtures/layout-retry-job.yaml')
+        self.sched.reconfigure(self.config)
+        self.registerJobs()
+
+        change = self.fake_gerrit.addFakeChange('org/project',
+                                                'master',
+                                                'test retry')
+        self.fake_gerrit.addEvent(change.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(self.fail_count, 1)
+        self.assertEqual(self.worker.build_history[-1].result,
+                         'SUCCESS')
+
     def test_test_config(self):
         "Test that we can test the config"
         sched = zuul.scheduler.Scheduler()

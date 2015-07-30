@@ -425,6 +425,9 @@ class Scheduler(threading.Thread):
             m = config_job.get('voting', None)
             if m is not None:
                 job.voting = m
+            m = config_job.get('retries', None)
+            if m is not None:
+                job.retries = m
             fname = config_job.get('parameter-function', None)
             if fname:
                 func = config_env.get(fname, None)
