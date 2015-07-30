@@ -430,6 +430,19 @@ class Gearman(object):
                     build.retry = True
                 self.log.info("Build %s complete, result %s" %
                               (job, result))
+                build.result = result
+                if result == "FAILURE" and build.job.retries > 0:
+                    build.retry = True
+                    build.job.retries -= 1
+                    if build.job.retries != 0:
+                        self.log.info(("Build has been told to re-run "
+                                       "(configured to do so in layout.yaml). "
+                                       "Will retry up to %d more times.") %
+                                      build.job.retries)
+                    else:
+                        self.log.info("Build has been told to re-run "
+                                      "(configured to do so in layout.yaml). "
+                                      "This is the final attempt.")
                 self.sched.onBuildCompleted(build, result)
             # The test suite expects the build to be removed from the
             # internal dict after it's added to the report queue.

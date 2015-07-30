@@ -454,6 +454,7 @@ class Job(object):
         self.failure_pattern = None
         self.success_pattern = None
         self.parameter_function = None
+        self.retries = None
         # A metajob should only supply values for attributes that have
         # been explicitly provided, so avoid setting boolean defaults.
         if self.is_metajob:
@@ -505,6 +506,9 @@ class Job(object):
             self.hold_following_changes = other.hold_following_changes
         if other.voting is not None:
             self.voting = other.voting
+        # Same with the retry count.
+        if other.retries is not None:
+            self.retries = other.retries
 
     def changeMatches(self, change):
         matches_branch = False
