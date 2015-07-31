@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a50d1a3_dcca741a",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1202,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-07-31T01:07:47Z",
+      "side": 1,
+      "message": "This change should not be necessary now that we are properly dealing with builds above.",
+      "revId": "e0ed3728227f657331be4b502cb764079f433308",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
