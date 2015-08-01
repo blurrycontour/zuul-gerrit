@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a50d1a3_b94dfdc5",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 408,
+      "author": {
+        "id": 6133
+      },
+      "writtenOn": "2015-08-01T06:35:16Z",
+      "side": 1,
+      "message": "setting attempt to 0, and move the conditional and the attempt increase after the gerrit query, sounds more logical to me\nYou can save one comparison here if \u0027project\u0027 in data at first time\nAlso you did it like that on second comparison, so it\u0027s worth to maintain the same style everywhere",
+      "revId": "a723f19ea1ea1f958a760398c85397dbe4c682e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
