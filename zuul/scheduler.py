@@ -514,6 +514,11 @@ class Scheduler(threading.Thread):
             p = self.layout.projects.get(name)
         finally:
             self.layout_lock.release()
+        if p is None:
+            self.log.warning("No project %s in layout, "
+                             "use default constructor" % name)
+            p = Project(name, foreign=True)
+            self.layout.projects[name] = p
         return p
 
     def addEvent(self, event):
@@ -685,14 +690,14 @@ class Scheduler(threading.Thread):
                         item.items_behind = []
                         item.pipeline = None
                         item.queue = None
-                        project = layout.projects.get(item.change.project.name)
+                        item_project_name = item.change.project.name
+                        project = layout.projects.get(item_project_name)
                         if not project:
                             self.log.warning("Unable to find project for "
                                              "change %s while reenqueueing" %
                                              item.change)
-                            item.change.project = None
-                            items_to_remove.append(item)
-                            continue
+                            project = Project(item_project_name)
+                            layout.projects[item_project_name] = project
                         item.change.project = project
                         item_jobs = new_pipeline.getJobs(item)
                         for build in item.current_build_set.getBuilds():
@@ -861,7 +866,7 @@ class Scheduler(threading.Thread):
         self.log.debug("Processing trigger event %s" % event)
         try:
             project = self.layout.projects.get(event.project_name)
-            if not project:
+            if not project or project.foreign:
                 self.log.debug("Project %s not found" % event.project_name)
                 return
 
@@ -1797,7 +1802,7 @@ class IndependentPipelineManager(BasePipelineManager):
         if existing:
             return DynamicChangeQueueContextManager(existing)
         if change.project not in self.pipeline.getProjects():
-            return DynamicChangeQueueContextManager(None)
+            self.pipeline.addProject(change.project)
         change_queue = ChangeQueue(self.pipeline)
         change_queue.addProject(change.project)
         self.pipeline.addQueue(change_queue)
