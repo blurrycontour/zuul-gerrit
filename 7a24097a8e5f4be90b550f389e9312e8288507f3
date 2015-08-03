@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a50d1a3_3edbf77d",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 412,
+      "author": {
+        "id": 6133
+      },
+      "writtenOn": "2015-08-03T06:54:02Z",
+      "side": 1,
+      "message": "i\u0027d better say \"while attempt \u003c self.query_attempts_max\"",
+      "revId": "7a24097a8e5f4be90b550f389e9312e8288507f3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
