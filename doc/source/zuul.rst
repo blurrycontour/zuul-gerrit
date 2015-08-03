@@ -87,6 +87,15 @@ gerrit
   Path to SSH key to use when logging into above server.
   ``sshkey=/home/zuul/.ssh/id_rsa``
 
+**query_attempts_max**
+  Max query attempts to do when querying changes from Gerrit. This works
+  around a problem where Gerrit announces changes before they can be fully
+  queried with all dependent changes. Defaults to ``1``. ``query_attempts_max=1``
+
+**query_attempts_interval**
+  Time in seconds to wait before subsequent query attempts.
+  Defaults to ``1``. ``query_attempts_interval=1``
+
 zuul
 """"
 
