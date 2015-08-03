@@ -148,6 +148,16 @@ class Gerrit(object):
         self.gerrit_connector = GerritEventConnector(
             self.gerrit, sched, self)
         self.gerrit_connector.start()
+        if config.has_option('gerrit', 'query_attempts_max'):
+            self.query_attempts_max = int(config.get(
+                'gerrit', 'query_attempts_max'))
+        else:
+            self.query_attempts_max = 1
+        if config.has_option('gerrit', 'query_attempts_interval'):
+            self.query_attempts_interval = float(config.get(
+                'gerrit', 'query_attempts_interval'))
+        else:
+            self.query_attempts_interval = 1.0
 
     def stop(self):
         self.gerrit_connector.stop()
@@ -395,8 +405,27 @@ class Gerrit(object):
     def updateChange(self, change, history=None):
         self.log.info("Updating information for %s,%s" %
                       (change.number, change.patchset))
-        data = self.gerrit.query(change.number)
-        change._data = data
+
+        # Because Gerrit can announce a change before all dependents can be
+        # retrieved it must be queried in a loop.
+        attempt = 0
+        while 1:
+            data = self.gerrit.query(change.number)
+            attempt += 1
+
+            if 'project' in data:
+                # all ok
+                change._data = data
+                break
+            else:
+                if attempt >= self.query_attempts_max:
+                    raise Exception("Change %s,%s not found" %
+                                    (change.number, change.patchset))
+                self.log.warning("updateChange: Change %s,%s not found, "
+                                 "attempt %d/%d" %
+                                 (change.number, change.patchset, attempt,
+                                  self.query_attempts_max))
+                time.sleep(self.query_attempts_interval)
 
         if change.patchset is None:
             change.patchset = data['currentPatchSet']['number']
@@ -448,7 +477,14 @@ class Gerrit(object):
                     dep_num, history))
             self.log.debug("Getting git-dependent change %s,%s" %
                            (dep_num, dep_ps))
-            dep = self._getChange(dep_num, dep_ps, history=history)
+            try:
+                dep = self._getChange(dep_num, dep_ps, history=history)
+            except Exception:
+                self.log.error("Could not get dependency for %s,%s "
+                               "during processing of %s,%s" %
+                               (dep_num, dep_ps, change.number,
+                                change.patchset))
+                raise
             if (not dep.is_merged) and dep not in needs_changes:
                 needs_changes.append(dep)
 
@@ -470,9 +506,21 @@ class Gerrit(object):
             for needed in data['neededBy']:
                 parts = needed['ref'].split('/')
                 dep_num, dep_ps = parts[3], parts[4]
-                dep = self._getChange(dep_num, dep_ps)
-                if (not dep.is_merged) and dep.is_current_patchset:
-                    needed_by_changes.append(dep)
+                attempt = 0
+                while attempt < self.query_attempts_max:
+                    try:
+                        dep = self._getChange(dep_num, dep_ps)
+                        if (not dep.is_merged) and dep.is_current_patchset:
+                            needed_by_changes.append(dep)
+                        break
+                    except Exception:
+                        self.log.warning("Could not get child patch %s,%s "
+                                         "during processing of %s,%s, "
+                                         "attempt %s" %
+                                         (dep_num, dep_ps, change.number,
+                                          change.patchset, attempt))
+                        attempt += 1
+                        time.sleep(self.query_attempts_interval)
 
         for record in self._getNeededByFromCommit(data['id']):
             dep_num = record['number']

@@ -9,6 +9,8 @@ server=review.example.com
 ;baseurl=https://review.example.com/r
 user=jenkins
 sshkey=/home/jenkins/.ssh/id_rsa
+;query_attempts_max=1
+;query_attempts_interval=1
 
 [zuul]
 layout_config=/etc/zuul/layout.yaml
