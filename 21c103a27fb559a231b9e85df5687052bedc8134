@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a4dcd0f_0c0ff137",
+        "filename": "zuul/launcher/gearman.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 435,
+      "author": {
+        "id": 9624
+      },
+      "writtenOn": "2015-08-05T19:52:30Z",
+      "side": 1,
+      "message": "Is this the line that causes the retry to happen? It would be good to explain how this works.",
+      "revId": "21c103a27fb559a231b9e85df5687052bedc8134",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
