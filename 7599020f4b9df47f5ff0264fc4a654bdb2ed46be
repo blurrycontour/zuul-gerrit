@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a4dcd0f_550c7eec",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 429,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-08-06T11:25:58Z",
+      "side": 1,
+      "message": "This needs rewording since the default is now True.",
+      "revId": "7599020f4b9df47f5ff0264fc4a654bdb2ed46be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
