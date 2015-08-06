@@ -19,6 +19,125 @@
     },
     {
       "key": {
+        "uuid": "1a4dcd0f_7106a01e",
+        "filename": "zuul/connection/github.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-08-06T10:39:25Z",
+      "side": 1,
+      "message": "Should be HTTPMethodNotAllowed",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a4dcd0f_919d6c68",
+        "filename": "zuul/connection/github.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-08-06T10:39:25Z",
+      "side": 1,
+      "message": "\u0027get\u0027 on non-existing dictionary key won\u0027t throw KeyError, but rather return None.\nUse direct directory access instead, same as on L141.\n\nAlso I\u0027d use a different variable name such as \u0027event_name\u0027 to distinguish with the latter \u0027event\u0027 which is a TriggerEvent instance.",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a4dcd0f_819df067",
+        "filename": "zuul/connection/github.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-08-06T10:39:25Z",
+      "side": 1,
+      "message": "Leave this dummy implementation out of this commit and rather let the exception with \"unhandled event\" message occur. Add this at the dependent change https://review.openstack.org/#/c/191207/",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a4dcd0f_41060887",
+        "filename": "zuul/connection/github.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-08-06T10:39:25Z",
+      "side": 1,
+      "message": "Why do you distinguish this and all later events when you return None from all of them? Is this for future use? I\u0027d remove this out of this commit and leave just the \u0027else\u0027 clause.",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a4dcd0f_a1182c76",
+        "filename": "zuul/connection/github.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-08-06T10:39:25Z",
+      "side": 1,
+      "message": "\u0027if secret is None\u0027 would be cleaner.",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a4dcd0f_4484d65c",
+        "filename": "zuul/connection/github.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-08-06T10:39:25Z",
+      "side": 1,
+      "message": "Should implement the onStop method to kill the listener thread.",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a4dcd0f_841bbe72",
+        "filename": "zuul/connection/github.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-08-06T10:39:25Z",
+      "side": 1,
+      "message": "Why exactly this check? How could happen the situation that the webhook listener is already alive?",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba3cc151_c6efabe7",
         "filename": "zuul/layoutvalidator.py",
         "patchSetId": 6
@@ -87,6 +206,23 @@
     },
     {
       "key": {
+        "uuid": "1a4dcd0f_84473ebb",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-08-06T10:39:25Z",
+      "side": 1,
+      "message": "Intentional, or debugging leftover?",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba3cc151_66e01ffb",
         "filename": "zuul/source/github.py",
         "patchSetId": 6
@@ -132,6 +268,23 @@
       "writtenOn": "2015-07-01T14:35:04Z",
       "side": 1,
       "message": "this looks like leftover debugging",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a4dcd0f_44dff60c",
+        "filename": "zuul/trigger/github.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-08-06T10:39:25Z",
+      "side": 1,
+      "message": "Add \u0027pr-close\u0027 and \u0027pr-reopen\u0027, which is allowed in the GithubConnection.",
       "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
