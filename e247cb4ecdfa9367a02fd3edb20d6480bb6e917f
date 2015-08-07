@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a4dcd0f_b00fe235",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 6133
+      },
+      "writtenOn": "2015-08-07T08:24:05Z",
+      "side": 1,
+      "message": "zull\u003dzuul",
+      "revId": "e247cb4ecdfa9367a02fd3edb20d6480bb6e917f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
