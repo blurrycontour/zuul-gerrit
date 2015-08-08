@@ -3127,7 +3127,7 @@ For CI problems and help debugging, contact ci@example.org"""
                 self.assertEqual(False, job['retry'])
                 self.assertEqual('https://server/job/project-merge/0/',
                                  job['url'])
-                self.assertEqual(7, len(job['worker']))
+                self.assertEqual(8, len(job['worker']))
                 self.assertEqual(False, job['canceled'])
                 self.assertEqual(True, job['voting'])
                 self.assertEqual(None, job['result'])

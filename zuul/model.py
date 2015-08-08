@@ -578,6 +578,7 @@ class Build(object):
         self.retry = False
         self.parameters = {}
         self.worker = Worker()
+        self.node_labels = []
 
     def __repr__(self):
         return ('<Build %s of %s on %s>' %
@@ -799,7 +800,8 @@ class QueueItem(object):
                 'canceled': build.canceled if build else None,
                 'retry': build.retry if build else None,
                 'number': build.number if build else None,
-                'worker': worker
+                'node_labels': build.node_labels if build else [],
+                'worker': worker,
             })
 
         if self.pipeline.haveAllJobsStarted(self):

@@ -232,6 +232,9 @@ class Client(zuul.cmd.ZuulApp):
             'number': {
                 'title': 'Number'
             },
+            'node_labels': {
+                'title': 'Node Labels'
+            },
             'worker.name': {
                 'title': 'Worker'
             },
@@ -245,7 +248,7 @@ class Client(zuul.cmd.ZuulApp):
             'worker.fqdn': {
                 'title': 'Worker Domain'
             },
-            'worker.progam': {
+            'worker.program': {
                 'title': 'Worker Program'
             },
             'worker.version': {
