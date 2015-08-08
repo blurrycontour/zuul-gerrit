@@ -598,6 +598,7 @@ class FakeBuild(threading.Thread):
             result = 'RUN_ERROR'
         else:
             data['result'] = result
+            data['node_labels'] = ['bare-necessities']
             work_fail = False
 
         changes = None
