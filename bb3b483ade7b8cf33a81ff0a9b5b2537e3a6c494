@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a4dcd0f_c7afdf7b",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 609,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-08-10T23:17:36Z",
+      "side": 1,
+      "message": "I think we should model this on promote rather than enqueue.  Enqueue is more complicated because it needs to simulate a triggering event in order to know how to create the change.  At least for the moment -- that should be able to be simplified soon.  But for an item already in the queue, we should be able to avoid specfiying the trigger even now.  The promote event happens with only knowing the pipeline name and change id -- we should be able to identify a change to remove with only the same information.",
+      "revId": "bb3b483ade7b8cf33a81ff0a9b5b2537e3a6c494",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
