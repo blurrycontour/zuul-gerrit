@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a4dcd0f_0e52e0dd",
+        "filename": "zuul/lib/gerrit.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-08-10T12:11:20Z",
+      "side": 1,
+      "message": "perhaps best to check if { is the first char of line.",
+      "revId": "bce73821752da005f2713f5c99f0c0354cb84093",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
