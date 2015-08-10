@@ -34,6 +34,24 @@
       "revId": "347e7b4f6657cf174708c8345d182eda8ee992ba",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a4dcd0f_137e89ae",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 704,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-08-10T12:01:49Z",
+      "side": 1,
+      "message": "I was confused and didn\u0027t notice that the layout object is reconstructed on reconfigure and therefore the project list is cleaned up by the GC.",
+      "parentUuid": "1a4dcd0f_c0f76989",
+      "revId": "347e7b4f6657cf174708c8345d182eda8ee992ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
