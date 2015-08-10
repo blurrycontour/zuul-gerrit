@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a4dcd0f_bf22dda1",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 580,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-08-10T20:10:10Z",
+      "side": 1,
+      "message": "The problem that caused us to revert is that the meaning of this\nchanged.  Currently \"require: approval: [foo, bar]\" means \"for a\nchange to be enqueued, there must be both a foo approval and a\nbar approval for the change\".  Or in other words that are more\nlike what is being used here, \"all of the requirements listed here\nmust be matched by any one approval on the change\".\n\nStrictly speaking it was not the confusion terminology that\nprompted the reversion, it was the regression in behavior.\nHowever, in trying to understand the problem, we realized that it\nwas very difficult to talk about this.\n\nThere are two sets of approvals that are involved in this: the\nset of approvals on the change, and the set of required\napprovals.  I am okay with the terminology proposed here because\nI interpret it as:\n\n  any-approval: all of the requirements that follow must be\n    matched by any one of the approvals on the change\n  all-approvals: all of the requirements that follow must be\n    matched by all of the approvals on the change\n\nBecause in all cases the number of requirements that must be met\nis invariant (all of them!) I think this terminology is okay.\nThings only got confusing when we noticed the actual behavior was\nnot that, but rather that of any one approval must match any one\nrequirement.\n\nI do think it may be less confusing to drop \"any-approvals\" and\njust keep \"approval\" and \"all-approvals\".  I think that reads\neasier: \"require: approval: workflow +1\", \"require: all-aprovals:\nnot code-review -1\".\n\nSo I also suggest that we do that.",
+      "revId": "3aec5b9ad13b25ae162297d312f0f9f42a8467cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
