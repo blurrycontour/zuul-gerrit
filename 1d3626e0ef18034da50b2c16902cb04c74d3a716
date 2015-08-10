@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a4dcd0f_6e8284ca",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-08-10T12:15:04Z",
+      "side": 1,
+      "message": "(nit) should try to keep this to 80cols.",
+      "revId": "1d3626e0ef18034da50b2c16902cb04c74d3a716",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
