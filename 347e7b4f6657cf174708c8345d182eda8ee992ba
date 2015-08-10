@@ -16,6 +16,24 @@
       "revId": "347e7b4f6657cf174708c8345d182eda8ee992ba",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a4dcd0f_c0f76989",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 704,
+      "author": {
+        "id": 13431
+      },
+      "writtenOn": "2015-08-10T11:55:00Z",
+      "side": 1,
+      "message": "The ones removed from layout - no, they won\u0027t be removed. Precisely, they will be replaced with new Project() instances. What problem do you see here? Memory leakage? But consider how any project is added, ultimately: in gerrit. Zuul watches gerrit events stream. Layout is just a filter. This change makes this filter to restrict only possible head changes projects, but not the dependencies.\n\nItems will stay in queue, like they did before, only their builds won\u0027t be cancelled.\n\nSo answer is: as long as a project occurs in gerrit stream, \n\nProjects may appear in the layout by 2 ways: initially defined in layout config, and dynamically added as dependencies of changes to defined projects. Total set of layout projects cannot exceed the total set of gerrit projects, but that is hardly possible.",
+      "parentUuid": "1a4dcd0f_f5f02aff",
+      "revId": "347e7b4f6657cf174708c8345d182eda8ee992ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
