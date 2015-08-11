@@ -79,9 +79,10 @@ class Pipeline(object):
         self.queues = []
         self.precedence = PRECEDENCE_NORMAL
         self.source = None
-        self.start_actions = None
-        self.success_actions = None
-        self.failure_actions = None
+        self.start_actions = []
+        self.success_actions = []
+        self.failure_actions = []
+        self.merge_failure_actions = []
         self.window = None
         self.window_floor = None
         self.window_increase_type = None
@@ -289,22 +290,21 @@ class ActionReporter(object):
     """An ActionReporter has a reporter and its configured parameters"""
 
     def __repr__(self):
-        return '<ActionReporter %s, %s>' % (self.reporter, self.params)
+        return '<ActionReporter %s>' % (self.reporter)
 
-    def __init__(self, reporter, params):
+    def __init__(self, reporter):
         self.reporter = reporter
-        self.params = params
 
     def report(self, source, change, message):
         """Sends the built message off to the configured reporter.
         Takes the change and message and adds the configured parameters.
         """
-        return self.reporter.report(source, change, message, self.params)
+        return self.reporter.report(source, change, message)
 
     def getSubmitAllowNeeds(self):
         """Gets the submit allow needs from the reporter based off the
         parameters."""
-        return self.reporter.getSubmitAllowNeeds(self.params)
+        return self.reporter.getSubmitAllowNeeds()
 
 
 class ChangeQueue(object):
@@ -1011,6 +1011,9 @@ class TriggerEvent(object):
         # For events that arrive with a destination pipeline (eg, from
         # an admin command, etc):
         self.forced_pipeline = None
+
+        # Internal mechanism to track if the change needs a refresh from cache
+        self._needs_refresh = False
 
     def __repr__(self):
         ret = '<TriggerEvent %s %s' % (self.type, self.project_name)
