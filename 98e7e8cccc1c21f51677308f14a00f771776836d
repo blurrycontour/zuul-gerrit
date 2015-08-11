@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a4dcd0f_5501f536",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 475,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-08-11T23:26:06Z",
+      "side": 1,
+      "message": "I think this directive means that for each specified criteria there exists an appoval on the current patchset that matches.  The old text has that meaning for me, but the additional sentence seems to contradict it.",
+      "revId": "98e7e8cccc1c21f51677308f14a00f771776836d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a4dcd0f_f5f9214f",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 563,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-08-11T23:26:06Z",
+      "side": 1,
+      "message": "I realize this is from the earlier version too, but as I think about it more\nI\u0027m not excited about the string requirement here, or the fact that to implement\nit we have to start doing our own parsing of these values.\n\nMaybe we covered this on the other change, and I\u0027ve forgotten -- but is there\na reason to take this approach rather than something like:\n\npipeline:\n  - name: gate\n    require:\n      approval:\n        - verified: 2\n    reject:\n      approval:\n        - code-review: -1\n\nWhich would then require a change have a verified\u003d+2 and also require that it _not_ have a code-review\u003d-1 approval in order to be enqueued?",
+      "revId": "98e7e8cccc1c21f51677308f14a00f771776836d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
