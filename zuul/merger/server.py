@@ -14,6 +14,7 @@
 
 import json
 import logging
+import os
 import threading
 import traceback
 
@@ -25,7 +26,7 @@ import merger
 class MergeServer(object):
     log = logging.getLogger("zuul.MergeServer")
 
-    def __init__(self, config):
+    def __init__(self, config, connections={}):
         self.config = config
         self.zuul_url = config.get('merger', 'zuul_url')
 
@@ -44,13 +45,25 @@ class MergeServer(object):
         else:
             merge_name = None
 
+        for connection_name in connections:
+            self._makeSSHWrapper(key, connection_name)
         if self.config.has_option('gerrit', 'sshkey'):
+            # Check for depreciated option
             sshkey = self.config.get('gerrit', 'sshkey')
+            self._makeSSHWrapper(sshkey)
         else:
             sshkey = None
 
-        self.merger = merger.Merger(merge_root, sshkey,
-                                    merge_email, merge_name)
+        self.merger = merger.Merger(merge_root, merge_email, merge_name)
+
+    def _makeSSHWrapper(self, key, connection_name='default'):
+        wrapper_name = '.ssh_wrapper_%s' % connection_name
+        name = os.path.join(self.working_root, wrapper_name)
+        fd = open(name, 'w')
+        fd.write('#!/bin/bash\n')
+        fd.write('ssh -i %s $@\n' % key)
+        fd.close()
+        os.chmod(name, 0755)
 
     def start(self):
         self._running = True

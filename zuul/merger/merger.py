@@ -188,24 +188,13 @@ class Repo(object):
 class Merger(object):
     log = logging.getLogger("zuul.Merger")
 
-    def __init__(self, working_root, sshkey, email, username):
+    def __init__(self, working_root, email, username):
         self.repos = {}
         self.working_root = working_root
         if not os.path.exists(working_root):
             os.makedirs(working_root)
-        if sshkey:
-            self._makeSSHWrapper(sshkey)
         self.email = email
         self.username = username
-
-    def _makeSSHWrapper(self, key):
-        name = os.path.join(self.working_root, '.ssh_wrapper')
-        fd = open(name, 'w')
-        fd.write('#!/bin/bash\n')
-        fd.write('ssh -i %s $@\n' % key)
-        fd.close()
-        os.chmod(name, 0755)
-        os.environ['GIT_SSH'] = name
 
     def addProject(self, project, url):
         repo = None
@@ -263,10 +252,16 @@ class Merger(object):
 
         return commit
 
+    def _set_git_ssh(connection_name):
+        wrapper_name = '.ssh_wrapper_%s' % connection_name
+        name = os.path.join(self.working_root, wrapper_name)
+        os.environ['GIT_SSH'] = name
+
     def _mergeItem(self, item, recent):
         self.log.debug("Processing refspec %s for project %s / %s ref %s" %
                        (item['refspec'], item['project'], item['branch'],
                         item['ref']))
+        self._set_git_ssh(item['connection_name'])
         repo = self.getRepo(item['project'], item['url'])
         key = (item['project'], item['branch'])
         # See if we have a commit for this change already in this repo
