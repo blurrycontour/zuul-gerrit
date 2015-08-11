@@ -33,6 +33,24 @@
       "revId": "3aec5b9ad13b25ae162297d312f0f9f42a8467cb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a4dcd0f_286d1404",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 580,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-08-11T12:48:22Z",
+      "side": 1,
+      "message": "Right, I see the regression. I must have gotten confused when writing this and thought any-approval should be \u0027any one of these requirements must be met by any one approval\u0027. I\u0027ll fix this up.",
+      "parentUuid": "1a4dcd0f_1fb9912e",
+      "revId": "3aec5b9ad13b25ae162297d312f0f9f42a8467cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
