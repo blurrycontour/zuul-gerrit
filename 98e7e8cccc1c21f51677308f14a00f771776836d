@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1a4dcd0f_df994d6e",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 475,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-08-13T12:21:02Z",
+      "side": 1,
+      "message": "err, yes, that\u0027s poor word choosing on my part. Will fix.",
+      "parentUuid": "1a4dcd0f_5501f536",
+      "revId": "98e7e8cccc1c21f51677308f14a00f771776836d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a4dcd0f_f5f9214f",
         "filename": "doc/source/zuul.rst",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2015-08-11T23:26:06Z",
       "side": 1,
       "message": "I realize this is from the earlier version too, but as I think about it more\nI\u0027m not excited about the string requirement here, or the fact that to implement\nit we have to start doing our own parsing of these values.\n\nMaybe we covered this on the other change, and I\u0027ve forgotten -- but is there\na reason to take this approach rather than something like:\n\npipeline:\n  - name: gate\n    require:\n      approval:\n        - verified: 2\n    reject:\n      approval:\n        - code-review: -1\n\nWhich would then require a change have a verified\u003d+2 and also require that it _not_ have a code-review\u003d-1 approval in order to be enqueued?",
+      "revId": "98e7e8cccc1c21f51677308f14a00f771776836d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a4dcd0f_426006cf",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 563,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-08-13T12:21:02Z",
+      "side": 1,
+      "message": "I\u0027m not entirely sure if we have covered it. The string is only required when wanting to do a negative set of votes (such as the example given).\n\nYour suggestion of a reject category wouldn\u0027t require the full implementation of \"negative requirements\". At the same time we also wouldn\u0027t need a requires-all type declaration.\n\nI can\u0027t think of any good case where we might want require-all that the reject case wouldn\u0027t cover so I think this is a good suggestion.\n\nThe only problem is that it probably isn\u0027t a small amount of (re)work to do a \u0027reject\u0027 category.",
+      "parentUuid": "1a4dcd0f_f5f9214f",
       "revId": "98e7e8cccc1c21f51677308f14a00f771776836d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
