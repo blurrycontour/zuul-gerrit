@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#
 # Copyright 2014 Antoine "hashar" Musso
 # Copyright 2014 Wikimedia Foundation Inc.
 #
@@ -149,8 +147,3 @@ class Cloner(zuul.cmd.ZuulApp):
 def main():
     cloner = Cloner()
     cloner.main()
-
-
-if __name__ == "__main__":
-    sys.path.insert(0, '.')
-    main()
