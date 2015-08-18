@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "fa1b9901_36edd18b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-08-18T05:06:58Z",
+      "side": 1,
+      "message": "Ah I see. Nope, I think I just parsed it poorly. Thanks!",
+      "parentUuid": "1a4dcd0f_19419a39",
+      "revId": "347e7b4f6657cf174708c8345d182eda8ee992ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a4dcd0f_f5f02aff",
         "filename": "zuul/scheduler.py",
         "patchSetId": 3
