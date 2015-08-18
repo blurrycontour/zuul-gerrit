@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Copyright 2012 Hewlett-Packard Development Company, L.P.
 # Copyright 2013 OpenStack Foundation
 #
@@ -248,8 +247,3 @@ def main():
     else:
         with daemon.DaemonContext(pidfile=pid):
             server.main()
-
-
-if __name__ == "__main__":
-    sys.path.insert(0, '.')
-    main()

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Copyright 2012 Hewlett-Packard Development Company, L.P.
 # Copyright 2013-2014 OpenStack Foundation
 #
@@ -23,7 +22,6 @@ import extras
 pid_file_module = extras.try_imports(['daemon.pidlockfile', 'daemon.pidfile'])
 
 import os
-import sys
 import signal
 
 import zuul.cmd
@@ -103,8 +101,3 @@ def main():
     else:
         with daemon.DaemonContext(pidfile=pid):
             server.main()
-
-
-if __name__ == "__main__":
-    sys.path.insert(0, '.')
-    main()
