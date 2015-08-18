@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#
 # Copyright 2014 Antoine "hashar" Musso
 # Copyright 2014 Wikimedia Foundation Inc.
 #
