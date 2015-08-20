@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa1b9901_9498c7c1",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 35
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-08-20T14:40:06Z",
+      "side": 1,
+      "message": "This calls the connection\u0027s onLoad() without calling onStop() before. Is the onLoad() function expected to be idempotent and possibly do some cleanup itself if needed? Or would you consider to call the onStop() before the onLoad() in the scheduler explicitly in case of reconfiguration?",
+      "revId": "bb076e6e512fd6a1604050869eb475007cb0a910",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
