@@ -250,10 +250,11 @@ class Scheduler(threading.Thread):
             # Any skip-if predicate can be matched to trigger a skip
             return cm.MatchAny(skip_matchers)
 
-    def registerConnections(self, connections):
+    def registerConnections(self, connections, webapp):
         self.connections = connections
         for connection_name, connection in self.connections.items():
             connection.registerScheduler(self)
+            connection.registerWebapp(webapp)
             connection.onLoad()
 
     def stopConnections(self):
