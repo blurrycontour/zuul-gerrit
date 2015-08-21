@@ -66,7 +66,7 @@ class Server(zuul.cmd.ZuulApp):
         self.setup_logging('zuul', 'log_config')
         try:
             self.configure_connections()
-            self.sched.registerConnections(self.connections)
+            self.sched.registerConnections(self.connections, self.webapp)
             self.sched.reconfigure(self.config)
         except Exception:
             self.log.exception("Reconfiguration failed:")
@@ -172,7 +172,7 @@ class Server(zuul.cmd.ZuulApp):
             cache_expiry = self.config.getint('zuul', 'status_expiry')
         else:
             cache_expiry = 1
-        webapp = zuul.webapp.WebApp(self.sched, cache_expiry=cache_expiry)
+        self.webapp = zuul.webapp.WebApp(self.sched, cache_expiry=cache_expiry)
         rpc = zuul.rpclistener.RPCListener(self.config, self.sched)
 
         self.configure_connections()
@@ -181,11 +181,11 @@ class Server(zuul.cmd.ZuulApp):
 
         self.log.info('Starting scheduler')
         self.sched.start()
-        self.sched.registerConnections(self.connections)
+        self.sched.registerConnections(self.connections, self.webapp)
         self.sched.reconfigure(self.config)
         self.sched.resume()
         self.log.info('Starting Webapp')
-        webapp.start()
+        self.webapp.start()
         self.log.info('Starting RPC')
         rpc.start()
 

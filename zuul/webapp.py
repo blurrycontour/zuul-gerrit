@@ -42,6 +42,7 @@ array of changes, they will not include the queue structure.
 
 class WebApp(threading.Thread):
     log = logging.getLogger("zuul.WebApp")
+    change_path_regexp = '/status/change/(\d+,\d+)$'
 
     def __init__(self, scheduler, port=8001, cache_expiry=1):
         threading.Thread.__init__(self)
@@ -51,8 +52,14 @@ class WebApp(threading.Thread):
         self.cache_time = 0
         self.cache = None
         self.daemon = True
+        self.routes = {}
+        self._init_default_routes()
         self.server = httpserver.serve(dec.wsgify(self.app), host='0.0.0.0',
                                        port=self.port, start_loop=False)
+
+    def _init_default_routes(self):
+        self.register_path('/(status\.json|status)$', self.status)
+        self.register_path(self.change_path_regexp, self.change)
 
     def run(self):
         self.server.serve_forever()
@@ -84,20 +91,40 @@ class WebApp(threading.Thread):
             return change['id'] == rev
         return self._changes_by_func(func)
 
-    def _normalize_path(self, path):
-        # support legacy status.json as well as new /status
-        if path == '/status.json' or path == '/status':
-            return "status"
-        m = re.match('/status/change/(\d+,\d+)$', path)
-        if m:
-            return m.group(1)
-        return None
+    def register_path(self, path, handler):
+        path_re = re.compile(path)
+        self.routes[path] = (path_re, handler)
+
+    def unregister_path(self, path):
+        if self.routes.get(path):
+            del self.routes[path]
 
     def app(self, request):
-        path = self._normalize_path(request.path)
-        if path is None:
+        for path_re, handler in self.routes.itervalues():
+            if path_re.match(request.path):
+                return handler(request)
+        else:
             raise webob.exc.HTTPNotFound()
 
+    def status(self, request):
+        def func():
+            return webob.Response(body=self.cache,
+                                  content_type='application/json')
+        return self._response_with_status_cache(func)
+
+    def change(self, request):
+        def func():
+            m = re.match(self.change_path_regexp, request.path)
+            change_id = m.group(1)
+            status = self._status_for_change(change_id)
+            if status:
+                return webob.Response(body=status,
+                                      content_type='application/json')
+            else:
+                raise webob.exc.HTTPNotFound()
+        return self._response_with_status_cache(func)
+
+    def _refresh_status_cache(self):
         if (not self.cache or
             (time.time() - self.cache_time) > self.cache_expiry):
             try:
@@ -109,19 +136,12 @@ class WebApp(threading.Thread):
                 self.log.exception("Exception formatting status:")
                 raise
 
-        if path == 'status':
-            response = webob.Response(body=self.cache,
-                                      content_type='application/json')
-        else:
-            status = self._status_for_change(path)
-            if status:
-                response = webob.Response(body=status,
-                                          content_type='application/json')
-            else:
-                raise webob.exc.HTTPNotFound()
+    def _response_with_status_cache(self, func):
+        self._refresh_status_cache()
+
+        response = func()
 
         response.headers['Access-Control-Allow-Origin'] = '*'
-
         response.cache_control.public = True
         response.cache_control.max_age = self.cache_expiry
         response.last_modified = self.cache_time
