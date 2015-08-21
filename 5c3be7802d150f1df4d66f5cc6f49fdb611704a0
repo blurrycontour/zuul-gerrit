@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "fa1b9901_71cdc864",
+        "filename": "zuul/connection/github.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-08-21T13:51:00Z",
+      "side": 1,
+      "message": "General mechanism implemented in a new change depended on: https://review.openstack.org/215642",
+      "parentUuid": "ba3cc151_217761d4",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a4dcd0f_7106a01e",
         "filename": "zuul/connection/github.py",
         "patchSetId": 6
@@ -30,6 +48,24 @@
       "writtenOn": "2015-08-06T10:39:25Z",
       "side": 1,
       "message": "Should be HTTPMethodNotAllowed",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a4dcd0f_cf579258",
+        "filename": "zuul/connection/github.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-08-21T13:51:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a4dcd0f_7106a01e",
       "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "1a4dcd0f_ef5cce7e",
+        "filename": "zuul/connection/github.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-08-21T13:51:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a4dcd0f_919d6c68",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a4dcd0f_819df067",
         "filename": "zuul/connection/github.py",
         "patchSetId": 6
@@ -64,6 +118,24 @@
       "writtenOn": "2015-08-06T10:39:25Z",
       "side": 1,
       "message": "Leave this dummy implementation out of this commit and rather let the exception with \"unhandled event\" message occur. Add this at the dependent change https://review.openstack.org/#/c/191207/",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a4dcd0f_6ff75e59",
+        "filename": "zuul/connection/github.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-08-21T13:51:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a4dcd0f_819df067",
       "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "1a4dcd0f_2fc396ee",
+        "filename": "zuul/connection/github.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-08-21T13:51:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a4dcd0f_41060887",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a4dcd0f_a1182c76",
         "filename": "zuul/connection/github.py",
         "patchSetId": 6
@@ -98,6 +188,24 @@
       "writtenOn": "2015-08-06T10:39:25Z",
       "side": 1,
       "message": "\u0027if secret is None\u0027 would be cleaner.",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a4dcd0f_4fa86220",
+        "filename": "zuul/connection/github.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-08-21T13:51:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a4dcd0f_a1182c76",
       "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "fa1b9901_717f0815",
+        "filename": "zuul/connection/github.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-08-21T13:51:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a4dcd0f_4484d65c",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a4dcd0f_841bbe72",
         "filename": "zuul/connection/github.py",
         "patchSetId": 6
@@ -132,6 +258,24 @@
       "writtenOn": "2015-08-06T10:39:25Z",
       "side": 1,
       "message": "Why exactly this check? How could happen the situation that the webhook listener is already alive?",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa1b9901_91241c0d",
+        "filename": "zuul/connection/github.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-08-21T13:51:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a4dcd0f_841bbe72",
       "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "fa1b9901_e9cd1e5e",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-08-21T13:51:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba3cc151_c6efabe7",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba3cc151_e6ec2ff5",
         "filename": "zuul/layoutvalidator.py",
         "patchSetId": 6
@@ -166,6 +328,24 @@
       "writtenOn": "2015-07-01T14:35:04Z",
       "side": 1,
       "message": "Same.",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa1b9901_49052a78",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-08-21T13:51:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba3cc151_e6ec2ff5",
       "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -189,6 +369,24 @@
     },
     {
       "key": {
+        "uuid": "fa1b9901_29023670",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-08-21T13:51:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba3cc151_86bc43dd",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba3cc151_a6c14756",
         "filename": "zuul/layoutvalidator.py",
         "patchSetId": 6
@@ -206,6 +404,24 @@
     },
     {
       "key": {
+        "uuid": "fa1b9901_e9f43e88",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-08-21T13:51:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba3cc151_a6c14756",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a4dcd0f_84473ebb",
         "filename": "zuul/scheduler.py",
         "patchSetId": 6
@@ -217,6 +433,24 @@
       "writtenOn": "2015-08-06T10:39:25Z",
       "side": 1,
       "message": "Intentional, or debugging leftover?",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa1b9901_11f48c58",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-08-21T13:51:00Z",
+      "side": 1,
+      "message": "I\u0027ll leave the logging here for now.",
+      "parentUuid": "1a4dcd0f_84473ebb",
       "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -257,6 +491,24 @@
     },
     {
       "key": {
+        "uuid": "fa1b9901_03c0bf4e",
+        "filename": "zuul/trigger/github.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-08-21T13:51:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba3cc151_06ea73db",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba3cc151_26e77712",
         "filename": "zuul/trigger/github.py",
         "patchSetId": 6
@@ -274,6 +526,24 @@
     },
     {
       "key": {
+        "uuid": "fa1b9901_63fc1bb8",
+        "filename": "zuul/trigger/github.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-08-21T13:51:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba3cc151_26e77712",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a4dcd0f_44dff60c",
         "filename": "zuul/trigger/github.py",
         "patchSetId": 6
@@ -285,6 +555,24 @@
       "writtenOn": "2015-08-06T10:39:25Z",
       "side": 1,
       "message": "Add \u0027pr-close\u0027 and \u0027pr-reopen\u0027, which is allowed in the GithubConnection.",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a4dcd0f_c3fbee45",
+        "filename": "zuul/trigger/github.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-08-21T13:51:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a4dcd0f_44dff60c",
       "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
