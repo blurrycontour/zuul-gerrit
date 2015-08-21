@@ -17,6 +17,7 @@
 
 import json
 import urllib2
+import webob
 
 from tests.base import ZuulTestCase
 
@@ -83,3 +84,16 @@ class TestWebapp(ZuulTestCase):
 
         self.assertEqual(1, len(data), data)
         self.assertEqual("org/project1", data[0]['project'], data)
+
+    def test_webapp_custom_handler(self):
+        def custom_handler(request):
+            return webob.Response(body='ok')
+
+        self.webapp.register_path('/custom', custom_handler)
+        req = urllib2.Request(
+            "http://localhost:%s/custom" % self.port)
+        f = urllib2.urlopen(req)
+        self.assertEqual('ok', f.read())
+
+        self.webapp.unregister_path('/custom')
+        self.assertRaises(urllib2.HTTPError, urllib2.urlopen, req)
