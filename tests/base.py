@@ -934,6 +934,7 @@ class ZuulTestCase(BaseTestCase):
         self.useFixture(fixtures.MonkeyPatch('swiftclient.client.Connection',
                                              FakeSwiftClientConnection))
         self.swift = zuul.lib.swift.Swift(self.config)
+        self.webapp = zuul.webapp.WebApp(self.sched, port=0)
 
         self.event_queues = [
             self.sched.result_event_queue,
@@ -941,7 +942,7 @@ class ZuulTestCase(BaseTestCase):
         ]
 
         self.configure_connections()
-        self.sched.registerConnections(self.connections)
+        self.sched.registerConnections(self.connections, self.webapp)
 
         def URLOpenerFactory(*args, **kw):
             if isinstance(args[0], urllib2.Request):
@@ -963,7 +964,6 @@ class ZuulTestCase(BaseTestCase):
         self.sched.setLauncher(self.launcher)
         self.sched.setMerger(self.merge_client)
 
-        self.webapp = zuul.webapp.WebApp(self.sched, port=0)
         self.rpc = zuul.rpclistener.RPCListener(self.config, self.sched)
 
         self.sched.start()
