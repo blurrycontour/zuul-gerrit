@@ -26,7 +26,7 @@ class GerritSource(BaseSource):
     replication_timeout = 300
     replication_retry_interval = 5
 
-    depends_on_re = re.compile(r"^Depends-On: (I[0-9a-f]{40})\s*$",
+    depends_on_re = re.compile(r"^Depends-On: ((I[0-9a-f]{40})|(\d+))\s*$",
                                re.MULTILINE | re.IGNORECASE)
 
     def getRefSha(self, project, ref):
