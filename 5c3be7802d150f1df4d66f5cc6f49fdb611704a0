@@ -474,6 +474,24 @@
     },
     {
       "key": {
+        "uuid": "fa1b9901_b1955241",
+        "filename": "zuul/source/github.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-08-24T13:44:07Z",
+      "side": 1,
+      "message": "The current spec (still under review) states that at this point, only independent pipelines will be supported: http://docs-draft.openstack.org/37/163637/11/check/gate-infra-specs-docs/9100ef2//doc/build/html/specs/zuul_github-integration.html#not-in-scope\n\nCiting Wayne Warren in https://review.openstack.org/#/c/163637/3/specs/zuul_github-integration.rst:\n\"...after talking with Greg Haynes we decided that intially only supporting Independent pipelines should be sufficient to get started.\"\nOthers participating on the review agreed.\n\nIs using Ref here sufficient for Independent pipelines? If so, we can postpone this for later development.\n\nNote that I\u0027m still learning how dependent pipelines work, so I\u0027m not sure myself whether the change you suggest is needed for the basic functionality or not.",
+      "parentUuid": "ba3cc151_66e01ffb",
+      "revId": "5c3be7802d150f1df4d66f5cc6f49fdb611704a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba3cc151_06ea73db",
         "filename": "zuul/trigger/github.py",
         "patchSetId": 6
