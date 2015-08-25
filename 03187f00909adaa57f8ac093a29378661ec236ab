@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa1b9901_2a418463",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 519,
+      "author": {
+        "id": 9624
+      },
+      "writtenOn": "2015-08-25T16:53:34Z",
+      "side": 1,
+      "message": "not sure what you mean by \"use default constructor\"",
+      "revId": "03187f00909adaa57f8ac093a29378661ec236ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
