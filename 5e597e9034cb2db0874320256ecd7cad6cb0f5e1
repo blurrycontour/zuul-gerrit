@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "da20952f_2a89cb26",
+        "filename": "zuul/lib/gerrit.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 6039
+      },
+      "writtenOn": "2015-08-27T16:49:58Z",
+      "side": 1,
+      "message": "Huh, I don\u0027t know where this came from.",
+      "revId": "5e597e9034cb2db0874320256ecd7cad6cb0f5e1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa1b9901_972e628a",
         "filename": "zuul/model.py",
         "patchSetId": 5
@@ -30,6 +47,23 @@
       "writtenOn": "2015-08-21T07:18:37Z",
       "side": 1,
       "message": "can we ensure that it will always be like that? maybe we can define it as a constant, at least to make it more visible",
+      "revId": "5e597e9034cb2db0874320256ecd7cad6cb0f5e1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da20952f_8a9b3772",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1164,
+      "author": {
+        "id": 6039
+      },
+      "writtenOn": "2015-08-27T16:49:58Z",
+      "side": 1,
+      "message": "Git uses a sha of all zeros internally to mean that an object is being deleted. This will not change without git making a breaking change to the interpretation of the .git/ directory.",
       "revId": "5e597e9034cb2db0874320256ecd7cad6cb0f5e1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
