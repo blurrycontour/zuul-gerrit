@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da20952f_d25b1cf5",
+        "filename": "zuul/model.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1169,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2015-08-27T21:50:58Z",
+      "side": 1,
+      "message": "If you move this out of the loop then it becomes a little bit more consistent with all the other filtering below...\n\n        matches_ref \u003d False\n        if event.ref is not None:\n            for ref in self.refs:\n                if ref.match(event.ref):\n                    matches_ref \u003d True\n                    #(btw... why don\u0027t we break here?)\n\n        if self.refs and not matches_ref:\n            return False\n\n        if self.ignore_deletes and event.newrev \u003d\u003d all_zeros:\n            # If the updated ref has a new git hash of all 0s,\n            # then the ref is being deleted\n            return False",
+      "revId": "9eea1028cde2ab933a1f91cb936105aca9376c79",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
