@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da20952f_21090d2d",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 438,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-08-27T09:23:53Z",
+      "side": 1,
+      "message": "(nit) insert: but otherwise not known by zuul",
+      "revId": "235b2137e6f0bdef39b78c4d9e14781c1f772071",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da20952f_5e31800a",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 699,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-08-27T09:23:53Z",
+      "side": 1,
+      "message": "won\u0027t this cause jobs that were running, but are now cancelled due to the project being dropped, to continue to be ran? Why wouldn\u0027t we continue removing these items from the queue?",
+      "revId": "235b2137e6f0bdef39b78c4d9e14781c1f772071",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
