@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da20952f_757808f3",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1165,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2015-08-27T17:14:36Z",
+      "side": 1,
+      "message": "This does not seem to be the right place to embed this logic.  Also, you I would suggest either compiling a regex and doing something like this:\n\nall_zero_rev_re.match(event.newrev, \"\\d{40}\") or something.\n\nOr placing all_zeros some where that only runs once -- there\u0027s no point in repeating calculating its value.  It should be constant.",
+      "revId": "172528724714673e6356c2f47949ed28ece9a533",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
