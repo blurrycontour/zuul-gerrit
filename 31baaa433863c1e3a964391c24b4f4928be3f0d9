@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da20952f_c7ab4f88",
+        "filename": "etc/layout.yaml-sample",
+        "patchSetId": 8
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-08-28T04:22:30Z",
+      "side": 1,
+      "message": "If iterating I\u0027d suggest dropping this from the example file since it defaults to True and we don\u0027t want to clutter layout.yaml\u0027s.",
+      "revId": "31baaa433863c1e3a964391c24b4f4928be3f0d9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da20952f_a79f3b4f",
+        "filename": "zuul/model.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 1135,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-08-28T04:22:30Z",
+      "side": 1,
+      "message": "(nit) this is an odd spot to put this. I\u0027d suggest having it outside of the class definitions up the top of the file and call it something along the lines of GIT_DELETE_REV",
+      "revId": "31baaa433863c1e3a964391c24b4f4928be3f0d9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
