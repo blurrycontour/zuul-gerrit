@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "da20952f_fefc62b9",
+        "filename": "etc/layout.yaml-sample",
+        "patchSetId": 8
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 6039
+      },
+      "writtenOn": "2015-08-31T20:52:24Z",
+      "side": 1,
+      "message": "I disagree, I don\u0027t think this is clutter, and I think that the sample file should list all of the available pipeline options.",
+      "revId": "31baaa433863c1e3a964391c24b4f4928be3f0d9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da20952f_a79f3b4f",
         "filename": "zuul/model.py",
         "patchSetId": 8
