@@ -243,6 +243,10 @@ projects:
     gate:
       - noop
 
+  - name: org/noop-project2
+    gate:
+      - noop
+
   - name: org/experimental-project
     experimental:
       - experimental-project-test

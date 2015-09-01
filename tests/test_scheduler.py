@@ -1878,6 +1878,23 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(A.data['status'], 'MERGED')
         self.assertEqual(A.reported, 2)
 
+    def test_noop_job_separate_queues(self):
+        "Test that the internal noop does not group two projects "
+        "into the same dependent pipeline"
+
+        port = self.webapp.server.socket.getsockname()[1]
+
+        f = urllib.urlopen("http://localhost:%s/status.json" % port)
+        data = f.read()
+
+        data = json.loads(data)
+        for p in data['pipelines']:
+            for q in p['change_queues']:
+                if 'noop-project' in q['name']:
+                    self.assertNotIn('noop-project2', q['name'])
+                elif 'noop-project2' in q['name']:
+                    self.assertNotIn('noop-project', q['name'])
+
     def test_no_job_project(self):
         "Test that reports with no jobs don't get sent"
         A = self.fake_gerrit.addFakeChange('org/no-jobs-project',
