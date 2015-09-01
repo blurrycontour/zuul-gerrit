@@ -239,7 +239,11 @@ projects:
         - conflict-project-test1
         - conflict-project-test2
 
-  - name: org/noop-project
+  - name: org/noop-project1
+    gate:
+      - noop
+
+  - name: org/noop-project2
     gate:
       - noop
 
