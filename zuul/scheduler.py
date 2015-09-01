@@ -1922,8 +1922,14 @@ class DependentPipelineManager(BasePipelineManager):
         new_change_queues = []
         for a in change_queues:
             merged_a = False
+            a_jobs = a.getJobs()
             for b in new_change_queues:
-                if not a.getJobs().isdisjoint(b.getJobs()):
+                b_jobs = b.getJobs()
+                shared_jobs = a_jobs.intersection(b_jobs)
+                if len(shared_jobs) == 0 or (len(shared_jobs) == 1 and
+                            shared_jobs.pop().name == 'noop'):
+                    continue  # check the next 'b' queue
+                else:
                     self.log.debug("Merging queue %s into %s" % (a, b))
                     b.mergeChangeQueue(a)
                     merged_a = True
