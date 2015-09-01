@@ -916,7 +916,8 @@ class ZuulTestCase(BaseTestCase):
         self.init_repo("org/layered-project")
         self.init_repo("org/node-project")
         self.init_repo("org/conflict-project")
-        self.init_repo("org/noop-project")
+        self.init_repo("org/noop-project1")
+        self.init_repo("org/noop-project2")
         self.init_repo("org/experimental-project")
         self.init_repo("org/no-jobs-project")
 
