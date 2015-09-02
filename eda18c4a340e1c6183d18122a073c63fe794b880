@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da20952f_7bed7b8d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1930,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2015-09-02T02:19:24Z",
+      "side": 1,
+      "message": "Looks like pep8 doesn\u0027t like this :/",
+      "revId": "eda18c4a340e1c6183d18122a073c63fe794b880",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da20952f_dbf8474c",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1932,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2015-09-02T02:19:24Z",
+      "side": 1,
+      "message": "a_jobs and b_jobs are use only once, so I\u0027m not sure I see a whole lot of value of doing the assignment vs:\n\nshared_jobs \u003d a.getJobs().intersection(b.getJobs())",
+      "revId": "eda18c4a340e1c6183d18122a073c63fe794b880",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
