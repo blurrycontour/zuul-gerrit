@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da20952f_3bf10c6b",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 917,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-09-03T01:56:45Z",
+      "side": 1,
+      "message": "(nit) This comment appears wrong",
+      "revId": "6acb43f78a624ba230ce67d070792bb66eae81c4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
