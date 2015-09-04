@@ -1,0 +1,36 @@
+pipelines:
+  - name: check
+    manager: IndependentPipelineManager
+    source: github
+    trigger:
+      github:
+        - event:
+            - pr-open
+            - pr-change
+            - pr-reopen
+    success:
+      github: 'TEST PASSES'
+    failure:
+      github: 'TEST FAILED'
+
+  - name: post
+    manager: IndependentPipelineManager
+    source: github
+    trigger:
+      github:
+        - event: push
+
+  - name: tag
+    manager: IndependentPipelineManager
+    source: github
+    trigger:
+      github:
+        - event: tag
+projects:
+  - name: github/project
+    check:
+      - project-test1
+    post:
+      - project-push
+    tag:
+      - project-tag
