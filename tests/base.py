@@ -97,12 +97,17 @@ def iterate_timeout(max_seconds, purpose):
     raise Exception("Timeout waiting for %s" % purpose)
 
 
-class ChangeReference(git.Reference):
+class GerritChangeReference(git.Reference):
     _common_path_default = "refs/changes"
     _points_to_commits_only = True
 
 
-class FakeChange(object):
+class GithubChangeReference(git.Reference):
+    _common_path_default = "refs/pull"
+    _points_to_commits_only = True
+
+
+class FakeGerritChange(object):
     categories = {'APRV': ('Approved', -1, 1),
                   'CRVW': ('Code-Review', -2, 2),
                   'VRFY': ('Verified', -2, 2)}
@@ -149,9 +154,9 @@ class FakeChange(object):
     def add_fake_change_to_repo(self, msg, fn, large):
         path = os.path.join(self.upstream_root, self.project)
         repo = git.Repo(path)
-        ref = ChangeReference.create(repo, '1/%s/%s' % (self.number,
-                                                        self.latest_patchset),
-                                     'refs/tags/init')
+        ref = GerritChangeReference.create(
+            repo, '1/%s/%s' % (self.number, self.latest_patchset),
+            'refs/tags/init')
         repo.head.reference = ref
         zuul.merger.merger.reset_repo_to_head(repo)
         repo.git.clean('-x', '-f', '-d')
@@ -385,6 +390,144 @@ class FakeChange(object):
         self.reported += 1
 
 
+class FakeGithubPullRequest(object):
+
+    def __init__(self, github, number, project, branch,
+                 upstream_root, number_of_commits=1):
+        """Creates a new PR with several commits.
+        Sends an event about opened PR."""
+        self.github = github
+        self.number = number
+        self.project = project
+        self.branch = branch
+        self.upstream_root = upstream_root
+        self.comments = []
+        self._createPRRef()
+        self._addCommitToRepo()
+        self._emitPullRequestEvent('opened')
+
+    def addCommit(self):
+        """Adds a commit on top of the actual PR head.
+        Sends an event about updated PR."""
+        self._addCommitToRepo()
+        self._emitPullRequestEvent('synchronize')
+
+    def forcePush(self):
+        """Clears actual commits and add a commit on top of the base.
+        Sends an event about updated PR."""
+        self._addCommitToRepo(reset=True)
+        self._emitPullRequestEvent('synchronize')
+
+    def close(self):
+        """Sends an event about closed PR."""
+        self._emitPullRequestEvent('closed')
+
+    def reopen(self):
+        """Sends an event about reopened PR."""
+        self._emitPullRequestEvent('reopened')
+
+    def merge(self):
+        """Merge the PR to the target branch.
+        Sends an event about the push."""
+        repo = self._getRepo()
+        repo.head.reference = self.branch
+        zuul.merger.merger.reset_repo_to_head(repo)
+        repo.git.clean('-x', '-f', '-d')
+        repo.heads[self.branch].checkout()
+        base_branch_sha = repo.heads[self.branch].commit.hexsha
+        repo.git.merge(self.getPRHeadSha())
+        self._emitPullRequestEvent('closed')
+        self._emitPushEvent(base_branch_sha)
+
+    def addComment(self, message):
+        self.comments.append(message)
+
+    def _getRepo(self):
+        repo_path = os.path.join(self.upstream_root, self.project)
+        return git.Repo(repo_path)
+
+    def _createPRRef(self):
+        repo = self._getRepo()
+        GithubChangeReference.create(
+            repo, self._getPRReference(), 'refs/tags/init')
+
+    def _addCommitToRepo(self, reset=False):
+        repo = self._getRepo()
+        ref = repo.references[self._getPRReference()]
+        if reset:
+            ref.set_object('refs/tags/init')
+        repo.head.reference = ref
+        zuul.merger.merger.reset_repo_to_head(repo)
+        repo.git.clean('-x', '-f', '-d')
+
+        fn = '%s-%s' % (self.branch.replace('/', '_'), self.number)
+        msg = 'test-%s' % self.number
+        fn = os.path.join(repo.working_dir, fn)
+        f = open(fn, 'w')
+        with open(fn, 'w') as f:
+            f.write("test %s %s\n" %
+                    (self.branch, self.number))
+        repo.index.add([fn])
+
+        repo.index.commit(msg)
+        repo.head.reference = 'master'
+        zuul.merger.merger.reset_repo_to_head(repo)
+        repo.git.clean('-x', '-f', '-d')
+        repo.heads['master'].checkout()
+
+    def getBaseBranchSha(self):
+        repo = self._getRepo()
+        return repo.heads[self.branch].commit.hexsha
+
+    def getPRHeadSha(self):
+        repo = self._getRepo()
+        return repo.references[self._getPRReference()].commit.hexsha
+
+    def _getPRReference(self):
+        return '%s/head' % self.number
+
+    def _getPushEvent(self, old_rev):
+        name = 'push'
+        data = {
+            'ref': 'refs/heads/%s' % self.branch,
+            'before': old_rev,
+            'after': self.getBaseBranchSha(),
+            'repository': {
+                'full_name': self.project
+            }
+        }
+        return (name, data)
+
+    def _getPullRequestEvent(self, action):
+        name = 'pull_request'
+        data = {
+            'action': action,
+            'number': self.number,
+            'pull_request': {
+                'base': {
+                    'ref': self.branch,
+                    'repo': {
+                        'full_name': self.project
+                    },
+                    'sha': self.getBaseBranchSha()
+                },
+                'head': {
+                    'sha': self.getPRHeadSha()
+                },
+                'number': self.number,
+                'url': 'https://api.github.com/repos/%s/pulls/%s' %
+                       (self.project, self.number)
+            }
+        }
+        return (name, data)
+
+    def _emitPullRequestEvent(self, action):
+        self.github.emitWebhookEvent(self._getPullRequestEvent(action))
+
+    def _emitPushEvent(self, old_rev):
+        self.github.emitWebhookEvent(self._getPushEvent(old_rev))
+
+
 class FakeGerritConnection(zuul.connection.gerrit.GerritConnection):
     log = logging.getLogger("zuul.test.FakeGerritConnection")
 
@@ -402,9 +545,9 @@ class FakeGerritConnection(zuul.connection.gerrit.GerritConnection):
 
     def addFakeChange(self, project, branch, subject, status='NEW'):
         self.change_number += 1
-        c = FakeChange(self, self.change_number, project, branch, subject,
-                       upstream_root=self.upstream_root,
-                       status=status)
+        c = FakeGerritChange(self, self.change_number, project, branch,
+                             subject, upstream_root=self.upstream_root,
+                             status=status)
         self.changes[self.change_number] = c
         return c
 
@@ -466,6 +609,60 @@ class FakeGerritConnection(zuul.connection.gerrit.GerritConnection):
 
     def getGitUrl(self, project):
         return os.path.join(self.upstream_root, project.name)
+
+
+class FakeGithubConnection(zuul.connection.github.GithubConnection):
+    log = logging.getLogger("zuul.test.FakeGithubConnection")
+
+    def __init__(self, connection_name, connection_config, upstream_root=None):
+        super(FakeGithubConnection, self).__init__(connection_name,
+                                                   connection_config)
+        self.connection_name = connection_name
+        self.pr_number = 0
+        self.pull_requests = []
+        self.upstream_root = upstream_root
+
+    def openFakePullRequest(self, project, branch):
+        self.pr_number += 1
+        pull_request = FakeGithubPullRequest(
+            self, self.pr_number, project, branch, self.upstream_root)
+        self.pull_requests.append(pull_request)
+        return pull_request
+
+    def tagBranch(self, project, branch, tag):
+        repo_path = os.path.join(self.upstream_root, project)
+        repo = git.Repo(repo_path)
+        sha = repo.heads[branch].commit.hexsha
+        repo.create_tag(tag, branch)
+        event_name = 'push'
+        event_data = {
+            'ref': 'refs/tags/%s' % tag,
+            'before': sha,
+            'after': sha,
+            'repository': {
+                'full_name': project
+            }
+        }
+        self.emitWebhookEvent((event_name, event_data))
+
+    def emitWebhookEvent(self, event):
+        """Emulates sending the GitHub webhook event to the connection."""
+        port = self.webapp.server.socket.getsockname()[1]
+        name, data = event
+        payload = json.dumps(data)
+        headers = {'X-Github-Event': name}
+        req = urllib2.Request(
+            'http://localhost:%s/connection/%s/payload'
+            % (port, self.connection_name),
+            data=payload, headers=headers)
+        urllib2.urlopen(req)
+
+    def getGitUrl(self, project):
+        return os.path.join(self.upstream_root, str(project))
+
+    def report(self, owner, project, pr_number, message, params=None):
+        pull_request = self.pull_requests[pr_number - 1]
+        pull_request.addComment(message)
 
 
 class BuildHistory(object):
@@ -892,6 +1089,7 @@ class ZuulTestCase(BaseTestCase):
         self.config.set('merger', 'git_dir', self.git_root)
 
         # For each project in config:
+        self.init_repo("github/project")
         self.init_repo("org/project")
         self.init_repo("org/project1")
         self.init_repo("org/project2")
@@ -1023,6 +1221,10 @@ class ZuulTestCase(BaseTestCase):
                     queues_db=self.gerrit_queues_dbs[con_config['server']],
                     upstream_root=self.upstream_root
                 )
+                setattr(self, 'fake_' + con_name, self.connections[con_name])
+            elif con_driver == 'github':
+                self.connections[con_name] = FakeGithubConnection(
+                    con_name, con_config, upstream_root=self.upstream_root)
                 setattr(self, 'fake_' + con_name, self.connections[con_name])
             elif con_driver == 'smtp':
                 self.connections[con_name] = \
