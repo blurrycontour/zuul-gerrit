@@ -3904,3 +3904,29 @@ For CI problems and help debugging, contact ci@example.org"""
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(2))
         self.waitUntilSettled()
         self.assertEqual(self.history[-1].changes, '3,2 2,1 1,2')
+
+    def test_new_patch_in_child(self):
+        "Ensure parent is not lost when child gets new patchset"
+        self.gearman_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
+        # B is a child of A
+        B.setDependsOn(A, 1)
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        # Start jobs in both changes:
+        self.gearman_server.hold_jobs_in_build = False
+        self.worker.release('.*-merge')
+        self.waitUntilSettled()
+        # Add new patchset to child:
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        # Let all jobs complete
+        self.worker.release()
+        self.waitUntilSettled()
+        # Check that original jobs complete in A and new jobs complete in B
+        # A should run the original set of 4 jobs.
+        # B should run the merge job then all 4 for the new patchset for a
+        # total of 5.
+        self.assertEqual(A.reported, 4)
+        self.assertEqual(B.reported, 5)
