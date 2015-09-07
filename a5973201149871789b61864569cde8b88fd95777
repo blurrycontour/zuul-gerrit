@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da20952f_a19a4b12",
+        "filename": "doc/source/cloner.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 6133
+      },
+      "writtenOn": "2015-09-07T08:25:48Z",
+      "side": 1,
+      "message": "typo if you refactor: directory",
+      "revId": "a5973201149871789b61864569cde8b88fd95777",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
