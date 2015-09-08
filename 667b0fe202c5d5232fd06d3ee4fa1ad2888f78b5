@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da20952f_e20ed78b",
+        "filename": "zuul/source/gerrit.py",
+        "patchSetId": 35
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-09-08T12:17:43Z",
+      "side": 0,
+      "message": "startWathing is now not called anywhere, rendering the GerritWatcher a dead code, so the gerrit trigger won\u0027t work (I didn\u0027t tried). \n\nNote that the startWatching method is mocked out in tests, but still not called anywhere.",
+      "revId": "667b0fe202c5d5232fd06d3ee4fa1ad2888f78b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}

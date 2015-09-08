@@ -16,6 +16,23 @@
       "revId": "bb076e6e512fd6a1604050869eb475007cb0a910",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da20952f_028d0b2a",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 35
+      },
+      "lineNbr": 901,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-09-08T12:17:43Z",
+      "side": 1,
+      "message": "When working on the github-integration, I\u0027ve found a glitch here.\n\nWhen a pipeline has a different source than event which is being handled, getting the change referenced by event from that source might fail, or yield weird results (eg. due to trying to get the same change ID from different gerrit instances).\n\nI\u0027m not sure where exactly is a check that the event matches for the pipeline-project combination, so I\u0027ve tried to solve this naively by adding here:\nif project not in pipeline.getProjects():\n    continue\n\nThis still won\u0027t solve configuration where one project is be configured in several pipelines with different sources. Thinking of that, such configuration most likely does not have a real world use case, so it should be forbidden.",
+      "revId": "bb076e6e512fd6a1604050869eb475007cb0a910",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
