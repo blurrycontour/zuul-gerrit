@@ -901,6 +901,7 @@ class Change(Changeish):
         self.url = None
         self.patchset = None
         self.refspec = None
+        self.commit_message = None
 
         self.files = []
         self.needs_changes = []
