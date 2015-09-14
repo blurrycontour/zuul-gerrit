@@ -44,6 +44,7 @@ from git import GitCommandError
 
 import zuul.connection.gerrit
 import zuul.connection.smtp
+import zuul.connection.sql
 import zuul.scheduler
 import zuul.webapp
 import zuul.rpclistener
@@ -979,6 +980,8 @@ class ZuulTestCase(BaseTestCase):
         self.addCleanup(self.shutdown)
 
     def configure_connections(self):
+        # TODO(jhesketh): This should come from lib.connections for better
+        # coverage
         # Register connections from the config
         self.smtp_messages = []
 
@@ -1027,6 +1030,9 @@ class ZuulTestCase(BaseTestCase):
             elif con_driver == 'smtp':
                 self.connections[con_name] = \
                     zuul.connection.smtp.SMTPConnection(con_name, con_config)
+            elif con_driver == 'sql':
+                self.connections[con_name] = \
+                    zuul.connection.sql.SQLConnection(con_name, con_config)
             else:
                 raise Exception("Unknown driver, %s, for connection %s"
                                 % (con_config['driver'], con_name))
