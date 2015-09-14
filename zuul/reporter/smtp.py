@@ -24,18 +24,21 @@ class SMTPReporter(BaseReporter):
     name = 'smtp'
     log = logging.getLogger("zuul.reporter.smtp.Reporter")
 
-    def report(self, source, change, message, params):
+    def report(self, source, pipeline, item, message, params):
         """Send the compiled report message via smtp."""
+        if not message:
+            message = self._formatItemReport(pipeline, item)
+
         self.log.debug("Report change %s, params %s, message: %s" %
-                       (change, params, message))
+                       (item.change, params, message))
 
         from_email = params['from'] if 'from' in params else None
         to_email = params['to'] if 'to' in params else None
 
         if 'subject' in params:
-            subject = params['subject'].format(change=change)
+            subject = params['subject'].format(change=item.change)
         else:
-            subject = "Report for change %s" % change
+            subject = "Report for change %s" % item.change
 
         self.connection.sendMail(subject, message, from_email, to_email)
 

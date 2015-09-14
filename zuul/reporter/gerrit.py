@@ -25,16 +25,19 @@ class GerritReporter(BaseReporter):
     name = 'gerrit'
     log = logging.getLogger("zuul.reporter.gerrit.Reporter")
 
-    def report(self, source, change, message, params):
+    def report(self, source, pipeline, item, message=None, params=[]):
         """Send a message to gerrit."""
-        self.log.debug("Report change %s, params %s, message: %s" %
-                       (change, params, message))
-        changeid = '%s,%s' % (change.number, change.patchset)
-        change._ref_sha = source.getRefSha(change.project.name,
-                                           'refs/heads/' + change.branch)
+        if not message:
+            message = self._formatItemReport(pipeline, item)
 
-        return self.connection.review(change.project.name, changeid, message,
-                                      params)
+        self.log.debug("Report change %s, params %s, message: %s" %
+                       (item.change, params, message))
+        changeid = '%s,%s' % (item.change.number, item.change.patchset)
+        item.change._ref_sha = source.getRefSha(
+            item.change.project.name, 'refs/heads/' + item.change.branch)
+
+        return self.connection.review(item.change.project.name, changeid,
+                                      message, params)
 
     def getSubmitAllowNeeds(self, params):
         """Get a list of code review labels that are allowed to be
