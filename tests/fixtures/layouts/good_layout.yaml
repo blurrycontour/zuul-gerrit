@@ -19,9 +19,13 @@ pipelines:
     success:
       review_gerrit:
         verified: 1
+      mydatabase:
+        score: 1
     failure:
       review_gerrit:
         verified: -1
+      mydatabase:
+        score: -1
 
   - name: post
     manager: IndependentPipelineManager
