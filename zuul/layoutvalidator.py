@@ -162,6 +162,7 @@ class LayoutSchema(object):
             'reporter': {
                 'gerrit': 'zuul.reporter.gerrit',
                 'smtp': 'zuul.reporter.smtp',
+                'sqlalchemy': 'zuul.reporter.sqlalchemy_reporter',
             },
         }
         standard_drivers = {
