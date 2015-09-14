@@ -15,9 +15,21 @@
 import logging
 import testtools
 
-import zuul.connection.gerrit
+import sqlalchemy as sa
 
-from tests.base import ZuulTestCase
+import zuul.connection.gerrit
+import zuul.connection.sql
+
+from tests.base import ZuulTestCase, ZuulDBTestCase
+
+
+def _get_reporter_from_connection_name(reporters, connection_name):
+    # Reporters are placed into lists for each action they may exist in.
+    # Search through the given list for the correct reporter by its conncetion
+    # name
+    for r in reporters:
+        if r.connection.connection_name == connection_name:
+            return r
 
 
 class TestGerritConnection(testtools.TestCase):
@@ -28,11 +40,18 @@ class TestGerritConnection(testtools.TestCase):
                          zuul.connection.gerrit.GerritConnection.driver_name)
 
 
-class TestConnections(ZuulTestCase):
-    def setup_config(self, config_file='zuul-connections-same-gerrit.conf'):
-        super(TestConnections, self).setup_config(config_file)
+class TestSQLConnection(testtools.TestCase):
+    log = logging.getLogger("zuul.test_connection")
 
-    def test_multiple_connections(self):
+    def test_driver_name(self):
+        self.assertEqual(
+            'sql',
+            zuul.connection.sql.SQLConnection.driver_name
+        )
+
+
+class TestConnections(ZuulDBTestCase):
+    def test_multiple_gerrit_connections(self):
         "Test multiple connections to the one gerrit"
 
         A = self.fake_review_gerrit.addFakeChange('org/project', 'master', 'A')
@@ -57,6 +76,170 @@ class TestConnections(ZuulTestCase):
         self.assertEqual(B.patchsets[-1]['approvals'][0]['value'], '-1')
         self.assertEqual(B.patchsets[-1]['approvals'][0]['by']['username'],
                          'civoter')
+
+    def _test_sql_tables_created(self, metadata_table=None):
+        "Test the tables for storing results are created properly"
+        buildset_table = 'zuul_buildset'
+        build_table = 'zuul_build'
+
+        insp = sa.engine.reflection.Inspector(
+            self.connections['resultsdb'].engine)
+
+        self.assertEqual(9, len(insp.get_columns(buildset_table)))
+        self.assertEqual(10, len(insp.get_columns(build_table)))
+
+    def test_sql_tables_created(self):
+        "Test the default table is created"
+        self.config.set('zuul', 'layout_config',
+                        'tests/fixtures/layout-sql-reporter.yaml')
+        self.sched.reconfigure(self.config)
+        self._test_sql_tables_created()
+
+    def _test_sql_results(self):
+        "Test results are entered into an sql table"
+        # Grab the sa tables
+        reporter = _get_reporter_from_connection_name(
+            self.sched.layout.pipelines['check'].success_actions,
+            'resultsdb'
+        )
+
+        # Add a success result
+        A = self.fake_review_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_review_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Add a failed result for a negative score
+        B = self.fake_review_gerrit.addFakeChange('org/project', 'master', 'B')
+        self.worker.addFailTest('project-test1', B)
+        self.fake_review_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        conn = self.connections['resultsdb'].engine.connect()
+        result = conn.execute(
+            sa.sql.select([reporter.connection.zuul_buildset]))
+
+        buildsets = result.fetchall()
+        self.assertEqual(2, len(buildsets))
+        buildset0 = buildsets[0]
+        buildset1 = buildsets[1]
+
+        self.assertEqual('gate', buildset0['pipeline'])
+        self.assertEqual('org/project', buildset0['project'])
+        self.assertEqual(1, buildset0['change'])
+        self.assertEqual(1, buildset0['patchset'])
+        self.assertEqual(1, buildset0['score'])
+        self.assertEqual('Build succeeded.', buildset0['message'])
+
+        buildset0_builds = conn.execute(
+            sa.sql.select([reporter.connection.zuul_build]).
+            where(
+                reporter.connection.zuul_build.c.buildset_id == buildset0['id']
+            )
+        ).fetchall()
+
+        # Check the first result, which should be the project-merge job
+        self.assertEqual('project-merge', buildset0_builds[0]['job_name'])
+        self.assertEqual("SUCCESS", buildset0_builds[0]['result'])
+        self.assertEqual('1,1', buildset0_builds[0]['changeid'])
+        self.assertEqual('http://logs.example.com/1/1/check/project-merge/0',
+                         buildset0_builds[0]['url'])
+
+        self.assertEqual('gate', buildset1['pipeline'])
+        self.assertEqual('org/project', buildset1['project'])
+        self.assertEqual(2, buildset1['change'])
+        self.assertEqual(1, buildset1['patchset'])
+        self.assertEqual(-1, buildset1['score'])
+        self.assertEqual('Build failed.', buildset1['message'])
+
+        buildset1_builds = conn.execute(
+            sa.sql.select([reporter.connection.zuul_build]).
+            where(
+                reporter.connection.zuul_build.c.buildset_id == buildset1['id']
+            )
+        ).fetchall()
+
+        # Check the second last result, which should be the project-test1 job
+        # which failed
+        self.assertEqual('project-test1', buildset1_builds[-2]['job_name'])
+        self.assertEqual("FAILURE", buildset1_builds[-2]['result'])
+        self.assertEqual('1,1', buildset1_builds[-2]['changeid'])
+        self.assertEqual('http://logs.example.com/2/1/check/project-test1/4',
+                         buildset1_builds[-2]['url'])
+
+    def test_sql_results(self):
+        "Test results are entered into the default sql table"
+        self.config.set('zuul', 'layout_config',
+                        'tests/fixtures/layout-sql-reporter.yaml')
+        self.sched.reconfigure(self.config)
+        self._test_sql_results()
+
+    def disable_test_multiple_sql_connections(self):
+        "Test putting results in different databases"
+        self.config.set('zuul', 'layout_config',
+                        'tests/fixtures/layout-sql-reporter.yaml')
+        self.sched.reconfigure(self.config)
+
+        # Add a successful result
+        A = self.fake_review_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_review_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Add a failed result
+        B = self.fake_review_gerrit.addFakeChange('org/project', 'master', 'B')
+        self.worker.addFailTest('project-test1', B)
+        self.fake_review_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Grab the sa tables for resultsdb
+        reporter1 = _get_reporter_from_connection_name(
+            self.sched.layout.pipelines['check'].success_actions,
+            'resultsdb'
+        )
+
+        conn = self.connections['resultsdb'].engine.connect()
+        result = conn.execute(sa.sql.select(
+            [reporter1.connection.zuul_build]))
+        # Should have been 6 jobs reported to the resultsdb
+        self.assertEqual(6, len(result.fetchall()))
+
+        # Grab the sa tables for resultsdb_failures
+        reporter2 = _get_reporter_from_connection_name(
+            self.sched.layout.pipelines['check'].failure_actions,
+            'resultsdb_failures'
+        )
+
+        conn = self.connections['resultsdb_failures'].engine.connect()
+        result = conn.execute(sa.sql.select(
+            [reporter2.connection.zuul_build]))
+        rows = result.fetchall()
+        # The failure db should only have 3 jobs from the failed try
+        self.assertEqual(3, len(rows))
+
+        # Check the failed result
+        found_failed_project = False
+        for row in rows:
+            if row['job_name'] == 'project-test1':
+                found_failed_project = True
+                self.assertEqual("FAILURE", row['result'])
+
+        self.assertEqual(True, found_failed_project)
+
+
+class TestConnectionsBadSQL(ZuulDBTestCase):
+    def setup_config(self, config_file='zuul-connections-bad-sql.conf'):
+        super(TestConnectionsBadSQL, self).setup_config(config_file)
+
+    def test_unable_to_connect(self):
+        "Test the SQL reporter fails gracefully when unable to connect"
+        self.config.set('zuul', 'layout_config',
+                        'tests/fixtures/layout-sql-reporter.yaml')
+        self.sched.reconfigure(self.config)
+
+        # Trigger a reporter. If no errors are raised, the reporter has been
+        # disabled correctly
+        A = self.fake_review_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_review_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
 
 
 class TestMultipleGerrits(ZuulTestCase):
