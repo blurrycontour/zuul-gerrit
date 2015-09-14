@@ -19,9 +19,15 @@ pipelines:
     success:
       review_gerrit:
         verified: 1
+      mydatabase:
+        build_table: zuul_build
+        build_metadata_table: zuul_build_metadata
     failure:
       review_gerrit:
         verified: -1
+      mydatabase:
+        build_table: zuul_build
+        build_metadata_table: zuul_build_metadata
 
   - name: post
     manager: IndependentPipelineManager
