@@ -34,7 +34,7 @@ SMTP
 A simple email reporter is also available.
 
 A :ref:`connection` that uses the smtp driver must be supplied to the
-trigger.
+reporter.
 
 SMTP Configuration
 ~~~~~~~~~~~~~~~~~~
@@ -60,3 +60,35 @@ providing alternatives as arguments to the reporter. For example, ::
           to: you@example.com
           from: alternative@example.com
           subject: Change {change} failed
+
+SQL
+---
+
+This reporter is used to store results in a database.
+
+A :ref:`connection` that uses the sql driver must be supplied to the
+reporter.
+
+SQL Configuration
+~~~~~~~~~~~~~~~~~
+
+zuul.conf contains the database connection and credentials.
+
+Each reporter can set the tables to be used. If these tables don't exist they
+will be created at reload.
+
+  pipelines:
+    - name: post-merge
+      manager: IndependentPipelineManager
+      source: my_gerrit
+      trigger:
+        my_gerrit:
+          - event: change-merged
+      success:
+        mydb_conn:
+            build_table: zuul_build
+            build_metadata_table: zuul_build_metadata
+      failure:
+        mydb_conn:
+            build_table: zuul_build
+            build_metadata_table: zuul_build_metadata

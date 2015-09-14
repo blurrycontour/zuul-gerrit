@@ -13,9 +13,14 @@
 # under the License.
 
 import logging
+import os
+import re
+import sqlalchemy
+import tempfile
 import testtools
 
 import zuul.connection.gerrit
+import zuul.connection.sql
 
 from tests.base import ZuulTestCase
 
@@ -28,12 +33,38 @@ class TestGerritConnection(testtools.TestCase):
                          zuul.connection.gerrit.GerritConnection.driver_name)
 
 
+class TestSQLConnection(testtools.TestCase):
+    log = logging.getLogger("zuul.test_connection")
+
+    def test_driver_name(self):
+        self.assertEqual(
+            'sql',
+            zuul.connection.sql.SQLConnection.driver_name
+        )
+
+
 class TestConnections(ZuulTestCase):
     def setup_config(self, config_file='zuul-connections.conf'):
         super(TestConnections, self).setup_config(config_file)
         self.fake_gerrit_connection = 'review_gerrit'
+        # Because tables for the sql reporter are created in a different thread
+        # (due to the scheduler loading the appropriate reporters dynamically)
+        # we are unable to use the sqlite:///:memory: database. Instead set up
+        # a database location for each test run.
+        for section_name in self.config.sections():
+            con_match = re.match(r'^connection ([\'\"]?)(.*)(\1)$',
+                                 section_name, re.I)
+            if not con_match:
+                continue
 
-    def test_multiple_connections(self):
+            if self.config.get(section_name, 'driver') == 'sql':
+                if self.config.get(section_name, 'dburi') == '$TEMP_SQLITE$':
+                    temp_db_dir = tempfile.mkdtemp()
+                    temp_db = os.path.join(temp_db_dir, 'zuul.db')
+                    self.config.set(section_name, 'dburi',
+                                    'sqlite:///' + temp_db)
+
+    def test_multiple_gerrit_connections(self):
         "Test multiple connections to the one gerrit"
 
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
@@ -58,3 +89,119 @@ class TestConnections(ZuulTestCase):
         self.assertEqual(B.patchsets[-1]['approvals'][0]['value'], '-1')
         self.assertEqual(B.patchsets[-1]['approvals'][0]['by']['username'],
                          'civoter')
+
+    def _test_sql_tables_created(self, build_table=None, metadata_table=None):
+        "Test the tables for storing results are created properly"
+        if not build_table:
+            build_table = 'zuul_build'
+        if not metadata_table:
+            metadata_table = 'zuul_build_metadata'
+
+        insp = sqlalchemy.engine.reflection.Inspector(
+            self.connections['resultsdb'].engine)
+        self.assertEqual(5, len(insp.get_columns(build_table)))
+        self.assertEqual(3, len(insp.get_columns(metadata_table)))
+        self.assertEqual([{
+            'column_names': ['build_uuid', 'key'],
+            'name': 'zuul_build_build_uuid_key'}],
+            insp.get_unique_constraints(metadata_table))
+
+    def test_sql_tables_created(self):
+        "Test the default table is created"
+        self.config.set('zuul', 'layout_config',
+                        'tests/fixtures/layout-sql-reporter.yaml')
+        self.sched.reconfigure(self.config)
+        self._test_sql_tables_created()
+
+    def test_sql_tables_created_alternative_table(self):
+        "Test an alternative layout that creates different tables"
+        self.config.set('zuul', 'layout_config',
+                        'tests/fixtures/layout-sql-reporter-alternative.yaml')
+        self.sched.reconfigure(self.config)
+        self._test_sql_tables_created('alt_results', 'alt_results_metadata')
+
+    def _test_sql_results(self):
+        "Test results are entered into an sql table"
+        # Grab the sqlalchemy tables
+        reporter = \
+            self.sched.layout.pipelines['check'].success_actions[1].reporter
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        conn = self.connections['resultsdb'].engine.connect()
+        result = conn.execute(sqlalchemy.sql.select([reporter.zuul_build]))
+
+        # Just check the first result, which should be the project-merge job
+        row = result.fetchone()
+        metadata = conn.execute(
+            sqlalchemy.sql.select([reporter.zuul_build_metadata]).
+            where(sqlalchemy.sql.and_(
+                reporter.zuul_build_metadata.c.build_uuid ==
+                reporter.zuul_build.c.uuid,
+                reporter.zuul_build_metadata.c.build_uuid == row['uuid']))
+        ).fetchall()
+        metadata_dict = {}
+        for data in metadata:
+            metadata_dict[data['key']] = data['value']
+
+        self.assertEqual('project-merge', row['job_name'])
+        self.assertEqual(True, row['result'])
+        self.assertEqual('1,1', metadata_dict['changeid'])
+        self.assertEqual('http://logs.example.com/1/1/check/project-merge/0',
+                         metadata_dict['url'])
+
+    def test_sql_results(self):
+        "Test results are entered into the default sql table"
+        self.config.set('zuul', 'layout_config',
+                        'tests/fixtures/layout-sql-reporter.yaml')
+        self.sched.reconfigure(self.config)
+        self._test_sql_results()
+
+    def test_sql_results_alternative_table(self):
+        "Test an alternative layout that puts the results in a different table"
+        self.config.set('zuul', 'layout_config',
+                        'tests/fixtures/layout-sql-reporter-alternative.yaml')
+        self.sched.reconfigure(self.config)
+        self._test_sql_results()
+
+    def test_multiple_sql_connections(self):
+        "Test putting results in different databases"
+        self.config.set('zuul', 'layout_config',
+                        'tests/fixtures/layout-sql-reporter.yaml')
+        self.sched.reconfigure(self.config)
+        # Grab the sqlalchemy tables
+        reporter = \
+            self.sched.layout.pipelines['check'].success_actions[1].reporter
+
+        # Add a successful result
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Add a failed result
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        self.worker.addFailTest('project-test1', B)
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        conn = self.connections['resultsdb'].engine.connect()
+        result = conn.execute(sqlalchemy.sql.select([reporter.zuul_build]))
+        # Should have been 6 jobs reported to the resultsdb
+        self.assertEqual(6, len(result.fetchall()))
+
+        conn = self.connections['resultsdb_failures'].engine.connect()
+        result = conn.execute(sqlalchemy.sql.select([reporter.zuul_build]))
+        rows = result.fetchall()
+        # The failure db should only have 3 jobs from the failed try
+        self.assertEqual(3, len(rows))
+
+        # Check the failed result
+        found_failed_project = False
+        for row in rows:
+            if row['job_name'] == 'project-test1':
+                found_failed_project = True
+                self.assertEqual(False, row['result'])
+
+        self.assertEqual(True, found_failed_project)
