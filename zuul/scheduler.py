@@ -359,6 +359,7 @@ class Scheduler(threading.Thread):
             'reporter': {
                 'gerrit': 'zuul.reporter.gerrit:GerritReporter',
                 'smtp': 'zuul.reporter.smtp:SMTPReporter',
+                'sql': 'zuul.reporter.sql:SQLReporter',
             },
         }
 
@@ -625,12 +626,12 @@ class Scheduler(threading.Thread):
     def setMerger(self, merger):
         self.merger = merger
 
-    def getProject(self, name):
+    def getProject(self, name, create_foreign=False):
         self.layout_lock.acquire()
         p = None
         try:
             p = self.layout.projects.get(name)
-            if p is None:
+            if p is None and create_foreign:
                 self.log.info("Registering foreign project: %s" % name)
                 p = Project(name, foreign=True)
                 self.layout.projects[name] = p
