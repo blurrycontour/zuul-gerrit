@@ -1,0 +1,31 @@
+pipelines:
+  - name: check
+    manager: IndependentPipelineManager
+    source:
+        review_gerrit
+    trigger:
+      review_gerrit:
+        - event: patchset-created
+    success:
+      review_gerrit:
+        verified: 1
+      resultsdb:
+        build_table: alt_results
+        build_metadata_table: alt_results_metadata
+    failure:
+      review_gerrit:
+        verified: -1
+      resultsdb:
+        score: -1
+        build_table: alt_results
+        build_metadata_table: alt_results_metadata
+      resultsdb_failures:
+        build_table: alt_results
+        build_metadata_table: alt_results_metadata
+
+projects:
+  - name: org/project
+    check:
+      - project-merge:
+        - project-test1
+        - project-test2
