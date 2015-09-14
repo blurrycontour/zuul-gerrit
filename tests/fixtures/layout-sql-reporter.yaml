@@ -1,0 +1,28 @@
+pipelines:
+  - name: check
+    manager: IndependentPipelineManager
+    source:
+        review_gerrit
+    trigger:
+      review_gerrit:
+        - event: patchset-created
+    success:
+      review_gerrit:
+        verified: 1
+      resultsdb:
+        build_table: zuul_build
+    failure:
+      review_gerrit:
+        verified: -1
+      resultsdb:
+        score: -1
+      resultsdb_failures:
+        build_table: zuul_build
+        build_metadata_table: zuul_build_metadata
+
+projects:
+  - name: org/project
+    check:
+      - project-merge:
+        - project-test1
+        - project-test2
