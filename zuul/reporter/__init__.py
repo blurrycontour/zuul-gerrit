@@ -100,36 +100,43 @@ class BaseReporter(object):
         else:
             return self._formatItemReport(pipeline, item)
 
+    def _createBuildURL(self, pipeline, job, item):
+        build = item.current_build_set.getBuild(job.name)
+        result = build.result
+        if self.sched.config.has_option('zuul', 'url_pattern'):
+            pattern = self.sched.config.get('zuul', 'url_pattern')
+        else:
+            pattern = None
+        if result == 'SUCCESS':
+            if job.success_pattern:
+                pattern = job.success_pattern
+        elif result == 'FAILURE':
+            if job.failure_pattern:
+                pattern = job.failure_pattern
+        if pattern:
+            url = pattern.format(change=item.change,
+                                 pipeline=pipeline,
+                                 job=job,
+                                 build=build)
+        else:
+            url = build.url or job.name
+        return url
+
     def _formatItemReportJobs(self, pipeline, item):
         # Return the list of jobs portion of the report
         ret = ''
 
-        if self.sched.config.has_option('zuul', 'url_pattern'):
-            url_pattern = self.sched.config.get('zuul', 'url_pattern')
-        else:
-            url_pattern = None
-
         for job in pipeline.getJobs(item):
             build = item.current_build_set.getBuild(job.name)
             result = build.result
-            pattern = url_pattern
             if result == 'SUCCESS':
                 if job.success_message:
                     result = job.success_message
-                if job.success_pattern:
-                    pattern = job.success_pattern
             elif result == 'FAILURE':
                 if job.failure_message:
                     result = job.failure_message
-                if job.failure_pattern:
-                    pattern = job.failure_pattern
-            if pattern:
-                url = pattern.format(change=item.change,
-                                     pipeline=pipeline,
-                                     job=job,
-                                     build=build)
-            else:
-                url = build.url or job.name
+
+            url = self._createBuildURL(pipeline, job, item)
             if not job.voting:
                 voting = ' (non-voting)'
             else:
