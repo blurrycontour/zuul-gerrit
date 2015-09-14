@@ -166,6 +166,7 @@ class LayoutSchema(object):
             'reporter': {
                 'gerrit': 'zuul.reporter.gerrit',
                 'smtp': 'zuul.reporter.smtp',
+                'sql': 'zuul.reporter.sql',
             },
         }
         standard_drivers = {
