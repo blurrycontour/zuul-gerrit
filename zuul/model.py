@@ -295,11 +295,11 @@ class ActionReporter(object):
     def __init__(self, reporter):
         self.reporter = reporter
 
-    def report(self, source, change, message):
+    def report(self, source, pipeline, item, message=None):
         """Sends the built message off to the configured reporter.
-        Takes the change and message and adds the configured parameters.
+        Takes the  pipeline, item and message.
         """
-        return self.reporter.report(source, change, message)
+        return self.reporter.report(source, pipeline, item, message)
 
     def getSubmitAllowNeeds(self):
         """Gets the submit allow needs from the reporter based off the
