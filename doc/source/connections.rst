@@ -77,3 +77,25 @@ SMTP
   Who the report should be emailed to by default.
   This can be overridden by individual pipelines.
   ``default_to=you@example.com``
+
+SQL
+----
+
+  Only one connection per a database is permitted.
+
+  **driver=sql**
+
+  **dburi**
+    Database connection information in the form of a URI understood by
+    sqlalchemy. eg http://docs.sqlalchemy.org/en/rel_1_0/core/engines.html#database-urls
+    ``dburi=mysql://user:pass@localhost/db``
+
+.. Comment out build_table. It's available but don't document the feature.
+   At the moment changing the table isn't possible between connections. You can
+   set it from the start, but will need to clear the alembic version table
+   if you ever change it.
+
+..
+      **build_table**
+        Optional: Table to store the build results in.
+        (default: zuul_build)
