@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "ba15a1d1_b7bd1b6a",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-09-15T21:40:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da20952f_b37fd816",
+      "revId": "460498193f916890a120738e4767e4102fba0e2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da20952f_93cc1463",
         "filename": "doc/source/zuul.rst",
         "patchSetId": 12
@@ -30,6 +48,24 @@
       "writtenOn": "2015-09-08T11:32:21Z",
       "side": 1,
       "message": "Change \"trigger\" to \"connection\".",
+      "revId": "460498193f916890a120738e4767e4102fba0e2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba15a1d1_d7c0cfe2",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-09-15T21:40:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da20952f_93cc1463",
       "revId": "460498193f916890a120738e4767e4102fba0e2d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
