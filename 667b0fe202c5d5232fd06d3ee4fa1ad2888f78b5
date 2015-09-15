@@ -16,6 +16,24 @@
       "revId": "667b0fe202c5d5232fd06d3ee4fa1ad2888f78b5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba15a1d1_f74f13bb",
+        "filename": "zuul/source/gerrit.py",
+        "patchSetId": 35
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-09-15T23:05:23Z",
+      "side": 0,
+      "message": "another great catch. I\u0027ll do some more testing a in a real env",
+      "parentUuid": "da20952f_e20ed78b",
+      "revId": "667b0fe202c5d5232fd06d3ee4fa1ad2888f78b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
