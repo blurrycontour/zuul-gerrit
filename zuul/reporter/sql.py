@@ -22,7 +22,7 @@ class SQLReporter(BaseReporter):
     """Sends off reports to a database."""
 
     name = 'sql'
-    log = logging.getLogger("zuul.reporter.mysql.SQLReporter")
+    log = logging.getLogger("zuul.SQLReporter")
 
     def __init__(self, reporter_config={}, sched=None, connection=None):
         super(SQLReporter, self).__init__(
