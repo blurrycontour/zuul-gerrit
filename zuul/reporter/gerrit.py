@@ -23,7 +23,7 @@ class GerritReporter(BaseReporter):
     """Sends off reports to Gerrit."""
 
     name = 'gerrit'
-    log = logging.getLogger("zuul.reporter.gerrit.Reporter")
+    log = logging.getLogger("zuul.GerritReporter")
 
     def report(self, source, pipeline, item, message=None):
         """Send a message to gerrit."""
