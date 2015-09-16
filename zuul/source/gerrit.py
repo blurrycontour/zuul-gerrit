@@ -21,7 +21,7 @@ from zuul.source import BaseSource
 
 class GerritSource(BaseSource):
     name = 'gerrit'
-    log = logging.getLogger("zuul.source.Gerrit")
+    log = logging.getLogger("zuul.GerritSource")
     replication_timeout = 300
     replication_retry_interval = 5
 
