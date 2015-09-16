@@ -43,15 +43,16 @@ array of changes, they will not include the queue structure.
 class WebApp(threading.Thread):
     log = logging.getLogger("zuul.WebApp")
 
-    def __init__(self, scheduler, port=8001, cache_expiry=1):
+    def __init__(self, scheduler, host='0.0.0.0', port=8001, cache_expiry=1):
         threading.Thread.__init__(self)
         self.scheduler = scheduler
+        self.host = host
         self.port = port
         self.cache_expiry = cache_expiry
         self.cache_time = 0
         self.cache = None
         self.daemon = True
-        self.server = httpserver.serve(dec.wsgify(self.app), host='0.0.0.0',
+        self.server = httpserver.serve(dec.wsgify(self.app), host=self.host,
                                        port=self.port, start_loop=False)
 
     def run(self):

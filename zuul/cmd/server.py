@@ -180,7 +180,14 @@ class Server(zuul.cmd.ZuulApp):
             cache_expiry = self.config.getint('zuul', 'status_expiry')
         else:
             cache_expiry = 1
-        webapp = zuul.webapp.WebApp(self.sched, cache_expiry=cache_expiry)
+
+        if self.config.has_option('zuul', 'listen_address'):
+            listen_address = self.config.get('zuul', 'listen_address')
+        else:
+            listen_address = '0.0.0.0'
+
+        webapp = zuul.webapp.WebApp(self.sched, host=listen_address,
+                                    cache_expiry=cache_expiry)
         rpc = zuul.rpclistener.RPCListener(self.config, self.sched)
         gerrit_reporter = zuul.reporter.gerrit.Reporter(gerrit)
         smtp_reporter = zuul.reporter.smtp.Reporter(

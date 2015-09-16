@@ -92,6 +92,10 @@ zuul
 
 .. _layout_config:
 
+**listen_address**
+  IP address on which to listen (default: ``0.0.0.0.0``).
+  ``listen_address=127.0.0.1``
+
 **layout_config**
   Path to layout config file.  Used by zuul-server only.
   ``layout_config=/etc/zuul/layout.yaml``
