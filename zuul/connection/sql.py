@@ -21,7 +21,7 @@ from zuul.connection import BaseConnection
 
 class SQLConnection(BaseConnection):
     driver_name = 'sql'
-    log = logging.getLogger("connection.sql")
+    log = logging.getLogger("zuul.SQLConnection")
 
     def __init__(self, connection_name, connection_config):
 
