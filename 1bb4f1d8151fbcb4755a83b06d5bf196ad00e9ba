@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba15a1d1_d7ef131c",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-09-17T15:27:24Z",
+      "side": 1,
+      "message": "one too many 0\u0027s here.\n\nIt\u0027s also not clear what it is listening for. zuul talks to workers, zmq\u0027s and other things which may make this confusing. I\u0027d like to see it webapp_listen_address or better yet, in it\u0027s own \u0027webapp\u0027 section.",
+      "revId": "1bb4f1d8151fbcb4755a83b06d5bf196ad00e9ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
