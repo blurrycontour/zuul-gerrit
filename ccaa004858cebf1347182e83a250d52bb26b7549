@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba15a1d1_0501d805",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 1760,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-09-17T15:22:53Z",
+      "side": 1,
+      "message": "(nit) It\u0027s harmless, but you don\u0027t need this wait here",
+      "revId": "ccaa004858cebf1347182e83a250d52bb26b7549",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
