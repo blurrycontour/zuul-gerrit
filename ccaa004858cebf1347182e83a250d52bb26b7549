@@ -16,6 +16,24 @@
       "revId": "ccaa004858cebf1347182e83a250d52bb26b7549",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba15a1d1_4130e8e8",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 1760,
+      "author": {
+        "id": 6808
+      },
+      "writtenOn": "2015-09-18T21:25:28Z",
+      "side": 1,
+      "message": "Ah, I see now. The other tests don\u0027t do it either. Only after addEvent, not after addFakeChange.",
+      "parentUuid": "ba15a1d1_0501d805",
+      "revId": "ccaa004858cebf1347182e83a250d52bb26b7549",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
