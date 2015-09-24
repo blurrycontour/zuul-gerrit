@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9a1a9d01_0c1783a4",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 516,
+      "author": {
+        "id": 13431
+      },
+      "writtenOn": "2015-09-24T15:48:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba15a1d1_83f7aff4",
+      "revId": "add949b161928d48e4cb12970301c7cc76e6ac04",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba15a1d1_63985b6b",
         "filename": "zuul/scheduler.py",
         "patchSetId": 8
@@ -30,6 +48,24 @@
       "writtenOn": "2015-09-21T18:17:56Z",
       "side": 1,
       "message": "So what if a change was queued for a real project that was then removed in the reload but another change depended on it? The project wouldn\u0027t be known as foreign and wouldn\u0027t be re-loaded back in so we may end up in an interesting state.\n\nWe should also see a test case for this scenario to make sure it is handled correctly.\n\n(edit) Is this what is handled by zuul/trigger/gerrit.py:407? Either way it\u0027d be good to do a reload during a test to check the functionality is correct.",
+      "revId": "add949b161928d48e4cb12970301c7cc76e6ac04",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a1a9d01_4c46dbc0",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 701,
+      "author": {
+        "id": 13431
+      },
+      "writtenOn": "2015-09-24T15:48:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba15a1d1_63985b6b",
       "revId": "add949b161928d48e4cb12970301c7cc76e6ac04",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
