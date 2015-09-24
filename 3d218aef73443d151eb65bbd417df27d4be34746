@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a1a9d01_607c0821",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 6133
+      },
+      "writtenOn": "2015-09-24T14:40:04Z",
+      "side": 1,
+      "message": "takes the pipeline, item and message",
+      "revId": "3d218aef73443d151eb65bbd417df27d4be34746",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a1a9d01_e02a58e7",
+        "filename": "zuul/reporter/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 6133
+      },
+      "writtenOn": "2015-09-24T14:40:04Z",
+      "side": 1,
+      "message": "i think this bit for date formatting can be moved to an independent function",
+      "revId": "3d218aef73443d151eb65bbd417df27d4be34746",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a1a9d01_2077f003",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1283,
+      "author": {
+        "id": 6133
+      },
+      "writtenOn": "2015-09-24T14:40:04Z",
+      "side": 1,
+      "message": "why do you move this bit here?",
+      "revId": "3d218aef73443d151eb65bbd417df27d4be34746",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
