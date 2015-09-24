@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba15a1d1_b37e3ae2",
+        "filename": "tests/base.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 1020,
+      "author": {
+        "id": 6133
+      },
+      "writtenOn": "2015-09-24T10:05:39Z",
+      "side": 1,
+      "message": "can you isolate these timeouts, that are repeated over the tests, in some constant?",
+      "revId": "1b8b3b007e2e6d360933ef89bfeb8a368523deec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba15a1d1_539d5e08",
+        "filename": "zuul/source/gerrit.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 6133
+      },
+      "writtenOn": "2015-09-24T10:05:39Z",
+      "side": 1,
+      "message": "i feel this needs some comment about what data[4] means",
+      "revId": "1b8b3b007e2e6d360933ef89bfeb8a368523deec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba15a1d1_33878ab6",
+        "filename": "zuul/source/gerrit.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 6133
+      },
+      "writtenOn": "2015-09-24T10:05:39Z",
+      "side": 1,
+      "message": "you could define that in some constant, with a meaningful name",
+      "revId": "1b8b3b007e2e6d360933ef89bfeb8a368523deec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
