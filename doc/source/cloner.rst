@@ -78,6 +78,10 @@ The "indicated branch" is one of the following:
  B) The user specified branch (from the branch arg)
  C) ZUUL_BRANCH (from the zuul_branch arg)
 
+Optionally, the ``--require-zuul-ref`` argument can be passed which will limit
+the lookup order to zuul references steps (1) and (2), but will not continue
+to the tip of branches steps (3) and (4).
+
 Clone order
 -----------
 

@@ -194,6 +194,65 @@ class TestCloner(ZuulTestCase):
         self.worker.release()
         self.waitUntilSettled()
 
+    def test_zuul_ref_required(self):
+        self.worker.hold_jobs_in_build = True
+
+        projects = ['org/project1', 'org/project2']
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        A.addApproval('CRVW', 2)
+        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+
+        self.waitUntilSettled()
+
+        self.assertEquals(1, len(self.builds), "One build is running")
+
+        upstream = self.getUpstreamRepos(projects)
+        state = {
+            'org/project1': self.builds[0].parameters['ZUUL_COMMIT'],
+            'org/project2': str(upstream['org/project2'].commit('master')),
+        }
+
+        build = self.builds[0]
+        self.log.debug("Build parameters: %s", build.parameters)
+
+        cloner = zuul.lib.cloner.Cloner(
+            git_base_url=self.upstream_root,
+            projects=[projects[0], ],
+            workspace=self.workspace_root,
+            zuul_branch=build.parameters['ZUUL_BRANCH'],
+            zuul_ref=build.parameters['ZUUL_REF'],
+            zuul_url=self.git_root,
+            require_zuul_ref=True,
+        )
+        ret = cloner.execute()
+        self.assertEquals(ret, True, "Zuul ref found for project")
+
+        cloner = zuul.lib.cloner.Cloner(
+            git_base_url=self.upstream_root,
+            projects=[projects[1], ],
+            workspace=self.workspace_root,
+            zuul_branch=build.parameters['ZUUL_BRANCH'],
+            zuul_ref=build.parameters['ZUUL_REF'],
+            zuul_url=self.git_root,
+            require_zuul_ref=True,
+        )
+        ret = cloner.execute()
+        self.assertEquals(ret, False, "Missing zuul ref for project")
+
+        work = self.getWorkspaceRepos(projects)
+
+        for project in projects:
+            self.assertEquals(state[project],
+                              str(work[project].commit('HEAD')),
+                              'Project %s commit for build %s should '
+                              'be correct' % (project, 0))
+
+        shutil.rmtree(self.workspace_root)
+
+        self.worker.hold_jobs_in_build = False
+        self.worker.release()
+        self.waitUntilSettled()
+
     def test_multi_branch(self):
         self.worker.hold_jobs_in_build = True
         projects = ['org/project1', 'org/project2',
