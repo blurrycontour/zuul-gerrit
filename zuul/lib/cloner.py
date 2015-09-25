@@ -24,12 +24,17 @@ from zuul.lib.clonemapper import CloneMapper
 from zuul.merger.merger import Repo
 
 
+class CloneError(Exception):
+    pass
+
+
 class Cloner(object):
     log = logging.getLogger("zuul.Cloner")
 
     def __init__(self, git_base_url, projects, workspace, zuul_branch,
                  zuul_ref, zuul_url, branch=None, clone_map_file=None,
-                 project_branches=None, cache_dir=None):
+                 project_branches=None, cache_dir=None,
+                 require_zuul_ref=False):
 
         self.clone_map = []
         self.dests = None
@@ -43,6 +48,7 @@ class Cloner(object):
         self.zuul_ref = zuul_ref or ''
         self.zuul_url = zuul_url
         self.project_branches = project_branches or {}
+        self.require_zuul_ref = require_zuul_ref
 
         if clone_map_file:
             self.readCloneMap(clone_map_file)
@@ -63,8 +69,13 @@ class Cloner(object):
 
         self.log.info("Preparing %s repositories", len(dests))
         for project, dest in dests.iteritems():
-            self.prepareRepo(project, dest)
+            try:
+                self.prepareRepo(project, dest)
+            except Exception:
+                self.log.exception("Failure preparing project: %s" % project)
+                return False
         self.log.info("Prepared all repositories")
+        return True
 
     def cloneUpstream(self, project, dest):
         # Check for a cached git repo first
@@ -160,7 +171,7 @@ class Cloner(object):
             fallback_zuul_ref = None
 
         # If we have a non empty zuul_ref to use, use it. Otherwise we fall
-        # back to checking out the branch.
+        # back to checking out the branch (unless we require a zuul_ref)
         if ((override_zuul_ref and
             self.fetchFromZuul(repo, project, override_zuul_ref)) or
             (fallback_zuul_ref and
@@ -172,7 +183,7 @@ class Cloner(object):
             repo.checkout(fetch_head)
             self.log.info("Prepared %s repo with commit %s",
                           project, fetch_head)
-        else:
+        elif not self.require_zuul_ref:
             # Checkout branch
             self.log.info("Falling back to branch %s", fallback_branch)
             try:
@@ -182,3 +193,6 @@ class Cloner(object):
                                    fallback_branch)
             self.log.info("Prepared %s repo with branch %s at commit %s",
                           project, fallback_branch, commit)
+        else:
+            raise CloneError("Unable to checkout %s or %s and a zuul ref is "
+                             "required" % override_zuul_ref, fallback_zuul_ref)

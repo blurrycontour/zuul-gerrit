@@ -45,6 +45,10 @@ class Cloner(zuul.cmd.ZuulApp):
         parser.add_argument('-v', '--verbose', dest='verbose',
                             action='store_true',
                             help='verbose output')
+        parser.add_argument('--require-zuul-ref', dest='require_zuul_ref',
+                            action='store_true',
+                            help=('Only fetch a zuul ref, '
+                                  'do not fallback to a branch'))
         parser.add_argument('--color', dest='color', action='store_true',
                             help='use color output')
         parser.add_argument('--version', dest='version', action='version',
@@ -143,7 +147,10 @@ class Cloner(zuul.cmd.ZuulApp):
             project_branches=project_branches,
             cache_dir=self.args.cache_dir,
         )
-        cloner.execute()
+        if cloner.execute():
+            sys.exit(0)
+        else:
+            sys.exit(1)
 
 
 def main():
