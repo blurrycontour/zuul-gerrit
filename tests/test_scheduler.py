@@ -1203,15 +1203,15 @@ class TestScheduler(ZuulTestCase):
         self.waitUntilSettled()
 
         self.assertEqual(len(self.builds), 9)
-        self.assertEqual(self.builds[0].name, 'project1-test1')
-        self.assertEqual(self.builds[1].name, 'project1-test2')
-        self.assertEqual(self.builds[2].name, 'project1-project2-integration')
-        self.assertEqual(self.builds[3].name, 'project1-test1')
-        self.assertEqual(self.builds[4].name, 'project1-test2')
-        self.assertEqual(self.builds[5].name, 'project1-project2-integration')
-        self.assertEqual(self.builds[6].name, 'project1-test1')
-        self.assertEqual(self.builds[7].name, 'project1-test2')
-        self.assertEqual(self.builds[8].name, 'project1-project2-integration')
+        self.assertEqual(self.builds[0].name, 'project1-project2-integration')
+        self.assertEqual(self.builds[1].name, 'project1-test1')
+        self.assertEqual(self.builds[2].name, 'project1-test2')
+        self.assertEqual(self.builds[3].name, 'project1-project2-integration')
+        self.assertEqual(self.builds[4].name, 'project1-test1')
+        self.assertEqual(self.builds[5].name, 'project1-test2')
+        self.assertEqual(self.builds[6].name, 'project1-project2-integration')
+        self.assertEqual(self.builds[7].name, 'project1-test1')
+        self.assertEqual(self.builds[8].name, 'project1-test2')
 
         self.release(self.builds[0])
         self.waitUntilSettled()
@@ -3904,3 +3904,151 @@ For CI problems and help debugging, contact ci@example.org"""
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(2))
         self.waitUntilSettled()
         self.assertEqual(self.history[-1].changes, '3,2 2,1 1,2')
+
+    def test_dependeny_graph_dispatch_jobs_once(self):
+        "Test a job in a dependency graph is queued only once"
+        # Job dependencies, starting with A
+        #     A
+        #    / \
+        #   B   C
+        #  / \ / \
+        # D   F   E
+        #     |
+        #     G
+
+        self.worker.hold_jobs_in_build = True
+        flat_change = self.fake_gerrit.addFakeChange(
+            'org/flat-dependency-graph', 'master', 'flat-change')
+        deep_change = self.fake_gerrit.addFakeChange(
+            'org/deep-dependency-graph', 'master', 'deep-change')
+        flat_change.addApproval('CRVW', 2)
+        deep_change.addApproval('CRVW', 2)
+
+        self.fake_gerrit.addEvent(flat_change.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(deep_change.addApproval('APRV', 1))
+
+        self.waitUntilSettled()
+        self.assertEqual(len(self.builds), 2)
+        self.assertEqual(set(b.name for b in self.builds),
+                         set(('A-flat', 'A-deep')))
+
+        self.worker.release('A-.*')
+        self.waitUntilSettled()
+        self.assertEqual(len(self.builds), 4)
+        self.assertEqual(set(b.name for b in self.builds),
+                         set(('B-flat', 'B-deep', 'C-flat', 'C-deep')))
+
+        self.worker.release('B-.*')
+        self.waitUntilSettled()
+        self.assertEqual(len(self.builds), 4)
+        self.assertEqual(set(b.name for b in self.builds),
+                         set(('C-flat', 'C-deep', 'D-flat', 'D-deep')))
+
+        self.worker.release('D-.*')
+        self.waitUntilSettled()
+        self.assertEqual(len(self.builds), 2)
+        self.assertEqual(set(b.name for b in self.builds),
+                         set(('C-flat', 'C-deep')))
+
+        self.worker.release('C-.*')
+        self.waitUntilSettled()
+        self.assertEqual(len(self.builds), 4)
+        self.assertEqual(set(b.name for b in self.builds),
+                         set(('E-flat', 'E-deep', 'F-flat', 'F-deep')))
+
+        self.worker.release('F-.*')
+        self.waitUntilSettled()
+        self.assertEqual(len(self.builds), 4)
+        self.assertEqual(set(b.name for b in self.builds),
+                         set(('E-flat', 'E-deep', 'G-flat', 'G-deep')))
+
+        self.worker.release('G-.*')
+        self.waitUntilSettled()
+        self.assertEqual(len(self.builds), 2)
+        self.assertEqual(set(b.name for b in self.builds),
+                         set(('E-flat', 'E-deep')))
+
+        self.worker.release('E-.*')
+        self.waitUntilSettled()
+        self.assertEqual(len(self.builds), 0)
+
+        self.worker.hold_jobs_in_build = False
+        self.worker.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 0)
+        self.assertEqual(len(self.history), 14)
+
+        self.assertEqual(flat_change.data['status'], 'MERGED')
+        self.assertEqual(deep_change.data['status'], 'MERGED')
+        self.assertEqual(flat_change.reported, 2)
+        self.assertEqual(deep_change.reported, 2)
+
+    def test_jobs_launched_only_if_all_dependencies_are_successful(self):
+        "Test that a job waits till all dependencies are successful"
+        # Job dependencies, starting with A
+        #     A
+        #    / \
+        #   B   C
+        #  / \ / \
+        # D   F   E
+        #     |
+        #     G
+
+        self.worker.hold_jobs_in_build = True
+        flat_change = self.fake_gerrit.addFakeChange(
+            'org/flat-dependency-graph', 'master', 'flat-change')
+        deep_change = self.fake_gerrit.addFakeChange(
+            'org/deep-dependency-graph', 'master', 'deep-change')
+        flat_change.addApproval('CRVW', 2)
+        deep_change.addApproval('CRVW', 2)
+
+        self.worker.addFailTest('B-flat', flat_change)
+        self.worker.addFailTest('C-deep', deep_change)
+
+        self.fake_gerrit.addEvent(flat_change.addApproval('APRV', 1))
+        self.fake_gerrit.addEvent(deep_change.addApproval('APRV', 1))
+
+        self.waitUntilSettled()
+        self.assertEqual(len(self.builds), 2)
+        self.assertEqual(set(b.name for b in self.builds),
+                         set(('A-flat', 'A-deep')))
+
+        self.worker.release('A-.*')
+        self.waitUntilSettled()
+        self.assertEqual(len(self.builds), 4)
+        self.assertEqual(set(b.name for b in self.builds),
+                         set(('B-flat', 'B-deep', 'C-flat', 'C-deep')))
+
+        self.worker.release('B-.*')
+        self.waitUntilSettled()
+        self.assertEqual(len(self.builds), 3)
+        self.assertEqual(set(b.name for b in self.builds),
+                         set(('C-flat', 'C-deep', 'D-deep')))
+
+        self.worker.release('D-.*')
+        self.waitUntilSettled()
+        self.assertEqual(len(self.builds), 2)
+        self.assertEqual(set(b.name for b in self.builds),
+                         set(('C-flat', 'C-deep')))
+
+        self.worker.release('C-.*')
+        self.waitUntilSettled()
+        self.assertEqual(len(self.builds), 1)
+        self.assertEqual(self.builds[0].name, 'E-flat')
+
+        self.worker.release('E-.*')
+        self.waitUntilSettled()
+        self.assertEqual(len(self.builds), 0)
+
+        self.worker.hold_jobs_in_build = False
+        self.worker.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 0)
+        self.assertEqual(len(self.history), 8)
+
+        self.assertEqual(flat_change.data['status'], 'NEW')
+        self.assertEqual(deep_change.data['status'], 'NEW')
+        self.assertEqual(flat_change.reported, 2)
+        self.assertEqual(deep_change.reported, 2)
