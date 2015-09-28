@@ -76,7 +76,7 @@ class Pipeline(object):
         self.footer_message = None
         self.dequeue_on_new_patchset = True
         self.ignore_dependencies = False
-        self.job_trees = {}  # project -> JobTree
+        self.job_graphs = {}  # project -> JobGraph
         self.manager = None
         self.queues = []
         self.precedence = PRECEDENCE_NORMAL
@@ -103,12 +103,12 @@ class Pipeline(object):
         self.manager = manager
 
     def addProject(self, project):
-        job_tree = JobTree(None)  # Null job == job tree root
-        self.job_trees[project] = job_tree
-        return job_tree
+        job_graph = JobGraph()
+        self.job_graphs[project] = job_graph
+        return job_graph
 
     def getProjects(self):
-        return sorted(self.job_trees.keys(), lambda a, b: cmp(a.name, b.name))
+        return sorted(self.job_graphs.keys(), lambda a, b: cmp(a.name, b.name))
 
     def addQueue(self, queue):
         self.queues.append(queue)
@@ -122,54 +122,58 @@ class Pipeline(object):
     def removeQueue(self, queue):
         self.queues.remove(queue)
 
-    def getJobTree(self, project):
-        tree = self.job_trees.get(project)
-        return tree
+    def getJobGraph(self, project):
+        graph = self.job_graphs.get(project)
+        return graph
 
     def getJobs(self, item):
         if not item.live:
             return []
-        tree = self.getJobTree(item.change.project)
-        if not tree:
+        graph = self.getJobGraph(item.change.project)
+        if not graph:
             return []
-        return item.change.filterJobs(tree.getJobs())
+        return item.change.filterJobs(graph.getJobs())
 
-    def _findJobsToRun(self, job_trees, item, mutex):
-        torun = []
+    def findJobsToRun(self, item, mutex):
+        torun = set()
+        if not item.live:
+            return []
+        job_graph = self.getJobGraph(item.change.project)
+        if not job_graph:
+            return []
+
         if item.item_ahead:
             # Only run jobs if any 'hold' jobs on the change ahead
             # have completed successfully.
             if self.isHoldingFollowingChanges(item.item_ahead):
                 return []
-        for tree in job_trees:
-            job = tree.job
-            result = None
-            if job:
-                if not job.changeMatches(item.change):
-                    continue
-                build = item.current_build_set.getBuild(job.name)
-                if build:
-                    result = build.result
-                else:
-                    # There is no build for the root of this job tree,
-                    # so we should run it.
-                    if mutex.acquire(item, job):
-                        # If this job needs a mutex, either acquire it or make
-                        # sure that we have it before running the job.
-                        torun.append(job)
-            # If there is no job, this is a null job tree, and we should
-            # run all of its jobs.
-            if result == 'SUCCESS' or not job:
-                torun.extend(self._findJobsToRun(tree.job_trees, item, mutex))
-        return torun
 
-    def findJobsToRun(self, item, mutex):
-        if not item.live:
-            return []
-        tree = self.getJobTree(item.change.project)
-        if not tree:
-            return []
-        return self._findJobsToRun(tree.job_trees, item, mutex)
+        successful_job_names = set()
+        jobs_not_started = set()
+        for job in job_graph.getJobs():
+            if not job.changeMatches(item.change):
+                # Mark this job as successful as it should not run at all
+                successful_job_names.add(job.name)
+                continue
+            build = item.current_build_set.getBuild(job.name)
+            if build:
+                if build.result == 'SUCCESS':
+                    successful_job_names.add(job.name)
+            else:
+                jobs_not_started.add(job)
+
+        for job in jobs_not_started:
+            all_parent_jobs_successful = True
+            for parent_job in job_graph.getParentJobsRecursively(job):
+                if parent_job.name not in successful_job_names:
+                    all_parent_jobs_successful = False
+                    break
+            if all_parent_jobs_successful:
+                if mutex.acquire(item, job):
+                    # If this job needs a mutex, either acquire it or make
+                    # sure that we have it before running the job.
+                    torun.add(job)
+        return sorted(torun, lambda a, b: cmp(a.name, b.name))
 
     def haveAllJobsStarted(self, item):
         for job in self.getJobs(item):
@@ -230,26 +234,27 @@ class Pipeline(object):
         if build.retry:
             item.removeBuild(build)
         elif build.result != 'SUCCESS':
-            # Get a JobTree from a Job so we can find only its dependent jobs
-            root = self.getJobTree(item.change.project)
-            tree = root.getJobTreeForJob(build.job)
-            for job in tree.getJobs():
-                fakebuild = Build(job, None)
-                fakebuild.result = 'SKIPPED'
-                item.addBuild(fakebuild)
+            graph = self.getJobGraph(item.change.project)
+            for job in graph.getDependentJobsRecursively(build.job):
+                # A previously failing job may already have added fake Builds.
+                build = item.current_build_set.getBuild(job.name)
+                if not build:
+                    fakebuild = Build(job, None)
+                    fakebuild.result = 'SKIPPED'
+                    item.addBuild(fakebuild)
 
     def setUnableToMerge(self, item):
         item.current_build_set.unable_to_merge = True
-        root = self.getJobTree(item.change.project)
-        for job in root.getJobs():
+        graph = self.getJobGraph(item.change.project)
+        for job in graph.getJobs():
             fakebuild = Build(job, None)
             fakebuild.result = 'SKIPPED'
             item.addBuild(fakebuild)
 
     def setDequeuedNeedingChange(self, item):
         item.dequeued_needing_change = True
-        root = self.getJobTree(item.change.project)
-        for job in root.getJobs():
+        graph = self.getJobGraph(item.change.project)
+        for job in graph.getJobs():
             fakebuild = Build(job, None)
             fakebuild.result = 'SKIPPED'
             item.addBuild(fakebuild)
@@ -327,7 +332,7 @@ class ChangeQueue(object):
     def addProject(self, project):
         if project not in self.projects:
             self.projects.append(project)
-            self._jobs |= set(self.pipeline.getJobTree(project).getJobs())
+            self._jobs |= set(self.pipeline.getJobGraph(project).getJobs())
 
             names = [x.name for x in self.projects]
             names.sort()
@@ -524,39 +529,64 @@ class Job(object):
         return True
 
 
-class JobTree(object):
-    """ A JobTree represents an instance of one Job, and holds JobTrees
-    whose jobs should be run if that Job succeeds.  A root node of a
-    JobTree will have no associated Job. """
+class JobGraph(object):
+    """ A JobGraph represents the dependency graph between Job."""
 
-    def __init__(self, job):
-        self.job = job
-        self.job_trees = []
+    def __init__(self):
+        self.jobs = {}  # job_name -> Job
+        self._dependencies = {}  # dependent_job_name -> set(parent_job_names)
 
-    def addJob(self, job):
-        if job not in [x.job for x in self.job_trees]:
-            t = JobTree(job)
-            self.job_trees.append(t)
-            return t
-        for tree in self.job_trees:
-            if tree.job == job:
-                return tree
+    def addJob(self, job, parent_job=None):
+        # parent_job=None means no dependency
+        # The job may already exist, it must be the same
+        if self.jobs.setdefault(job.name, job) != job:
+            return False
+        # Append the dependency information
+        self._dependencies.setdefault(job.name, set())
+        if parent_job is not None:
+            # Make sure a circular dependency is never created
+            ancestor_jobs = self.getParentJobsRecursively(parent_job)
+            ancestor_jobs.add(parent_job)
+            if any((job.name == anc_job.name) for anc_job in ancestor_jobs):
+                return False
+            self._dependencies[job.name].add(parent_job.name)
+        return True
 
     def getJobs(self):
-        jobs = []
-        for x in self.job_trees:
-            jobs.append(x.job)
-            jobs.extend(x.getJobs())
-        return jobs
+        return sorted(self.jobs.values(), lambda a, b: cmp(a.name, b.name))
 
-    def getJobTreeForJob(self, job):
-        if self.job == job:
-            return self
-        for tree in self.job_trees:
-            ret = tree.getJobTreeForJob(job)
-            if ret:
-                return ret
-        return None
+    def getDirectDependentJobs(self, parent_job):
+        ret = set()
+        for dependent_name, parent_names in self._dependencies.items():
+            if parent_job.name in parent_names:
+                ret.add(self.jobs[dependent_name])
+        return ret
+
+    def getDependentJobsRecursively(self, parent_job):
+        all_dependent_jobs = set()
+        jobs_to_iterate = set([parent_job])
+        while len(jobs_to_iterate) > 0:
+            current_job = jobs_to_iterate.pop()
+            current_dependent_jobs = self.getDirectDependentJobs(current_job)
+            new_dependent_jobs = current_dependent_jobs - all_dependent_jobs
+            jobs_to_iterate |= new_dependent_jobs
+            all_dependent_jobs |= new_dependent_jobs
+        return all_dependent_jobs
+
+    def getDirectParentJobs(self, dependent_job):
+        parent_job_names = self._dependencies[dependent_job.name]
+        return set(self.jobs[parent_name] for parent_name in parent_job_names)
+
+    def getParentJobsRecursively(self, dependent_job):
+        all_parent_jobs = set()
+        jobs_to_iterate = set([dependent_job])
+        while len(jobs_to_iterate) > 0:
+            current_job = jobs_to_iterate.pop()
+            current_parent_jobs = self.getDirectParentJobs(current_job)
+            new_parent_jobs = current_parent_jobs - all_parent_jobs
+            jobs_to_iterate |= new_parent_jobs
+            all_parent_jobs |= new_parent_jobs
+        return all_parent_jobs
 
 
 class Build(object):
