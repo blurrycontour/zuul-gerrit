@@ -113,17 +113,18 @@
     name: org/project
     check:
       jobs:
-        - project-merge:
-            jobs:
-              - project-test1
-              - project-test2
+        - project-merge
+        - project-test1:
+            dependencies: project-merge
+        - project-test2:
+            dependencies: project-merge
     gate:
       jobs:
-        - project-merge:
-            jobs:
-              - project-test1
-              - project-test2
-              - project-testfile
+        - project-merge
+        - project-test1:
+            dependencies: project-merge
+        - project-test2:
+            dependencies: project-merge
     post:
       jobs:
         - project-post
@@ -133,18 +134,18 @@
     check:
       jobs:
         - project-merge:
-            jobs:
-              - project-test1
-              - project-test2
-              - project1-project2-integration
+#            jobs:
+#              - project-test1
+#              - project-test2
+#              - project1-project2-integration
     gate:
       queue: integrated
       jobs:
         - project-merge:
-            jobs:
-              - project-test1
-              - project-test2
-              - project1-project2-integration
+#            jobs:
+#              - project-test1
+#              - project-test2
+#              - project1-project2-integration
 
 - project:
     name: org/project2
@@ -152,28 +153,28 @@
       queue: integrated
       jobs:
         - project-merge:
-            jobs:
-              - project-test1
-              - project-test2
-              - project1-project2-integration
+#            jobs:
+#              - project-test1
+#              - project-test2
+#              - project1-project2-integration
 
 - project:
     name: org/project3
     check:
       jobs:
         - project-merge:
-            jobs:
-              - project-test1
-              - project-test2
-              - project1-project2-integration
+#            jobs:
+#              - project-test1
+#              - project-test2
+#              - project1-project2-integration
     gate:
       queue: integrated
       jobs:
         - project-merge:
-            jobs:
-              - project-test1
-              - project-test2
-              - project1-project2-integration
+#            jobs:
+#              - project-test1
+#              - project-test2
+#              - project1-project2-integration
     post:
       jobs:
         - project-post
@@ -183,8 +184,8 @@
     experimental:
       jobs:
         - project-merge:
-            jobs:
-              - experimental-project-test
+#            jobs:
+#              - experimental-project-test
 
 - project:
     name: org/noop-project
@@ -200,15 +201,15 @@
     check:
       jobs:
         - nonvoting-project-merge:
-            jobs:
-              - nonvoting-project-test1
-              - nonvoting-project-test2
+#            jobs:
+#              - nonvoting-project-test1
+#              - nonvoting-project-test2
     gate:
       jobs:
         - nonvoting-project-merge:
-            jobs:
-              - nonvoting-project-test1
-              - nonvoting-project-test2
+#            jobs:
+#              - nonvoting-project-test1
+#              - nonvoting-project-test2
 
 - project:
     name: org/no-jobs-project

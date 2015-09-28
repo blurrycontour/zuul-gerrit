@@ -220,7 +220,7 @@ class TestJob(BaseTestCase):
         self.assertFalse(python27diablo.changeMatches(change))
         self.assertFalse(python27essex.changeMatches(change))
 
-        item.freezeJobTree()
+        item.freezeJobGraph()
         self.assertEqual(len(item.getJobs()), 1)
         job = item.getJobs()[0]
         self.assertEqual(job.name, 'python27')
@@ -248,7 +248,7 @@ class TestJob(BaseTestCase):
         self.assertTrue(python27diablo.changeMatches(change))
         self.assertFalse(python27essex.changeMatches(change))
 
-        item.freezeJobTree()
+        item.freezeJobGraph()
         self.assertEqual(len(item.getJobs()), 1)
         job = item.getJobs()[0]
         self.assertEqual(job.name, 'python27')
@@ -277,7 +277,7 @@ class TestJob(BaseTestCase):
         self.assertFalse(python27diablo.changeMatches(change))
         self.assertTrue(python27essex.changeMatches(change))
 
-        item.freezeJobTree()
+        item.freezeJobGraph()
         self.assertEqual(len(item.getJobs()), 1)
         job = item.getJobs()[0]
         self.assertEqual(job.name, 'python27')
@@ -427,7 +427,7 @@ class TestJob(BaseTestCase):
         self.assertTrue(python27.changeMatches(change))
         self.assertFalse(python27diablo.changeMatches(change))
 
-        item.freezeJobTree()
+        item.freezeJobGraph()
         self.assertEqual(len(item.getJobs()), 1)
         job = item.getJobs()[0]
         self.assertEqual(job.name, 'python27')
@@ -441,7 +441,7 @@ class TestJob(BaseTestCase):
         self.assertTrue(python27.changeMatches(change))
         self.assertTrue(python27diablo.changeMatches(change))
 
-        item.freezeJobTree()
+        item.freezeJobGraph()
         self.assertEqual(len(item.getJobs()), 1)
         job = item.getJobs()[0]
         self.assertEqual(job.name, 'python27')
@@ -492,7 +492,7 @@ class TestJob(BaseTestCase):
         self.assertTrue(base.changeMatches(change))
         self.assertFalse(python27.changeMatches(change))
 
-        item.freezeJobTree()
+        item.freezeJobGraph()
         self.assertEqual([], item.getJobs())
 
     def test_job_source_project(self):
@@ -593,3 +593,54 @@ class TestTimeDataBase(BaseTestCase):
         for x in range(10):
             self.db.update('job-name', 100, 'SUCCESS')
         self.assertEqual(self.db.getEstimatedTime('job-name'), 100)
+
+
+class TestGraph(BaseTestCase):
+    def test_job_graph_disallows_multiple_jobs_with_same_name(self):
+        graph = model.JobGraph()
+        job1 = model.Job('job')
+        job2 = model.Job('job')
+        graph.addJob(job1)
+        with testtools.ExpectedException(Exception,
+                                         "Job job already added"):
+            graph.addJob(job2)
+
+    def test_job_graph_disallows_circular_dependencies(self):
+        graph = model.JobGraph()
+        jobs = [model.Job('job%d' % i) for i in range(0, 10)]
+        prevjob = None
+        for j in jobs[:3]:
+            if prevjob:
+                j.dependencies = frozenset([prevjob.name])
+            graph.addJob(j)
+            prevjob = j
+        # 0 triggers 1 triggers 2 triggers 3...
+
+        # Cannot depend on itself
+        with testtools.ExpectedException(Exception,
+                                         "Dependency cycle detected in job jobX"):
+            j = model.Job('jobX')
+            j.dependencies = frozenset([j.name])
+            graph.addJob(j)
+
+        # Disallow circular dependencies
+        with testtools.ExpectedException(Exception,
+                                         "Dependency cycle detected in job job3"):
+            jobs[4].dependencies = frozenset([jobs[3].name])
+            graph.addJob(jobs[4])
+            jobs[3].dependencies = frozenset([jobs[4].name])
+            graph.addJob(jobs[3])
+
+        jobs[5].dependencies = frozenset([jobs[4].name])
+        graph.addJob(jobs[5])
+
+        print graph._dependencies
+        with testtools.ExpectedException(Exception,
+                                         "Dependency cycle detected in job job3"):
+            jobs[3].dependencies = frozenset([jobs[5].name])
+            graph.addJob(jobs[3])
+
+        jobs[3].dependencies = frozenset([jobs[2].name])
+        graph.addJob(jobs[3])
+        jobs[6].dependencies = frozenset([jobs[2].name])
+        graph.addJob(jobs[6])
