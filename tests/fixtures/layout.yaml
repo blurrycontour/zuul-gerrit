@@ -259,3 +259,31 @@ projects:
   - name: org/no-jobs-project
     check:
       - project-testfile
+
+  - name: org/flat-dependency-graph
+    gate:
+      - A:
+        - B
+        - C
+      - B:
+        - D
+        -
+          - F
+      - C:
+        - E
+        - F
+      - F:
+        - G
+
+  - name: org/deep-dependency-graph
+    gate:
+      - A:
+        - B:
+          - D
+          - F:
+            - G
+        - C:
+          -
+            - E
+          - F:
+            - G
