@@ -250,3 +250,29 @@ projects:
   - name: org/no-jobs-project
     check:
       - project-testfile
+
+  - name: org/flat-dependency-graph
+    gate:
+      - A-flat:
+        - B-flat
+        - C-flat
+      - B-flat:
+        - D-flat
+        - F-flat
+      - C-flat:
+        - E-flat
+        - F-flat
+      - F-flat:
+        - G-flat
+
+  - name: org/deep-dependency-graph
+    gate:
+      - A-deep:
+        - B-deep:
+          - D-deep
+          - F-deep:
+            - G-deep
+        - C-deep:
+          - E-deep
+          - F-deep:
+            - G-deep
