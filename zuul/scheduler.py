@@ -441,17 +441,23 @@ class Scheduler(threading.Thread):
                 for s in swift:
                     job.swift[s['name']] = s
 
-        def add_jobs(job_tree, config_jobs):
+        def add_jobs(job_graph, config_jobs, parent_job=None):
             for job in config_jobs:
                 if isinstance(job, list):
-                    for x in job:
-                        add_jobs(job_tree, x)
+                    add_jobs(job_graph, job, parent_job)
                 if isinstance(job, dict):
-                    for parent, children in job.items():
-                        parent_tree = job_tree.addJob(layout.getJob(parent))
-                        add_jobs(parent_tree, children)
+                    for sub, children in job.items():
+                        sub_job = layout.getJob(sub)
+                        if not job_graph.addJob(sub_job, parent_job):
+                            raise Exception("Circular dependency when adding "
+                                            "job %s with parent %s" %
+                                            (sub_job, parent_job))
+                        add_jobs(job_graph, children, sub_job)
                 if isinstance(job, str):
-                    job_tree.addJob(layout.getJob(job))
+                    if not job_graph.addJob(layout.getJob(job), parent_job):
+                        raise Exception("Circular dependency when adding "
+                                        "job %s with parent %s" %
+                                        (job, parent_job))
 
         for config_project in data.get('projects', []):
             project = Project(config_project['name'])
@@ -483,9 +489,9 @@ class Scheduler(threading.Thread):
             project.merge_mode = model.MERGER_MAP[mode]
             for pipeline in layout.pipelines.values():
                 if pipeline.name in config_project:
-                    job_tree = pipeline.addProject(project)
+                    job_graph = pipeline.addProject(project)
                     config_jobs = config_project[pipeline.name]
-                    add_jobs(job_tree, config_jobs)
+                    add_jobs(job_graph, config_jobs)
 
         # All jobs should be defined at this point, get rid of
         # metajobs so that getJob isn't doing anything weird.
@@ -1039,34 +1045,34 @@ class BasePipelineManager(object):
             self.log.info("    %s" % e)
         self.log.info("  Projects:")
 
-        def log_jobs(tree, indent=0):
-            istr = '    ' + ' ' * indent
-            if tree.job:
-                efilters = ''
-                for b in tree.job._branches:
-                    efilters += str(b)
-                for f in tree.job._files:
-                    efilters += str(f)
-                if tree.job.skip_if_matcher:
-                    efilters += str(tree.job.skip_if_matcher)
-                if efilters:
-                    efilters = ' ' + efilters
-                hold = ''
-                if tree.job.hold_following_changes:
-                    hold = ' [hold]'
-                voting = ''
-                if not tree.job.voting:
-                    voting = ' [nonvoting]'
-                self.log.info("%s%s%s%s%s" % (istr, repr(tree.job),
-                                              efilters, hold, voting))
-            for x in tree.job_trees:
-                log_jobs(x, indent + 2)
+        def log_job(graph, job):
+            efilters = ''
+            for b in job._branches:
+                efilters += str(b)
+            for f in job._files:
+                efilters += str(f)
+            if job.skip_if_matcher:
+                efilters += str(job.skip_if_matcher)
+            if efilters:
+                efilters = ' ' + efilters
+            hold = ''
+            if job.hold_following_changes:
+                hold = ' [hold]'
+            voting = ''
+            if not job.voting:
+                voting = ' [nonvoting]'
+            self.log.info("    %s%s%s%s" % (repr(job),
+                                            efilters, hold, voting))
+            for dependent_job in sorted(graph.getDirectDependentJobs(job),
+                                        lambda a, b: cmp(a.name, b.name)):
+                self.log.info("      %s" % repr(dependent_job))
 
         for p in layout.projects.values():
-            tree = self.pipeline.getJobTree(p)
-            if tree:
+            graph = self.pipeline.getJobGraph(p)
+            if graph:
                 self.log.info("    %s" % p)
-                log_jobs(tree)
+                for job in graph.getJobs():
+                    log_job(graph, job)
         self.log.info("  On start:")
         self.log.info("    %s" % self.pipeline.start_actions)
         self.log.info("  On success:")

@@ -1206,15 +1206,15 @@ class TestScheduler(ZuulTestCase):
         self.waitUntilSettled()
 
         self.assertEqual(len(self.builds), 9)
-        self.assertEqual(self.builds[0].name, 'project1-test1')
-        self.assertEqual(self.builds[1].name, 'project1-test2')
-        self.assertEqual(self.builds[2].name, 'project1-project2-integration')
-        self.assertEqual(self.builds[3].name, 'project1-test1')
-        self.assertEqual(self.builds[4].name, 'project1-test2')
-        self.assertEqual(self.builds[5].name, 'project1-project2-integration')
-        self.assertEqual(self.builds[6].name, 'project1-test1')
-        self.assertEqual(self.builds[7].name, 'project1-test2')
-        self.assertEqual(self.builds[8].name, 'project1-project2-integration')
+        self.assertEqual(self.builds[0].name, 'project1-project2-integration')
+        self.assertEqual(self.builds[1].name, 'project1-test1')
+        self.assertEqual(self.builds[2].name, 'project1-test2')
+        self.assertEqual(self.builds[3].name, 'project1-project2-integration')
+        self.assertEqual(self.builds[4].name, 'project1-test1')
+        self.assertEqual(self.builds[5].name, 'project1-test2')
+        self.assertEqual(self.builds[6].name, 'project1-project2-integration')
+        self.assertEqual(self.builds[7].name, 'project1-test1')
+        self.assertEqual(self.builds[8].name, 'project1-test2')
 
         self.release(self.builds[0])
         self.waitUntilSettled()
@@ -4136,3 +4136,123 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertIn('Build failed.', K.messages[0])
         # No more messages reported via smtp
         self.assertEqual(3, len(self.smtp_messages))
+
+    def test_dependeny_graph_dispatch_jobs_once_deep(self):
+        self._test_dependeny_graph_dispatch_jobs_once('deep')
+
+    def test_dependeny_graph_dispatch_jobs_once_flat(self):
+        self._test_dependeny_graph_dispatch_jobs_once('flat')
+
+    def _test_dependeny_graph_dispatch_jobs_once(self, type):
+        "Test a job in a dependency graph is queued only once"
+        # Job dependencies, starting with A
+        #     A
+        #    / \
+        #   B   C
+        #  / \ / \
+        # D   F   E
+        #     |
+        #     G
+
+        self.worker.hold_jobs_in_build = True
+        change = self.fake_gerrit.addFakeChange(
+            'org/' + type + '-dependency-graph', 'master', 'change')
+        change.addApproval('CRVW', 2)
+
+        self.fake_gerrit.addEvent(change.addApproval('APRV', 1))
+
+        self.waitUntilSettled()
+        self.assertEqual([b.name for b in self.builds], ['A'])
+
+        self.worker.release('A')
+        self.waitUntilSettled()
+        self.assertEqual(sorted(b.name for b in self.builds), ['B', 'C'])
+
+        self.worker.release('B')
+        self.waitUntilSettled()
+        self.assertEqual(sorted(b.name for b in self.builds), ['C', 'D'])
+
+        self.worker.release('D')
+        self.waitUntilSettled()
+        self.assertEqual([b.name for b in self.builds], ['C'])
+
+        self.worker.release('C')
+        self.waitUntilSettled()
+        self.assertEqual(sorted(b.name for b in self.builds), ['E', 'F'])
+
+        self.worker.release('F')
+        self.waitUntilSettled()
+        self.assertEqual(sorted(b.name for b in self.builds), ['E', 'G'])
+
+        self.worker.release('G')
+        self.waitUntilSettled()
+        self.assertEqual([b.name for b in self.builds], ['E'])
+
+        self.worker.release('E')
+        self.waitUntilSettled()
+        self.assertEqual(len(self.builds), 0)
+
+        self.worker.hold_jobs_in_build = False
+        self.worker.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 0)
+        self.assertEqual(len(self.history), 7)
+
+        self.assertEqual(change.data['status'], 'MERGED')
+        self.assertEqual(change.reported, 2)
+
+    def test_jobs_launched_only_if_all_dependencies_are_successful_deep(self):
+        self._test_jobs_launched_only_if_all_dependencies_are_successful('deep')
+
+    def test_jobs_launched_only_if_all_dependencies_are_successful_flat(self):
+        self._test_jobs_launched_only_if_all_dependencies_are_successful('flat')
+
+    def _test_jobs_launched_only_if_all_dependencies_are_successful(self, type):
+        "Test that a job waits till all dependencies are successful"
+        # Job dependencies, starting with A
+        #     A
+        #    / \
+        #   B   C
+        #  / \ / \
+        # D   F   E
+        #     |
+        #     G
+
+        self.worker.hold_jobs_in_build = True
+        change = self.fake_gerrit.addFakeChange(
+            'org/' + type + '-dependency-graph', 'master', 'change')
+        change.addApproval('CRVW', 2)
+
+        self.worker.addFailTest('C', change)
+
+        self.fake_gerrit.addEvent(change.addApproval('APRV', 1))
+
+        self.waitUntilSettled()
+        self.assertEqual([b.name for b in self.builds], ['A'])
+
+        self.worker.release('A')
+        self.waitUntilSettled()
+        self.assertEqual(sorted(b.name for b in self.builds), ['B', 'C'])
+
+        self.worker.release('B')
+        self.waitUntilSettled()
+        self.assertEqual(sorted(b.name for b in self.builds), ['C', 'D'])
+
+        self.worker.release('D')
+        self.waitUntilSettled()
+        self.assertEqual([b.name for b in self.builds], ['C'])
+
+        self.worker.release('C')
+        self.waitUntilSettled()
+        self.assertEqual(len(self.builds), 0)
+
+        self.worker.hold_jobs_in_build = False
+        self.worker.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 0)
+        self.assertEqual(len(self.history), 4)
+
+        self.assertEqual(change.data['status'], 'NEW')
+        self.assertEqual(change.reported, 2)
