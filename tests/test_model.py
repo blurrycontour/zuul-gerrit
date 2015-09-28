@@ -140,3 +140,36 @@ class TestTimeDataBase(BaseTestCase):
         for x in range(10):
             self.db.update('job-name', 100, 'SUCCESS')
         self.assertEqual(self.db.getEstimatedTime('job-name'), 100)
+
+
+class TestGraph(BaseTestCase):
+    def test_job_graph_disallows_multiple_jobs_with_same_name(self):
+        graph = model.JobGraph()
+        job1 = model.Job('job')
+        job2 = model.Job('job')
+        self.assertTrue(graph.addJob(job1))
+        self.assertFalse(graph.addJob(job2))
+
+    def test_job_graph_disallows_circular_dependecies(self):
+        graph = model.JobGraph()
+        jobs = [model.Job('job%d' % i) for i in range(0, 20)]
+        prevjob = None
+        for j in jobs:
+            self.assertTrue(graph.addJob(j, prevjob))
+            prevjob = j
+        # 0 triggers 1 triggers 2 triggers 3...
+
+        # Cannot depend on itself
+        self.assertFalse(graph.addJob(jobs[10], parent_job=jobs[10]))
+
+        # Disallow circular dependencies
+        # 6 cannot trigger 5
+        self.assertFalse(graph.addJob(jobs[5], parent_job=jobs[6]))
+        # 17 cannot trigger 8
+        self.assertFalse(graph.addJob(jobs[8], parent_job=jobs[17]))
+
+        # Allow a short cut in the dependecy graph
+        # 3 already triggers 4
+        self.assertTrue(graph.addJob(jobs[4], parent_job=jobs[3]))
+        # Short cut 7 to trigger 12
+        self.assertTrue(graph.addJob(jobs[12], parent_job=jobs[7]))

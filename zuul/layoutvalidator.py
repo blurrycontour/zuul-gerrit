@@ -116,14 +116,38 @@ class LayoutSchema(object):
     job_name = v.Schema(v.Match("^\S+$"))
 
     def validateJob(self, value, path=[]):
-        if isinstance(value, list):
-            for (i, val) in enumerate(value):
-                self.validateJob(val, path + [i])
-        elif isinstance(value, dict):
-            for k, val in value.items():
-                self.validateJob(val, path + [k])
-        else:
-            self.job_name.schema(value)
+        dependencies = {}
+
+        def parse_entry(value, path, parent):
+            if isinstance(value, list):
+                for (i, val) in enumerate(value):
+                    parse_entry(val, path + [i], parent)
+            elif isinstance(value, dict):
+                for k, val in value.items():
+                    if parent is not None:
+                        dependencies.setdefault(k, set()).add(parent)
+                    parse_entry(val, path + [k], k)
+            else:
+                if parent is not None:
+                    dependencies.setdefault(value, set()).add(parent)
+                self.job_name.schema(value)
+        parse_entry(value, path, None)
+
+        def get_all_recursive_dependencies(root):
+            ret = set()
+            todo = set([root])
+            while len(todo) > 0:
+                current = todo.pop()
+                new_deps = dependencies.get(current, set()) - ret
+                todo |= new_deps
+                ret |= new_deps
+            return ret
+        # Check dependencies
+        for job in dependencies.keys():
+            needed_jobs = get_all_recursive_dependencies(job)
+            if job in needed_jobs:
+                raise v.Invalid("Job %s is dependent on itself : %s" % (job,
+                                sorted(needed_jobs)))
 
     def validateTemplateCalls(self, calls):
         """ Verify a project pass the parameters required
