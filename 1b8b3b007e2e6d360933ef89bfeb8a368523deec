@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9a1a9d01_9db8d676",
+        "filename": "tests/base.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 1020,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-09-30T12:59:52Z",
+      "side": 1,
+      "message": "Actually these don\u0027t need to be here, so I could remove them. However they are removed in a couple of patches down this series. If I remove them I\u0027ll have to rebase everything and lose the reviews on the patches. I\u0027d rather leave them since they are harmless and get cleaned up in a couple of commits.",
+      "parentUuid": "ba15a1d1_b37e3ae2",
+      "revId": "1b8b3b007e2e6d360933ef89bfeb8a368523deec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba15a1d1_539d5e08",
         "filename": "zuul/source/gerrit.py",
         "patchSetId": 25
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "9a1a9d01_bd66fa27",
+        "filename": "zuul/source/gerrit.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-09-30T12:59:52Z",
+      "side": 1,
+      "message": "This is taken directly from the old gerrit trigger. I could tidy it up but again I\u0027d like not to wipe out the reviews. This would be better to fix in another change.",
+      "parentUuid": "ba15a1d1_539d5e08",
+      "revId": "1b8b3b007e2e6d360933ef89bfeb8a368523deec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba15a1d1_33878ab6",
         "filename": "zuul/source/gerrit.py",
         "patchSetId": 25
@@ -47,6 +83,24 @@
       "writtenOn": "2015-09-24T10:05:39Z",
       "side": 1,
       "message": "you could define that in some constant, with a meaningful name",
+      "revId": "1b8b3b007e2e6d360933ef89bfeb8a368523deec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a1a9d01_5d76bed7",
+        "filename": "zuul/source/gerrit.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-09-30T12:59:52Z",
+      "side": 1,
+      "message": "ditto",
+      "parentUuid": "ba15a1d1_33878ab6",
       "revId": "1b8b3b007e2e6d360933ef89bfeb8a368523deec",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
