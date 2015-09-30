@@ -38,7 +38,6 @@ import git
 import gear
 import fixtures
 import six.moves.urllib.parse as urlparse
-import statsd
 import testtools
 from git import GitCommandError
 
@@ -496,6 +495,8 @@ class FakeURLOpener(object):
 
 
 class FakeStatsd(threading.Thread):
+    log = logging.getLogger("zuul.test.FakeStatsd")
+
     def __init__(self):
         threading.Thread.__init__(self)
         self.daemon = True
@@ -504,6 +505,7 @@ class FakeStatsd(threading.Thread):
         self.port = self.sock.getsockname()[1]
         self.wake_read, self.wake_write = os.pipe()
         self.stats = []
+        self.log.debug("Starting fake statsd on %d" % self.port)
 
     def run(self):
         while True:
@@ -517,6 +519,7 @@ class FakeStatsd(threading.Thread):
                     if not data:
                         return
                     self.stats.append(data[0])
+                    # self.log.debug("Received stat: %s" % data[0])
                 if fd == self.wake_read:
                     return
 
@@ -912,9 +915,7 @@ class ZuulTestCase(BaseTestCase):
         os.environ['STATSD_HOST'] = '127.0.0.1'
         os.environ['STATSD_PORT'] = str(self.statsd.port)
         self.statsd.start()
-        # the statsd client object is configured in the statsd module import
-        reload(statsd)
-        reload(zuul.scheduler)
+        self.log.debug("Logging stats to localhost:%d" % self.statsd.port)
 
         self.gearman_server = FakeGearmanServer()
 
