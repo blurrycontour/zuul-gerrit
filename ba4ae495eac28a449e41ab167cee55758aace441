@@ -16,6 +16,24 @@
       "revId": "ba4ae495eac28a449e41ab167cee55758aace441",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a1a9d01_1dc36658",
+        "filename": "doc/source/connections.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-09-30T12:51:51Z",
+      "side": 1,
+      "message": "Just an example dburi. You can use whatever sqlalchemy will accept.",
+      "parentUuid": "ba15a1d1_d02de4a8",
+      "revId": "ba4ae495eac28a449e41ab167cee55758aace441",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
