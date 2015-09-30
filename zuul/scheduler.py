@@ -15,7 +15,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import extras
 import json
 import logging
 import os
@@ -23,6 +22,7 @@ import pickle
 from six.moves import queue as Queue
 import re
 import sys
+import statsd
 import threading
 import time
 import yaml
@@ -33,8 +33,6 @@ from model import ActionReporter, Pipeline, Project, ChangeQueue
 from model import EventFilter, ChangeishFilter
 from zuul import change_matcher
 from zuul import version as zuul_version
-
-statsd = extras.try_import('statsd.statsd')
 
 
 def deep_format(obj, paramdict):
@@ -57,6 +55,23 @@ def deep_format(obj, paramdict):
     else:
         ret = obj
     return ret
+
+
+def _setup_statsd():
+    """Return a statsd client object setup from environment variables; or
+    None if they are not set
+    """
+    # note we're just being careful to let the default values
+    # fall-through to StatsClient()
+    statsd_args = {}
+    if os.getenv('STATSD_HOST', None):
+        statsd_args['host'] = os.environ['STATSD_HOST']
+    if os.getenv('STATSD_PORT', None):
+        statsd_args['port'] = os.environ['STATSD_PORT']
+    if statsd_args:
+        return statsd.StatsClient(**statsd_args)
+    else:
+        return None
 
 
 class MergeFailure(Exception):
@@ -200,6 +215,8 @@ class Scheduler(threading.Thread):
 
         self.zuul_version = zuul_version.version_info.release_string()
         self.last_reconfigured = None
+
+        self.statsd = _setup_statsd()
 
     def stop(self):
         self._stopped = True
@@ -520,7 +537,7 @@ class Scheduler(threading.Thread):
         self.log.debug("Adding trigger event: %s" % event)
         try:
             if statsd:
-                statsd.incr('gerrit.event.%s' % event.type)
+                self.statsd.incr('gerrit.event.%s' % event.type)
         except:
             self.log.exception("Exception reporting event stats")
         self.trigger_event_queue.put(event)
@@ -551,10 +568,10 @@ class Scheduler(threading.Thread):
                                                       jobname, build.result)
                 if build.result in ['SUCCESS', 'FAILURE'] and build.start_time:
                     dt = int((build.end_time - build.start_time) * 1000)
-                    statsd.timing(key, dt)
-                statsd.incr(key)
+                    self.statsd.timing(key, dt)
+                self.statsd.incr(key)
                 key = 'zuul.pipeline.%s.all_jobs' % build.pipeline.name
-                statsd.incr(key)
+                self.statsd.incr(key)
         except:
             self.log.exception("Exception reporting runtime stats")
         event = BuildCompletedEvent(build)
@@ -727,7 +744,7 @@ class Scheduler(threading.Thread):
                         items = len(pipeline.getAllItems())
                         # stats.gauges.zuul.pipeline.NAME.current_changes
                         key = 'zuul.pipeline.%s' % pipeline.name
-                        statsd.gauge(key + '.current_changes', items)
+                        self.statsd.gauge(key + '.current_changes', items)
                 except Exception:
                     self.log.exception("Exception reporting initial "
                                        "pipeline stats:")
@@ -802,11 +819,6 @@ class Scheduler(threading.Thread):
         return False
 
     def run(self):
-        if statsd:
-            self.log.debug("Statsd enabled")
-        else:
-            self.log.debug("Statsd disabled because python statsd "
-                           "package not found")
         while True:
             self.log.debug("Run handler sleeping")
             self.wake_event.wait()
@@ -994,6 +1006,8 @@ class BasePipelineManager(object):
                 'zuul', 'report_times')
         else:
             self.report_times = True
+
+        self.statsd = _setup_statsd()
 
     def __str__(self):
         return "<%s %s>" % (self.__class__.__name__, self.pipeline.name)
@@ -1757,18 +1771,18 @@ class BasePipelineManager(object):
             # stats_counts.zuul.pipeline.NAME.total_changes
             # stats.gauges.zuul.pipeline.NAME.current_changes
             key = 'zuul.pipeline.%s' % self.pipeline.name
-            statsd.gauge(key + '.current_changes', items)
+            self.statsd.gauge(key + '.current_changes', items)
             if dt:
-                statsd.timing(key + '.resident_time', dt)
-                statsd.incr(key + '.total_changes')
+                self.statsd.timing(key + '.resident_time', dt)
+                self.statsd.incr(key + '.total_changes')
 
             # stats.timers.zuul.pipeline.NAME.ORG.PROJECT.resident_time
             # stats_counts.zuul.pipeline.NAME.ORG.PROJECT.total_changes
             project_name = item.change.project.name.replace('/', '.')
             key += '.%s' % project_name
             if dt:
-                statsd.timing(key + '.resident_time', dt)
-                statsd.incr(key + '.total_changes')
+                self.statsd.timing(key + '.resident_time', dt)
+                self.statsd.incr(key + '.total_changes')
         except:
             self.log.exception("Exception reporting pipeline stats")
 
