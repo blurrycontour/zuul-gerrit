@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9a1a9d01_5d3ebe28",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-09-30T12:55:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a1a9d01_607c0821",
+      "revId": "3d218aef73443d151eb65bbd417df27d4be34746",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a1a9d01_e02a58e7",
         "filename": "zuul/reporter/__init__.py",
         "patchSetId": 4
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "9a1a9d01_1d712644",
+        "filename": "zuul/reporter/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-09-30T12:55:48Z",
+      "side": 1,
+      "message": "Most likely, but it has come like this out of the scheduler",
+      "parentUuid": "9a1a9d01_e02a58e7",
+      "revId": "3d218aef73443d151eb65bbd417df27d4be34746",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a1a9d01_2077f003",
         "filename": "zuul/scheduler.py",
         "patchSetId": 4
@@ -47,6 +83,24 @@
       "writtenOn": "2015-09-24T14:40:04Z",
       "side": 1,
       "message": "why do you move this bit here?",
+      "revId": "3d218aef73443d151eb65bbd417df27d4be34746",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a1a9d01_fdc31236",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1283,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-09-30T12:55:48Z",
+      "side": 1,
+      "message": "The reportStart now takes an item, not a change so we need to set up the item first.",
+      "parentUuid": "9a1a9d01_2077f003",
       "revId": "3d218aef73443d151eb65bbd417df27d4be34746",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
