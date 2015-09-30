@@ -1,0 +1,13 @@
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Jenkins
+Code-Review+1: Antoine Musso <hashar@free.fr>
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Code-Review+2: yolanda.robla <info@ysoft.biz>
+Code-Review+1: Khai Do <zaro0508@gmail.com>
+Code-Review+1: Tobias Henkel <tobias.henkel@bmw-carit.de>
+Submitted-by: Jenkins
+Submitted-at: Wed, 30 Sep 2015 16:10:18 +0000
+Reviewed-on: https://review.openstack.org/228631
+Project: openstack-infra/zuul
+Branch: refs/heads/master
