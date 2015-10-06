@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a2fa921_250d7537",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 553,
+      "author": {
+        "id": 18700
+      },
+      "writtenOn": "2015-10-06T21:19:32Z",
+      "side": 1,
+      "message": "It is not enough to just check the direct dependencies. Need \"any((job.name \u003d\u003d pj.name) for pj in getParentJobsRecursively(parent_job))\".",
+      "revId": "218868941859bd5adc0981187904b6cbbe4ff36e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
