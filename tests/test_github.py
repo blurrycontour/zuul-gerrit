@@ -73,15 +73,25 @@ class TestGithub(ZuulTestCase):
             re.DOTALL
         ))
 
+        # comment PR with a matching keyword
+        pull_request.addComment('test me')
+        assertTestJobsParams()
+        self.assertEqual(len(pull_request.comments), 3)
+
+        # comment PR without a matching keyword
+        pull_request.addComment('just a plain comment')
+        self.waitUntilSettled()
+        self.assertEqual(len(pull_request.comments), 4)
+
         # push to PR
         pull_request.addCommit()
         assertTestJobsParams()
-        self.assertEqual(len(pull_request.comments), 2)
+        self.assertEqual(len(pull_request.comments), 5)
 
         # force-push to PR
         pull_request.forcePush()
         assertTestJobsParams()
-        self.assertEqual(len(pull_request.comments), 3)
+        self.assertEqual(len(pull_request.comments), 6)
 
         # close the PR
         pull_request.close()
@@ -89,12 +99,12 @@ class TestGithub(ZuulTestCase):
         self.assertEqual(len(self.builds), 0)
         self.worker.release()
         self.waitUntilSettled()
-        self.assertEqual(len(pull_request.comments), 3)
+        self.assertEqual(len(pull_request.comments), 6)
 
         # reopen the PR
         pull_request.reopen()
         assertTestJobsParams()
-        self.assertEqual(len(pull_request.comments), 4)
+        self.assertEqual(len(pull_request.comments), 7)
 
         # merge the PR
         pull_request.merge()
@@ -109,7 +119,7 @@ class TestGithub(ZuulTestCase):
                          pull_request.getBaseBranchSha())
         self.worker.release('project-push')
         self.waitUntilSettled()
-        self.assertEqual(len(pull_request.comments), 4)
+        self.assertEqual(len(pull_request.comments), 7)
 
     def test_tag_scenario(self):
         """Tag a GitHub branch."""

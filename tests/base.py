@@ -441,6 +441,7 @@ class FakeGithubPullRequest(object):
 
     def addComment(self, message):
         self.comments.append(message)
+        self._emitCommentAddedEvent(message)
 
     def _getRepo(self):
         repo_path = os.path.join(self.upstream_root, self.project)
@@ -521,11 +522,30 @@ class FakeGithubPullRequest(object):
         }
         return (name, data)
 
+    def _getCommentAddedEvent(self, text):
+        name = 'issue_comment'
+        data = {
+            'action': 'created',
+            'issue': {
+                'number': self.number
+            },
+            'comment': {
+                'body': text
+            },
+            'repository': {
+                'full_name': self.project
+            }
+        }
+        return (name, data)
+
     def _emitPullRequestEvent(self, action):
         self.github.emitWebhookEvent(self._getPullRequestEvent(action))
 
     def _emitPushEvent(self, old_rev):
         self.github.emitWebhookEvent(self._getPushEvent(old_rev))
+
+    def _emitCommentAddedEvent(self, text):
+        self.github.emitWebhookEvent(self._getCommentAddedEvent(text))
 
 
 class FakeGerritConnection(zuul.connection.gerrit.GerritConnection):
@@ -656,6 +676,24 @@ class FakeGithubConnection(zuul.connection.github.GithubConnection):
             % (port, self.connection_name),
             data=payload, headers=headers)
         urllib2.urlopen(req)
+
+    def getPull(self, owner, project, number):
+        pr = self.pull_requests[number - 1]
+        data = {
+            'number': number,
+            'url': self.getGitUrl(project),
+            'head': {
+                'sha': pr.getPRHeadSha()
+            },
+            'base': {
+                'repo': {
+                    'full_name': pr.project
+                },
+                'ref': pr.branch,
+                'sha': pr.getBaseBranchSha()
+            }
+        }
+        return data
 
     def getGitUrl(self, project):
         return os.path.join(self.upstream_root, str(project))

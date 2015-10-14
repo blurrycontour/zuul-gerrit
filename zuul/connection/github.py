@@ -98,22 +98,7 @@ class GithubWebhookListener():
         body = request.json_body
         action = body.get('action')
         pr_body = body.get('pull_request')
-        base = pr_body.get('base')
-        base_repo = base.get('repo')
-
-        event = TriggerEvent()
-        event.trigger_name = 'github'
-        event.project_name = base_repo.get('full_name')
-        event.change_number = body.get('number')
-        event.change_url = self.connection.getPullUrl(event.project_name,
-                                                      event.change_number)
-
-        event.account = None
-
-        event.branch = base.get('ref')
-        event.refspec = "refs/pull/" + str(pr_body.get('number')) + "/head"
-
-        event.type = 'pull-request'
+        event = self._pull_request_to_event(pr_body)
 
         if action == 'opened':
             event.type = 'pr-open'
@@ -126,6 +111,24 @@ class GithubWebhookListener():
         else:
             return None
 
+        return event
+
+    def _event_issue_comment(self, request):
+        """Handles pull request comments"""
+        body = request.json_body
+        action = body.get('action')
+        if action != 'created':
+            return
+        number = body.get('issue').get('number')
+        project_name = body.get('repository').get('full_name')
+        owner, project = project_name.split('/')
+        pr_body = self.connection.getPull(owner, project, number)
+        if pr_body is None:
+            return
+
+        event = self._pull_request_to_event(pr_body)
+        event.comment = body.get('comment').get('body')
+        event.type = 'pr-comment'
         return event
 
     def _validate_signature(self, request):
@@ -152,6 +155,25 @@ class GithubWebhookListener():
                 'signature. Check that secret is correct.')
 
         return True
+
+    def _pull_request_to_event(self, pr_body):
+        event = TriggerEvent()
+        event.trigger_name = 'github'
+
+        base = pr_body.get('base')
+        base_repo = base.get('repo')
+
+        event.project_name = base_repo.get('full_name')
+        event.change_number = pr_body.get('number')
+        event.change_url = self.connection.getPullUrl(event.project_name,
+                                                      event.change_number)
+
+        event.account = None
+
+        event.branch = base.get('ref')
+        event.refspec = "refs/pull/" + str(pr_body.get('number')) + "/head"
+
+        return event
 
 
 class GithubConnection(BaseConnection):
@@ -219,6 +241,9 @@ class GithubConnection(BaseConnection):
 
     def getPullUrl(self, project, number):
         return '%s/pull/%s' % (self.getGitwebUrl(project), number)
+
+    def getPull(self, owner, project, number):
+        return self.github.pull_request(owner, project, number)
 
     def report(self, owner, project, pr_number, message, params=None):
         if params is None:
