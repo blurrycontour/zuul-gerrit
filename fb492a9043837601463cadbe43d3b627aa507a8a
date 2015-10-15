@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a2ca52d_8ec6af66",
+        "filename": "zuul/cmd/cloner.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2015-10-15T15:50:09Z",
+      "side": 1,
+      "message": "So the default is False here...",
+      "revId": "fb492a9043837601463cadbe43d3b627aa507a8a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a2ca52d_ced02722",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2015-10-15T15:50:09Z",
+      "side": 1,
+      "message": "But None here.  Should this value be changed from None to False?",
+      "revId": "fb492a9043837601463cadbe43d3b627aa507a8a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a2ca52d_eecde385",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2015-10-15T15:50:09Z",
+      "side": 1,
+      "message": "This seems like a total hack to me.  Can we not use \u0027--no-hardlinks\u0027.  Should be able to jut pass it via kwargs into the clone_from down below.",
+      "revId": "fb492a9043837601463cadbe43d3b627aa507a8a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
