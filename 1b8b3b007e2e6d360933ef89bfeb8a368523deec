@@ -37,6 +37,23 @@
     },
     {
       "key": {
+        "uuid": "5a2ca52d_e8af1b28",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2015-10-15T15:31:32Z",
+      "side": 1,
+      "message": "This is slightly frightening python :)",
+      "revId": "1b8b3b007e2e6d360933ef89bfeb8a368523deec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba15a1d1_539d5e08",
         "filename": "zuul/source/gerrit.py",
         "patchSetId": 25
