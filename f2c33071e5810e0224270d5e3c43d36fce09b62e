@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a2ca52d_d50c21ef",
+        "filename": "tests/test_trigger.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2015-10-16T02:12:19Z",
+      "side": 1,
+      "message": "Does this even need assigment? Will the linter flag it?  Just curious",
+      "revId": "f2c33071e5810e0224270d5e3c43d36fce09b62e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
