@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a2ca52d_72cf6329",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2015-10-16T01:48:54Z",
+      "side": 1,
+      "message": "I think pipeline names can in theory be arbitrary strings and I think this assumes that is not the case.  That would certainly be a good assumption for upstream specifically, but not necessarily a good assumption in general.  At the very least you should provide url encoding.",
+      "revId": "67e87c62b010dafd6bb1898bcb0d93e3d3975e3c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a2ca52d_92d47fbd",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1097,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2015-10-16T01:48:54Z",
+      "side": 1,
+      "message": "As I mentioned before I find this a bit too naive.  Maybe just pass the urlencoded self.pipeline.name?",
+      "revId": "67e87c62b010dafd6bb1898bcb0d93e3d3975e3c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
