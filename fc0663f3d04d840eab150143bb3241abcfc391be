@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a2ca52d_95aea996",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 30
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2015-10-16T02:17:35Z",
+      "side": 1,
+      "message": "I know Jim will hate me for this... but scheduler :)",
+      "revId": "fc0663f3d04d840eab150143bb3241abcfc391be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
