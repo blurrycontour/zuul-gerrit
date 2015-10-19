@@ -26,6 +26,81 @@ Your init script most probably loads a configuration file named
   STATSD_HOST=10.0.0.1
   STATSD_PORT=8125
 
+Metrics Types
+-------------
+
+StatsD has different types of metrics to help produce better understanding of the system.
+They are the following:
+
+**Counters**
+  The counters are simple numbers of events occurrence over time. StatsD will
+  collect the events over a flush interval, and then send the accumulated sum
+  and the average events per-second. StatsD will send the information to
+  Graphite into two different prefixes:
+
+  **stats.<key>**
+    The count of events per-second. This is the accumulated events count divided
+    by the flush interval, per seconds.
+
+  **stats_counts.<key>**
+    The count of events. This is the accumulated events count at the flush
+    interval.
+
+**Timers**
+  Timers collect number values, and provide you with the extra timing metrics
+  calculated, as well as the 90 percentile calculations.
+
+  **stats.timers.<key>.count**
+    The count of timing events for the key per-second. As StatsD has a flush
+    interval to send group of data to the graphite, this information will be
+    the event counts during the flush interval as a per-second average.
+
+  **stats.timers.<key>.count_ps**
+    The count of timing events for the key per-second. As StatsD has a flush
+    interval to send group of data to the graphite, this information will be
+    the event counts during the flush interval as a per-second average.
+
+  **stats.timers.<key>.lower**
+    Lower bound of the timing events on the flush interval.
+
+  **stats.timers.<key>.mean**
+    The mean of the timing events on the flush interval.
+
+  **stats.timers.<key>.mean_90**
+    The 90 percentile mean of the timing events on the flush interval.
+
+  **stats.timers.<key>.median**
+    The median of the timing events on the flush interval.
+
+  **stats.timers.<key>.median_90**
+    The 90 percentile median of the timing events on the flush interval.
+
+  **stats.timers.<key>.std**
+    The standard deviation of the timing events on the flush interval.
+
+  **stats.timers.<key>.sum**
+    The sum of the timing events on the flush interval.
+
+  **stats.timers.<key>.sum_90**
+    The 90 percentile sum of the timing events on the flush interval.
+
+  **stats.timers.<key>.upper**
+    The upper bound of the timing events on the flush interval.
+
+  **stats.timers.<key>.upper_90**
+    The 90 percentile upper of the timing events on the flush interval.
+
+**Gauges**
+  Gauges are similar to counters, except that it does not increase with each
+  new event sent, only produce data points if the values are different. This is
+  useful for monitoring, as if there is much variance it could mean the system
+  needs some attention.
+
+  **stats.gauges.<key>**
+    The metrics related to a gauge event. Only if the value of the key differs
+    it will register a data point. Only the last value on the flush interval
+    will be sent.
+
 Metrics
 -------
 
@@ -99,6 +174,8 @@ The metrics are emitted by the Zuul scheduler (`zuul/scheduler.py`):
   which took 40 seconds to build, the Zuul scheduler will emit the following
   statsd events:
 
-    * `zuul.pipeline.gate.job.myjob.SUCCESS` +1
-    * `zuul.pipeline.gate.job.myjob`  40 seconds
-    * `zuul.pipeline.gate.all_jobs` +1
+    * `stats.zuul.pipeline.gate.job.myjob.SUCCESS` +0.025 per second
+    * `stats_counts.zuul.pipeline.gate.job.myjob.SUCCESS` +1
+    * `stats.timers.zuul.pipeline.gate.job.myjob`  40 seconds
+    * `stats.zuul.pipeline.gate.all_jobs` +0.025 per second
+    * `stats_counts.zuul.pipeline.gate.all_jobs` +1
