@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3a29b11f_2e3551d9",
+        "filename": "zuul/cmd/cloner.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 6808
+      },
+      "writtenOn": "2015-10-20T03:00:54Z",
+      "side": 1,
+      "message": "Yes, but I\u0027m not sure what you mean. How is this different from --color or other boolean parameters that would default behaviour?",
+      "parentUuid": "5a2ca52d_8ec6af66",
+      "revId": "fb492a9043837601463cadbe43d3b627aa507a8a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a2ca52d_ced02722",
         "filename": "zuul/lib/cloner.py",
         "patchSetId": 10
@@ -47,6 +65,24 @@
       "writtenOn": "2015-10-15T15:50:09Z",
       "side": 1,
       "message": "This seems like a total hack to me.  Can we not use \u0027--no-hardlinks\u0027.  Should be able to jut pass it via kwargs into the clone_from down below.",
+      "revId": "fb492a9043837601463cadbe43d3b627aa507a8a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a29b11f_4e476d4b",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 6808
+      },
+      "writtenOn": "2015-10-20T03:00:54Z",
+      "side": 1,
+      "message": "I\u0027m not sure what you\u0027re referring to. Are you proposed to rename the option form --cache-no-hardlinks to --no-hardlinks?",
+      "parentUuid": "5a2ca52d_eecde385",
       "revId": "fb492a9043837601463cadbe43d3b627aa507a8a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
