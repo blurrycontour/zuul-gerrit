@@ -39,13 +39,12 @@ class TestGitHubConnection(testtools.TestCase):
 class TestConnections(ZuulTestCase):
     def setup_config(self, config_file='zuul-connections.conf'):
         super(TestConnections, self).setup_config(config_file)
-        self.fake_gerrit_connection = 'review_gerrit'
 
     def test_multiple_connections(self):
         "Test multiple connections to the one gerrit"
 
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        A = self.fake_review_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_review_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
 
         self.waitUntilSettled()
 
@@ -55,9 +54,9 @@ class TestConnections(ZuulTestCase):
         self.assertEqual(A.patchsets[-1]['approvals'][0]['by']['username'],
                          'jenkins')
 
-        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        B = self.fake_review_gerrit.addFakeChange('org/project', 'master', 'B')
         self.worker.addFailTest('project-test2', B)
-        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.fake_review_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
 
         self.waitUntilSettled()
 
