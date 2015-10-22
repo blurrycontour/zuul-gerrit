@@ -389,7 +389,7 @@ class FakeGerritConnection(zuul.connection.gerrit.GerritConnection):
     log = logging.getLogger("zuul.test.FakeGerritConnection")
 
     def __init__(self, connection_name, connection_config,
-                 changes_db=None, queues_db=None):
+                 changes_db=None, queues_db=None, upstream_root=None):
         super(FakeGerritConnection, self).__init__(connection_name,
                                                    connection_config)
 
@@ -398,7 +398,7 @@ class FakeGerritConnection(zuul.connection.gerrit.GerritConnection):
         self.change_number = 0
         self.changes = changes_db
         self.queries = []
-        self.upstream_root = None
+        self.upstream_root = upstream_root
 
     def addFakeChange(self, project, branch, subject, status='NEW'):
         self.change_number += 1
@@ -948,7 +948,6 @@ class ZuulTestCase(BaseTestCase):
         self.configure_connections()
         self.sched.registerConnections(self.connections, self.webapp)
         self.fake_gerrit = self.connections[self.fake_gerrit_connection]
-        self.fake_gerrit.upstream_root = self.upstream_root
 
         def URLOpenerFactory(*args, **kw):
             if isinstance(args[0], urllib2.Request):
@@ -1023,7 +1022,8 @@ class ZuulTestCase(BaseTestCase):
                 self.connections[con_name] = FakeGerritConnection(
                     con_name, con_config,
                     changes_db=self.gerrit_changes_dbs[con_config['server']],
-                    queues_db=self.gerrit_queues_dbs[con_config['server']]
+                    queues_db=self.gerrit_queues_dbs[con_config['server']],
+                    upstream_root=self.upstream_root
                 )
             elif con_driver == 'smtp':
                 self.connections[con_name] = \
