@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a29b11f_9969c2fb",
+        "filename": "zuul/connection/gerrit.py",
+        "patchSetId": 38
+      },
+      "lineNbr": 419,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-10-22T16:15:44Z",
+      "side": 1,
+      "message": "In FakeGerritConnection, rename startWatching to _start_watcher_thread, so it\u0027s mocked. Otherwise it gives an exception during testing.",
+      "revId": "9aa465eb38757380d9dc24f129ee0f6c466caf34",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
