@@ -478,9 +478,8 @@ class BuildHistory(object):
 
 
 class FakeURLOpener(object):
-    def __init__(self, upstream_root, fake_gerrit, url):
+    def __init__(self, upstream_root, url):
         self.upstream_root = upstream_root
-        self.fake_gerrit = fake_gerrit
         self.url = url
 
     def read(self):
@@ -954,7 +953,6 @@ class ZuulTestCase(BaseTestCase):
         def URLOpenerFactory(*args, **kw):
             if isinstance(args[0], urllib2.Request):
                 return old_urlopen(*args, **kw)
-            args = [self.fake_gerrit] + list(args)
             return FakeURLOpener(self.upstream_root, *args, **kw)
 
         old_urlopen = urllib2.urlopen
