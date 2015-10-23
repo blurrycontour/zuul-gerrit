@@ -856,6 +856,12 @@ class Changeish(object):
     def __init__(self, project):
         self.project = project
 
+    def __str__(self):
+        return str(self._id())
+
+    def _id(self):
+        return None
+
     def getBasePath(self):
         base_path = ''
         if hasattr(self, 'refspec'):
@@ -901,7 +907,10 @@ class Change(Changeish):
         self.owner = None
 
     def _id(self):
-        return '%s,%s' % (self.number, self.patchset)
+        if self.patchset is not None:
+            return '%s,%s' % (self.number, self.patchset)
+        else:
+            return str(self.number)
 
     def __repr__(self):
         return '<Change 0x%x %s>' % (id(self), self._id())
