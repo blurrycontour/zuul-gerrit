@@ -893,6 +893,12 @@ class Changeish(object):
     def __init__(self, project):
         self.project = project
 
+    def __str__(self):
+        return str(self._id())
+
+    def _id(self):
+        return None
+
     def getBasePath(self):
         base_path = ''
         if hasattr(self, 'refspec'):
