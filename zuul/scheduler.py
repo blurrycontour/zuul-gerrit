@@ -1742,7 +1742,7 @@ class BasePipelineManager(object):
 
         for change in build.build_set.other_changes:
             concurrent_changes += '<li><a href="{change.url}">\
-              {change.number},{change.patchset}</a></li>'.format(
+              {change}</a></li>'.format(
                 change=change)
 
         change = build.build_set.item.change
@@ -1789,7 +1789,7 @@ class BasePipelineManager(object):
             ret = """\
 <p>
   Triggered by change:
-    <a href="{change.url}">{change.number},{change.patchset}</a><br/>
+    <a href="{change.url}">{change}</a><br/>
   Branch: <b>{change.branch}</b><br/>
   Pipeline: <b>{self.pipeline.name}</b>
 </p>"""
