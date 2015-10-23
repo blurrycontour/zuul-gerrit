@@ -940,6 +940,7 @@ class Ref(Changeish):
         self.ref = None
         self.oldrev = None
         self.newrev = None
+        self.url = None
 
     def _id(self):
         return self.newrev

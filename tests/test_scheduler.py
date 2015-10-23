@@ -2140,6 +2140,36 @@ class TestScheduler(ZuulTestCase):
         self.assertTrue(re.search("project-test2.*SUCCESS", desc))
         self.assertTrue(re.search("Reported result.*SUCCESS", desc))
 
+    def test_build_description_ref_updated(self):
+        "Test that build description is set corretly for reference update."
+        self.worker.registerFunction('set_description:' +
+                                     self.worker.worker_id)
+        old_rev = '90f173846e3af9154517b88543ffbd1691f31366'
+        new_rev = 'd479a0bfcb34da57a31adb2a595c0cf687812543'
+        ref_name = 'master'
+        e = {
+            "type": "ref-updated",
+            "submitter": {
+                "name": "User Name",
+            },
+            "refUpdate": {
+                "oldRev": old_rev,
+                "newRev": new_rev,
+                "refName": ref_name,
+                "project": "org/project",
+            }
+        }
+        self.fake_gerrit.addEvent(e)
+        self.waitUntilSettled()
+
+        desc = self.history[0].description
+        self.log.debug("Description: %s" % desc)
+        self.assertTrue(
+            re.search('<a href=".*%s.*">%s</a>' % (new_rev, ref_name), desc))
+        self.assertTrue(re.search('Old revision.*%s' % old_rev, desc))
+        self.assertTrue(re.search('New revision.*%s' % new_rev, desc))
+        self.assertTrue(re.search('Pipeline.*post', desc))
+
     def test_queue_names(self):
         "Test shared change queue names"
         project1 = self.sched.layout.projects['org/project1']

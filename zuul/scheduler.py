@@ -1722,7 +1722,7 @@ class BasePipelineManager(object):
             ret = """\
 <p>
   Triggered by reference:
-    {change.ref}</a><br/>
+    <a href="{change.url}">{change.ref}</a><br/>
   Old revision: <b>{change.oldrev}</b><br/>
   New revision: <b>{change.newrev}</b><br/>
   Pipeline: <b>{self.pipeline.name}</b>
