@@ -13,6 +13,7 @@
 # under the License.
 
 import logging
+import re
 from testtools.matchers import MatchesRegex
 
 from tests.base import ZuulTestCase
@@ -36,6 +37,9 @@ class TestGithub(ZuulTestCase):
         * reopen the PR
         * merge the PR
         """
+        self.worker.registerFunction('set_description:' +
+                                     self.worker.worker_id)
+
         def assertTestJobsParams():
             self.waitUntilSettled()
             build = self.builds[0]
@@ -60,6 +64,14 @@ class TestGithub(ZuulTestCase):
                                                             'master')
         assertTestJobsParams()
         self.assertEqual(len(pull_request.comments), 1)
+        descr = self.history[0].description
+        self.assertThat(descr, MatchesRegex(
+            r'.*<\s*a\s+href='
+            '[\'"]https://github.com/github/project/pull/%s[\'"]'
+            '\s*>%s<\s*/a\s*>' %
+            (pull_request.number, pull_request.number),
+            re.DOTALL
+        ))
 
         # push to PR
         pull_request.addCommit()
