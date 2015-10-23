@@ -62,6 +62,8 @@ class GerritWatcher(threading.Thread):
                            username=self.username,
                            port=self.port,
                            key_filename=self.keyfile)
+            transport = client.get_transport()
+            transport.set_keepalive(60)
 
             stdin, stdout, stderr = client.exec_command("gerrit stream-events")
 
@@ -182,6 +184,8 @@ class Gerrit(object):
                        username=self.username,
                        port=self.port,
                        key_filename=self.keyfile)
+        transport = client.get_transport()
+        transport.set_keepalive(60)
         self.client = client
 
     def _ssh(self, command):
