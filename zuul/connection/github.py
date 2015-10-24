@@ -186,18 +186,31 @@ class GithubConnection(BaseConnection):
     driver_name = 'github'
     log = logging.getLogger("connection.github")
     payload_path = '/payload'
+    git_user = 'git'
+    git_host = 'github.com'
 
     def __init__(self, connection_name, connection_config):
         super(GithubConnection, self).__init__(
             connection_name, connection_config)
         self.github = None
         self._change_cache = {}
+        self._git_ssh = False
 
     def onLoad(self):
+
+        def to_bool(value):
+            # TODO(hrubi): duplicates ConfigParser.getbool
+            bools = {'1': True, 'yes': True, 'true': True, 'on': True,
+                     '0': False, 'no': False, 'false': False, 'off': False}
+            if value.lower() not in bools:
+                raise ValueError('Not a boolean: %s' % value)
+            return bools[value.lower()]
+
         webhook_listener = GithubWebhookListener(self)
         self.registerHttpHandler(self.payload_path,
                                  webhook_listener.handle_request)
         self._authenticateGithubAPI()
+        self._git_ssh = to_bool(self.connection_config.get('git_ssh', 'false'))
 
     def onStop(self):
         self.unregisterHttpHandler(self.payload_path)
@@ -219,11 +232,15 @@ class GithubConnection(BaseConnection):
                 del self._change_cache[key]
 
     def getGitUrl(self, project):
-        url = 'https://%s/%s' % ("github.com", project)
+        if self._git_ssh:
+            url = 'ssh://%s@%s:%s.git' % \
+                (self.git_user, self.git_host, project)
+        else:
+            url = 'https://%s/%s' % (self.git_host, project)
         return url
 
     def getGitwebUrl(self, project, sha=None):
-        url = 'https://%s/%s' % ("github.com", project)
+        url = 'https://%s/%s' % (self.git_host, project)
         if sha is not None:
             url += '/commit/%s' % sha
         return url
