@@ -118,3 +118,15 @@ class TestGithub(ZuulTestCase):
 
         self.assertEqual('SUCCESS',
                          self.getJobFromHistory('project-post').result)
+
+    def test_git_https_url(self):
+        """Test that git_ssh option gives git url with ssh"""
+        url = self.fake_github.real_getGitUrl('org/project')
+        self.assertThat(url, MatchesRegex('https://github.com/org/project'))
+
+    def test_git_ssh_url(self):
+        """Test that git_ssh option gives git url with ssh"""
+        url = self.fake_github_ssh.real_getGitUrl('org/project')
+        self.assertThat(
+            url,
+            MatchesRegex('ssh://git@github.com/org/project.git'))
