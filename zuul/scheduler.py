@@ -376,6 +376,7 @@ class Scheduler(threading.Thread):
                         in conf_pipeline.get(action).items():
                         reporter = self._getReporterDriver(reporter_name,
                                                            params)
+                        reporter.setAction(action)
                         action_reporters[action].append(ActionReporter(
                             reporter))
             pipeline.start_actions = action_reporters['start']
