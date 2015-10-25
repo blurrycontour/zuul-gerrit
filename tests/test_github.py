@@ -63,6 +63,7 @@ class TestGithub(ZuulTestCase):
             re.DOTALL
         ))
         self.assertEqual(1, len(pr.comments))
+        self.assertEqual(pr.statuses['check']['state'], 'success')
 
     def test_comment_event(self):
         pr = self.fake_github.openFakePullRequest('org/project', 'master')
