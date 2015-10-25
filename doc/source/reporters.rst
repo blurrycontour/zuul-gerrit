@@ -35,7 +35,11 @@ Zull reports back to GitHub pull requests via GitHub API.
 It will create a comment containing the job status.
 
 A :ref:`connection` that uses the github driver must be supplied to the
-reporter. It has a string parameter, but it has no special meaning yet.
+reporter. It can have following options.
+
+  **status**
+  Set the github commit status. It has to be set on at least ``start``,
+  ``success`` and ``failure`` reporters to make sense.
 
 SMTP
 ----

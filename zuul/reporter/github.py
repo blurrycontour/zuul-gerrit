@@ -24,12 +24,49 @@ class GithubReporter(BaseReporter):
     name = 'github'
     log = logging.getLogger("zuul.reporter.gerrit.Reporter")
 
+    def __init__(self, reporter_config={}, sched=None, connection=None):
+        super(GithubReporter, self).__init__(
+            reporter_config, sched, connection)
+        self.github_state = None
+
+    def postConfig(self):
+        github_states = {
+            self.action_start: 'pending',
+            self.action_success: 'success',
+            self.action_failure: 'failure',
+            self.action_merge_failure: 'failure'
+        }
+        self.github_state = github_states[self.action]
+
     def report(self, source, pipeline, item, message=None):
         """Comment on PR with test status."""
-        owner, project = item.change.project.name.split("/")
-        pr_number = item.change.number
+        self.addPullComment(pipeline, item, message)
+        if ('status' in self.reporter_config and
+            hasattr(item.change, 'patchset') and
+            item.change.patchset is not None):
+            self.setPullStatus(pipeline, item)
 
-        self.connection.report(owner, project, pr_number, message)
+    def addPullComment(self, pipeline, item, message):
+        if message is None:
+            message = self._formatItemReport(pipeline, item)
+        owner, project = item.change.project.name.split('/')
+        pr_number = item.change.number
+        self.connection.commentPull(owner, project, pr_number, message)
+
+    def setPullStatus(self, pipeline, item):
+        owner, project = item.change.project.name.split('/')
+        sha = item.change.patchset
+        context = pipeline.name
+        state = self.github_state
+        url = ''
+        if self.sched.config.has_option('zuul', 'status_url'):
+            url = self.sched.config.get('zuul', 'status_url')
+        description = ''
+        if pipeline.description:
+            description = pipeline.description
+
+        self.connection.setCommitStatus(
+            owner, project, sha, state, url, description, context)
 
 
 def getSchema():
