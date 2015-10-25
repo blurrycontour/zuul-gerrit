@@ -24,10 +24,22 @@ class BaseReporter(object):
     Defines the exact public methods that must be supplied.
     """
 
+    _action_start = 'start'
+    _action_success = 'success'
+    _action_failure = 'failure'
+    _action_merge_failure = 'merge-failure'
+
     def __init__(self, reporter_config={}, sched=None, connection=None):
         self.reporter_config = reporter_config
         self.sched = sched
         self.connection = connection
+        self._action = None
+
+    def setAction(self, action):
+        if action not in [self._action_start, self._action_success,
+                          self._action_failure, self._action_merge_failure]:
+            raise ValueError('Unknown reporter action: %s' % action)
+        self._action = action
 
     def stop(self):
         """Stop the reporter."""

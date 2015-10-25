@@ -32,10 +32,12 @@ GitHub
 ------
 
 Zull reports back to GitHub pull requests via GitHub API.
-It will create a comment containing the job status.
+On success and failure, it creates a comment containing the build results.
+It also sets the status on start, success and failure. Status name and
+description is taken from the pipeline.
 
 A :ref:`connection` that uses the github driver must be supplied to the
-reporter. It has a string parameter, but it has no special meaning yet.
+reporter. It ignores any options, so empty value is sufficient.
 
 SMTP
 ----
