@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "3a29b11f_adee80b2",
+        "filename": "zuul/cmd/cloner.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2015-10-25T00:42:22Z",
+      "side": 1,
+      "message": "So I was just observing that your default is False here but in your function (which I commented on) the default became None.  Shouldn\u0027t it be false there as well?",
+      "parentUuid": "3a29b11f_2e3551d9",
+      "revId": "fb492a9043837601463cadbe43d3b627aa507a8a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a2ca52d_ced02722",
         "filename": "zuul/lib/cloner.py",
         "patchSetId": 10
@@ -83,6 +101,24 @@
       "side": 1,
       "message": "I\u0027m not sure what you\u0027re referring to. Are you proposed to rename the option form --cache-no-hardlinks to --no-hardlinks?",
       "parentUuid": "5a2ca52d_eecde385",
+      "revId": "fb492a9043837601463cadbe43d3b627aa507a8a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a29b11f_8df14498",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2015-10-25T00:42:22Z",
+      "side": 1,
+      "message": "No I\u0027m proposing rather than inferring a certain side affect of using file:// we explicitly pass the argument --no-hardlinks to the clone operation\n\nSee: https://www.kernel.org/pub/software/scm/git/docs/git-clone.html",
+      "parentUuid": "3a29b11f_4e476d4b",
       "revId": "fb492a9043837601463cadbe43d3b627aa507a8a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
