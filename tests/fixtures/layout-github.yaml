@@ -11,9 +11,11 @@ pipelines:
         - event: pr-comment
           comment: 'test me'
     success:
-      github: 'TEST PASSES'
+      github:
+        - status
     failure:
-      github: 'TEST FAILED'
+      github:
+        - status
 
   - name: post
     manager: IndependentPipelineManager
