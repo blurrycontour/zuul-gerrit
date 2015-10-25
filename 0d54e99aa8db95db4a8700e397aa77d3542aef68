@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a29b11f_37edd58e",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1120,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-10-25T13:20:42Z",
+      "side": 1,
+      "message": "I\u0027d move formatting the start message to the reporter as well. It will simplify the interface, message will be never sent to reporter from outside. Reporter then can decide how to format the start action report.\n\nThen you can either have the BaseReporter format the default message and pass it to the report function of the specific reporter class. Or you can leave it as is, ie. just provide the generic _formatItemReport in BaseReporter for specific reporters to use (or not).",
+      "revId": "0d54e99aa8db95db4a8700e397aa77d3542aef68",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
