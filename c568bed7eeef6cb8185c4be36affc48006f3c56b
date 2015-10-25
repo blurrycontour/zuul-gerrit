@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a29b11f_17e1b9fe",
+        "filename": "doc/source/statsd.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-10-25T12:01:41Z",
+      "side": 1,
+      "message": "Isn\u0027t this general information about statsd something better to link to in the upstream documentation?",
+      "revId": "c568bed7eeef6cb8185c4be36affc48006f3c56b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a29b11f_b7cd6588",
+        "filename": "doc/source/statsd.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-10-25T12:01:41Z",
+      "side": 1,
+      "message": "These changes, however, are useful.",
+      "revId": "c568bed7eeef6cb8185c4be36affc48006f3c56b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
