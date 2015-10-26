@@ -16,6 +16,7 @@ git_dir=/var/lib/zuul/git
 ;git_user_email=zuul@example.com
 ;git_user_name=zuul
 zuul_url=http://zuul.example.com/p
+sshkey=/home/jenkins/.ssh/id_rsa
 
 [swift]
 authurl=https://identity.api.example.org/v2.0/

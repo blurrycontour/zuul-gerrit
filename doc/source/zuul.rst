@@ -143,6 +143,10 @@ merger
   Path to PID lock file for the merger process.
   ``pidfile=/var/run/zuul-merger/merger.pid``
 
+**sshkey**
+  Path to SSH key to use when fetching git repositories.
+  ``sshkey=/home/zuul/.ssh/id_rsa``
+
 .. _swift:
 
 swift
