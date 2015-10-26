@@ -25,7 +25,7 @@ class GerritReporter(BaseReporter):
     name = 'gerrit'
     log = logging.getLogger("zuul.GerritReporter")
 
-    def report(self, source, pipeline, item, message=None):
+    def report(self, source, pipeline, item, message=None, trigger_type=None):
         """Send a message to gerrit."""
         if not message:
             message = self._formatItemReport(pipeline, item)

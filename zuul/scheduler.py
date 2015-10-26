@@ -1143,7 +1143,7 @@ class BasePipelineManager(object):
             if self.sched.config.has_option('zuul', 'status_url'):
                 msg += "\n" + self.sched.config.get('zuul', 'status_url')
             ret = self.sendReport(self.pipeline.start_actions,
-                                  self.pipeline.source, item, msg)
+                                  self.pipeline.source, item, msg, 'start')
             if ret:
                 self.log.error("Reporting item start %s received: %s" %
                                (item, ret))
@@ -1151,7 +1151,7 @@ class BasePipelineManager(object):
             self.log.exception("Exception while reporting start:")
 
     def sendReport(self, action_reporters, source, item,
-                   message=None):
+                   message=None, trigger_type=None):
         """Sends the built message off to configured reporters.
 
         Takes the action_reporters, item, message and extra options and
@@ -1161,7 +1161,7 @@ class BasePipelineManager(object):
         if len(action_reporters) > 0:
             for action_reporter in action_reporters:
                 ret = action_reporter.report(source, self.pipeline, item,
-                                             message)
+                                             message, trigger_type)
                 if ret:
                     report_errors.append(ret)
             if len(report_errors) == 0:
@@ -1590,6 +1590,7 @@ class BasePipelineManager(object):
     def _reportItem(self, item):
         self.log.debug("Reporting change %s" % item.change)
         ret = True  # Means error as returned by trigger.report
+        trigger_type = None
         if not self.pipeline.getJobs(item):
             # We don't send empty reports with +1,
             # and the same for -1's (merge failures or transient errors)
@@ -1600,18 +1601,21 @@ class BasePipelineManager(object):
             self.log.debug("success %s" % (self.pipeline.success_actions))
             actions = self.pipeline.success_actions
             item.setReportedResult('SUCCESS')
+            trigger_type = 'success'
         elif not self.pipeline.didMergerSucceed(item):
             actions = self.pipeline.merge_failure_actions
             item.setReportedResult('MERGER_FAILURE')
+            trigger_type = 'merge_failure'
         else:
             actions = self.pipeline.failure_actions
             item.setReportedResult('FAILURE')
+            trigger_type = 'failure'
         if actions:
             try:
                 self.log.info("Reporting item %s, actions: %s" %
                               (item, actions))
                 ret = self.sendReport(actions, self.pipeline.source,
-                                      item)
+                                      item, trigger_type=trigger_type)
                 if ret:
                     self.log.error("Reporting item %s received: %s" %
                                    (item, ret))
