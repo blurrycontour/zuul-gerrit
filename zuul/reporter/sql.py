@@ -73,7 +73,8 @@ class SQLReporter(BaseReporter):
                 "Unable to connect to the database or establish the required "
                 "tables. Reporter %s is disabled" % self)
 
-    def report(self, source, pipeline, item, message=None, params=[]):
+    def report(self, source, pipeline, item, message=None, params=[],
+               trigger_type=None):
         """Create an entry into a database."""
 
         if not self.tables_established:
