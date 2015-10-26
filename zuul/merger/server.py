@@ -44,7 +44,10 @@ class MergeServer(object):
         else:
             merge_name = None
 
-        if self.config.has_option('gerrit', 'sshkey'):
+        if self.config.has_option('merger', 'sshkey'):
+            sshkey = self.config.get('merger', 'sshkey')
+        # TODO(hrubi): Remove backwards compatibility
+        elif self.config.has_option('gerrit', 'sshkey'):
             sshkey = self.config.get('gerrit', 'sshkey')
         else:
             sshkey = None
