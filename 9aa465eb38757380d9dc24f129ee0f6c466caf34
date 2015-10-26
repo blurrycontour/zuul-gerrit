@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "3a29b11f_59a0b190",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 38
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-10-26T16:30:57Z",
+      "side": 1,
+      "message": "Scheduler takes \u0027config\u0027 parameter, this now fails with an exception.",
+      "revId": "9aa465eb38757380d9dc24f129ee0f6c466caf34",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a29b11f_9969c2fb",
         "filename": "zuul/connection/gerrit.py",
         "patchSetId": 38
