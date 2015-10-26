@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3a29b11f_e9cd3687",
+        "filename": "doc/source/statsd.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 18158
+      },
+      "writtenOn": "2015-10-26T12:39:36Z",
+      "side": 1,
+      "message": "Many times on dowstream we face questions of what are the types of metrics, specially the per-second and accumulated keys are.\n\nWe thought that providing this introductory documentation would help with that, specially showing the calculated keys for timers and where to find each.\n\nWould it make sense to have this introduction to types as well as a link to upstream documentation?",
+      "parentUuid": "3a29b11f_17e1b9fe",
+      "revId": "c568bed7eeef6cb8185c4be36affc48006f3c56b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a29b11f_b7cd6588",
         "filename": "doc/source/statsd.rst",
         "patchSetId": 2
