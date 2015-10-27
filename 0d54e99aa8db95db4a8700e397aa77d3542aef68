@@ -16,6 +16,24 @@
       "revId": "0d54e99aa8db95db4a8700e397aa77d3542aef68",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a29b11f_dbe6ee43",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1120,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-10-27T02:23:18Z",
+      "side": 1,
+      "message": "The message string is passed along for the reporter to decide what to do. However, what type of report is being done might be useful for them to know. As such I\u0027ve added that in a future change.",
+      "parentUuid": "3a29b11f_37edd58e",
+      "revId": "0d54e99aa8db95db4a8700e397aa77d3542aef68",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
