@@ -34,6 +34,24 @@
       "revId": "0d54e99aa8db95db4a8700e397aa77d3542aef68",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a26ad4f_078d2631",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1120,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-10-27T09:32:26Z",
+      "side": 1,
+      "message": "The message is passed from here only when reporting start. For other actions, it\u0027s constructed in every reporter which needs it. My point was to construct the messages in one place consistently. As you\u0027re moving the message formatting to reporters, the default message for the start action should be constructed in the reporter too.\n\nPerhaps more obvious from function signatures:\n BasePipelineManager.sendReport(action_reporters, source, item)\n # calls BaseReporter.sendReport(source, self.pipeline, item)\n\n BaseReporter.sendReport(source, pipeline, item)\n # this is a new function, to be used from outside reporter\n # calls BaseReporter._formatItemReport(pipeline, item)\n # then calls BaseReporter.report(source, pipeline, item, default_message)\n\n BaseReporter.report(source, pipeline, item, default_message)\n # To be overriden by specific reporters. They can either use the default message, or construct their own.",
+      "parentUuid": "3a29b11f_dbe6ee43",
+      "revId": "0d54e99aa8db95db4a8700e397aa77d3542aef68",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
