@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3a29b11f_5b0e5ee6",
+        "filename": "zuul/source/__init__.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-10-27T02:28:12Z",
+      "side": 1,
+      "message": "The reporter needs this so it should be available. decoupling them further is something we could do in a later patch rather than here.",
+      "parentUuid": "3a29b11f_474355b2",
+      "revId": "8b63c1646122ec37052cb5fadd07130a3645d53b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a29b11f_0720fdf5",
         "filename": "zuul/source/__init__.py",
         "patchSetId": 31
@@ -30,6 +48,24 @@
       "writtenOn": "2015-10-22T10:49:28Z",
       "side": 1,
       "message": "Unneeded abstract method - remove.\nUsed only internally by GerritSource.",
+      "revId": "8b63c1646122ec37052cb5fadd07130a3645d53b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a29b11f_7b131a0e",
+        "filename": "zuul/source/__init__.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-10-27T02:28:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a29b11f_0720fdf5",
       "revId": "8b63c1646122ec37052cb5fadd07130a3645d53b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "3a29b11f_1bf9c6c8",
+        "filename": "zuul/source/__init__.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-10-27T02:28:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a29b11f_4771150e",
+      "revId": "8b63c1646122ec37052cb5fadd07130a3645d53b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a29b11f_2772d911",
         "filename": "zuul/source/__init__.py",
         "patchSetId": 31
@@ -64,6 +118,24 @@
       "writtenOn": "2015-10-22T10:49:28Z",
       "side": 1,
       "message": "Dummy implementation would suffice, no need to force overriding in subclasses. Remove abstractmethod decorator.",
+      "revId": "8b63c1646122ec37052cb5fadd07130a3645d53b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a29b11f_3bf602d8",
+        "filename": "zuul/source/__init__.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-10-27T02:28:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a29b11f_2772d911",
       "revId": "8b63c1646122ec37052cb5fadd07130a3645d53b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "3a29b11f_db026eb4",
+        "filename": "zuul/source/__init__.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-10-27T02:28:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a29b11f_67da11ea",
+      "revId": "8b63c1646122ec37052cb5fadd07130a3645d53b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a29b11f_6788d1c5",
         "filename": "zuul/source/__init__.py",
         "patchSetId": 31
@@ -98,6 +188,24 @@
       "writtenOn": "2015-10-22T10:49:28Z",
       "side": 1,
       "message": "Unneeded abstract method - remove. Used only internally by GerritSource.",
+      "revId": "8b63c1646122ec37052cb5fadd07130a3645d53b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a29b11f_fbff2aa8",
+        "filename": "zuul/source/__init__.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-10-27T02:28:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a29b11f_6788d1c5",
       "revId": "8b63c1646122ec37052cb5fadd07130a3645d53b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
