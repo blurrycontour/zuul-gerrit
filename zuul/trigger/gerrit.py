@@ -143,7 +143,16 @@ class Gerrit(object):
             port = int(config.get('gerrit', 'port'))
         else:
             port = 29418
-        self.gerrit = gerrit.Gerrit(self.server, user, port, sshkey)
+        if (config.has_option('gerrit', 'proxy_server') and
+            config.has_option('gerrit', 'proxy_port')):
+            proxy_server = config.get('gerrit', 'proxy_server')
+            proxy_port = int(config.get('gerrit', 'proxy_port'))
+            if (config.has_option('gerrit', 'proxy_id') and
+                config.has_option('gerrit', 'proxy_pw'):
+                proxy_id = config.get('gerrit', 'proxy_id')
+                proxy_pw = config.get('gerrit', 'proxy_pw')
+
+        self.gerrit = gerrit.Gerrit(self.server, user, port, sshkey, proxy_id, proxy_pw, proxy_server, proxy_port)
         self.gerrit.startWatching()
         self.gerrit_connector = GerritEventConnector(
             self.gerrit, sched, self)
