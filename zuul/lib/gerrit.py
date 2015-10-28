@@ -21,18 +21,24 @@ from six.moves import queue as Queue
 import paramiko
 import logging
 import pprint
+import socket
+import socks
 
 
 class GerritWatcher(threading.Thread):
     log = logging.getLogger("gerrit.GerritWatcher")
 
-    def __init__(self, gerrit, username, hostname, port=29418, keyfile=None):
+    def __init__(self, gerrit, username, hostname, port=29418, keyfile=None, proxy_id=None, proxy_pw=None, proxy_server=None, proxy_port=Non):
         threading.Thread.__init__(self)
         self.username = username
         self.keyfile = keyfile
         self.hostname = hostname
         self.port = port
         self.gerrit = gerrit
+        self.proxy_id = proxy_id
+        self.proxy_pw = proxy_pw
+        self.proxy_server = proxy_server
+        self.proxy_port = proxy_port
 
     def _read(self, fd):
         l = fd.readline()
@@ -53,15 +59,30 @@ class GerritWatcher(threading.Thread):
                     else:
                         raise Exception("event on ssh connection")
 
+    def socket_to_gerrit(self):
+        for (family, socktype, proto, canonname, sockaddr) in socket.getaddrinfo(self.proxy_server, int(self.proxy_port), socket.AF_UNSPEC, socket.SOCK_STREAM):
+            if socktype == socket.SOCK_STREAM:
+                socks5_addr = sockaddr
+                break
+
+        sock = socks.socksocket()
+        sock.setproxy(socks.PROXY_TYPE_SOCKS5, socks5_addr[0], socks5_addr[1], username=self.proxy_id, password=self.proxy_pw)
+        gerrit_addr = (self.hostname, self.port)
+        paramiko.util.retry_on_signal(lambda: sock.connect(gerrit_addr))
+
+        return sock
+
     def _run(self):
         try:
             client = paramiko.SSHClient()
             client.load_system_host_keys()
             client.set_missing_host_key_policy(paramiko.WarningPolicy())
+            sock = self.socket_to_gerrit()
             client.connect(self.hostname,
                            username=self.username,
                            port=self.port,
-                           key_filename=self.keyfile)
+                           key_filename=self.keyfile,
+                           sock=sock)
 
             stdin, stdout, stderr = client.exec_command("gerrit stream-events")
 
@@ -84,7 +105,7 @@ class GerritWatcher(threading.Thread):
 class Gerrit(object):
     log = logging.getLogger("gerrit.Gerrit")
 
-    def __init__(self, hostname, username, port=29418, keyfile=None):
+    def __init__(self, hostname, username, port=29418, keyfile=None, proxy_id=None, proxy_pw=None, proxy_server=None, proxy_port=None):
         self.username = username
         self.hostname = hostname
         self.port = port
@@ -92,6 +113,10 @@ class Gerrit(object):
         self.watcher_thread = None
         self.event_queue = None
         self.client = None
+        self.proxy_id = proxy_id
+        self.proxy_pw = proxy_pw
+        self.proxy_server = proxy_server
+        self.proxy_port = proxy_port
 
     def startWatching(self):
         self.event_queue = Queue.Queue()
@@ -100,7 +125,11 @@ class Gerrit(object):
             self.username,
             self.hostname,
             self.port,
-            keyfile=self.keyfile)
+            keyfile=self.keyfile,
+            proxy_id=self.proxy_id,
+            proxy_pw=self.proxy_pw,
+            proxy_server=self.proxy_server,
+            proxy_port=self.proxy_port)
         self.watcher_thread.start()
 
     def addEvent(self, data):
@@ -178,10 +207,12 @@ class Gerrit(object):
         client = paramiko.SSHClient()
         client.load_system_host_keys()
         client.set_missing_host_key_policy(paramiko.WarningPolicy())
+        sock = self.watcher_thread.socket_to_gerrit()
         client.connect(self.hostname,
                        username=self.username,
                        port=self.port,
-                       key_filename=self.keyfile)
+                       key_filename=self.keyfile,
+                       sock=sock)
         self.client = client
 
     def _ssh(self, command):
