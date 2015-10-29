@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1a26ad4f_f509702d",
+        "filename": "requirements.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 14039
+      },
+      "writtenOn": "2015-10-29T06:43:20Z",
+      "side": 1,
+      "message": "You are right. Maybe python already have it. I\u0027ll try it.",
+      "parentUuid": "1a26ad4f_eaa50f04",
+      "revId": "30990d2750aeeac07c9c7e77677d05120ab81c88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a26ad4f_cf85c5ad",
         "filename": "zuul/lib/gerrit.py",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2015-10-29T06:06:00Z",
       "side": 1,
       "message": "None",
+      "revId": "30990d2750aeeac07c9c7e77677d05120ab81c88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a26ad4f_4aed2324",
+        "filename": "zuul/lib/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 14039
+      },
+      "writtenOn": "2015-10-29T06:43:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a26ad4f_cf85c5ad",
       "revId": "30990d2750aeeac07c9c7e77677d05120ab81c88",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "1a26ad4f_8a025b0a",
+        "filename": "zuul/lib/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 14039
+      },
+      "writtenOn": "2015-10-29T06:43:20Z",
+      "side": 1,
+      "message": "Please let me find out and replay latter.",
+      "parentUuid": "1a26ad4f_af5f2940",
+      "revId": "30990d2750aeeac07c9c7e77677d05120ab81c88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a26ad4f_ef120162",
         "filename": "zuul/trigger/gerrit.py",
         "patchSetId": 1
@@ -64,6 +118,24 @@
       "writtenOn": "2015-10-29T06:06:00Z",
       "side": 1,
       "message": "Username and password should be optional. Not all proxies require these.",
+      "revId": "30990d2750aeeac07c9c7e77677d05120ab81c88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a26ad4f_0a808b45",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 14039
+      },
+      "writtenOn": "2015-10-29T06:43:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a26ad4f_ef120162",
       "revId": "30990d2750aeeac07c9c7e77677d05120ab81c88",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
