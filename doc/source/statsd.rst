@@ -52,6 +52,26 @@ The metrics are emitted by the Zuul scheduler (`zuul/scheduler.py`):
   Refer to your Gerrit installation documentation for an exhaustive list of
   Gerrit event types.
 
+**zuul.node_types**
+  Holds metrics specific to labels (not nodes). The hierarchy is:
+
+    #. **<label name>**
+
+      #. **job** subtree detailing per jobs statistics:
+
+        #. **<jobname>** The triggered job name.
+
+          #. **<wait_time>** timing, how long a job has been waiting to start.
+                 Can give useful insights into the performance and capacity of
+                 the build system.
+
+  As an example given a job named `myjob` that took 30 seconds to build and ran
+  on a node with labels `ubuntu-trusty` and `performance`, the Zuul scheduler
+  will emit the following statsd events:
+
+    * `zuul.node_types.ubuntu-trusty.job.myjob.wait_time` 30 seconds
+    * `zuul.node_types.performance.job.myjob.wait_time` 30 seconds
+
 **zuul.pipeline.**
   Holds metrics specific to jobs. The hierarchy is:
 
@@ -70,6 +90,9 @@ The metrics are emitted by the Zuul scheduler (`zuul/scheduler.py`):
                  reporting the duration of the build. Whenever the result is a
                  SUCCESS or FAILURE, Zuul will additionally report the duration
                  of the build as a timing event.
+        #. **<wait_time>** timing, how long a job has been waiting to start.
+                 Can give useful insights into the performance and capacity of
+                 the build system.
 
       #. **resident_time** timing representing how long the Change has been
                known by Zuul (which includes build time and Zuul overhead).
