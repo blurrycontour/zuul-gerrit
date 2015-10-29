@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a26ad4f_251c8376",
+        "filename": "doc/source/statsd.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2015-10-29T21:02:41Z",
+      "side": 1,
+      "message": "I don\u0027t know how to document that the key is both a timing and a counter. From the code:\n\n                    key \u003d \u0027zuul.node_type.%s.job.%s.wait_time\u0027 % (\n                        label, jobname)\n                    statsd.timing(key, dt) \n                    statsd.incr(key) \n\nI have no idea what that statsd.incr() ends up doing.",
+      "revId": "ccb32029a4e1524e5f908e2c25ce0fdeacea915e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
