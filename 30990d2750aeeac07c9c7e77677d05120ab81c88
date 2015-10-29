@@ -107,6 +107,24 @@
     },
     {
       "key": {
+        "uuid": "1a26ad4f_957d9cb3",
+        "filename": "zuul/lib/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 14039
+      },
+      "writtenOn": "2015-10-29T07:24:15Z",
+      "side": 1,
+      "message": "Hello, Ramy. About this, socket.getaddrinfo returned us a list, it was [(2, 1, 6, \u0027\u0027, (\u0027proxy_adderess\u0027, proxy_port))]. So we used a for loop. What do you think?",
+      "parentUuid": "1a26ad4f_8a025b0a",
+      "revId": "30990d2750aeeac07c9c7e77677d05120ab81c88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a26ad4f_ef120162",
         "filename": "zuul/trigger/gerrit.py",
         "patchSetId": 1
