@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a26ad4f_cf85c5ad",
+        "filename": "zuul/lib/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 9624
+      },
+      "writtenOn": "2015-10-29T06:06:00Z",
+      "side": 1,
+      "message": "None",
+      "revId": "30990d2750aeeac07c9c7e77677d05120ab81c88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a26ad4f_af5f2940",
+        "filename": "zuul/lib/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 9624
+      },
+      "writtenOn": "2015-10-29T06:06:00Z",
+      "side": 1,
+      "message": "why do you need to loop here?",
+      "revId": "30990d2750aeeac07c9c7e77677d05120ab81c88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a26ad4f_ef120162",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 9624
+      },
+      "writtenOn": "2015-10-29T06:06:00Z",
+      "side": 1,
+      "message": "Username and password should be optional. Not all proxies require these.",
+      "revId": "30990d2750aeeac07c9c7e77677d05120ab81c88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
