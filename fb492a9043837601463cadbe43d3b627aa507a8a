@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "1a26ad4f_dff8a5c5",
+        "filename": "zuul/cmd/cloner.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 6808
+      },
+      "writtenOn": "2015-11-02T22:33:12Z",
+      "side": 1,
+      "message": "I didn\u0027t specify a default value and assumed it would be None (which casts to False implicitly when used as boolean later). None of the other parameters have a default of False in the Cloner class.\n\nI now see that store_true internally defaults to False even if the flag doesn\u0027t end up triggering the action, which is a bit counter-intuitive since I would imagine a flag using an action \"store true\" not to trigger the action \"store true\" unless the flag is specified and otherwise not trigger, but really the class always has an influence on the arguments object.\n\nGiven that premise, the default really doesn\u0027t matter in the class since it is always set.",
+      "parentUuid": "3a29b11f_adee80b2",
+      "revId": "fb492a9043837601463cadbe43d3b627aa507a8a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a2ca52d_ced02722",
         "filename": "zuul/lib/cloner.py",
         "patchSetId": 10
