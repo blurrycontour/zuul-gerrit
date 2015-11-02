@@ -140,6 +140,24 @@
       "revId": "fb492a9043837601463cadbe43d3b627aa507a8a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a26ad4f_3fd5191b",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 6808
+      },
+      "writtenOn": "2015-11-02T22:35:45Z",
+      "side": 1,
+      "message": "Oh, right. I proposed that originally. There was some reason in #openstack-infra on IRC that made us (Wikimedia) implement it this way instead.\n\nI don\u0027t have time available to verify and test out that this parameter in our environment. Feel free to amend if you\u0027re confident that it works. We\u0027ll find out next time we upgrade our release.",
+      "parentUuid": "3a29b11f_8df14498",
+      "revId": "fb492a9043837601463cadbe43d3b627aa507a8a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
