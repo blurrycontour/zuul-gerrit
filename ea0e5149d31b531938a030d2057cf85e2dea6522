@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a26ad4f_a6b84f76",
+        "filename": "zuul/lib/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2015-11-02T17:52:15Z",
+      "side": 1,
+      "message": "Please do not hardcode this to 60, a configuration options is better.",
+      "revId": "ea0e5149d31b531938a030d2057cf85e2dea6522",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
