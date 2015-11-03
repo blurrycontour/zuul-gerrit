@@ -187,3 +187,19 @@ class TestGithub(ZuulTestCase):
         self.worker.release()
         self.waitUntilSettled()
         self.assertEqual(2, len(pr.comments))
+
+    def test_report_pull_merge(self):
+        # pipeline merges the pull request on success
+        pr = self.fake_github.openFakePullRequest('org/project', 'master')
+        self.fake_github.emitEvent(pr.getCommentAddedEvent('merge me'))
+        self.waitUntilSettled()
+        self.assertTrue(pr.is_merged)
+
+    def test_report_pull_merge_failure(self):
+        # pipeline merges the pull request on success
+        self.fake_github.merge_failure = True
+        pr = self.fake_github.openFakePullRequest('org/project', 'master')
+        self.fake_github.emitEvent(pr.getCommentAddedEvent('merge me'))
+        self.waitUntilSettled()
+        self.assertFalse(pr.is_merged)
+        self.fake_github.merge_failure = False
