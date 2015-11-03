@@ -240,12 +240,16 @@ class GithubConnection(BaseConnection):
         return '%s/pull/%s' % (self.getGitwebUrl(project), number)
 
     def getPull(self, owner, project, number):
-        return self.github.pull_request(owner, project, number).to_json()
+        return self.github.pull_request(owner, project, number).as_dict()
 
     def commentPull(self, owner, project, pr_number, message):
-        repository = self.github.repository(owner, project)
-        pull_request = repository.issue(pr_number)
+        pull_request = self.github.issue(owner, project, pr_number)
         pull_request.create_comment(message)
+
+    def mergePull(self, owner, project, pr_number, sha=None):
+        pull_request = self.github.pull_request(owner, project, pr_number)
+        if not pull_request.merge(sha=sha):
+            raise Exception('Pull request was not merged')
 
     def setCommitStatus(self, owner, project, sha, state,
                         url='', description='', context=''):
