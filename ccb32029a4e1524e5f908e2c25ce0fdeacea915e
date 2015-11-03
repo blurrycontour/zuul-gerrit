@@ -16,6 +16,24 @@
       "revId": "ccb32029a4e1524e5f908e2c25ce0fdeacea915e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa80f949_21c85874",
+        "filename": "doc/source/statsd.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-11-03T12:01:39Z",
+      "side": 1,
+      "message": "Actually I wonder if the increment is a mistake in the previous change?",
+      "parentUuid": "1a26ad4f_251c8376",
+      "revId": "ccb32029a4e1524e5f908e2c25ce0fdeacea915e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
