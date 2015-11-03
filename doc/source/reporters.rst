@@ -51,6 +51,11 @@ reporter. It has the following options.
   reporters. It defaults to ``false`` for **start** reporter.
   ``comment=true``
 
+  **merge**
+  Boolean value (``true`` or ``false``) that determines if the reporter should
+  merge the pull reqeust. Defaults to ``false``.
+  ``merge=false``
+
 
 SMTP
 ----

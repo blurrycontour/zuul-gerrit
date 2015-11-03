@@ -41,6 +41,7 @@ class GithubReporter(BaseReporter):
         self._github_status_value = github_status_values[self._action]
         self._create_comment = self._shouldCreateComment()
         self._set_commit_status = self._shouldSetCommitStatus()
+        self._merge = self._shouldMerge()
 
     def _shouldCreateComment(self):
         if self.reporter_config and 'comment' in self.reporter_config:
@@ -54,6 +55,10 @@ class GithubReporter(BaseReporter):
             return self.reporter_config.get('commit_status')
         return True
 
+    def _shouldMerge(self):
+        return (self.reporter_config and
+                self.reporter_config.get('merge', False))
+
     def report(self, source, pipeline, item, message=None):
         """Comment on PR and set commit status."""
         if self._create_comment:
@@ -62,6 +67,9 @@ class GithubReporter(BaseReporter):
             hasattr(item.change, 'patchset') and
             item.change.patchset is not None):
             self.setPullStatus(pipeline, item)
+        if (self._merge and
+            hasattr(item.change, 'number')):
+            self.mergePull(item)
 
     def addPullComment(self, pipeline, item, message):
         if message is None:
@@ -94,10 +102,20 @@ class GithubReporter(BaseReporter):
         self.connection.setCommitStatus(
             owner, project, sha, state, url, description, context)
 
+    def mergePull(self, item):
+        owner, project = item.change.project.name.split('/')
+        pr_number = item.change.number
+        sha = item.change.patchset
+        self.log.debug('Reporting change %s, params %s, merging via API' %
+                       (item.change, self.reporter_config))
+        self.connection.mergePull(owner, project, pr_number, sha)
+        item.change.is_merged = True
+
 
 def getSchema():
     github_reporter = v.Any(
         v.Schema({'commit_status': bool,
-                  'comment': bool}),
+                  'comment': bool,
+                  'merge': bool}),
         None)
     return github_reporter
