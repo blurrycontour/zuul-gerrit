@@ -1,0 +1,17 @@
+- pipeline:
+    name: check
+    manager: independent
+    trigger:
+      github:
+        - event:
+            - pr-open
+            - pr-change
+
+- job:
+    name: one-job-project-merge
+
+- project:
+    name: org/one-job-project
+    check:
+      jobs:
+        - one-job-project-merge
