@@ -22,7 +22,7 @@ import voluptuous as v
 import github3
 
 from zuul.connection import BaseConnection
-from zuul.model import TriggerEvent
+from zuul.model import GithubTriggerEvent
 
 log = logging.getLogger("connection.github")
 
@@ -75,7 +75,7 @@ class GithubWebhookListener():
         body = request.json_body
         base_repo = body.get('repository')
 
-        event = TriggerEvent()
+        event = GithubTriggerEvent()
         event.trigger_name = 'github'
         event.project_name = base_repo.get('full_name')
 
@@ -174,7 +174,7 @@ class GithubWebhookListener():
         return True
 
     def _pull_request_to_event(self, pr_body):
-        event = TriggerEvent()
+        event = GithubTriggerEvent()
         event.trigger_name = 'github'
 
         base = pr_body.get('base')
