@@ -1798,6 +1798,7 @@ class TriggerEvent(object):
         self.approvals = []
         self.branch = None
         self.comment = None
+        self.label = None
         # ref-updated
         self.ref = None
         self.oldrev = None
@@ -1922,7 +1923,7 @@ class EventFilter(BaseFilter):
     def __init__(self, trigger, types=[], branches=[], refs=[],
                  event_approvals={}, comments=[], emails=[], usernames=[],
                  timespecs=[], required_approvals=[], reject_approvals=[],
-                 pipelines=[], ignore_deletes=True):
+                 pipelines=[], labels=[], ignore_deletes=True):
         super(EventFilter, self).__init__(
             required_approvals=required_approvals,
             reject_approvals=reject_approvals)
@@ -1943,6 +1944,7 @@ class EventFilter(BaseFilter):
         self.pipelines = [re.compile(x) for x in pipelines]
         self.event_approvals = event_approvals
         self.timespecs = timespecs
+        self.labels = labels
         self.ignore_deletes = ignore_deletes
 
     def __repr__(self):
@@ -1975,6 +1977,8 @@ class EventFilter(BaseFilter):
             ret += ' username_filters: %s' % ', '.join(self._usernames)
         if self.timespecs:
             ret += ' timespecs: %s' % ', '.join(self.timespecs)
+        if self.labels:
+            ret += ' labels: %s' % ', '.join(self.labels)
         ret += '>'
 
         return ret
@@ -2069,6 +2073,10 @@ class EventFilter(BaseFilter):
             if (event.timespec == timespec):
                 matches_timespec = True
         if self.timespecs and not matches_timespec:
+            return False
+
+        # labels are ORed
+        if self.labels and event.label not in self.labels:
             return False
 
         return True
