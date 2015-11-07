@@ -485,6 +485,7 @@ class FakeGithubPullRequest(object):
         self.branch = branch
         self.upstream_root = upstream_root
         self.comments = []
+        self.labels = []
         self.statuses = {}
         self.updated_at = None
         self.head_sha = None
@@ -530,6 +531,32 @@ class FakeGithubPullRequest(object):
             },
             'comment': {
                 'body': text
+            },
+            'repository': {
+                'full_name': self.project
+            }
+        }
+        return (name, data)
+
+    def addLabel(self, name):
+        if name not in self.labels:
+            self.labels.append(name)
+        return self._getLabelEvent(name, 'labeled')
+
+    def removeLabel(self, name):
+        if name in self.labels:
+            self.labels.remove(name)
+            return self._getLabelEvent(name, 'unlabeled')
+
+    def _getLabelEvent(self, label, action):
+        name = 'issues'
+        data = {
+            'action': action,
+            'issue': {
+                'number': self.number
+            },
+            'label': {
+                'name': label
             },
             'repository': {
                 'full_name': self.project
@@ -713,6 +740,14 @@ class FakeGithubConnection(zuul.connection.github.GithubConnection):
             if (pr_owner == owner and pr_project == project and
                 pr.head_sha == sha):
                 pr.setStatus(state, url, description, context)
+
+    def labelPull(self, owner, project, pr_number, label):
+        pull_request = self.pull_requests[pr_number - 1]
+        pull_request.addLabel(label)
+
+    def unlabelPull(self, owner, project, pr_number, label):
+        pull_request = self.pull_requests[pr_number - 1]
+        pull_request.removeLabel(label)
 
 
 class BuildHistory(object):
