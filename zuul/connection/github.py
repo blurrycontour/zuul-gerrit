@@ -123,6 +123,33 @@ class GithubWebhookListener():
         action = body.get('action')
         if action != 'created':
             return
+        pr_body = self._issue_to_pull_request(body)
+        if pr_body is None:
+            return
+
+        event = self._pull_request_to_event(pr_body)
+        event.comment = body.get('comment').get('body')
+        event.type = 'pr-comment'
+        return event
+
+    def _event_issues(self, request):
+        """Handles pull reqeust labels"""
+        body = request.json_body
+        action = body.get('action')
+        if action not in ['labeled', 'unlabeled']:
+            return
+        pr_body = self._issue_to_pull_request(body)
+        if pr_body is None:
+            return
+
+        event = self._pull_request_to_event(pr_body)
+        event.label = body['label']['name']
+        if action == 'unlabeled':
+            event.label = '-' + event.label
+        event.type = 'pr-label'
+        return event
+
+    def _issue_to_pull_request(self, body):
         number = body.get('issue').get('number')
         project_name = body.get('repository').get('full_name')
         owner, project = project_name.split('/')
@@ -130,12 +157,7 @@ class GithubWebhookListener():
         if pr_body is None:
             self.log.debug('Pull request #%s not found in project %s' %
                            (number, project_name))
-            return
-
-        event = self._pull_request_to_event(pr_body)
-        event.comment = body.get('comment').get('body')
-        event.type = 'pr-comment'
-        return event
+        return pr_body
 
     def _validate_signature(self, request):
         secret = self.connection.connection_config.get('webhook_token', None)
@@ -255,6 +277,14 @@ class GithubConnection(BaseConnection):
                         url='', description='', context=''):
         repository = self.github.repository(owner, project)
         repository.create_status(sha, state, url, description, context)
+
+    def labelPull(self, owner, project, pr_number, label):
+        pull_request = self.github.issue(owner, project, pr_number)
+        pull_request.add_label(label)
+
+    def unlabelPull(self, owner, project, pr_number, label):
+        pull_request = self.github.issue(owner, project, pr_number)
+        pull_request.remove_label(label)
 
 
 def getSchema():
