@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da85f559_6a885223",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 40
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-11-09T11:27:26Z",
+      "side": 1,
+      "message": "Unaddressed comment from patchset 38:\n\nScheduler takes \u0027config\u0027 parameter, this now fails with an exception.",
+      "revId": "bba0b4fc34572a266e79e8c18e8a230d040a97b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da85f559_efad3432",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 40
+      },
+      "lineNbr": 928,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-11-09T11:27:26Z",
+      "side": 1,
+      "message": "Still unsolved an issue from patchset 35:\n\nThere can be configured several gerrit connections for separate gerrit instances. It can be harmful to do the getChange on a different pipeline\u0027s source than it should. Looking on GerritSource._getChange, it would either raise an exception or get a wrong change.\nSeems like the pipeline.manager.eventMatches should be done first and \u0027continue\u0027 on an unmatched event. But that already needs the \u0027change\u0027 instance. Seems to me like some more refactoring is required here.",
+      "revId": "bba0b4fc34572a266e79e8c18e8a230d040a97b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
