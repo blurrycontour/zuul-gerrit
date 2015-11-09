@@ -52,6 +52,24 @@
       "revId": "0d54e99aa8db95db4a8700e397aa77d3542aef68",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da85f559_1c0ec634",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1120,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-11-09T00:56:04Z",
+      "side": 1,
+      "message": "Right. To make it easier to know which message is needed when it\u0027d be good to have your change that passes through what type of reporter it is ahead of this one. Do you have time to pull that out and put it in here?",
+      "parentUuid": "1a26ad4f_078d2631",
+      "revId": "0d54e99aa8db95db4a8700e397aa77d3542aef68",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
