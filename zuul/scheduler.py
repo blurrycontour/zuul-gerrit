@@ -249,7 +249,10 @@ class Scheduler(threading.Thread):
         data = yaml.load(config_file)
 
         validator = layoutvalidator.LayoutValidator()
-        validator.validate(data)
+        try:
+            validator.validate(data)
+        except:
+            self.log.exception("Exception validating zuul schema:")
 
         config_env = {}
         for include in data.get('includes', []):
