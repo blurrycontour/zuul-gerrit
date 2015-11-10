@@ -69,6 +69,24 @@
       "revId": "bba0b4fc34572a266e79e8c18e8a230d040a97b1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da85f559_672a8d2e",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 40
+      },
+      "lineNbr": 928,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-11-10T12:12:16Z",
+      "side": 1,
+      "message": "I\u0027ve added a test for the case when the change is looked up on the wrong connection here:\n* https://review.openstack.org/169300\n\nThe case when there\u0027s a clash of project/change on several is more unlikely. I can\u0027t imagine a real world use case where one would have same project on two gerrit instances, or two projects by same name on different instances. Anyway, test could be done for this use case too. However I would need the following changes with some test refactoring for that - please check them out, maybe they make sense to incorporate here afterall:\n* https://review.openstack.org/238817\n* https://review.openstack.org/238818\n* https://review.openstack.org/238819\n* https://review.openstack.org/238820",
+      "parentUuid": "da85f559_88d54bba",
+      "revId": "bba0b4fc34572a266e79e8c18e8a230d040a97b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
