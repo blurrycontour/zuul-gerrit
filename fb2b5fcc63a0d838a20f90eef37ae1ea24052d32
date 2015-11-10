@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da85f559_85d9b785",
+        "filename": "zuul/reporter/__init__.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-11-10T08:10:48Z",
+      "side": 1,
+      "message": "We don\u0027t really need these actions written out as attributes of the class. We could just put the keys right in the format_methods dict.",
+      "revId": "fb2b5fcc63a0d838a20f90eef37ae1ea24052d32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da85f559_65737381",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 372,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-11-10T08:10:48Z",
+      "side": 1,
+      "message": "It feels odd setting the action on the reporter when we have the ActionReporter class.\n\nI actually think now we\u0027re loading a new instance of each reporter we can do without the actionreporter altogether. I\u0027ll look at rolling that in above this.",
+      "revId": "fb2b5fcc63a0d838a20f90eef37ae1ea24052d32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
