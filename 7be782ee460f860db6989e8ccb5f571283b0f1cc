@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da85f559_a06a7fec",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 41
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-11-10T22:21:01Z",
+      "side": 1,
+      "message": "Unfortunately, this alone does not help to make the config validation to work. Scheduler does not have any conections configured. This would fix it:\n\n # zuul/cmd/server.py (here)\n self.configure_connections() # or factor out to main()\n layout \u003d self.sched.testConfig(self.config.get(\u0027zuul\u0027, \u0027layout_config\u0027), self.connections)\n\n # zuul/scheduler.py\n def testConfig(self, config_path, connections):\n     self.connections \u003d connections\n     return self._parseConfig(config_path)",
+      "revId": "7be782ee460f860db6989e8ccb5f571283b0f1cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
