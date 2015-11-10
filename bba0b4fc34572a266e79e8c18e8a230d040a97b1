@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "da85f559_08c15b2e",
+        "filename": "zuul/cmd/server.py",
+        "patchSetId": 40
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-11-10T09:13:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da85f559_6a885223",
+      "revId": "bba0b4fc34572a266e79e8c18e8a230d040a97b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da85f559_efad3432",
         "filename": "zuul/scheduler.py",
         "patchSetId": 40
@@ -30,6 +48,24 @@
       "writtenOn": "2015-11-09T11:27:26Z",
       "side": 1,
       "message": "Still unsolved an issue from patchset 35:\n\nThere can be configured several gerrit connections for separate gerrit instances. It can be harmful to do the getChange on a different pipeline\u0027s source than it should. Looking on GerritSource._getChange, it would either raise an exception or get a wrong change.\nSeems like the pipeline.manager.eventMatches should be done first and \u0027continue\u0027 on an unmatched event. But that already needs the \u0027change\u0027 instance. Seems to me like some more refactoring is required here.",
+      "revId": "bba0b4fc34572a266e79e8c18e8a230d040a97b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da85f559_88d54bba",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 40
+      },
+      "lineNbr": 928,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-11-10T09:13:51Z",
+      "side": 1,
+      "message": "Hmm, I\u0027m not sure how it would get the wrong change. It might not get any change if it can\u0027t find it (raising an exception). We need to check if an event enters more than one pipeline and a connection could be attached to more than one pipeline.\n\nDo you have a unit test that would expose this bug?",
+      "parentUuid": "da85f559_efad3432",
       "revId": "bba0b4fc34572a266e79e8c18e8a230d040a97b1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
