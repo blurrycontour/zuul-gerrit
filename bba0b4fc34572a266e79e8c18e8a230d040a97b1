@@ -87,6 +87,24 @@
       "revId": "bba0b4fc34572a266e79e8c18e8a230d040a97b1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da85f559_a1ea25d9",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 40
+      },
+      "lineNbr": 928,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-11-12T13:29:22Z",
+      "side": 1,
+      "message": "Thanks that\u0027s really helpful :-).\n\nAs mentioned I\u0027ve re-ordered the world to bring these in closer to the connection tests.\n\nI\u0027ve added some checking around here that the change is correct/appropriate. However, I don\u0027t think it\u0027s adequate yet so I\u0027ll have to look at it some more.",
+      "parentUuid": "da85f559_672a8d2e",
+      "revId": "bba0b4fc34572a266e79e8c18e8a230d040a97b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
