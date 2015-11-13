@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da85f559_0de1aefe",
+        "filename": "zuul/reporter/__init__.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-11-13T10:50:15Z",
+      "side": 1,
+      "message": "Leftover \u0027action\u0027, remove,",
+      "revId": "decee86bba7dc913777b4b8314a6c630f890c444",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
