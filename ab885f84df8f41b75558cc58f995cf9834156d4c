@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da85f559_a15de116",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 917,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2015-11-14T17:30:35Z",
+      "side": 1,
+      "message": "This is a copy-pasta error.",
+      "revId": "ab885f84df8f41b75558cc58f995cf9834156d4c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
