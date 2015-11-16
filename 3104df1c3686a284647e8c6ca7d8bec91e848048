@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba8a016a_e430220a",
+        "filename": "zuul/cmd/cloner.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-11-16T10:40:16Z",
+      "side": 1,
+      "message": "(nit) worth adding that it fails if it\u0027s unable find the ref.",
+      "revId": "3104df1c3686a284647e8c6ca7d8bec91e848048",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
