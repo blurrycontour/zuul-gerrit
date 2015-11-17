@@ -87,6 +87,11 @@ gerrit
   Path to SSH key to use when logging into above server.
   ``sshkey=/home/zuul/.ssh/id_rsa``
 
+**no_http**
+  Optional: Don't use HTTP for accessing Gerrit. You may need this if
+  your Gerrit doesn't have public HTTP access.
+  ``no_http=false``
+
 zuul
 """"
 
