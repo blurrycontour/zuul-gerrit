@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "ba8a016a_e858c258",
+        "filename": "zuul/model.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 18700
+      },
+      "writtenOn": "2015-11-17T07:42:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba8a016a_96986c6c",
+      "revId": "c65cf8cdebe5f9a8c18808f17e1f491c4587ca14",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba8a016a_36d8a01d",
         "filename": "zuul/model.py",
         "patchSetId": 7
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "ba8a016a_206b5620",
+        "filename": "zuul/model.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 552,
+      "author": {
+        "id": 18700
+      },
+      "writtenOn": "2015-11-17T07:42:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba8a016a_36d8a01d",
+      "revId": "c65cf8cdebe5f9a8c18808f17e1f491c4587ca14",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba8a016a_b90d6339",
         "filename": "zuul/scheduler.py",
         "patchSetId": 7
@@ -47,6 +83,24 @@
       "writtenOn": "2015-11-16T10:13:26Z",
       "side": 1,
       "message": "(nit) parent_job should default to None",
+      "revId": "c65cf8cdebe5f9a8c18808f17e1f491c4587ca14",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba8a016a_7b4d8f71",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 444,
+      "author": {
+        "id": 18700
+      },
+      "writtenOn": "2015-11-17T07:42:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba8a016a_b90d6339",
       "revId": "c65cf8cdebe5f9a8c18808f17e1f491c4587ca14",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
