@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba8a016a_6506fecf",
+        "filename": "etc/status/public_html/jquery.zuul.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 492,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-11-18T04:26:37Z",
+      "side": 1,
+      "message": "(nit) extra whitespace",
+      "revId": "1181190c77b21f77ce8a797378d9512e96525466",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba8a016a_e54c2e44",
+        "filename": "etc/status/public_html/jquery.zuul.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 495,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-11-18T04:26:37Z",
+      "side": 1,
+      "message": "(as above)",
+      "revId": "1181190c77b21f77ce8a797378d9512e96525466",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
