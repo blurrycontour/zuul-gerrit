@@ -1,0 +1,11 @@
+Verified+2: Jenkins
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Code-Review+2: yolanda.robla <info@ysoft.biz>
+Workflow+1: yolanda.robla <info@ysoft.biz>
+Code-Review+2: Joshua Hesketh <joshua.hesketh@rackspace.com>
+Workflow+1: Joshua Hesketh <joshua.hesketh@rackspace.com>
+Submitted-by: Jenkins
+Submitted-at: Wed, 18 Nov 2015 04:37:43 +0000
+Reviewed-on: https://review.openstack.org/220615
+Project: openstack-infra/zuul
+Branch: refs/heads/master
