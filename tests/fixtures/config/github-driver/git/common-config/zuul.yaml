@@ -25,6 +25,29 @@
         comment: true
 
 - pipeline:
+    name: gate
+    description: Gatekeeping
+    manager: dependent
+    source: github
+    trigger:
+      github:
+        - event: pr-label
+          label: 'merge'
+    start:
+      github:
+        status: true
+    success:
+      github:
+        status: true
+        merge: true
+        label: '-merge'
+    failure:
+      github:
+        status: true
+        comment: true
+        label: '-merge'
+
+- pipeline:
     name: reporting
     description: Uncommon reporting
     manager: independent
@@ -106,6 +129,10 @@
     name: project-labels
 - job:
     name: one-job-project-merge
+- job:
+    name: project-merge
+    failure-message: Unable to merge change
+    hold-following-changes: true
 
 - project:
     name: org/project
@@ -113,6 +140,13 @@
       jobs:
         - project-test1
         - project-test2
+    gate:
+      jobs:
+        - project-merge
+        - project-test1:
+            dependencies: project-merge
+        - project-test2:
+            dependencies: project-merge
     merge:
       jobs:
         - noop
