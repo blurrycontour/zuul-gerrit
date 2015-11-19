@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba8a016a_826078d0",
+        "filename": "zuul/trigger/gerrit.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-11-19T06:02:57Z",
+      "side": 1,
+      "message": "Should use https://docs.python.org/2/library/configparser.html#ConfigParser.RawConfigParser.getboolean",
+      "revId": "3b62c7924e3578c4749a1643ed9d01ddbe383131",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
