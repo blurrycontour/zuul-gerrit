@@ -92,18 +92,17 @@ class AbstractMatcherCollection(AbstractChangeMatcher):
 
 class MatchAllFiles(AbstractMatcherCollection):
 
-    commit_regex = re.compile('^/COMMIT_MSG$')
-
     @property
     def regexes(self):
         for matcher in self.matchers:
             yield matcher.regex
-        yield self.commit_regex
 
     def matches(self, change):
         if not (hasattr(change, 'files') and change.files):
             return False
         for file_ in change.files:
+            if file_ == '/COMMIT_MSG':
+                continue
             matched_file = False
             for regex in self.regexes:
                 if regex.match(file_):

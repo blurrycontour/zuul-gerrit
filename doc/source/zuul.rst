@@ -869,8 +869,7 @@ each job as it builds a list from the project specification.
     change only if all files in a change match at least one of these
     expressions.
 
-    The pattern for '/COMMIT_MSG' is always matched on and does not
-    have to be included.
+    The pattern for '/COMMIT_MSG' is always ignored and never matches.
 
 **voting (optional)**
   Boolean value (``true`` or ``false``) that indicates whatever
