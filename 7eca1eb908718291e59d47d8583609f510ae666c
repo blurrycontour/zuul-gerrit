@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba8a016a_b71ec75d",
+        "filename": "etc/zuul.conf-sample",
+        "patchSetId": 25
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2015-11-20T12:49:08Z",
+      "side": 1,
+      "message": "This will break https://github.com/openstack-infra/project-config/blob/master/tools/run-layout.sh#L35 as it relies on connection named \"gerrit\" to be in the sample conf.",
+      "revId": "7eca1eb908718291e59d47d8583609f510ae666c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
