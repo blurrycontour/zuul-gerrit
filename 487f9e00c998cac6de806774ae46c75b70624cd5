@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba8a016a_b4a3dd9d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1528,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2015-11-23T12:29:50Z",
+      "side": 1,
+      "message": "This should be isinstance(item, NullChange) ... it\u0027s mostly unliklely that anyone would ever sub-class NullChange, but if they did, this would not work. Also, for what it\u0027s worth, if you did want to use type(item) it should be type(item) is not NullChange, because you\u0027re testing identity not equality.",
+      "revId": "487f9e00c998cac6de806774ae46c75b70624cd5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
