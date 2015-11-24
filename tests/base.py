@@ -1314,6 +1314,11 @@ class ZuulTestCase(BaseTestCase):
                                  "Pipelines queues should be empty")
 
     def assertReportedStat(self, key, value=None, kind=None):
+        """Check statsd output.  KEY is the key.  A VALUE should specify a
+           KIND, however KIND may be specified without a VALUE for a
+           generic match.  Leave both empty to just check the key
+           presence
+        """
         start = time.time()
         while time.time() < (start + 5):
             for stat in self.statsd.stats:
@@ -1321,13 +1326,25 @@ class ZuulTestCase(BaseTestCase):
                 k, v = stat.split(':')
                 if key == k:
                     if value is None and kind is None:
-                        return
-                    elif value:
-                        if value == v:
-                            return
-                    elif kind:
-                        if v.endswith('|' + kind):
-                            return
+                        # key is found
+                        return True
+
+                    s_value, s_kind = v.split('|')
+
+                    # special-case value|ms because statsd can turn
+                    # timing results into float of indeterminate
+                    # length, hence foiling string matching.
+                    if value and kind == 'ms' and s_kind == 'ms':
+                        if float(value) == float(s_value):
+                            return True
+
+                    if value and value != s_value:
+                        return False
+
+                    if kind and s_kind != kind:
+                        return False
+
+                    return True
             time.sleep(0.1)
 
         pprint.pprint(self.statsd.stats)
