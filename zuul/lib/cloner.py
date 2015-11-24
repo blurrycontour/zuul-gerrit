@@ -79,6 +79,7 @@ class Cloner(object):
     def cloneUpstream(self, project, dest):
         # Check for a cached git repo first
         git_cache = '%s/%s' % (self.cache_dir, project)
+        git_cache_bare = '%s.git' % (git_cache)
 
         # Then, if we are cloning the repo for the zuul_project, then
         # set its origin to be the zuul merger, as it is guaranteed to
@@ -92,20 +93,28 @@ class Cloner(object):
             git_upstream = '%s/%s' % (self.git_url, project)
 
         repo_is_cloned = os.path.exists(os.path.join(dest, '.git'))
-        if (self.cache_dir and
-            os.path.exists(git_cache) and
-            not repo_is_cloned):
-            # file:// tells git not to hard-link across repos
-            git_cache = 'file://%s' % git_cache
-            self.log.info("Creating repo %s from cache %s",
-                          project, git_cache)
-            new_repo = git.Repo.clone_from(git_cache, dest)
-            self.log.info("Updating origin remote in repo %s to %s",
-                          project, git_upstream)
-            new_repo.remotes.origin.config_writer.set('url', git_upstream)
-        else:
+
+        repo_cache = None
+        if (self.cache_dir and not repo_is_cloned):
+            if os.path.exists(git_cache_bare):
+                repo_cache = git_cache_bare
+            elif os.path.exists(git_cache):
+                repo_cache = git_cache
+
+            if repo_cache:
+                # file:// tells git not to hard-link across repos
+                repo_cache = 'file://%s' % repo_cache
+                self.log.info("Creating repo %s from cache %s",
+                              project, repo_cache)
+                new_repo = git.Repo.clone_from(repo_cache, dest)
+                self.log.info("Updating origin remote in repo %s to %s",
+                              project, git_upstream)
+                new_repo.remotes.origin.config_writer.set('url', git_upstream)
+
+        if not repo_cache:
             self.log.info("Creating repo %s from upstream %s",
                           project, git_upstream)
+
         repo = Repo(
             remote=git_upstream,
             local=dest,
