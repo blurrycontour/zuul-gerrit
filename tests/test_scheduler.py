@@ -96,20 +96,22 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(A.data['status'], 'MERGED')
         self.assertEqual(A.reported, 2)
 
-        self.assertReportedStat('gerrit.event.comment-added', value='1|c')
+        self.assertReportedStat('gerrit.event.comment-added', value='1',
+                                kind='c')
         self.assertReportedStat('zuul.pipeline.gate.current_changes',
-                                value='1|g')
+                                value='1', kind='g')
         self.assertReportedStat('zuul.pipeline.gate.job.project-merge.SUCCESS',
                                 kind='ms')
         self.assertReportedStat('zuul.pipeline.gate.job.project-merge.SUCCESS',
-                                value='1|c')
+                                value='1', kind='c')
         self.assertReportedStat('zuul.pipeline.gate.resident_time', kind='ms')
         self.assertReportedStat('zuul.pipeline.gate.total_changes',
-                                value='1|c')
+                                value='1', kind='c')
         self.assertReportedStat(
             'zuul.pipeline.gate.org.project.resident_time', kind='ms')
         self.assertReportedStat(
-            'zuul.pipeline.gate.org.project.total_changes', value='1|c')
+            'zuul.pipeline.gate.org.project.total_changes', value='1',
+            kind='c')
 
         for build in self.builds:
             self.assertEqual(build.parameters['ZUUL_VOTING'], '1')
@@ -120,7 +122,7 @@ class TestScheduler(ZuulTestCase):
         self.assertNotEqual(len(pipeline_names), 0)
         for name in pipeline_names:
             self.assertReportedStat('zuul.pipeline.%s.current_changes' % name,
-                                    value='0|g')
+                                    value='0', kind='g')
 
     def test_duplicate_pipelines(self):
         "Test that a change matching multiple pipelines works"
@@ -2058,9 +2060,9 @@ class TestScheduler(ZuulTestCase):
         statsd.incr('test-incr')
         statsd.timing('test-timing', 3)
         statsd.gauge('test-gauge', 12)
-        self.assertReportedStat('test-incr', '1|c')
-        self.assertReportedStat('test-timing', '3|ms')
-        self.assertReportedStat('test-gauge', '12|g')
+        self.assertReportedStat('test-incr', '1', 'c')
+        self.assertReportedStat('test-timing', '3', 'ms')
+        self.assertReportedStat('test-gauge', '12', 'g')
 
     def test_stuck_job_cleanup(self):
         "Test that pending jobs are cleaned up if removed from layout"
