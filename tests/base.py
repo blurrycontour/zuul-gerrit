@@ -2789,19 +2789,47 @@ class ZuulTestCase(BaseTestCase):
                                      "Pipelines queues should be empty")
 
     def assertReportedStat(self, key, value=None, kind=None):
+        """Check statsd output
+
+        Check statsd return values.  A ``value`` should specify a
+        ``kind``, however a ``kind`` may be specified without a
+        ``value`` for a generic match.  Leave both empy to just check
+        for key presence.
+
+        :arg str key: The statsd key
+        :arg str value: The expected value of the metric ``key``
+        :arg str kind: The expected type of the metric ``key``  For example
+
+          - ``c`` counter
+          - ``g`` gauge
+          - ``ms`` timing
+          - ``s`` set
+        """
         start = time.time()
         while time.time() < (start + 5):
             for stat in self.statsd.stats:
                 k, v = stat.decode('utf-8').split(':')
                 if key == k:
                     if value is None and kind is None:
-                        return
-                    elif value:
-                        if value == v:
-                            return
-                    elif kind:
-                        if v.endswith('|' + kind):
-                            return
+                        # key is found
+                        return True
+
+                    s_value, s_kind = v.split('|')
+
+                    # special-case value|ms because statsd can turn
+                    # timing results into float of indeterminate
+                    # length, hence foiling string matching.
+                    if value and kind == 'ms' and s_kind == 'ms':
+                        if float(value) == float(s_value):
+                            return True
+
+                    if value and value != s_value:
+                        return False
+
+                    if kind and s_kind != kind:
+                        return False
+
+                    return True
             time.sleep(0.1)
 
         raise Exception("Key %s not found in reported stats" % key)
