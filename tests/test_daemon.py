@@ -32,7 +32,7 @@ pid_file_module = extras.try_imports(['daemon.pidlockfile', 'daemon.pidfile'])
 
 def daemon_test(pidfile, flagfile):
     pid = pid_file_module.TimeoutPIDLockFile(pidfile, 10)
-    with daemon.DaemonContext(pidfile=pid):
+    with daemon.DaemonContext(pidfile=pid, initgroups=False):
         for x in iterate_timeout(30, "flagfile to be removed"):
             if not os.path.exists(flagfile):
                 break
