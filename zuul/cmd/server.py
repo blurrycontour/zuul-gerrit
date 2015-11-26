@@ -226,7 +226,7 @@ def main():
     if server.args.nodaemon:
         server.main()
     else:
-        with daemon.DaemonContext(pidfile=pid):
+        with daemon.DaemonContext(pidfile=pid, initgroups=False):
             server.main()
 
 
