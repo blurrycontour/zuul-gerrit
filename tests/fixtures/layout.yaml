@@ -116,6 +116,8 @@ jobs:
     parameter-function: select_debian_node
   - name: project1-project2-integration
     queue-name: integration
+  - name: extra-job
+    commit-message: "(?mi)^SPECIALJOB$"
 
 project-templates:
   - name: test-one-and-two
@@ -250,3 +252,7 @@ projects:
   - name: org/no-jobs-project
     check:
       - project-testfile
+
+  - name: org/specialjob
+    check:
+      - extra-job

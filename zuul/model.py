@@ -451,6 +451,8 @@ class Job(object):
             self.voting = True
         self.branches = []
         self._branches = []
+        self.commit_messages = []
+        self._commit_messages = []
         self.files = []
         self._files = []
         self.skip_if_matcher = None
@@ -480,6 +482,9 @@ class Job(object):
         if other.branches:
             self.branches = other.branches[:]
             self._branches = other._branches[:]
+        if other.commit_messages:
+            self.commit_messages = other.commit_messages[:]
+            self._commit_messages = other._commit_messages[:]
         if other.files:
             self.files = other.files[:]
             self._files = other._files[:]
@@ -501,6 +506,14 @@ class Job(object):
             if hasattr(change, 'ref') and branch.match(change.ref):
                 matches_branch = True
         if self.branches and not matches_branch:
+            return False
+
+        matches_commit_message = False
+        for commit_message in self.commit_messages:
+            if (hasattr(change, 'commit_message') and
+                commit_message.search(change.commit_message)):
+                matches_commit_message = True
+        if self.commit_messages and not matches_commit_message:
             return False
 
         matches_file = False

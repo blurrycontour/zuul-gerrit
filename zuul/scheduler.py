@@ -472,6 +472,10 @@ class Scheduler(threading.Thread):
             if branches:
                 job._branches = branches
                 job.branches = [re.compile(x) for x in branches]
+            commit_messages = toList(config_job.get('commit-message'))
+            if commit_messages:
+                job._commit_messages = commit_messages
+                job.commit_messages = [re.compile(x) for x in commit_messages]
             files = toList(config_job.get('files'))
             if files:
                 job._files = files
@@ -1081,6 +1085,8 @@ class BasePipelineManager(object):
                 efilters = ''
                 for b in tree.job._branches:
                     efilters += str(b)
+                for c in tree.job._commit_messages:
+                    efilters += str(c)
                 for f in tree.job._files:
                     efilters += str(f)
                 if tree.job.skip_if_matcher:

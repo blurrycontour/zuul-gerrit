@@ -87,6 +87,7 @@ jobs:
   - name: project-testfile
     files:
       - 'tools/.*-requires'
+    commit-message: ^ThisThat$
 
 projects:
   - name: test-org/test
