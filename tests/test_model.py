@@ -26,17 +26,20 @@ class TestJob(BaseTestCase):
         job.skip_if_matcher = cm.MatchAll([
             cm.ProjectMatcher('^project$'),
             cm.MatchAllFiles([cm.FileMatcher('^docs/.*$')]),
+            cm.CommitMessageMatcher('(?mi)^SKIP$'),
         ])
         return job
 
     def test_change_matches_returns_false_for_matched_skip_if(self):
         change = model.Change('project')
         change.files = ['docs/foo']
+        change.commit_message = "Hello world\n\nSKIP\n\nChange-ID:123"
         self.assertFalse(self.job.changeMatches(change))
 
     def test_change_matches_returns_true_for_unmatched_skip_if(self):
         change = model.Change('project')
         change.files = ['foo']
+        change.commit_message = 'Hello world\n\nChange-ID:123'
         self.assertTrue(self.job.changeMatches(change))
 
     def test_copy_retains_skip_if(self):

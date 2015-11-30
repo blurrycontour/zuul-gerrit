@@ -53,6 +53,7 @@ jobs:
     skip-if:
       - project: ^project_name$
         branch: ^stable/icehouse$
+        commit-message: (?mi)^NOTESTS$
         all-files-match-any:
           - ^filename$
       - project: ^project2_name$
@@ -67,6 +68,7 @@ jobs:
             cm.MatchAll([
                 cm.ProjectMatcher('^project_name$'),
                 cm.BranchMatcher('^stable/icehouse$'),
+                cm.CommitMessageMatcher('(?mi)^NOTESTS$'),
                 cm.MatchAllFiles([cm.FileMatcher('^filename$')]),
             ]),
             cm.MatchAll([
@@ -2135,16 +2137,17 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(B.data['status'], 'MERGED')
         self.assertEqual(B.reported, 2)
 
-    def _test_skip_if_jobs(self, branch, should_skip):
+    def _test_skip_if_jobs(self, branch="",
+                           commit_message="test skip-if\nSKIP",
+                           should_skip=None):
         "Test that jobs with a skip-if filter run only when appropriate"
         self.config.set('zuul', 'layout_config',
                         'tests/fixtures/layout-skip-if.yaml')
         self.sched.reconfigure(self.config)
         self.registerJobs()
 
-        change = self.fake_gerrit.addFakeChange('org/project',
-                                                branch,
-                                                'test skip-if')
+        change = self.fake_gerrit.addFakeChange('org/project', branch,
+                                                commit_message)
         self.fake_gerrit.addEvent(change.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
@@ -2161,6 +2164,12 @@ class TestScheduler(ZuulTestCase):
 
     def test_skip_if_no_match_runs_job(self):
         self._test_skip_if_jobs(branch='mp', should_skip=False)
+
+    def test_skip_if_no_match_commit_msg_skips_job(self):
+        self._test_skip_if_jobs(
+            branch='master',
+            commit_message="My Commit\nCloses-Bug:123",
+            should_skip=False)
 
     def test_test_config(self):
         "Test that we can test the config"

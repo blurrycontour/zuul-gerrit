@@ -19,6 +19,7 @@ jobs:
     skip-if:
       - project: ^org/project$
         branch: ^master$
+        commit-message: (?mi)^SKIP$
         all-files-match-any:
           - ^README$
   - name: project-test-skip-if

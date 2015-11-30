@@ -237,6 +237,11 @@ class Scheduler(threading.Thread):
             if branch_regex:
                 nested_matchers.append(cm.BranchMatcher(branch_regex))
 
+            commit_msg_regex = config_skip.get('commit-message')
+            if commit_msg_regex:
+                nested_matchers.append(
+                    cm.CommitMessageMatcher(commit_msg_regex))
+
             file_regexes = toList(config_skip.get('all-files-match-any'))
             if file_regexes:
                 file_matchers = [cm.FileMatcher(x) for x in file_regexes]
