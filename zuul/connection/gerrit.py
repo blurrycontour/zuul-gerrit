@@ -103,6 +103,7 @@ class GerritEventConnector(threading.Thread):
             self.connection.sched.getProject(event.project_name)):
             # Mark the change as needing a refresh in the cache
             event._needs_refresh = True
+            # TODO(jhesketh):  event.commit_message = change.commit_message
 
         self.connection.sched.addEvent(event)
         self.connection.eventDone()
