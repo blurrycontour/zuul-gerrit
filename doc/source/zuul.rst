@@ -825,6 +825,10 @@ each job as it builds a list from the project specification.
   treated as a regular expression and multiple branches may be
   listed.
 
+**commit-message (optional)**
+  This job should only be run on matching commit message.  This field
+  is treated as a regular expression.
+
 **files (optional)**
   This job should only be run if at least one of the files involved in
   the change (added, deleted, or modified) matches at least one of the

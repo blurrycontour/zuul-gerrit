@@ -156,6 +156,7 @@ class LayoutSchema(object):
            'parameter-function': str,
            'branch': toList(str),
            'files': toList(str),
+           'commit-message': toList(str),
            'swift': toList(swift),
            'skip-if': toList(skip_if),
            }

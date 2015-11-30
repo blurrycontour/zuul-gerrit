@@ -4193,3 +4193,33 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertIn('Build failed.', K.messages[0])
         # No more messages reported via smtp
         self.assertEqual(3, len(self.smtp_messages))
+
+    def test_job_filter_by_commit(self):
+        # Check extra-job is queued when SpecialJob is in commit message
+        commit_message = "Hello world\nSpecialJob\nMore info."
+        A = self.fake_gerrit.addFakeChange('org/specialjob', 'master',
+                                           commit_message)
+        self.worker.hold_jobs_in_build = True
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 1)
+        self.assertEqual(self.builds[0].job.name, 'build:extra-job')
+
+        self.worker.hold_jobs_in_build = False
+        self.worker.release()
+        self.waitUntilSettled()
+
+        # Check that extra-job is not normally queued
+        commit_message = "Hello world\nMore info."
+        B = self.fake_gerrit.addFakeChange('org/specialjob', 'master',
+                                           commit_message)
+        self.worker.hold_jobs_in_build = True
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 0)
+
+        self.worker.hold_jobs_in_build = False
+        self.worker.release()
+        self.waitUntilSettled()
