@@ -1027,6 +1027,7 @@ class TriggerEvent(object):
         self.refspec = None
         self.approvals = []
         self.branch = None
+        self.commit_message = None
         self.comment = None
         # ref-updated
         self.ref = None
@@ -1045,6 +1046,8 @@ class TriggerEvent(object):
 
         if self.branch:
             ret += " %s" % self.branch
+        if self.commit_message:
+            ret += " %s" % self.commit_message
         if self.change_number:
             ret += " %s,%s" % (self.change_number, self.patch_number)
         if self.approvals:
@@ -1116,12 +1119,13 @@ class EventFilter(BaseFilter):
     def __init__(self, trigger, types=[], branches=[], refs=[],
                  event_approvals={}, comments=[], emails=[], usernames=[],
                  timespecs=[], required_approvals=[], pipelines=[],
-                 ignore_deletes=True):
+                 ignore_deletes=True, commit_messages=[]):
         super(EventFilter, self).__init__(
             required_approvals=required_approvals)
         self.trigger = trigger
         self._types = types
         self._branches = branches
+        self._commit_messages = commit_messages
         self._refs = refs
         self._comments = comments
         self._emails = emails
@@ -1129,6 +1133,7 @@ class EventFilter(BaseFilter):
         self._pipelines = pipelines
         self.types = [re.compile(x) for x in types]
         self.branches = [re.compile(x) for x in branches]
+        self.commit_messages = [re.compile(x) for x in commit_messages]
         self.refs = [re.compile(x) for x in refs]
         self.comments = [re.compile(x) for x in comments]
         self.emails = [re.compile(x) for x in emails]
@@ -1147,6 +1152,8 @@ class EventFilter(BaseFilter):
             ret += ' pipelines: %s' % ', '.join(self._pipelines)
         if self._branches:
             ret += ' branches: %s' % ', '.join(self._branches)
+        if self._commit_messages:
+            ret += ' commit_messages: %s' % ', '.join(self._commit_messages)
         if self._refs:
             ret += ' refs: %s' % ', '.join(self._refs)
         if self.ignore_deletes:
@@ -1192,6 +1199,15 @@ class EventFilter(BaseFilter):
             if branch.match(event.branch):
                 matches_branch = True
         if self.branches and not matches_branch:
+            return False
+
+        # commit-messages are ORed
+        matches_commit_message = False
+        for commit_message in self.commit_messages:
+            if (hasattr(event, 'commit_message') and event.commit_message and
+                commit_message.search(str(event.commit_message))):
+                matches_commit_message = True
+        if self.commit_messages and not matches_commit_message:
             return False
 
         # refs are ORed

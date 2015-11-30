@@ -60,6 +60,7 @@ class LayoutSchema(object):
                       'username_filter': toList(str),
                       'username': toList(str),
                       'branch': toList(str),
+                      'commit-message': toList(str),
                       'ref': toList(str),
                       'ignore-deletes': bool,
                       'approval': toList(variable_dict),

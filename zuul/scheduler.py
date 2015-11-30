@@ -363,6 +363,7 @@ class Scheduler(threading.Thread):
                         trigger=self.triggers['gerrit'],
                         types=toList(trigger['event']),
                         branches=toList(trigger.get('branch')),
+                        commit_messages=toList(trigger.get('commit-message')),
                         refs=toList(trigger.get('ref')),
                         event_approvals=approvals,
                         comments=comments,

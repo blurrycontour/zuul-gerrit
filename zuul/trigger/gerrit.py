@@ -98,9 +98,10 @@ class GerritEventConnector(threading.Thread):
             # Call _getChange for the side effect of updating the
             # cache.  Note that this modifies Change objects outside
             # the main thread.
-            self.trigger._getChange(event.change_number,
-                                    event.patch_number,
-                                    refresh=True)
+            change = self.trigger._getChange(event.change_number,
+                                             event.patch_number,
+                                             refresh=True)
+            event.commit_message = change.commit_message
 
         self.sched.addEvent(event)
 

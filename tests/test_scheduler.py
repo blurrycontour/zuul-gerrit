@@ -4223,3 +4223,33 @@ For CI problems and help debugging, contact ci@example.org"""
         self.worker.hold_jobs_in_build = False
         self.worker.release()
         self.waitUntilSettled()
+
+    def test_commit_message_event_filter(self):
+        # Check tests are ran when commit message is set
+        commit_message = "Hello world\ncheckme\nMore info."
+        A = self.fake_gerrit.addFakeChange('org/specialjob', 'master',
+                                           commit_message)
+        self.worker.hold_jobs_in_build = True
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 1)
+        self.assertEqual(self.builds[0].job.name, 'build:project-test1')
+
+        self.worker.hold_jobs_in_build = False
+        self.worker.release()
+        self.waitUntilSettled()
+
+        # Check that they otherwise aren't
+        commit_message = "Hello world\nMore info."
+        B = self.fake_gerrit.addFakeChange('org/specialjob', 'master',
+                                           commit_message)
+        self.worker.hold_jobs_in_build = True
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 0)
+
+        self.worker.hold_jobs_in_build = False
+        self.worker.release()
+        self.waitUntilSettled()

@@ -417,6 +417,10 @@ explanation of each of the parameters::
     field is treated as a regular expression, and multiple branches may
     be listed.
 
+    *commit-message*
+    The commit-message on the change associated with the event. This field
+    is treated as a regular expression.
+
     *ref*
     On ref-updated events, the branch parameter is not used, instead the
     ref is provided.  Currently Gerrit has the somewhat idiosyncratic
