@@ -60,6 +60,14 @@ class BranchMatcher(AbstractChangeMatcher):
         )
 
 
+class CommitMessageMatcher(AbstractChangeMatcher):
+
+    def matches(self, change):
+        if not hasattr(change, 'commit_message'):
+            return False
+        return self.regex.search(str(change.commit_message))
+
+
 class FileMatcher(AbstractChangeMatcher):
 
     def matches(self, change):

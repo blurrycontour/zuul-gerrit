@@ -843,6 +843,7 @@ each job as it builds a list from the project specification.
         skip-if:
           - project: ^openstack/neutron$
             branch: ^stable/juno$
+            commit-message: (?mi)^SKIP$
             all-files-match-any:
               - ^neutron/tests/.*$
               - ^tools/.*$
@@ -861,6 +862,10 @@ each job as it builds a list from the project specification.
 
   *branch* (optional)
     The regular expression to match against the branch or ref of the
+    change.
+
+  *commit-message* (optional)
+    The regular expression to match against the commit message of the
     change.
 
   *all-files-match-any* (optional)

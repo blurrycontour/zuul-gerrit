@@ -142,6 +142,7 @@ class LayoutSchema(object):
     skip_if = {'project': str,
                'branch': str,
                'all-files-match-any': toList(str),
+               'commit-message': str,
                }
 
     job = {v.Required('name'): str,
