@@ -110,12 +110,17 @@ class GerritEventConnector(threading.Thread):
             # the correct/new information and also avoid hitting gerrit
             # multiple times.
             if self.connection.attached_to['source']:
-                self.connection.attached_to['source'][0]._getChange(
+                change = self.connection.attached_to['source'][0]._getChange(
                     event.change_number, event.patch_number, refresh=True)
                 # We only need to do this once since the connection maintains
                 # the cache (which is shared between all the sources)
                 # NOTE(jhesketh): We may couple sources and connections again
                 # at which point this becomes more sensible.
+
+                # Grab the commit message into the event so it can be filtered
+                # on.
+                event.commit_message = change.commit_message
+
         self.connection.sched.addEvent(event)
 
     def run(self):

@@ -103,6 +103,17 @@ pipelines:
     failure:
       gerrit: {}
 
+  - name: commit_message_checks
+    manager: IndependentPipelineManager
+    trigger:
+      gerrit:
+        - event: patchset-created
+          commit-message: "(?mi)^CHECKME$"
+    success:
+      gerrit: {}
+    failure:
+      gerrit: {}
+
 jobs:
   - name: ^.*-merge$
     failure-message: Unable to merge change
@@ -256,3 +267,5 @@ projects:
   - name: org/specialjob
     check:
       - extra-job
+    commit_message_checks:
+      - project-test1
