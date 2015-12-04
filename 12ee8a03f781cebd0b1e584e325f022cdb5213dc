@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a740942_a38ac5bd",
+        "filename": "zuul/model.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1056,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-12-04T18:17:43Z",
+      "side": 1,
+      "message": "Why are you removing the re.compile and time conversion?  This means that they have to be re-done for every comparison.",
+      "revId": "12ee8a03f781cebd0b1e584e325f022cdb5213dc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a740942_c38591ad",
+        "filename": "zuul/model.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1059,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-12-04T18:17:43Z",
+      "side": 1,
+      "message": "This is a noop, right?",
+      "revId": "12ee8a03f781cebd0b1e584e325f022cdb5213dc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
