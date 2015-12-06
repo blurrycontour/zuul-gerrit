@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7a740942_d0d78021",
+        "filename": "setup.cfg",
+        "patchSetId": 24
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-12-06T04:04:47Z",
+      "side": 1,
+      "message": "that\u0027s why they are extras. sqlalchemy needs them if you are using one of those dialects.",
+      "parentUuid": "7a740942_59946636",
+      "revId": "3ae2c881922f50fe33933568c79183d679fb5eed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a740942_398f1a25",
         "filename": "zuul/reporter/sql.py",
         "patchSetId": 24
@@ -30,6 +48,24 @@
       "writtenOn": "2015-12-03T22:39:37Z",
       "side": 1,
       "message": "a database",
+      "revId": "3ae2c881922f50fe33933568c79183d679fb5eed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a740942_70decc40",
+        "filename": "zuul/reporter/sql.py",
+        "patchSetId": 24
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-12-06T04:04:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a740942_398f1a25",
       "revId": "3ae2c881922f50fe33933568c79183d679fb5eed",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
