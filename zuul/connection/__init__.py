@@ -43,6 +43,14 @@ class BaseConnection(object):
         self.connection_name = connection_name
         self.connection_config = connection_config
 
+        # Keep track of the sources, triggers and reporters using this
+        # connection
+        self._attached_to = {
+            'source': set(),
+            'trigger': set(),
+            'reporter': set(),
+        }
+
     def onLoad(self):
         pass
 
@@ -51,3 +59,6 @@ class BaseConnection(object):
 
     def registerScheduler(self, sched):
         self.sched = sched
+
+    def registerUse(self, what, instance):
+        self._attached_to[what].add(instance)
