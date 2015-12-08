@@ -276,7 +276,7 @@ class GerritSource(BaseSource):
             self.log.debug("Getting git-dependent change %s,%s" %
                            (dep_num, dep_ps))
             dep = self._getChange(dep_num, dep_ps, history=history)
-            if (not dep.is_merged) and dep not in needs_changes:
+            if dep.open and dep not in needs_changes:
                 needs_changes.append(dep)
 
         for record in self._getDependsOnFromCommit(data['commitMessage']):
@@ -288,7 +288,7 @@ class GerritSource(BaseSource):
             self.log.debug("Getting commit-dependent change %s,%s" %
                            (dep_num, dep_ps))
             dep = self._getChange(dep_num, dep_ps, history=history)
-            if (not dep.is_merged) and dep not in needs_changes:
+            if dep.open and dep not in needs_changes:
                 needs_changes.append(dep)
         change.needs_changes = needs_changes
 
@@ -298,7 +298,7 @@ class GerritSource(BaseSource):
                 parts = needed['ref'].split('/')
                 dep_num, dep_ps = parts[3], parts[4]
                 dep = self._getChange(dep_num, dep_ps)
-                if (not dep.is_merged) and dep.is_current_patchset:
+                if dep.open and dep.is_current_patchset:
                     needed_by_changes.append(dep)
 
         for record in self._getNeededByFromCommit(data['id']):
@@ -311,7 +311,7 @@ class GerritSource(BaseSource):
             # reference the latest patchset of its Depends-On (this
             # change).
             dep = self._getChange(dep_num, dep_ps, refresh=True)
-            if (not dep.is_merged) and dep.is_current_patchset:
+            if dep.open and dep.is_current_patchset:
                 needed_by_changes.append(dep)
         change.needed_by_changes = needed_by_changes
 

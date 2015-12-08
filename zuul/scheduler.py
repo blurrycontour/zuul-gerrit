@@ -938,6 +938,7 @@ class Scheduler(threading.Thread):
                     pipeline.manager.removeOldVersionsOfChange(change)
                 elif event.type == 'change-abandoned':
                     pipeline.manager.removeAbandonedChange(change)
+                    change.open = False
                 if pipeline.manager.eventMatches(event, change):
                     self.log.info("Adding %s, %s to %s" %
                                   (project, change, pipeline))
