@@ -99,8 +99,10 @@ class GerritEventConnector(threading.Thread):
                     Can not get account information." % event.type)
             event.account = None
 
-        if (event.change_number and
-            self.connection.sched.getProject(event.project_name)):
+        #XXX(jeblair)
+        #if (event.change_number and
+        #    self.connection.sched.getProject(event.project_name)):
+        if event.change_number:
             # Mark the change as needing a refresh in the cache
             event._needs_refresh = True
 

@@ -16,7 +16,7 @@ import logging
 import re
 import time
 from zuul import exceptions
-from zuul.model import Change, Ref, NullChange
+from zuul.model import Change, Ref, NullChange, Project
 from zuul.source import BaseSource
 
 
@@ -126,7 +126,13 @@ class GerritSource(BaseSource):
     def postConfig(self):
         pass
 
-    def getChange(self, event, project):
+    def getProject(self, name):
+        if name not in self.projects:
+            self.log.debug('xxx %s creating project %s' % (self, name))
+            self.projects[name] = Project(name)
+        return self.projects[name]
+
+    def getChange(self, event):
         if event.change_number:
             refresh = False
             if event._needs_refresh:
@@ -135,12 +141,14 @@ class GerritSource(BaseSource):
             change = self._getChange(event.change_number, event.patch_number,
                                      refresh=refresh)
         elif event.ref:
+            project = self.getProject(event.project_name)
             change = Ref(project)
             change.ref = event.ref
             change.oldrev = event.oldrev
             change.newrev = event.newrev
             change.url = self._getGitwebUrl(project, sha=event.newrev)
         else:
+            #XXX(jeblair)
             change = NullChange(project)
         return change
 
@@ -227,11 +235,7 @@ class GerritSource(BaseSource):
 
         if 'project' not in data:
             raise exceptions.ChangeNotFound(change.number, change.patchset)
-        # If updated changed came as a dependent on
-        # and its project is not defined,
-        # then create a 'foreign' project for it in layout
-        change.project = self.sched.getProject(data['project'],
-                                               create_foreign=bool(history))
+        change.project = self.getProject(data['project'])
         change.branch = data['branch']
         change.url = data['url']
         max_ps = 0
