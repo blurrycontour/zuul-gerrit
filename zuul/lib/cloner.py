@@ -129,13 +129,17 @@ class Cloner(object):
 
          1) The indicated revision for specific project
          2) Zuul reference for the indicated branch
-         3) Zuul reference for the master branch
-         4) The tip of the indicated branch
-         5) The tip of the master branch
+         3) The tip of the indicated branch
 
         If an "indicated revision" is specified for this project, and we are
         unable to meet this requirement, we stop attempting to check this
         repo out and raise a zuul.exceptions.RevNotFound exception.
+
+        If the indicated branch does not exist in the repository a fallback
+        lookup is attempted as follows:
+
+         1) Zuul reference for the master branch
+         2) The tip of the master branch
 
         The "indicated branch" is one of the following:
 
@@ -163,27 +167,8 @@ class Cloner(object):
         if project in self.project_branches:
             indicated_branch = self.project_branches[project]
 
-        if indicated_branch:
-            override_zuul_ref = re.sub(self.zuul_branch, indicated_branch,
-                                       self.zuul_ref)
-        else:
-            override_zuul_ref = None
-
-        if indicated_branch and repo.hasBranch(indicated_branch):
-            self.log.info("upstream repo has branch %s", indicated_branch)
-            fallback_branch = indicated_branch
-        else:
-            if indicated_branch:
-                self.log.info("upstream repo is missing branch %s",
-                              indicated_branch)
-            # FIXME should be origin HEAD branch which might not be 'master'
-            fallback_branch = 'master'
-
-        if self.zuul_branch:
-            fallback_zuul_ref = re.sub(self.zuul_branch, fallback_branch,
-                                       self.zuul_ref)
-        else:
-            fallback_zuul_ref = None
+        self.log.info("indicated revision is %s", indicated_revision)
+        self.log.info("indicated branch is %s", indicated_branch)
 
         # If the user has requested an explicit revision to be checked out,
         # we use it above all else, and if we cannot satisfy this requirement
@@ -198,13 +183,26 @@ class Cloner(object):
                 raise exceptions.RevNotFound(project, indicated_revision)
             self.log.info("Prepared '%s' repo at revision '%s'", project,
                           indicated_revision)
-        # If we have a non empty zuul_ref to use, use it. Otherwise we fall
-        # back to checking out the branch.
-        elif ((override_zuul_ref and
-              self.fetchFromZuul(repo, project, override_zuul_ref)) or
-              (fallback_zuul_ref and
-               fallback_zuul_ref != override_zuul_ref and
-              self.fetchFromZuul(repo, project, fallback_zuul_ref))):
+            return
+
+        # If the upstream repo does not have the indicated branch,
+        # use a default branch instead
+        zuul_ref = None
+        if not indicated_branch or not repo.hasBranch(indicated_branch):
+            # FIXME should be origin HEAD branch which might not be 'master'
+            self.log.info("upstream repo is missing branch %s, setting " +
+                          "indicated branch to master", indicated_branch)
+            indicated_branch = 'master'
+
+            # Get a zuul ref for the indicated branch
+            if self.zuul_branch:
+                zuul_ref = re.sub(self.zuul_branch, indicated_branch,
+                                  self.zuul_ref)
+        else:
+            zuul_ref = re.sub(self.zuul_branch, indicated_branch,
+                              self.zuul_ref)
+
+        if (zuul_ref and self.fetchFromZuul(repo, project, zuul_ref)):
             # Work around a bug in GitPython which can not parse FETCH_HEAD
             gitcmd = git.Git(dest)
             fetch_head = gitcmd.rev_parse('FETCH_HEAD')
@@ -212,12 +210,13 @@ class Cloner(object):
             self.log.info("Prepared %s repo with commit %s",
                           project, fetch_head)
         else:
-            # Checkout branch
-            self.log.info("Falling back to branch %s", fallback_branch)
+            # Checkout branch as no zuul ref
+            self.log.info("Falling back to checkout of branch %s",
+                          indicated_branch)
             try:
-                commit = repo.checkout('remotes/origin/%s' % fallback_branch)
+                commit = repo.checkout('remotes/origin/%s' % indicated_branch)
             except (ValueError, GitCommandError):
-                self.log.exception("Fallback branch not found: %s",
-                                   fallback_branch)
+                self.log.exception("Branch not found: %s",
+                                   indicated_branch)
             self.log.info("Prepared %s repo with branch %s at commit %s",
-                          project, fallback_branch, commit)
+                          project, indicated_branch, commit)
