@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a740942_47350d44",
+        "filename": "zuul/lib/connections.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-12-10T23:27:26Z",
+      "side": 1,
+      "message": "typo in faovur",
+      "revId": "a519bbd8d58bb7d40a275b5bb256f1eff92c5c36",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a740942_6738493e",
+        "filename": "zuul/lib/connections.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2015-12-10T23:27:26Z",
+      "side": 1,
+      "message": "typo",
+      "revId": "a519bbd8d58bb7d40a275b5bb256f1eff92c5c36",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
