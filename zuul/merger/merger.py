@@ -273,8 +273,10 @@ class Merger(object):
         name = os.path.join(self.working_root, wrapper_name)
         if os.path.isfile(name):
             os.environ['GIT_SSH'] = name
-        elif 'GIT_SSH' in os.environ:
-            del os.environ['GIT_SSH']
+        else:
+            self.log.warning("Wrapper file not found: %s", name)
+            if 'GIT_SSH' in os.environ:
+                del os.environ['GIT_SSH']
 
     def _mergeItem(self, item, recent):
         self.log.debug("Processing refspec %s for project %s / %s ref %s" %
