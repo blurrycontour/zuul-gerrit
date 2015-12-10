@@ -54,12 +54,12 @@ def configure_connections(config):
     # connection named 'gerrit' or 'smtp' respectfully
 
     if 'gerrit' in config.sections():
-        connections['gerrit'] = \
+        connections['_legacy_gerrit'] = \
             zuul.connection.gerrit.GerritConnection(
                 '_legacy_gerrit', dict(config.items('gerrit')))
 
     if 'smtp' in config.sections():
-        connections['smtp'] = \
+        connections['_legacy_smtp'] = \
             zuul.connection.smtp.SMTPConnection(
                 '_legacy_smtp', dict(config.items('smtp')))
 
