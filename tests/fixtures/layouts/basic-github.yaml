@@ -7,6 +7,7 @@
             - pr-open
             - pr-change
             - pr-reopen
+          branch: '^master$'
         - event: pr-comment
           comment: 'test me'
     success:
