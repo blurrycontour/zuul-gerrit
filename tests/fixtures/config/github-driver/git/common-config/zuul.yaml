@@ -10,6 +10,7 @@
             - pr-open
             - pr-change
             - pr-reopen
+          branch: '^master$'
         - event: pr-comment
           comment: 'test me'
     start:
@@ -107,6 +108,7 @@
     trigger:
       github:
         - event: push
+          ref: '^refs/heads/master$'
 
 - pipeline:
     name: tag
