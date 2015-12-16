@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a7e1126_6f3e4dba",
+        "filename": "tests/base.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 538,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2015-12-16T21:18:07Z",
+      "side": 1,
+      "message": "delete?",
+      "revId": "ff6da145db24e2f268a75136495cd8f00cc1fe6d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
