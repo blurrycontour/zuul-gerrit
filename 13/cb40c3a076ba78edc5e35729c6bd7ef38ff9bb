@@ -1,0 +1,12 @@
+Code-Review+2: Clark Boylan <cboylan@sapwetik.org>
+Code-Review+1: Anita Kuno <anteaya@anteaya.info>
+Code-Review+1: Sean McGinnis <sean.mcginnis@gmail.com>
+Code-Review+1: Ramy Asselin <ramy.asselin@hpe.com>
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Workflow+1: Jeremy Stanley <fungi@yuggoth.org>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Fri, 18 Dec 2015 21:59:36 +0000
+Reviewed-on: https://review.openstack.org/259623
+Project: openstack-infra/zuul
+Branch: refs/heads/master
