@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a7e1126_94ba36bf",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1376,
+      "author": {
+        "id": 10731
+      },
+      "writtenOn": "2015-12-18T09:46:08Z",
+      "side": 1,
+      "message": "Define this as a constant using a named string format parameter?\n\nI.e.\n\n TENANTS \u003d \"\"\"\n tenants:\n  - name: openstack\n    include:\n      - %(path)s\n  \"\"\"\n\nand then:\n\n f.write(TENANTS % {\u0027path\u0027: os.path.abspath(path)}",
+      "range": {
+        "startLine": 1371,
+        "startChar": 16,
+        "endLine": 1376,
+        "endChar": 11
+      },
+      "revId": "f84026c6e9213403d3fb93e2c010589b5a418ffe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
