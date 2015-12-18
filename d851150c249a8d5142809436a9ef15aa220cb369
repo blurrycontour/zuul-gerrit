@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a7e1126_1e60ae00",
+        "filename": "zuul/connection/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-12-18T05:21:44Z",
+      "side": 1,
+      "message": "If we need to access _attached_to from outside the connection object it shouldn\u0027t be marked private.\n\nAlso, if we only need to do this once for all sources maybe this reflects that a little better:\n\n  if self.connection.attached_to[\u0027source\u0027]:\n      source.getChange(...)",
+      "revId": "d851150c249a8d5142809436a9ef15aa220cb369",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a7e1126_de07861a",
+        "filename": "zuul/connection/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2015-12-18T05:21:44Z",
+      "side": 1,
+      "message": "Seems like this has the same private method issue as the private attribute above. If we need to access them outside of the objects we shouldn\u0027t mark them private.",
+      "revId": "d851150c249a8d5142809436a9ef15aa220cb369",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
