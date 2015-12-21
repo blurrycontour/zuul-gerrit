@@ -13,6 +13,7 @@
 # under the License.
 
 import abc
+import logging
 
 import six
 
@@ -23,6 +24,8 @@ class BaseReporter(object):
 
     Defines the exact public methods that must be supplied.
     """
+
+    log = logging.getLogger("zuul.reporter.BaseReporter")
 
     def __init__(self, reporter_config={}, sched=None, connection=None):
         self.reporter_config = reporter_config
@@ -124,10 +127,16 @@ class BaseReporter(object):
                 if job.failure_pattern:
                     pattern = job.failure_pattern
             if pattern:
-                url = pattern.format(change=item.change,
-                                     pipeline=pipeline,
-                                     job=job,
-                                     build=build)
+                try:
+                    url = pattern.format(change=item.change,
+                                         pipeline=pipeline,
+                                         job=job,
+                                         build=build)
+                except KeyError as e:
+                    self.log.warning(
+                        "Bad substitution (%s) in URL (%s) pattern",
+                        e, pattern)
+                    url = build.url or job.name
             else:
                 url = build.url or job.name
             if not job.voting:
