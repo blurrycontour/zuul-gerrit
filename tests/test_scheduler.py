@@ -20,8 +20,7 @@ import os
 import re
 import shutil
 import time
-import urllib
-import urllib2
+import six.moves.urllib.request as urlreq
 import yaml
 
 import git
@@ -2238,8 +2237,8 @@ class TestScheduler(ZuulTestCase):
 
         port = self.webapp.server.socket.getsockname()[1]
 
-        req = urllib2.Request("http://localhost:%s/status.json" % port)
-        f = urllib2.urlopen(req)
+        req = urlreq.Request("http://localhost:%s/status.json" % port)
+        f = urlreq.urlopen(req)
         headers = f.info()
         self.assertIn('Content-Length', headers)
         self.assertIn('Content-Type', headers)
@@ -2764,7 +2763,7 @@ class TestScheduler(ZuulTestCase):
 
         port = self.webapp.server.socket.getsockname()[1]
 
-        f = urllib.urlopen("http://localhost:%s/status.json" % port)
+        f = urlreq.urlopen("http://localhost:%s/status.json" % port)
         data = f.read()
 
         self.worker.hold_jobs_in_build = False
