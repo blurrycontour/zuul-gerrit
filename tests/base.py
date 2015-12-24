@@ -32,12 +32,12 @@ import subprocess
 import swiftclient
 import threading
 import time
-import urllib2
 
 import git
 import gear
 import fixtures
 import six.moves.urllib.parse as urlparse
+import six.moves.urllib.request as urlreq
 import statsd
 import testtools
 from git import GitCommandError
@@ -943,12 +943,12 @@ class ZuulTestCase(BaseTestCase):
         self.sched.registerConnections(self.connections)
 
         def URLOpenerFactory(*args, **kw):
-            if isinstance(args[0], urllib2.Request):
+            if isinstance(args[0], urlreq.Request):
                 return old_urlopen(*args, **kw)
             return FakeURLOpener(self.upstream_root, *args, **kw)
 
-        old_urlopen = urllib2.urlopen
-        urllib2.urlopen = URLOpenerFactory
+        old_urlopen = urlreq.urlopen
+        urlreq.urlopen = URLOpenerFactory
 
         self.merge_server = zuul.merger.server.MergeServer(self.config,
                                                            self.connections)

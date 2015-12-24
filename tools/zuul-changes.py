@@ -14,16 +14,16 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import urllib2
-import json
 import argparse
+import json
+import six.moves.urllib.request as urlreq
 
 parser = argparse.ArgumentParser()
 parser.add_argument('url', help='The URL of the running Zuul instance')
 parser.add_argument('pipeline_name', help='The name of the Zuul pipeline')
 options = parser.parse_args()
 
-data = urllib2.urlopen('%s/status.json' % options.url).read()
+data = urlreq.urlopen('%s/status.json' % options.url).read()
 data = json.loads(data)
 
 for pipeline in data['pipelines']:
