@@ -42,6 +42,9 @@ jobs:
   - name: ^.*$
     swift:
       - name: logs
+      - name: logs_metadata
+        container: logs_metadata
+        destination_prefix: ''
   - name: ^.*-merge$
     swift:
       - name: logs

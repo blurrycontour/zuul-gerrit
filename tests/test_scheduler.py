@@ -3457,6 +3457,35 @@ For CI problems and help debugging, contact ci@example.org"""
         self.worker.release()
         self.waitUntilSettled()
 
+    def test_swift_instructions_overwrite_destination_prefix(self):
+        "Test that the correct swift instructions are sent to the workers"
+        self.config.set('zuul', 'layout_config',
+                        'tests/fixtures/layout-swift.yaml')
+        self.sched.reconfigure(self.config)
+        self.registerJobs()
+
+        self.worker.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+
+        A.addApproval('CRVW', 2)
+        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        self.waitUntilSettled()
+
+        # Check the 'logs' instruction has the full LOG_PATH
+        self.assertEqual(
+            "https://storage.example.org/V1/AUTH_account/merge_logs/1/1/1/"
+            "gate/test-merge/",
+            self.builds[0].parameters['SWIFT_logs_URL'][:-7])
+
+        # Check the 'logs_metadata' has no LOG_PATH
+        self.assertEqual(
+            "https://storage.example.org/V1/AUTH_account/logs_metadata/",
+            self.builds[0].parameters['SWIFT_logs_metadata_URL'])
+
+        self.worker.hold_jobs_in_build = False
+        self.worker.release()
+        self.waitUntilSettled()
+
     def test_client_get_running_jobs(self):
         "Test that the RPC client can get a list of running jobs"
         self.worker.hold_jobs_in_build = True
