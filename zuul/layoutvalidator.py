@@ -125,6 +125,7 @@ class LayoutSchema(object):
     project_templates = [project_template]
 
     swift = {v.Required('name'): str,
+             'destination_prefix': str,
              'container': str,
              'expiry': int,
              'max_file_size': int,

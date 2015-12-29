@@ -248,11 +248,17 @@ class Gearman(object):
                                 else (k, v)
                                 for k, v in s.items())
 
+                if 'destination_prefix' in s_config:
+                    destination_prefix = s_config['destination_prefix']
+                    del s_config['destination_prefix']
+                else:
+                    destination_prefix = params['LOG_PATH']
+
                 (swift_instructions['URL'],
                  swift_instructions['HMAC_BODY'],
                  swift_instructions['SIGNATURE']) = \
                     self.swift.generate_form_post_middleware_params(
-                        params['LOG_PATH'], **s_config)
+                        destination_prefix, **s_config)
 
                 if 'logserver_prefix' in s_config:
                     swift_instructions['LOGSERVER_PREFIX'] = \
