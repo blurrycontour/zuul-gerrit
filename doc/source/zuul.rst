@@ -893,6 +893,9 @@ each job as it builds a list from the project specification.
     one of the parameters sent will be ``SWIFT_logs_CONTAINER``
     (case-sensitive).
 
+  *destination-prefix* (optional)
+    Overwrite the destination-prefix. Defaults to a generated LOG_PATH.
+
   Each of the defaults defined in :ref:`swift` can be overwritten as:
 
   *container* (optional)
