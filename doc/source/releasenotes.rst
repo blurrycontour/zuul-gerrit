@@ -1,4 +1,11 @@
-Since 2.0.0:
+=============
+Release Notes
+=============
+
+.. release-notes::
+
+2.1.0
+=====
 
 * The push_change_refs option which specified that Zuul refs should be
   pushed to Gerrit has been removed.
@@ -12,7 +19,8 @@ Since 2.0.0:
   the Zuul server in smaller deployments.  Several configuration
   options have moved from the ``zuul`` section to ``merger``.
 
-Since 1.3.0:
+2.0.0
+=====
 
 * The Jenkins launcher is replaced with Gearman launcher.  An internal
   Gearman server is provided, and there is a Gearman plugin for
@@ -40,6 +48,7 @@ Since 1.3.0:
   documentation.
 
 * Some statsd keys have changed in a backwards incompatible way:
+
   * The counters and timers of the form zuul.job.{name} is now split
     into several keys of the form:
     zuul.pipeline.{pipeline-name}.job.{job-name}.{result}
