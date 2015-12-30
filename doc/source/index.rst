@@ -24,6 +24,7 @@ Contents:
    launchers
    statsd
    client
+   releasenotes
 
 Indices and tables
 ==================
