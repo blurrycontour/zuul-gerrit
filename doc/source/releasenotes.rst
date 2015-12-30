@@ -1,4 +1,11 @@
-Since 2.0.0:
+=============
+Release Notes
+=============
+
+.. release-notes::
+
+2.1.0
+=====
 
 * The push_change_refs option which specified that Zuul refs should be
   pushed to Gerrit has been removed.
@@ -12,7 +19,8 @@ Since 2.0.0:
   the Zuul server in smaller deployments.  Several configuration
   options have moved from the ``zuul`` section to ``merger``.
 
-Since 1.3.0:
+2.0.0
+=====
 
 * The Jenkins launcher is replaced with Gearman launcher.  An internal
   Gearman server is provided, and there is a Gearman plugin for
@@ -40,6 +48,7 @@ Since 1.3.0:
   documentation.
 
 * Some statsd keys have changed in a backwards incompatible way:
+
   * The counters and timers of the form zuul.job.{name} is now split
     into several keys of the form:
     zuul.pipeline.{pipeline-name}.job.{job-name}.{result}
@@ -48,11 +57,3 @@ Since 1.3.0:
 
 * The layout.yaml structure has changed to introduce configurable
   reporters. This requires restructuring the start/success/failure
-  actions to include a dictionary of reporters and their parameters.
-  See reporters in the docs and layout.yaml-sample.
-
-* The zuul_url configuration option is required in zuul.conf.  It
-  specifies the URL of the git repositories that should be used by
-  workers when fetching Zuul refs and is passed to the workers as the
-  ZUUL_URL parameter.  It should probably be set to
-  "http://zuul-host-name/p/".
