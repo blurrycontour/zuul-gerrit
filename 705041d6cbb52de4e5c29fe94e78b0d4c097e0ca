@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa69d971_ca02b86f",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 867,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2015-12-30T01:13:17Z",
+      "side": 0,
+      "message": "Why are we taking this out?",
+      "range": {
+        "startLine": 863,
+        "startChar": 0,
+        "endLine": 867,
+        "endChar": 47
+      },
+      "revId": "705041d6cbb52de4e5c29fe94e78b0d4c097e0ca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
