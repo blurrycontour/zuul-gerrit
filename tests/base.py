@@ -855,10 +855,10 @@ class BaseTestCase(testtools.TestCase):
             os.environ.get('OS_STDERR_CAPTURE') == '1'):
             stderr = self.useFixture(fixtures.StringStream('stderr')).stream
             self.useFixture(fixtures.MonkeyPatch('sys.stderr', stderr))
-        if (os.environ.get('OS_LOG_CAPTURE') == 'True' or
-            os.environ.get('OS_LOG_CAPTURE') == '1'):
+        os_log_capture = os.environ.get('OS_LOG_CAPTURE').upper()
+        if (os_log_capture in logging._levelNames.keys()):
             self.useFixture(fixtures.FakeLogger(
-                level=logging.DEBUG,
+                level=getattr(logging, os_log_capture),
                 format='%(asctime)s %(name)-32s '
                 '%(levelname)-8s %(message)s'))
 
