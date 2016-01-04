@@ -1152,7 +1152,7 @@ class BaseTestCase(testtools.TestCase):
         if (os.environ.get('OS_LOG_CAPTURE') == 'True' or
             os.environ.get('OS_LOG_CAPTURE') == '1'):
             self.useFixture(fixtures.FakeLogger(
-                level=logging.DEBUG,
+                level=logging.INFO,
                 format='%(asctime)s %(name)-32s '
                 '%(levelname)-8s %(message)s'))
 
