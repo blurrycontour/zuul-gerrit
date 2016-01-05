@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "7a740942_e0e73f3e",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1363,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-01-05T02:44:09Z",
+      "side": 1,
+      "message": "why not take the tenant here too?",
+      "revId": "59fdbac11989b904a28a29134a1a69beefebbb41",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a7e1126_b41bb21a",
         "filename": "tests/test_v3.py",
         "patchSetId": 2
@@ -25,6 +42,76 @@
     },
     {
       "key": {
+        "uuid": "fa69d971_44a95f8f",
+        "filename": "tests/test_v3.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-01-05T02:44:09Z",
+      "side": 1,
+      "message": "The code in here is largely copied from test_scheduler.py so it could be said that the copyright needs to be maintained.",
+      "parentUuid": "3a7e1126_b41bb21a",
+      "range": {
+        "startLine": 3,
+        "startChar": 2,
+        "endLine": 3,
+        "endChar": 58
+      },
+      "revId": "59fdbac11989b904a28a29134a1a69beefebbb41",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa69d971_e4bf33a8",
+        "filename": "zuul/connection/gerrit.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-01-05T02:44:09Z",
+      "side": 1,
+      "message": "https://review.openstack.org/#/c/259281/",
+      "range": {
+        "startLine": 103,
+        "startChar": 30,
+        "endLine": 103,
+        "endChar": 36
+      },
+      "revId": "59fdbac11989b904a28a29134a1a69beefebbb41",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa69d971_440abf7a",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 381,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-01-05T02:44:09Z",
+      "side": 1,
+      "message": "This makes pipelines+tenants share sources now rather than have one per pipeline.",
+      "range": {
+        "startLine": 381,
+        "startChar": 12,
+        "endLine": 381,
+        "endChar": 27
+      },
+      "revId": "59fdbac11989b904a28a29134a1a69beefebbb41",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a7e1126_d4519ed9",
         "filename": "zuul/scheduler.py",
         "patchSetId": 2
@@ -36,6 +123,30 @@
       "writtenOn": "2015-12-18T09:40:28Z",
       "side": 1,
       "message": "This doesn\u0027t seem to be logging any useful information about the exception.",
+      "range": {
+        "startLine": 825,
+        "startChar": 16,
+        "endLine": 826,
+        "endChar": 53
+      },
+      "revId": "59fdbac11989b904a28a29134a1a69beefebbb41",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa69d971_e472d310",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 826,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-01-05T02:44:09Z",
+      "side": 1,
+      "message": "logging.exception will include the caught exception",
+      "parentUuid": "3a7e1126_d4519ed9",
       "range": {
         "startLine": 825,
         "startChar": 16,
