@@ -22,6 +22,30 @@
       "revId": "f84026c6e9213403d3fb93e2c010589b5a418ffe",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa69d971_c491cff2",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1376,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-01-05T02:47:02Z",
+      "side": 1,
+      "message": "Could do. Potential for a followup change, but for the purpose of tests this is fine.",
+      "parentUuid": "3a7e1126_94ba36bf",
+      "range": {
+        "startLine": 1371,
+        "startChar": 16,
+        "endLine": 1376,
+        "endChar": 11
+      },
+      "revId": "f84026c6e9213403d3fb93e2c010589b5a418ffe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
