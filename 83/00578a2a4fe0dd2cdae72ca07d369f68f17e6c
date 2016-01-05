@@ -1,0 +1,8 @@
+Code-Review+2: Joshua Hesketh <joshua.hesketh@rackspace.com>
+Workflow+1: Joshua Hesketh <joshua.hesketh@rackspace.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Tue, 05 Jan 2016 04:45:43 +0000
+Reviewed-on: https://review.openstack.org/258198
+Project: openstack-infra/zuul
+Branch: refs/heads/feature/zuulv3
