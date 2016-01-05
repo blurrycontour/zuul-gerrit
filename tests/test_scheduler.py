@@ -3490,7 +3490,7 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertEqual(None, running_item['item_ahead'])
         self.assertEqual('org/project', running_item['project'])
         self.assertEqual(None, running_item['remaining_time'])
-        self.assertEqual(True, running_item['active'])
+        self.assertTrue(running_item['active'])
         self.assertEqual('1,1', running_item['id'])
 
         self.assertEqual(3, len(running_item['jobs']))
@@ -3498,12 +3498,12 @@ For CI problems and help debugging, contact ci@example.org"""
             if job['name'] == 'project-merge':
                 self.assertEqual('project-merge', job['name'])
                 self.assertEqual('gate', job['pipeline'])
-                self.assertEqual(False, job['retry'])
+                self.assertFalse(job['retry'])
                 self.assertEqual('https://server/job/project-merge/0/',
                                  job['url'])
                 self.assertEqual(7, len(job['worker']))
-                self.assertEqual(False, job['canceled'])
-                self.assertEqual(True, job['voting'])
+                self.assertFalse(job['canceled'])
+                self.assertTrue(job['voting'])
                 self.assertEqual(None, job['result'])
                 self.assertEqual('gate', job['pipeline'])
                 break
