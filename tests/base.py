@@ -48,7 +48,7 @@ import zuul.connection.smtp
 import zuul.scheduler
 import zuul.webapp
 import zuul.rpclistener
-import zuul.launcher.ansible
+import zuul.launcher.ansiblelauncher
 import zuul.launcher.gearman
 import zuul.lib.swift
 import zuul.lib.connections
@@ -636,7 +636,7 @@ class FakeBuild(threading.Thread):
         self.worker.lock.release()
 
 
-class RecordingLaunchServer(zuul.launcher.ansible.LaunchServer):
+class RecordingLaunchServer(zuul.launcher.ansiblelauncher.LaunchServer):
     def __init__(self, *args, **kw):
         super(RecordingLaunchServer, self).__init__(*args, **kw)
         self.job_history = []
