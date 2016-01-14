@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da6ed579_01f7a259",
+        "filename": "zuul/launcher/ansible.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-01-14T19:40:25Z",
+      "side": 1,
+      "message": "This fixes a race condition where the update and the gitfiles might both try to create the repo at once (not to mention, getfiles might get outdated info).",
+      "revId": "f5dbd007128a03f6f0c5bc75427dc21a9a48ecb9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
