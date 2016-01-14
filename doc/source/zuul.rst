@@ -756,6 +756,10 @@ each job as it builds a list from the project specification.
     The pattern for '/COMMIT_MSG' is always matched on and does not
     have to be included.
 
+    Skip-if directives are ignored for merge commits due to the lack
+    of reliability of the file list returned by Gerrit for such
+    commits.
+
 **voting (optional)**
   Boolean value (``true`` or ``false``) that indicates whatever
   a job is voting or not.  Default: ``true``.
