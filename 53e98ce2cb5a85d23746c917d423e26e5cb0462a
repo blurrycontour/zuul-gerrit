@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da6ed579_f1fe13ad",
+        "filename": "zuul/lib/connections.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 10731
+      },
+      "writtenOn": "2016-01-14T02:59:51Z",
+      "side": 1,
+      "message": "should this be \"zuul.configure_connections\"?",
+      "range": {
+        "startLine": 23,
+        "startChar": 29,
+        "endLine": 23,
+        "endChar": 50
+      },
+      "revId": "53e98ce2cb5a85d23746c917d423e26e5cb0462a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
