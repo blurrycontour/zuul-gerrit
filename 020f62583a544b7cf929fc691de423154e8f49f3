@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da6ed579_5aa3669d",
+        "filename": "zuul/launcher/gearman.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-01-14T10:38:20Z",
+      "side": 1,
+      "message": "Just adding a note for my own use that we\u0027re losing compatibility with jenkins, or at least when using jenkins the registered job has to do a lot more of the setting up (which I guess is what zuul\u0027s launcher/ansible will be doing)",
+      "range": {
+        "startLine": 389,
+        "startChar": 32,
+        "endLine": 389,
+        "endChar": 47
+      },
+      "revId": "020f62583a544b7cf929fc691de423154e8f49f3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
