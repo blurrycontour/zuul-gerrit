@@ -104,7 +104,7 @@ class FakeChange(object):
                   'VRFY': ('Verified', -2, 2)}
 
     def __init__(self, gerrit, number, project, branch, subject,
-                 status='NEW', upstream_root=None):
+                 status='NEW', upstream_root=None, parent_count=1):
         self.gerrit = gerrit
         self.reported = 0
         self.queried = 0
@@ -130,6 +130,7 @@ class FakeChange(object):
             'owner': {'email': 'user@example.com',
                       'name': 'User Name',
                       'username': 'username'},
+            'parents': [random_sha1() for i in range(parent_count)],
             'patchSets': self.patchsets,
             'project': project,
             'status': status,
@@ -396,11 +397,11 @@ class FakeGerritConnection(zuul.connection.gerrit.GerritConnection):
         self.queries = []
         self.upstream_root = upstream_root
 
-    def addFakeChange(self, project, branch, subject, status='NEW'):
+    def addFakeChange(self, project, branch, subject, status='NEW', **kwargs):
         self.change_number += 1
         c = FakeChange(self, self.change_number, project, branch, subject,
                        upstream_root=self.upstream_root,
-                       status=status)
+                       status=status, **kwargs)
         self.changes[self.change_number] = c
         return c
 

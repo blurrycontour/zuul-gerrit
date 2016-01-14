@@ -511,9 +511,13 @@ class Job(object):
                         matches_file = True
         if self.files and not matches_file:
             return False
-
-        if self.skip_if_matcher and self.skip_if_matcher.matches(change):
-            return False
+        is_merge_commit = False
+        if (hasattr(change, '_data') and 'parents' in change._data and
+            len(change._data['parents']) > 1):
+                is_merge_commit = True
+        if (not is_merge_commit and
+            self.skip_if_matcher and self.skip_if_matcher.matches(change)):
+                return False
 
         return True
 

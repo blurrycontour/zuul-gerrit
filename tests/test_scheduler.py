@@ -2135,16 +2135,18 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(B.data['status'], 'MERGED')
         self.assertEqual(B.reported, 2)
 
-    def _test_skip_if_jobs(self, branch, should_skip):
+    def _test_skip_if_jobs(self, branch, should_skip, is_merge=False):
         "Test that jobs with a skip-if filter run only when appropriate"
         self.config.set('zuul', 'layout_config',
                         'tests/fixtures/layout-skip-if.yaml')
         self.sched.reconfigure(self.config)
         self.registerJobs()
 
+        parent_count = 2 if is_merge else 1
         change = self.fake_gerrit.addFakeChange('org/project',
                                                 branch,
-                                                'test skip-if')
+                                                'test skip-if',
+                                                parent_count=parent_count)
         self.fake_gerrit.addEvent(change.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
@@ -2161,6 +2163,10 @@ class TestScheduler(ZuulTestCase):
 
     def test_skip_if_no_match_runs_job(self):
         self._test_skip_if_jobs(branch='mp', should_skip=False)
+
+    def test_skip_if_match_on_merge_commit_runs_job(self):
+        self._test_skip_if_jobs(branch='master', should_skip=False,
+                                is_merge=True)
 
     def test_test_config(self):
         "Test that we can test the config"
