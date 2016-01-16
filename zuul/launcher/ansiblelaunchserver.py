@@ -221,6 +221,7 @@ class LaunchServer(object):
             self.log.debug("Job %s: job root at %s" %
                            (job.unique, jobdir.root))
             args = json.loads(job.arguments)
+            self.log.debug("Job arguments: %s" % (args,))
             tasks = []
             for project in args['projects']:
                 self.log.debug("Job %s: updating project %s" %

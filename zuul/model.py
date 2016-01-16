@@ -452,6 +452,8 @@ class Job(object):
         pre_run=None,
         post_run=None,
         voting=None,
+        project_source=None,
+        project_name=None,
         failure_message=None,
         success_message=None,
         failure_url=None,
@@ -1507,6 +1509,7 @@ class Tenant(object):
     def __init__(self, name):
         self.name = name
         self.layout = None
+        self.playbook_paths = []
 
 
 class Abide(object):
