@@ -4181,3 +4181,32 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertIn('Build failed.', K.messages[0])
         # No more messages reported via smtp
         self.assertEqual(3, len(self.smtp_messages))
+
+
+class TestSchedulerSwiftTempUrl(ZuulTestCase):
+    def setup_config(self, config_file='zuul-swift-temp-url.conf'):
+        super(TestSchedulerSwiftTempUrl, self).setup_config(config_file)
+
+    def test_swift_temp_url_instructions(self):
+        "Test that the correct temp url instructions are sent to the workers"
+        self.config.set('zuul', 'layout_config',
+                        'tests/fixtures/layout-swift.yaml')
+        self.sched.reconfigure(self.config)
+        self.registerJobs()
+
+        self.worker.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+
+        A.addApproval('CRVW', 2)
+        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        self.waitUntilSettled()
+
+        params = self.builds[0].parameters
+        self.assertEqual(5, len(params['SWIFT_logs_HMAC_BODY'].split('\n')))
+        self.assertEqual("http://logs.example.org/AUTH_swiftaccount/logs",
+                         params['SWIFT_logs_LOGSERVER_PREFIX'])
+        self.assertIn('SWIFT_logs_SIGNATURE', params)
+
+        self.worker.hold_jobs_in_build = False
+        self.worker.release()
+        self.waitUntilSettled()
