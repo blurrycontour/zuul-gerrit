@@ -224,7 +224,10 @@ class Gearman(object):
         # NOTE(jhesketh): The params need to stay in a key=value data pair
         # as workers cannot necessarily handle lists.
 
-        if job.swift and self.swift.connection:
+        if job.swift and (self.swift.connection or (
+            self.config.has_option('swift', 'X-Account-Meta-Temp-Url-Key') and
+            self.config.has_option('swift', 'Send-Temp-Url-Key') and
+            self.config.getboolean('swift', 'Send-Temp-Url-Key') == False)):
 
             for name, s in job.swift.items():
                 swift_instructions = {}
