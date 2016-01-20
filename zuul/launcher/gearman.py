@@ -243,8 +243,8 @@ class Gearman(object):
         # NOTE(mmedvede): Swift parameter creation should remain after the call
         # to job.parameter_function to make it possible to update LOG_PATH for
         # swift upload url using parameter_function mechanism.
-        if job.swift and self.swift.connection:
 
+        if job.swift and self.swift.storage_url:
             for name, s in job.swift.items():
                 swift_instructions = {}
                 s_config = {}
