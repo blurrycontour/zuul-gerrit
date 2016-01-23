@@ -566,3 +566,131 @@ class TestCloner(ZuulTestCase):
         self.worker.hold_jobs_in_build = False
         self.worker.release()
         self.waitUntilSettled()
+
+    def test_post(self):
+        projects = ['org/project1', 'org/project2']
+        self.create_branch('org/project1', 'stable/kilo')
+        self.create_branch('org/project2', 'stable/kilo')
+        self.config.set('zuul', 'layout_config',
+                        'tests/fixtures/layout-cloner.yaml')
+        self.sched.reconfigure(self.config)
+        self.registerJobs()
+        self.waitUntilSettled()
+
+        self.worker.hold_jobs_in_build = True
+        e = {
+            "type": "ref-updated",
+            "submitter": {
+                "name": "User Name",
+            },
+            "refUpdate": {
+                "oldRev": "90f173846e3af9154517b88543ffbd1691f31366",
+                "newRev": "d479a0bfcb34da57a31adb2a595c0cf687812543",
+                "refName": "stable/kilo",
+                "project": "org/project1",
+            }
+        }
+        self.fake_gerrit.addEvent(e)
+        self.waitUntilSettled()
+        self.worker.hold_jobs_in_build = False
+
+        builds = self.builds[:]
+        self.assertEquals(1, len(builds), "One build is running")
+
+        upstream = self.getUpstreamRepos(projects)
+        states = [
+            {'org/project1':
+                str(upstream['org/project1'].commit('stable/kilo')),
+             'org/project2':
+                str(upstream['org/project2'].commit('stable/kilo')),
+             },
+        ]
+
+        for number, build in enumerate(builds):
+            self.log.debug("Build parameters: %s", build.parameters)
+            cloner = zuul.lib.cloner.Cloner(
+                git_base_url=self.upstream_root,
+                projects=projects,
+                workspace=self.workspace_root,
+                zuul_branch=build.parameters.get('ZUUL_BRANCH', None),
+                zuul_ref=build.parameters.get('ZUUL_REF', None),
+                zuul_url=self.git_root,
+            )
+            cloner.execute()
+            work = self.getWorkspaceRepos(projects)
+            state = states[number]
+
+            for project in projects:
+                self.assertEquals(state[project],
+                                  str(work[project].commit('HEAD')),
+                                  'Project %s commit for build %s should '
+                                  'be correct' % (project, number))
+
+            shutil.rmtree(self.workspace_root)
+
+        self.worker.release()
+        self.waitUntilSettled()
+
+    def test_release(self):
+        projects = ['org/project1', 'org/project2']
+        self.config.set('zuul', 'layout_config',
+                        'tests/fixtures/layout-cloner.yaml')
+        self.sched.reconfigure(self.config)
+        self.registerJobs()
+        self.waitUntilSettled()
+
+        self.worker.hold_jobs_in_build = True
+        self.create_tagged_commit('org/project2', '0.0.0')
+        e = {
+            "type": "ref-updated",
+            "submitter": {
+                "name": "User Name",
+            },
+            "refUpdate": {
+                "oldRev": "0000000000000000000000000000000000000000",
+                "newRev": "d479a0bfcb34da57a31adb2a595c0cf687812543",
+                "refName": "refs/tags/0.0.0",
+                "project": "org/project2",
+            }
+        }
+        self.fake_gerrit.addEvent(e)
+        self.waitUntilSettled()
+
+        builds = self.builds[:]
+        self.worker.hold_jobs_in_build = False
+
+        self.assertEquals(1, len(builds), "One build is running")
+
+        upstream = self.getUpstreamRepos(projects)
+        states = [
+            {'org/project1':
+                str(upstream['org/project1'].commit('master')),
+             'org/project2':
+                str(upstream['org/project2'].tag('refs/tags/0.0.0').commit),
+             },
+        ]
+
+        for number, build in enumerate(builds):
+            self.log.debug("Build parameters: %s", build.parameters)
+            cloner = zuul.lib.cloner.Cloner(
+                git_base_url=self.upstream_root,
+                projects=projects,
+                workspace=self.workspace_root,
+                zuul_branch=build.parameters.get('ZUUL_BRANCH', None),
+                zuul_ref=build.parameters.get('ZUUL_REF', None),
+                zuul_url=self.git_root,
+            )
+            cloner.execute()
+            work = self.getWorkspaceRepos(projects)
+            state = states[number]
+
+            for project in projects:
+                self.assertEquals(state[project],
+                                  str(work[project].commit('HEAD')),
+                                  'Project %s commit for build %s should '
+                                  'be correct' % (project, number))
+
+            shutil.rmtree(self.workspace_root)
+
+        self.worker.release()
+        self.waitUntilSettled()

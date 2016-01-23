@@ -890,20 +890,35 @@ class ZuulTestCase(BaseTestCase):
 
         # For each project in config:
         self.init_repo("org/project")
+        time.sleep(.1)  # Prevent duplicate SHAs
         self.init_repo("org/project1")
+        time.sleep(.1)  # Prevent duplicate SHAs
         self.init_repo("org/project2")
+        time.sleep(.1)  # Prevent duplicate SHAs
         self.init_repo("org/project3")
+        time.sleep(.1)  # Prevent duplicate SHAs
         self.init_repo("org/project4")
+        time.sleep(.1)  # Prevent duplicate SHAs
         self.init_repo("org/project5")
+        time.sleep(.1)  # Prevent duplicate SHAs
         self.init_repo("org/project6")
+        time.sleep(.1)  # Prevent duplicate SHAs
         self.init_repo("org/one-job-project")
+        time.sleep(.1)  # Prevent duplicate SHAs
         self.init_repo("org/nonvoting-project")
+        time.sleep(.1)  # Prevent duplicate SHAs
         self.init_repo("org/templated-project")
+        time.sleep(.1)  # Prevent duplicate SHAs
         self.init_repo("org/layered-project")
+        time.sleep(.1)  # Prevent duplicate SHAs
         self.init_repo("org/node-project")
+        time.sleep(.1)  # Prevent duplicate SHAs
         self.init_repo("org/conflict-project")
+        time.sleep(.1)  # Prevent duplicate SHAs
         self.init_repo("org/noop-project")
+        time.sleep(.1)  # Prevent duplicate SHAs
         self.init_repo("org/experimental-project")
+        time.sleep(.1)  # Prevent duplicate SHAs
         self.init_repo("org/no-jobs-project")
 
         self.statsd = FakeStatsd()
@@ -1116,17 +1131,41 @@ class ZuulTestCase(BaseTestCase):
 
     def create_branch(self, project, branch):
         path = os.path.join(self.upstream_root, project)
-        repo = git.Repo.init(path)
-        fn = os.path.join(path, 'README')
+        repo = git.Repo(path)
 
+        self.log.info("Creating branch %s for project %s",
+                      branch, project)
         branch_head = repo.create_head(branch)
         repo.head.reference = branch_head
+        fn = os.path.join(path, 'README')
         f = open(fn, 'a')
         f.write("test %s\n" % branch)
         f.close()
         repo.index.add([fn])
-        repo.index.commit('%s commit' % branch)
+        commit = repo.index.commit('%s commit' % branch)
+        self.log.debug("Created commit %s on project %s",
+                       commit, project)
 
+        repo.head.reference = repo.heads['master']
+        zuul.merger.merger.reset_repo_to_head(repo)
+        repo.git.clean('-x', '-f', '-d')
+
+    def create_tagged_commit(self, project, tag):
+        path = os.path.join(self.upstream_root, project)
+        repo = git.Repo(path)
+
+        self.log.info("Creating tag %s for project %s",
+                      tag, project)
+        fn = os.path.join(path, 'README')
+        f = open(fn, 'a')
+        f.write("test %s\n" % tag)
+        f.close()
+        repo.index.add([fn])
+        commit = repo.index.commit('%s commit' % tag)
+        self.log.debug("Created commit %s on project %s",
+                       commit, project)
+
+        repo.create_tag(tag)
         repo.head.reference = repo.heads['master']
         zuul.merger.merger.reset_repo_to_head(repo)
         repo.git.clean('-x', '-f', '-d')
