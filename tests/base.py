@@ -1131,6 +1131,12 @@ class ZuulTestCase(BaseTestCase):
         zuul.merger.merger.reset_repo_to_head(repo)
         repo.git.clean('-x', '-f', '-d')
 
+    def add_tag(self, project, tag, ref):
+        path = os.path.join(self.upstream_root, project)
+        repo = git.Repo(path)
+        repo.head.reference = ref
+        repo.create_tag(tag)
+
     def ref_has_change(self, ref, change):
         path = os.path.join(self.git_root, change.project)
         repo = git.Repo(path)
