@@ -148,8 +148,11 @@ class Cloner(object):
             self.log.info("upstream repo has branch %s", indicated_branch)
             fallback_branch = indicated_branch
         else:
-            self.log.info("upstream repo is missing branch %s",
-                          self.branch)
+            if indicated_branch:
+                self.log.info("upstream repo is missing branch %s",
+                              indicated_branch)
+            else:
+                self.log.info("No indicated branch found")
             # FIXME should be origin HEAD branch which might not be 'master'
             fallback_branch = 'master'
 
@@ -157,7 +160,12 @@ class Cloner(object):
             fallback_zuul_ref = re.sub(self.zuul_branch, fallback_branch,
                                        self.zuul_ref)
         else:
-            fallback_zuul_ref = None
+            if self.zuul_ref:
+                # If we have a zuul_ref but no zuul_branch, then we are in a
+                # post or release pipeline
+                fallback_zuul_ref = self.zuul_ref
+            else:
+                fallback_zuul_ref = None
 
         # If we have a non empty zuul_ref to use, use it. Otherwise we fall
         # back to checking out the branch.
