@@ -10,14 +10,15 @@ Zuul has three configuration files:
 
 **zuul.conf**
   Connection information for Gerrit and Gearman, locations of the
-  other config files.
+  other config files. (required)
 **layout.yaml**
-  Project and pipeline configuration -- what Zuul does.
+  Project and pipeline configuration -- what Zuul does. (required)
 **logging.conf**
-    Python logging config.
+    Python logging config. (optional)
 
 Examples of each of the three files can be found in the etc/ directory
-of the source distribution.
+of the source distribution. While logging.conf is not necessary it is highly
+recommended so that it logs your process.
 
 .. _zuulconf:
 
@@ -41,16 +42,24 @@ You can also find an example zuul.conf file in the git
 gearman
 """""""
 
+This is Zuul's gearman client configuration. Zuul needs to use this in order
+to communicate with the gearman server. At minimal provide a **server**
+section to specify the hostname/ip of the gearmand server. If using Zuul's
+builtin gearmand server just set **server** to 127.0.0.1.
+
 **server**
   Hostname or IP address of the Gearman server.
-  ``server=gearman.example.com``
+  ``server=gearman.example.com`` (required)
 
 **port**
   Port on which the Gearman server is listening.
-  ``port=4730``
+  ``port=4730`` (optional)
 
 gearman_server
 """"""""""""""
+
+The builtin gearman server. This section is optional and only necessary if you
+want to use the builtin gearman server.
 
 **start**
   Whether to start the internal Gearman server (default: False).
@@ -66,6 +75,9 @@ gearman_server
 
 zuul
 """"
+
+Zuul's main configuration section. At minimum zuul must be able to find
+layout.yaml to be useful.
 
 .. _layout_config:
 
@@ -117,6 +129,9 @@ zuul
 
 merger
 """"""
+
+The zuul-merger process configuration. Detailed documentation on this process
+can be found on the :doc:`merger` page.
 
 **git_dir**
   Directory that Zuul should clone local git repositories to.
