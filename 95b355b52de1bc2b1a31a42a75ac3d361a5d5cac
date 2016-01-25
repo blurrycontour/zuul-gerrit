@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a68dd71_935c447e",
+        "filename": "doc/source/reporters.rst",
+        "patchSetId": 28
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 13807
+      },
+      "writtenOn": "2016-01-25T02:42:21Z",
+      "side": 1,
+      "message": "typo **zuul**",
+      "revId": "95b355b52de1bc2b1a31a42a75ac3d361a5d5cac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
