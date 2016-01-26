@@ -13,11 +13,13 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import git
 import threading
 import select
 import json
 import time
 from six.moves import queue as Queue
+import os
 import paramiko
 import logging
 import pprint
@@ -223,6 +225,7 @@ class GerritConnection(BaseConnection):
         self.server = self.connection_config.get('server')
         self.port = int(self.connection_config.get('port', 29418))
         self.keyfile = self.connection_config.get('sshkey', None)
+        self.no_http = bool(self.connection_config.get('no_http', False))
         self.watcher_thread = None
         self.event_queue = None
         self.client = None
@@ -232,6 +235,26 @@ class GerritConnection(BaseConnection):
 
         self._change_cache = {}
         self.gerrit_event_connector = None
+
+        if self.no_http and self.keyfile:
+            self._makeSSHWrapper(self.keyfile, self.connection_name)
+
+    def _makeSSHWrapper(self, key, connection_name='default'):
+        wrapper_name = '.ssh_wrapper_%s' % connection_name
+        name = os.path.join(os.environ['HOME'], wrapper_name)
+        fd = open(name, 'w')
+        fd.write('#!/bin/bash\n')
+        fd.write('ssh -i %s $@\n' % key)
+        fd.close()
+        os.chmod(name, 0755)
+
+    def _setGitSsh(self, connection_name):
+        wrapper_name = '.ssh_wrapper_%s' % connection_name
+        name = os.path.join(os.environ['HOME'], wrapper_name)
+        if os.path.isfile(name):
+            os.environ['GIT_SSH'] = name
+        elif 'GIT_SSH' in os.environ:
+            del os.environ['GIT_SSH']
 
     def getCachedChange(self, key):
         if key in self._change_cache:
@@ -384,47 +407,60 @@ class GerritConnection(BaseConnection):
         return (out, err)
 
     def getInfoRefs(self, project):
-        url = "%s/p/%s/info/refs?service=git-upload-pack" % (
-            self.baseurl, project)
-        try:
-            data = urllib2.urlopen(url).read()
-        except:
-            self.log.error("Cannot get references from %s" % url)
-            raise  # keeps urllib2 error informations
         ret = {}
-        read_headers = False
-        read_advertisement = False
-        if data[4] != '#':
-            raise Exception("Gerrit repository does not support "
-                            "git-upload-pack")
-        i = 0
-        while i < len(data):
-            if len(data) - i < 4:
-                raise Exception("Invalid length in info/refs")
-            plen = int(data[i:i + 4], 16)
-            i += 4
-            # It's the length of the packet, including the 4 bytes of the
-            # length itself, unless it's null, in which case the length is
-            # not included.
-            if plen > 0:
-                plen -= 4
-            if len(data) - i < plen:
-                raise Exception("Invalid data in info/refs")
-            line = data[i:i + plen]
-            i += plen
-            if not read_headers:
+        if self.no_http:
+            url = "ssh://%s@%s:%d/%s" % (
+                self.user, self.server, self.port, project)
+            self._setGitSsh(self.connection_name)
+            try:
+                data = git.cmd.Git().ls_remote(url)
+            except:
+                self.log.error("Cannot get references from %s" % url)
+                raise  # keeps git error informations
+            for rev_info in data.splitlines():
+                revision, ref = rev_info.split()
+                ret[ref] = revision
+        else:
+            url = "%s/p/%s/info/refs?service=git-upload-pack" % (
+                self.baseurl, project)
+            try:
+                data = urllib2.urlopen(url).read()
+            except:
+                self.log.error("Cannot get references from %s" % url)
+                raise  # keeps urllib2 error informations
+            read_headers = False
+            read_advertisement = False
+            if data[4] != '#':
+                raise Exception("Gerrit repository does not support "
+                                "git-upload-pack")
+            i = 0
+            while i < len(data):
+                if len(data) - i < 4:
+                    raise Exception("Invalid length in info/refs")
+                plen = int(data[i:i + 4], 16)
+                i += 4
+                # It's the length of the packet, including the 4 bytes of the
+                # length itself, unless it's null, in which case the length is
+                # not included.
+                if plen > 0:
+                    plen -= 4
+                if len(data) - i < plen:
+                    raise Exception("Invalid data in info/refs")
+                line = data[i:i + plen]
+                i += plen
+                if not read_headers:
+                    if plen == 0:
+                        read_headers = True
+                    continue
+                if not read_advertisement:
+                    read_advertisement = True
+                    continue
                 if plen == 0:
-                    read_headers = True
-                continue
-            if not read_advertisement:
-                read_advertisement = True
-                continue
-            if plen == 0:
-                # The terminating null
-                continue
-            line = line.strip()
-            revision, ref = line.split()
-            ret[ref] = revision
+                    # The terminating null
+                    continue
+                line = line.strip()
+                revision, ref = line.split()
+                ret[ref] = revision
         return ret
 
     def getGitUrl(self, project):
