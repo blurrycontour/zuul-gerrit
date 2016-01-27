@@ -60,6 +60,7 @@ class LayoutSchema(object):
                 'description': str,
                 'require': require,
                 'reject': reject,
+                'start-message': str,
                 'success-message': str,
                 'failure-message': str,
                 'merge-failure-message': str,
