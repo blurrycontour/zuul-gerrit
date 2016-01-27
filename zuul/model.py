@@ -70,6 +70,7 @@ class Pipeline(object):
     def __init__(self, name):
         self.name = name
         self.description = None
+        self.start_message = None
         self.failure_message = None
         self.merge_failure_message = None
         self.success_message = None
@@ -726,7 +727,10 @@ class QueueItem(object):
 
     def formatJobResult(self, job, url_pattern=None):
         build = self.current_build_set.getBuild(job.name)
-        result = build.result
+        if hasattr(build, 'result'):
+            result = build.result
+        else:
+            result = item.current_build_set.result
         pattern = url_pattern
         if result == 'SUCCESS':
             if job.success_message:
@@ -748,7 +752,7 @@ class QueueItem(object):
             except Exception:
                 pass  # FIXME: log this or something?
         if not url:
-            url = build.url or job.name
+            url = build.url if hasattr(build, 'url') else job.name
         return (result, url)
 
     def formatJSON(self, url_pattern=None):
