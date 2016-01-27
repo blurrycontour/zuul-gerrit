@@ -418,6 +418,8 @@ class Scheduler(threading.Thread):
                 conf_pipeline.get('source', 'gerrit'))
             precedence = model.PRECEDENCE_MAP[conf_pipeline.get('precedence')]
             pipeline.precedence = precedence
+            pipeline.start_message = conf_pipeline.get('start-message',
+                                                       "Build started.")
             pipeline.failure_message = conf_pipeline.get('failure-message',
                                                          "Build failed.")
             pipeline.merge_failure_message = conf_pipeline.get(
@@ -1225,6 +1227,7 @@ class BasePipelineManager(object):
             try:
                 self.log.info("Reporting start, action %s item %s" %
                               (self.pipeline.start_actions, item))
+                item.setReportedResult('QUEUED')
                 ret = self.sendReport(self.pipeline.start_actions,
                                       self.pipeline.source, item)
                 if ret:
