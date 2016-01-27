@@ -296,6 +296,11 @@ explanation of each of the parameters::
   for the connection named will be the source. Currently only ``gerrit``
   drivers are supported.
 
+**start-message**
+  An optional field that supplies the introductory text in message
+  reported back to Gerrit when jobs are queued.
+  Defaults to "Build started."
+
 **success-message**
   An optional field that supplies the introductory text in message
   reported back to Gerrit when all the voting builds are successful.
