@@ -70,6 +70,7 @@ class Pipeline(object):
     def __init__(self, name):
         self.name = name
         self.description = None
+        self.start_message = None
         self.failure_message = None
         self.merge_failure_message = None
         self.success_message = None

@@ -72,10 +72,11 @@ class BaseReporter(object):
         return ret
 
     def _formatItemReportStart(self, pipeline, item):
-        msg = "Starting %s jobs." % pipeline.name
+        msg = pipeline.start_message
         if self.sched.config.has_option('zuul', 'status_url'):
             msg += "\n" + self.sched.config.get('zuul', 'status_url')
-        return msg
+        return (msg + '\n\n' +
+                self._formatItemReportJobs(pipeline, item))
 
     def _formatItemReportSuccess(self, pipeline, item):
         return (pipeline.success_message + '\n\n' +
@@ -111,7 +112,10 @@ class BaseReporter(object):
 
         for job in pipeline.getJobs(item):
             build = item.current_build_set.getBuild(job.name)
-            result = build.result
+            if hasattr(build, 'result'):
+                result = build.result
+            else:
+                result = item.current_build_set.result
             pattern = url_pattern
             if result == 'SUCCESS':
                 if job.success_message:
@@ -129,20 +133,23 @@ class BaseReporter(object):
                                      job=job,
                                      build=build)
             else:
-                url = build.url or job.name
+                url = build.url if hasattr(build, 'url') else job.name
             if not job.voting:
                 voting = ' (non-voting)'
             else:
                 voting = ''
 
-            if self.sched.config and self.sched.config.has_option(
-                'zuul', 'report_times'):
+            if (self.sched.config and
+                    self.sched.config.has_option('zuul', 'report_times')):
                 report_times = self.sched.config.getboolean(
                     'zuul', 'report_times')
             else:
                 report_times = True
 
-            if report_times and build.end_time and build.start_time:
+            elapsed = ''
+            if (report_times and
+                    hasattr(build, 'end_time') and
+                    hasattr(build, 'start_time')):
                 dt = int(build.end_time - build.start_time)
                 m, s = divmod(dt, 60)
                 h, m = divmod(m, 60)
@@ -152,8 +159,6 @@ class BaseReporter(object):
                     elapsed = ' in %dm %02ds' % (m, s)
                 else:
                     elapsed = ' in %ds' % (s)
-            else:
-                elapsed = ''
             name = ''
             if self.sched.config.has_option('zuul', 'job_name_in_report'):
                 if self.sched.config.getboolean('zuul',
