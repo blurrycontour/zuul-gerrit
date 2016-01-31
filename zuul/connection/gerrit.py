@@ -33,6 +33,7 @@ class GerritEventConnector(threading.Thread):
 
     log = logging.getLogger("zuul.GerritEventConnector")
     delay = 5.0
+    poll_timeout = 500
 
     def __init__(self, connection):
         super(GerritEventConnector, self).__init__()
@@ -154,7 +155,7 @@ class GerritWatcher(threading.Thread):
         poll = select.poll()
         poll.register(stdout.channel)
         while not self._stopped:
-            ret = poll.poll()
+            ret = poll.poll(self.poll_timeout)
             for (fd, event) in ret:
                 if fd == stdout.channel.fileno():
                     if event == select.POLLIN:
