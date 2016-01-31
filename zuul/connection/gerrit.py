@@ -154,7 +154,7 @@ class GerritWatcher(threading.Thread):
         poll = select.poll()
         poll.register(stdout.channel)
         while not self._stopped:
-            ret = poll.poll()
+            ret = poll.poll(500)
             for (fd, event) in ret:
                 if fd == stdout.channel.fileno():
                     if event == select.POLLIN:

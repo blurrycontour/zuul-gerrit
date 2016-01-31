@@ -510,7 +510,7 @@ class FakeStatsd(threading.Thread):
             poll = select.poll()
             poll.register(self.sock, select.POLLIN)
             poll.register(self.wake_read, select.POLLIN)
-            ret = poll.poll()
+            ret = poll.poll(500)
             for (fd, event) in ret:
                 if fd == self.sock.fileno():
                     data = self.sock.recvfrom(1024)
