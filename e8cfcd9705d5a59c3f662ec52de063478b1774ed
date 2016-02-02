@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a5de9d1_a6854608",
+        "filename": "zuul/connection/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 6133
+      },
+      "writtenOn": "2016-02-02T09:07:14Z",
+      "side": 1,
+      "message": "this could better be defined on a var, as we do for example with the upper delay parameter",
+      "range": {
+        "startLine": 157,
+        "startChar": 28,
+        "endLine": 157,
+        "endChar": 31
+      },
+      "revId": "e8cfcd9705d5a59c3f662ec52de063478b1774ed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
