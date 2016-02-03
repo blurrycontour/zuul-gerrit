@@ -882,7 +882,7 @@ class Scheduler(threading.Thread):
                     self.process_management_queue()
 
                 # Give result events priority -- they let us stop builds,
-                # whereas trigger evensts cause us to launch builds.
+                # whereas trigger events cause us to launch builds.
                 while not self.result_event_queue.empty():
                     self.process_result_queue()
 
