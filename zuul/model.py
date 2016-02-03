@@ -13,6 +13,7 @@
 # under the License.
 
 import copy
+import logging
 import re
 import time
 from uuid import uuid4
@@ -146,7 +147,7 @@ class Pipeline(object):
             return []
         return item.change.filterJobs(tree.getJobs())
 
-    def _findJobsToRun(self, job_trees, item):
+    def _findJobsToRun(self, job_trees, item, mutex):
         torun = []
         for tree in job_trees:
             job = tree.job
@@ -155,25 +156,28 @@ class Pipeline(object):
                 if not job.changeMatches(item.change):
                     continue
                 build = item.current_build_set.getBuild(job.name)
-                if build:
-                    result = build.result
-                else:
-                    # There is no build for the root of this job tree,
-                    # so we should run it.
-                    torun.append(job)
+                # If this job needs a mutex, either acquire it or make
+                # sure that we have it before running the job.
+                if mutex.acquire(item, job):
+                    if build:
+                        result = build.result
+                    else:
+                        # There is no build for the root of this job tree,
+                        # so we should run it.
+                        torun.append(job)
             # If there is no job, this is a null job tree, and we should
             # run all of its jobs.
             if result == 'SUCCESS' or not job:
-                torun.extend(self._findJobsToRun(tree.job_trees, item))
+                torun.extend(self._findJobsToRun(tree.job_trees, item, mutex))
         return torun
 
-    def findJobsToRun(self, item):
+    def findJobsToRun(self, item, mutex):
         if not item.live:
             return []
         tree = item.job_tree
         if not tree:
             return []
-        return self._findJobsToRun(tree.job_trees, item)
+        return self._findJobsToRun(tree.job_trees, item, mutex)
 
     def haveAllJobsStarted(self, item):
         for job in self.getJobs(item):
@@ -456,6 +460,7 @@ class Job(object):
         success_message=None,
         failure_url=None,
         success_url=None,
+        mutex=None,
         # Matchers.  These are separate so they can be individually
         # overidden.
         branch_matcher=None,
@@ -1459,12 +1464,46 @@ class UnparsedTenantConfig(object):
                                 (conf,))
 
 
+class MutexHandler(object):
+    log = logging.getLogger("zuul.MutexHandler")
+
+    def __init__(self):
+        self.mutexes = {}
+
+    def acquire(self, item, job):
+        if not job.mutex:
+            return True
+        mutex_name = job.mutex
+        m = self.mutexes.get(mutex_name)
+        if not m:
+            # The mutex is not held, release it
+            self._acquire(mutex_name, item, job.name)
+            return True
+        held_item, held_job_name = m
+        if held_item is item and held_job_name == job.name:
+            # This item already holds the mutex
+            return True
+        held_build = held_item.current_build_set.getBuild(held_job_name)
+        if held_build and held_build.result:
+            # The build that held the mutex is complete, release it
+            # and let the new item have it.
+            self._acquire(mutex_name, item, job.name)
+            return True
+        return False
+
+    def _acquire(self, mutex_name, item, job_name):
+        self.log.debug("Job %s of item %s acquiring mutex %s" %
+                       (job_name, item, mutex_name))
+        self.mutexes[mutex_name] = (item, job_name)
+
+
 class Layout(object):
     def __init__(self):
         self.projects = {}
         self.project_configs = {}
         self.project_templates = {}
         self.pipelines = OrderedDict()
+        self.mutex = MutexHandler()
         # This is a dictionary of name -> [jobs].  The first element
         # of the list is the first job added with that name.  It is
         # the reference definition for a given job.  Subsequent

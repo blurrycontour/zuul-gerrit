@@ -348,7 +348,7 @@ class BasePipelineManager(object):
     def launchJobs(self, item):
         # TODO(jeblair): This should return a value indicating a job
         # was launched.  Appears to be a longstanding bug.
-        jobs = self.pipeline.findJobsToRun(item)
+        jobs = self.pipeline.findJobsToRun(item, self.pipeline.layout.mutex)
         if jobs:
             self._launchJobs(item, jobs)
 
