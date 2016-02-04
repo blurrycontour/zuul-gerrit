@@ -22,6 +22,23 @@
       "revId": "2c5bbe3a7c779365fbb10a4e3c0885e0a1b77a9b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a5ae5dd_a10dee3f",
+        "filename": "tests/fixtures/layout.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-02-04T02:45:06Z",
+      "side": 1,
+      "message": "Ah, sorry, it\u0027s mostly to make sure that even if it\u0027s not used it\u0027s not munging up the configuration somehow -- this means that at least some of the code is exercised in a whole lot of tests it shouldn\u0027t affect at all.",
+      "revId": "2c5bbe3a7c779365fbb10a4e3c0885e0a1b77a9b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
