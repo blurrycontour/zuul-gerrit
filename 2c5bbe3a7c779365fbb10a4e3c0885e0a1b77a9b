@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a5ae5dd_61c93678",
+        "filename": "tests/fixtures/layout.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-02-04T02:42:27Z",
+      "side": 1,
+      "message": "I can\u0027t see where this is needed?",
+      "range": {
+        "startLine": 119,
+        "startChar": 0,
+        "endLine": 122,
+        "endChar": 21
+      },
+      "revId": "2c5bbe3a7c779365fbb10a4e3c0885e0a1b77a9b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
