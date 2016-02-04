@@ -39,6 +39,24 @@
       "revId": "1aa89ff632e8d64a76a4885420f4d642c97883d7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a5ae5dd_d93b3e37",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-02-04T05:18:41Z",
+      "side": 1,
+      "message": "Right, I was hypothesising that this could be a race condition for the reasons you mention.\n\nHowever noting it (as an error) sounds like a good idea to me :-)",
+      "parentUuid": "5a5ae5dd_36194189",
+      "revId": "1aa89ff632e8d64a76a4885420f4d642c97883d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
