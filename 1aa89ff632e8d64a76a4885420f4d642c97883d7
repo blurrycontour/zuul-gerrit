@@ -22,6 +22,23 @@
       "revId": "1aa89ff632e8d64a76a4885420f4d642c97883d7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a5ae5dd_36194189",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-02-04T04:56:18Z",
+      "side": 1,
+      "message": "Well, if the result is set that means the job is completed and the mutex is already released.\n\nI don\u0027t think this should ever happen (but if it does, we may have serious logic problems) which is why I put it in as error, so that if it does happen, someone will complain about it.  :)",
+      "revId": "1aa89ff632e8d64a76a4885420f4d642c97883d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
