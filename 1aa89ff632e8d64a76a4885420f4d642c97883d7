@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a5ae5dd_27902e43",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-02-04T03:38:00Z",
+      "side": 1,
+      "message": "I\u0027m not sure, but this may be a valid state if a result is set and the scheduler launches another job clearing the mutex from the previous one. Either way it\u0027s a nit around the log level.",
+      "range": {
+        "startLine": 100,
+        "startChar": 21,
+        "endLine": 100,
+        "endChar": 26
+      },
+      "revId": "1aa89ff632e8d64a76a4885420f4d642c97883d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
