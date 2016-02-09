@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a5ae5dd_ba5f6b74",
+        "filename": "zuul/reporter/__init__.py",
+        "patchSetId": 24
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-02-09T16:13:40Z",
+      "side": 1,
+      "message": "If this is used as the merge-failure reporter (the default), it will not check whether the merge succeeded.",
+      "revId": "385d11e2eddad010dd8de2989668092249acddd3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}

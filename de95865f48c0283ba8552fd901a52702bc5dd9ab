@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a5ae5dd_1a747ffb",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 24
+      },
+      "lineNbr": 1666,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-02-09T16:13:40Z",
+      "side": 0,
+      "message": "Note that we only format the jobs list if the merger succeeded.",
+      "revId": "de95865f48c0283ba8552fd901a52702bc5dd9ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
