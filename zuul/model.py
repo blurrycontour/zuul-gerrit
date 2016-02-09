@@ -459,6 +459,8 @@ class Job(object):
         success_message=None,
         failure_url=None,
         success_url=None,
+        mutex=None,
+        tags=None,
         # Matchers.  These are separate so they can be individually
         # overidden.
         branch_matcher=None,
