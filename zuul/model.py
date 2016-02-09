@@ -459,6 +459,8 @@ class Job(object):
         success_message=None,
         failure_url=None,
         success_url=None,
+        mutex=None,
+        tags=None,
         # Matchers.  These are separate so they can be individually
         # overidden.
         branch_matcher=None,
@@ -467,7 +469,6 @@ class Job(object):
         swift=None,  # TODOv3(jeblair): move to auth
         parameter_function=None,  # TODOv3(jeblair): remove
         success_pattern=None,  # TODOv3(jeblair): remove
-        mutex=None,
     )
 
     def __init__(self, name):
