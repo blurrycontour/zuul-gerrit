@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a57f1b5_2f17c652",
+        "filename": "zuul/connection/gerrit.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-02-10T11:20:00Z",
+      "side": 1,
+      "message": "This is duplicated from merger/merger.py. Should possibly be abstracted elsewhere rather than duplicated.",
+      "range": {
+        "startLine": 242,
+        "startChar": 8,
+        "endLine": 242,
+        "endChar": 23
+      },
+      "revId": "4ab15660dab878fee2b142c624cf3a546bfb4bdf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
