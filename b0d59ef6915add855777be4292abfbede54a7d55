@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a57f1b5_24299c37",
+        "filename": "tox.ini",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2016-02-12T15:03:20Z",
+      "side": 1,
+      "message": "Isn\u0027t it enough to apply basepython solely in [textenv] ?",
+      "revId": "b0d59ef6915add855777be4292abfbede54a7d55",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
