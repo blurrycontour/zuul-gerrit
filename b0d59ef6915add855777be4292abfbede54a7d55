@@ -16,6 +16,24 @@
       "revId": "b0d59ef6915add855777be4292abfbede54a7d55",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dae33548_948d2d7e",
+        "filename": "tox.ini",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 11279
+      },
+      "writtenOn": "2016-02-14T21:51:22Z",
+      "side": 1,
+      "message": "Yes.  That would fix python2.7 for every derived environment - I was leaving a glimmer of hope for the future where more of the environments worked with py3.  Note for example the \"docs\" environment below that *does* work with python3.\n\nI\u0027m not fussed however - if you think it looks better to fix it \"globally\" in [testenv] and don\u0027t care about the version used for [testenv:docs], then I\u0027m happy to adjust it as you suggest.",
+      "parentUuid": "3a57f1b5_24299c37",
+      "revId": "b0d59ef6915add855777be4292abfbede54a7d55",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
