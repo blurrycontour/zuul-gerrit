@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "dae33548_e91ac46d",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 13807
+      },
+      "writtenOn": "2016-02-15T14:33:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dae33548_201b281d",
+      "range": {
+        "startLine": 20,
+        "startChar": 28,
+        "endLine": 21,
+        "endChar": 41
+      },
+      "revId": "6ca55f3f2d34e745cf6c4e6f6051fca06078add5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dae33548_2077a83b",
         "filename": "doc/source/zuul.rst",
         "patchSetId": 1
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "dae33548_49e9301a",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 13807
+      },
+      "writtenOn": "2016-02-15T14:33:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dae33548_2077a83b",
+      "range": {
+        "startLine": 45,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 44
+      },
+      "revId": "6ca55f3f2d34e745cf6c4e6f6051fca06078add5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dae33548_20a0489f",
         "filename": "doc/source/zuul.rst",
         "patchSetId": 1
@@ -59,6 +107,30 @@
       "writtenOn": "2016-02-15T11:58:02Z",
       "side": 1,
       "message": "This sentence isn\u0027t necessary. A client configuration implies that it talks to the server.",
+      "range": {
+        "startLine": 45,
+        "startChar": 45,
+        "endLine": 46,
+        "endChar": 38
+      },
+      "revId": "6ca55f3f2d34e745cf6c4e6f6051fca06078add5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dae33548_29ee6c22",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 13807
+      },
+      "writtenOn": "2016-02-15T14:33:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dae33548_20a0489f",
       "range": {
         "startLine": 45,
         "startChar": 45,
@@ -117,6 +189,30 @@
     },
     {
       "key": {
+        "uuid": "dae33548_09bf28fc",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 13807
+      },
+      "writtenOn": "2016-02-15T14:33:44Z",
+      "side": 1,
+      "message": "I think it\u0027s important to note that this is a builtin gearman server so that it\u0027s clear.",
+      "parentUuid": "dae33548_20c5e83b",
+      "range": {
+        "startLine": 61,
+        "startChar": 0,
+        "endLine": 62,
+        "endChar": 39
+      },
+      "revId": "6ca55f3f2d34e745cf6c4e6f6051fca06078add5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dae33548_6004107e",
         "filename": "doc/source/zuul.rst",
         "patchSetId": 1
@@ -128,6 +224,30 @@
       "writtenOn": "2016-02-15T11:58:02Z",
       "side": 1,
       "message": "You could omit this in favour of denoting the layout is required.\n\nIt\u0027s also worth noting this section isn\u0027t actually required if you are just running a merger process.",
+      "range": {
+        "startLine": 79,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 25
+      },
+      "revId": "6ca55f3f2d34e745cf6c4e6f6051fca06078add5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dae33548_a9cb9c71",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 13807
+      },
+      "writtenOn": "2016-02-15T14:33:44Z",
+      "side": 1,
+      "message": "I disagree, I think it\u0027s important to at least inform the user what this section is for. As someone who tried to setup zuul for the first time it took me awhile to figure out what sections did, as many of the configuration documentation appears to have implied knowledge. It doesn\u0027t hurt to be explicit here in my opinion.",
+      "parentUuid": "dae33548_6004107e",
       "range": {
         "startLine": 79,
         "startChar": 0,
