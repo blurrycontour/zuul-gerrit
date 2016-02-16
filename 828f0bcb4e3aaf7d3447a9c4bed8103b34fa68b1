@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "dae33548_39b507ee",
+        "filename": "doc/source/quick-start.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 13807
+      },
+      "writtenOn": "2016-02-16T00:58:15Z",
+      "side": 1,
+      "message": "Fixed, I forget where I got these numbers from but I saw it on one of the OpenStack pages. I\u0027ll update it if I find it again.",
+      "parentUuid": "dae33548_59c1ece3",
+      "range": {
+        "startLine": 7,
+        "startChar": 42,
+        "endLine": 7,
+        "endChar": 68
+      },
+      "revId": "828f0bcb4e3aaf7d3447a9c4bed8103b34fa68b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dae33548_7963101b",
         "filename": "doc/source/quick-start.rst",
         "patchSetId": 1
