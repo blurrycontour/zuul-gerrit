@@ -257,6 +257,30 @@
       "revId": "6ca55f3f2d34e745cf6c4e6f6051fca06078add5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dae33548_79c79012",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-02-16T00:19:56Z",
+      "side": 1,
+      "message": "Right, but the at minimum isn\u0027t true for when just setting up a zuul merger. Perhaps something like:\n\n[zuul] must be provided when running zuul-server. [merger] must be provided when running zuul-merger. Both services may share the same configuration (and even host) or otherwise have individual zuul.conf\u0027s.",
+      "parentUuid": "dae33548_a9cb9c71",
+      "range": {
+        "startLine": 79,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 25
+      },
+      "revId": "6ca55f3f2d34e745cf6c4e6f6051fca06078add5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
