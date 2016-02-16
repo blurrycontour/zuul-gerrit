@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dae33548_59c1ece3",
+        "filename": "doc/source/quick-start.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-02-16T00:30:34Z",
+      "side": 1,
+      "message": "Actually openstack\u0027s zuul runs on a 30gb instance. I\u0027m not sure what zuul\u0027s min requirements would actually be for a smaller gerrit, likely 1-2gb is plenty.",
+      "range": {
+        "startLine": 7,
+        "startChar": 42,
+        "endLine": 7,
+        "endChar": 68
+      },
+      "revId": "828f0bcb4e3aaf7d3447a9c4bed8103b34fa68b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dae33548_7963101b",
+        "filename": "doc/source/quick-start.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-02-16T00:30:34Z",
+      "side": 1,
+      "message": "I\u0027d suggest expanding this with something like: \"handles receiving events, launching jobs, collecting results and posting reports\"",
+      "range": {
+        "startLine": 21,
+        "startChar": 19,
+        "endLine": 21,
+        "endChar": 28
+      },
+      "revId": "828f0bcb4e3aaf7d3447a9c4bed8103b34fa68b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dae33548_197f64ab",
+        "filename": "doc/source/quick-start.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-02-16T00:30:34Z",
+      "side": 1,
+      "message": "suggestion: \"Prepares git repositories ready for jobs to test against\"",
+      "range": {
+        "startLine": 22,
+        "startChar": 19,
+        "endLine": 22,
+        "endChar": 30
+      },
+      "revId": "828f0bcb4e3aaf7d3447a9c4bed8103b34fa68b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dae33548_794af084",
+        "filename": "doc/source/quick-start.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-02-16T00:30:34Z",
+      "side": 1,
+      "message": "suggestion: from the aforementioned zuul-merger.",
+      "range": {
+        "startLine": 23,
+        "startChar": 56,
+        "endLine": 23,
+        "endChar": 65
+      },
+      "revId": "828f0bcb4e3aaf7d3447a9c4bed8103b34fa68b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
