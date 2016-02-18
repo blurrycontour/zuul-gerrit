@@ -16,6 +16,8 @@
 import git
 import os
 import logging
+import multiprocessing
+import signal
 
 import zuul.model
 
@@ -40,19 +42,46 @@ class ZuulReference(git.Reference):
     _points_to_commits_only = True
 
 
+class CloneTimeoutError(Exception):
+    def __init__(self, path):
+        return super(CloneTimeoutError, self).__init__(
+            "Timeout while cloning %s" % (path,))
+
+
+def timeout_clone(remote, local, timeout=None):
+    log = logging.getLogger("zuul.Repo")
+
+    def clone():
+        log.debug("Cloning from %s to %s" % (remote, local))
+        git.Repo.clone_from(remote, local)
+
+    p = multiprocessing.Process(target=clone)
+    p.start()
+    p.join(timeout)
+    if p.is_alive():
+        log.warning("Timeout while cloning %s" % (remote,))
+        os.kill(p.pid, signal.SIGKILL)
+        p.join()
+        raise CloneTimeoutError(remote)
+
+
 class Repo(object):
     log = logging.getLogger("zuul.Repo")
 
-    def __init__(self, remote, local, email, username):
+    def __init__(self, remote, local, email, username, timeout=None):
         self.remote_url = remote
         self.local_path = local
         self.email = email
         self.username = username
+        self.timeout = timeout
         self._initialized = False
         try:
             self._ensure_cloned()
-        except:
+        except CloneTimeoutError:
+            raise
+        except Exception:
             self.log.exception("Unable to initialize repo for %s" % remote)
+            raise
 
     def _ensure_cloned(self):
         repo_is_cloned = os.path.exists(os.path.join(self.local_path, '.git'))
@@ -60,9 +89,7 @@ class Repo(object):
             return
         # If the repo does not exist, clone the repo.
         if not repo_is_cloned:
-            self.log.debug("Cloning from %s to %s" % (self.remote_url,
-                                                      self.local_path))
-            git.Repo.clone_from(self.remote_url, self.local_path)
+            timeout_clone(self.remote_url, self.local_path, self.timeout)
         repo = git.Repo(self.local_path)
         if self.email:
             repo.config_writer().set_value('user', 'email',
