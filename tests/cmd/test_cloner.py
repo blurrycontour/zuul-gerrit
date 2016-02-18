@@ -54,3 +54,14 @@ class TestClonerCmdArguments(testtools.TestCase):
         self.app.parse_arguments(['--cache-dir', 'argument',
                                   'base', 'repo'])
         self.assertEqual('argument', self.app.args.cache_dir)
+
+    def test_timeout_and_retries(self):
+        self.app.parse_arguments(['--timeout', '30', '--retries', '2',
+                                  'base', 'repo'])
+        self.assertEqual(30, self.app.args.timeout)
+        self.assertEqual(2, self.app.args.retries)
+
+    def test_default_timeout_and_retries(self):
+        self.app.parse_arguments(['base', 'repo'])
+        self.assertIsNone(self.app.args.timeout)
+        self.assertIsNone(self.app.args.retries)
