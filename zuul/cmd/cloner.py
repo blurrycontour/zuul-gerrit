@@ -47,6 +47,11 @@ class Cloner(zuul.cmd.ZuulApp):
                             help='verbose output')
         parser.add_argument('--color', dest='color', action='store_true',
                             help='use color output')
+        parser.add_argument('--retries', dest='retries', type=int,
+                            help='how many times to retry git operations')
+        parser.add_argument('--timeout', dest='timeout', type=int,
+                            help='how long to wait for git operations '
+                                 '(in seconds)')
         parser.add_argument('--version', dest='version', action='version',
                             version=self._get_version(),
                             help='show zuul version')
@@ -145,6 +150,8 @@ class Cloner(zuul.cmd.ZuulApp):
             clone_map_file=self.args.clone_map_file,
             project_branches=project_branches,
             cache_dir=self.args.cache_dir,
+            timeout=self.args.timeout,
+            retries=self.args.retries,
         )
         cloner.execute()
 
