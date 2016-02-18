@@ -21,7 +21,8 @@ import yaml
 
 from git import GitCommandError
 from zuul.lib.clonemapper import CloneMapper
-from zuul.merger.merger import Repo
+from zuul.merger.merger import Repo, CloneTimeoutError
+import zuul.merger.merger
 
 
 class Cloner(object):
@@ -29,7 +30,8 @@ class Cloner(object):
 
     def __init__(self, git_base_url, projects, workspace, zuul_branch,
                  zuul_ref, zuul_url, branch=None, clone_map_file=None,
-                 project_branches=None, cache_dir=None):
+                 project_branches=None, cache_dir=None,
+                 timeout=None, retries=None):
 
         self.clone_map = []
         self.dests = None
@@ -43,6 +45,11 @@ class Cloner(object):
         self.zuul_ref = zuul_ref or ''
         self.zuul_url = zuul_url
         self.project_branches = project_branches or {}
+        self.timeout = timeout
+        self.retries = retries or 0
+        self.retries += 1
+        # This is for the unit tests to verify that retries work.
+        self._clone_attempts = 0
 
         if clone_map_file:
             self.readCloneMap(clone_map_file)
@@ -67,6 +74,7 @@ class Cloner(object):
         self.log.info("Prepared all repositories")
 
     def cloneUpstream(self, project, dest):
+        self._clone_attempts += 1
         # Check for a cached git repo first
         git_cache = '%s/%s' % (self.cache_dir, project)
         git_upstream = '%s/%s' % (self.git_url, project)
@@ -77,7 +85,8 @@ class Cloner(object):
             git_cache = 'file://%s' % git_cache
             self.log.info("Creating repo %s from cache %s",
                           project, git_cache)
-            new_repo = git.Repo.clone_from(git_cache, dest)
+            zuul.merger.merger.timeout_clone(git_cache, dest, self.timeout)
+            new_repo = git.Repo(dest)
             self.log.info("Updating origin remote in repo %s to %s",
                           project, git_upstream)
             new_repo.remotes.origin.config_writer.set('url', git_upstream)
@@ -88,7 +97,8 @@ class Cloner(object):
             remote=git_upstream,
             local=dest,
             email=None,
-            username=None)
+            username=None,
+            timeout=self.timeout)
 
         if not repo.isInitialized():
             raise Exception("Error cloning %s to %s" % (git_upstream, dest))
@@ -123,7 +133,13 @@ class Cloner(object):
          C) ZUUL_BRANCH (from the zuul_branch arg)
         """
 
-        repo = self.cloneUpstream(project, dest)
+        for x in range(self.retries):
+            try:
+                repo = self.cloneUpstream(project, dest)
+            except Exception:
+                if x == self.retries - 1:
+                    raise
+                self.log.warning("Retrying failed clone; attempt %s" % x)
 
         # Ensure that we don't have stale remotes around
         repo.prune()

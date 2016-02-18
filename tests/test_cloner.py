@@ -20,6 +20,8 @@ import os
 import shutil
 import time
 
+import fixtures
+import testtools
 import git
 
 import zuul.lib.cloner
@@ -563,6 +565,47 @@ class TestCloner(ZuulTestCase):
 
             shutil.rmtree(self.workspace_root)
 
+        self.worker.hold_jobs_in_build = False
+        self.worker.release()
+        self.waitUntilSettled()
+
+    def test_timeout(self):
+        projects = ['org/project1']
+
+        self.worker.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        A.addApproval('CRVW', 2)
+        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+
+        self.waitUntilSettled()
+
+        self.assertEqual(1, len(self.builds), "One build is running")
+
+        orig_execute = git.cmd.Git.execute
+
+        def fake_clone(bound, *args, **kw):
+            if args[0][1] == 'clone':
+                args = tuple([['sleep', '300']] + list(args[1:]))
+            return orig_execute(bound, *args, **kw)
+
+        self.useFixture(fixtures.MonkeyPatch('git.cmd.Git.execute',
+                                             fake_clone))
+
+        for number, build in enumerate(self.builds):
+            self.log.debug("Build parameters: %s", build.parameters)
+            cloner = zuul.lib.cloner.Cloner(
+                git_base_url=self.upstream_root,
+                projects=projects,
+                workspace=self.workspace_root,
+                zuul_branch=build.parameters['ZUUL_BRANCH'],
+                zuul_ref=build.parameters['ZUUL_REF'],
+                zuul_url=self.git_root,
+                timeout=1, retries=2,
+            )
+            with testtools.ExpectedException(
+                    zuul.lib.cloner.CloneTimeoutError):
+                cloner.execute()
+            self.assertEqual(cloner._clone_attempts, 3)
         self.worker.hold_jobs_in_build = False
         self.worker.release()
         self.waitUntilSettled()
