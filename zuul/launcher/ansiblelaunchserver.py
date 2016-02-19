@@ -23,27 +23,10 @@ import threading
 import traceback
 
 import gear
+import runansible
 import yaml
 
 import zuul.merger
-
-
-class JobDir(object):
-    def __init__(self):
-        self.root = tempfile.mkdtemp()
-        self.git_root = os.path.join(self.root, 'git')
-        os.makedirs(self.git_root)
-        self.ansible_root = os.path.join(self.root, 'ansible')
-        os.makedirs(self.ansible_root)
-        self.inventory = os.path.join(self.ansible_root, 'inventory')
-        self.playbook = os.path.join(self.ansible_root, 'playbook')
-        self.config = os.path.join(self.ansible_root, 'ansible.cfg')
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, etype, value, tb):
-        shutil.rmtree(self.root)
 
 
 class UpdateTask(object):
@@ -217,7 +200,7 @@ class LaunchServer(object):
 
     def _launch(self, job):
         self.log.debug("Job %s: beginning" % (job.unique,))
-        with JobDir() as jobdir:
+        with runansible.AnsibleRunner() as runner:
             self.log.debug("Job %s: job root at %s" %
                            (job.unique, jobdir.root))
             args = json.loads(job.arguments)
@@ -229,12 +212,19 @@ class LaunchServer(object):
             for task in tasks:
                 task.wait()
             self.log.debug("Job %s: git updates complete" % (job.unique,))
-            merger = self._getMerger(jobdir.git_root)
+            git_root = runner.add_dir('git')
+            merger = self._getMerger(git_root)
             commit = merger.mergeChanges(args['items'])  # noqa
 
+            hostlist= self.getHostList(args)
             # TODOv3: Ansible the ansible thing here.
-            self.prepareAnsibleFiles(jobdir, args)
-            result = self.runAnsible(jobdir)
+            runner.prepare_files(hostlist)
+            play = dict(
+                hosts='localhost',
+                tasks=[dict(name='test', shell='echo Hello world')])
+            runner.write_playbook(yaml.dump([play]))
+
+            result = runner.run()
 
             data = {
                 'url': 'https://server/job',
@@ -267,22 +257,6 @@ class LaunchServer(object):
         with open(jobdir.config, 'w') as config:
             config.write('[defaults]\n')
             config.write('hostfile = %s\n' % jobdir.inventory)
-
-    def runAnsible(self, jobdir):
-        proc = subprocess.Popen(
-            ['ansible-playbook', jobdir.playbook],
-            cwd=jobdir.ansible_root,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        (out, err) = proc.communicate()
-        ret = proc.wait()
-        print out
-        print err
-        if ret == 0:
-            return 'SUCCESS'
-        else:
-            return 'FAILURE'
 
     def cat(self, job):
         args = json.loads(job.arguments)
