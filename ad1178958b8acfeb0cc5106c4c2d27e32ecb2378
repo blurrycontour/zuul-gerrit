@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bae84128_557726d4",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 6133
+      },
+      "writtenOn": "2016-02-19T11:00:00Z",
+      "side": 1,
+      "message": "why is that needed? can\u0027t we add timeout_clone on upper import?",
+      "range": {
+        "startLine": 25,
+        "startChar": 7,
+        "endLine": 25,
+        "endChar": 11
+      },
+      "revId": "ad1178958b8acfeb0cc5106c4c2d27e32ecb2378",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
