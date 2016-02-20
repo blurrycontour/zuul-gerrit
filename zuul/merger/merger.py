@@ -223,27 +223,28 @@ class Merger(object):
         fd.close()
         os.chmod(name, 0o755)
 
-    def addProject(self, project, url):
+    def addProject(self, project, connection_name, url):
         repo = None
         try:
-            path = os.path.join(self.working_root, project)
+            path = os.path.join(self.working_root, connection_name, project)
             repo = Repo(url, path, self.email, self.username)
 
-            self.repos[project] = repo
+            self.repos.setdefault(connection_name, {})[project] = repo
         except Exception:
             self.log.exception("Unable to add project %s" % project)
         return repo
 
-    def getRepo(self, project, url):
-        if project in self.repos:
-            return self.repos[project]
+    def getRepo(self, project, connection_name, url):
+        if connection_name in self.repos:
+            if project in self.repos[connection_name]:
+                return self.repos[connection_name][project]
         if not url:
             raise Exception("Unable to set up repo for project %s"
                             " without a url" % (project,))
-        return self.addProject(project, url)
+        return self.addProject(project, connection_name, url)
 
-    def updateRepo(self, project, url):
-        repo = self.getRepo(project, url)
+    def updateRepo(self, project, connection_name, url):
+        repo = self.getRepo(project, connection_name, url)
         try:
             self.log.info("Updating local repository %s", project)
             repo.update()
@@ -251,7 +252,9 @@ class Merger(object):
             self.log.exception("Unable to update %s", project)
 
     def _mergeChange(self, item, ref):
-        repo = self.getRepo(item['project'], item['url'])
+        repo = self.getRepo(item['project'],
+                            item['connection_name'],
+                            item['url'])
         try:
             repo.checkout(ref)
         except Exception:
@@ -288,12 +291,15 @@ class Merger(object):
             del os.environ['GIT_SSH']
 
     def _mergeItem(self, item, recent):
-        self.log.debug("Processing refspec %s for project %s / %s ref %s" %
-                       (item['refspec'], item['project'], item['branch'],
-                        item['ref']))
+        self.log.debug("Processing refspec %s for project %s @ %s / %s "
+                       "ref %s" % (item['refspec'], item['project'],
+                                   item['connection_name'], item['branch'],
+                                   item['ref']))
         self._setGitSsh(item['connection_name'])
-        repo = self.getRepo(item['project'], item['url'])
-        key = (item['project'], item['branch'])
+        repo = self.getRepo(item['project'],
+                            item['connection_name'],
+                            item['url'])
+        key = (item['project'], item['connection_name'], item['branch'])
         # See if we have a commit for this change already in this repo
         zuul_ref = item['branch'] + '/' + item['ref']
         commit = repo.getCommitFromRef(zuul_ref)
@@ -328,9 +334,9 @@ class Merger(object):
         # Set the Zuul ref for this item to point to the most recent
         # commits of each project-branch
         for key, mrc in recent.items():
-            project, branch = key
+            project, connection_name, branch = key
             try:
-                repo = self.getRepo(project, None)
+                repo = self.getRepo(project, connection_name, None)
                 zuul_ref = branch + '/' + item['ref']
                 repo.createZuulRef(zuul_ref, mrc)
             except Exception:
