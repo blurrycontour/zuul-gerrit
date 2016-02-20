@@ -1469,7 +1469,9 @@ class BasePipelineManager(object):
         else:
             self.log.debug("Preparing update repo for: %s" % item.change)
             url = self.pipeline.source.getGitUrl(item.change.project)
+            connection_name = self.pipeline.source.connection.connection_name
             self.sched.merger.updateRepo(item.change.project.name,
+                                         connection_name,
                                          url, build_set,
                                          self.pipeline.precedence)
         # merge:merge has been emitted properly:
