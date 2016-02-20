@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bae84128_e192c44a",
+        "filename": "requirements.txt",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1726
+      },
+      "writtenOn": "2016-02-20T20:39:49Z",
+      "side": 1,
+      "message": "I like the idea, but not where it\u0027s hosted. Depending in a personal github repo with no testing/CI at all is a bad idea.",
+      "revId": "de07b8871278d888436fbba3f6fecfec342d024f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
