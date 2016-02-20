@@ -285,7 +285,8 @@ class Gearman(object):
         params = dict(ZUUL_UUID=uuid,
                       ZUUL_PROJECT=item.change.project.name)
         params['ZUUL_PIPELINE'] = pipeline.name
-        params['ZUUL_URL'] = item.current_build_set.zuul_url
+        params['ZUUL_URL'] = item.current_build_set.zuul_url \
+            + item.pipeline.source.connection.connection_name
         params['ZUUL_VOTING'] = job.voting and '1' or '0'
         if hasattr(item.change, 'refspec'):
             changes_str = '^'.join(
