@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bae84128_a7bf17fa",
+        "filename": "zuul/connection/gerrit.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-02-22T04:05:52Z",
+      "side": 1,
+      "message": "Carrying over my comment on the last patch:\nThis is duplicated from merger/merger.py. Should possibly be abstracted elsewhere rather than duplicated.",
+      "range": {
+        "startLine": 242,
+        "startChar": 8,
+        "endLine": 242,
+        "endChar": 23
+      },
+      "revId": "1bdfe8951e16d169e1df65de7550774f92e0392a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
