@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bae84128_3156ef06",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2016-02-24T21:30:39Z",
+      "side": 1,
+      "message": "Code ends up duplicated, wrong rebase",
+      "revId": "0d86cc162d17d988c6041602f6d449810cf85ea4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
