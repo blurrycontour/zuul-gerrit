@@ -34,6 +34,24 @@
       "revId": "b0d59ef6915add855777be4292abfbede54a7d55",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bae84128_dac1bee5",
+        "filename": "tox.ini",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2016-02-24T13:48:36Z",
+      "side": 1,
+      "message": "I like how you made the python version to be stated explicitly on each target, that is easier to notice / less error prone etc.\n\nI was just being curious :-} Sorry for the confusing question!",
+      "parentUuid": "dae33548_948d2d7e",
+      "revId": "b0d59ef6915add855777be4292abfbede54a7d55",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
