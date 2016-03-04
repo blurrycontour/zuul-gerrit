@@ -26,6 +26,7 @@ import zuul.lib.cloner
 ZUUL_ENV_SUFFIXES = (
     'branch',
     'ref',
+    'refname',
     'url',
 )
 
@@ -140,6 +141,7 @@ class Cloner(zuul.cmd.ZuulApp):
             workspace=self.args.workspace,
             zuul_branch=self.args.zuul_branch,
             zuul_ref=self.args.zuul_ref,
+            zuul_refname=self.args.zuul_refname,
             zuul_url=self.args.zuul_url,
             branch=self.args.branch,
             clone_map_file=self.args.clone_map_file,

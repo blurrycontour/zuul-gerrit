@@ -28,8 +28,8 @@ class Cloner(object):
     log = logging.getLogger("zuul.Cloner")
 
     def __init__(self, git_base_url, projects, workspace, zuul_branch,
-                 zuul_ref, zuul_url, branch=None, clone_map_file=None,
-                 project_branches=None, cache_dir=None):
+                 zuul_ref, zuul_refname, zuul_url, branch=None,
+                 clone_map_file=None, project_branches=None, cache_dir=None):
 
         self.clone_map = []
         self.dests = None
@@ -41,6 +41,7 @@ class Cloner(object):
         self.workspace = workspace
         self.zuul_branch = zuul_branch or ''
         self.zuul_ref = zuul_ref or ''
+        self.zuul_refname = zuul_refname or ''
         self.zuul_url = zuul_url
         self.project_branches = project_branches or {}
 
