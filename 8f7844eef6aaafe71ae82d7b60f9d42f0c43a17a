@@ -22,6 +22,30 @@
       "revId": "8f7844eef6aaafe71ae82d7b60f9d42f0c43a17a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7af24918_167462cd",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2016-03-07T06:32:06Z",
+      "side": 1,
+      "message": "I just wanted to avoid code duplication as the logging and return is the same for both. I was unsure which variant is preferred here. I\u0027ll update this with a separate except clause.",
+      "parentUuid": "7af24918_96d4f247",
+      "range": {
+        "startLine": 111,
+        "startChar": 16,
+        "endLine": 111,
+        "endChar": 26
+      },
+      "revId": "8f7844eef6aaafe71ae82d7b60f9d42f0c43a17a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
