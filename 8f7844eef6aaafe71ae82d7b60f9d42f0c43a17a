@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7af24918_96d4f247",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-03-07T06:00:52Z",
+      "side": 1,
+      "message": "Why not add this as another except clause?",
+      "range": {
+        "startLine": 111,
+        "startChar": 16,
+        "endLine": 111,
+        "endChar": 26
+      },
+      "revId": "8f7844eef6aaafe71ae82d7b60f9d42f0c43a17a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
