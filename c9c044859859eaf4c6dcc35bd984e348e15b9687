@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "5aef4532_2b070119",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 498,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-03-09T17:38:35Z",
+      "side": 1,
+      "message": "Right, the documentation says \"tags will accumulate on jobs that match\", so I think union is correct here.\n\nSay you have a definition for \"^.*$\" and \"^neutron.*\" and \"neutron-foo\", each with a tag.\n\nWhen zuul hits the defn for neutron-foo, it will start with an empty job with no tags.  Then it will go through all of the metajobs defined.  It will start with \"^.*\" which matches, so it will call this copy method to union the tags of the new job with the metajob.  At this point, the new job has the tags from \"^.*\".  Then it will call copy for the \"^neutron.*\" job, so now the new job has the union of the tags from both metajobs.  Then it is done calling copy and proceeds to your comment below.",
+      "revId": "c9c044859859eaf4c6dcc35bd984e348e15b9687",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5aef4532_058676da",
         "filename": "zuul/scheduler.py",
         "patchSetId": 2
@@ -30,6 +47,23 @@
       "writtenOn": "2016-03-09T17:24:50Z",
       "side": 1,
       "message": "Same issue here as before, we should be setting the one correct value not building up a composite set.",
+      "revId": "c9c044859859eaf4c6dcc35bd984e348e15b9687",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5aef4532_0b0cc539",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 532,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-03-09T17:38:35Z",
+      "side": 1,
+      "message": "This holds as well.\n\nDown here, our new job has all the tags for the metajobs, but now it needs the tags that the user specifically applied to this job, so they get unioned here.",
       "revId": "c9c044859859eaf4c6dcc35bd984e348e15b9687",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
