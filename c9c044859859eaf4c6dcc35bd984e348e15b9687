@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "5aef4532_2b0d41e8",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 498,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2016-03-09T17:42:43Z",
+      "side": 1,
+      "message": "Would it be preferable to separate job copying from merging of job tags? That way copy() remains a copy and the special case of merging tags is handled in an explicit expected manner?",
+      "parentUuid": "5aef4532_2b070119",
+      "revId": "c9c044859859eaf4c6dcc35bd984e348e15b9687",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5aef4532_058676da",
         "filename": "zuul/scheduler.py",
         "patchSetId": 2
