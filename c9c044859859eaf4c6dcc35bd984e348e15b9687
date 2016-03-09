@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5aef4532_e5deea0f",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 498,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2016-03-09T17:24:50Z",
+      "side": 1,
+      "message": "The union of two sets may be larger than the original.\n\n  union({1,2}, {3,4}) \u003d {1,2,3,4}\n\nThis isn\u0027t a copy as much as it is a merge.",
+      "revId": "c9c044859859eaf4c6dcc35bd984e348e15b9687",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5aef4532_058676da",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 532,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2016-03-09T17:24:50Z",
+      "side": 1,
+      "message": "Same issue here as before, we should be setting the one correct value not building up a composite set.",
+      "revId": "c9c044859859eaf4c6dcc35bd984e348e15b9687",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
