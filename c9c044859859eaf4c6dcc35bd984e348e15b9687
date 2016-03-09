@@ -54,6 +54,23 @@
     },
     {
       "key": {
+        "uuid": "5aef4532_4b0b6d2a",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 498,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-03-09T17:50:23Z",
+      "side": 1,
+      "message": "It would never be correct to call the copy() method without also calling the merge_tags() method, so without a need for that, it seems like it would just open the door to potential errors and spread out the logic (which is nicely contained right now) of how the multiple job definitions are dealt with.",
+      "revId": "c9c044859859eaf4c6dcc35bd984e348e15b9687",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5aef4532_058676da",
         "filename": "zuul/scheduler.py",
         "patchSetId": 2
