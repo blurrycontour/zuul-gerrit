@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3afc51ec_6fd35939",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1095,
+      "author": {
+        "id": 14119
+      },
+      "writtenOn": "2016-03-11T23:44:09Z",
+      "side": 1,
+      "message": "this doesnt actually close the file. itll get closed with GC at somepoint, maybe. but until then its open\n\nrecommend:\n\n    with open(absolute_filepath, \u0027r\u0027) as f:\n        content \u003d f.read()\n\nWill properly close the file after read",
+      "revId": "176f78ca5c4d59483cae50e12da73590a3ae8144",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afc51ec_0fc61567",
+        "filename": "tests/test_v3.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 14119
+      },
+      "writtenOn": "2016-03-11T23:44:09Z",
+      "side": 1,
+      "message": "i find the formatting here a bit odd, and hard to read\n\nrecommend or similar:\n\n    self.assertEqual(self.getJobFromHistory(\n        \u0027python27\u0027, \u0027org/project2\u0027).result, \u0027SUCCESS\u0027)",
+      "revId": "176f78ca5c4d59483cae50e12da73590a3ae8144",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
