@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "3afc51ec_fe54eb21",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1095,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-03-14T20:58:06Z",
+      "side": 1,
+      "message": "That would be better (CPython determinism notwithstanding), thanks.",
+      "revId": "176f78ca5c4d59483cae50e12da73590a3ae8144",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3afc51ec_0fc61567",
         "filename": "tests/test_v3.py",
         "patchSetId": 5
@@ -30,6 +47,23 @@
       "writtenOn": "2016-03-11T23:44:09Z",
       "side": 1,
       "message": "i find the formatting here a bit odd, and hard to read\n\nrecommend or similar:\n\n    self.assertEqual(self.getJobFromHistory(\n        \u0027python27\u0027, \u0027org/project2\u0027).result, \u0027SUCCESS\u0027)",
+      "revId": "176f78ca5c4d59483cae50e12da73590a3ae8144",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afc51ec_5e323f11",
+        "filename": "tests/test_v3.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-03-14T20:58:06Z",
+      "side": 1,
+      "message": "I happen to think the opposite of what you do on this, so to avoid endless bikeshedding, we generally try to be pretty flexible in terms of code style in infra reviews and adopt a live-and-let-live attitude.  It\u0027s more enjoyable and lets us spend our limited review time focusing on correcting errors.",
       "revId": "176f78ca5c4d59483cae50e12da73590a3ae8144",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
