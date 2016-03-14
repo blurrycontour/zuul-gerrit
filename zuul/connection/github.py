@@ -204,6 +204,7 @@ class GithubWebhookListener():
 
 
 class GithubUser(collections.Mapping):
+    log = logging.getLogger('zuul.GithubUser')
 
     def __init__(self, github, username):
         self._github = github
@@ -223,6 +224,7 @@ class GithubUser(collections.Mapping):
 
     def _init_data(self):
         user = self._github.user(self._username)
+        log_rate_limit(self.log, self._github)
         data = {
             'username': user.login,
             'name': user.name,
@@ -289,11 +291,15 @@ class GithubConnection(BaseConnection):
         return '%s/pull/%s' % (self.getGitwebUrl(project), number)
 
     def getPull(self, owner, project, number):
-        return self.github.pull_request(owner, project, number).as_dict()
+        pr = self.github.pull_request(owner, project, number).as_dict()
+        log_rate_limit(self.log, self.github)
+        return pr
 
     def getPullFileNames(self, owner, project, number):
-        return [f.filename for f in
-                self.github.pull_request(owner, project, number).files()]
+        filenames = [f.filename for f in
+                     self.github.pull_request(owner, project, number).files()]
+        log_rate_limit(self.log, self.github)
+        return filenames
 
     def getUser(self, login):
         return GithubUser(self.github, login)
@@ -304,25 +310,42 @@ class GithubConnection(BaseConnection):
     def commentPull(self, owner, project, pr_number, message):
         pull_request = self.github.issue(owner, project, pr_number)
         pull_request.create_comment(message)
+        log_rate_limit(self.log, self.github)
 
     def mergePull(self, owner, project, pr_number, commit_message='',
                   sha=None):
         pull_request = self.github.pull_request(owner, project, pr_number)
-        if not pull_request.merge(commit_message=commit_message, sha=sha):
+        result = pull_request.merge(commit_message=commit_message, sha=sha)
+        log_rate_limit(self.log, self.github)
+        if not result:
             raise Exception('Pull request was not merged')
 
     def setCommitStatus(self, owner, project, sha, state,
                         url='', description='', context=''):
         repository = self.github.repository(owner, project)
         repository.create_status(sha, state, url, description, context)
+        log_rate_limit(self.log, self.github)
 
     def labelPull(self, owner, project, pr_number, label):
         pull_request = self.github.issue(owner, project, pr_number)
         pull_request.add_label(label)
+        log_rate_limit(self.log, self.github)
 
     def unlabelPull(self, owner, project, pr_number, label):
         pull_request = self.github.issue(owner, project, pr_number)
         pull_request.remove_label(label)
+        log_rate_limit(self.log, self.github)
+
+
+def log_rate_limit(log, github):
+    try:
+        rate_limit = github.rate_limit()
+        remaining = rate_limit['resources']['core']['remaining']
+        reset = rate_limit['resources']['core']['reset']
+    except:
+        return
+    log.debug('GitHub API rate limit remaining: %s reset: %s' %
+              (remaining, reset))
 
 
 def getSchema():
