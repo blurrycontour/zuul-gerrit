@@ -67,6 +67,24 @@
       "revId": "176f78ca5c4d59483cae50e12da73590a3ae8144",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afc51ec_7f10d5a8",
+        "filename": "tests/test_v3.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 14119
+      },
+      "writtenOn": "2016-03-14T22:10:41Z",
+      "side": 1,
+      "message": "no problem. i only -1\u0027d on the open() issue. formatting is... well everyone has their own opinion. I honestly care more about consistency. I can read anyones style of coding, but switching styles all over the place is problematic",
+      "parentUuid": "3afc51ec_5e323f11",
+      "revId": "176f78ca5c4d59483cae50e12da73590a3ae8144",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
