@@ -208,6 +208,7 @@ class GithubWebhookListener():
 
 
 class GithubUser(collections.Mapping):
+    log = logging.getLogger('zuul.GithubUser')
 
     def __init__(self, github, username):
         self._github = github
@@ -227,6 +228,7 @@ class GithubUser(collections.Mapping):
 
     def _init_data(self):
         user = self._github.user(self._username)
+        log_rate_limit(self.log, self._github)
         data = {
             'username': user.login,
             'name': user.name,
@@ -329,6 +331,7 @@ class GithubConnection(BaseConnection):
         owner, proj = project.name.split('/')
         repository = self.github.repository(owner, proj)
         branches = [branch.name for branch in repository.iter_branches()]
+        log_rate_limit(self.log, self.github)
         return branches
 
     def getPullUrl(self, project, number):
@@ -336,12 +339,16 @@ class GithubConnection(BaseConnection):
 
     def getPull(self, project_name, number):
         owner, proj = project_name.split('/')
-        return self.github.pull_request(owner, proj, number).to_dict()
+        pr = self.github.pull_request(owner, proj, number).to_dict()
+        log_rate_limit(self.log, self.github)
+        return pr
 
     def getPullFileNames(self, project, number):
         owner, proj = project.name.split('/')
-        return [f.filename for f in
-                self.github.pull_request(owner, proj, number).files()]
+        filenames = [f.filename for f in
+                     self.github.pull_request(owner, proj, number).files()]
+        log_rate_limit(self.log, self.github)
+        return filenames
 
     def getUser(self, login):
         return GithubUser(self.github, login)
@@ -354,6 +361,7 @@ class GithubConnection(BaseConnection):
         repository = self.github.repository(owner, proj)
         pull_request = repository.issue(pr_number)
         pull_request.create_comment(message)
+        log_rate_limit(self.log, self.github)
 
     def mergePull(self, project, pr_number, commit_message='', sha=None):
         owner, proj = project.name.split('/')
@@ -363,6 +371,7 @@ class GithubConnection(BaseConnection):
         except MethodNotAllowed as e:
             raise MergeFailure('Merge was not successful due to mergeability'
                                ' conflict, original error is %s' % e)
+        log_rate_limit(self.log, self.github)
         if not result:
             raise Exception('Pull request was not merged')
 
@@ -371,19 +380,33 @@ class GithubConnection(BaseConnection):
         owner, proj = project.name.split('/')
         repository = self.github.repository(owner, proj)
         repository.create_status(sha, state, url, description, context)
+        log_rate_limit(self.log, self.github)
 
     def labelPull(self, project, pr_number, label):
         owner, proj = project.name.split('/')
         pull_request = self.github.issue(owner, proj, pr_number)
         pull_request.add_labels(label)
+        log_rate_limit(self.log, self.github)
 
     def unlabelPull(self, project, pr_number, label):
         owner, proj = project.name.split('/')
         pull_request = self.github.issue(owner, proj, pr_number)
         pull_request.remove_label(label)
+        log_rate_limit(self.log, self.github)
 
     def _ghTimestampToDate(self, timestamp):
         return time.strptime(timestamp, '%Y-%m-%dT%H:%M:%SZ')
+
+
+def log_rate_limit(log, github):
+    try:
+        rate_limit = github.rate_limit()
+        remaining = rate_limit['resources']['core']['remaining']
+        reset = rate_limit['resources']['core']['reset']
+    except:
+        return
+    log.debug('GitHub API rate limit remaining: %s reset: %s' %
+              (remaining, reset))
 
 
 def getSchema():
