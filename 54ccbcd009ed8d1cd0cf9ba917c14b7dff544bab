@@ -22,6 +22,30 @@
       "revId": "54ccbcd009ed8d1cd0cf9ba917c14b7dff544bab",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afc51ec_a9717a78",
+        "filename": "zuul/connection/gerrit.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-03-15T10:30:01Z",
+      "side": 1,
+      "message": "good catch",
+      "parentUuid": "3afc51ec_a6940a43",
+      "range": {
+        "startLine": 216,
+        "startChar": 25,
+        "endLine": 216,
+        "endChar": 67
+      },
+      "revId": "54ccbcd009ed8d1cd0cf9ba917c14b7dff544bab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
