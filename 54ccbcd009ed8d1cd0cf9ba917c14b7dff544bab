@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3afc51ec_a6940a43",
+        "filename": "zuul/connection/gerrit.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2016-03-15T08:38:33Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this be int(self.connection_config...)?",
+      "range": {
+        "startLine": 216,
+        "startChar": 25,
+        "endLine": 216,
+        "endChar": 67
+      },
+      "revId": "54ccbcd009ed8d1cd0cf9ba917c14b7dff544bab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
