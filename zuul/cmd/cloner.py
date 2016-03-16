@@ -134,6 +134,11 @@ class Cloner(zuul.cmd.ZuulApp):
             for x in self.args.project_branch:
                 project, branch = x[0].split('=')
                 project_branches[project] = branch
+        project_revisions = {}
+        project = os.environ.get('ZUUL_PROJECT')
+        newrev = os.environ.get('ZUUL_NEWREV')
+        if newrev and project:
+            project_revisions[project] = newrev
         cloner = zuul.lib.cloner.Cloner(
             git_base_url=self.args.git_base_url,
             projects=self.args.projects,
@@ -144,6 +149,7 @@ class Cloner(zuul.cmd.ZuulApp):
             branch=self.args.branch,
             clone_map_file=self.args.clone_map_file,
             project_branches=project_branches,
+            project_revisions=project_revisions,
             cache_dir=self.args.cache_dir,
         )
         cloner.execute()
