@@ -29,7 +29,8 @@ class Cloner(object):
 
     def __init__(self, git_base_url, projects, workspace, zuul_branch,
                  zuul_ref, zuul_url, branch=None, clone_map_file=None,
-                 project_branches=None, cache_dir=None):
+                 project_branches=None, project_revisions=None,
+                 cache_dir=None):
 
         self.clone_map = []
         self.dests = None
@@ -43,6 +44,7 @@ class Cloner(object):
         self.zuul_ref = zuul_ref or ''
         self.zuul_url = zuul_url
         self.project_branches = project_branches or {}
+        self.project_revisions = project_revisions or {}
 
         if clone_map_file:
             self.readCloneMap(clone_map_file)
@@ -112,10 +114,11 @@ class Cloner(object):
         """Clone a repository for project at dest and apply a reference
         suitable for testing. The reference lookup is attempted in this order:
 
-         1) Zuul reference for the indicated branch
-         2) Zuul reference for the master branch
-         3) The tip of the indicated branch
-         4) The tip of the master branch
+         1) The indicated revision for specific project
+         2) Zuul reference for the indicated branch
+         3) Zuul reference for the master branch
+         4) The tip of the indicated branch
+         5) The tip of the master branch
 
         The "indicated branch" is one of the following:
 
@@ -134,6 +137,10 @@ class Cloner(object):
         # Later with repo.checkout() we set HEAD to something that
         # `git branch` is happy with.
         repo.reset()
+
+        indicated_revision = None
+        if project in self.project_revisions:
+            indicated_revision = self.project_revisions[project]
 
         indicated_branch = self.branch or self.zuul_branch
         if project in self.project_branches:
@@ -160,13 +167,26 @@ class Cloner(object):
         else:
             fallback_zuul_ref = None
 
+        # If this project has a rev specified for checkout, use it above all
+        # else then fall back to the other methods.
+        # FIXME (Nakato): This should return a failure in the future as we
+        # should fail explicitly if we cant do what is asked of us.
+        if indicated_revision:
+            self.log.info("Attempting to check out revision %s for"
+                          "project %s", indicated_revision, project)
+            try:
+                commit = repo.checkout(indicated_revision)
+            except (ValueError, GitCommandError):
+                self.log.exception("Could not checkout requested revision")
+            self.log.info("Prepared %s repo with revision %s", project,
+                          indicated_revision)
         # If we have a non empty zuul_ref to use, use it. Otherwise we fall
         # back to checking out the branch.
-        if ((override_zuul_ref and
-            self.fetchFromZuul(repo, project, override_zuul_ref)) or
-            (fallback_zuul_ref and
-             fallback_zuul_ref != override_zuul_ref and
-            self.fetchFromZuul(repo, project, fallback_zuul_ref))):
+        elif ((override_zuul_ref and
+              self.fetchFromZuul(repo, project, override_zuul_ref)) or
+              (fallback_zuul_ref and
+               fallback_zuul_ref != override_zuul_ref and
+              self.fetchFromZuul(repo, project, fallback_zuul_ref))):
             # Work around a bug in GitPython which can not parse FETCH_HEAD
             gitcmd = git.Git(dest)
             fetch_head = gitcmd.rev_parse('FETCH_HEAD')
