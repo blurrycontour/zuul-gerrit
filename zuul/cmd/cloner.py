@@ -27,6 +27,8 @@ ZUUL_ENV_SUFFIXES = (
     'branch',
     'ref',
     'url',
+    'project',
+    'newrev',
 )
 
 
@@ -145,6 +147,8 @@ class Cloner(zuul.cmd.ZuulApp):
             clone_map_file=self.args.clone_map_file,
             project_branches=project_branches,
             cache_dir=self.args.cache_dir,
+            zuul_newrev=self.args.zuul_newrev,
+            zuul_project=self.args.zuul_project,
         )
         cloner.execute()
 
