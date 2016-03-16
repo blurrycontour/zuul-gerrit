@@ -78,6 +78,13 @@ class Cloner(zuul.cmd.ZuulApp):
                   'over --branch if it is provided; may be specified multiple '
                   'times.')
         )
+        project_env.add_argument(
+            '--project-revision', nargs=1, action='append',
+            metavar='PROJECT=REV',
+            help=('request a project be checked out with a specific revision '
+                  'from the main tree with precedence over all other options'
+                  '; may be specified multiple times.')
+        )
 
         zuul_env = parser.add_argument_group(
             'zuul environment',
@@ -134,6 +141,11 @@ class Cloner(zuul.cmd.ZuulApp):
             for x in self.args.project_branch:
                 project, branch = x[0].split('=')
                 project_branches[project] = branch
+        project_revisions = {}
+        if self.args.project_revision:
+            for x in self.args.project_revision:
+                project, rev = x[0].split('=')
+                project_revisions[project] = rev
         cloner = zuul.lib.cloner.Cloner(
             git_base_url=self.args.git_base_url,
             projects=self.args.projects,
@@ -144,6 +156,7 @@ class Cloner(zuul.cmd.ZuulApp):
             branch=self.args.branch,
             clone_map_file=self.args.clone_map_file,
             project_branches=project_branches,
+            project_revisions=project_revisions,
             cache_dir=self.args.cache_dir,
         )
         cloner.execute()
