@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1af94dfe_f6e9e61b",
+        "filename": "tests/base.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1093,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-03-16T11:50:33Z",
+      "side": 1,
+      "message": "I\u0027m not sure this is necessary. For each iteration of os.walk, the filenames is just the basenames of the files in dirpath. ie, the filename never contains the dirpath prefix.\n\nHowever this could also cause a problem. In the case where you have a file with the same name as it\u0027s folder. This can only happen when source path is a relative folder name with no delimiter and it contains a file with the same name.\n\nFor example:\n\n  path/path\n\nwhere source_path is \u0027path\u0027.\n\nFor simplicity we should probably just remove this.\n\n(edit)\nThis actually won\u0027t even give you the relative path. You probably just want to do:\n\n  os.join(dirpath, filename)\n\nand that\u0027s it",
+      "range": {
+        "startLine": 1093,
+        "startChar": 20,
+        "endLine": 1093,
+        "endChar": 67
+      },
+      "revId": "9dfc95d30b9bd5f3655c5c42b8b633dab2c1a9b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1af94dfe_165c52ec",
+        "filename": "tests/base.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1094,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-03-16T11:50:33Z",
+      "side": 1,
+      "message": "Because filenames doesn\u0027t contain the dirpath you\u0027ll need\n\n  os.path.join(source_path, dirpath, filename)",
+      "range": {
+        "startLine": 1094,
+        "startChar": 16,
+        "endLine": 1094,
+        "endChar": 33
+      },
+      "revId": "9dfc95d30b9bd5f3655c5c42b8b633dab2c1a9b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1af94dfe_d62f8a3c",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-03-16T11:50:33Z",
+      "side": 1,
+      "message": "These",
+      "range": {
+        "startLine": 97,
+        "startChar": 14,
+        "endLine": 97,
+        "endChar": 18
+      },
+      "revId": "9dfc95d30b9bd5f3655c5c42b8b633dab2c1a9b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
