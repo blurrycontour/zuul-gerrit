@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "1af94dfe_bdd9c985",
+        "filename": "zuul/connection/gerrit.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2016-03-17T06:31:51Z",
+      "side": 1,
+      "message": "I would make this parameter (also the others, but this would be another patch) mandatory as the keepalive setting gets read with a default value somewhere else (line 216).\n\nLeaving this optional will hide errors when this setting is not forwarded (e.g. line 451).",
+      "range": {
+        "startLine": 124,
+        "startChar": 31,
+        "endLine": 124,
+        "endChar": 42
+      },
+      "revId": "54ccbcd009ed8d1cd0cf9ba917c14b7dff544bab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3afc51ec_a6940a43",
         "filename": "zuul/connection/gerrit.py",
         "patchSetId": 11
@@ -42,6 +65,29 @@
         "startChar": 25,
         "endLine": 216,
         "endChar": 67
+      },
+      "revId": "54ccbcd009ed8d1cd0cf9ba917c14b7dff544bab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1af94dfe_5d752596",
+        "filename": "zuul/connection/gerrit.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 456,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2016-03-17T06:31:51Z",
+      "side": 1,
+      "message": "This misses the keepalive argument leading to disabled keepalive for stream-events",
+      "range": {
+        "startLine": 451,
+        "startChar": 8,
+        "endLine": 456,
+        "endChar": 33
       },
       "revId": "54ccbcd009ed8d1cd0cf9ba917c14b7dff544bab",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
