@@ -138,6 +138,9 @@ project-templates:
   - name: test-five
     check:
      - '{name}-{something}-test5'
+  - name: template-with-longname
+    check:
+     - '{longname}-job-with-longname'
 
 projects:
   - name: org/project
@@ -233,6 +236,7 @@ projects:
       - name: test-three-and-four
       - name: test-five
         something: foo
+      - name: template-with-longname
     check:
       - project-test6
 

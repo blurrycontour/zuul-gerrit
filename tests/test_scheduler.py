@@ -1115,6 +1115,8 @@ class TestScheduler(ZuulTestCase):
                                                 ).result, 'SUCCESS')
         self.assertEqual(self.getJobFromHistory('layered-project-foo-test5'
                                                 ).result, 'SUCCESS')
+        self.assertEqual(self.getJobFromHistory(
+            'org-layered-project-job-with-longname').result, 'SUCCESS')
         self.assertEqual(self.getJobFromHistory('project-test6').result,
                          'SUCCESS')
 
