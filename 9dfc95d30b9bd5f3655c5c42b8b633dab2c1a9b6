@@ -48,6 +48,23 @@
     },
     {
       "key": {
+        "uuid": "fa0719c6_c556a4d1",
+        "filename": "tests/base.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1094,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-03-22T02:38:27Z",
+      "side": 1,
+      "message": "You are right that both of these are wrong, but also, dirpath has the full content of source_path in it already, so the solution is still slightly different than this.  I think I\u0027ve got it in the next patchset though.",
+      "revId": "9dfc95d30b9bd5f3655c5c42b8b633dab2c1a9b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1af94dfe_d62f8a3c",
         "filename": "zuul/configloader.py",
         "patchSetId": 6
