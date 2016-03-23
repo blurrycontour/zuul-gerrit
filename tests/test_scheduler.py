@@ -2243,7 +2243,7 @@ class TestScheduler(ZuulTestCase):
         self.assertIn('Content-Length', headers)
         self.assertIn('Content-Type', headers)
         self.assertEqual(headers['Content-Type'],
-                         'application/json; charset=UTF-8')
+                         'application/json')
         self.assertIn('Access-Control-Allow-Origin', headers)
         self.assertIn('Cache-Control', headers)
         self.assertIn('Last-Modified', headers)
