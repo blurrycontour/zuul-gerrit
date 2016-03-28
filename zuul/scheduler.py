@@ -617,15 +617,21 @@ class Scheduler(threading.Thread):
     def setMerger(self, merger):
         self.merger = merger
 
-    def getProject(self, name, create_foreign=False):
+    def registerTrigger(self, trigger, name=None):
+        if name is None:
+            name = trigger.name
+        self.triggers[name] = trigger
+
+    def registerReporter(self, reporter, name=None):
+        if name is None:
+            name = reporter.name
+        self.reporters[name] = reporter
+
+    def getProject(self, name):
         self.layout_lock.acquire()
         p = None
         try:
             p = self.layout.projects.get(name)
-            if p is None and create_foreign:
-                self.log.info("Registering foreign project: %s" % name)
-                p = Project(name, foreign=True)
-                self.layout.projects[name] = p
         finally:
             self.layout_lock.release()
         return p
@@ -815,15 +821,15 @@ class Scheduler(threading.Thread):
                         item.items_behind = []
                         item.pipeline = None
                         item.queue = None
-                        project_name = item.change.project.name
-                        item.change.project = layout.projects.get(project_name)
-                        if not item.change.project:
-                            self.log.debug("Project %s not defined, "
-                                           "re-instantiating as foreign" %
-                                           project_name)
-                            project = Project(project_name, foreign=True)
-                            layout.projects[project_name] = project
-                            item.change.project = project
+                        project = layout.projects.get(item.change.project.name)
+                        if not project:
+                            self.log.warning("Unable to find project for "
+                                             "change %s while reenqueueing" %
+                                             item.change)
+                            item.change.project = None
+                            items_to_remove.append(item)
+                            continue
+                        item.change.project = project
                         item_jobs = new_pipeline.getJobs(item)
                         for build in item.current_build_set.getBuilds():
                             job = layout.jobs.get(build.job.name)
@@ -997,7 +1003,9 @@ class Scheduler(threading.Thread):
         self.log.debug("Processing trigger event %s" % event)
         try:
             project = self.layout.projects.get(event.project_name)
-
+            if not project:
+                self.log.debug("Project %s not found" % event.project_name)
+                return
             for pipeline in self.layout.pipelines.values():
                 # Get the change even if the project is unknown to us for the
                 # use of updating the cache if there is another change
@@ -1892,11 +1900,10 @@ class IndependentPipelineManager(BasePipelineManager):
         if existing:
             return DynamicChangeQueueContextManager(existing)
         if change.project not in self.pipeline.getProjects():
-            self.pipeline.addProject(change.project)
+            return DynamicChangeQueueContextManager(None)
         change_queue = ChangeQueue(self.pipeline)
         change_queue.addProject(change.project)
         self.pipeline.addQueue(change_queue)
-        self.log.debug("Dynamically created queue %s", change_queue)
         return DynamicChangeQueueContextManager(change_queue)
 
     def enqueueChangesAhead(self, change, quiet, ignore_requirements,
