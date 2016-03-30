@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba0121b8_78ce28b5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 34
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 13807
+      },
+      "writtenOn": "2016-03-30T13:47:11Z",
+      "side": 1,
+      "message": "Just noticed this. The co-authored-by line should be underneath the Change-Id: line in the same block (no blank line between them). Also you should use angle brackets to surround the email instead of parenthesis.\n\nThe last block in a commit message is reserved for metadata and tools typically parse only the last block so anything that analyses the co-authored-by line might miss it.",
+      "revId": "d42fdf5757ca940f3debae53d7495db1bf9091ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
