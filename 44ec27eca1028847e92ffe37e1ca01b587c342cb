@@ -45,6 +45,30 @@
       "revId": "44ec27eca1028847e92ffe37e1ca01b587c342cb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba0121b8_eb716b0d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 12612
+      },
+      "writtenOn": "2016-03-31T22:58:05Z",
+      "side": 1,
+      "message": "Woops, that\u0027s what I get for not doing a literal copy-paste.\n\nI\u0027ll fix that up in the next commit.",
+      "parentUuid": "ba0121b8_45c4d03e",
+      "range": {
+        "startLine": 29,
+        "startChar": 27,
+        "endLine": 29,
+        "endChar": 44
+      },
+      "revId": "44ec27eca1028847e92ffe37e1ca01b587c342cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
