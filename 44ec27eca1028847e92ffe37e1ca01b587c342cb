@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba0121b8_85b9c8ce",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2016-03-31T18:22:12Z",
+      "side": 1,
+      "message": "This is liberty",
+      "range": {
+        "startLine": 24,
+        "startChar": 32,
+        "endLine": 24,
+        "endChar": 46
+      },
+      "revId": "44ec27eca1028847e92ffe37e1ca01b587c342cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba0121b8_45c4d03e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2016-03-31T18:22:12Z",
+      "side": 1,
+      "message": "I expect this to be liberty instead of kilo as well.",
+      "range": {
+        "startLine": 29,
+        "startChar": 27,
+        "endLine": 29,
+        "endChar": 44
+      },
+      "revId": "44ec27eca1028847e92ffe37e1ca01b587c342cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
