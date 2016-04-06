@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a061dce_303e798c",
+        "filename": "zuul/source/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-04-06T12:07:49Z",
+      "side": 1,
+      "message": "This feels odd. The method is called \"isMerged\" and we\u0027re logging here whether or not a change is merged, but it\u0027s still possible for the method to return False.",
+      "range": {
+        "startLine": 78,
+        "startChar": 0,
+        "endLine": 78,
+        "endChar": 61
+      },
+      "revId": "92464a2291a032b9253fd02fbdd1f61569a4522c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
