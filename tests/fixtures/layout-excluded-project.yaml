@@ -1,0 +1,55 @@
+pipelines:
+  - name: check
+    description: >
+      Newly uploaded patchsets enter this pipeline to receive an initial
+      +/-1 Verified vote from Jenkins.
+    manager: IndependentPipelineManager
+    success-message: Your change is awesome
+    failure-message: Your change breaks the build
+    ignore-dependencies: True
+    require:
+      open: True
+      current-patchset: True
+    trigger:
+      gerrit:
+        - event: patchset-created
+        - event: comment-added
+          comment_filter: retrigger
+    success:
+      gerrit:
+        verified: 1
+    failure:
+      gerrit:
+        verified: -1
+    start:
+      gerrit:
+        verified: 0
+
+  - name: test
+    description: >
+      This pipeline serves as a manually triggered test environment in order to
+      safely create and experiment with new build-jobs. This pipeline can be
+      triggered by commenting with 'retest' on gerrit patches.
+    manager: IndependentPipelineManager
+    success-message: Your change passed the test pipeline.
+    failure-message: Your change failed the test pipeline.
+    ignore-dependencies: True
+    require:
+      open: True
+      current-patchset: True
+    trigger:
+      gerrit:
+        - event: comment-added
+          comment_filter: retest
+    success:
+      gerrit: {}
+    failure:
+      gerrit: {}
+    start:
+      gerrit: {}
+
+
+projects:
+  - name: testing/foo
+    test:
+      - noop

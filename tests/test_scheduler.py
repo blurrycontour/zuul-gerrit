@@ -4336,3 +4336,23 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertIn('Build failed.', K.messages[0])
         # No more messages reported via smtp
         self.assertEqual(3, len(self.smtp_messages))
+
+    def test_excluded_project(self):
+        # Where a project isn't in the 'check' pipeline, ensure the start
+        # reporters aren't run or the change isn't unncessarily merged.
+        self.init_repo("testing/foo")
+        self.config.set('zuul', 'layout_config',
+                        'tests/fixtures/layout-excluded-project.yaml')
+        self.sched.reconfigure(self.config)
+
+        A = self.fake_gerrit.addFakeChange('testing/foo', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # None of the triggers match the test pipeline. There are no jobs in
+        # the check pipeline, so nothing should be checked out.
+        self.assertFalse(
+            os.path.exists(os.path.join(self.git_root, "testing/foo")))
+
+        # For the same reasons there should be no start messages.
+        self.assertNotIn('Starting check jobs.', A.messages)
