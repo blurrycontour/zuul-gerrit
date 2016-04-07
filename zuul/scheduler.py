@@ -1401,7 +1401,8 @@ class BasePipelineManager(object):
                                    "requirement %s" % (change, f))
                     return False
 
-        with self.getChangeQueue(change, change_queue) as change_queue:
+        with self.getChangeQueue(change, change_queue,
+                                 noforeign=True) as change_queue:
             if not change_queue:
                 self.log.debug("Unable to find change queue for "
                                "change %s in project %s" %
@@ -1921,11 +1922,13 @@ class IndependentPipelineManager(BasePipelineManager):
     def _postConfig(self, layout):
         super(IndependentPipelineManager, self)._postConfig(layout)
 
-    def getChangeQueue(self, change, existing=None):
+    def getChangeQueue(self, change, existing=None, noforeign=False):
         # creates a new change queue for every change
         if existing:
             return DynamicChangeQueueContextManager(existing)
         if change.project not in self.pipeline.getProjects():
+            if noforeign:
+                return DynamicChangeQueueContextManager(None)
             self.pipeline.addProject(change.project)
         change_queue = ChangeQueue(self.pipeline)
         change_queue.addProject(change.project)
@@ -2063,7 +2066,7 @@ class DependentPipelineManager(BasePipelineManager):
                 new_change_queues.append(a)
         return new_change_queues
 
-    def getChangeQueue(self, change, existing=None):
+    def getChangeQueue(self, change, existing=None, noforeign=False):
         if existing:
             return StaticChangeQueueContextManager(existing)
         return StaticChangeQueueContextManager(
