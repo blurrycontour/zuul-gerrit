@@ -4481,3 +4481,30 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertIn(
             '- docs-draft-test2 https://server/job/docs-draft-test2/1/',
             body[3])
+
+    def test_excluded_project(self):
+        # Where a project isn't in the 'check' pipeline, ensure the start
+        # reporters aren't run or the change isn't unncessarily merged.
+        self.init_repo("testing/foo")
+        self.config.set('zuul', 'layout_config',
+                        'tests/fixtures/layout-excluded-project.yaml')
+        self.sched.reconfigure(self.config)
+
+        A = self.fake_gerrit.addFakeChange('testing/foo', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # None of the triggers match the test pipeline. There are no jobs in
+        # the check pipeline, so nothing should be checked out.
+        self.assertFalse(
+            os.path.exists(os.path.join(self.git_root, "testing/foo")))
+
+        # For the same reasons there should be no start messages.
+        self.assertNotIn('Starting check jobs.', A.messages)
+        self.assertEqual(0, len(A.messages))
+
+        # Trigger the gate to test dependent pipeline
+        A.addApproval('CRVW', 2)
+        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        self.waitUntilSettled()
+        self.assertEqual(0, len(A.messages))
