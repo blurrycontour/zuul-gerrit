@@ -150,6 +150,7 @@ class Server(zuul.cmd.ZuulApp):
         import zuul.scheduler
         import zuul.launcher.gearman
         import zuul.merger.client
+        import zuul.nodepool
         import zuul.lib.swift
         import zuul.webapp
         import zuul.rpclistener
@@ -169,6 +170,7 @@ class Server(zuul.cmd.ZuulApp):
         gearman = zuul.launcher.gearman.Gearman(self.config, self.sched,
                                                 self.swift)
         merger = zuul.merger.client.MergeClient(self.config, self.sched)
+        nodepool = zuul.nodepool.Nodepool(self.sched)
 
         if self.config.has_option('zuul', 'status_expiry'):
             cache_expiry = self.config.getint('zuul', 'status_expiry')
@@ -180,6 +182,7 @@ class Server(zuul.cmd.ZuulApp):
         self.configure_connections()
         self.sched.setLauncher(gearman)
         self.sched.setMerger(merger)
+        self.sched.setNodepool(nodepool)
 
         self.log.info('Starting scheduler')
         self.sched.start()
