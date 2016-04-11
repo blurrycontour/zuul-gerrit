@@ -69,6 +69,29 @@
       "revId": "44ec27eca1028847e92ffe37e1ca01b587c342cb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_90c42c41",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-04-11T03:17:55Z",
+      "side": 1,
+      "message": "Why should we fail in the future and not now (or vice versa).",
+      "range": {
+        "startLine": 172,
+        "startChar": 46,
+        "endLine": 172,
+        "endChar": 69
+      },
+      "revId": "44ec27eca1028847e92ffe37e1ca01b587c342cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
