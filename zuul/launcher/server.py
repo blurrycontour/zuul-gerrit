@@ -31,8 +31,6 @@ import zuul.merger
 class JobDir(object):
     def __init__(self):
         self.root = tempfile.mkdtemp()
-        self.git_root = os.path.join(self.root, 'git')
-        os.makedirs(self.git_root)
         self.ansible_root = os.path.join(self.root, 'ansible')
         os.makedirs(self.ansible_root)
         self.inventory = os.path.join(self.ansible_root, 'inventory')
@@ -224,9 +222,17 @@ class LaunchServer(object):
                 tasks.append(self.update(project['name'], project['url']))
             for task in tasks:
                 task.wait()
+            for project in args['projects']:
+                # Check out the master branch for all projects to reset them
+                # in case they were at a different point due to a prevoius
+                # build.
+                repo = self.merger.getRepo(project['name'], project['url'])
+                repo.reset()
+                # NOTE(jhesketh): We need to consider how stable jobs will be
+                # defined across multiple repos.
+
+            commit = self.merger.mergeChanges(args['items'])  # noqa
             self.log.debug("Job %s: git updates complete" % (job.unique,))
-            merger = self._getMerger(jobdir.git_root)
-            commit = merger.mergeChanges(args['items'])  # noqa
 
             # TODOv3: Ansible the ansible thing here.
             self.prepareAnsibleFiles(jobdir, args)
