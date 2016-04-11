@@ -212,10 +212,6 @@ class LaunchServer(object):
                 self.log.exception("Exception while getting job")
 
     def launch(self, job):
-        thread = threading.Thread(target=self._launch, args=(job,))
-        thread.start()
-
-    def _launch(self, job):
         self.log.debug("Job %s: beginning" % (job.unique,))
         with JobDir() as jobdir:
             self.log.debug("Job %s: job root at %s" %
