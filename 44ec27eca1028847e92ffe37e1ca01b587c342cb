@@ -116,6 +116,30 @@
       "revId": "44ec27eca1028847e92ffe37e1ca01b587c342cb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_708697ba",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-04-11T13:41:52Z",
+      "side": 1,
+      "message": "So the rest of zuul cloner is opportunistic. If you look at the steps taken (above in the section you modified) zuul tries in preference for ways of getting a commit.\n\nThe reason it\u0027s opportunistic is that a project \"may\" have a certain ref. If it doesn\u0027t, that\u0027s actually expected and in which case we want to make sure we have the most correct branch.\n\nIn this case of specifying very precise commit sha\u0027s, it may be more correct to bail on a particular project. If the intended use is the post queue this is likely desirable.",
+      "parentUuid": "7a1b2928_4b3f8525",
+      "range": {
+        "startLine": 172,
+        "startChar": 46,
+        "endLine": 172,
+        "endChar": 69
+      },
+      "revId": "44ec27eca1028847e92ffe37e1ca01b587c342cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
