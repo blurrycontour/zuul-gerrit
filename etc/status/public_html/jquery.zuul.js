@@ -226,7 +226,7 @@
             },
 
             change_total_progress_bar: function(change) {
-                var job_percent = Math.floor(100 / change.jobs.length);
+                var job_percent = 100 / change.jobs.length;
                 var $bar_outter = $('<div />')
                     .addClass('progress zuul-change-total-result');
 
