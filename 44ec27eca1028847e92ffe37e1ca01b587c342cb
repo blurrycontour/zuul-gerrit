@@ -92,6 +92,30 @@
       "revId": "44ec27eca1028847e92ffe37e1ca01b587c342cb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_4b3f8525",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 12612
+      },
+      "writtenOn": "2016-04-11T06:18:20Z",
+      "side": 1,
+      "message": "I didn\u0027t implement any failure logic as it\u0027s contrary to how zuul_cloner is currently designed.  But to leave the topic momentary, I do think that should be tightened up across all clones instead of falling back till we hit master.\n\nThen again, I do think it would make since to implement the failure logic for this addition as when the code under indicated_revision is hit, we have received explicit instructions for what the user is expecting, we would be completely right to fail hard if we cannot check it out.\n\nWhat do think, should I go ahead and implement failing out?",
+      "parentUuid": "7a1b2928_90c42c41",
+      "range": {
+        "startLine": 172,
+        "startChar": 46,
+        "endLine": 172,
+        "endChar": 69
+      },
+      "revId": "44ec27eca1028847e92ffe37e1ca01b587c342cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
