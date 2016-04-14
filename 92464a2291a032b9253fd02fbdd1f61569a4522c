@@ -22,6 +22,23 @@
       "revId": "92464a2291a032b9253fd02fbdd1f61569a4522c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_1aeb6f14",
+        "filename": "zuul/source/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-04-14T17:00:56Z",
+      "side": 1,
+      "message": "This closely mimics earlier logging, which may have gotten off-track by a later change.  We can definitely rethink it.",
+      "revId": "92464a2291a032b9253fd02fbdd1f61569a4522c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
