@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a122d0e_3195f2dd",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-04-19T04:32:43Z",
+      "side": 1,
+      "message": "This implies that failing the indicated revision a clone should continue with the other steps/attempts.\n\nI\u0027m not sure which behaviour is more desirable (I think, raising is), but we should document it clearly.",
+      "range": {
+        "startLine": 118,
+        "startChar": 0,
+        "endLine": 118,
+        "endChar": 55
+      },
+      "revId": "7f24c249907ca243d9f09d7db9c0a986f5336a51",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
