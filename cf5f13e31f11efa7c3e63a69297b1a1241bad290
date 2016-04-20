@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a122d0e_fedbe879",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 745,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-04-20T15:07:38Z",
+      "side": 1,
+      "message": "Probably want to wrap this in a try (logging a warning) where the url_pattern is trying to access attributes that may not exist yet (also protects against bad url_patterns).",
+      "range": {
+        "startLine": 742,
+        "startChar": 0,
+        "endLine": 745,
+        "endChar": 45
+      },
+      "revId": "cf5f13e31f11efa7c3e63a69297b1a1241bad290",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
