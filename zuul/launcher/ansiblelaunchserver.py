@@ -17,12 +17,14 @@ import json
 import logging
 import multiprocessing
 import os
+import Queue
 import shutil
 import signal
 import socket
 import subprocess
 import tempfile
 import threading
+import time
 import traceback
 import uuid
 
@@ -61,10 +63,13 @@ class LaunchServer(object):
         self.node_workers = {}
         self.mpmanager = multiprocessing.Manager()
         self.jobs = self.mpmanager.dict()
-        self.zmq_send_queue = multiprocessing.Queue()
+        self.zmq_send_queue = multiprocessing.JoinableQueue()
+        self.termination_queue = multiprocessing.JoinableQueue()
 
     def start(self):
-        self._running = True
+        self._gearman_running = True
+        self._zmq_running = True
+        self._reaper_running = True
 
         # Setup ZMQ
         self.zcontext = zmq.Context()
@@ -89,9 +94,15 @@ class LaunchServer(object):
 
         # Start ZMQ worker thread
         self.log.debug("Starting ZMQ processor")
-        self.zmq_thread = threading.Thread(target=self.run_zmq)
+        self.zmq_thread = threading.Thread(target=self.runZMQ)
         self.zmq_thread.daemon = True
         self.zmq_thread.start()
+
+        # Start node worker reaper thread
+        self.log.debug("Starting reaper")
+        self.reaper_thread = threading.Thread(target=self.runReaper)
+        self.reaper_thread.daemon = True
+        self.reaper_thread.start()
 
         # Start Gearman worker thread
         self.log.debug("Starting worker")
@@ -120,21 +131,33 @@ class LaunchServer(object):
         self.config = config
         self.loadJobs()
         for node in self.node_workers.values():
-            node.queue.put(dict(action='reconfigure'))
+            try:
+                if node.isAlive():
+                    node.queue.put(dict(action='reconfigure'))
+            except Exception:
+                self.log.exception("Exception sending reconfigure command to worker:")
 
     def stop(self):
         self.log.debug("Stopping")
-        self._running = False
+        self._gearman_running = False
+        self._reaper_running = False
         self.worker.shutdown()
         for node in self.node_workers.values():
-            node.stop()
+            try:
+                if node.isAlive():
+                    node.stop()
+            except Exception:
+                self.log.exception("Exception sending stop command to worker:")
+        self._zmq_running = False
+        self.zmq_send_queue.put(None)
+        self.zmq_send_queue.join()
         self.log.debug("Stopped")
 
     def join(self):
         self.gearman_thread.join()
 
-    def run_zmq(self):
-        while self._running:
+    def runZMQ(self):
+        while self._zmq_running or not self.zmq_send_queue.empty():
             try:
                 item = self.zmq_send_queue.get()
                 self.log.debug("Got ZMQ event %s" % (item,))
@@ -143,9 +166,11 @@ class LaunchServer(object):
                 self.zsocket.send(item)
             except Exception:
                 self.log.exception("Exception while processing ZMQ events")
+            finally:
+                self.zmq_send_queue.task_done()
 
     def run(self):
-        while self._running:
+        while self._gearman_running:
             try:
                 job = self.worker.getJob()
                 try:
@@ -169,7 +194,8 @@ class LaunchServer(object):
         worker = NodeWorker(self.config, self.jobs,
                             args['name'], args['host'],
                             args['description'], args['labels'],
-                            self.hostname, self.zmq_send_queue)
+                            self.hostname, self.zmq_send_queue,
+                            self.termination_queue)
         self.node_workers[worker.name] = worker
 
         worker.process = multiprocessing.Process(target=worker.run)
@@ -179,12 +205,26 @@ class LaunchServer(object):
         job.sendWorkData(json.dumps(data))
         job.sendWorkComplete()
 
+    def runReaper(self):
+        # We don't actually care if all the events are processed
+        while self._reaper_running:
+            try:
+                item = self.termination_queue.get()
+                self.log.debug("Got termination event %s" % (item,))
+                if item is None:
+                    continue
+                del self.node_workers[item]
+            except Exception:
+                self.log.exception("Exception while processing termination events")
+            finally:
+                self.termination_queue.task_done()
+
 
 class NodeWorker(object):
     log = logging.getLogger("zuul.NodeWorker")
 
     def __init__(self, config, jobs, name, host, description, labels,
-                 manager_name, zmq_send_queue):
+                 manager_name, zmq_send_queue, termination_queue):
         self.log.debug("Creating node worker %s" % (name,))
         self.config = config
         self.jobs = jobs
@@ -192,14 +232,25 @@ class NodeWorker(object):
         self.host = host
         self.description = description
         self.labels = labels
+        self.process = None
         self.registered_functions = set()
         self._running = True
-        self.queue = multiprocessing.Queue()
+        self.queue = multiprocessing.JoinableQueue()
         self.manager_name = manager_name
         self.zmq_send_queue = zmq_send_queue
+        self.termination_queue = termination_queue
         self.running_job_lock = threading.Lock()
+        self._job_complete_event = threading.Event()
         self._running_job = False
         self._sent_complete_event = False
+        self._job_timeout = None
+        self._job_start_time = None
+
+    def isAlive(self):
+        # Meant to be called from the manager
+        if self.process and self.process.is_alive():
+            return True
+        return False
 
     def run(self):
         signal.signal(signal.SIGINT, signal.SIG_IGN)
@@ -215,13 +266,13 @@ class NodeWorker(object):
         self.worker.waitForServer()
         self.register()
 
-        self.gearman_thread = threading.Thread(target=self.run_gearman)
+        self.gearman_thread = threading.Thread(target=self.runGearman)
         self.gearman_thread.daemon = True
         self.gearman_thread.start()
 
-        while self._running:
+        while self._running or not self.queue.empty():
             try:
-                self._run_queue()
+                self._runQueue()
             except Exception:
                 self.log.exception("Exception in queue manager:")
 
@@ -232,26 +283,48 @@ class NodeWorker(object):
         self.log.debug("Submitting stop request")
         self._running = False
         self.queue.put(dict(action='stop'))
+        self.queue.join()
 
-    def _run_queue(self):
-        item = self.queue.get()
-        if item['action'] == 'stop':
-            self.log.debug("Received stop request")
-            self._running = False
-            self.worker.shutdown()
-            if not self.abortRunningJob():
-                self.sendFakeCompleteEvent()
-        elif item['action'] == 'reconfigure':
-            self.register()
+    def _runQueue(self):
+        # This also runs the timeout function if needed
+        try:
+            item = self.queue.get(True, 10)  # 10 second resolution on timeout
+        except Queue.Empty:
+            # We don't need these in a critical section, but we do
+            # need them not to change while we evaluate them, so make
+            # local copies.
+            running = self._running_job
+            start = self._job_start_time
+            timeout = self._job_timeout
+            now = time.time()
+            if (running and timeout and start
+                and now - start >= timeout):
+                self.log.info("Job timed out after %s seconds" % (now-start,))
+                self.abortRunningJob()
+            return
+        try:
+            if item['action'] == 'stop':
+                self.log.debug("Received stop request")
+                self._running = False
+                self.termination_queue.put(self.name)
+                if not self.abortRunningJob():
+                    self.sendFakeCompleteEvent()
+                else:
+                    self._job_complete_event.wait()
+                self.worker.shutdown()
+            elif item['action'] == 'reconfigure':
+                self.register()
+        finally:
+            self.queue.task_done()
 
-    def run_gearman(self):
+    def runGearman(self):
         while self._running:
             try:
-                self._run_gearman()
+                self._runGearman()
             except Exception:
                 self.log.exception("Exception in gearman manager:")
 
-    def _run_gearman(self):
+    def _runGearman(self):
         try:
             job = self.worker.getJob()
         except gear.InterruptedError:
@@ -302,9 +375,10 @@ class NodeWorker(object):
                 self.log.debug("Abort: a job is running")
                 proc = self.ansible_proc
                 if proc:
-                    self.log.debug("Abort: sending kill signal to job process")
+                    self.log.debug("Abort: sending kill signal to job process group")
                     try:
-                        proc.kill()
+                        pgid = os.getpgid(proc.pid)
+                        os.killpg(pgid, signal.SIGKILL)
                         aborted = True
                     except Exception:
                         self.log.exception("Exception while killing ansible process:")
@@ -314,7 +388,7 @@ class NodeWorker(object):
         return aborted
 
     def launch(self, job):
-        self.log.debug("Node worker %s launching job %s" % (self.name, job.name))
+        self.log.info("Node worker %s launching job %s" % (self.name, job.name))
 
         # Make sure we can parse what we need from the job first
         args = json.loads(job.arguments)
@@ -338,6 +412,8 @@ class NodeWorker(object):
             self.log.exception("Exception while launching job thread")
 
         self._running_job = False
+        self._job_timeout = None
+        self._job_start_time = None
         if not result:
             result = b''
 
@@ -351,7 +427,8 @@ class NodeWorker(object):
         except Exception:
             self.log.exception("Exception while sending job completion event")
 
-        if offline:
+        self._job_complete_event.set()
+        if offline and self._running:
             self.stop()
 
     def sendStartEvent(self, name, parameters):
@@ -393,14 +470,15 @@ class NodeWorker(object):
             if not self._running:
                 return result
             self._running_job = True
+            self._job_complete_event.clear()
 
         self.log.debug("Job %s: beginning" % (job.unique,))
         with JobDir() as jobdir:
             self.log.debug("Job %s: job root at %s" %
                            (job.unique, jobdir.root))
-            args = json.loads(job.arguments)
-
             self.prepareAnsibleFiles(jobdir, job)
+
+            self._job_start_time = time.time()
             status = self.runAnsible(jobdir)
 
             data = {
@@ -427,6 +505,15 @@ class NodeWorker(object):
                 inventory.write('\n')
         job_name = gearman_job.name.split(':')[1]
         jjb_job = self.jobs[job_name]
+
+        for wrapper in jjb_job.get('wrappers', []):
+            if isinstance(wrapper, dict):
+                timeout = wrapper.get('build-timeout', {})
+                if isinstance(timeout, dict):
+                    timeout = timeout.get('timeout')
+                    if timeout:
+                        self._job_timeout = timeout * 60
+
         with open(jobdir.playbook, 'w') as playbook:
             tasks = []
             for builder in jjb_job['builders']:
@@ -450,12 +537,11 @@ class NodeWorker(object):
             cwd=jobdir.ansible_root,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
+            preexec_fn=os.setsid,
         )
         (out, err) = self.ansible_proc.communicate()
         ret = self.ansible_proc.wait()
         self.ansible_proc = None
-        print out
-        print err
         if ret == 0:
             return 'SUCCESS'
         else:
