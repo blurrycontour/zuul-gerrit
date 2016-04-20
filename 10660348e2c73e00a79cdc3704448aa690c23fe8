@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a122d0e_900ac988",
+        "filename": "zuul/cmd/cloner.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2016-04-20T02:27:40Z",
+      "side": 1,
+      "message": "Here we allow a single project revision due to nargs. Below we attempt to interate over 1 or more project_revisions. Why not set nargs to * here to allow zero or more?",
+      "revId": "10660348e2c73e00a79cdc3704448aa690c23fe8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
