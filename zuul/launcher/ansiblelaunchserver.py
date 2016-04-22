@@ -522,7 +522,7 @@ class NodeWorker(object):
             data = {
                 'manager': self.manager_name,
                 'number': job.unique,
-                # 'url': '',
+                'url': 'telnet://%s:8088' % self.host,
             }
             job.sendWorkData(json.dumps(data))
             job.sendWorkStatus(0, 100)
@@ -655,6 +655,9 @@ class NodeWorker(object):
             tasks = []
 
             task = dict(file=dict(path='/tmp/console.log', state='absent'))
+            tasks.append(task)
+
+            task = dict(zuul_console=dict(path='/tmp/console.log', port=8088))
             tasks.append(task)
 
             task = dict(file=dict(path=parameters['WORKSPACE'], state='directory'))
