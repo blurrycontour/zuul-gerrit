@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a122d0e_e095b488",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 657,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2016-04-22T00:44:27Z",
+      "side": 1,
+      "message": "You do th e/tmp/console.log in other places too - do we think that there is any issue with well-known file locations? Maybe pass in a console log path as a param?",
+      "revId": "500251ce961e857c3433a22b1872f1b6f7aad0a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a122d0e_c092389f",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 690,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2016-04-22T00:44:27Z",
+      "side": 1,
+      "message": "I think this line is not necessary, and is also potentially incorrect given how ansible was installed.",
+      "revId": "500251ce961e857c3433a22b1872f1b6f7aad0a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a122d0e_20904c95",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 710,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2016-04-22T00:44:27Z",
+      "side": 1,
+      "message": "debugging? :)",
+      "revId": "500251ce961e857c3433a22b1872f1b6f7aad0a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
