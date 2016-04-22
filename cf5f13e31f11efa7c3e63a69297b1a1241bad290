@@ -22,6 +22,23 @@
       "revId": "cf5f13e31f11efa7c3e63a69297b1a1241bad290",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a122d0e_805b202e",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 745,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-04-22T00:38:28Z",
+      "side": 1,
+      "message": "We don\u0027t have any logging facilities in the model, so that\u0027s not terribly easy.  The current pattern for this is to bomb and let the exception propogate and eventually get logged elsewhere, and expect the operator to fix the configuration.  (I believe this is what would happen today if you misconfigured a reporter).",
+      "revId": "cf5f13e31f11efa7c3e63a69297b1a1241bad290",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
