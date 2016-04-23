@@ -22,6 +22,23 @@
       "revId": "1fc558ebb605a335f23003b80e4a9a74a0af3091",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a122d0e_2f6e42c9",
+        "filename": "zuul/ansible/library/zuul_runner.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-04-23T14:39:50Z",
+      "side": 1,
+      "message": "This is run on the actual node (ansible modules generally get copied over and invoked remotely).  It\u0027s in a known location so that we can fetch it later (and also serve it from the streaming server in the next change).  Having said that, I\u0027m sure we could create a tmpfile and then register it with ansible and then have the runner use that location as an argument.",
+      "revId": "1fc558ebb605a335f23003b80e4a9a74a0af3091",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
