@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a122d0e_61717844",
+        "filename": "zuul/ansible/library/zuul_runner.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-04-23T02:28:04Z",
+      "side": 1,
+      "message": "Won\u0027t the zuul-launcher manage mulitple nodes concurrently and possibly write to this file more than once?\n\nPerhaps should use tmpfile.",
+      "range": {
+        "startLine": 24,
+        "startChar": 34,
+        "endLine": 24,
+        "endChar": 41
+      },
+      "revId": "1fc558ebb605a335f23003b80e4a9a74a0af3091",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
