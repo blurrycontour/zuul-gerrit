@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a122d0e_a590b396",
+        "filename": "releasenotes/notes/started-using-reno-242e2b0cd27f9480.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-04-23T18:34:38Z",
+      "side": 1,
+      "message": "I don\u0027t think this is necessary.  It\u0027s just noise for users.",
+      "revId": "4ec2bc04ebc3dd5c808daa925ad16023062de613",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
