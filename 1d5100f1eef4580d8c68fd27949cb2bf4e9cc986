@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a122d0e_362184fd",
+        "filename": "doc/source/releasenotes.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-04-23T00:48:58Z",
+      "side": 0,
+      "message": "Deleting these looks like a mistake?",
+      "range": {
+        "startLine": 51,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 29
+      },
+      "revId": "1d5100f1eef4580d8c68fd27949cb2bf4e9cc986",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
