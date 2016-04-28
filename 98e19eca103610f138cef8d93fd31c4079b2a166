@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a122d0e_d06feb28",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 532
+      },
+      "writtenOn": "2016-04-28T21:36:57Z",
+      "side": 1,
+      "message": "Is this needed as your using the import for callback_plugins to build the plugin path below.\n\nIf correct this is just an unused item but since it will be short lived shouldn\u0027t matter.",
+      "revId": "98e19eca103610f138cef8d93fd31c4079b2a166",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
