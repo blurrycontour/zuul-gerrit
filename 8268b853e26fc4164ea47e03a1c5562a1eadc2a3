@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a122d0e_cf20ca9c",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2016-04-29T21:20:37Z",
+      "side": 1,
+      "message": "There is a third onCompleted event that happens before onFinalized. I don\u0027t think anything relies on it, and I don\u0027t quite grok the difference between completed and finalized but for completeness we should consider sending both here.",
+      "revId": "8268b853e26fc4164ea47e03a1c5562a1eadc2a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
