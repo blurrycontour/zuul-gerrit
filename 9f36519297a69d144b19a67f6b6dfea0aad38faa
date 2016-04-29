@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a122d0e_5eeaaed8",
+        "filename": "zuul/cmd/launcher.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2016-04-29T20:01:39Z",
+      "side": 1,
+      "message": "We don\u0027t need a pidfile if we are no daemoning. I would put this into the else block below.",
+      "revId": "9f36519297a69d144b19a67f6b6dfea0aad38faa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a122d0e_9e8c4636",
+        "filename": "zuul/cmd/launcher.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2016-04-29T20:01:39Z",
+      "side": 1,
+      "message": "Adding \u0027.\u0027 to front of path is generally a bad idea, lets not do it here.",
+      "revId": "9f36519297a69d144b19a67f6b6dfea0aad38faa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a122d0e_be9662ed",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2016-04-29T20:01:39Z",
+      "side": 1,
+      "message": "Is this preferred over data \u003d {\u0027manager\u0027: self.hostname} ?",
+      "revId": "9f36519297a69d144b19a67f6b6dfea0aad38faa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
