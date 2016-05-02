@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a122d0e_677a6379",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 433,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2016-05-02T12:15:55Z",
+      "side": 1,
+      "message": "This means all our JJB templates need builders, which is fine but I ran into a failure here in my testing.\n\nMostly an FYI",
+      "revId": "25dd8a5d4e5f887f0f62d08372fdfb43ecafbb25",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
