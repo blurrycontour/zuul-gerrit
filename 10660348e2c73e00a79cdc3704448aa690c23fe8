@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "1a122d0e_8324c560",
+        "filename": "tests/test_cloner.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 570,
+      "author": {
+        "id": 6039
+      },
+      "writtenOn": "2016-05-02T21:56:34Z",
+      "side": 1,
+      "message": "Can we expand this to make sure that cloning of other projects works as expected? This currently only clones the active project, but I would like to be sure that giving a revision for a separate project that is explicitly listed also checks out the specified revision.",
+      "revId": "10660348e2c73e00a79cdc3704448aa690c23fe8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a122d0e_900ac988",
         "filename": "zuul/cmd/cloner.py",
         "patchSetId": 8
