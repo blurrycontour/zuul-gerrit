@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a122d0e_041bad81",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2016-05-02T12:11:34Z",
+      "side": 1,
+      "message": "Ran into an issue while testing this. I had to do:\n\n  set([self.labels])\n\nfor this logic to work. My job was centos-7.",
+      "revId": "6aedae0746fc2f66bf2aeb0fc5d9e58043b059b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
