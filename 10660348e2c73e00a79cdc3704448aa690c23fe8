@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1a122d0e_499be772",
+        "filename": "tests/test_cloner.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 570,
+      "author": {
+        "id": 12612
+      },
+      "writtenOn": "2016-05-03T04:34:06Z",
+      "side": 1,
+      "message": "Yea, fair enough, I\u0027ll work on adding a test for that.",
+      "parentUuid": "1a122d0e_8324c560",
+      "revId": "10660348e2c73e00a79cdc3704448aa690c23fe8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a122d0e_900ac988",
         "filename": "zuul/cmd/cloner.py",
         "patchSetId": 8
