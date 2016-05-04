@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a122d0e_09e3af06",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 893,
+      "author": {
+        "id": 12612
+      },
+      "writtenOn": "2016-05-04T01:24:10Z",
+      "side": 1,
+      "message": "Rather than repeated sleeping, it seems like it would be better to put the project name in the initial commit message, as that would result in a different hash.\n\nI\u0027m not sure the overall runtime hit this would have across the whole test suite, but it does add 1.5 seconds to every test that uses ZuulTestCase, which seem suboptimal if not required.",
+      "range": {
+        "startLine": 893,
+        "startChar": 8,
+        "endLine": 893,
+        "endChar": 22
+      },
+      "revId": "0c2b9ed478a9cdabfd86fc75c8c6e3601411bbe5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
