@@ -16,6 +16,23 @@
       "revId": "8268b853e26fc4164ea47e03a1c5562a1eadc2a3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a122d0e_926f9291",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-05-04T21:17:24Z",
+      "side": 1,
+      "message": "I checked and we don\u0027t use it which is why I omitted it.",
+      "revId": "8268b853e26fc4164ea47e03a1c5562a1eadc2a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
