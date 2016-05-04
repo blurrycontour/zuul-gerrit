@@ -1,0 +1,10 @@
+Code-Review+2: Joshua Hesketh <joshua.hesketh@rackspace.com>
+Code-Review+1: Philip Marc Schwartz <pschwar@linux.vnet.ibm.com>
+Code-Review+2: Clark Boylan <cboylan@sapwetik.org>
+Workflow+1: Clark Boylan <cboylan@sapwetik.org>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Wed, 04 May 2016 21:02:09 +0000
+Reviewed-on: https://review.openstack.org/307389
+Project: openstack-infra/zuul
+Branch: refs/heads/master
