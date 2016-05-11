@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dab17558_27d6004f",
+        "filename": "etc/zuul.conf-sample",
+        "patchSetId": 12
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 14372
+      },
+      "writtenOn": "2016-05-11T11:11:25Z",
+      "side": 1,
+      "message": "why not set non \u00270\u0027 value here as a default (meaning - keepalive enable)?",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 13
+      },
+      "revId": "6f100c02f9830a621eb5303c0279ffe7f0d1f81a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
