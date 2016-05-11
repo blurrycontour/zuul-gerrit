@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "dab17558_0302b109",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2016-05-11T20:01:21Z",
+      "side": 1,
+      "message": "Can we guarantee that all of these dict keys will be present? Just wondering about KeyError exceptions here.",
+      "revId": "6aedae0746fc2f66bf2aeb0fc5d9e58043b059b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a122d0e_041bad81",
         "filename": "zuul/launcher/ansiblelaunchserver.py",
         "patchSetId": 3
