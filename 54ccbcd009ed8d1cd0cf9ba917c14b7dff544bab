@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "dab17558_424ea0c1",
+        "filename": "zuul/connection/gerrit.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 13431
+      },
+      "writtenOn": "2016-05-11T06:56:56Z",
+      "side": 1,
+      "message": "Better to do so for all parameters in separate patch, as \u0027keepalive\u0027 parameter has the smallest priority among others, it would seem odd to place it in front of \u0027port\u0027 f.e.",
+      "parentUuid": "1af94dfe_bdd9c985",
+      "range": {
+        "startLine": 124,
+        "startChar": 31,
+        "endLine": 124,
+        "endChar": 42
+      },
+      "revId": "54ccbcd009ed8d1cd0cf9ba917c14b7dff544bab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3afc51ec_a6940a43",
         "filename": "zuul/connection/gerrit.py",
         "patchSetId": 11
@@ -72,6 +96,54 @@
     },
     {
       "key": {
+        "uuid": "dab17558_8215289d",
+        "filename": "zuul/connection/gerrit.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 13431
+      },
+      "writtenOn": "2016-05-11T06:56:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3afc51ec_a6940a43",
+      "range": {
+        "startLine": 216,
+        "startChar": 25,
+        "endLine": 216,
+        "endChar": 67
+      },
+      "revId": "54ccbcd009ed8d1cd0cf9ba917c14b7dff544bab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dab17558_621804d4",
+        "filename": "zuul/connection/gerrit.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 13431
+      },
+      "writtenOn": "2016-05-11T06:56:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3afc51ec_a9717a78",
+      "range": {
+        "startLine": 216,
+        "startChar": 25,
+        "endLine": 216,
+        "endChar": 67
+      },
+      "revId": "54ccbcd009ed8d1cd0cf9ba917c14b7dff544bab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1af94dfe_5d752596",
         "filename": "zuul/connection/gerrit.py",
         "patchSetId": 11
@@ -83,6 +155,30 @@
       "writtenOn": "2016-03-17T06:31:51Z",
       "side": 1,
       "message": "This misses the keepalive argument leading to disabled keepalive for stream-events",
+      "range": {
+        "startLine": 451,
+        "startChar": 8,
+        "endLine": 456,
+        "endChar": 33
+      },
+      "revId": "54ccbcd009ed8d1cd0cf9ba917c14b7dff544bab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dab17558_e23d142c",
+        "filename": "zuul/connection/gerrit.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 456,
+      "author": {
+        "id": 13431
+      },
+      "writtenOn": "2016-05-11T06:56:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1af94dfe_5d752596",
       "range": {
         "startLine": 451,
         "startChar": 8,
