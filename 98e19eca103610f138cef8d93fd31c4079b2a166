@@ -16,6 +16,23 @@
       "revId": "98e19eca103610f138cef8d93fd31c4079b2a166",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dab17558_96086e2a",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-05-12T17:08:42Z",
+      "side": 1,
+      "message": "Nope, it\u0027s cruft.  Thanks.",
+      "revId": "98e19eca103610f138cef8d93fd31c4079b2a166",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
