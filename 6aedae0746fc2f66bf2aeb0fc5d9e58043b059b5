@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "dab17558_f37d8cb2",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-05-12T17:05:05Z",
+      "side": 1,
+      "message": "I would rather not put it in requirements.txt since it\u0027s only required for this unconventional use.",
+      "revId": "6aedae0746fc2f66bf2aeb0fc5d9e58043b059b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dab17558_0302b109",
         "filename": "zuul/launcher/ansiblelaunchserver.py",
         "patchSetId": 3
@@ -36,6 +53,23 @@
     },
     {
       "key": {
+        "uuid": "dab17558_5349f88d",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-05-12T17:05:05Z",
+      "side": 1,
+      "message": "Generally, yes, because we control the other end of this in nodepool.  If they are not (truly an \u0027exceptional\u0027 situation), KeyErrors will be caught by the exception handler in the run method above and logged as well as sent back to the requesting gearman client.",
+      "revId": "6aedae0746fc2f66bf2aeb0fc5d9e58043b059b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a122d0e_041bad81",
         "filename": "zuul/launcher/ansiblelaunchserver.py",
         "patchSetId": 3
@@ -47,6 +81,23 @@
       "writtenOn": "2016-05-02T12:11:34Z",
       "side": 1,
       "message": "Ran into an issue while testing this. I had to do:\n\n  set([self.labels])\n\nfor this logic to work. My job was centos-7.",
+      "revId": "6aedae0746fc2f66bf2aeb0fc5d9e58043b059b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dab17558_334ef496",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-05-12T17:05:05Z",
+      "side": 1,
+      "message": "Fixed, thanks.",
       "revId": "6aedae0746fc2f66bf2aeb0fc5d9e58043b059b5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
