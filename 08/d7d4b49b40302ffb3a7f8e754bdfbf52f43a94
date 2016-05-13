@@ -1,0 +1,10 @@
+Code-Review+2: Joshua Hesketh <joshua.hesketh@rackspace.com>
+Code-Review+1: Philip Marc Schwartz <pschwar@linux.vnet.ibm.com>
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Fri, 13 May 2016 19:45:48 +0000
+Reviewed-on: https://review.openstack.org/309095
+Project: openstack-infra/zuul
+Branch: refs/heads/master
