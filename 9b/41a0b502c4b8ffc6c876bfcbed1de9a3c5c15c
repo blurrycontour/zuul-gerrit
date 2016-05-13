@@ -1,0 +1,10 @@
+Code-Review+1: Tobias Henkel <tobias.henkel@bmw.de>
+Code-Review+1: Morgan Fainberg <morgan.fainberg@gmail.com>
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Fri, 13 May 2016 18:06:52 +0000
+Reviewed-on: https://review.openstack.org/315715
+Project: openstack-infra/zuul
+Branch: refs/heads/master
