@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dab17558_6fe19bd0",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 621,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2016-05-13T00:38:59Z",
+      "side": 1,
+      "message": "So, some sudo code, but I had to convert parameters into json, other wise I was seeing weirdness in the playbook\n\nhttp://paste.openstack.org/show/496995/\n\n  p \u003d json.dumps(parameters)\n  # I converted to yaml, see next comment below.\n  y \u003d yaml.safe_load(p)\n\n  runner \u003d dict(command\u003dremote_path,\n                cwd\u003dparameters[\u0027WORKSPACE\u0027],\n                parameters\u003dy)",
+      "revId": "47ef69f941d11d7d3978a4d507b8052b8c52bd6d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dab17558_8f2affe5",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 689,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2016-05-13T00:38:59Z",
+      "side": 1,
+      "message": "More a request then anything, I found adding default_flow_style\u003dFalse, rendered the playbook a little more user friendly.  Which, made debugging ansible a little easier.\n\n  playbook.write(yaml.dump([play], default_flow_style\u003dFalse))\n\nNew format for playbook:\n\n  name: Job body\n  tasks:\n  - file:\n      path: /tmp/console.log\n      state: absent\n  - zuul_console:\n      path: /tmp/console.log\n      port: 8088\n  - file:\n      path: /tmp/gate-noop\n      state: directory\n  - copy:\n      dest: /tmp/33e87197a60947e0ba0c46c41e641c35.sh\n      mode: 365\n      src: /tmp/tmpHy49Cw/ansible/scripts/33e87197a60947e0ba0c46c41e641c35.sh\n  - async: 7200\n    poll: 5\n    zuul_runner:\n      command: /tmp/33e87197a60947e0ba0c46c41e641c35.sh\n      cwd: /tmp/gate-noop\n      parameters:\n        BASE_LOG_PATH: 27/311627/1\n        LOG_PATH: 27/311627/1/check/gate-noop/42e6ef4\n        OFFLINE_NODE_WHEN_COMPLETE: \u00271\u0027\n        WORKSPACE: /tmp/gate-noop\n        ZUUL_BRANCH: master\n        ZUUL_CHANGE: \u0027311627\u0027\n        ZUUL_CHANGES: openstack-dev/sandbox:master:refs/changes/27/311627/1\n        ZUUL_CHANGE_IDS: 311627,1\n        ZUUL_COMMIT: d5b7dfd1564a32c816958eb785fa8f7be2d6f444\n        ZUUL_PATCHSET: \u00271\u0027\n        ZUUL_PIPELINE: check\n        ZUUL_PROJECT: openstack-dev/sandbox\n        ZUUL_REF: refs/zuul/master/Z1c7336d8064f4a7ca173b48e28c35c6a\n        ZUUL_URL: 127.0.0.6\n        ZUUL_UUID: 42e6ef4cabb44a39a484a76a1496163f\n        ZUUL_VOTING: \u00271\u0027\n  - file:\n      path: /tmp/33e87197a60947e0ba0c46c41e641c35.sh\n      state: absent",
+      "revId": "47ef69f941d11d7d3978a4d507b8052b8c52bd6d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
