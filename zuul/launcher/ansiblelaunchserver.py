@@ -61,6 +61,7 @@ class JobDir(object):
 class LaunchServer(object):
     log = logging.getLogger("zuul.LaunchServer")
     section_re = re.compile('site "(.*?)"')
+    ZMQ_port = 8881
 
     def __init__(self, config):
         self.config = config
@@ -91,7 +92,10 @@ class LaunchServer(object):
         # Setup ZMQ
         self.zcontext = zmq.Context()
         self.zsocket = self.zcontext.socket(zmq.PUB)
-        self.zsocket.bind("tcp://*:8881")
+        if self.ZMQ_port:
+            self.zsocket.bind("tcp://*:%d" % self.ZMQ_port)
+        else:
+            self.zsocket.bind_to_random_port("tcp://*")
 
         # Setup Gearman
         server = self.config.get('gearman', 'server')
