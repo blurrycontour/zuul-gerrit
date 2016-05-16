@@ -35,7 +35,7 @@ import zuul.reporter.smtp
 
 from tests.base import (
     BaseTestCase,
-    ZuulTestCase,
+    FakeWorkerTestCase,
     repack_repo,
 )
 
@@ -78,7 +78,7 @@ jobs:
         self.assertEqual(expected, matcher)
 
 
-class TestScheduler(ZuulTestCase):
+class TestScheduler(FakeWorkerTestCase):
 
     def test_jobs_launched(self):
         "Test that jobs are launched and a change is merged"
