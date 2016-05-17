@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dab17558_f5781491",
+        "filename": "requirements.txt",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2016-05-17T13:45:33Z",
+      "side": 1,
+      "message": "zmq probably works, but I think pip autocorrects that to pyzmq for you. Nodepool uses pyzmq explicitly too.",
+      "revId": "c862170196ee22ca4eeeb48cdb4a49c9ee8cab9a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
