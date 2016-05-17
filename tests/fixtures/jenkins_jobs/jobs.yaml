@@ -1,0 +1,15 @@
+- job:
+    name: hello-world
+    node: ubuntu-trusty
+
+    builders:
+        - shell: |
+            echo "Hello World"
+
+    publishers:
+      - scp:
+          site: 'logs.example.org'
+          files:
+            - target: 'logs/$LOG_PATH'
+              copy-console: true
+              copy-after-failure: true
