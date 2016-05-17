@@ -17,14 +17,14 @@
 import logging
 import time
 
-from tests.base import ZuulTestCase
+from tests.base import FakeWorkerTestCase
 
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(name)-32s '
                     '%(levelname)-8s %(message)s')
 
 
-class TestRequirements(ZuulTestCase):
+class TestRequirements(FakeWorkerTestCase):
     """Test pipeline and trigger requirements"""
 
     def test_pipeline_require_approval_newer_than(self):

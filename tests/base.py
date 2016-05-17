@@ -47,6 +47,7 @@ import zuul.connection.smtp
 import zuul.scheduler
 import zuul.webapp
 import zuul.rpclistener
+import zuul.launcher.ansiblelaunchserver
 import zuul.launcher.gearman
 import zuul.lib.swift
 import zuul.merger.client
@@ -864,7 +865,6 @@ class BaseTestCase(testtools.TestCase):
 
 
 class ZuulTestCase(BaseTestCase):
-
     def setUp(self):
         super(ZuulTestCase, self).setUp()
         if USE_TEMPDIR:
@@ -921,10 +921,6 @@ class ZuulTestCase(BaseTestCase):
 
         self.config.set('gearman', 'port', str(self.gearman_server.port))
 
-        self.worker = FakeWorker('fake_worker', self)
-        self.worker.addServer('127.0.0.1', self.gearman_server.port)
-        self.gearman_server.worker = self.worker
-
         zuul.source.gerrit.GerritSource.replication_timeout = 1.5
         zuul.source.gerrit.GerritSource.replication_retry_interval = 0.5
         zuul.connection.gerrit.GerritEventConnector.delay = 0.0
@@ -972,10 +968,6 @@ class ZuulTestCase(BaseTestCase):
         self.webapp.start()
         self.rpc.start()
         self.launcher.gearman.waitForServer()
-        self.registerJobs()
-        self.builds = self.worker.running_builds
-        self.history = self.worker.build_history
-
         self.addCleanup(self.assertFinalState)
         self.addCleanup(self.shutdown)
 
@@ -1053,6 +1045,12 @@ class ZuulTestCase(BaseTestCase):
         """Per test config object. Override to set different config."""
         self.config = ConfigParser.ConfigParser()
         self.config.read(os.path.join(FIXTURE_DIR, config_file))
+        self.workspace_root = os.path.join(self.test_root,
+                                           "launcher_workspace")
+        if self.config.has_section('launcher'):
+            self.config.set('launcher', 'workspace_root', self.workspace_root)
+            self.config.set('launcher', 'jenkins_jobs',
+                            os.path.join(FIXTURE_DIR, 'jenkins_jobs'))
 
     def assertFinalState(self):
         # Make sure that git.Repo objects have been garbage collected.
@@ -1074,7 +1072,6 @@ class ZuulTestCase(BaseTestCase):
         self.merge_server.stop()
         self.merge_server.join()
         self.merge_client.stop()
-        self.worker.shutdown()
         self.sched.stop()
         self.sched.join()
         self.statsd.stop()
@@ -1171,6 +1168,81 @@ class ZuulTestCase(BaseTestCase):
         self.log.debug("  OK")
         return True
 
+    def getParameter(self, job, name):
+        if isinstance(job, FakeBuild):
+            return job.parameters[name]
+        else:
+            parameters = json.loads(job.arguments)
+            return parameters[name]
+
+    def resetGearmanServer(self):
+        while True:
+            done = True
+            for connection in self.gearman_server.active_connections:
+                if (connection.functions and
+                    connection.client_id not in ['Zuul RPC Listener',
+                                                 'Zuul Merger']):
+                    done = False
+            if done:
+                break
+            time.sleep(0)
+        self.gearman_server.functions = set()
+        self.rpc.register()
+        self.merge_server.register()
+
+    def eventQueuesEmpty(self):
+        for queue in self.event_queues:
+            yield queue.empty()
+
+    def eventQueuesJoin(self):
+        for queue in self.event_queues:
+            queue.join()
+
+    def countJobResults(self, jobs, result):
+        jobs = filter(lambda x: x.result == result, jobs)
+        return len(jobs)
+
+    def assertEmptyQueues(self):
+        # Make sure there are no orphaned jobs
+        for pipeline in self.sched.layout.pipelines.values():
+            for queue in pipeline.queues:
+                if len(queue.queue) != 0:
+                    print 'pipeline %s queue %s contents %s' % (
+                        pipeline.name, queue.name, queue.queue)
+                self.assertEqual(len(queue.queue), 0,
+                                 "Pipelines queues should be empty")
+
+    def assertReportedStat(self, key, value=None, kind=None):
+        start = time.time()
+        while time.time() < (start + 5):
+            for stat in self.statsd.stats:
+                pprint.pprint(self.statsd.stats)
+                k, v = stat.split(':')
+                if key == k:
+                    if value is None and kind is None:
+                        return
+                    elif value:
+                        if value == v:
+                            return
+                    elif kind:
+                        if v.endswith('|' + kind):
+                            return
+            time.sleep(0.1)
+
+        pprint.pprint(self.statsd.stats)
+        raise Exception("Key %s not found in reported stats" % key)
+
+
+class FakeWorkerTestCase(ZuulTestCase):
+    def setUp(self):
+        super(FakeWorkerTestCase, self).setUp()
+        self.worker = FakeWorker('fake_worker', self)
+        self.worker.addServer('127.0.0.1', self.gearman_server.port)
+        self.worker.waitForServer()
+        self.builds = self.worker.running_builds
+        self.history = self.worker.build_history
+        self.registerJobs()
+
     def registerJobs(self):
         count = 0
         for job in self.sched.layout.jobs.keys():
@@ -1181,6 +1253,14 @@ class ZuulTestCase(BaseTestCase):
 
         while len(self.gearman_server.functions) < count:
             time.sleep(0)
+
+    def resetGearmanServer(self):
+        self.worker.setFunctions([])
+        super(FakeWorkerTestCase, self).resetGearmanServer()
+
+    def shutdown(self):
+        self.worker.shutdown()
+        super(FakeWorkerTestCase, self).shutdown()
 
     def orderedRelease(self):
         # Run one build at a time to ensure non-race order:
@@ -1195,29 +1275,6 @@ class ZuulTestCase(BaseTestCase):
             job.waiting = False
             self.log.debug("Queued job %s released" % job.unique)
             self.gearman_server.wakeConnections()
-
-    def getParameter(self, job, name):
-        if isinstance(job, FakeBuild):
-            return job.parameters[name]
-        else:
-            parameters = json.loads(job.arguments)
-            return parameters[name]
-
-    def resetGearmanServer(self):
-        self.worker.setFunctions([])
-        while True:
-            done = True
-            for connection in self.gearman_server.active_connections:
-                if (connection.functions and
-                    connection.client_id not in ['Zuul RPC Listener',
-                                                 'Zuul Merger']):
-                    done = False
-            if done:
-                break
-            time.sleep(0)
-        self.gearman_server.functions = set()
-        self.rpc.register()
-        self.merge_server.register()
 
     def haveAllBuildsReported(self):
         # See if Zuul is waiting on a meta job to complete
@@ -1280,14 +1337,6 @@ class ZuulTestCase(BaseTestCase):
                 return False
         return True
 
-    def eventQueuesEmpty(self):
-        for queue in self.event_queues:
-            yield queue.empty()
-
-    def eventQueuesJoin(self):
-        for queue in self.event_queues:
-            queue.join()
-
     def waitUntilSettled(self):
         self.log.debug("Waiting until settled...")
         start = time.time()
@@ -1317,10 +1366,6 @@ class ZuulTestCase(BaseTestCase):
             self.worker.lock.release()
             self.sched.wake_event.wait(0.1)
 
-    def countJobResults(self, jobs, result):
-        jobs = filter(lambda x: x.result == result, jobs)
-        return len(jobs)
-
     def getJobFromHistory(self, name):
         history = self.worker.build_history
         for job in history:
@@ -1328,32 +1373,26 @@ class ZuulTestCase(BaseTestCase):
                 return job
         raise Exception("Unable to find job %s in history" % name)
 
-    def assertEmptyQueues(self):
-        # Make sure there are no orphaned jobs
-        for pipeline in self.sched.layout.pipelines.values():
-            for queue in pipeline.queues:
-                if len(queue.queue) != 0:
-                    print 'pipeline %s queue %s contents %s' % (
-                        pipeline.name, queue.name, queue.queue)
-                self.assertEqual(len(queue.queue), 0,
-                                 "Pipelines queues should be empty")
 
-    def assertReportedStat(self, key, value=None, kind=None):
-        start = time.time()
-        while time.time() < (start + 5):
-            for stat in self.statsd.stats:
-                pprint.pprint(self.statsd.stats)
-                k, v = stat.split(':')
-                if key == k:
-                    if value is None and kind is None:
-                        return
-                    elif value:
-                        if value == v:
-                            return
-                    elif kind:
-                        if v.endswith('|' + kind):
-                            return
-            time.sleep(0.1)
+class FakeAnsibleLaunchServer(zuul.launcher.ansiblelaunchserver.LaunchServer):
+    def __init__(self, config):
+        self.ZMQ_port = None
+        super(FakeAnsibleLaunchServer, self).__init__(config)
 
-        pprint.pprint(self.statsd.stats)
-        raise Exception("Key %s not found in reported stats" % key)
+
+class FakeNodeWorker(zuul.launcher.ansiblelaunchserver.NodeWorker):
+    pass
+
+
+class ZuulAnsibleLauncherTestCase(ZuulTestCase):
+    def setUp(self):
+        super(ZuulAnsibleLauncherTestCase, self).setUp()
+        self.useFixture(fixtures.MonkeyPatch(
+            'zuul.launcher.ansiblelaunchserver.NodeWorker', FakeNodeWorker))
+        self.ansible_launcher = FakeAnsibleLaunchServer(self.config)
+        self.ansible_launcher.start()
+        self.addCleanup(self.launcherShutdown)
+
+    def launcherShutdown(self):
+        self.ansible_launcher.stop()
+        self.ansible_launcher.join()
