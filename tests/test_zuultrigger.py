@@ -16,14 +16,14 @@
 
 import logging
 
-from tests.base import ZuulTestCase
+from tests.base import FakeWorkerTestCase
 
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(name)-32s '
                     '%(levelname)-8s %(message)s')
 
 
-class TestZuulTrigger(ZuulTestCase):
+class TestZuulTrigger(FakeWorkerTestCase):
     """Test Zuul Trigger"""
 
     def test_zuul_trigger_parent_change_enqueued(self):

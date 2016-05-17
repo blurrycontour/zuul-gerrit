@@ -17,7 +17,7 @@ import testtools
 
 import zuul.connection.gerrit
 
-from tests.base import ZuulTestCase
+from tests.base import FakeWorkerTestCase
 
 
 class TestGerritConnection(testtools.TestCase):
@@ -28,7 +28,7 @@ class TestGerritConnection(testtools.TestCase):
                          zuul.connection.gerrit.GerritConnection.driver_name)
 
 
-class TestConnections(ZuulTestCase):
+class TestConnections(FakeWorkerTestCase):
     def setup_config(self, config_file='zuul-connections-same-gerrit.conf'):
         super(TestConnections, self).setup_config(config_file)
 
@@ -59,7 +59,7 @@ class TestConnections(ZuulTestCase):
                          'civoter')
 
 
-class TestMultipleGerrits(ZuulTestCase):
+class TestMultipleGerrits(FakeWorkerTestCase):
     def setup_config(self,
                      config_file='zuul-connections-multiple-gerrits.conf'):
         super(TestMultipleGerrits, self).setup_config(config_file)

@@ -21,14 +21,14 @@ import os
 import git
 
 from zuul.merger.merger import Repo
-from tests.base import ZuulTestCase
+from tests.base import FakeWorkerTestCase
 
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(name)-32s '
                     '%(levelname)-8s %(message)s')
 
 
-class TestMergerRepo(ZuulTestCase):
+class TestMergerRepo(FakeWorkerTestCase):
 
     log = logging.getLogger("zuul.test.merger.repo")
     workspace_root = None
