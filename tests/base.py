@@ -1387,6 +1387,26 @@ class FakeNodeWorker(zuul.launcher.ansiblelaunchserver.NodeWorker):
     pass
 
 
+class FakeNodepool(object):
+    def __init__(self, gearman_port):
+        self.gearman_client = gear.Client()
+        self.gearman_client.addServer('localhost', gearman_port)
+        self.gearman_client.waitForServer()
+
+    def assign_self_as_node(self):
+        args = {
+            'name': "node-local",
+            'host': "127.0.0.1",
+            'description': "The local node",
+            'labels': ['ubuntu-trusty'],
+        }
+        job = gear.Job("node-assign:zuul", json.dumps(args))
+        self.gearman_client.submitJob(job)
+        for x in iterate_timeout(30, 'wait for node-assign to complete'):
+            if job.complete:
+                break
+
+
 class ZuulAnsibleLauncherTestCase(ZuulTestCase):
     def setUp(self):
         super(ZuulAnsibleLauncherTestCase, self).setUp()
@@ -1395,6 +1415,9 @@ class ZuulAnsibleLauncherTestCase(ZuulTestCase):
         self.ansible_launcher = FakeAnsibleLaunchServer(self.config)
         self.ansible_launcher.start()
         self.addCleanup(self.launcherShutdown)
+
+        self.fake_nodepool = FakeNodepool(self.gearman_server.port)
+        self.fake_nodepool.assign_self_as_node()
 
     def launcherShutdown(self):
         self.ansible_launcher.stop()
