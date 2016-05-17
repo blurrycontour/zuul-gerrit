@@ -797,7 +797,7 @@ class NodeWorker(object):
 
         # Initialize the result so we have something regardless of
         # whether the job actually runs
-        result = None
+        result_data = {'result': b''}
         self._sent_complete_event = False
         self._aborted_job = False
 
@@ -807,20 +807,20 @@ class NodeWorker(object):
             self.log.exception("Exception while sending job start event")
 
         try:
-            result = self.runJob(job, args)
+            result_data = self.runJob(job, args)
         except Exception:
             self.log.exception("Exception while launching job thread")
+            result_data = dict(result='UNSTABLE')
 
         self._running_job = False
 
         try:
-            data = json.dumps(dict(result=result))
-            job.sendWorkComplete(data)
+            job.sendWorkComplete(json.dumps(result_data))
         except Exception:
             self.log.exception("Exception while sending job completion packet")
 
         try:
-            self.sendCompleteEvent(job_name, result, args)
+            self.sendCompleteEvent(job_name, result_data['result'], args)
         except Exception:
             self.log.exception("Exception while sending job completion event")
 
@@ -868,10 +868,9 @@ class NodeWorker(object):
     def runJob(self, job, args):
         self.ansible_job_proc = None
         self.ansible_post_proc = None
-        result = None
         with self.running_job_lock:
             if not self._running:
-                return result
+                return {}
             self._running_job = True
             self._job_complete_event.clear()
 
@@ -894,22 +893,22 @@ class NodeWorker(object):
             if job_status is None:
                 # The result of the job is indeterminate.  Zuul will
                 # run it again.
-                return result
+                return data
 
             post_status = self.runAnsiblePostPlaybook(jobdir, job_status)
             if not post_status:
-                result = 'POST_FAILURE'
+                data['result'] = 'POST_FAILURE'
             elif job_status:
-                result = 'SUCCESS'
+                data['result'] = 'SUCCESS'
             else:
-                result = 'FAILURE'
+                data['result'] = 'FAILURE'
 
             if self._aborted_job:
                 # A Null result will cause zuul to relaunch the job if
                 # it needs to.
-                result = None
+                data['result'] = None
 
-        return result
+        return data
 
     def getHostList(self):
         return [('node', dict(
