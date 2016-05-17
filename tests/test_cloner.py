@@ -24,14 +24,14 @@ import git
 
 import zuul.lib.cloner
 
-from tests.base import ZuulTestCase
+from tests.base import FakeWorkerTestCase
 
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(name)-32s '
                     '%(levelname)-8s %(message)s')
 
 
-class TestCloner(ZuulTestCase):
+class TestCloner(FakeWorkerTestCase):
 
     log = logging.getLogger("zuul.test.cloner")
     workspace_root = None
