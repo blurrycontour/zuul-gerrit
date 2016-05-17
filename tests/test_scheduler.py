@@ -33,7 +33,7 @@ import zuul.reporter.gerrit
 import zuul.reporter.smtp
 
 from tests.base import (
-    ZuulTestCase,
+    FakeWorkerTestCase,
     repack_repo,
 )
 
@@ -42,8 +42,7 @@ logging.basicConfig(level=logging.DEBUG,
                     '%(levelname)-8s %(message)s')
 
 
-class TestScheduler(ZuulTestCase):
-
+class TestScheduler(FakeWorkerTestCase):
     def test_jobs_launched(self):
         "Test that jobs are launched and a change is merged"
 

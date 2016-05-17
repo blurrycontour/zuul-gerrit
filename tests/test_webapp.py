@@ -19,10 +19,10 @@ import json
 
 from six.moves import urllib
 
-from tests.base import ZuulTestCase
+from tests.base import FakeWorkerTestCase
 
 
-class TestWebapp(ZuulTestCase):
+class TestWebapp(FakeWorkerTestCase):
 
     def _cleanup(self):
         self.worker.hold_jobs_in_build = False
