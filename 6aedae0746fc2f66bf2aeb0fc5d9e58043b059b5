@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "dab17558_27360003",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1054
+      },
+      "writtenOn": "2016-05-17T09:51:38Z",
+      "side": 1,
+      "message": "Is this not the path everyone who wishes to upgrade and transition will need to take?",
+      "parentUuid": "dab17558_f37d8cb2",
+      "revId": "6aedae0746fc2f66bf2aeb0fc5d9e58043b059b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dab17558_0302b109",
         "filename": "zuul/launcher/ansiblelaunchserver.py",
         "patchSetId": 3
