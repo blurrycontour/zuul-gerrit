@@ -456,7 +456,7 @@ class NodeWorker(object):
 
         # Initialize the result so we have something regardless of
         # whether the job actually runs
-        result = None
+        result_data = {'result': b''}
         self._sent_complete_event = False
 
         try:
@@ -465,21 +465,20 @@ class NodeWorker(object):
             self.log.exception("Exception while sending job start event")
 
         try:
-            result = self.runJob(job, args)
+            result_data = self.runJob(job, args)
         except Exception:
             self.log.exception("Exception while launching job thread")
+            result_data = dict(result='UNSTABLE')
 
         self._running_job = False
-        if not result:
-            result = b''
 
         try:
-            job.sendWorkComplete(result)
+            job.sendWorkComplete(json.dumps(result_data))
         except Exception:
             self.log.exception("Exception while sending job completion packet")
 
         try:
-            self.sendCompleteEvent(job_name, result, args)
+            self.sendCompleteEvent(job_name, result_data['result'], args)
         except Exception:
             self.log.exception("Exception while sending job completion event")
 
@@ -526,7 +525,7 @@ class NodeWorker(object):
 
     def runJob(self, job, args):
         self.ansible_proc = None
-        result = None
+        result = {}
         with self.running_job_lock:
             if not self._running:
                 return result
@@ -551,11 +550,11 @@ class NodeWorker(object):
             job_status = self.runAnsiblePlaybook(jobdir, timeout)
             post_status = self.runAnsiblePostPlaybook(jobdir, job_status)
             if job_status and post_status:
-                status = 'SUCCESS'
+                data['result'] = 'SUCCESS'
             else:
-                status = 'FAILURE'
+                data['result'] = 'FAILURE'
 
-            result = json.dumps(dict(result=status))
+            result = data
 
         return result
 
