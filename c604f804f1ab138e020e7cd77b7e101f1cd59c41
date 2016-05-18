@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bab6814e_da94f2e9",
+        "filename": "requirements.txt",
+        "patchSetId": 3
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1106
+      },
+      "writtenOn": "2016-05-18T07:47:43Z",
+      "side": 1,
+      "message": "wouldn\u0027t be better to pin whatever current versions they are now and you can assert that they work with the tests?\n\nI\u0027ve been bitten in the past by jenkins-job-builder specially, where an upstream upgrade broke us at Gozer.\n\nJust trying to be safe...",
+      "range": {
+        "startLine": 17,
+        "startChar": 9,
+        "endLine": 17,
+        "endChar": 10
+      },
+      "revId": "c604f804f1ab138e020e7cd77b7e101f1cd59c41",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
