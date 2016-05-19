@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bab6814e_bc21f1fd",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 577,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-05-19T03:09:29Z",
+      "side": 1,
+      "message": "I don\u0027t think this will work as it is expecting the string to start with **/. You probably want re.search to match in the middle of the string.",
+      "range": {
+        "startLine": 577,
+        "startChar": 20,
+        "endLine": 577,
+        "endChar": 34
+      },
+      "revId": "ab0aadf8dfecd4617a0ef63b68c0a94c68169273",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_dc7cb5ed",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 580,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-05-19T03:09:29Z",
+      "side": 1,
+      "message": "I think you want text \u003d\u0027s here..",
+      "range": {
+        "startLine": 580,
+        "startChar": 12,
+        "endLine": 580,
+        "endChar": 42
+      },
+      "revId": "ab0aadf8dfecd4617a0ef63b68c0a94c68169273",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
