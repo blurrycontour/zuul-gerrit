@@ -572,6 +572,15 @@ class NodeWorker(object):
             return variables.get(match.group(1), '')
         return re.sub('\$([A-Za-z0-9_]+)', lookup, text)
 
+    def _extractAntPaths(self, text):
+        text = re.sub('\*\*$', '', text)
+        m = re.search('\*\*/(.*)$', text)
+        ret = []
+        if m:
+            text = re.sub('\*\*/(.*)$', '', text)
+            ret.append('--include=%s' % (m.group(0),))
+        return text, ret
+
     def _makeSCPTask(self, jobdir, publisher, parameters):
         tasks = []
         for scpfile in publisher['scp']['files']:
@@ -585,11 +594,15 @@ class NodeWorker(object):
                 src = scpfile['source']
                 src = self._substituteVariables(src, parameters)
                 src = os.path.join(parameters['WORKSPACE'], src)
+            src, rsync_opts = self._extractAntPaths(src)
+
             scproot = tempfile.mkdtemp(dir=jobdir.ansible_root)
             os.chmod(scproot, 0o755)
             syncargs = dict(src=src,
                             dest=scproot,
                             mode='pull')
+            if rsync_opts:
+                syncargs['rsync_opts'] = rsync_opts
             task = dict(synchronize=syncargs)
             if not scpfile.get('copy-after-failure'):
                 task['when'] = 'success'
@@ -636,9 +649,12 @@ class NodeWorker(object):
         ftpscript = os.path.join(ftproot, 'script')
         src = ftp['source']
         src = self._substituteVariables(src, parameters)
+        src, rsync_opts = self._extractAntPaths(src)
         src = os.path.join(parameters['WORKSPACE'], src)
         syncargs = dict(src=src,
                         dest=ftpcontent)
+        if rsync_opts:
+            syncargs['rsync_opts'] = rsync_opts
         task = dict(synchronize=syncargs,
                     when='success')
         tasks.append(task)
