@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "bab6814e_f9fec736",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 577,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-05-19T14:54:21Z",
+      "side": 1,
+      "message": "Yep, thanks.",
+      "revId": "ab0aadf8dfecd4617a0ef63b68c0a94c68169273",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bab6814e_dc7cb5ed",
         "filename": "zuul/launcher/ansiblelaunchserver.py",
         "patchSetId": 1
@@ -42,6 +59,23 @@
         "endLine": 580,
         "endChar": 42
       },
+      "revId": "ab0aadf8dfecd4617a0ef63b68c0a94c68169273",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_59fef337",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 580,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-05-19T14:54:21Z",
+      "side": 1,
+      "message": "And yep.",
       "revId": "ab0aadf8dfecd4617a0ef63b68c0a94c68169273",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
