@@ -1,0 +1,26 @@
+includes:
+  - python-file: custom_functions.py
+
+pipelines:
+  - name: check
+    manager: IndependentPipelineManager
+    trigger:
+      gerrit:
+        - event: patchset-created
+    success:
+      gerrit:
+        verified: 1
+    failure:
+      gerrit:
+        verified: -1
+
+jobs:
+  - name: ^.
+    parameter-function: alter_job_names
+
+projects:
+  - name: org/project1
+    check:
+      - should-be-noop
+      - should-be-project-test1
+      - not-registered

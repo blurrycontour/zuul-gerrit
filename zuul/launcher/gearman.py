@@ -344,14 +344,16 @@ class Gearman(object):
         # ZUUL_OLDREV
         # ZUUL_NEWREV
 
+        remote_job_name = params.get('ZUUL_REMOTEJOB', job.name)
         if 'ZUUL_NODE' in params:
-            name = "build:%s:%s" % (job.name, params['ZUUL_NODE'])
+            name = "build:%s:%s" % (remote_job_name, params['ZUUL_NODE'])
         else:
-            name = "build:%s" % job.name
+            name = "build:%s" % remote_job_name
         build = Build(job, uuid)
+        build.display_name = params.get('ZUUL_DISPLAYNAME')
         build.parameters = params
 
-        if job.name == 'noop':
+        if remote_job_name == 'noop':
             self.sched.onBuildCompleted(build, 'SUCCESS')
             return build
 
