@@ -495,6 +495,46 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(B.reported, 2)
         self.assertEqual(C.reported, 2)
 
+    def _test_time_database(self, iteration):
+        self.worker.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('CRVW', 2)
+        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        self.waitUntilSettled()
+        time.sleep(2)
+
+        data = json.loads(self.sched.formatStatusJSON())
+        found_job = None
+        for pipeline in data['pipelines']:
+            if pipeline['name'] != 'gate':
+                continue
+            for queue in pipeline['change_queues']:
+                for head in queue['heads']:
+                    for item in head:
+                        for job in item['jobs']:
+                            if job['name'] == 'project-merge':
+                                found_job = job
+                                break
+
+        self.assertIsNotNone(found_job)
+        if iteration == 1:
+            self.assertIsNotNone(found_job['estimated_time'])
+            self.assertIsNone(found_job['remaining_time'])
+        else:
+            self.assertIsNotNone(found_job['estimated_time'])
+            self.assertTrue(found_job['estimated_time'] >= 2)
+            self.assertIsNotNone(found_job['remaining_time'])
+
+        self.worker.hold_jobs_in_build = False
+        self.worker.release()
+        self.waitUntilSettled()
+
+    def test_time_database(self):
+        "Test the time database"
+
+        self._test_time_database(1)
+        self._test_time_database(2)
+
     def test_two_failed_changes_at_head(self):
         "Test that changes are reparented correctly if 2 fail at head"
 
