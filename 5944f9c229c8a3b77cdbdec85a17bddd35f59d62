@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "bab6814e_f9508760",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-05-19T14:53:41Z",
+      "side": 1,
+      "message": "I did too.  It turns out expandYaml does the project/template expansion, and macros stay in the job definition.  Then when it\u0027s time to convert to xml, the dispatch routine which handle sending yaml bits to the correct plugins does the macro substitution.  The code at the bottom here is a lightweight copy of its routine.",
+      "revId": "5944f9c229c8a3b77cdbdec85a17bddd35f59d62",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bab6814e_5cd9e582",
         "filename": "zuul/launcher/ansiblelaunchserver.py",
         "patchSetId": 1
@@ -42,6 +59,23 @@
         "endLine": 606,
         "endChar": 42
       },
+      "revId": "5944f9c229c8a3b77cdbdec85a17bddd35f59d62",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_5950b35d",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 606,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-05-19T14:53:41Z",
+      "side": 1,
+      "message": "Oh, huh, we probably don\u0027t need it in the inventory anymore, thanks.\n\nWe can\u0027t use synchronize because there isn\u0027t a way to push from the controller to a third-party host.  It assumes the remote host is the host-in-context (our worker) in push mode.  If you delegate_to in push, it changes the source from the controller to the delegate node, but the target is still the host-in-context.",
       "revId": "5944f9c229c8a3b77cdbdec85a17bddd35f59d62",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
