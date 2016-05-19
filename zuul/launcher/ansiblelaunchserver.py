@@ -615,6 +615,15 @@ class NodeWorker(object):
             if not dest.startswith(site['root']):
                 raise Exception("Target path %s is not below site root" %
                                 (dest,))
+
+            # Ensure destination hierarchy exists (because rysnc won't
+            # create parent directories).
+            task = dict(file=dict(path=dest,
+                                  state='directory'))
+            if not scpfile.get('copy-after-failure'):
+                task['when'] = 'success'
+            tasks.append(task)
+
             local_args = [
                 'command', '/usr/bin/rsync', '--delay-updates', '-F',
                 '--compress', '-rt', '--safe-links', '--rsh',
