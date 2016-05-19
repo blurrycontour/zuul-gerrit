@@ -628,7 +628,7 @@ class NodeWorker(object):
                 'command', '/usr/bin/rsync', '--delay-updates', '-F',
                 '--compress', '-rt', '--safe-links', '--rsh',
                 '"/usr/bin/ssh -i {private_key_file} -S none '
-                '-o StrictHostKeyChecking=no"',
+                '-o StrictHostKeyChecking=no -q"',
                 '--out-format="<<CHANGED>>%i %n%L"',
                 '"{source}/"', '"{user}@{host}:{dest}"'
             ]
