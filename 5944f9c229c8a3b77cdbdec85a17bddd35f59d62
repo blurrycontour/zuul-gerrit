@@ -1,0 +1,188 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bab6814e_1c2abd2c",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-05-19T02:57:29Z",
+      "side": 1,
+      "message": "I thought expandYaml compiled the macros?",
+      "range": {
+        "startLine": 137,
+        "startChar": 23,
+        "endLine": 137,
+        "endChar": 33
+      },
+      "revId": "5944f9c229c8a3b77cdbdec85a17bddd35f59d62",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_5cd9e582",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 606,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-05-19T02:57:29Z",
+      "side": 1,
+      "message": "Curious why you changed from ansible\u0027s synchronize given you set up the destination in the inventory?",
+      "range": {
+        "startLine": 606,
+        "startChar": 37,
+        "endLine": 606,
+        "endChar": 42
+      },
+      "revId": "5944f9c229c8a3b77cdbdec85a17bddd35f59d62",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_5c1c4513",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 612,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-05-19T02:57:29Z",
+      "side": 1,
+      "message": "pep8",
+      "range": {
+        "startLine": 612,
+        "startChar": 16,
+        "endLine": 612,
+        "endChar": 17
+      },
+      "revId": "5944f9c229c8a3b77cdbdec85a17bddd35f59d62",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_3cdea13f",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 614,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-05-19T02:57:29Z",
+      "side": 1,
+      "message": "pep8",
+      "range": {
+        "startLine": 614,
+        "startChar": 20,
+        "endLine": 614,
+        "endChar": 26
+      },
+      "revId": "5944f9c229c8a3b77cdbdec85a17bddd35f59d62",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_9ced0df2",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 756,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-05-19T02:57:29Z",
+      "side": 1,
+      "message": "pep8 to 754*756",
+      "range": {
+        "startLine": 756,
+        "startChar": 70,
+        "endLine": 756,
+        "endChar": 80
+      },
+      "revId": "5944f9c229c8a3b77cdbdec85a17bddd35f59d62",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_1cce3db4",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 816,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-05-19T02:57:29Z",
+      "side": 1,
+      "message": "pep8",
+      "range": {
+        "startLine": 816,
+        "startChar": 44,
+        "endLine": 816,
+        "endChar": 46
+      },
+      "revId": "5944f9c229c8a3b77cdbdec85a17bddd35f59d62",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_5cca856f",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 834,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-05-19T02:57:29Z",
+      "side": 1,
+      "message": "pep8",
+      "range": {
+        "startLine": 834,
+        "startChar": 40,
+        "endLine": 834,
+        "endChar": 54
+      },
+      "revId": "5944f9c229c8a3b77cdbdec85a17bddd35f59d62",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_1c13dd0e",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 839,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-05-19T02:57:29Z",
+      "side": 1,
+      "message": "pep8",
+      "range": {
+        "startLine": 839,
+        "startChar": 48,
+        "endLine": 839,
+        "endChar": 50
+      },
+      "revId": "5944f9c229c8a3b77cdbdec85a17bddd35f59d62",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
