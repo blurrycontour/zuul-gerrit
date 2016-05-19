@@ -91,14 +91,14 @@
                         $('<a />')
                             .addClass('zuul-job-name')
                             .attr('href', job.url)
-                            .text(job.name)
+                            .text(job.display_name)
                     );
                 }
                 else {
                     $job_line.append(
                         $('<span />')
                             .addClass('zuul-job-name')
-                            .text(job.name)
+                            .text(job.display_name)
                     );
                 }
 
@@ -255,7 +255,7 @@
                             case 'queued':
                                 break;
                         }
-                        $bar_inner.attr('title', job.name)
+                        $bar_inner.attr('title', job.display_name)
                             .css('width', job_percent + '%');
                         $bar_outter.append($bar_inner);
                     }

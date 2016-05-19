@@ -142,6 +142,14 @@ layout.yaml to be useful.
   is included).  Defaults to ``false``.  Used by zuul-server only.
   ``job_name_in_report=true``
 
+**job_display_name_in_report**
+  Boolean value (``true`` or ``false``) that indicates whether the
+  job display name should be included in the report if set (normally
+  only the URL is included).  Defaults to ``false``.  Used by
+  zuul-server only.
+  See ``ZUUL_DISPLAYNAME``.
+  ``job_display_name_in_report=true``
+
 merger
 """"""
 
@@ -829,9 +837,18 @@ each job as it builds a list from the project specification.
      :param parameters: parameters to be passed to the job
      :type parameters: dict
 
+  If the parameter **ZUUL_DISPLAYNAME** is set by this function, then it will
+  be used instead of the original job name when reporting progress and
+  completion.
+  See ``job_display_name_in_report``.
+
   If the parameter **ZUUL_NODE** is set by this function, then it will
   be used to specify on what node (or class of node) the job should be
   run.
+
+  If the parameter **ZUUL_REMOTEJOB** is set by this function, then it will
+  be used to specify what remote job should be run, e.g. on Jenkins.
+  A remote job may this way be reused but differentiated by other parameters.
 
 **swift**
   If :ref:`swift` is configured then each job can define a destination

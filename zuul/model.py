@@ -575,6 +575,7 @@ class Build(object):
     def __init__(self, job, uuid):
         self.job = job
         self.uuid = uuid
+        self.display_name = None
         self.url = None
         self.number = None
         self.result = None
@@ -826,6 +827,8 @@ class QueueItem(object):
 
             ret['jobs'].append({
                 'name': job.name,
+                'display_name':
+                    (build.display_name if build else None) or job.name,
                 'elapsed_time': elapsed,
                 'remaining_time': remaining,
                 'url': build_url,

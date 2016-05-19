@@ -146,6 +146,12 @@ class BaseReporter(object):
                 if self.sched.config.getboolean('zuul',
                                                 'job_name_in_report'):
                     name = job.name + ' '
+            if build.display_name is not None:
+                if self.sched.config.has_option(
+                        'zuul', 'job_display_name_in_report'):
+                    if self.sched.config.getboolean(
+                            'zuul', 'job_display_name_in_report'):
+                        name = build.display_name + ' '
             ret += '- %s%s : %s%s%s\n' % (name, url, result, elapsed,
                                           voting)
         return ret

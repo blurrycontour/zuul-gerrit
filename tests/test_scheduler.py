@@ -4481,3 +4481,36 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertIn(
             '- docs-draft-test2 https://server/job/docs-draft-test2/1/',
             body[3])
+
+    def test_remote_job_names_can_be_parameterized(self):
+        "Test that a parameter function can alter the name of the remote job."
+        self.config.set('zuul', 'layout_config',
+                        'tests/fixtures/layout-dynamic-job-names.yaml')
+        self.sched.reconfigure(self.config)
+
+        self.worker.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        items = self.sched.layout.pipelines['check'].getAllItems()
+        builds = {build.job.name: build for build in
+                  items[0].current_build_set.getBuilds()}
+
+        # noop should work
+        self.assertEqual(builds['should-be-noop'].result, 'SUCCESS')
+        # project-test1 should be called
+        self.assertEqual(builds['should-be-project-test1'].result, None)
+        # If not-registered is not registered, neither is
+        # should-be-project-test1 nor should-be-noop.
+        # Verifying this makes sure that should-be-... is actually translated
+        # into project-test1 and noop, which are registered.
+        self.assertEqual(builds['not-registered'].result, 'NOT_REGISTERED')
+
+        self.worker.hold_jobs_in_build = False
+        self.worker.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.history), 1)
+        self.assertEqual(self.history[0].name, 'project-test1')
+        self.assertEqual(self.history[0].result, 'SUCCESS')
