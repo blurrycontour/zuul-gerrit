@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "bab6814e_917c72b6",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1410,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-05-20T15:26:11Z",
+      "side": 1,
+      "message": "This is not currently thread-safe, which is why it\u0027s only called from within the main scheduling loop.  That will ensure no locking is needed.  If we decide to use it from outside, then yes, we should add a lock.\n\n(For the most part, zuul attempts to avoid locks, so I have kept that pattern here.)",
+      "revId": "b7aadc382cb3a1a034c9a4824b8dc4d1aa3ad952",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bab6814e_74b3e0e9",
         "filename": "zuul/model.py",
         "patchSetId": 3
@@ -42,6 +59,23 @@
         "endLine": 1446,
         "endChar": 31
       },
+      "revId": "b7aadc382cb3a1a034c9a4824b8dc4d1aa3ad952",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_f14b3e85",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1446,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-05-20T15:26:11Z",
+      "side": 1,
+      "message": "Yeah, I believe the job name is sufficiently unique for v2.  We will need to change that in v3.",
       "revId": "b7aadc382cb3a1a034c9a4824b8dc4d1aa3ad952",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -71,6 +105,23 @@
     },
     {
       "key": {
+        "uuid": "bab6814e_d150ba34",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1450,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-05-20T15:26:11Z",
+      "side": 1,
+      "message": "Agreed, that was what I intended, so this is an indentation failure.  Thanks.",
+      "revId": "b7aadc382cb3a1a034c9a4824b8dc4d1aa3ad952",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bab6814e_54c97c25",
         "filename": "zuul/scheduler.py",
         "patchSetId": 3
@@ -94,6 +145,23 @@
     },
     {
       "key": {
+        "uuid": "bab6814e_3142e668",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 747,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-05-20T15:26:11Z",
+      "side": 1,
+      "message": "It is an existing and documented option.",
+      "revId": "b7aadc382cb3a1a034c9a4824b8dc4d1aa3ad952",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bab6814e_5414dc9e",
         "filename": "zuul/scheduler.py",
         "patchSetId": 3
@@ -111,6 +179,23 @@
         "endLine": 754,
         "endChar": 20
       },
+      "revId": "b7aadc382cb3a1a034c9a4824b8dc4d1aa3ad952",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_1147e277",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 754,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-05-20T15:26:11Z",
+      "side": 1,
+      "message": "We have not made the state dir itself previously, but rather assumed it existed.  We could consider changing that, but I think that\u0027s a further change than necessary here.",
       "revId": "b7aadc382cb3a1a034c9a4824b8dc4d1aa3ad952",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
