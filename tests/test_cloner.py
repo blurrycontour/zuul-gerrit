@@ -647,3 +647,77 @@ class TestCloner(ZuulTestCase):
             repos[master_project].rev_parse('HEAD').hexsha,
             repos[master_project].rev_parse('master').hexsha)
         self.waitUntilSettled()
+
+    def test_post_with_cache_dir(self):
+        cache_root = os.path.join(self.test_root, "cache")
+        project = 'org/project1'
+        projects = [project]
+        upstream_repo_path = os.path.join(self.upstream_root, project)
+        cache_repo_path = os.path.join(cache_root, project)
+        git.Repo.clone_from(upstream_repo_path, cache_repo_path)
+
+        upstream = self.getUpstreamRepos(projects)
+        old_mp = str(upstream[project].commit('mp'))
+
+        A = self.fake_gerrit.addFakeChange(project, 'mp', 'A')
+        A.addApproval('CRVW', 2)
+        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        self.waitUntilSettled()
+
+        new_mp = str(upstream[project].commit('mp'))
+
+        e = {
+            "type": "ref-updated",
+            "submitter": {
+                "name": "User Name",
+            },
+            "refUpdate": {
+                "oldRev": old_mp,
+                "newRev": new_mp,
+                "refName": "mp",
+                "project": project,
+            }
+        }
+        self.worker.hold_jobs_in_build = True
+        self.fake_gerrit.addEvent(e)
+
+        self.waitUntilSettled()
+        self.assertEquals(1, len(self.builds), "One build is running")
+
+        states = [{
+            project: new_mp,
+        }]
+
+        for number, build in enumerate(self.builds):
+            self.log.debug("Build parameters: %s", build.parameters)
+            cloner = zuul.lib.cloner.Cloner(
+                git_base_url=self.upstream_root,
+                projects=projects,
+                workspace=self.workspace_root,
+                zuul_branch=None,
+                zuul_ref=build.parameters['ZUUL_REF'],
+                zuul_newrev=build.parameters['ZUUL_NEWREV'],
+                zuul_url=self.git_root,
+                cache_dir=cache_root,
+            )
+            cloner.execute()
+            work = self.getWorkspaceRepos(projects)
+            state = states[number]
+
+            for project in projects:
+                self.assertEquals(state[project],
+                                  str(work[project].commit('HEAD')),
+                                  'Project %s commit for build %s should '
+                                  'be correct' % (project, number))
+
+        work = self.getWorkspaceRepos(projects)
+        upstream_repo_path = os.path.join(self.upstream_root, project)
+        self.assertEquals(
+            work[project].remotes.origin.url,
+            upstream_repo_path,
+            'workspace repo origin should be upstream, not cache'
+        )
+
+        self.worker.hold_jobs_in_build = False
+        self.worker.release()
+        self.waitUntilSettled()
