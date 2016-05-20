@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bab6814e_2b0d59e8",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 581,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2016-05-20T14:48:09Z",
+      "side": 1,
+      "message": "I think you want quotes around the %s, and m.group(1).",
+      "revId": "0d137e2a783f7a466b70fe834ee57613e174e9e0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
