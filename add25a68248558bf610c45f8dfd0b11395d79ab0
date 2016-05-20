@@ -50,6 +50,24 @@
       "revId": "add25a68248558bf610c45f8dfd0b11395d79ab0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_97a8df21",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2016-05-20T17:05:09Z",
+      "side": 1,
+      "message": "This is a good catch. I think we should address it now for two reasons. The first is debugging why this corner case causes a failure 2 years from now is going to be unfun for whoever ends up doing that. And second doing a fetch of an already fetched ref should be really quick so the cost is low here.",
+      "parentUuid": "bab6814e_f7cccbbc",
+      "revId": "add25a68248558bf610c45f8dfd0b11395d79ab0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
