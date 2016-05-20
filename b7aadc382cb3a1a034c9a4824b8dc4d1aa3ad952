@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bab6814e_9433e461",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1410,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-05-20T01:24:58Z",
+      "side": 1,
+      "message": "Do we want a lock on this method to avoid two saves()\u0027s both writing to the .tmp file while it\u0027s being moved into place?",
+      "range": {
+        "startLine": 1410,
+        "startChar": 8,
+        "endLine": 1410,
+        "endChar": 15
+      },
+      "revId": "b7aadc382cb3a1a034c9a4824b8dc4d1aa3ad952",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_74b3e0e9",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1446,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-05-20T01:24:58Z",
+      "side": 1,
+      "message": "Should we should append project_name and job_name to make up the TimeData?\n\nIf two jobs are named the same but ran on different projects do we want to time them differently? Perhaps at the moment while jobs are uniquely named for each project it doesn\u0027t matter (and those sharing names are expected to run the same way no matter the project against).",
+      "range": {
+        "startLine": 1446,
+        "startChar": 27,
+        "endLine": 1446,
+        "endChar": 31
+      },
+      "revId": "b7aadc382cb3a1a034c9a4824b8dc4d1aa3ad952",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_14f094c8",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1450,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-05-20T01:24:58Z",
+      "side": 1,
+      "message": "The JobTimeData object holds all of its own state. We probably don\u0027t want to load it from disk again each time we want to know the running time. We should only need to load() when we instantiate a new instance of JobTimeData.",
+      "range": {
+        "startLine": 1450,
+        "startChar": 11,
+        "endLine": 1450,
+        "endChar": 15
+      },
+      "revId": "b7aadc382cb3a1a034c9a4824b8dc4d1aa3ad952",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_54c97c25",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 747,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-05-20T01:24:58Z",
+      "side": 1,
+      "message": "Should probably document this option",
+      "range": {
+        "startLine": 747,
+        "startChar": 43,
+        "endLine": 747,
+        "endChar": 52
+      },
+      "revId": "b7aadc382cb3a1a034c9a4824b8dc4d1aa3ad952",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_5414dc9e",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 754,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-05-20T01:24:58Z",
+      "side": 1,
+      "message": "consider makedirs?",
+      "range": {
+        "startLine": 754,
+        "startChar": 15,
+        "endLine": 754,
+        "endChar": 20
+      },
+      "revId": "b7aadc382cb3a1a034c9a4824b8dc4d1aa3ad952",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
