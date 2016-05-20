@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bab6814e_57c6779a",
+        "filename": "zuul/cmd/cloner.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-05-20T16:52:06Z",
+      "side": 1,
+      "message": "I think this logic should go into zuul/lib/cloner, so that zuul/cmd/cloner can be a thin layer on top that is only responsible for interfacing with the shell.  That makes the actual logic easier to test (the tests can pass in zuul_newrev and exercise this logic -- moreover, all the existing tests will exercise this logic too (and hopefully not trigger it).",
+      "revId": "add25a68248558bf610c45f8dfd0b11395d79ab0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_17c86fa7",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-05-20T16:52:06Z",
+      "side": 1,
+      "message": "I think the logic in zuul/cmd/cloner can move to this point, with the addition of a zuul_newrev argument.",
+      "revId": "add25a68248558bf610c45f8dfd0b11395d79ab0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_f7cccbbc",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-05-20T16:52:06Z",
+      "side": 1,
+      "message": "Currenty, GGP performs a fetch of ZUUL_REF in this case.  It does not appear that we need it here -- I think that perhaps the remote update that the cloner performs typically ends up fetching the necessary commits in all the cases I can think of.  I am slightly worried about some case that I can\u0027t think of that would cause us not to have the commit locally.  (Maybe a tag on a commit that is not in a branch?  Yuck.)\n\nI feel like the safest thing would be to fetch ZUUL_REF before checking out the indicated revision.  However, I\u0027m willing to entertain that I\u0027m being paranoid and it\u0027s worth saving the network traffic to skip it for now.",
+      "revId": "add25a68248558bf610c45f8dfd0b11395d79ab0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
