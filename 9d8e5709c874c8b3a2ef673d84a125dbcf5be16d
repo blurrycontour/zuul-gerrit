@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bab6814e_67075f82",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 637,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-05-23T09:14:11Z",
+      "side": 1,
+      "message": "this seems like a bit of an abuse of rsync-path... Should we ensure the dir exists some other way?",
+      "range": {
+        "startLine": 637,
+        "startChar": 19,
+        "endLine": 637,
+        "endChar": 29
+      },
+      "revId": "9d8e5709c874c8b3a2ef673d84a125dbcf5be16d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
