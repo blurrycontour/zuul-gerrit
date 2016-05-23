@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bab6814e_1ce5e407",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 587,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2016-05-23T18:15:29Z",
+      "side": 1,
+      "message": "I tend to be in the os.path.join() camp here.",
+      "revId": "949d74ff486e52c0034080ddfa9d968ecd099eb0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
