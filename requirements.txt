@@ -20,3 +20,5 @@ kazoo
 sqlalchemy
 alembic
 cryptography>=1.6
+autobahn[accelerate];python_version>='3.0'
+uvloop;python_version>='3.5'
