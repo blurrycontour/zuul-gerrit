@@ -16,6 +16,23 @@
       "revId": "b5aa68ffee1292bed5fb80f942150e57373d51f7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_6dba47c2",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 675,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-05-24T15:53:21Z",
+      "side": 1,
+      "message": "It is enabled here.",
+      "revId": "b5aa68ffee1292bed5fb80f942150e57373d51f7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
