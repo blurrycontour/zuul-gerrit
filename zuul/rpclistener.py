@@ -51,6 +51,7 @@ class RPCListener(object):
         self.worker.registerFunction("zuul:enqueue_ref")
         self.worker.registerFunction("zuul:promote")
         self.worker.registerFunction("zuul:get_running_jobs")
+        self.worker.registerFunction("zuul:get_job_log_location")
 
     def stop(self):
         self.log.debug("Stopping")
@@ -157,3 +158,27 @@ class RPCListener(object):
                     running_items.append(item.formatJSON())
 
         job.sendWorkComplete(json.dumps(running_items))
+
+    def handle_get_job_log_location(self, job):
+        args = json.loads(job.arguments)
+        uuid = args['uuid']
+        build = None
+        job_log_location = {
+            'server': None,
+            # TODO: map log files to ports?
+            'port': '8088',
+        }
+        for pipeline_name, pipeline in six.iteritems(
+                self.sched.layout.pipelines):
+            for queue in pipeline.queues:
+                for item in queue.queue:
+                    if item.uuid == uuid:
+                        build = item
+
+                    running_items.append(item.formatJSON())
+        if build:
+            # There should be a better way to get the IP that the
+            # ansible launcher sees as self.host
+            job_log_location['server'] = [
+                ip for ip in build.worker.ips if ip != '127.0.0.1'][0]
+            job.sendWorkComplete(json.dumps(job_log_location))
