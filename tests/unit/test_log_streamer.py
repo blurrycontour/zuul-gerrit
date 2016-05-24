@@ -14,6 +14,11 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import aiohttp
+import asyncio
+import functools
+import logging
+import json
 import os
 import os.path
 import socket
@@ -21,6 +26,7 @@ import tempfile
 import threading
 import time
 
+import zuul.web
 import zuul.lib.log_streamer
 import tests.base
 
@@ -57,6 +63,7 @@ class TestLogStreamer(tests.base.BaseTestCase):
 class TestStreaming(tests.base.AnsibleZuulTestCase):
 
     tenant_config_file = 'config/streamer/main.yaml'
+    log = logging.getLogger("zuul.test.test_log_streamer.TestStreaming")
 
     def setUp(self):
         super(TestStreaming, self).setUp()
@@ -152,3 +159,94 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
         self.log.debug("\n\nFile contents: %s\n\n", file_contents)
         self.log.debug("\n\nStreamed: %s\n\n", self.streaming_data)
         self.assertEqual(file_contents, self.streaming_data)
+
+    def runWSClient(self, build_uuid):
+        async def client(loop, build_uuid):
+            uri = 'http://127.0.0.1:9000/console-stream'
+            try:
+                session = aiohttp.ClientSession(loop=loop)
+                async with session.ws_connect(uri) as ws:
+                    req = {'uuid': build_uuid, 'logfile': None}
+                    ws.send_str(json.dumps(req))
+                    async for msg in ws:
+                        if msg.type == aiohttp.WSMsgType.TEXT:
+                            self.ws_client_results += msg.data
+                        elif msg.type == aiohttp.WSMsgType.CLOSED:
+                            break
+                        elif msg.type == aiohttp.WSMsgType.ERROR:
+                            break
+                session.close()
+            except Exception as e:
+                self.log.exception("client exception:")
+
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(client(loop, build_uuid))
+
+    def test_websocket_streaming(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+
+        # We don't have any real synchronization for the ansible jobs, so
+        # just wait until we get our running build.
+        while not len(self.builds):
+            time.sleep(0.1)
+        build = self.builds[0]
+        self.assertEqual(build.name, 'python27')
+
+        build_dir = os.path.join(self.executor_server.jobdir_root, build.uuid)
+        while not os.path.exists(build_dir):
+            time.sleep(0.1)
+
+        # Need to wait to make sure that jobdir gets set
+        while build.jobdir is None:
+            time.sleep(0.1)
+            build = self.builds[0]
+
+        # Wait for the job to begin running and create the ansible log file.
+        # The job waits to complete until the flag file exists, so we can
+        # safely access the log here. We only open it (to force a file handle
+        # to be kept open for it after the job finishes) but wait to read the
+        # contents until the job is done.
+        ansible_log = os.path.join(build.jobdir.log_root, 'job-output.txt')
+        while not os.path.exists(ansible_log):
+            time.sleep(0.1)
+        logfile = open(ansible_log, 'r')
+        self.addCleanup(logfile.close)
+
+        # Start the finger streamer daemon
+        port = 7902
+        streamer = zuul.lib.log_streamer.LogStreamer(
+            None, self.host, port, self.executor_server.jobdir_root)
+        self.addCleanup(streamer.stop)
+
+        # Start the web server
+        web_server = zuul.web.ZuulWeb()
+        loop = asyncio.new_event_loop()
+        ws_thread = threading.Thread(target=web_server.run, args=(loop,))
+        ws_thread.start()
+        self.addCleanup(web_server.stop)
+
+        # FIXME: Wait until web server is started
+        time.sleep(2)
+
+        # Start a thread with the websocket client
+        self.ws_client_results = ''
+        ws_client_thread = threading.Thread(
+            target=self.runWSClient, args=(build.uuid,)
+        )
+        ws_client_thread.start()
+
+        # Allow the job to complete
+        flag_file = os.path.join(build_dir, 'test_wait')
+        open(flag_file, 'w').close()
+
+        # Wait for the websocket client to complete, which it should when
+        # it's received the full log.
+        ws_client_thread.join()
+
+        self.waitUntilSettled()
+
+        file_contents = ''.join(logfile.readlines())
+        logfile.close()
+        self.assertEqual(file_contents, self.ws_client_results)
