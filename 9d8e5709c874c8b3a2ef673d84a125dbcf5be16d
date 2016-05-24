@@ -22,6 +22,23 @@
       "revId": "9d8e5709c874c8b3a2ef673d84a125dbcf5be16d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_cdf25306",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 637,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-05-24T15:48:29Z",
+      "side": 1,
+      "message": "It is, though it is a well-known abuse.  However, I\u0027m open to suggestions.  Using the ansible file module won\u0027t work because it will want to change the permissions of parent directories.  See earlier patchset.",
+      "revId": "9d8e5709c874c8b3a2ef673d84a125dbcf5be16d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
