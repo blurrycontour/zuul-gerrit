@@ -1,0 +1,55 @@
+<html>
+<!--
+    pip install websockify
+    websockify -D localhost:8888 166.78.99.141:8088
+
+    Then open log.html in a browser
+-->
+
+    <head>
+        <title>Zuul Console Log</title>
+
+    </head>
+
+    <body>
+
+        <pre id="log"></pre>
+
+        <script>
+
+	    function getElement(id) {
+		if (document.getElementById) {
+		    return document.getElementById(id);
+		} else if (document.all) {
+		    return document.all[id];
+		} else if (document.layers) {
+		    return document.layers[id];
+		}
+		return undefined;
+	    };
+
+            function message(str) {
+		cell = getElement('log');
+		cell.innerHTML += str;
+	    }
+            window.onload = function() {
+		var ws = new WebSocket("ws://localhost:9000");
+		ws.binaryType = "arraybuffer";
+
+		ws.onmessage = function(e) {
+	            message(e.data);
+	        };
+		ws.onopen = function(e) {
+		    ws.send(JSON.stringify({
+	              // TODO(mordred): Get uuid from param string?
+		      uuid: 'SOMEUUID',
+		      logfile: 'console.log'
+		    }));
+		};
+
+            }
+        </script>
+
+    </body>
+
+</html>
