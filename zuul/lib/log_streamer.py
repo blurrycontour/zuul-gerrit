@@ -15,6 +15,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import logging
 import os
 import os.path
 import pwd
@@ -214,6 +215,8 @@ class LogStreamer(object):
     '''
 
     def __init__(self, user, host, port, jobdir_root):
+        self.log = logging.getLogger('zuul.lib.LogStreamer')
+        self.log.debug("LogStreamer starting on port %s", port)
         self.server = CustomForkingTCPServer((host, port),
                                              RequestHandler,
                                              user=user,
@@ -229,3 +232,4 @@ class LogStreamer(object):
         if self.thd.isAlive():
             self.server.shutdown()
             self.server.server_close()
+            self.log.debug("LogStreamer stopped")

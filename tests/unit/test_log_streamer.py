@@ -14,6 +14,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import asyncio
+import functools
+import logging
 import os
 import os.path
 import socket
@@ -21,6 +24,10 @@ import tempfile
 import threading
 import time
 
+from autobahn.asyncio.websocket import WebSocketClientFactory
+from autobahn.asyncio.websocket import WebSocketClientProtocol
+
+import zuul.streamer
 import zuul.lib.log_streamer
 import tests.base
 
@@ -54,9 +61,39 @@ class TestLogStreamer(tests.base.BaseTestCase):
         s.close()
 
 
+class WSClientProtocol(WebSocketClientProtocol):
+    def __init__(self, build_uuid, results, event):
+        super(WebSocketClientProtocol, self).__init__()
+        self.build_uuid = build_uuid
+        self.event = event
+        self.results = results
+
+    def onConnect(self, request):
+        print("\n\nWebsocket client connecting\n\n")
+
+    def onOpen(self):
+        print("\n\nWebsocket client requesting build UUID %s\n\n" % self.build_uuid)
+        self.sendMessage(self.build_uuid.encode('utf8'))
+
+    def onMessage(self, payload, isBinary):
+        if isBinary:
+            print("WSClientProtocol not expecting binary")
+            self.sendClose()
+        self.results += payload.decode('utf8')
+        # Let the test know we've connected and begun communication
+        self.event.set()
+
+    def onClose(self, wasClean, code, reason):
+        print("Websocket connection closed: code=%s, reason=%s" % (code, reason))
+        print("Websocket results: %s" % self.results)
+        self.factory.loop.stop()
+        self.event.set()
+
+
 class TestStreaming(tests.base.AnsibleZuulTestCase):
 
     tenant_config_file = 'config/streamer/main.yaml'
+    log = logging.getLogger("zuul.test.test_log_streamer.TestStreaming")
 
     def setUp(self):
         super(TestStreaming, self).setUp()
@@ -152,3 +189,83 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
         self.log.debug("\n\nFile contents: %s\n\n", file_contents)
         self.log.debug("\n\nStreamed: %s\n\n", self.streaming_data)
         self.assertEqual(file_contents, self.streaming_data)
+
+    def startWSClient(self, host, port, build_uuid, results, event):
+        # We expect to be started in a new thread, so create a separate
+        # event loop for it.
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
+        factory = WebSocketClientFactory(u"ws://%s:%s" % (host, port))
+        factory.protocol = functools.partial(
+            WSClientProtocol, build_uuid, results, event)
+        coro = loop.create_connection(factory, host, port)
+        loop.run_until_complete(coro)
+        loop.run_forever()
+        loop.close()
+
+    def test_websocket_streaming(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+
+        # We don't have any real synchronization for the ansible jobs, so
+        # just wait until we get our running build.
+        while not len(self.builds):
+            time.sleep(0.1)
+        build = self.builds[0]
+        self.assertEqual(build.name, 'python27')
+
+        build_dir = os.path.join(self.executor_server.jobdir_root, build.uuid)
+        while not os.path.exists(build_dir):
+            time.sleep(0.1)
+
+        # Need to wait to make sure that jobdir gets set
+        while build.jobdir is None:
+            time.sleep(0.1)
+            build = self.builds[0]
+
+        # Wait for the job to begin running and create the ansible log file.
+        # The job waits to complete until the flag file exists, so we can
+        # safely access the log here. We only open it (to force a file handle
+        # to be kept open for it after the job finishes) but wait to read the
+        # contents until the job is done.
+        ansible_log = os.path.join(build.jobdir.log_root, 'job-output.txt')
+        while not os.path.exists(ansible_log):
+            time.sleep(0.1)
+        logfile = open(ansible_log, 'r')
+        self.addCleanup(logfile.close)
+
+        # Start the finger streamer daemon
+        port = 7902
+        streamer = zuul.lib.log_streamer.LogStreamer(
+            None, self.host, port, self.executor_server.jobdir_root)
+        self.addCleanup(streamer.stop)
+
+        # Start the websocket streamer
+        ws_streamer = zuul.streamer.ZuulStreamer()
+        loop = asyncio.get_event_loop()
+        ws_streamer_thread = threading.Thread(
+            target=ws_streamer.run, args=(loop,))
+        ws_streamer_thread.start()
+        self.addCleanup(ws_streamer.stop)
+
+        # Start a thread with the websocket client
+        results = ''
+        ws_event = threading.Event()
+        ws_client_thread = threading.Thread(
+            target=self.startWSClient,
+            args=(self.host, port, build.uuid, results, ws_event,))
+        ws_client_thread.start()
+
+        # Wait until the client has begun receiving data, or terminated
+        ws_event.wait()
+
+        # Allow the job to complete
+        flag_file = os.path.join(build_dir, 'test_wait')
+        open(flag_file, 'w').close()
+        self.waitUntilSettled()
+        ws_client_thread.join()
+
+        file_contents = ''.join(logfile.readlines())
+        logfile.close()
+        self.assertEqual(file_contents, results)
