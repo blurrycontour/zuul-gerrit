@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bab6814e_bec79794",
+        "filename": "zuul/cmd/cloner.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 12612
+      },
+      "writtenOn": "2016-05-24T07:55:41Z",
+      "side": 1,
+      "message": "I disagree, I think this is best kept here.\n\nIt seems that these values are consequences of the shell and would move shell/caller logic into lib.cloner.  As well it would make adding multiple revision based checkouts in the future cumbersome requiring logic to be duplicated and additional logic being added in lib.cloner to decide what to do if it receives multiple values that could result in a revision_checkout.",
+      "parentUuid": "bab6814e_57c6779a",
+      "revId": "add25a68248558bf610c45f8dfd0b11395d79ab0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bab6814e_17c86fa7",
         "filename": "zuul/lib/cloner.py",
         "patchSetId": 12
@@ -30,6 +48,24 @@
       "writtenOn": "2016-05-20T16:52:06Z",
       "side": 1,
       "message": "I think the logic in zuul/cmd/cloner can move to this point, with the addition of a zuul_newrev argument.",
+      "revId": "add25a68248558bf610c45f8dfd0b11395d79ab0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_1e3d038f",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 12612
+      },
+      "writtenOn": "2016-05-24T07:55:41Z",
+      "side": 1,
+      "message": "See comment in zuul/cmd/cloner",
+      "parentUuid": "bab6814e_17c86fa7",
       "revId": "add25a68248558bf610c45f8dfd0b11395d79ab0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -65,6 +101,24 @@
       "side": 1,
       "message": "This is a good catch. I think we should address it now for two reasons. The first is debugging why this corner case causes a failure 2 years from now is going to be unfun for whoever ends up doing that. And second doing a fetch of an already fetched ref should be really quick so the cost is low here.",
       "parentUuid": "bab6814e_f7cccbbc",
+      "revId": "add25a68248558bf610c45f8dfd0b11395d79ab0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_9c19bb7c",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 12612
+      },
+      "writtenOn": "2016-05-24T07:55:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bab6814e_97a8df21",
       "revId": "add25a68248558bf610c45f8dfd0b11395d79ab0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
