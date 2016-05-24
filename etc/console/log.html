@@ -1,0 +1,53 @@
+<html>
+<!--
+    pip install websockify
+    websockify -D localhost:8888 166.78.99.141:8088
+
+    Then open log.html in a browser
+-->
+
+    <head>
+        <title>Zuul Console Log</title>
+        <script src="base64.js"></script>
+        <script src="websock.js"></script>
+
+    </head>
+
+    <body>
+
+        <pre id="log"></pre>
+
+        <script>
+
+	    function getElement(id) {
+		if (document.getElementById) {
+		    return document.getElementById(id);
+		} else if (document.all) {
+		    return document.all[id];
+		} else if (document.layers) {
+		    return document.layers[id];
+		}
+		return undefined;
+	    };
+
+            function message(str) {
+		cell = getElement('log');
+		cell.innerHTML += str;
+	    }
+            window.onload = function() {
+                ws = new Websock();
+
+                ws.on('message', function(e) {
+		    message(ws.rQshiftStr());
+                });
+                ws.on('open', function(e) {
+		    message(ws.rQshiftStr());
+                });
+		ws.open("ws://localhost:8888");
+
+            }
+        </script>
+
+    </body>
+
+</html>
