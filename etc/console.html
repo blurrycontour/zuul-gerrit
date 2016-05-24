@@ -1,0 +1,84 @@
+<html>
+<!--
+    pip install websockify
+    websockify -D localhost:8888 166.78.99.141:8088
+
+    Then open in a browser: console.html?uuid=123&logfile=console.log
+-->
+
+    <head>
+        <title>Zuul Console Log</title>
+
+        <script language="javascript" type="text/javascript">
+
+            var wsUri = "ws://localhost:9000"
+            var log;
+            var ws;
+
+            function init()
+            {
+                log = document.getElementById("log")
+                startWebSocket()
+            }
+
+            function startWebSocket()
+            {
+                ws = new WebSocket(wsUri)
+                ws.onopen    = onOpen;
+                ws.onclose   = onClose;
+                ws.onerror   = onError;
+                ws.onmessage = onMessage;
+            }
+
+            function onOpen(e)
+            {
+                console.log('Connection open');
+                var params = getQuery();
+                ws.send(
+                    JSON.stringify({
+                        uuid: params.uuid,
+                        logfile: params.logfile || 'console.log'
+                    })
+                );
+            }
+
+            function onClose(e)
+            {
+                console.log("Connection closed: " + e.code + ", " + e.reason);
+                if (e.code != 0) {
+                    log.innerHTML +=
+                        '<span style="color:red">STREAMER ERROR:</span> '
+                        + e.code + ", " + e.reason;
+                }
+            }
+
+            function onError(e)
+            {
+                console.log("Error: " + e);
+            }
+
+            function onMessage(e)
+            {
+                log.innerHTML += e.data;
+            }
+
+            function getQuery()
+            {
+                var url = location.search;
+                var qs = url.substring(url.indexOf('?') + 1).split('&');
+                for(var i = 0, result = {}; i < qs.length; i++){
+                    qs[i] = qs[i].split('=');
+                    result[qs[i][0]] = decodeURIComponent(qs[i][1]);
+                }
+                return result;
+            }
+
+            window.addEventListener("load", init);
+        </script>
+    </head>
+
+    <body>
+        <pre id="log"></pre>
+    </body>
+
+</html>
