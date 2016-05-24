@@ -16,6 +16,23 @@
       "revId": "949d74ff486e52c0034080ddfa9d968ecd099eb0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_2d52ffdd",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 587,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-05-24T15:49:53Z",
+      "side": 1,
+      "message": "How is os.path.join better here?",
+      "revId": "949d74ff486e52c0034080ddfa9d968ecd099eb0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
