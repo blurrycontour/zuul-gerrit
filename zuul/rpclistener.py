@@ -53,6 +53,7 @@ class RPCListener(object):
         self.worker.registerFunction("zuul:enqueue_ref")
         self.worker.registerFunction("zuul:promote")
         self.worker.registerFunction("zuul:get_running_jobs")
+        self.worker.registerFunction("zuul:get_job_log_stream_address")
 
     def stop(self):
         self.log.debug("Stopping")
@@ -173,3 +174,40 @@ class RPCListener(object):
                         running_items.append(item.formatJSON())
 
         job.sendWorkComplete(json.dumps(running_items))
+
+    def handle_get_job_log_stream_address(self, job):
+        # TODO: map log files to ports. Currently there is only one
+        #       log stream for a given job. But many jobs produce many
+        #       log files, so this is forwards compatible with a future
+        #       where there are more logs to potentially request than
+        #       "console.log"
+        args = json.loads(job.arguments)
+        uuid = args['uuid']
+        # TODO: logfile = args['logfile']
+        job_log_stream_address = {
+            'server': None,
+            'port': '7902',
+        }
+        build = None
+        for tenant in self.sched.abide.tenants.values():
+            for pipeline_name, pipeline in tenant.layout.pipelines.items():
+                for queue in pipeline.queues:
+                    for item in queue.queue:
+                        for bld in item.current_build_set.getBuilds():
+                            if bld.uuid == uuid:
+                                build = bld
+                                break
+                        if build:
+                            break
+                    if build:
+                        break
+                if build:
+                    break
+            if build:
+                break
+
+        if build:
+            # There should be a better way to get the IP that the
+            # ansible launcher sees as self.host
+            job_log_stream_address['server'] = build.worker.hostname
+        job.sendWorkComplete(json.dumps(job_log_stream_address))
