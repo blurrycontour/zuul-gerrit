@@ -82,3 +82,11 @@ class RPCClient(object):
 
     def shutdown(self):
         self.gearman.shutdown()
+
+    def get_job_log_location(self, uuid):
+        data = {'uuid': uuid}
+        job = self.submitJob('zuul:get_job_log_location', data)
+        if job.failure:
+            return False
+        else:
+            return json.loads(job.data[0])
