@@ -13,3 +13,4 @@ testtools>=0.9.32
 sphinxcontrib-programoutput
 mock
 PyMySQL
+aiohttp
