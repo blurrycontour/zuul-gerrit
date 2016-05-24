@@ -36,7 +36,7 @@ class Console(object):
 
 def run(cwd, cmd, args):
     proc = subprocess.Popen(
-        [cmd],
+        ['/bin/sh', '-l', '-c', cmd],
         cwd=cwd,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
@@ -65,7 +65,6 @@ def main():
 
     p = module.params
     env = p['parameters'].copy()
-    env['HOME'] = os.path.expanduser('~')
     ret = run(p['cwd'], p['command'], env)
     if ret == 0:
         module.exit_json(changed=True, rc=ret)
