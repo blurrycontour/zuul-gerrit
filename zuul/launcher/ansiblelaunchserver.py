@@ -777,6 +777,10 @@ class NodeWorker(object):
                                   state='directory'))
             tasks.append(task)
 
+            # TODO: remove once zuul-worker DIB element has landed
+            tasks.extend(shell="[ -f /usr/bin/yum ] && "
+                         "/usr/bin/yum install libselinux-python")
+
             for builder in jjb_job.get('builders', []):
                 if 'shell' in builder:
                     tasks.extend(self._makeBuilderTask(jobdir, builder,
