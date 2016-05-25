@@ -33,6 +33,24 @@
       "revId": "949d74ff486e52c0034080ddfa9d968ecd099eb0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_f4451043",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 587,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2016-05-25T21:09:28Z",
+      "side": 1,
+      "message": "Well I think you can get rid of some of that conditional right?\n\nif not source.startswith(\"**\"):\n    source \u003d os.path.join(\u0027/\u0027, source)\n\ne.g.\n\nIn [1]: import os\n\nIn [2]: p1 \u003d \"/this/is/an/absolute/path\"\n\nIn [3]: p2 \u003d \"this/is/a/relative/path\"\n\nIn [4]: os.path.join(\"/\", p1)\nOut[4]: \u0027/this/is/an/absolute/path\u0027\n\nIn [5]: os.path.join(\"/\", p2)\nOut[5]: \u0027/this/is/a/relative/path\u0027\n\nBut also, when I\u0027m unfamiliar with code and I\u0027m looking around for where a path is being constructed, it\u0027s nice to have a pattern like \u0027os.path.join\u0027 to match on ;-)",
+      "parentUuid": "bab6814e_2d52ffdd",
+      "revId": "949d74ff486e52c0034080ddfa9d968ecd099eb0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
