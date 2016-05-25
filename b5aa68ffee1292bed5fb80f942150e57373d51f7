@@ -33,6 +33,24 @@
       "revId": "b5aa68ffee1292bed5fb80f942150e57373d51f7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_74000067",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 675,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2016-05-25T21:27:00Z",
+      "side": 1,
+      "message": "Right, but only if #! is missing.. I\u0027m not sure what data could look like, but if data could start with \"#!/bin/bash\\n\", then it\u0027d not be enabled, right? I guess my comment was more generally: it would be nice if we ensured bash -x or set -x were always present (assuming there were cases where that wouldn\u0027t be true).",
+      "parentUuid": "bab6814e_6dba47c2",
+      "revId": "b5aa68ffee1292bed5fb80f942150e57373d51f7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
