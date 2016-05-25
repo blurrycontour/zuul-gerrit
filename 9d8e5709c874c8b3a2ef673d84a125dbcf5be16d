@@ -39,6 +39,24 @@
       "revId": "9d8e5709c874c8b3a2ef673d84a125dbcf5be16d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_86b92131",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 637,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-05-25T10:30:25Z",
+      "side": 1,
+      "message": "can\u0027t you use the file module to set the permissions?\n\nFrom the docs (http://docs.ansible.com/ansible/file_module.html):\n\n  If [state\u003d] directory, all immediate subdirectories will be created if they do not exist, since 1.7 they will be created with the supplied permissions.\n\nOr we could control the permissions individually by splitting up the {dest}.\n\nHowever if it\u0027s a well-known abuse I don\u0027t really want to nit-pick over it etc. (it\u0027s likely I\u0027m missing something about the file module that\u0027s making it diffult)",
+      "parentUuid": "bab6814e_cdf25306",
+      "revId": "9d8e5709c874c8b3a2ef673d84a125dbcf5be16d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
