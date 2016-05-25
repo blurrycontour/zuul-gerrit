@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bab6814e_919e5d52",
+        "filename": "zuul/ansible/library/zuul_log.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2016-05-25T17:43:20Z",
+      "side": 1,
+      "message": "Please add:\n\nif __name__ \u003d\u003d \"__main__\":",
+      "revId": "114adc5ae3aac9192b813b55beadc6de08e9519d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
