@@ -60,6 +60,23 @@
     },
     {
       "key": {
+        "uuid": "bab6814e_0604ee15",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1410,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-05-25T20:34:25Z",
+      "side": 1,
+      "message": "I think it\u0027s important for zuul developers to understand that the expectation is that everything associated with the scheduler runs in the main loop, and the queues are responsible for serializing and locking.  There are good reasons for that, and the lack of locking associated with it, and I don\u0027t really want to change that in this patch.",
+      "revId": "b7aadc382cb3a1a034c9a4824b8dc4d1aa3ad952",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bab6814e_74b3e0e9",
         "filename": "zuul/model.py",
         "patchSetId": 3
@@ -112,6 +129,23 @@
       "side": 1,
       "message": "There is a chance that somebody adds a job with the same name to multiple projects and we don\u0027t realise it. For this reason, should we protect it here anyway since it\u0027s trivial?",
       "parentUuid": "bab6814e_f14b3e85",
+      "revId": "b7aadc382cb3a1a034c9a4824b8dc4d1aa3ad952",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_e600ca04",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1446,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-05-25T20:34:25Z",
+      "side": 1,
+      "message": "In zuulv2, if someone adds a job with the same name to multiple projects, they have added one job to multiple projects.  I.e., the two jobs are the same job, so this behavior is correct.",
       "revId": "b7aadc382cb3a1a034c9a4824b8dc4d1aa3ad952",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
