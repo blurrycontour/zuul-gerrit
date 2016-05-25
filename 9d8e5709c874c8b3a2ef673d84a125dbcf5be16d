@@ -57,6 +57,23 @@
       "revId": "9d8e5709c874c8b3a2ef673d84a125dbcf5be16d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_164f0ebe",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 637,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-05-25T14:41:57Z",
+      "side": 1,
+      "message": "When I used it, it tried to set the permissions of /srv/static.  I\u0027d like to see how we can use it in the future, I just don\u0027t want to block on it.",
+      "revId": "9d8e5709c874c8b3a2ef673d84a125dbcf5be16d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
