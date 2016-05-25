@@ -51,6 +51,23 @@
       "revId": "949d74ff486e52c0034080ddfa9d968ecd099eb0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_141ed4ba",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 587,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-05-25T21:27:18Z",
+      "side": 1,
+      "message": "This is true.  I suppose I wrote it this way because I wasn\u0027t thinking \"I need to join these two path components\" but rather was thinking \"I want to make sure this string starts with /\".  I guess I considered it an edge case where I didn\u0027t want to have to go verify the behavior.\n\nI think I would +2 a patch to change it though.  :)",
+      "revId": "949d74ff486e52c0034080ddfa9d968ecd099eb0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
