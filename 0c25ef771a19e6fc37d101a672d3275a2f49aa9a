@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bab6814e_b92cfc4a",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 853,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2016-05-26T14:06:30Z",
+      "side": 1,
+      "message": "s/err/line/",
+      "revId": "0c25ef771a19e6fc37d101a672d3275a2f49aa9a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_39212c4e",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 871,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2016-05-26T14:06:30Z",
+      "side": 1,
+      "message": "s/err/line/",
+      "revId": "0c25ef771a19e6fc37d101a672d3275a2f49aa9a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
