@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bab6814e_ddf90c82",
+        "filename": "zuul/ansible/library/zuul_log.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-05-26T00:54:39Z",
+      "side": 1,
+      "message": "Should there be two line breaks here but it\u0027s being suppressed by the #noqa?",
+      "revId": "7c85204e02042c1d0130231f0b6fd63e538f9ea8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
