@@ -1,0 +1,8 @@
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Thu, 26 May 2016 13:33:24 +0000
+Reviewed-on: https://review.openstack.org/321254
+Project: openstack-infra/zuul
+Branch: refs/heads/master
