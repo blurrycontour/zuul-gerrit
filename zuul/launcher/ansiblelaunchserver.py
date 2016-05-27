@@ -35,6 +35,7 @@ import zmq
 
 import zuul.ansible.library
 import zuul.ansible.plugins.callback_plugins
+from zuul.lib import commandsocket
 
 
 def boolify(x):
@@ -78,6 +79,9 @@ class LaunchServer(object):
         self.keep_jobdir = keep_jobdir
         self.hostname = socket.gethostname()
         self.node_workers = {}
+        # This has the side effect of creating the logger; our logging
+        # config will handle the rest.
+        multiprocessing.get_logger()
         self.mpmanager = multiprocessing.Manager()
         self.jobs = self.mpmanager.dict()
         self.builds = self.mpmanager.dict()
@@ -86,9 +90,15 @@ class LaunchServer(object):
         self.sites = {}
         self.static_nodes = {}
         if config.has_option('launcher', 'accept-nodes'):
-            self.accept_nodes = config.getdefault('launcher', 'accept-nodes')
+            self.accept_nodes = config.get('launcher', 'accept-nodes')
         else:
             self.accept_nodes = True
+
+        if config.has_option('launcher', 'socket'):
+            path = config.get('launcher', 'socket')
+            self.command_socket = commandsocket.CommandSocket(path)
+        else:
+            self.command_socket = None
 
         for section in config.sections():
             m = self.site_section_re.match(section)
@@ -128,6 +138,7 @@ class LaunchServer(object):
         self._gearman_running = True
         self._zmq_running = True
         self._reaper_running = True
+        self._command_running = True
 
         # Setup ZMQ
         self.zcontext = zmq.Context()
@@ -146,6 +157,14 @@ class LaunchServer(object):
         self.worker.waitForServer()
         self.log.debug("Registering")
         self.register()
+
+        # Start command socket
+        if self.command_socket:
+            self.log.debug("Starting command processor")
+            self.command_socket.start()
+            self.command_thread = threading.Thread(target=self.runCommand)
+            self.command_thread.daemon = True
+            self.command_thread.start()
 
         # Load JJB config
         self.loadJobs()
@@ -197,9 +216,8 @@ class LaunchServer(object):
             self.worker.registerFunction("node-assign:zuul")
         self.worker.registerFunction("stop:%s" % self.hostname)
 
-    def reconfigure(self, config):
+    def reconfigure(self):
         self.log.debug("Reconfiguring")
-        self.config = config
         self.loadJobs()
         for node in self.node_workers.values():
             try:
@@ -224,10 +242,24 @@ class LaunchServer(object):
         self._zmq_running = False
         self.zmq_send_queue.put(None)
         self.zmq_send_queue.join()
+        self._command_running = False
+        if self.command_socket:
+            self.command_socket.stop()
         self.log.debug("Stopped")
 
     def join(self):
         self.gearman_thread.join()
+
+    def runCommand(self):
+        while self._command_running:
+            try:
+                command = self.command_socket.get()
+                if command == 'reconfigure':
+                    self.reconfigure()
+                if command == 'stop':
+                    self.stop()
+            except Exception:
+                self.log.exception("Exception while processing command")
 
     def runZMQ(self):
         while self._zmq_running or not self.zmq_send_queue.empty():
