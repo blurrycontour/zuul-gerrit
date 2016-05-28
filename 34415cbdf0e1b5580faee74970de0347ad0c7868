@@ -113,6 +113,24 @@
       "revId": "34415cbdf0e1b5580faee74970de0347ad0c7868",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_4312bdb5",
+        "filename": "zuul/lib/commandsocket.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2016-05-28T01:02:10Z",
+      "side": 1,
+      "message": "I believe it\u0027s an error here, status 22. I\u0027ll have to 2x check, and exiting the loop should be good at that point (or triggering a shutdown).",
+      "parentUuid": "9abb7d3a_23097996",
+      "revId": "34415cbdf0e1b5580faee74970de0347ad0c7868",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
