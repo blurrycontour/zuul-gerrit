@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "9abb7d3a_83fe6569",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-05-28T01:00:25Z",
+      "side": 1,
+      "message": "I agree.",
+      "revId": "34415cbdf0e1b5580faee74970de0347ad0c7868",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abb7d3a_484ada84",
         "filename": "zuul/lib/commandsocket.py",
         "patchSetId": 1
@@ -48,6 +65,23 @@
     },
     {
       "key": {
+        "uuid": "9abb7d3a_43047d7d",
+        "filename": "zuul/lib/commandsocket.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-05-28T01:00:25Z",
+      "side": 1,
+      "message": "The daemonization does have a pidfile lock, so it\u0027s pretty hard to run 2 of these, though possible with some effort.",
+      "revId": "34415cbdf0e1b5580faee74970de0347ad0c7868",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abb7d3a_83578501",
         "filename": "zuul/lib/commandsocket.py",
         "patchSetId": 1
@@ -59,6 +93,23 @@
       "writtenOn": "2016-05-28T00:40:45Z",
       "side": 1,
       "message": "maybe an alternative to blocking unlinking an active socket is to handle the error that comes from reading from an unlinked socket here to close down the listener?",
+      "revId": "34415cbdf0e1b5580faee74970de0347ad0c7868",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_23097996",
+        "filename": "zuul/lib/commandsocket.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-05-28T01:00:25Z",
+      "side": 1,
+      "message": "Would you get the error here, or when you started listening above?\n\nAt any rate, I\u0027d be willing to try the alternative approach.",
       "revId": "34415cbdf0e1b5580faee74970de0347ad0c7868",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
