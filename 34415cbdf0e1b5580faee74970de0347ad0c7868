@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abb7d3a_4863fa1a",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2016-05-28T00:40:45Z",
+      "side": 1,
+      "message": "If we are going to have a whole mess of these things there should be a master list we can keep everything in sync with vs. needing to maintain distinct lists between here and the cmd module.\n\nThis is definitely not a blocker for now, but worth considering as we expand down the line.",
+      "range": {
+        "startLine": 252,
+        "startChar": 0,
+        "endLine": 261,
+        "endChar": 72
+      },
+      "revId": "34415cbdf0e1b5580faee74970de0347ad0c7868",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_484ada84",
+        "filename": "zuul/lib/commandsocket.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2016-05-28T00:40:45Z",
+      "side": 1,
+      "message": "We may want to fnctl lock here or also maintain a .pid file of some sort so we can avoid unlinking an active socket - you\u0027re asking for potential issues here if systemd/somethingelse ends up fireing up multiple zuuls, potentially one will be uncontrollable.\n\n\nTypically I try and prevent actively bound sockets from being unlinked especially if it is the primary command channel.",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 32
+      },
+      "revId": "34415cbdf0e1b5580faee74970de0347ad0c7868",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_83578501",
+        "filename": "zuul/lib/commandsocket.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2016-05-28T00:40:45Z",
+      "side": 1,
+      "message": "maybe an alternative to blocking unlinking an active socket is to handle the error that comes from reading from an unlinked socket here to close down the listener?",
+      "revId": "34415cbdf0e1b5580faee74970de0347ad0c7868",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
