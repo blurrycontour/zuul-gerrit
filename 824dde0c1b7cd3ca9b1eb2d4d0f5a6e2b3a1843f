@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abb7d3a_86302e58",
+        "filename": "zuul/lib/commandsocket.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2016-05-28T10:16:37Z",
+      "side": 1,
+      "message": "This doesn\u0027t seem to be actually used to stop the listener, the call to .stop() should break the listener loop instead of just plopping something into the queue, unless I am mis-reading the code.",
+      "revId": "824dde0c1b7cd3ca9b1eb2d4d0f5a6e2b3a1843f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
