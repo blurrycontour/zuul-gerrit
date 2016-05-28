@@ -131,6 +131,24 @@
       "revId": "34415cbdf0e1b5580faee74970de0347ad0c7868",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_43311d0b",
+        "filename": "zuul/lib/commandsocket.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2016-05-28T01:12:35Z",
+      "side": 1,
+      "message": "I am incorrect. I there is no error, the FD is active and you can continue to accept even if the socket has been unlinked.",
+      "parentUuid": "9abb7d3a_4312bdb5",
+      "revId": "34415cbdf0e1b5580faee74970de0347ad0c7868",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
