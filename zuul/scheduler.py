@@ -20,6 +20,7 @@ import json
 import logging
 import os
 import pickle
+import six
 from six.moves import queue as Queue
 import re
 import sys
@@ -125,12 +126,10 @@ class ManagementEvent(object):
     """An event that should be processed within the main queue run loop"""
     def __init__(self):
         self._wait_event = threading.Event()
-        self._exception = None
-        self._traceback = None
+        self._exc_info = None
 
     def exception(self, e, tb):
-        self._exception = e
-        self._traceback = tb
+        self._exc_info = sys.exc_info()
         self._wait_event.set()
 
     def done(self):
@@ -138,8 +137,8 @@ class ManagementEvent(object):
 
     def wait(self, timeout=None):
         self._wait_event.wait(timeout)
-        if self._exception:
-            raise self._exception, None, self._traceback
+        if self._exc_info:
+            six.reraise(*self._exc_info)
         return self._wait_event.is_set()
 
 
