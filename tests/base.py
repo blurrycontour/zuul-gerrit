@@ -22,6 +22,7 @@ import logging
 import os
 import pprint
 from six.moves import queue as Queue
+from six.moves import urllib
 import random
 import re
 import select
@@ -32,7 +33,6 @@ import subprocess
 import swiftclient
 import threading
 import time
-import urllib2
 
 import git
 import gear
@@ -947,12 +947,12 @@ class ZuulTestCase(BaseTestCase):
         self.sched.registerConnections(self.connections)
 
         def URLOpenerFactory(*args, **kw):
-            if isinstance(args[0], urllib2.Request):
+            if isinstance(args[0], urllib.Request):
                 return old_urlopen(*args, **kw)
             return FakeURLOpener(self.upstream_root, *args, **kw)
 
-        old_urlopen = urllib2.urlopen
-        urllib2.urlopen = URLOpenerFactory
+        old_urlopen = urllib.urlopen
+        urllib.urlopen = URLOpenerFactory
 
         self.merge_server = zuul.merger.server.MergeServer(self.config,
                                                            self.connections)
