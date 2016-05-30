@@ -20,6 +20,7 @@ import json
 import logging
 import os
 import pickle
+import six
 from six.moves import queue as Queue
 import re
 import sys
@@ -139,7 +140,7 @@ class ManagementEvent(object):
     def wait(self, timeout=None):
         self._wait_event.wait(timeout)
         if self._exception:
-            raise self._exception, None, self._traceback
+            six.reraise(type(self._exception), None, self._traceback)
         return self._wait_event.is_set()
 
 
