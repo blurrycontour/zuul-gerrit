@@ -20,7 +20,7 @@ import os
 import random
 import six
 import string
-import urlparse
+import six.moves.urllib.parse as urlparse
 
 
 class Swift(object):
