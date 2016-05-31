@@ -888,7 +888,7 @@ class JJB(jenkins_jobs.builder.Builder):
             name = component
             component_data = {}
 
-        new_component = self.parser.data[component_type].get(name)
+        new_component = self.parser.data.get(component_type, {}).get(name)
         if new_component:
             for new_sub_component in new_component[component_list_type]:
                 new_components.extend(
@@ -903,6 +903,8 @@ class JJB(jenkins_jobs.builder.Builder):
             component_list_type = component_type + 's'
             new_components = []
             for new_component in job.get(component_list_type, []):
-                new_components.extend(self.expandComponent(component_type,
-                                                           new_component, {}))
+                if new_component:
+                    new_components.extend(
+                        self.expandComponent(component_type,
+                                             new_component, {}))
             job[component_list_type] = new_components
