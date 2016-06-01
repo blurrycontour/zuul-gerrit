@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abb7d3a_8c972847",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2016-06-01T06:57:03Z",
+      "side": 1,
+      "message": "I probably don\u0027t wnat to know why the form of these changed do I?",
+      "revId": "876849f4f5cc70f590c7df8e07775960272f5f9a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_4cdb804f",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2016-06-01T06:57:03Z",
+      "side": 1,
+      "message": "I look forward to learning why. By that, I look forward to throwing wet cats when I learn why.",
+      "revId": "876849f4f5cc70f590c7df8e07775960272f5f9a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
