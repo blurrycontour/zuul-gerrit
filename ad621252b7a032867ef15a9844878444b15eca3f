@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "9abb7d3a_d39248f5",
+        "filename": "zuul/cmd/launcher.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-01T17:20:27Z",
+      "side": 1,
+      "message": "I guess we could use that (currently a launcher doesn\u0027t need a state_dir, but it could).  Also, I was thinking of having this be optional, but I don\u0027t think it should be.  I will rework this.",
+      "revId": "ad621252b7a032867ef15a9844878444b15eca3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abb7d3a_66a778bd",
         "filename": "zuul/launcher/ansiblelaunchserver.py",
         "patchSetId": 3
@@ -42,6 +59,23 @@
         "endLine": 247,
         "endChar": 36
       },
+      "revId": "ad621252b7a032867ef15a9844878444b15eca3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_73871cb5",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-01T17:20:27Z",
+      "side": 1,
+      "message": "This is called from the command_thread, so we can\u0027t join it.  It\u0027s a daemon thread, so it should be fine.  Reworking things to be able to join it would be complicated.  I will leave a comment here though.",
       "revId": "ad621252b7a032867ef15a9844878444b15eca3f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
