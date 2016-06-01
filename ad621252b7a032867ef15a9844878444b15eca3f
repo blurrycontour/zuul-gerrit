@@ -2,6 +2,52 @@
   "comments": [
     {
       "key": {
+        "uuid": "9abb7d3a_0624ac5b",
+        "filename": "zuul/cmd/launcher.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-01T10:44:40Z",
+      "side": 1,
+      "message": "Why not store the socket in the state_dir rather than creating a new option?",
+      "range": {
+        "startLine": 60,
+        "startChar": 44,
+        "endLine": 60,
+        "endChar": 50
+      },
+      "revId": "ad621252b7a032867ef15a9844878444b15eca3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_66a778bd",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-01T10:44:40Z",
+      "side": 1,
+      "message": "Possibly want to rejoin the command_thread here.",
+      "range": {
+        "startLine": 247,
+        "startChar": 32,
+        "endLine": 247,
+        "endChar": 36
+      },
+      "revId": "ad621252b7a032867ef15a9844878444b15eca3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abb7d3a_f5904c45",
         "filename": "zuul/lib/commandsocket.py",
         "patchSetId": 3
