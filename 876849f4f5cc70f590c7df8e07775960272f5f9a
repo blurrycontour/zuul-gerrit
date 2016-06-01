@@ -2,6 +2,52 @@
   "comments": [
     {
       "key": {
+        "uuid": "9abb7d3a_8bd6e525",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-01T10:26:26Z",
+      "side": 1,
+      "message": "This will fail if the launcher section doesn\u0027t exist... then again you probably shouldn\u0027t be running a launcher..",
+      "range": {
+        "startLine": 88,
+        "startChar": 18,
+        "endLine": 88,
+        "endChar": 28
+      },
+      "revId": "876849f4f5cc70f590c7df8e07775960272f5f9a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_ebd971f4",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-01T10:26:26Z",
+      "side": 1,
+      "message": "(-1) should this be get()? I don\u0027t think getdefault is a method.",
+      "range": {
+        "startLine": 89,
+        "startChar": 39,
+        "endLine": 89,
+        "endChar": 49
+      },
+      "revId": "876849f4f5cc70f590c7df8e07775960272f5f9a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abb7d3a_8c972847",
         "filename": "zuul/launcher/ansiblelaunchserver.py",
         "patchSetId": 3
@@ -13,6 +59,24 @@
       "writtenOn": "2016-06-01T06:57:03Z",
       "side": 1,
       "message": "I probably don\u0027t wnat to know why the form of these changed do I?",
+      "revId": "876849f4f5cc70f590c7df8e07775960272f5f9a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_eb005136",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-01T10:26:26Z",
+      "side": 1,
+      "message": "ConfigParser doesn\u0027t take defaults on the get like a dictionary. Must have missed it in earlier reviews.",
+      "parentUuid": "9abb7d3a_8c972847",
       "revId": "876849f4f5cc70f590c7df8e07775960272f5f9a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
