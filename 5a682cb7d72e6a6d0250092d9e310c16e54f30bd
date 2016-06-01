@@ -1,0 +1,234 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abb7d3a_9df58bee",
+        "filename": "etc/console.html",
+        "patchSetId": 7
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-01T10:06:23Z",
+      "side": 1,
+      "message": "eww, mixed tabs",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 5
+      },
+      "revId": "5a682cb7d72e6a6d0250092d9e310c16e54f30bd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_c0fd6c6f",
+        "filename": "requirements.txt",
+        "patchSetId": 7
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-01T10:06:23Z",
+      "side": 1,
+      "message": "If we\u0027re going to require v3 for log streaming, why not just require 3.5?\n\nI assume infra will run this on a different server to zuul to reduce load?",
+      "range": {
+        "startLine": 19,
+        "startChar": 7,
+        "endLine": 19,
+        "endChar": 21
+      },
+      "revId": "5a682cb7d72e6a6d0250092d9e310c16e54f30bd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_3daa9f19",
+        "filename": "zuul/rpcclient.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-01T10:06:23Z",
+      "side": 1,
+      "message": "Should be clearer that this is the server IP running a job, not the actual log location",
+      "range": {
+        "startLine": 86,
+        "startChar": 8,
+        "endLine": 86,
+        "endChar": 28
+      },
+      "revId": "5a682cb7d72e6a6d0250092d9e310c16e54f30bd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_7dbf0761",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-01T10:06:23Z",
+      "side": 1,
+      "message": "This isn\u0027t really the log location so much as the server running the job.",
+      "range": {
+        "startLine": 162,
+        "startChar": 8,
+        "endLine": 162,
+        "endChar": 35
+      },
+      "revId": "5a682cb7d72e6a6d0250092d9e310c16e54f30bd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_fd577755",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-01T10:06:23Z",
+      "side": 1,
+      "message": "This list doesn\u0027t exist. Looks like a copy fail that you don\u0027t need.\n\nuuid is unique anyway, so you can break above",
+      "range": {
+        "startLine": 178,
+        "startChar": 20,
+        "endLine": 178,
+        "endChar": 33
+      },
+      "revId": "5a682cb7d72e6a6d0250092d9e310c16e54f30bd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_80ca4419",
+        "filename": "zuul/streamer.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-01T10:06:23Z",
+      "side": 1,
+      "message": "The streamer server should cache the log locations. Perhaps it should even request a list of all known running jobs from zuul at a time (or a subset) rather than making individual requests.",
+      "range": {
+        "startLine": 44,
+        "startChar": 22,
+        "endLine": 44,
+        "endChar": 42
+      },
+      "revId": "5a682cb7d72e6a6d0250092d9e310c16e54f30bd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_00ebf4df",
+        "filename": "zuul/streamer.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-01T10:06:23Z",
+      "side": 1,
+      "message": "Perhaps should log something or close the connection if we get a binary request",
+      "range": {
+        "startLine": 50,
+        "startChar": 15,
+        "endLine": 50,
+        "endChar": 23
+      },
+      "revId": "5a682cb7d72e6a6d0250092d9e310c16e54f30bd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_20727811",
+        "filename": "zuul/streamer.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-01T10:06:23Z",
+      "side": 1,
+      "message": "This will be slow... should look to send a waiting message or something to the client",
+      "range": {
+        "startLine": 59,
+        "startChar": 48,
+        "endLine": 59,
+        "endChar": 65
+      },
+      "revId": "5a682cb7d72e6a6d0250092d9e310c16e54f30bd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_8092444a",
+        "filename": "zuul/streamer.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-01T10:06:23Z",
+      "side": 1,
+      "message": "probably want this configurable",
+      "range": {
+        "startLine": 85,
+        "startChar": 68,
+        "endLine": 85,
+        "endChar": 72
+      },
+      "revId": "5a682cb7d72e6a6d0250092d9e310c16e54f30bd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_40adfc86",
+        "filename": "zuul/streamer.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-01T10:06:23Z",
+      "side": 1,
+      "message": "probably want this as an entry point",
+      "range": {
+        "startLine": 104,
+        "startChar": 4,
+        "endLine": 104,
+        "endChar": 16
+      },
+      "revId": "5a682cb7d72e6a6d0250092d9e310c16e54f30bd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
