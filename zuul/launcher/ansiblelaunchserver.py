@@ -874,7 +874,8 @@ class NodeWorker(object):
             task = dict(zuul_log=dict(msg="Job complete, result: SUCCESS"))
             main_block.append(task)
 
-            task = dict(zuul_log=dict(msg="Job complete, result: FAILURE"))
+            task = dict(zuul_log=dict(msg="Job complete, result: FAILURE",
+                                      failure=True))
             error_block.append(task)
 
             play = dict(hosts='node', name='Job body',
