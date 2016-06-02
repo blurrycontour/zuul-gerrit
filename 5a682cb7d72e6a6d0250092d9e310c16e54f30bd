@@ -84,6 +84,24 @@
     },
     {
       "key": {
+        "uuid": "9abb7d3a_0c45a616",
+        "filename": "requirements.txt",
+        "patchSetId": 7
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-02T11:08:20Z",
+      "side": 1,
+      "message": "Are we expecting $not_infra to follow with v25 (ie not-jenkins) or do you think people will/should wait for zuulv3?",
+      "parentUuid": "9abb7d3a_3138d5d2",
+      "revId": "5a682cb7d72e6a6d0250092d9e310c16e54f30bd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abb7d3a_3daa9f19",
         "filename": "zuul/rpcclient.py",
         "patchSetId": 7
