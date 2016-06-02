@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abb7d3a_ce4b965e",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-02T11:08:55Z",
+      "side": 1,
+      "message": "I think you\u0027ve undone https://review.openstack.org/#/c/323044",
+      "range": {
+        "startLine": 71,
+        "startChar": 16,
+        "endLine": 71,
+        "endChar": 20
+      },
+      "revId": "b3113e182f8b9ad0389883e6a9377f7a99353764",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_8eb86e2c",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-02T11:08:55Z",
+      "side": 1,
+      "message": "this only actually breaks out of one loop.. you could add a break at each level or (probably neater) turn this into a small function and return the build as soon as it\u0027s found",
+      "range": {
+        "startLine": 182,
+        "startChar": 24,
+        "endLine": 182,
+        "endChar": 29
+      },
+      "revId": "b3113e182f8b9ad0389883e6a9377f7a99353764",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_4edcc674",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-02T11:08:55Z",
+      "side": 1,
+      "message": "I agree with this comment...",
+      "range": {
+        "startLine": 185,
+        "startChar": 14,
+        "endLine": 185,
+        "endChar": 19
+      },
+      "revId": "b3113e182f8b9ad0389883e6a9377f7a99353764",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
