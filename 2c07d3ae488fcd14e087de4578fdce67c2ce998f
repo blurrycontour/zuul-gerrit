@@ -34,6 +34,23 @@
       "revId": "2c07d3ae488fcd14e087de4578fdce67c2ce998f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_d454a922",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 878,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2016-06-02T18:42:53Z",
+      "side": 1,
+      "message": "I know I suggested using \u0027command\u0027 on IRC, but I think using the \u0027fail\u0027 module would give us what we want without having to modify zuul_log or call out to a remote command:\n\n   error_block.append(dict(fail\u003ddict(msg\u003d\u0027FAILURE\u0027)))",
+      "revId": "2c07d3ae488fcd14e087de4578fdce67c2ce998f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
