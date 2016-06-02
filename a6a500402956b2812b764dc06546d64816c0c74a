@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abb7d3a_6efba179",
+        "filename": "zuul/cmd/launcher.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2016-06-02T00:29:05Z",
+      "side": 1,
+      "message": "From a readability perspective, it\u0027d be nicer, I think to do something like from zuul.launcher.ansiblelaunchserver import COMMANDS as LAUNCHER_COMMANDS or something.",
+      "revId": "a6a500402956b2812b764dc06546d64816c0c74a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
