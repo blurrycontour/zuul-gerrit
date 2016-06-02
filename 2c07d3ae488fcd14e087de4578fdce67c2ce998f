@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abb7d3a_d44ae9ab",
+        "filename": "zuul/ansible/library/zuul_log.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-02T18:37:58Z",
+      "side": 1,
+      "message": "I\u0027ve always seen this with keywords; does positional work?",
+      "revId": "2c07d3ae488fcd14e087de4578fdce67c2ce998f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
