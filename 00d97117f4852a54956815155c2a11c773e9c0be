@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abb7d3a_7fece9ba",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2016-06-02T02:34:12Z",
+      "side": 1,
+      "message": "This is screaming for some sort of command-to-method mapping dict, assuming commands keep getting added.",
+      "revId": "00d97117f4852a54956815155c2a11c773e9c0be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_1fe79dac",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 562,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2016-06-02T02:34:12Z",
+      "side": 1,
+      "message": "You should use your _get_job_lock lock here lest you get a nasty race.",
+      "revId": "00d97117f4852a54956815155c2a11c773e9c0be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
