@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "9abb7d3a_2395f43f",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2016-06-02T21:52:27Z",
+      "side": 1,
+      "message": "Totes agreed. Wasn\u0027t a -1, just a suggestion.",
+      "parentUuid": "9abb7d3a_4369188b",
+      "revId": "00d97117f4852a54956815155c2a11c773e9c0be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abb7d3a_1fe79dac",
         "filename": "zuul/launcher/ansiblelaunchserver.py",
         "patchSetId": 1
@@ -87,6 +105,24 @@
     },
     {
       "key": {
+        "uuid": "9abb7d3a_43d8f81d",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 569,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2016-06-02T21:52:27Z",
+      "side": 1,
+      "message": "++",
+      "parentUuid": "9abb7d3a_830940e0",
+      "revId": "00d97117f4852a54956815155c2a11c773e9c0be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abb7d3a_e30e4ce4",
         "filename": "zuul/launcher/ansiblelaunchserver.py",
         "patchSetId": 1
@@ -98,6 +134,24 @@
       "writtenOn": "2016-06-02T21:47:41Z",
       "side": 1,
       "message": "except Exception:\n                self._got_job \u003d False\n                raise",
+      "revId": "00d97117f4852a54956815155c2a11c773e9c0be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_e3fdac6f",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 570,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2016-06-02T21:52:27Z",
+      "side": 1,
+      "message": "++",
+      "parentUuid": "9abb7d3a_e30e4ce4",
       "revId": "00d97117f4852a54956815155c2a11c773e9c0be",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
