@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "9abb7d3a_4369188b",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-02T21:47:41Z",
+      "side": 1,
+      "message": "I can think of 2 more, but yeah.  For me it\u0027s only asking nicely, but I agree, I will probably hear it screaming in the near future.",
+      "revId": "00d97117f4852a54956815155c2a11c773e9c0be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abb7d3a_1fe79dac",
         "filename": "zuul/launcher/ansiblelaunchserver.py",
         "patchSetId": 1
@@ -30,6 +47,57 @@
       "writtenOn": "2016-06-02T02:34:12Z",
       "side": 1,
       "message": "You should use your _get_job_lock lock here lest you get a nasty race.",
+      "revId": "00d97117f4852a54956815155c2a11c773e9c0be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_a30444c6",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 562,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-02T21:47:41Z",
+      "side": 1,
+      "message": "Well, we don\u0027t actually need it because the main purpose of the lock is so that we don\u0027t go from having no job to having a job during the pause method.  If we go from having a job to not having a job, that\u0027s actually fine.\n\nHowever, I take the point that we may be laying a trap if we ever assume that both transitions are true.  If we want to try to clean that up, then I think I would prefer that instead of setting it to false here, we move that into _runGearman below.  That means we will need to add it to the existing gear.InterruptedError clause as well as a new generic handler.  I\u0027ll write it here and we can see what it looks like.\n\nThere, how does that look?",
+      "revId": "00d97117f4852a54956815155c2a11c773e9c0be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_830940e0",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 569,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-02T21:47:41Z",
+      "side": 1,
+      "message": "self._got_job \u003d False",
+      "revId": "00d97117f4852a54956815155c2a11c773e9c0be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_e30e4ce4",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 570,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-02T21:47:41Z",
+      "side": 1,
+      "message": "except Exception:\n                self._got_job \u003d False\n                raise",
       "revId": "00d97117f4852a54956815155c2a11c773e9c0be",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
