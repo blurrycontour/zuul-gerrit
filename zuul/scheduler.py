@@ -413,7 +413,18 @@ class Scheduler(threading.Thread):
                     base = os.path.dirname(os.path.realpath(config_path))
                     fn = os.path.join(base, fn)
                 fn = os.path.expanduser(fn)
-                execfile(fn, config_env)
+                # NOTE(notmorgan): Some versions of python handle this pattern
+                # differently. Notably execfile is not in python 3 and in
+                # some versions of python2 it is not possible to use the new
+                # form via exec() due to unqualified exec errors. To make this
+                # work as expected, handle the differences for the different
+                # python versions explicitly.
+                if six.PY3:
+                    with open(fn) as _f:
+                        code = compile(_f.read(), fn, 'exec')
+                        exec(code, config_env)
+                else:
+                    execfile(fn, config_env)
 
         for conf_pipeline in data.get('pipelines', []):
             pipeline = Pipeline(conf_pipeline['name'])
