@@ -123,6 +123,23 @@
     },
     {
       "key": {
+        "uuid": "9abb7d3a_512f1ea1",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 562,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-02T22:54:51Z",
+      "side": 1,
+      "message": "Er, actually, that doesn\u0027t account for setting _got_job to false when it\u0027s complete.  I think your original suggestion is the best after all.  :)",
+      "revId": "00d97117f4852a54956815155c2a11c773e9c0be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abb7d3a_830940e0",
         "filename": "zuul/launcher/ansiblelaunchserver.py",
         "patchSetId": 1
