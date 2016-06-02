@@ -46,6 +46,30 @@
       "revId": "46326de5ed2c7f28a33a367333385aacf7e3b95c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_c024deb0",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 879,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2016-06-02T21:56:44Z",
+      "side": 1,
+      "message": "WFM!",
+      "parentUuid": "9abb7d3a_489adac6",
+      "range": {
+        "startLine": 879,
+        "startChar": 50,
+        "endLine": 879,
+        "endChar": 59
+      },
+      "revId": "46326de5ed2c7f28a33a367333385aacf7e3b95c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
