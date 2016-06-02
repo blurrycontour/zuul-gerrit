@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "9abb7d3a_c30d0839",
+        "filename": "zuul/cmd/launcher.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-02T21:40:09Z",
+      "side": 1,
+      "message": "I don\u0027t disagree.  :)",
+      "revId": "a6a500402956b2812b764dc06546d64816c0c74a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abb7d3a_a7fbd546",
         "filename": "zuul/launcher/ansiblelaunchserver.py",
         "patchSetId": 2
@@ -36,6 +53,23 @@
         "endLine": 40,
         "endChar": 8
       },
+      "revId": "a6a500402956b2812b764dc06546d64816c0c74a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_0009c631",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-02T21:40:09Z",
+      "side": 1,
+      "message": "I don\u0027t disagree.  :)",
       "revId": "a6a500402956b2812b764dc06546d64816c0c74a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -65,6 +99,23 @@
     },
     {
       "key": {
+        "uuid": "9abb7d3a_6006d221",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-02T21:40:09Z",
+      "side": 1,
+      "message": "It isn\u0027t.  However, this particular approach to idempotentcy requires that we create the full desired set of functions each time.  We could go with a stateful approach and avoid this.  I chose not to do that because it\u0027s less self-contained.  I don\u0027t mind either one though.",
+      "revId": "a6a500402956b2812b764dc06546d64816c0c74a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abb7d3a_c2024709",
         "filename": "zuul/launcher/ansiblelaunchserver.py",
         "patchSetId": 2
@@ -82,6 +133,23 @@
         "endLine": 236,
         "endChar": 21
       },
+      "revId": "a6a500402956b2812b764dc06546d64816c0c74a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_4003ce0f",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-02T21:40:09Z",
+      "side": 1,
+      "message": "This is \"CANT_DO accept-nodes\" in gearman speak.  It means we will not receive any more node assignments.",
       "revId": "a6a500402956b2812b764dc06546d64816c0c74a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -111,6 +179,23 @@
     },
     {
       "key": {
+        "uuid": "9abb7d3a_a3fe0403",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-02T21:40:09Z",
+      "side": 1,
+      "message": "Yes.",
+      "revId": "a6a500402956b2812b764dc06546d64816c0c74a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abb7d3a_82479f4a",
         "filename": "zuul/launcher/ansiblelaunchserver.py",
         "patchSetId": 2
@@ -134,6 +219,23 @@
     },
     {
       "key": {
+        "uuid": "9abb7d3a_8303000d",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-02T21:40:09Z",
+      "side": 1,
+      "message": "Me too.  I thought a lot about it.",
+      "revId": "a6a500402956b2812b764dc06546d64816c0c74a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abb7d3a_e235cba8",
         "filename": "zuul/launcher/ansiblelaunchserver.py",
         "patchSetId": 2
@@ -151,6 +253,23 @@
         "endLine": 505,
         "endChar": 14
       },
+      "revId": "a6a500402956b2812b764dc06546d64816c0c74a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_e3080c2b",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 505,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-02T21:40:09Z",
+      "side": 1,
+      "message": "Yes.",
       "revId": "a6a500402956b2812b764dc06546d64816c0c74a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
