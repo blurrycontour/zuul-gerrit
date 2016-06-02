@@ -16,6 +16,144 @@
       "revId": "a6a500402956b2812b764dc06546d64816c0c74a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_a7fbd546",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-02T11:44:41Z",
+      "side": 1,
+      "message": "perhaps we want to call these socket_commands or control_commands for clarity?",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 40,
+        "endChar": 8
+      },
+      "revId": "a6a500402956b2812b764dc06546d64816c0c74a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_8702110a",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-02T11:44:41Z",
+      "side": 1,
+      "message": "when is self.hostname going to change and therefore create a new entry in the set?",
+      "range": {
+        "startLine": 213,
+        "startChar": 43,
+        "endLine": 213,
+        "endChar": 51
+      },
+      "revId": "a6a500402956b2812b764dc06546d64816c0c74a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_c2024709",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-02T11:44:41Z",
+      "side": 1,
+      "message": "I think I\u0027m missing something because I don\u0027t understand the importance of this?",
+      "range": {
+        "startLine": 236,
+        "startChar": 13,
+        "endLine": 236,
+        "endChar": 21
+      },
+      "revId": "a6a500402956b2812b764dc06546d64816c0c74a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_82303fea",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-02T11:44:41Z",
+      "side": 1,
+      "message": "As suggested by David in 324137, these could be dispatched by a dictionary or something.",
+      "range": {
+        "startLine": 299,
+        "startChar": 25,
+        "endLine": 299,
+        "endChar": 32
+      },
+      "revId": "a6a500402956b2812b764dc06546d64816c0c74a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_82479f4a",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-02T11:44:41Z",
+      "side": 1,
+      "message": "(I know why this is unpaused rather than paused, but I wish there was a way to avoid the double negative)",
+      "range": {
+        "startLine": 422,
+        "startChar": 13,
+        "endLine": 422,
+        "endChar": 21
+      },
+      "revId": "a6a500402956b2812b764dc06546d64816c0c74a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_e235cba8",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 505,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-02T11:44:41Z",
+      "side": 1,
+      "message": "This could also be rolled into mapping a dict to methods",
+      "range": {
+        "startLine": 505,
+        "startChar": 12,
+        "endLine": 505,
+        "endChar": 14
+      },
+      "revId": "a6a500402956b2812b764dc06546d64816c0c74a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
