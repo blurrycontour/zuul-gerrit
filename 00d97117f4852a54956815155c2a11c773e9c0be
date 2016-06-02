@@ -54,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "9abb7d3a_a32a84e5",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2016-06-02T21:53:22Z",
+      "side": 1,
+      "message": "@Shrews,\n\nI think i pointed this out bad when it was just reconfigure and stop ;)\n\nIt def. needs it sometime (sooner rather than later)",
+      "parentUuid": "9abb7d3a_4369188b",
+      "revId": "00d97117f4852a54956815155c2a11c773e9c0be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abb7d3a_1fe79dac",
         "filename": "zuul/launcher/ansiblelaunchserver.py",
         "patchSetId": 1
