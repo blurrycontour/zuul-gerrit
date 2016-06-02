@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abb7d3a_b7af5a93",
+        "filename": "zuul/ansible/library/zuul_runner.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2016-06-02T23:44:28Z",
+      "side": 1,
+      "message": "Should we identify the lines or line numbers where the trailing newline is present? Hard to debug if we add in the newline and don\u0027t identify where we did that.",
+      "revId": "a6740b40a73582c2ee505e2c52d76ba843d6ef1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
