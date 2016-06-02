@@ -25,6 +25,24 @@
     },
     {
       "key": {
+        "uuid": "9abb7d3a_8e052015",
+        "filename": "etc/console.html",
+        "patchSetId": 7
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2016-06-02T04:21:44Z",
+      "side": 1,
+      "message": "oops",
+      "parentUuid": "9abb7d3a_9df58bee",
+      "revId": "5a682cb7d72e6a6d0250092d9e310c16e54f30bd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abb7d3a_c0fd6c6f",
         "filename": "requirements.txt",
         "patchSetId": 7
@@ -42,6 +60,24 @@
         "endLine": 19,
         "endChar": 21
       },
+      "revId": "5a682cb7d72e6a6d0250092d9e310c16e54f30bd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_3138d5d2",
+        "filename": "requirements.txt",
+        "patchSetId": 7
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2016-06-02T04:21:44Z",
+      "side": 1,
+      "message": "No strong reason - 3.5 is in xenial and whatnot. That said, other than uvloop not working with \u003c 3.5 (and it\u0027s just an optimization) - the rest works with 3.4... so the folks who are not-infra might want to run on trusty?",
+      "parentUuid": "9abb7d3a_c0fd6c6f",
       "revId": "5a682cb7d72e6a6d0250092d9e310c16e54f30bd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -71,6 +107,24 @@
     },
     {
       "key": {
+        "uuid": "9abb7d3a_d1a349b0",
+        "filename": "zuul/rpcclient.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2016-06-02T04:21:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9abb7d3a_3daa9f19",
+      "revId": "5a682cb7d72e6a6d0250092d9e310c16e54f30bd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abb7d3a_7dbf0761",
         "filename": "zuul/rpclistener.py",
         "patchSetId": 7
@@ -88,6 +142,24 @@
         "endLine": 162,
         "endChar": 35
       },
+      "revId": "5a682cb7d72e6a6d0250092d9e310c16e54f30bd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_f1ac8da0",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2016-06-02T04:21:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9abb7d3a_7dbf0761",
       "revId": "5a682cb7d72e6a6d0250092d9e310c16e54f30bd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -117,6 +189,24 @@
     },
     {
       "key": {
+        "uuid": "9abb7d3a_116dd1cb",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2016-06-02T04:21:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9abb7d3a_fd577755",
+      "revId": "5a682cb7d72e6a6d0250092d9e310c16e54f30bd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abb7d3a_80ca4419",
         "filename": "zuul/streamer.py",
         "patchSetId": 7
@@ -134,6 +224,24 @@
         "endLine": 44,
         "endChar": 42
       },
+      "revId": "5a682cb7d72e6a6d0250092d9e310c16e54f30bd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_516bd9b6",
+        "filename": "zuul/streamer.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2016-06-02T04:21:44Z",
+      "side": 1,
+      "message": "oooh. I likey yes I do.\n\nI\u0027m going to do that as a follow up just for my sanity, but I like that a lot.",
+      "parentUuid": "9abb7d3a_80ca4419",
       "revId": "5a682cb7d72e6a6d0250092d9e310c16e54f30bd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -163,6 +271,24 @@
     },
     {
       "key": {
+        "uuid": "9abb7d3a_11a4b105",
+        "filename": "zuul/streamer.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2016-06-02T04:21:44Z",
+      "side": 1,
+      "message": "Yes. Also, we should handle errors. I need to go learn something about reporting errors over websockets channels ....",
+      "parentUuid": "9abb7d3a_00ebf4df",
+      "revId": "5a682cb7d72e6a6d0250092d9e310c16e54f30bd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abb7d3a_20727811",
         "filename": "zuul/streamer.py",
         "patchSetId": 7
@@ -180,6 +306,24 @@
         "endLine": 59,
         "endChar": 65
       },
+      "revId": "5a682cb7d72e6a6d0250092d9e310c16e54f30bd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_b1096597",
+        "filename": "zuul/streamer.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2016-06-02T04:21:44Z",
+      "side": 1,
+      "message": "Yah. Excellent point.",
+      "parentUuid": "9abb7d3a_20727811",
       "revId": "5a682cb7d72e6a6d0250092d9e310c16e54f30bd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -209,6 +353,24 @@
     },
     {
       "key": {
+        "uuid": "9abb7d3a_71b37d4d",
+        "filename": "zuul/streamer.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2016-06-02T04:21:44Z",
+      "side": 1,
+      "message": "Very much so.",
+      "parentUuid": "9abb7d3a_8092444a",
+      "revId": "5a682cb7d72e6a6d0250092d9e310c16e54f30bd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abb7d3a_40adfc86",
         "filename": "zuul/streamer.py",
         "patchSetId": 7
@@ -226,6 +388,24 @@
         "endLine": 104,
         "endChar": 16
       },
+      "revId": "5a682cb7d72e6a6d0250092d9e310c16e54f30bd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_b187a55f",
+        "filename": "zuul/streamer.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2016-06-02T04:21:44Z",
+      "side": 1,
+      "message": "Actually intending on making a zuul/cmd/streamer.py that makes and runs a ZuulStrearmer (and also reads config and whatnot)",
+      "parentUuid": "9abb7d3a_40adfc86",
       "revId": "5a682cb7d72e6a6d0250092d9e310c16e54f30bd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
