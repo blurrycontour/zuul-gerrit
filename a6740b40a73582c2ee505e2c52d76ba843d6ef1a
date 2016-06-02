@@ -16,6 +16,23 @@
       "revId": "a6740b40a73582c2ee505e2c52d76ba843d6ef1a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_377ecaae",
+        "filename": "zuul/ansible/library/zuul_runner.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-02T23:52:58Z",
+      "side": 1,
+      "message": "I only expect it at the final line (more or less by definition).",
+      "revId": "a6740b40a73582c2ee505e2c52d76ba843d6ef1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
