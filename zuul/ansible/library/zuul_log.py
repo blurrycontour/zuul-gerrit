@@ -42,11 +42,14 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             msg=dict(required=True),
+            failure=dict(default=False, type='bool'),
         )
     )
 
     p = module.params
     log(p['msg'])
+    if p['failure']:
+        module.fail_json(p['msg'])
     module.exit_json(changed=True)
 
 from ansible.module_utils.basic import *  # noqa
