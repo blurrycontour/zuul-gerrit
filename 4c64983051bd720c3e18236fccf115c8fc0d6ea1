@@ -22,6 +22,23 @@
       "revId": "4c64983051bd720c3e18236fccf115c8fc0d6ea1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_eb4a9626",
+        "filename": "zuul/ansible/library/zuul_runner.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-03T05:05:48Z",
+      "side": 1,
+      "message": "I would like that too, but I know of no good way to break out of readline() like that; the alternative would be a select loop in python where we read 1 character at a time.  Readline is, I believe, implemented in C outside of the GIL and so is much more efficient.  I think it\u0027s worth sticking with readline -- there is ultimately no difference between the fd being closed by python before sys.exit or during.  :)",
+      "revId": "4c64983051bd720c3e18236fccf115c8fc0d6ea1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
