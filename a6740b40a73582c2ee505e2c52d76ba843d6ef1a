@@ -138,6 +138,23 @@
       "revId": "a6740b40a73582c2ee505e2c52d76ba843d6ef1a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_907177e3",
+        "filename": "zuul/ansible/library/zuul_runner.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-03T04:49:10Z",
+      "side": 1,
+      "message": "If you\u0027re concerned about not writing all of the console lines before exiting (especially in the *normal* case), we could probably rework this a bit to try to make sure we get all the output.  But even so, we will still expect that in some cases the program will exit while the follow thread is in readline().",
+      "revId": "a6740b40a73582c2ee505e2c52d76ba843d6ef1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
