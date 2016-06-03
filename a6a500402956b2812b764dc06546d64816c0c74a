@@ -156,6 +156,24 @@
     },
     {
       "key": {
+        "uuid": "9abb7d3a_49581257",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-03T01:39:54Z",
+      "side": 1,
+      "message": "Ah, I understand now... Because self.accept_nodes is changing. Thanks",
+      "parentUuid": "9abb7d3a_4003ce0f",
+      "revId": "a6a500402956b2812b764dc06546d64816c0c74a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abb7d3a_82303fea",
         "filename": "zuul/launcher/ansiblelaunchserver.py",
         "patchSetId": 2
