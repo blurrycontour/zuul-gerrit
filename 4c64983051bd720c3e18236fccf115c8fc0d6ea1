@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abb7d3a_8b24aaaf",
+        "filename": "zuul/ansible/library/zuul_runner.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-03T04:57:32Z",
+      "side": 1,
+      "message": "I like this solution.\n\nI wonder if after 10sec if we should find a way to stop the follow() thread and close neatly.",
+      "range": {
+        "startLine": 89,
+        "startChar": 4,
+        "endLine": 89,
+        "endChar": 14
+      },
+      "revId": "4c64983051bd720c3e18236fccf115c8fc0d6ea1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
