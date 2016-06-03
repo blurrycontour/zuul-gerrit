@@ -57,6 +57,24 @@
       "revId": "4c64983051bd720c3e18236fccf115c8fc0d6ea1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_917f8b65",
+        "filename": "zuul/ansible/library/zuul_runner.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2016-06-03T18:37:15Z",
+      "side": 1,
+      "message": "I generally agree with using readline over select loop (mostly for readability). If needed we can move to the select loop or similar down the line (if this proves to be more problematic).",
+      "parentUuid": "9abb7d3a_eb4a9626",
+      "revId": "4c64983051bd720c3e18236fccf115c8fc0d6ea1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
