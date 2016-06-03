@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "9abb7d3a_c98242c8",
+        "filename": "zuul/ansible/library/zuul_runner.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-03T01:26:55Z",
+      "side": 1,
+      "message": "This will only break one level.. I think we might need the while to check if the process is still running otherwise I don\u0027t think we\u0027ll ever exit Console() cleanly.",
+      "range": {
+        "startLine": 60,
+        "startChar": 16,
+        "endLine": 60,
+        "endChar": 21
+      },
+      "revId": "a6740b40a73582c2ee505e2c52d76ba843d6ef1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abb7d3a_b7af5a93",
         "filename": "zuul/ansible/library/zuul_runner.py",
         "patchSetId": 2
@@ -48,6 +71,29 @@
       "side": 1,
       "message": "Good point, readline should read until newline or EOF meaning the last line would have been the one without a newline.",
       "parentUuid": "9abb7d3a_377ecaae",
+      "revId": "a6740b40a73582c2ee505e2c52d76ba843d6ef1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_492012f8",
+        "filename": "zuul/ansible/library/zuul_runner.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-03T01:26:55Z",
+      "side": 1,
+      "message": "Should we re-join the thread here to make sure the console fd in follow() is closed?",
+      "range": {
+        "startLine": 84,
+        "startChar": 10,
+        "endLine": 84,
+        "endChar": 14
+      },
       "revId": "a6740b40a73582c2ee505e2c52d76ba843d6ef1a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
