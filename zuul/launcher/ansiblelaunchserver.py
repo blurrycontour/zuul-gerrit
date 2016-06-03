@@ -926,13 +926,12 @@ class NodeWorker(object):
             stderr=subprocess.PIPE,
             preexec_fn=os.setsid,
         )
-        (out, err) = self.ansible_proc.communicate()
-        for line in out.split('\n'):
+        for line in iter(self.ansible_proc.stdout.readline, b''):
             line = line[:1024]
-            self.log.debug("Ansible stdout: %s" % line)
-        for line in err.split('\n'):
+            self.log.debug(line)
+        for line in iter(self.ansible_proc.stderr.readline, b''):
             line = line[:1024]
-            self.log.debug("Ansible stderr: %s" % line)
+            self.log.debug(line)
         ret = self.ansible_proc.wait()
         self.ansible_proc = None
         return ret == 0
@@ -946,13 +945,12 @@ class NodeWorker(object):
             stderr=subprocess.PIPE,
             preexec_fn=os.setsid,
         )
-        (out, err) = proc.communicate()
-        for line in out.split('\n'):
+        for line in iter(proc.stdout.readline, b''):
             line = line[:1024]
-            self.log.debug("Ansible post stdout: %s" % line)
-        for line in err.split('\n'):
+            self.log.debug(line)
+        for line in iter(proc.stderr.readline, b''):
             line = line[:1024]
-            self.log.debug("Ansible post stderr: %s" % line)
+            self.log.debug(line)
         return proc.wait() == 0
 
 
