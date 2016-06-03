@@ -726,7 +726,16 @@ class NodeWorker(object):
             if scpfile.get('keep-hierarchy'):
                 source = '"%s/"' % scproot
             else:
-                source = '`/usr/bin/find "%s" -type f`' % scproot
+                # The default is to not keep the file hierarchy and flatten the
+                # tree at the destination. To avoid shell injection exploits in
+                # filenames, feed the list via a pipe. Use a null-delimited
+                # list so that whitespace doesn't cause improper tokenization
+                # of filenames.
+                local_args[1:1] = [
+                    '/usr/bin/find', '"%s"' % scproot, '-type', 'f',
+                    '-print0', '|'
+                ]
+                source = '--from0 --files-from=-'
             local_action = ' '.join(local_args).format(
                 source=source,
                 dest=dest,
