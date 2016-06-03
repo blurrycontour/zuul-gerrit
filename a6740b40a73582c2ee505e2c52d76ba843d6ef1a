@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9abb7d3a_e9fe2637",
+        "filename": "zuul/ansible/library/zuul_runner.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-03T01:33:24Z",
+      "side": 1,
+      "message": "err, I\u0027m clearly under caffeinated. Ignore this.",
+      "parentUuid": "9abb7d3a_c98242c8",
+      "range": {
+        "startLine": 60,
+        "startChar": 16,
+        "endLine": 60,
+        "endChar": 21
+      },
+      "revId": "a6740b40a73582c2ee505e2c52d76ba843d6ef1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abb7d3a_b7af5a93",
         "filename": "zuul/ansible/library/zuul_runner.py",
         "patchSetId": 2
