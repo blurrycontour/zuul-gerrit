@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abb7d3a_510883d9",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 946,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2016-06-03T18:40:54Z",
+      "side": 1,
+      "message": "NIT: It would be nice to have a comment here indicating 1024 selection reason (magic numbers yay!). Same for above, but that is out-of-scope for this change.",
+      "revId": "1506b49e23810e7eb901793d7fe31a8924d35aae",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
