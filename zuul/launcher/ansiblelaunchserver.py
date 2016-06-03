@@ -43,6 +43,26 @@ def boolify(x):
     return bool(x)
 
 
+class WatchdogTimeoutException(Exception):
+    pass
+
+
+class Watchdog(object):
+    # Based off http://stackoverflow.com/questions/2281850
+    def __init__(self, timeout):
+        self.timeout = timeout
+
+    def handle_timeout(self, signum, frame):
+        raise WatchdogTimeoutException()
+
+    def __enter__(self):
+        signal.signal(signal.SIGALRM, self.handle_timeout)
+        signal.alarm(self.seconds)
+
+    def __exit__(self, type, value, traceback):
+        signal.alarm(0)
+
+
 class JobDir(object):
     def __init__(self, keep=False):
         self.keep = keep
@@ -509,12 +529,14 @@ class NodeWorker(object):
         self.registered_functions = new_functions
 
     def abortRunningJob(self):
+        return self.abortRunningProc(self.ansible_job_proc)
+
+    def abortRunningProc(self, proc):
         aborted = False
         self.log.debug("Abort: acquiring job lock")
         with self.running_job_lock:
             if self._running_job:
                 self.log.debug("Abort: a job is running")
-                proc = self.ansible_proc
                 if proc:
                     self.log.debug("Abort: sending kill signal to job "
                                    "process group")
@@ -610,7 +632,8 @@ class NodeWorker(object):
                                'SUCCESS', {})
 
     def runJob(self, job, args):
-        self.ansible_proc = None
+        self.ansible_job_proc = None
+        self.ansible_post_proc = None
         result = None
         with self.running_job_lock:
             if not self._running:
@@ -633,8 +656,28 @@ class NodeWorker(object):
             job.sendWorkData(json.dumps(data))
             job.sendWorkStatus(0, 100)
 
-            job_status = self.runAnsiblePlaybook(jobdir, timeout)
-            post_status = self.runAnsiblePostPlaybook(jobdir, job_status)
+            try:
+                # ansible has timeout set, so allow some slop
+                with Watchdog(int(timeout + 6000)):
+                    job_status = self.runAnsiblePlaybook(jobdir, timeout)
+            except WatchdogTimeoutException:
+                self.log.warning(
+                    "Ansible has exceeded its timeout and may have hung")
+                self.abortRunningJob()
+                job_status = False
+
+            try:
+                # Allow 10min for the post playbook.
+                with Watchdog(6000):
+                    post_status = self.runAnsiblePostPlaybook(
+                        jobdir, job_status)
+            except WatchdogTimeoutException:
+                self.log.warning(
+                    "Ansible has exceeded its timeout during the Post playbook"
+                    " and may have hung")
+                self.abortRunningProc(self.ansible_post_proc)
+                post_status = False
+
             if job_status and post_status:
                 status = 'SUCCESS'
             else:
@@ -805,11 +848,8 @@ class NodeWorker(object):
                       cwd=parameters['WORKSPACE'],
                       parameters=parameters)
         task = dict(zuul_runner=runner)
-        if timeout:
-            task['when'] = '{{ timeout | int > 0 }}'
-            task['async'] = '{{ timeout }}'
-        else:
-            task['async'] = 2 * 60 * 60  # 2 hour default timeout
+        task['when'] = '{{ timeout | int > 0 }}'
+        task['async'] = '{{ timeout }}'
         task['poll'] = 5
         tasks.append(task)
 
@@ -842,6 +882,8 @@ class NodeWorker(object):
                     timeout = timeout.get('timeout')
                     if timeout:
                         timeout = timeout * 60
+        if not timeout:
+            timeout = 2 * 60 * 60  # 2 hour default timeout
 
         with open(jobdir.playbook, 'w') as playbook:
             tasks = []
@@ -914,7 +956,7 @@ class NodeWorker(object):
         return timeout
 
     def runAnsiblePlaybook(self, jobdir, timeout):
-        self.ansible_proc = subprocess.Popen(
+        self.ansible_job_proc = subprocess.Popen(
             ['ansible-playbook', jobdir.playbook,
              '-e', 'timeout=%s' % timeout, '-v'],
             cwd=jobdir.ansible_root,
@@ -922,19 +964,19 @@ class NodeWorker(object):
             stderr=subprocess.PIPE,
             preexec_fn=os.setsid,
         )
-        (out, err) = self.ansible_proc.communicate()
+        (out, err) = self.ansible_job_proc.communicate()
         for line in out.split('\n'):
             line = line[:1024]
             self.log.debug("Ansible stdout: %s" % line)
         for line in err.split('\n'):
             line = line[:1024]
             self.log.debug("Ansible stderr: %s" % line)
-        ret = self.ansible_proc.wait()
-        self.ansible_proc = None
+        ret = self.ansible_job_proc.wait()
+        self.ansible_job_proc = None
         return ret == 0
 
     def runAnsiblePostPlaybook(self, jobdir, success):
-        proc = subprocess.Popen(
+        self.ansible_post_proc = subprocess.Popen(
             ['ansible-playbook', jobdir.post_playbook,
              '-e', 'success=%s' % success, '-v'],
             cwd=jobdir.ansible_root,
@@ -942,14 +984,16 @@ class NodeWorker(object):
             stderr=subprocess.PIPE,
             preexec_fn=os.setsid,
         )
-        (out, err) = proc.communicate()
+        (out, err) = self.ansible_post_proc.communicate()
         for line in out.split('\n'):
             line = line[:1024]
             self.log.debug("Ansible post stdout: %s" % line)
         for line in err.split('\n'):
             line = line[:1024]
             self.log.debug("Ansible post stderr: %s" % line)
-        return proc.wait() == 0
+        ret = self.ansible_post_proc.wait()
+        self.ansible_post_proc = None
+        return ret == 0
 
 
 class JJB(jenkins_jobs.builder.Builder):
