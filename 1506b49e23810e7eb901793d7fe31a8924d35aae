@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "9abb7d3a_558fce22",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 929,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2016-06-03T19:06:43Z",
+      "side": 1,
+      "message": "I think because of the way you setup the Popen object to have only a single pipe buffer that this is ok. Just noting the warning from the subprocess docs:\n\n\n  \"Use communicate() rather than .stdin.write, .stdout.read or .stderr.read to avoid deadlocks due to any of the other OS pipe buffers filling up and blocking the child process.\"\n\n\nShould we ever separate stderr again, that might cause us issues.",
+      "revId": "1506b49e23810e7eb901793d7fe31a8924d35aae",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abb7d3a_510883d9",
         "filename": "zuul/launcher/ansiblelaunchserver.py",
         "patchSetId": 2
