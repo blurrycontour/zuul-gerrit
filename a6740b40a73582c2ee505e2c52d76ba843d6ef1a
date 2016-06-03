@@ -121,6 +121,23 @@
       "revId": "a6740b40a73582c2ee505e2c52d76ba843d6ef1a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abb7d3a_107467fb",
+        "filename": "zuul/ansible/library/zuul_runner.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-03T04:40:47Z",
+      "side": 1,
+      "message": "Nope.  If the process exited while one of its children is holding its stdout open, the follow thread will never exit.  That\u0027s the bug this patch fixes.  In that case, wait() will return here, we will open a second fd for the console log, write something to it (the follow thread is *probably* mostly idle since our immediate process died -- at least, that has been the case in all instances in which the bug has happened -- worst case, if it isn\u0027t, we will get two interleaved log lines which is not the end of the world) and then this function will return and the whole program will exit.  At that point, the file descriptor in follow will be closed.  :)\n\nIf you want, I will be happy to add a comment as to why we should not t.join().",
+      "revId": "a6740b40a73582c2ee505e2c52d76ba843d6ef1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
