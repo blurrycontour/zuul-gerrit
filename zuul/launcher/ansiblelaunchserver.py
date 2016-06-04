@@ -806,6 +806,7 @@ class NodeWorker(object):
 
     def _makeSCPTask(self, jobdir, publisher, parameters):
         tasks = []
+        playbooks = False
         for scpfile in publisher['scp']['files']:
             site = publisher['scp']['site']
             if scpfile.get('copy-console'):
@@ -832,15 +833,27 @@ class NodeWorker(object):
             tasks.append(task)
 
             task = self._makeSCPTaskLocalAction(
-                site, scpfile, scproot, parameters)
+                site, scpfile['target'], scproot, parameters,
+                scpfile.get('keep-hierarchy'),
+                scpfile.get('copy-after-failure'))
             tasks.append(task)
+
+            # NOTE(pabelanger): If our job is publishing logs, we can
+            # also publish our ansible playbooks.
+            if scproot.find('logs') and not playbooks:
+                task = self._makeSCPTaskLocalAction(
+                    site, scpfile['target'], jobdir.root, parameters)
+                tasks.append(task)
+                playbooks = True
+
         return tasks
 
-    def _makeSCPTaskLocalAction(self, site, scpfile, scproot, parameters):
+    def _makeSCPTaskLocalAction(
+            self, site, dest, scproot, parameters, hierarchy=False,
+            failure_copy=False):
         if site not in self.sites:
             raise Exception("Undefined SCP site: %s" % (site,))
         site = self.sites[site]
-        dest = scpfile['target']
         dest = self._substituteVariables(dest, parameters)
         dest = os.path.join(site['root'], dest)
         dest = os.path.normpath(dest)
@@ -857,7 +870,7 @@ class NodeWorker(object):
             '--out-format="<<CHANGED>>%i %n%L"',
             '{source}', '"{user}@{host}:{dest}"'
         ]
-        if scpfile.get('keep-hierarchy'):
+        if hierarchy:
             source = '"%s/"' % scproot
         else:
             source = '`/usr/bin/find "%s" -type f`' % scproot
@@ -868,7 +881,7 @@ class NodeWorker(object):
             host=site['host'],
             user=site['user'])
         task = dict(local_action=local_action)
-        if not scpfile.get('copy-after-failure'):
+        if not failure_copy:
             task['when'] = 'success'
         return task
 
