@@ -1,0 +1,10 @@
+Code-Review+1: Morgan Fainberg <morgan.fainberg@gmail.com>
+Code-Review+1: David Shrewsbury <shrewsbury.dave@gmail.com>
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Sat, 04 Jun 2016 15:55:31 +0000
+Reviewed-on: https://review.openstack.org/325356
+Project: openstack-infra/zuul
+Branch: refs/heads/master
