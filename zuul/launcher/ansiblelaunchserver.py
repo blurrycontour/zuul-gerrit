@@ -832,15 +832,18 @@ class NodeWorker(object):
             tasks.append(task)
 
             task = self._makeSCPTaskLocalAction(
-                site, scpfile, scproot, parameters)
+                site, scpfile['target'], scproot, parameters,
+                scpfile.get('keep-hierarchy'),
+                scpfile.get('copy-after-failure'))
             tasks.append(task)
         return tasks
 
-    def _makeSCPTaskLocalAction(self, site, scpfile, scproot, parameters):
+    def _makeSCPTaskLocalAction(
+            self, site, dest, scproot, parameters, hierarchy=False,
+            failure_copy=False):
         if site not in self.sites:
             raise Exception("Undefined SCP site: %s" % (site,))
         site = self.sites[site]
-        dest = scpfile['target']
         dest = self._substituteVariables(dest, parameters)
         dest = os.path.join(site['root'], dest)
         dest = os.path.normpath(dest)
@@ -857,7 +860,7 @@ class NodeWorker(object):
             '--out-format="<<CHANGED>>%i %n%L"',
             '{source}', '"{user}@{host}:{dest}"'
         ]
-        if scpfile.get('keep-hierarchy'):
+        if hierarchy:
             source = '"%s/"' % scproot
         else:
             source = '`/usr/bin/find "%s" -type f`' % scproot
@@ -868,7 +871,7 @@ class NodeWorker(object):
             host=site['host'],
             user=site['user'])
         task = dict(local_action=local_action)
-        if not scpfile.get('copy-after-failure'):
+        if not failure_copy:
             task['when'] = 'success'
         return task
 
@@ -1018,6 +1021,16 @@ class NodeWorker(object):
                 if 'scp' in publisher:
                     tasks.extend(self._makeSCPTask(jobdir, publisher,
                                                    parameters))
+
+                    # NOTE(pabelanger): If our job is publishing logs, we can
+                    # also publish our ansible playbooks.
+                    task = self._makeSCPTaskLocalAction(
+                        publisher['scp']['site'],
+                        publisher['scp']['files'][0]['target'],
+                        jobdir.ansible_root,
+                        parameters)
+                    tasks.extend(task)
+
                 if 'ftp' in publisher:
                     tasks.extend(self._makeFTPTask(jobdir, publisher,
                                                    parameters))
