@@ -2291,7 +2291,7 @@ jobs:
         self.worker.release()
         self.waitUntilSettled()
 
-        data = json.loads(data)
+        data = json.loads(data.decode('utf-8'))
         status_jobs = []
         for p in data['pipelines']:
             for q in p['change_queues']:
