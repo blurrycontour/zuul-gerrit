@@ -72,7 +72,7 @@ class TestWebapp(ZuulTestCase):
         req = urllib.request.Request(
             "http://localhost:%s/status/change/1,1" % self.port)
         f = urllib.request.urlopen(req)
-        data = json.loads(f.read())
+        data = json.loads(f.read().decode('utf-8'))
 
         self.assertEqual(1, len(data), data)
         self.assertEqual("org/project", data[0]['project'])
@@ -80,7 +80,7 @@ class TestWebapp(ZuulTestCase):
         req = urllib.request.Request(
             "http://localhost:%s/status/change/2,1" % self.port)
         f = urllib.request.urlopen(req)
-        data = json.loads(f.read())
+        data = json.loads(f.read().decode('utf-8'))
 
         self.assertEqual(1, len(data), data)
         self.assertEqual("org/project1", data[0]['project'], data)

@@ -80,7 +80,7 @@ def repack_repo(path):
 
 
 def random_sha1():
-    return hashlib.sha1(str(random.random())).hexdigest()
+    return hashlib.sha1(str(random.random()).encode('utf-8')).hexdigest()
 
 
 def iterate_timeout(max_seconds, purpose):
@@ -524,7 +524,7 @@ class FakeStatsd(threading.Thread):
                     return
 
     def stop(self):
-        os.write(self.wake_write, '1\n')
+        os.write(self.wake_write, b'1\n')
 
 
 class FakeBuild(threading.Thread):
@@ -756,7 +756,8 @@ class FakeGearmanServer(gear.Server):
         for queue in [self.high_queue, self.normal_queue, self.low_queue]:
             for job in queue:
                 if not hasattr(job, 'waiting'):
-                    if job.name.startswith('build:'):
+                    job_name = job.name.decode('utf-8')
+                    if job_name.startswith('build:'):
                         job.waiting = self.hold_jobs_in_queue
                     else:
                         job.waiting = False
@@ -777,7 +778,8 @@ class FakeGearmanServer(gear.Server):
                 len(self.low_queue))
         self.log.debug("releasing queued job %s (%s)" % (regex, qlen))
         for job in self.getQueue():
-            cmd, name = job.name.split(':')
+            job_name = job.name.decode('utf-8')
+            cmd, name = job_name.split(':')
             if cmd != 'build':
                 continue
             if not regex or re.match(regex, name):
@@ -1065,8 +1067,15 @@ class ZuulTestCase(BaseTestCase):
         repos = []
         gc.collect()
         for obj in gc.get_objects():
-            if isinstance(obj, git.Repo):
-                repos.append(obj)
+            try:
+                if isinstance(obj, git.Repo):
+                    repos.append(obj)
+            except ReferenceError:
+                # NOTE(notmorgan): If we are handling weak-ref objects, this
+                # we can get ``ReferenceError: weakly-referenced object no
+                # longer exists`` in the instance check. Pass on this error
+                # so that the rest of the final state checks can continue.
+                pass
         self.assertEqual(len(repos), 0)
         self.assertEmptyQueues()
         for pipeline in self.sched.layout.pipelines.values():
@@ -1101,10 +1110,9 @@ class ZuulTestCase(BaseTestCase):
             os.makedirs(path)
         path = os.path.join(self.upstream_root, project)
         repo = git.Repo.init(path)
-
-        repo.config_writer().set_value('user', 'email', 'user@example.com')
-        repo.config_writer().set_value('user', 'name', 'User Name')
-        repo.config_writer().write()
+        with repo.config_writer() as config_writer:
+            config_writer.set_value('user', 'email', 'user@example.com')
+            config_writer.set_value('user', 'name', 'User Name')
 
         fn = os.path.join(path, 'README')
         f = open(fn, 'w')
@@ -1329,7 +1337,7 @@ class ZuulTestCase(BaseTestCase):
     def getJobFromHistory(self, name):
         history = self.worker.build_history
         for job in history:
-            if job.name == name:
+            if job.name.decode('utf-8') == name:
                 return job
         raise Exception("Unable to find job %s in history" % name)
 
@@ -1348,7 +1356,7 @@ class ZuulTestCase(BaseTestCase):
         while time.time() < (start + 5):
             for stat in self.statsd.stats:
                 pprint.pprint(self.statsd.stats)
-                k, v = stat.split(':')
+                k, v = stat.encode('utf-8').split(':')
                 if key == k:
                     if value is None and kind is None:
                         return
