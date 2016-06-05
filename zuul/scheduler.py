@@ -140,7 +140,13 @@ class ManagementEvent(object):
     def wait(self, timeout=None):
         self._wait_event.wait(timeout)
         if self._exception:
-            six.reraise(self._exception, None, self._traceback)
+            # NOTE(notmorgan): Minor differences in how reraise works under
+            # py2 and py3 here force us to pass a type() of the exception for
+            # python3 and the actual exception for python2.
+            exc = self._exception
+            if six.PY3:
+                exc = type(self._exception)
+            six.reraise(exc, None, self._traceback)
         return self._wait_event.is_set()
 
 
@@ -1491,7 +1497,7 @@ class BasePipelineManager(object):
             dependent_items = self.getDependentItems(item)
             dependent_items.reverse()
             all_items = dependent_items + [item]
-            merger_items = map(self._makeMergerItem, all_items)
+            merger_items = list(map(self._makeMergerItem, all_items))
             self.sched.merger.mergeChanges(merger_items,
                                            item.current_build_set,
                                            self.pipeline.precedence)
