@@ -347,7 +347,8 @@ class Gearman(object):
             self.sched.onBuildCompleted(build, 'SUCCESS')
             return build
 
-        gearman_job = gear.Job(name, json.dumps(params),
+        gearman_job = gear.Job(name,
+                               json.dumps(params).encode('utf-8'),
                                unique=uuid)
         build.__gearman_job = gearman_job
         self.builds[uuid] = build
@@ -439,7 +440,8 @@ class Gearman(object):
             # internal dict after it's added to the report queue.
             del self.builds[job.unique]
         else:
-            if not job.name.startswith("stop:"):
+            job_name = job.name.decode('utf-8')
+            if not job_name.startswith("stop:"):
                 self.log.error("Unable to find build %s" % job.unique)
 
     def onWorkStatus(self, job):
