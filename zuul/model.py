@@ -113,8 +113,7 @@ class Pipeline(object):
         # cmp is not in python3, applied idiom from
         # http://python-future.org/compatible_idioms.html#cmp
         return sorted(
-            self.job_trees.keys(),
-            lambda a, b: (a.name > b.name) - (a.name < b.name))
+            self.job_trees.keys(), key=lambda i: i.name)
 
     def addQueue(self, queue):
         self.queues.append(queue)
@@ -680,7 +679,7 @@ class BuildSet(object):
         return self.builds.get(job_name)
 
     def getBuilds(self):
-        keys = self.builds.keys()
+        keys = list(self.builds.keys())
         keys.sort()
         return [self.builds.get(x) for x in keys]
 

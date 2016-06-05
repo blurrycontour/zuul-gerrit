@@ -66,7 +66,8 @@ class RPCListener(object):
         while self._running:
             try:
                 job = self.worker.getJob()
-                z, jobname = job.name.split(':')
+                job_name = job.name.decode('utf-8')
+                z, jobname = job_name.split(':')
                 self.log.debug("Received job %s" % job.name)
                 attrname = 'handle_' + jobname
                 if hasattr(self, attrname):
