@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7aa08908_d69fa6b2",
+        "filename": "tests/base.py",
+        "patchSetId": 37
+      },
+      "lineNbr": 562,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2016-06-06T00:36:45Z",
+      "side": 1,
+      "message": "We use \"PR\" else where but \"PullRequest\" here.  I personally like PullRequest.",
+      "revId": "cc40cb7244d176a0bc375fa72c7ab15ffb6cc9f8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7aa08908_96e4fe3b",
+        "filename": "tests/test_connection.py",
+        "patchSetId": 37
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2016-06-06T00:36:45Z",
+      "side": 1,
+      "message": "In other places we use \"Github\", here we use \"GitHub\"",
+      "revId": "cc40cb7244d176a0bc375fa72c7ab15ffb6cc9f8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7aa08908_56c1f67f",
+        "filename": "zuul/model.py",
+        "patchSetId": 37
+      },
+      "lineNbr": 906,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2016-06-06T00:36:45Z",
+      "side": 1,
+      "message": "Random thought.  I know it defies convention, but I wonder why we don\u0027t adopt \"{0}/{1}/{2}\".format() -- eliminates the need for that explicit cast.",
+      "revId": "cc40cb7244d176a0bc375fa72c7ab15ffb6cc9f8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7aa08908_96523edc",
+        "filename": "zuul/source/github.py",
+        "patchSetId": 37
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 11610
+      },
+      "writtenOn": "2016-06-06T00:36:45Z",
+      "side": 1,
+      "message": "Is this true?",
+      "revId": "cc40cb7244d176a0bc375fa72c7ab15ffb6cc9f8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
