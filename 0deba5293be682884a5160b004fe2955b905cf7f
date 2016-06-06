@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7aa08908_b9ee4aea",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 845,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-06T04:30:56Z",
+      "side": 1,
+      "message": "We probably need to set the target to another folder such as \"zuul-ansible-playbooks\" or something. Otherwise it\u0027ll just be uploaded as a random tmpdir name.\n\nWhich also means you probably want to ensure jobdir.root has a trailing slash.",
+      "range": {
+        "startLine": 845,
+        "startChar": 26,
+        "endLine": 845,
+        "endChar": 44
+      },
+      "revId": "0deba5293be682884a5160b004fe2955b905cf7f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7aa08908_59abe689",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 852,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-06T04:30:56Z",
+      "side": 1,
+      "message": "I think it\u0027d be better to keep the hierarchy by default or at least keep it for the jobdir",
+      "range": {
+        "startLine": 852,
+        "startChar": 51,
+        "endLine": 852,
+        "endChar": 60
+      },
+      "revId": "0deba5293be682884a5160b004fe2955b905cf7f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7aa08908_d9c87677",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 853,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-06T04:30:56Z",
+      "side": 1,
+      "message": "Probably want to copy files on failure right? as in these could be useful for debugging?",
+      "range": {
+        "startLine": 853,
+        "startChar": 12,
+        "endLine": 853,
+        "endChar": 24
+      },
+      "revId": "0deba5293be682884a5160b004fe2955b905cf7f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
