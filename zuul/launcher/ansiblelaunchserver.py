@@ -235,7 +235,7 @@ class LaunchServer(object):
     def register(self):
         new_functions = set()
         if self.accept_nodes:
-            new_functions.add("node-assign:zuul")
+            new_functions.add("node-assign:%s" % self.hostname)
         new_functions.add("stop:%s" % self.hostname)
 
         for function in new_functions - self.registered_functions:
