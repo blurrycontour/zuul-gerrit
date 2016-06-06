@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7aa08908_59f3e60a",
+        "filename": "zuul/model.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-06T04:13:51Z",
+      "side": 1,
+      "message": "Do we actually even need this?\n\na) I think this is the default behavour for sorted (without a compare method passed)\n\nb) it doesn\u0027t look like python3 has a compare parameter https://docs.python.org/3/library/functions.html?highlight\u003dsorted#sorted",
+      "range": {
+        "startLine": 117,
+        "startChar": 13,
+        "endLine": 117,
+        "endChar": 62
+      },
+      "revId": "63cf74edb2b8b6c729be1b25719a7212c7fe1af7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
