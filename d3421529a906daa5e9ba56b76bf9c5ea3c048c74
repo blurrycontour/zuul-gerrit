@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7aa08908_2896494c",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2016-06-06T23:39:41Z",
+      "side": 1,
+      "message": "Why use six.BytesIO() over six.StringIO()?",
+      "revId": "d3421529a906daa5e9ba56b76bf9c5ea3c048c74",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
