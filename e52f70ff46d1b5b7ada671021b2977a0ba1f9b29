@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7aa08908_e4828193",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-07T14:55:13Z",
+      "side": 1,
+      "message": "Maybe drop the args now so we don\u0027t forget?  It only has one caller, I believe.",
+      "revId": "e52f70ff46d1b5b7ada671021b2977a0ba1f9b29",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7aa08908_c47dc5b2",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1056,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-07T14:55:13Z",
+      "side": 1,
+      "message": "Here it is.",
+      "revId": "e52f70ff46d1b5b7ada671021b2977a0ba1f9b29",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
