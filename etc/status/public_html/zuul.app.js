@@ -44,7 +44,7 @@ function zuul_build_dom($, container) {
 /**
  * @return The $.zuul instance
  */
-function zuul_start($) {
+function zuul_start($, options) {
     // Start the zuul app (expects default dom)
 
     var $container, $indicator;
@@ -54,10 +54,8 @@ function zuul_start($) {
             'status.json';
     source = source_url ? source_url[1] : source;
 
-    var zuul = $.zuul({
-        source: source,
-        //graphite_url: 'http://graphite.openstack.org/render/'
-    });
+    options = $.extend(options, {source: source});
+    var zuul = $.zuul(options);
 
     zuul.jq.on('update-start', function () {
         $container.addClass('zuul-container-loading');
