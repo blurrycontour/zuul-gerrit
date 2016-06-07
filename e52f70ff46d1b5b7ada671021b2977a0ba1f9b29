@@ -51,6 +51,24 @@
       "revId": "e52f70ff46d1b5b7ada671021b2977a0ba1f9b29",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7aa08908_723e50db",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1056,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2016-06-07T15:51:15Z",
+      "side": 1,
+      "message": "I\u0027m going to pass the exc_info in directly here, keep a single arg to keep the same pattern we have now.",
+      "parentUuid": "7aa08908_c47dc5b2",
+      "revId": "e52f70ff46d1b5b7ada671021b2977a0ba1f9b29",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
