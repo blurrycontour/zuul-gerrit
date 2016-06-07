@@ -28,10 +28,11 @@ under the License.
     <script src="lib/jquery-visibility.js"></script>
     <script src="lib/jquery.graphite.js"></script>
     <script src="jquery.zuul.js"></script>
+    <script src="zuul.config.js"></script>
     <script src="zuul.app.js"></script>
     <script>
         zuul_build_dom(jQuery, '#zuul_container');
-        zuul_start(jQuery);
+        zuul_start(jQuery, zuul_config);
     </script>
 </body>
 </html>
