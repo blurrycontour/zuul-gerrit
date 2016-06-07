@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7aa08908_a89de40b",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1055,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2016-06-07T16:59:27Z",
+      "side": 1,
+      "message": "pep8 failure.",
+      "range": {
+        "startLine": 1055,
+        "startChar": 8,
+        "endLine": 1055,
+        "endChar": 29
+      },
+      "revId": "054a14667eb8e98d34ae8f202a047d49cd2803bb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
