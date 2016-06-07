@@ -16,6 +16,24 @@
       "revId": "8ca35b4aeebc95f625efab16d7c7bf65e93088fe",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7aa08908_7301326a",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2016-06-07T16:34:08Z",
+      "side": 1,
+      "message": "I was finding this was not always the case. I\u0027ll look more closely at this. \n\n++ on putting it into config load if that is the case.",
+      "parentUuid": "7aa08908_0d57ed26",
+      "revId": "8ca35b4aeebc95f625efab16d7c7bf65e93088fe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
