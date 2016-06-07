@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7aa08908_13cb991f",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 6159
+      },
+      "writtenOn": "2016-06-07T14:15:39Z",
+      "side": 1,
+      "message": "nit: using the `{}` would have probably been more consistent with other parts of the code",
+      "revId": "8d9c8061960d9d525da581bda4ff593c83e64d8f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
