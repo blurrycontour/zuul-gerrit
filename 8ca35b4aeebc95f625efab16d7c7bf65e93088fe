@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7aa08908_0d57ed26",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-07T16:04:38Z",
+      "side": 1,
+      "message": "I think self.window should already be an int or None (which we have checked here).  If this is needed, perhaps we need to add a coercion somewhere else (on config load?).",
+      "revId": "8ca35b4aeebc95f625efab16d7c7bf65e93088fe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
