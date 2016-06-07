@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7aa08908_4372964a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-07T00:13:07Z",
+      "side": 1,
+      "message": "This doesn\u0027t actually chain exceptions, this is transferring exceptions from one thread to another.",
+      "revId": "2fb9d3836e4cc6316fc05402baf09748ae96ca6c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7aa08908_a38ffa21",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-07T00:13:07Z",
+      "side": 1,
+      "message": "Apparently None as the second argument doesn\u0027t work here.  But changing this whole thing to six.reraise(*self.exc_info) and then changing the exception method above to save self.exc_info \u003d sys.exc_info() will work (albiet with a slightly wonkier traceback).",
+      "revId": "2fb9d3836e4cc6316fc05402baf09748ae96ca6c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
