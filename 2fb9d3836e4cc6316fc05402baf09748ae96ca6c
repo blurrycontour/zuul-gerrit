@@ -33,6 +33,24 @@
       "revId": "2fb9d3836e4cc6316fc05402baf09748ae96ca6c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7aa08908_de4dbc73",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2016-06-07T02:36:57Z",
+      "side": 1,
+      "message": "Ok, so calling this a \"chained exception\" is technically incorrect (in the commit message), however, functionally this is chaining the exception (just via a new thread) - raising an exception possibly with a different traceback.\n\nI can convert to save sys.exc_info. As a point, in python2 this works as expected because reraise falls back to the syntax you are currently using here (looking into six).\n\nIn Python3, we need to explicitly pass the exec_type instead of a formed exception, so what we were losing with the change (and use of None), was the exception value but the traceback was still properly being set. this may still need special-cased py3 vs py2 exec value(arg1) being passed.",
+      "parentUuid": "7aa08908_a38ffa21",
+      "revId": "2fb9d3836e4cc6316fc05402baf09748ae96ca6c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
