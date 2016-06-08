@@ -164,6 +164,10 @@ class Gearman(object):
             port = config.get('gearman', 'port')
         else:
             port = 4730
+        if config.has_option('gearman', 'register'):
+            self.register = config.get('gearman', 'register')
+        else:
+            self.register = True
 
         self.gearman = ZuulGearmanClient(self)
         self.gearman.addServer(server, port)
@@ -351,7 +355,7 @@ class Gearman(object):
         build.__gearman_job = gearman_job
         self.builds[uuid] = build
 
-        if not self.isJobRegistered(gearman_job.name):
+        if self.register and not self.isJobRegistered(gearman_job.name):
             self.log.error("Job %s is not registered with Gearman" %
                            gearman_job)
             self.onBuildCompleted(gearman_job, 'NOT_REGISTERED')
@@ -502,7 +506,7 @@ class Gearman(object):
             # us where the job is running.
             return False
 
-        if not self.isJobRegistered(name):
+        if self.register and not self.isJobRegistered(name):
             return False
 
         desc_uuid = str(uuid4().hex)
