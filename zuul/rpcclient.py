@@ -36,7 +36,7 @@ class RPCClient(object):
     def submitJob(self, name, data):
         self.log.debug("Submitting job %s with data %s" % (name, data))
         job = gear.Job(name,
-                       json.dumps(data),
+                       json.dumps(data).encode('utf-8'),
                        unique=str(time.time()))
         self.gearman.submitJob(job, timeout=300)
 
@@ -44,7 +44,7 @@ class RPCClient(object):
         while not job.complete:
             time.sleep(0.1)
         if job.exception:
-            raise RPCFailure(job.exception)
+            raise RPCFailure(job.exception.decode('utf-8'))
         self.log.debug("Job complete, success: %s" % (not job.failure))
         return job
 
@@ -78,7 +78,7 @@ class RPCClient(object):
         if job.failure:
             return False
         else:
-            return json.loads(job.data[0])
+            return json.loads(job.data[0].decode('utf-8'))
 
     def shutdown(self):
         self.gearman.shutdown()

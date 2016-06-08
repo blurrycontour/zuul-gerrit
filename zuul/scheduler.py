@@ -1105,6 +1105,8 @@ class Scheduler(threading.Thread):
             return
         if build.end_time and build.start_time and build.result:
             duration = build.end_time - build.start_time
+        else:
+            duration = 0
         try:
             self.time_database.update(build.job.name, duration, build.result)
         except Exception:
@@ -1489,7 +1491,7 @@ class BasePipelineManager(object):
             dependent_items = self.getDependentItems(item)
             dependent_items.reverse()
             all_items = dependent_items + [item]
-            merger_items = map(self._makeMergerItem, all_items)
+            merger_items = list(map(self._makeMergerItem, all_items))
             self.sched.merger.mergeChanges(merger_items,
                                            item.current_build_set,
                                            self.pipeline.precedence)

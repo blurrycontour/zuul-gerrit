@@ -385,19 +385,21 @@ class LaunchServer(object):
         while self._gearman_running:
             try:
                 job = self.worker.getJob()
+                job_unique = job.unique.decode('utf-8')
+                job_name = job.name.decode('utf-8')
                 try:
                     if job.name.startswith('node_assign:'):
-                        self.log.debug("Got node_assign job: %s" % job.unique)
+                        self.log.debug("Got node_assign job: %s" % job_unique)
                         self.assignNode(job)
                     elif job.name.startswith('stop:'):
-                        self.log.debug("Got stop job: %s" % job.unique)
+                        self.log.debug("Got stop job: %s" % job_unique)
                         self.stopJob(job)
                     elif job.name.startswith('set_description:'):
                         self.log.debug("Got set_description job: %s" %
                                        job.unique)
                         job.sendWorkComplete()
                     else:
-                        self.log.error("Unable to handle job %s" % job.name)
+                        self.log.error("Unable to handle job %s" % job_name)
                         job.sendWorkFail()
                 except Exception:
                     self.log.exception("Exception while running job")
@@ -408,11 +410,11 @@ class LaunchServer(object):
                 self.log.exception("Exception while getting job")
 
     def assignNode(self, job):
-        args = json.loads(job.arguments)
+        args = json.loads(job.arguments.decode('utf-8'))
         self.log.debug("Assigned node with arguments: %s" % (args,))
         self._launchWorker(args)
         data = dict(manager=self.hostname)
-        job.sendWorkData(json.dumps(data))
+        job.sendWorkData(json.dumps(data).encode('utf-8'))
         job.sendWorkComplete()
 
     def _launchWorker(self, args):
@@ -428,7 +430,7 @@ class LaunchServer(object):
 
     def stopJob(self, job):
         try:
-            args = json.loads(job.arguments)
+            args = json.loads(job.arguments.decode('utf-8'))
             self.log.debug("Stop job with arguments: %s" % (args,))
             unique = args['number']
             build_worker_name = self.builds.get(unique)
@@ -694,9 +696,10 @@ class NodeWorker(object):
                       (self.name, job.name))
 
         # Make sure we can parse what we need from the job first
-        args = json.loads(job.arguments)
+        args = json.loads(job.arguments.decode('utf-8'))
         offline = boolify(args.get('OFFLINE_NODE_WHEN_COMPLETE', False))
-        job_name = job.name.split(':')[1]
+        job_name = job.name.decode('utf-8').split(':')[1]
+        job_unique = job.unique.decode('utf-8')
 
         # Initialize the result so we have something regardless of
         # whether the job actually runs
@@ -729,7 +732,7 @@ class NodeWorker(object):
             self.log.exception("Exception while sending job completion event")
 
         try:
-            del self.builds[job.unique]
+            del self.builds[job_unique]
         except Exception:
             self.log.exception("Exception while clearing build record")
 
@@ -779,16 +782,17 @@ class NodeWorker(object):
             self._running_job = True
             self._job_complete_event.clear()
 
-        self.log.debug("Job %s: beginning" % (job.unique,))
-        self.builds[job.unique] = self.name
+        job_unique = job.unique.decode('utf-8')
+        self.log.debug("Job %s: beginning" % (job_unique,))
+        self.builds[job_unique] = self.name
         with JobDir(self.keep_jobdir) as jobdir:
             self.log.debug("Job %s: job root at %s" %
-                           (job.unique, jobdir.root))
+                           (job_unique, jobdir.root))
             timeout = self.prepareAnsibleFiles(jobdir, job, args)
 
             data = {
                 'manager': self.manager_name,
-                'number': job.unique,
+                'number': job_unique,
                 'url': 'telnet://%s:8088' % self.host,
             }
             job.sendWorkData(json.dumps(data))
