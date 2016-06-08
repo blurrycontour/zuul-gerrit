@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7aa08908_099b0119",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-08T20:47:29Z",
+      "side": 1,
+      "message": "maybe \"check_job_registration\" ?  Mostly because \u0027register\u0027 makes me think that this will somehow either register or not register something with gearman.",
+      "revId": "6d16a7083efe210ddf912e3738db1087d88adc4e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
