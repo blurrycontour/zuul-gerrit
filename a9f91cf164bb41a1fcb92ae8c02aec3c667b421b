@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7aa08908_af290de8",
+        "filename": "etc/zuul.conf-sample",
+        "patchSetId": 2
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-08T21:21:41Z",
+      "side": 1,
+      "message": "0: We could omit this from the sample; it\u0027s not really recommended that people set it.",
+      "revId": "a9f91cf164bb41a1fcb92ae8c02aec3c667b421b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7aa08908_4f0ea98c",
+        "filename": "zuul/launcher/gearman.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-08T21:21:41Z",
+      "side": 1,
+      "message": "-1: Oh, this should probably be getboolean",
+      "revId": "a9f91cf164bb41a1fcb92ae8c02aec3c667b421b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
