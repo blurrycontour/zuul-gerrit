@@ -521,7 +521,7 @@ class FakeStatsd(threading.Thread):
                     return
 
     def stop(self):
-        os.write(self.wake_write, '1\n')
+        os.write(self.wake_write, b'1\n')
 
 
 class FakeBuild(threading.Thread):
@@ -1296,7 +1296,8 @@ class ZuulTestCase(BaseTestCase):
         start = time.time()
         while True:
             if time.time() - start > 10:
-                print('queue status:', ''.join(self.eventQueuesEmpty()))
+                print('queue status:', ''.join([str(q) for q in
+                                                self.eventQueuesEmpty()]))
                 print(self.areAllBuildsWaiting())
                 raise Exception("Timeout waiting for Zuul to settle")
             # Make sure no new events show up while we're checking
