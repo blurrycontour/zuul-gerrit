@@ -66,8 +66,9 @@ class RPCListener(object):
         while self._running:
             try:
                 job = self.worker.getJob()
-                self.log.debug("Received job %s" % job.name)
-                z, jobname = job.name.split(':')
+                job_name = job.name.decode('utf-8')
+                self.log.debug("Received job %s" % job_name)
+                z, jobname = job_name.split(':')
                 attrname = 'handle_' + jobname
                 if hasattr(self, attrname):
                     f = getattr(self, attrname)
@@ -76,7 +77,8 @@ class RPCListener(object):
                             f(job)
                         except Exception:
                             self.log.exception("Exception while running job")
-                            job.sendWorkException(traceback.format_exc())
+                            job.sendWorkException(
+                                traceback.format_exc().encode('utf-8'))
                     else:
                         job.sendWorkFail()
                 else:
@@ -85,7 +87,7 @@ class RPCListener(object):
                 self.log.exception("Exception while getting job")
 
     def _common_enqueue(self, job):
-        args = json.loads(job.arguments)
+        args = json.loads(job.arguments.decode('utf-8'))
         event = model.TriggerEvent()
         errors = ''
 
@@ -140,7 +142,7 @@ class RPCListener(object):
             job.sendWorkComplete()
 
     def handle_promote(self, job):
-        args = json.loads(job.arguments)
+        args = json.loads(job.arguments.decode('utf-8'))
         pipeline_name = args['pipeline']
         change_ids = args['change_ids']
         self.sched.promote(pipeline_name, change_ids)
@@ -156,4 +158,4 @@ class RPCListener(object):
                 for item in queue.queue:
                     running_items.append(item.formatJSON())
 
-        job.sendWorkComplete(json.dumps(running_items))
+        job.sendWorkComplete(json.dumps(running_items).encode('utf-8'))

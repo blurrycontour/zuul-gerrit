@@ -80,7 +80,7 @@ def repack_repo(path):
 
 
 def random_sha1():
-    return hashlib.sha1(str(random.random())).hexdigest()
+    return hashlib.sha1(str(random.random()).encode('utf8')).hexdigest()
 
 
 def iterate_timeout(max_seconds, purpose):
@@ -521,7 +521,7 @@ class FakeStatsd(threading.Thread):
                     return
 
     def stop(self):
-        os.write(self.wake_write, '1\n')
+        os.write(self.wake_write, b'1\n')
 
 
 class FakeBuild(threading.Thread):
@@ -532,10 +532,10 @@ class FakeBuild(threading.Thread):
         self.daemon = True
         self.worker = worker
         self.job = job
-        self.name = job.name.split(':')[1]
+        self.name = job.name.decode('utf-8').split(':')[1]
         self.number = number
         self.node = node
-        self.parameters = json.loads(job.arguments)
+        self.parameters = json.loads(job.arguments.decode('utf-8'))
         self.unique = self.parameters['ZUUL_UUID']
         self.wait_condition = threading.Condition()
         self.waiting = False
@@ -584,7 +584,7 @@ class FakeBuild(threading.Thread):
 
         self.log.debug('Running build %s' % self.unique)
 
-        self.job.sendWorkData(json.dumps(data))
+        self.job.sendWorkData(json.dumps(data).encode('utf-8'))
         self.log.debug('Sent WorkData packet with %s' % json.dumps(data))
         self.job.sendWorkStatus(0, 100)
 
@@ -624,12 +624,12 @@ class FakeBuild(threading.Thread):
                          pipeline=self.parameters['ZUUL_PIPELINE'])
         )
 
-        self.job.sendWorkData(json.dumps(data))
+        self.job.sendWorkData(json.dumps(data).encode('utf-8'))
         if work_fail:
             self.job.sendWorkFail()
         else:
-            self.job.sendWorkComplete(json.dumps(data))
-        del self.worker.gearman_jobs[self.job.unique]
+            self.job.sendWorkComplete(json.dumps(data).encode('utf-8'))
+        del self.worker.gearman_jobs[self.job.unique.decode('utf-8')]
         self.worker.running_builds.remove(self)
         self.worker.lock.release()
 
@@ -651,7 +651,7 @@ class FakeWorker(gear.Worker):
         self.__work_thread.start()
 
     def handleJob(self, job):
-        parts = job.name.split(":")
+        parts = job.name.decode('utf-8').split(":")
         cmd = parts[0]
         name = parts[1]
         if len(parts) > 2:
@@ -668,7 +668,7 @@ class FakeWorker(gear.Worker):
     def handleBuild(self, job, name, node):
         build = FakeBuild(self, job, self.build_counter, node)
         job.build = build
-        self.gearman_jobs[job.unique] = job
+        self.gearman_jobs[job.unique.decode('utf-8')] = job
         self.build_counter += 1
 
         self.running_builds.append(build)
@@ -676,7 +676,7 @@ class FakeWorker(gear.Worker):
 
     def handleStop(self, job, name):
         self.log.debug("handle stop")
-        parameters = json.loads(job.arguments)
+        parameters = json.loads(job.arguments.decode('utf-8'))
         name = parameters['name']
         number = parameters['number']
         for build in self.running_builds:
@@ -689,7 +689,7 @@ class FakeWorker(gear.Worker):
 
     def handleSetDescription(self, job, name):
         self.log.debug("handle set description")
-        parameters = json.loads(job.arguments)
+        parameters = json.loads(job.arguments.decode('utf-8'))
         name = parameters['name']
         number = parameters['number']
         descr = parameters['html_description']
@@ -753,7 +753,7 @@ class FakeGearmanServer(gear.Server):
         for queue in [self.high_queue, self.normal_queue, self.low_queue]:
             for job in queue:
                 if not hasattr(job, 'waiting'):
-                    if job.name.startswith('build:'):
+                    if job.name.startswith(b'build:'):
                         job.waiting = self.hold_jobs_in_queue
                     else:
                         job.waiting = False
@@ -774,17 +774,18 @@ class FakeGearmanServer(gear.Server):
                 len(self.low_queue))
         self.log.debug("releasing queued job %s (%s)" % (regex, qlen))
         for job in self.getQueue():
-            cmd, name = job.name.split(':')
+            cmd, name = job.name.decode('utf-8').split(':')
+            job_unique = job.unique.decode('utf-8')
             if cmd != 'build':
                 continue
             if not regex or re.match(regex, name):
                 self.log.debug("releasing queued job %s" %
-                               job.unique)
+                               job_unique)
                 job.waiting = False
                 released = True
             else:
                 self.log.debug("not releasing queued job %s" %
-                               job.unique)
+                               job_unique)
         if released:
             self.wakeConnections()
         qlen = (len(self.high_queue) + len(self.normal_queue) +
@@ -1121,9 +1122,9 @@ class ZuulTestCase(BaseTestCase):
         path = os.path.join(self.upstream_root, project)
         repo = git.Repo.init(path)
 
-        repo.config_writer().set_value('user', 'email', 'user@example.com')
-        repo.config_writer().set_value('user', 'name', 'User Name')
-        repo.config_writer().write()
+        with repo.config_writer() as config_writer:
+            config_writer.set_value('user', 'email', 'user@example.com')
+            config_writer.set_value('user', 'name', 'User Name')
 
         fn = os.path.join(path, 'README')
         f = open(fn, 'w')
@@ -1174,7 +1175,7 @@ class ZuulTestCase(BaseTestCase):
         if isinstance(job, FakeBuild):
             parameters = job.parameters
         else:
-            parameters = json.loads(job.arguments)
+            parameters = json.loads(job.arguments.decode('utf-8'))
         project = parameters['ZUUL_PROJECT']
         path = os.path.join(self.git_root, project)
         repo = git.Repo(path)
@@ -1218,14 +1219,15 @@ class ZuulTestCase(BaseTestCase):
             job.release()
         else:
             job.waiting = False
-            self.log.debug("Queued job %s released" % job.unique)
+            self.log.debug(
+                "Queued job %s released" % job.unique.decode('utf-8'))
             self.gearman_server.wakeConnections()
 
     def getParameter(self, job, name):
         if isinstance(job, FakeBuild):
             return job.parameters[name]
         else:
-            parameters = json.loads(job.arguments)
+            parameters = json.loads(job.arguments.decode('utf-8'))
             return parameters[name]
 
     def resetGearmanServer(self):
@@ -1234,8 +1236,8 @@ class ZuulTestCase(BaseTestCase):
             done = True
             for connection in self.gearman_server.active_connections:
                 if (connection.functions and
-                    connection.client_id not in ['Zuul RPC Listener',
-                                                 'Zuul Merger']):
+                    connection.client_id.decode('utf-8') not in
+                        ['Zuul RPC Listener', 'Zuul Merger']):
                     done = False
             if done:
                 break
@@ -1270,7 +1272,7 @@ class ZuulTestCase(BaseTestCase):
             client_job = None
             for conn in self.launcher.gearman.active_connections:
                 for j in conn.related_jobs.values():
-                    if j.unique == build.uuid:
+                    if j.unique.decode('utf-8') == build.uuid:
                         client_job = j
                         break
             if not client_job:
@@ -1290,7 +1292,8 @@ class ZuulTestCase(BaseTestCase):
                 return False
             if server_job.waiting:
                 continue
-            worker_job = self.worker.gearman_jobs.get(server_job.unique)
+            worker_job = self.worker.gearman_jobs.get(
+                server_job.unique.decode('utf-8'))
             if worker_job:
                 if build.number is None:
                     self.log.debug("%s has not reported start" % worker_job)
@@ -1345,7 +1348,7 @@ class ZuulTestCase(BaseTestCase):
             self.sched.wake_event.wait(0.1)
 
     def countJobResults(self, jobs, result):
-        jobs = filter(lambda x: x.result == result, jobs)
+        jobs = list(filter(lambda x: x.result == result, jobs))
         return len(jobs)
 
     def getJobFromHistory(self, name):
@@ -1370,7 +1373,7 @@ class ZuulTestCase(BaseTestCase):
         while time.time() < (start + 5):
             for stat in self.statsd.stats:
                 pprint.pprint(self.statsd.stats)
-                k, v = stat.split(':')
+                k, v = stat.decode('utf-8').split(':')
                 if key == k:
                     if value is None and kind is None:
                         return
