@@ -1,5 +1,6 @@
 [gearman]
 server=127.0.0.1
+check_job_registration=True
 
 [gearman_server]
 start=true
