@@ -118,12 +118,7 @@ class LaunchServer(object):
             self.accept_nodes = config.getboolean('launcher',
                                                   'accept_nodes')
         else:
-            # TODO(jeblair): remove deprecated form of option
-            if config.has_option('launcher', 'accept-nodes'):
-                self.accept_nodes = config.getboolean('launcher',
-                                                      'accept-nodes')
-            else:
-                self.accept_nodes = True
+            self.accept_nodes = True
 
         if self.config.has_option('zuul', 'state_dir'):
             state_dir = os.path.expanduser(
@@ -242,8 +237,6 @@ class LaunchServer(object):
         new_functions = set()
         if self.accept_nodes:
             new_functions.add("node_assign:zuul")
-            # TODO(jeblair): remove deprecated form
-            new_functions.add("node-assign:zuul")
         new_functions.add("stop:%s" % self.hostname)
         new_functions.add("set_description:%s" % self.hostname)
 
@@ -370,10 +363,6 @@ class LaunchServer(object):
                 try:
                     if job.name.startswith('node_assign:'):
                         self.log.debug("Got node_assign job: %s" % job.unique)
-                        self.assignNode(job)
-                    elif job.name.startswith('node-assign:'):
-                        # TODO(jeblair): remove deprecated form
-                        self.log.debug("Got node-assign job: %s" % job.unique)
                         self.assignNode(job)
                     elif job.name.startswith('stop:'):
                         self.log.debug("Got stop job: %s" % job.unique)
