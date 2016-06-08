@@ -162,7 +162,8 @@ class Swift(object):
                                             settings['max_file_size'],
                                             settings['max_file_count'],
                                             expires)
-
-        signature = hmac.new(self.secure_key, hmac_body, sha1).hexdigest()
+        signature = hmac.new(self.secure_key.encode('utf-8'),
+                             hmac_body.encode('utf-8'),
+                             sha1).hexdigest()
 
         return url, hmac_body, signature
