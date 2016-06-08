@@ -680,7 +680,7 @@ class BuildSet(object):
         return self.builds.get(job_name)
 
     def getBuilds(self):
-        keys = self.builds.keys()
+        keys = list(self.builds.keys())
         keys.sort()
         return [self.builds.get(x) for x in keys]
 
@@ -914,7 +914,7 @@ class Changeish(object):
         raise NotImplementedError()
 
     def filterJobs(self, jobs):
-        return filter(lambda job: job.changeMatches(self), jobs)
+        return list(filter(lambda job: job.changeMatches(self), jobs))
 
     def getRelatedChanges(self):
         return set()
@@ -1401,7 +1401,7 @@ class JobTimeData(object):
     def load(self):
         if not os.path.exists(self.path):
             return
-        with open(self.path) as f:
+        with open(self.path, 'rb') as f:
             data = struct.unpack(self.format, f.read())
         version = data[0]
         if version != self.version:
@@ -1417,7 +1417,7 @@ class JobTimeData(object):
         data.extend(self.failure_times)
         data.extend(self.results)
         data = struct.pack(self.format, *data)
-        with open(tmpfile, 'w') as f:
+        with open(tmpfile, 'wb') as f:
             f.write(data)
         os.rename(tmpfile, self.path)
 

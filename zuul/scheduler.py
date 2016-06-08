@@ -1490,7 +1490,7 @@ class BasePipelineManager(object):
             dependent_items = self.getDependentItems(item)
             dependent_items.reverse()
             all_items = dependent_items + [item]
-            merger_items = map(self._makeMergerItem, all_items)
+            merger_items = list(map(self._makeMergerItem, all_items))
             self.sched.merger.mergeChanges(merger_items,
                                            item.current_build_set,
                                            self.pipeline.precedence)
