@@ -80,7 +80,7 @@ def repack_repo(path):
 
 
 def random_sha1():
-    return hashlib.sha1(str(random.random())).hexdigest()
+    return hashlib.sha1(str(random.random()).encode('utf8')).hexdigest()
 
 
 def iterate_timeout(max_seconds, purpose):
@@ -753,7 +753,7 @@ class FakeGearmanServer(gear.Server):
         for queue in [self.high_queue, self.normal_queue, self.low_queue]:
             for job in queue:
                 if not hasattr(job, 'waiting'):
-                    if job.name.startswith('build:'):
+                    if job.name.startswith(b'build:'):
                         job.waiting = self.hold_jobs_in_queue
                     else:
                         job.waiting = False
@@ -1099,9 +1099,9 @@ class ZuulTestCase(BaseTestCase):
         path = os.path.join(self.upstream_root, project)
         repo = git.Repo.init(path)
 
-        repo.config_writer().set_value('user', 'email', 'user@example.com')
-        repo.config_writer().set_value('user', 'name', 'User Name')
-        repo.config_writer().write()
+        with repo.config_writer() as config_writer:
+            config_writer.set_value('user', 'email', 'user@example.com')
+            config_writer.set_value('user', 'name', 'User Name')
 
         fn = os.path.join(path, 'README')
         f = open(fn, 'w')
@@ -1320,7 +1320,7 @@ class ZuulTestCase(BaseTestCase):
             self.sched.wake_event.wait(0.1)
 
     def countJobResults(self, jobs, result):
-        jobs = filter(lambda x: x.result == result, jobs)
+        jobs = list(filter(lambda x: x.result == result, jobs))
         return len(jobs)
 
     def getJobFromHistory(self, name):
