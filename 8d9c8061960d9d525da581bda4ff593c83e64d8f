@@ -16,6 +16,23 @@
       "revId": "8d9c8061960d9d525da581bda4ff593c83e64d8f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7aa08908_0d5f5476",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-09T17:39:50Z",
+      "side": 1,
+      "message": "It\u0027s true the other initializers are {}, but I\u0027m usually fairly consistent about switching to dict if there\u0027s actual data.  I don\u0027t really have a strong opinion either way when there\u0027s data (dict means far less punctuation, which I like) but have almost no opinion whatsoever when there\u0027s no data.  ({} might save a function invocation?).",
+      "revId": "8d9c8061960d9d525da581bda4ff593c83e64d8f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
