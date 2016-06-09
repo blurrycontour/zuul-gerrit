@@ -1062,8 +1062,15 @@ class ZuulTestCase(BaseTestCase):
         repos = []
         gc.collect()
         for obj in gc.get_objects():
-            if isinstance(obj, git.Repo):
-                repos.append(obj)
+            try:
+                if isinstance(obj, git.Repo):
+                    repos.append(obj)
+            except ReferenceError:
+                # NOTE(notmorgan): If we are handling weak-ref objects, this
+                # we can get ``ReferenceError: weakly-referenced object no
+                # longer exists`` in the instance check. Pass on this error
+                # so that the rest of the final state checks can continue.
+                pass
         self.assertEqual(len(repos), 0)
         self.assertEmptyQueues()
         for pipeline in self.sched.layout.pipelines.values():
