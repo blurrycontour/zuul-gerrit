@@ -1105,6 +1105,8 @@ class Scheduler(threading.Thread):
             return
         if build.end_time and build.start_time and build.result:
             duration = build.end_time - build.start_time
+        else:
+            duration = 0
         try:
             self.time_database.update(build.job.name, duration, build.result)
         except Exception:
