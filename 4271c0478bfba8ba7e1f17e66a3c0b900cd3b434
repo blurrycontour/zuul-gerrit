@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7aa08908_d797c4e9",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 524,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2016-06-09T05:39:46Z",
+      "side": 1,
+      "message": "This is an encode/decode like issue, looks like it snuck into this patch instead of the bundled one.",
+      "range": {
+        "startLine": 524,
+        "startChar": 8,
+        "endLine": 524,
+        "endChar": 41
+      },
+      "revId": "4271c0478bfba8ba7e1f17e66a3c0b900cd3b434",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
