@@ -20,6 +20,9 @@ import time
 from uuid import uuid4
 import extras
 
+import six
+
+
 OrderedDict = extras.try_imports(['collections.OrderedDict',
                                   'ordereddict.OrderedDict'])
 
