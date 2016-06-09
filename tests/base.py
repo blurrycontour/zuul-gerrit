@@ -532,7 +532,7 @@ class FakeBuild(threading.Thread):
         self.daemon = True
         self.worker = worker
         self.job = job
-        self.name = job.name.split(':')[1]
+        self.name = job.name.decode('utf-8').split(':')[1]
         self.number = number
         self.node = node
         self.parameters = json.loads(job.arguments)
@@ -629,7 +629,7 @@ class FakeBuild(threading.Thread):
             self.job.sendWorkFail()
         else:
             self.job.sendWorkComplete(json.dumps(data))
-        del self.worker.gearman_jobs[self.job.unique]
+        del self.worker.gearman_jobs[self.job.unique.decode('utf-8')]
         self.worker.running_builds.remove(self)
         self.worker.lock.release()
 
@@ -668,7 +668,7 @@ class FakeWorker(gear.Worker):
     def handleBuild(self, job, name, node):
         build = FakeBuild(self, job, self.build_counter, node)
         job.build = build
-        self.gearman_jobs[job.unique] = job
+        self.gearman_jobs[job.unique.decode('utf-8')] = job
         self.build_counter += 1
 
         self.running_builds.append(build)
@@ -774,17 +774,18 @@ class FakeGearmanServer(gear.Server):
                 len(self.low_queue))
         self.log.debug("releasing queued job %s (%s)" % (regex, qlen))
         for job in self.getQueue():
-            cmd, name = job.name.split(':')
+            cmd, name = job.name.decode('utf-8').split(':')
+            job_unique = job.unique.decode('utf-8')
             if cmd != 'build':
                 continue
             if not regex or re.match(regex, name):
                 self.log.debug("releasing queued job %s" %
-                               job.unique)
+                               job_unique)
                 job.waiting = False
                 released = True
             else:
                 self.log.debug("not releasing queued job %s" %
-                               job.unique)
+                               job_unique)
         if released:
             self.wakeConnections()
         qlen = (len(self.high_queue) + len(self.normal_queue) +
@@ -1196,7 +1197,8 @@ class ZuulTestCase(BaseTestCase):
             job.release()
         else:
             job.waiting = False
-            self.log.debug("Queued job %s released" % job.unique)
+            self.log.debug(
+                "Queued job %s released" % job.unique.decode('utf-8'))
             self.gearman_server.wakeConnections()
 
     def getParameter(self, job, name):
@@ -1268,7 +1270,8 @@ class ZuulTestCase(BaseTestCase):
                 return False
             if server_job.waiting:
                 continue
-            worker_job = self.worker.gearman_jobs.get(server_job.unique)
+            worker_job = self.worker.gearman_jobs.get(
+                server_job.unique.decode('utf-8'))
             if worker_job:
                 if build.number is None:
                     self.log.debug("%s has not reported start" % worker_job)
@@ -1310,12 +1313,13 @@ class ZuulTestCase(BaseTestCase):
                 self.sched.run_handler_lock.acquire()
                 if (not self.merge_client.build_sets and
                     all(self.eventQueuesEmpty()) and
-                    self.haveAllBuildsReported() and
-                    self.areAllBuildsWaiting()):
-                    self.sched.run_handler_lock.release()
-                    self.worker.lock.release()
-                    self.log.debug("...settled.")
-                    return
+                        self.haveAllBuildsReported() and
+                        self.areAllBuildsWaiting()
+                    ):
+                        self.sched.run_handler_lock.release()
+                        self.worker.lock.release()
+                        self.log.debug("...settled.")
+                        return
                 self.sched.run_handler_lock.release()
             self.worker.lock.release()
             self.sched.wake_event.wait(0.1)
@@ -1327,7 +1331,7 @@ class ZuulTestCase(BaseTestCase):
     def getJobFromHistory(self, name):
         history = self.worker.build_history
         for job in history:
-            if job.name == name:
+            if job.name.decode('utf-8') == name:
                 return job
         raise Exception("Unable to find job %s in history" % name)
 
