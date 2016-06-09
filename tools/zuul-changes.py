@@ -14,17 +14,19 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import urllib2
 import json
 import argparse
+
+from six.moves import urllib
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('url', help='The URL of the running Zuul instance')
 parser.add_argument('pipeline_name', help='The name of the Zuul pipeline')
 options = parser.parse_args()
 
-data = urllib2.urlopen('%s/status.json' % options.url).read()
-data = json.loads(data)
+data = urllib.request.urlopen('%s/status.json' % options.url).read()
+data = json.loads(data.decode(('utf-8')))
 
 for pipeline in data['pipelines']:
     if pipeline['name'] != options.pipeline_name:
