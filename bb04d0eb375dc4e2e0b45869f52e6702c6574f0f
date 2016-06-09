@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7aa08908_9df1dd97",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1109,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2016-06-09T06:48:37Z",
+      "side": 1,
+      "message": "this appears to have snuck in here. this is simply prevention of referencing \"duration\" before assignment on L1111.",
+      "range": {
+        "startLine": 1108,
+        "startChar": 0,
+        "endLine": 1109,
+        "endChar": 24
+      },
+      "revId": "bb04d0eb375dc4e2e0b45869f52e6702c6574f0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
