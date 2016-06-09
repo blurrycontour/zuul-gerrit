@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import extras
 import json
 import logging
 import os
@@ -36,6 +37,8 @@ import zmq
 import zuul.ansible.library
 import zuul.ansible.plugins.callback_plugins
 from zuul.lib import commandsocket
+
+statsd = extras.try_import('statsd.statsd')
 
 ANSIBLE_WATCHDOG_GRACE = 5 * 60
 ANSIBLE_DEFAULT_TIMEOUT = 2 * 60 * 60
@@ -264,6 +267,7 @@ class LaunchServer(object):
 
     def reconfigure(self):
         self.log.debug("Reconfiguring")
+        self.updateCommandStats('reconfigure')
         self.loadJobs()
         for node in self.node_workers.values():
             try:
@@ -272,10 +276,12 @@ class LaunchServer(object):
             except Exception:
                 self.log.exception("Exception sending reconfigure command "
                                    "to worker:")
+        self.updateCommandStats()
         self.log.debug("Reconfiguration complete")
 
     def pause(self):
         self.log.debug("Pausing")
+        self.updateCommandStats('pause')
         self.accept_nodes = False
         self.register()
         for node in self.node_workers.values():
@@ -289,6 +295,7 @@ class LaunchServer(object):
 
     def unpause(self):
         self.log.debug("Unpausing")
+        self.updateCommandStats('unpause')
         self.accept_nodes = True
         self.register()
         for node in self.node_workers.values():
@@ -298,10 +305,27 @@ class LaunchServer(object):
             except Exception:
                 self.log.exception("Exception sending unpause command "
                                    "to worker:")
+        self.updateCommandStats()
         self.log.debug("Unpaused")
+
+    def updateCommandStats(self, command=None):
+        states = {}
+        for cmd in COMMANDS:
+            key = 'zuul.service.%s.command.%s' % (
+                self.hostname, cmd)
+            states[key] = 0
+
+        if command:
+            key = 'zuul.service.%s.command.%s' % (
+                self.hostname, command)
+            states[key] += 1
+
+        for key, count in states.items():
+            statsd.gauge(key, count)
 
     def release(self):
         self.log.debug("Releasing idle nodes")
+        self.updateCommandStats('release')
         for node in self.node_workers.values():
             if node.name in self.static_nodes:
                 continue
@@ -311,12 +335,14 @@ class LaunchServer(object):
             except Exception:
                 self.log.exception("Exception sending release command "
                                    "to worker:")
+        self.updateCommandStats()
         self.log.debug("Finished releasing idle nodes")
 
     def graceful(self):
         # Note: this is run in the command processing thread; no more
         # external commands will be processed after this.
         self.log.debug("Gracefully stopping")
+        self.updateCommandStats('graceful')
         self.pause()
         self.release()
         self.log.debug("Waiting for all builds to finish")
@@ -327,6 +353,7 @@ class LaunchServer(object):
 
     def stop(self):
         self.log.debug("Stopping")
+        self.updateCommandStats('stop')
         # First, stop accepting new jobs
         self._gearman_running = False
         self._reaper_running = False
@@ -376,6 +403,11 @@ class LaunchServer(object):
                 self.zmq_send_queue.task_done()
 
     def run(self):
+        if statsd:
+            self.log.debug("Statsd enabled")
+        else:
+            self.log.debug("Statsd disabled because python statsd "
+                           "package not found")
         while self._gearman_running:
             try:
                 job = self.worker.getJob()
