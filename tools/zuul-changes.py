@@ -24,7 +24,7 @@ parser.add_argument('pipeline_name', help='The name of the Zuul pipeline')
 options = parser.parse_args()
 
 data = urllib2.urlopen('%s/status.json' % options.url).read()
-data = json.loads(data)
+data = json.loads(data.decode('utf-8'))
 
 for pipeline in data['pipelines']:
     if pipeline['name'] != options.pipeline_name:

@@ -83,15 +83,17 @@ class MergeServer(object):
         while self._running:
             try:
                 job = self.worker.getJob()
+                job_unique = job.unique.decode('utf-8')
+                job_name = job.name.decode('utf-8')
                 try:
-                    if job.name == 'merger:merge':
-                        self.log.debug("Got merge job: %s" % job.unique)
+                    if job_name == 'merger:merge':
+                        self.log.debug("Got merge job: %s" % job_unique)
                         self.merge(job)
-                    elif job.name == 'merger:update':
-                        self.log.debug("Got update job: %s" % job.unique)
+                    elif job_name == 'merger:update':
+                        self.log.debug("Got update job: %s" % job_unique)
                         self.update(job)
                     else:
-                        self.log.error("Unable to handle job %s" % job.name)
+                        self.log.error("Unable to handle job %s" % job_name)
                         job.sendWorkFail()
                 except Exception:
                     self.log.exception("Exception while running job")
@@ -100,16 +102,16 @@ class MergeServer(object):
                 self.log.exception("Exception while getting job")
 
     def merge(self, job):
-        args = json.loads(job.arguments)
+        args = json.loads(job.arguments.decode('utf-8'))
         commit = self.merger.mergeChanges(args['items'])
         result = dict(merged=(commit is not None),
                       commit=commit,
                       zuul_url=self.zuul_url)
-        job.sendWorkComplete(json.dumps(result))
+        job.sendWorkComplete(json.dumps(result).encode('utf-8'))
 
     def update(self, job):
-        args = json.loads(job.arguments)
+        args = json.loads(job.arguments.decode('utf-8'))
         self.merger.updateRepo(args['project'], args['url'])
         result = dict(updated=True,
                       zuul_url=self.zuul_url)
-        job.sendWorkComplete(json.dumps(result))
+        job.sendWorkComplete(json.dumps(result).encode('utf-8'))

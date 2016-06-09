@@ -418,7 +418,7 @@ class TestScheduler(ZuulTestCase):
         queue = self.gearman_server.getQueue()
         self.assertEqual(len(self.builds), 0)
         self.assertEqual(len(queue), 1)
-        self.assertEqual(queue[0].name, 'build:project-merge')
+        self.assertEqual(queue[0].name.decode('utf-8'), 'build:project-merge')
         self.assertTrue(self.job_has_changes(queue[0], A))
 
         self.gearman_server.release('.*-merge')
@@ -431,12 +431,12 @@ class TestScheduler(ZuulTestCase):
 
         self.assertEqual(len(self.builds), 0)
         self.assertEqual(len(queue), 6)
-        self.assertEqual(queue[0].name, 'build:project-test1')
-        self.assertEqual(queue[1].name, 'build:project-test2')
-        self.assertEqual(queue[2].name, 'build:project-test1')
-        self.assertEqual(queue[3].name, 'build:project-test2')
-        self.assertEqual(queue[4].name, 'build:project-test1')
-        self.assertEqual(queue[5].name, 'build:project-test2')
+        self.assertEqual(queue[0].name.decode('utf-8'), 'build:project-test1')
+        self.assertEqual(queue[1].name.decode('utf-8'), 'build:project-test2')
+        self.assertEqual(queue[2].name.decode('utf-8'), 'build:project-test1')
+        self.assertEqual(queue[3].name.decode('utf-8'), 'build:project-test2')
+        self.assertEqual(queue[4].name.decode('utf-8'), 'build:project-test1')
+        self.assertEqual(queue[5].name.decode('utf-8'), 'build:project-test2')
 
         self.release(queue[0])
         self.waitUntilSettled()
@@ -1036,7 +1036,7 @@ jobs:
         queue = self.gearman_server.getQueue()
         job_A = None
         for job in queue:
-            if 'project-merge' in job.name:
+            if 'project-merge' in job.name.decode('utf-8'):
                 job_A = job
         ref_A = self.getParameter(job_A, 'ZUUL_REF')
         commit_A = self.getParameter(job_A, 'ZUUL_COMMIT')
@@ -1048,7 +1048,7 @@ jobs:
         queue = self.gearman_server.getQueue()
         job_B = None
         for job in queue:
-            if 'project-merge' in job.name:
+            if 'project-merge' in job.name.decode('utf-8'):
                 job_B = job
         ref_B = self.getParameter(job_B, 'ZUUL_REF')
         commit_B = self.getParameter(job_B, 'ZUUL_COMMIT')
@@ -1059,7 +1059,7 @@ jobs:
         self.waitUntilSettled()
         queue = self.gearman_server.getQueue()
         for job in queue:
-            if 'project-merge' in job.name:
+            if 'project-merge' in job.name.decode('utf-8'):
                 job_C = job
         ref_C = self.getParameter(job_C, 'ZUUL_REF')
         commit_C = self.getParameter(job_C, 'ZUUL_COMMIT')
@@ -2291,7 +2291,7 @@ jobs:
         self.worker.release()
         self.waitUntilSettled()
 
-        data = json.loads(data)
+        data = json.loads(data.decode('utf-8'))
         status_jobs = []
         for p in data['pipelines']:
             for q in p['change_queues']:
@@ -2899,7 +2899,7 @@ jobs:
         self.assertEqual(self.getJobFromHistory(
             'project-bitrot-stable-older').result, 'SUCCESS')
 
-        data = json.loads(data)
+        data = json.loads(data.decode('utf-8'))
         status_jobs = set()
         for p in data['pipelines']:
             for q in p['change_queues']:
