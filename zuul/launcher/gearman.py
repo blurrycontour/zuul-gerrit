@@ -347,7 +347,7 @@ class Gearman(object):
             self.sched.onBuildCompleted(build, 'SUCCESS')
             return build
 
-        gearman_job = gear.Job(name, json.dumps(params),
+        gearman_job = gear.Job(name, json.dumps(params).encode('utf-8'),
                                unique=uuid)
         build.__gearman_job = gearman_job
         self.builds[uuid] = build
@@ -418,11 +418,12 @@ class Gearman(object):
         self.log.debug("Unable to cancel build %s" % build)
 
     def onBuildCompleted(self, job, result=None):
-        if job.unique in self.meta_jobs:
-            del self.meta_jobs[job.unique]
+        job_unique = job.unique.decode('utf-8')
+        if job_unique in self.meta_jobs:
+            del self.meta_jobs[job_unique]
             return
 
-        build = self.builds.get(job.unique)
+        build = self.builds.get(job_unique)
         if build:
             data = getJobData(job)
             build.node_labels = data.get('node_labels', [])
@@ -437,15 +438,16 @@ class Gearman(object):
                 self.sched.onBuildCompleted(build, result)
             # The test suite expects the build to be removed from the
             # internal dict after it's added to the report queue.
-            del self.builds[job.unique]
+            del self.builds[job_unique]
         else:
-            if not job.name.startswith("stop:"):
-                self.log.error("Unable to find build %s" % job.unique)
+            if not job.name.startswith(b"stop:"):
+                self.log.error("Unable to find build %s" % job_unique)
 
     def onWorkStatus(self, job):
         data = getJobData(job)
         self.log.debug("Build %s update %s" % (job, data))
-        build = self.builds.get(job.unique)
+        job_unique = job.unique.decode('utf-8')
+        build = self.builds.get(job_unique)
         if build:
             # Allow URL to be updated
             build.url = data.get('url') or build.url
@@ -458,7 +460,7 @@ class Gearman(object):
                 build.__gearman_manager = data.get('manager')
                 self.sched.onBuildStarted(build)
         else:
-            self.log.error("Unable to find build %s" % job.unique)
+            self.log.error("Unable to find build %s" % job_unique)
 
     def onDisconnect(self, job):
         self.log.info("Gearman job %s lost due to disconnect" % job)
@@ -477,7 +479,7 @@ class Gearman(object):
                        (build, req.response.strip()))
         if req.response.startswith("OK"):
             try:
-                del self.builds[job.unique]
+                del self.builds[job.unique.decode('utf-8')]
             except:
                 pass
             return True
@@ -488,7 +490,8 @@ class Gearman(object):
         data = dict(name=build.job.name,
                     number=build.number)
         stop_job = gear.Job("stop:%s" % build.__gearman_manager,
-                            json.dumps(data), unique=stop_uuid)
+                            json.dumps(data).encode('utf-8'),
+                            unique=stop_uuid)
         self.meta_jobs[stop_uuid] = stop_job
         self.log.debug("Submitting stop job: %s", stop_job)
         self.gearman.submitJob(stop_job, precedence=gear.PRECEDENCE_HIGH,
