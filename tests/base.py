@@ -14,6 +14,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import signal
+
 from six.moves import configparser as ConfigParser
 import gc
 import hashlib
@@ -90,6 +92,48 @@ def iterate_timeout(max_seconds, purpose):
         yield count
         time.sleep(0)
     raise Exception("Timeout waiting for %s" % purpose)
+
+
+class Timeout(fixtures.Fixture):
+    """Fixture that aborts the contained code after a number of seconds.
+
+    The interrupt can be either gentle, in which case TimeoutException is
+    raised, or not gentle, in which case the process will typically be aborted
+    by SIGALRM.
+
+    Cautions:
+     * This has no effect on Windows.
+     * Only one Timeout can be used at any time per process.
+    """
+
+    def __init__(self, timeout_secs, gentle):
+        self.timeout_secs = timeout_secs
+        self.alarm_fn = getattr(signal, 'alarm', None)
+        self.gentle = gentle
+
+    def signal_handler(self, signum, frame):
+        class TimeoutException(Exception):
+            """TMP"""
+
+        import traceback
+        import sys
+        raise TimeoutException(json.dumps([traceback.extract_stack(i) for i in
+                                           sys._current_frames().values()]))
+
+    def _setUp(self):
+        if self.alarm_fn is None:
+            return  # Can't run on Windows
+        if self.gentle:
+            # Install a handler for SIGARLM so we can raise an exception rather
+            # than the default handler executing, which kills the process.
+            old_handler = signal.signal(signal.SIGALRM, self.signal_handler)
+        # We add the slarm cleanup before the cleanup for the signal handler,
+        # otherwise there is a race condition where the signal handler is
+        # cleaned up but the alarm still fires.
+        self.addCleanup(lambda: self.alarm_fn(0))
+        self.alarm_fn(self.timeout_secs)
+        if self.gentle:
+            self.addCleanup(lambda: signal.signal(signal.SIGALRM, old_handler))
 
 
 class ChangeReference(git.Reference):
@@ -844,7 +888,7 @@ class BaseTestCase(testtools.TestCase):
             # If timeout value is invalid do not set a timeout.
             test_timeout = 0
         if test_timeout > 0:
-            self.useFixture(fixtures.Timeout(test_timeout, gentle=False))
+            self.useFixture(Timeout(test_timeout, gentle=True))
 
         if (os.environ.get('OS_STDOUT_CAPTURE') == 'True' or
             os.environ.get('OS_STDOUT_CAPTURE') == '1'):
