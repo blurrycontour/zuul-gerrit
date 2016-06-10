@@ -27,9 +27,11 @@ import random
 import re
 import select
 import shutil
+import signal
 from six.moves import reload_module
 import socket
 import string
+import sys
 import subprocess
 import swiftclient
 import threading
@@ -833,6 +835,40 @@ class FakeSwiftClientConnection(swiftclient.client.Connection):
         return endpoint, ''
 
 
+class TimeoutFixture(fixtures.Timeout):
+    def __init__(self, test_case, stderr, timeout_secs, gentle):
+        self.test_case = test_case
+        self.stderr = stderr
+        # NOTE(notmorgan): gentle is always true here since we use the
+        # 'gentle' workflow in the upstream fixture to set the handler, even
+        # though we do not expect a standard "timeout error" gentle response.
+        gentle = True
+        super(TimeoutFixture, self).__init__(timeout_secs, gentle)
+
+    def signal_handler(self, *args, **kwargs):
+        # NOTE(notmorgan): This requires the original stderr (non-capture) to
+        # produce the log writeout. This might need re-working if we have a lot
+        # of timeout cases on a given test run, as STDERR is shared.
+        self.stderr.write('\n --=== TEST TIMEOUT (%ss) FOR %s ]===-- \n' %
+                          (self.timeout_secs,
+                           self.test_case._get_test_method()))
+        self.stderr.write(self.test_case.fake_logger.output)
+        self.stderr.write('\n --=== TEST TIMEOUT (%ss) FOR %s ]===-- \n' %
+                          (self.timeout_secs,
+                           self.test_case._get_test_method()))
+
+        # NOTE(notmorgan): This replaces the normal "gentle" behavior in that
+        # it causes a hard-timeout still (forced). Once we have addressed
+        # the issues in testr handling the timeout, this whole fixture gets
+        # dropped.
+        signal.signal(signal.SIGALRM, self.old_handler)
+        self.alarm_fn(1)
+        # Guarantee alarmclock interpreter exit.
+        time.sleep(2)
+        # In case something clears the sigalrm, still exit.
+        raise fixtures.TimeoutException()
+
+
 class BaseTestCase(testtools.TestCase):
     log = logging.getLogger("zuul.test")
 
@@ -845,7 +881,14 @@ class BaseTestCase(testtools.TestCase):
             # If timeout value is invalid do not set a timeout.
             test_timeout = 0
         if test_timeout > 0:
-            self.useFixture(fixtures.Timeout(test_timeout, gentle=False))
+            # NOTE(notmorgan): This fixture must be set before we replace
+            # sys.stderr with the captureing stream. The fixture writes
+            # directly to the STDERR low level socket to ensure we capture
+            # logging.
+            self.useFixture(TimeoutFixture(self,
+                                           sys.stderr,
+                                           test_timeout,
+                                           gentle=False))
 
         if (os.environ.get('OS_STDOUT_CAPTURE') == 'True' or
             os.environ.get('OS_STDOUT_CAPTURE') == '1'):
@@ -857,7 +900,7 @@ class BaseTestCase(testtools.TestCase):
             self.useFixture(fixtures.MonkeyPatch('sys.stderr', stderr))
         if (os.environ.get('OS_LOG_CAPTURE') == 'True' or
             os.environ.get('OS_LOG_CAPTURE') == '1'):
-            self.useFixture(fixtures.FakeLogger(
+            self.fake_logger = self.useFixture(fixtures.FakeLogger(
                 level=logging.DEBUG,
                 format='%(asctime)s %(name)-32s '
                 '%(levelname)-8s %(message)s'))
