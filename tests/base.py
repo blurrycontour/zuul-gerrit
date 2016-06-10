@@ -862,6 +862,16 @@ class BaseTestCase(testtools.TestCase):
                 level=logging.DEBUG,
                 format='%(asctime)s %(name)-32s '
                 '%(levelname)-8s %(message)s'))
+            self.useFixture(fixtures.FakeLogger(
+                name="gear.Server",
+                level=logging.INFO,
+                format='%(asctime)s %(name)-32s '
+                       '%(levelname)-8s %(message)s'))
+            self.useFixture(fixtures.FakeLogger(
+                name="gear.Client",
+                level=logging.INFO,
+                format='%(asctime)s %(name)-32s '
+                       '%(levelname)-8s %(message)s'))
 
 
 class ZuulTestCase(BaseTestCase):
