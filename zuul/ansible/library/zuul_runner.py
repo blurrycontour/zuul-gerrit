@@ -18,7 +18,6 @@
 import datetime
 import getpass
 import os
-import re
 import subprocess
 import threading
 
@@ -39,21 +38,45 @@ class Console(object):
 
 def get_env():
     env = {}
+
+    # Automatically export all defined variables.
+    cmd = ['set -a']
+    # Source every known potential source of default environment
+    # variables used by PAM.
+    for fn in ['/etc/environment', '/etc/default/locale']:
+        if os.path.exists(fn):
+            cmd.append('source %s' % (fn,))
+    # Print all (exported) environment variables.
+    cmd.append('env')
+
+    cmd = '; '.join(cmd)
+    proc = subprocess.Popen(
+        ['/bin/bash', '-l', '-c', cmd],
+        cwd='/',
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        env=env,
+    )
+    out, err = proc.communicate()
+    proc.wait()
+
+    # Ignore these variables which should automatically end up in a
+    # real shell later.
+    ignore = set(['_', 'SHLVL', 'PWD'])
+    for line in out.split('\n'):
+        if not line:
+            continue
+        if '=' not in line:
+            continue
+        k, v = line.split('=')
+        if k in ignore:
+            continue
+        env[k] = v
+
+    # Add more variables that PAM would normally set.
     env['HOME'] = os.path.expanduser('~')
     env['USER'] = getpass.getuser()
 
-    # Known locations for PAM mod_env sources
-    for fn in ['/etc/environment', '/etc/default/locale']:
-        if os.path.exists(fn):
-            with open(fn) as f:
-                for line in f:
-                    line = re.sub('#.*', '', line).strip()
-                    if not line:
-                        continue
-                    if '=' not in line:
-                        continue
-                    k, v = line.split('=')
-                    env[k] = v
     return env
 
 
