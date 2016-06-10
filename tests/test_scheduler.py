@@ -3092,6 +3092,8 @@ jobs:
             client.shutdown()
             self.assertEqual(r, False)
 
+        time.sleep(31)
+
         with testtools.ExpectedException(zuul.rpcclient.RPCFailure,
                                          "Invalid change"):
             r = client.enqueue(pipeline='gate',
