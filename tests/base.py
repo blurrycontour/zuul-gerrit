@@ -27,9 +27,11 @@ import random
 import re
 import select
 import shutil
+import signal
 from six.moves import reload_module
 import socket
 import string
+import sys
 import subprocess
 import swiftclient
 import threading
@@ -833,6 +835,46 @@ class FakeSwiftClientConnection(swiftclient.client.Connection):
         return endpoint, ''
 
 
+class TimeoutFixture(fixtures.Timeout):
+    def __init__(self, test_case, stderr, timeout_secs, gentle):
+        self.test_case = test_case
+        self.stderr = stderr
+        super(TimeoutFixture, self).__init__(timeout_secs, gentle)
+
+    def signal_handler(self, *args, **kwargs):
+        # NOTE(notmorgan): This requires the original stderr (non-capture) to
+        # produce the log writeout
+        self.stderr.write('\n --=== TEST TIMEOUT (%ss) FOR %s ]===-- \n' %
+                          (self.timeout_secs,
+                           self.test_case._get_test_method()))
+        self.stderr.write(self.test_case.fake_logger.output)
+        self.stderr.write('\n --=== TEST TIMEOUT (%ss) FOR %s ]===-- \n' %
+                          (self.timeout_secs,
+                           self.test_case._get_test_method()))
+        if not self.gentle:
+            # If this is not gentle, reset the signal handler and then hard
+            # bail out with a subsequent alarm call guarenteed to call the
+            # alarm clock. When "gentle" can be used safely with zuul, this
+            # whole fixture can be removed.
+            signal.signal(signal.SIGALRM, self.old_handler)
+            self.alarm_fn(1)
+            # Guarantee alarmclock interpreter exit.
+            time.sleep(2)
+        raise fixtures.TimeoutException()
+
+    def _setUp(self):
+        if self.alarm_fn is None:
+            return  # Can't run on Windows.
+        self.old_handler = signal.signal(signal.SIGALRM, self.signal_handler)
+        # We add the slarm cleanup before the cleanup for the signal handler,
+        # otherwise there is a race condition where the signal handler is
+        # cleaned up but the alarm still fires.
+        self.addCleanup(lambda: self.alarm_fn(0))
+        self.alarm_fn(self.timeout_secs)
+        self.addCleanup(lambda: signal.signal(signal.SIGALRM,
+                                              self.old_handler))
+
+
 class BaseTestCase(testtools.TestCase):
     log = logging.getLogger("zuul.test")
 
@@ -845,7 +887,14 @@ class BaseTestCase(testtools.TestCase):
             # If timeout value is invalid do not set a timeout.
             test_timeout = 0
         if test_timeout > 0:
-            self.useFixture(fixtures.Timeout(test_timeout, gentle=False))
+            # NOTE(notmorgan): This fixture must be set before we replace
+            # sys.stderr with the captureing stream. The fixture writes
+            # directly to the STDERR low level socket to ensure we capture
+            # logging.
+            self.useFixture(TimeoutFixture(self,
+                                           sys.stderr,
+                                           test_timeout,
+                                           gentle=False))
 
         if (os.environ.get('OS_STDOUT_CAPTURE') == 'True' or
             os.environ.get('OS_STDOUT_CAPTURE') == '1'):
@@ -857,7 +906,7 @@ class BaseTestCase(testtools.TestCase):
             self.useFixture(fixtures.MonkeyPatch('sys.stderr', stderr))
         if (os.environ.get('OS_LOG_CAPTURE') == 'True' or
             os.environ.get('OS_LOG_CAPTURE') == '1'):
-            self.useFixture(fixtures.FakeLogger(
+            self.fake_logger = self.useFixture(fixtures.FakeLogger(
                 level=logging.DEBUG,
                 format='%(asctime)s %(name)-32s '
                 '%(levelname)-8s %(message)s'))
