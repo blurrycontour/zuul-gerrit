@@ -1095,7 +1095,18 @@ class NodeWorker(object):
                         'second timeout')
         task['when'] = '{{ elapsed_time < timeout | int }}'
         task['async'] = '{{ timeout | int - elapsed_time }}'
-        task['poll'] = 5
+        task['poll'] = 0
+        task['register'] = 'runner'
+        tasks.append(task)
+
+        args = dict(jid="{{ runner.ansible_job_id }}")
+        task = dict(async_status=args)
+        task['when'] = '{{ timeout | int > 0 }}'
+        task['register'] = 'job_result'
+        task['until'] = 'job_result.finished == 1'
+        task['failed_when'] = 'job_result.finished == 0'
+        task['retries'] = '{{ (timeout|int)//5|int }}'
+        task['delay'] = '5'
         tasks.append(task)
 
         filetask = dict(path=remote_path,
