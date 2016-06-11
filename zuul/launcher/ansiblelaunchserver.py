@@ -37,9 +37,7 @@ import zuul.ansible.library
 import zuul.ansible.plugins.callback_plugins
 from zuul.lib import commandsocket
 
-ANSIBLE_WATCHDOG_GRACE = 5 * 60
 ANSIBLE_DEFAULT_TIMEOUT = 2 * 60 * 60
-ANSIBLE_DEFAULT_POST_TIMEOUT = 10 * 60
 
 
 COMMANDS = ['reconfigure', 'stop', 'pause', 'unpause', 'release', 'graceful']
@@ -49,29 +47,6 @@ def boolify(x):
     if isinstance(x, str):
         return bool(int(x))
     return bool(x)
-
-
-class Watchdog(object):
-    def __init__(self, timeout, function, args):
-        self.timeout = timeout
-        self.function = function
-        self.args = args
-        self.thread = threading.Thread(target=self._run)
-        self.thread.daemon = True
-
-    def _run(self):
-        while self._running and time.time() < self.end:
-            time.sleep(10)
-        if self._running:
-            self.function(*self.args)
-
-    def start(self):
-        self._running = True
-        self.end = time.time() + self.timeout
-        self.thread.start()
-
-    def stop(self):
-        self._running = False
 
 
 class JobDir(object):
@@ -760,8 +735,7 @@ class NodeWorker(object):
                                'SUCCESS', {})
 
     def runJob(self, job, args):
-        self.ansible_job_proc = None
-        self.ansible_post_proc = None
+        self.ansible_proc = None
         result = None
         with self.running_job_lock:
             if not self._running:
@@ -1088,12 +1062,8 @@ class NodeWorker(object):
 
         return timeout
 
-    def _ansibleTimeout(self, proc, msg):
-        self.log.warning(msg)
-        self.abortRunningProc(proc)
-
     def runAnsiblePlaybook(self, jobdir, timeout):
-        self.ansible_job_proc = subprocess.Popen(
+        self.ansible_proc = subprocess.Popen(
             ['ansible-playbook', jobdir.playbook,
              '-e', 'timeout=%s' % timeout, '-v'],
             cwd=jobdir.ansible_root,
@@ -1101,25 +1071,16 @@ class NodeWorker(object):
             stderr=subprocess.STDOUT,
             preexec_fn=os.setsid,
         )
-        ret = None
-        watchdog = Watchdog(timeout + ANSIBLE_WATCHDOG_GRACE,
-                            self._ansibleTimeout,
-                            (self.ansible_job_proc,
-                             "Ansible timeout exceeded"))
-        watchdog.start()
-        try:
-            for line in iter(self.ansible_job_proc.stdout.readline, b''):
-                line = line[:1024].rstrip()
-                self.log.debug("Ansible output: %s" % (line,))
-            ret = self.ansible_job_proc.wait()
-        finally:
-            watchdog.stop()
+        for line in iter(self.ansible_proc.stdout.readline, b''):
+            line = line[:1024].rstrip()
+            self.log.debug("Ansible output: %s" % (line,))
+        ret = self.ansible_proc.wait()
         self.log.debug("Ansible exit code: %s" % (ret,))
         self.ansible_proc = None
         return ret == 0
 
     def runAnsiblePostPlaybook(self, jobdir, success):
-        self.ansible_post_proc = subprocess.Popen(
+        proc = subprocess.Popen(
             ['ansible-playbook', jobdir.post_playbook,
              '-e', 'success=%s' % success, '-v'],
             cwd=jobdir.ansible_root,
@@ -1127,21 +1088,11 @@ class NodeWorker(object):
             stderr=subprocess.STDOUT,
             preexec_fn=os.setsid,
         )
-        ret = None
-        watchdog = Watchdog(ANSIBLE_DEFAULT_POST_TIMEOUT,
-                            self._ansibleTimeout,
-                            (self.ansible_post_proc,
-                             "Ansible post timeout exceeded"))
-        watchdog.start()
-        try:
-            for line in iter(self.ansible_post_proc.stdout.readline, b''):
-                line = line[:1024].rstrip()
-                self.log.debug("Ansible post output: %s" % (line,))
-            ret = self.ansible_post_proc.wait()
-        finally:
-            watchdog.stop()
+        for line in iter(proc.stdout.readline, b''):
+            line = line[:1024].rstrip()
+            self.log.debug("Ansible post output: %s" % (line,))
+        ret = proc.wait()
         self.log.debug("Ansible post exit code: %s" % (ret,))
-        self.ansible_post_proc = None
         return ret == 0
 
 
