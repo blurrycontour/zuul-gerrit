@@ -1085,7 +1085,7 @@ class NodeWorker(object):
     def runAnsiblePlaybook(self, jobdir, timeout):
         self.ansible_job_proc = subprocess.Popen(
             ['ansible-playbook', jobdir.playbook,
-             '-e', 'timeout=%s' % timeout, '-v'],
+             '-e', '-v'],
             cwd=jobdir.ansible_root,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
