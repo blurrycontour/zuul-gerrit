@@ -1082,7 +1082,7 @@ class NodeWorker(object):
     def runAnsiblePlaybook(self, jobdir, timeout):
         self.ansible_job_proc = subprocess.Popen(
             ['ansible-playbook', jobdir.playbook,
-             '-e', 'timeout=%s' % timeout, '-v'],
+             '-e', 'timeout=%s' % timeout, '-vv'],
             cwd=jobdir.ansible_root,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
@@ -1108,7 +1108,7 @@ class NodeWorker(object):
     def runAnsiblePostPlaybook(self, jobdir, success):
         self.ansible_post_proc = subprocess.Popen(
             ['ansible-playbook', jobdir.post_playbook,
-             '-e', 'success=%s' % success, '-v'],
+             '-e', 'success=%s' % success, '-vv'],
             cwd=jobdir.ansible_root,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
