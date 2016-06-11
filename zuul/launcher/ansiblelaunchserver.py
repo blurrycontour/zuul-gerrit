@@ -1028,6 +1028,15 @@ class NodeWorker(object):
                                   state='directory'))
             main_block.append(task)
 
+            msg = "Launched by %s" % self.manager_name
+            task = dict(zuul_log=dict(msg=msg))
+            main_block.append(task)
+
+            msg = "Building remotely on %s in workspace %s" % (
+                self.name, parameters['WORKSPACE'])
+            task = dict(zuul_log=dict(msg=msg))
+            main_block.append(task)
+
             for builder in jjb_job.get('builders', []):
                 if 'shell' in builder:
                     main_block.extend(
