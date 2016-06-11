@@ -987,6 +987,8 @@ class NodeWorker(object):
         jjb_job = self.jobs[job_name]
 
         parameters = args.copy()
+        parameters['ZUUL_LAUNCHER_NAME'] = self.manager_name
+        parameters['ZUUL_WORKER_NAME'] = self.name
         parameters['WORKSPACE'] = os.path.join(self.workspace_root, job_name)
 
         with open(jobdir.inventory, 'w') as inventory:
