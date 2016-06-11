@@ -972,7 +972,20 @@ class NodeWorker(object):
         task = dict(zuul_runner=runner)
         task['when'] = '{{ timeout | int > 0 }}'
         task['async'] = '{{ timeout }}'
-        task['poll'] = 5
+        task['poll'] = 0
+        task['register'] = 'runner'
+        tasks.append(task)
+
+        delay = 5
+        retries = timeout / delay
+        args = dict(jid="{{ runner.ansible_job_id }}")
+        task = dict(async_status=args)
+        task['when'] = '{{ timeout | int > 0 }}'
+        task['register'] = 'job_result'
+        task['until'] = 'job_result.finished == 1'
+        task['failed_when'] = 'job_result.finished == 0'
+        task['retries'] = retries
+        task['delay'] = delay
         tasks.append(task)
 
         filetask = dict(path=remote_path,
