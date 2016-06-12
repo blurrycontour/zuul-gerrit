@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7aa08908_c4dca2e6",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1038,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-12T16:48:57Z",
+      "side": 1,
+      "message": "Maybe we should make zuul_log optionally take a list of lines to output so this can be one task?",
+      "revId": "785a692880b4afa8bfefeb59671a60069084ff5b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
