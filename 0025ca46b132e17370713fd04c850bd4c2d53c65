@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7aa08908_287f1b18",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 534,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2016-06-13T15:24:37Z",
+      "side": 1,
+      "message": "GearWorker is a class defined in this file, this means the gear. prefix should be dropped.",
+      "revId": "0025ca46b132e17370713fd04c850bd4c2d53c65",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
