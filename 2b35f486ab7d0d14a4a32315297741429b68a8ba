@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7aa08908_29c27a85",
+        "filename": "tests/base.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 853,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2016-06-13T17:21:57Z",
+      "side": 1,
+      "message": "Just as a note that in our test runs we have \u003e1 python process all running with these timeouts and they may have interleaved debug output if they timeout at the \"same\" time.",
+      "revId": "2b35f486ab7d0d14a4a32315297741429b68a8ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7aa08908_29db9a7d",
+        "filename": "tests/base.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 865,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2016-06-13T17:21:57Z",
+      "side": 1,
+      "message": "I would prefer that we didn\u0027t override private implementation details of the timeout fixture. I think we can get away with just using a custom signal_handler which is part of the public interface in the existing fixture.",
+      "revId": "2b35f486ab7d0d14a4a32315297741429b68a8ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
