@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7aa08908_f8f6888d",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 974,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2016-06-13T14:34:07Z",
+      "side": 1,
+      "message": "So, I still need to confirm, but I believe this is the actually issue.  For what ever reason, our timeout for this task, is not being reached (fired?) by ansible.  And causes our jobs to run forever.  Adding -vvv to our ansible-playbook task should give us the needed debug logs to better track this down.",
+      "parentUuid": "7aa08908_38fe50ae",
+      "revId": "ca70d17f784a8f823b1de8f6a2ca47f5d3c36ff8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7aa08908_982dc448",
         "filename": "zuul/launcher/ansiblelaunchserver.py",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-06-13T14:25:59Z",
       "side": 1,
       "message": "\u0027retries\u0027 tells ansible how many times to poll before timing out the task.\n\nHow do those two interact?  Which is going to be the actual timeout?\n\nIn our system, \u0027async\u0027 is set to the running timeout of the job.  That is to say that if the job has a timeout of 60 minutes, and we have used 30 minutes in a previous task, the ansible variable \u0027timeout\u0027 will contain 30 minutes at the start of this task -- which is what is used to initialize the \u0027async\u0027 value.  But here, the \u0027retries\u0027 value is set using the entire job timeout.  In my example, we would be setting \u0027async\u0027 to 30 minutes while setting \u0027retries\u0027 to a value corresponding to 60 minutes.",
+      "revId": "ca70d17f784a8f823b1de8f6a2ca47f5d3c36ff8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7aa08908_f8d968f4",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 980,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2016-06-13T14:34:07Z",
+      "side": 1,
+      "message": "By setting poll to 0 above, we are doing our retries (polling) here now.\n\nI see what you are saying about timeout.  Let me take a few minutes to figure that out.",
+      "parentUuid": "7aa08908_982dc448",
       "revId": "ca70d17f784a8f823b1de8f6a2ca47f5d3c36ff8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
