@@ -37,6 +37,23 @@
     },
     {
       "key": {
+        "uuid": "7aa08908_9ffab5bb",
+        "filename": "zuul/cmd/cloner.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-13T23:23:19Z",
+      "side": 1,
+      "message": "The fact that they are in environment variables, or shell arguments, is just the method of transmission here.  Especially since project-revisions is not a concept that I think we should expose from the cloner, I think the cloner API should also not expose it.  This is all simplest to test and work with if lib.cloner does the work, and cmd.cloner just parses arguments for it.",
+      "revId": "add25a68248558bf610c45f8dfd0b11395d79ab0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bab6814e_17c86fa7",
         "filename": "zuul/lib/cloner.py",
         "patchSetId": 12
