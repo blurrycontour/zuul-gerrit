@@ -508,6 +508,7 @@ class NodeWorker(object):
         self._sent_complete_event = False
         self.ansible_job_proc = None
         self.ansible_post_proc = None
+        self.publish_logs = False
         self.workspace_root = config.get('launcher', 'workspace_root')
         if self.config.has_option('launcher', 'private_key_file'):
             self.private_key_file = config.get('launcher', 'private_key_file')
@@ -864,8 +865,18 @@ class NodeWorker(object):
                 rsync_opts = self._getRsyncOptions(scpfile['source'],
                                                    parameters)
 
-            scproot = tempfile.mkdtemp(dir=jobdir.ansible_root)
+            scproot = tempfile.mkdtemp(dir=jobdir.root)
             os.chmod(scproot, 0o755)
+
+            # Make sure we copy our ansible logs first.
+            if not self.publish_logs:
+                copyargs = dict(src=self.ansible_root,
+                                dest=scproot)
+                task = dict(copy=copyargs,
+                            delegate_to='127.0.0.1')
+                tasks.append(task)
+                self.publish_logs = True
+
             syncargs = dict(src=src,
                             dest=scproot,
                             copy_links='yes',
