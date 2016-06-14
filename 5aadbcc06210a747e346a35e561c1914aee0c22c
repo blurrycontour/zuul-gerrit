@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7aa08908_e1d7a920",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1016,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2016-06-14T18:10:58Z",
+      "side": 1,
+      "message": "I would be okay with this being a temporary thing, until we updated all our jenkins jobs properly.",
+      "revId": "5aadbcc06210a747e346a35e561c1914aee0c22c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
