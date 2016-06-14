@@ -1115,11 +1115,26 @@ class NodeWorker(object):
             tasks = []
             for publisher in publishers:
                 if 'scp' in publisher:
-                    tasks.extend(self._makeSCPTask(jobdir, publisher,
-                                                   parameters))
+                    main_block.extend(self._makeSCPTask(jobdir, publisher,
+                                                        parameters))
                 if 'ftp' in publisher:
-                    tasks.extend(self._makeFTPTask(jobdir, publisher,
-                                                   parameters))
+                    main_block.extend(self._makeFTPTask(jobdir, publisher,
+                                                        parameters))
+            # To ensure that every publisher attempts to run, ignore
+            # errors from each, but register their results.  Then at
+            # the end, we will check the return code from all of them.
+            return_code_eval = []
+            for i, task in enumerate(tasks):
+                taskid = 'task%i' % i
+                task['ignore_errors'] = True
+                task['register'] = taskid
+                return_code_eval.append('%s.rc != 0' % taskid)
+            publisher_failure = ' or '.join(return_code_eval)
+
+            tasks.append(dict(name='Return code',
+                              fail=dict(msg="A publisher failed"),
+                              when=publisher_failure))
+
             play = dict(hosts='node', name='Publishers',
                         tasks=tasks)
             playbook.write(yaml.dump([play], default_flow_style=False))
