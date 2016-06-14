@@ -95,8 +95,6 @@ class JobDir(object):
         os.makedirs(self.logs)
         self.ansible_root = os.path.join(self.root, 'ansible')
         os.makedirs(self.ansible_root)
-        self.plugins_root = os.path.join(self.ansible_root, 'plugins')
-        os.makedirs(self.plugins_root)
         self.inventory = os.path.join(self.ansible_root, 'inventory')
         self.playbook = os.path.join(self.ansible_root, 'playbook')
         self.post_playbook = os.path.join(self.ansible_root, 'post_playbook')
