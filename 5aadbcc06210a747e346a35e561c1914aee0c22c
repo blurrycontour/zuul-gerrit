@@ -16,6 +16,23 @@
       "revId": "5aadbcc06210a747e346a35e561c1914aee0c22c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7aa08908_61ff3934",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1016,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-14T18:16:36Z",
+      "side": 1,
+      "message": "Yeah, I put the debug log in at the bottom so we can see where and how often it hits.",
+      "revId": "5aadbcc06210a747e346a35e561c1914aee0c22c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
