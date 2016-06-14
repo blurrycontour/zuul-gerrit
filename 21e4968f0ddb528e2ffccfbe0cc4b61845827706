@@ -34,6 +34,24 @@
       "revId": "21e4968f0ddb528e2ffccfbe0cc4b61845827706",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7aa08908_e83825a2",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1133,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2016-06-14T20:56:02Z",
+      "side": 1,
+      "message": "Gotcha. Thx.",
+      "parentUuid": "7aa08908_6815553e",
+      "revId": "21e4968f0ddb528e2ffccfbe0cc4b61845827706",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
