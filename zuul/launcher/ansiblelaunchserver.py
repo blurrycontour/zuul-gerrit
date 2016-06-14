@@ -1060,7 +1060,7 @@ class NodeWorker(object):
             error_block.append(task)
             error_block.append(dict(fail=dict(msg='FAILURE')))
 
-            play = dict(hosts='node', name='Job body',
+            play = dict(hosts='node', name='Job body', gather_facts=False,
                         tasks=tasks)
             playbook.write(yaml.dump([play], default_flow_style=False))
 
@@ -1073,7 +1073,7 @@ class NodeWorker(object):
                 if 'ftp' in publisher:
                     tasks.extend(self._makeFTPTask(jobdir, publisher,
                                                    parameters))
-            play = dict(hosts='node', name='Publishers',
+            play = dict(hosts='node', name='Publishers', gather_facts=False,
                         tasks=tasks)
             playbook.write(yaml.dump([play], default_flow_style=False))
 
