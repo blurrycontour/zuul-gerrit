@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7aa08908_0665a31c",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1133,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2016-06-14T20:43:38Z",
+      "side": 1,
+      "message": "This would make _aborted_job a totally unnecessary variable (only used in runJob(), which now would return before it\u0027s use). Should we get rid of that variable?",
+      "revId": "21e4968f0ddb528e2ffccfbe0cc4b61845827706",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
