@@ -1106,7 +1106,7 @@ class NodeWorker(object):
             error_block.append(task)
             error_block.append(dict(fail=dict(msg='FAILURE')))
 
-            play = dict(hosts='node', name='Job body',
+            play = dict(hosts='node', name='Job body', gather_facts=False,
                         tasks=tasks)
             playbook.write(yaml.dump([play], default_flow_style=False))
 
@@ -1133,7 +1133,7 @@ class NodeWorker(object):
             tasks.append(dict(block=blocks[0],
                               always=blocks[1]))
 
-            play = dict(hosts='node', name='Publishers',
+            play = dict(hosts='node', name='Publishers', gather_facts=False,
                         tasks=tasks)
             playbook.write(yaml.dump([play], default_flow_style=False))
 
