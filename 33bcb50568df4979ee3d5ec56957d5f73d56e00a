@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7aa08908_e13cd7c9",
+        "filename": "etc/status/public_html/zuul.app.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 7156
+      },
+      "writtenOn": "2016-06-14T14:30:10Z",
+      "side": 1,
+      "message": "If source is defined in options, it will be overridden by the one found in 2nd parameter. This preserves backward compatibility shall one used the $.zuul class outside this script.",
+      "revId": "33bcb50568df4979ee3d5ec56957d5f73d56e00a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
