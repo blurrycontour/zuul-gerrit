@@ -16,6 +16,24 @@
       "revId": "21e4968f0ddb528e2ffccfbe0cc4b61845827706",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7aa08908_6815553e",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1133,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2016-06-14T20:48:09Z",
+      "side": 1,
+      "message": "I thought about removing it, but thought it would be possible for abort job to happen, but -9 never to be fired. Since ansible-playbook had finished before the abort attempt.\n\nThis way, we are still protected from an abort inside zuul-launcher",
+      "parentUuid": "7aa08908_0665a31c",
+      "revId": "21e4968f0ddb528e2ffccfbe0cc4b61845827706",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
