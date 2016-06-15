@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7aa08908_80e018ce",
+        "filename": "tests/base.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1342,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-15T22:59:00Z",
+      "side": 1,
+      "message": "This change is unecessary and suggests that haveallbuildsreported and areallbuildswaiting are part of the all, which they are not.  Could we omit this from this change?",
+      "revId": "afdf80471555af1aba6d7753985a64d817bd4380",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7aa08908_e0e59cdc",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1109,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-06-15T22:59:00Z",
+      "side": 1,
+      "message": "Oops, that\u0027s not the right fix for this.  See https://review.openstack.org/330263 and thanks for catching this.",
+      "revId": "afdf80471555af1aba6d7753985a64d817bd4380",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
