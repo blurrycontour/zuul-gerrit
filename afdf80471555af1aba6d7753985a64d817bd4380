@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7aa08908_60924cf8",
+        "filename": "tests/base.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1342,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2016-06-15T23:10:52Z",
+      "side": 1,
+      "message": "sure, this snuck in/out/in again, it was originally a debug place and got auto-reformatted.",
+      "parentUuid": "7aa08908_80e018ce",
+      "revId": "afdf80471555af1aba6d7753985a64d817bd4380",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7aa08908_e0e59cdc",
         "filename": "zuul/scheduler.py",
         "patchSetId": 13
@@ -30,6 +48,24 @@
       "writtenOn": "2016-06-15T22:59:00Z",
       "side": 1,
       "message": "Oops, that\u0027s not the right fix for this.  See https://review.openstack.org/330263 and thanks for catching this.",
+      "revId": "afdf80471555af1aba6d7753985a64d817bd4380",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7aa08908_e06bdcef",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1109,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2016-06-15T23:10:52Z",
+      "side": 1,
+      "message": "Done and done  in next patchset.",
+      "parentUuid": "7aa08908_e0e59cdc",
       "revId": "afdf80471555af1aba6d7753985a64d817bd4380",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
