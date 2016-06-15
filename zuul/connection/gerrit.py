@@ -171,9 +171,10 @@ class GerritWatcher(threading.Thread):
             client.connect(self.hostname,
                            username=self.username,
                            port=self.port,
-                           key_filename=self.keyfile)
+                           key_filename=self.keyfile,
+                           timeout=60)
 
-            stdin, stdout, stderr = client.exec_command("gerrit stream-events")
+            stdin, stdout, stderr = client.exec_command("gerrit stream-events", timeout=60)
 
             self._listen(stdout, stderr)
 
@@ -355,7 +356,8 @@ class GerritConnection(BaseConnection):
         client.connect(self.server,
                        username=self.user,
                        port=self.port,
-                       key_filename=self.keyfile)
+                       key_filename=self.keyfile,
+                       timeout=60)
         self.client = client
 
     def _ssh(self, command, stdin_data=None):
@@ -364,10 +366,10 @@ class GerritConnection(BaseConnection):
 
         try:
             self.log.debug("SSH command:\n%s" % command)
-            stdin, stdout, stderr = self.client.exec_command(command)
+            stdin, stdout, stderr = self.client.exec_command(command, timeout=60)
         except:
             self._open()
-            stdin, stdout, stderr = self.client.exec_command(command)
+            stdin, stdout, stderr = self.client.exec_command(command, timeout=60)
 
         if stdin_data:
             stdin.write(stdin_data)
