@@ -3101,6 +3101,7 @@ jobs:
             client.shutdown()
             self.assertEqual(r, False)
 
+        time.sleep(31)
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 0)
         self.assertEqual(len(self.builds), 0)
