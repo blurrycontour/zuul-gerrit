@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7aa08908_23a0838f",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 859,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2016-06-15T04:15:19Z",
+      "side": 1,
+      "message": "This now very closely mirrors what the test-cases do when they finish up. The only thing I\u0027m not directly calling here is os._exit() to allow us the possibility to inspect threads and try and kill them softly, letting us not hard-exit on timeout and continue with the tests (meaning this would only conditionally be hit if there were threads that didn\u0027t die properly)",
+      "range": {
+        "startLine": 853,
+        "startChar": 0,
+        "endLine": 859,
+        "endChar": 27
+      },
+      "revId": "c90eee0eb4620fb5896ef2e828d108e6ca3dcca3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
