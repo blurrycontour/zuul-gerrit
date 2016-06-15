@@ -26,6 +26,7 @@ import time
 import traceback
 import Queue
 import uuid
+import collections
 
 import gear
 import yaml
@@ -49,6 +50,23 @@ def boolify(x):
     if isinstance(x, str):
         return bool(int(x))
     return bool(x)
+
+
+def yaml_dump(data, stream=None, Dumper=yaml.Dumper, **kwds):
+    # Wrap yaml dump to support ordered dicts
+    class OrderedDumper(Dumper):
+        pass
+    def _dict_representer(dumper, data):
+        return dumper.represent_mapping(
+            yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+            data.items())
+    def unicode_representer(dumper, uni):
+        node = yaml.ScalarNode(tag=u'tag:yaml.org,2002:str', value=uni)
+        return node
+    OrderedDumper.add_representer(collections.OrderedDict, _dict_representer)
+    OrderedDumper.add_representer(collections.defaultdict, _dict_representer)
+    OrderedDumper.add_representer(unicode, unicode_representer)
+    return yaml.safe_dump(data, stream, OrderedDumper, **kwds)
 
 
 class GearWorker(gear.Worker):
@@ -1108,7 +1126,7 @@ class NodeWorker(object):
 
             play = dict(hosts='node', name='Job body',
                         tasks=tasks)
-            playbook.write(yaml.dump([play], default_flow_style=False))
+            playbook.write(yaml_dump([play], default_flow_style=False))
 
         early_publishers, late_publishers = self._transformPublishers(jjb_job)
 
@@ -1130,12 +1148,13 @@ class NodeWorker(object):
             # we run the log publisher regardless of whether the rest
             # of the publishers succeed.
             tasks = []
-            tasks.append(dict(block=blocks[0],
-                              always=blocks[1]))
+            tasks.append(collections.OrderedDict(
+                block=blocks[0],
+                always=blocks[1]))
 
             play = dict(hosts='node', name='Publishers',
                         tasks=tasks)
-            playbook.write(yaml.dump([play], default_flow_style=False))
+            playbook.write(yaml_dump([play], default_flow_style=False))
 
         with open(jobdir.config, 'w') as config:
             config.write('[defaults]\n')
