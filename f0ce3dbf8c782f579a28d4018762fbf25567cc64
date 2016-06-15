@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7aa08908_31ae0a30",
+        "filename": "tests/base.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 859,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2016-06-15T07:40:43Z",
+      "side": 1,
+      "message": "this is capturing to .testrepository locally, but not in the gate. I am looking into it.\n\nIt might be a difference between stderr and stdout, also note that changing this to use sys.stdout results in a ValueError raised out of io.FileIO since sys.stdout is not open for reading.",
+      "range": {
+        "startLine": 853,
+        "startChar": 0,
+        "endLine": 859,
+        "endChar": 27
+      },
+      "revId": "f0ce3dbf8c782f579a28d4018762fbf25567cc64",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
