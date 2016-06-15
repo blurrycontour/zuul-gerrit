@@ -22,6 +22,8 @@ from six.moves import urllib
 import paramiko
 import logging
 import pprint
+import socket
+import socks
 import voluptuous as v
 
 from zuul.connection import BaseConnection
@@ -135,7 +137,8 @@ class GerritWatcher(threading.Thread):
     poll_timeout = 500
 
     def __init__(self, gerrit_connection, username, hostname, port=29418,
-                 keyfile=None):
+                 keyfile=None, proxy_id=None, proxy_pw=None,
+                 proxy_server=None, proxy_port=None):
         threading.Thread.__init__(self)
         self.username = username
         self.keyfile = keyfile
@@ -143,6 +146,11 @@ class GerritWatcher(threading.Thread):
         self.port = port
         self.gerrit_connection = gerrit_connection
         self._stopped = False
+
+        self.proxy_id = proxy_id
+        self.proxy_pw = proxy_pw
+        self.proxy_server = proxy_server
+        self.proxy_port = proxy_port
 
     def _read(self, fd):
         l = fd.readline()
@@ -163,15 +171,33 @@ class GerritWatcher(threading.Thread):
                     else:
                         raise Exception("event on ssh connection")
 
+    def socket_to_gerrit(self):
+        for (family, socktype, proto, canonname, sockaddr
+             ) in socket.getaddrinfo(self.proxy_server, int(self.proxy_port),
+                                     socket.AF_UNSPEC, socket.SOCK_STREAM):
+            if socktype == socket.SOCK_STREAM:
+                socks5_addr = sockaddr
+                break
+
+        sock = socks.socksocket()
+        sock.setproxy(socks.PROXY_TYPE_SOCKS5, socks5_addr[0], socks5_addr[1],
+                      username=self.proxy_id, password=self.proxy_pw)
+        gerrit_addr = (self.hostname, self.port)
+        paramiko.util.retry_on_signal(lambda: sock.connect(gerrit_addr))
+
+        return sock
+
     def _run(self):
         try:
             client = paramiko.SSHClient()
             client.load_system_host_keys()
             client.set_missing_host_key_policy(paramiko.WarningPolicy())
+            sock = self.socket_to_gerrit()
             client.connect(self.hostname,
                            username=self.username,
                            port=self.port,
-                           key_filename=self.keyfile)
+                           key_filename=self.keyfile,
+                           sock=sock)
 
             stdin, stdout, stderr = client.exec_command("gerrit stream-events")
 
@@ -227,6 +253,11 @@ class GerritConnection(BaseConnection):
         self.watcher_thread = None
         self.event_queue = None
         self.client = None
+
+        self.proxy_id = self.connection_config.get('proxy_id')
+        self.proxy_pw = self.connection_config.get('proxy_pw')
+        self.proxy_server = self.connection_config.get('proxy_server')
+        self.proxy_port = self.connection_config.get('proxy_port')
 
         self.baseurl = self.connection_config.get('baseurl',
                                                   'https://%s' % self.server)
@@ -352,10 +383,12 @@ class GerritConnection(BaseConnection):
         client = paramiko.SSHClient()
         client.load_system_host_keys()
         client.set_missing_host_key_policy(paramiko.WarningPolicy())
+        sock = self.watcher_thread.socket_to_gerrit()
         client.connect(self.server,
                        username=self.user,
                        port=self.port,
-                       key_filename=self.keyfile)
+                       key_filename=self.keyfile,
+                       sock=sock)
         self.client = client
 
     def _ssh(self, command, stdin_data=None):
@@ -388,6 +421,13 @@ class GerritConnection(BaseConnection):
         url = "%s/p/%s/info/refs?service=git-upload-pack" % (
             self.baseurl, project)
         try:
+            if self.proxy_server:
+                http_server_url = "https://%s:%s@%s:$s/" % (
+                    self.proxy_id, self.proxy_pw, self.proxy_server,
+                    self.proxy_port)
+                proxy_handler = urllib.ProxyHandler({"https": http_server_url})
+                opener = urllib.build_opener(proxy_handler)
+                urllib.install_opener(opener)
             data = urllib.request.urlopen(url).read()
         except:
             self.log.error("Cannot get references from %s" % url)

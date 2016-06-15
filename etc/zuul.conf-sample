@@ -32,6 +32,10 @@ server=review.example.com
 ;baseurl=https://review.example.com/r
 user=jenkins
 sshkey=/home/jenkins/.ssh/id_rsa
+;proxy_id=your_proxy_id
+;proxy_pw=your_proxy_pw
+;proxy_server=your_proxy_server
+;proxy_port=your_proxy_port
 
 [connection smtp]
 driver=smtp
