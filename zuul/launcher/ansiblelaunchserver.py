@@ -1001,6 +1001,7 @@ class NodeWorker(object):
                       cwd=parameters['WORKSPACE'],
                       parameters=parameters)
         task = dict(zuul_runner=runner)
+        task['name'] = 'Builder: %s ' % builder['name']
         task['when'] = '{{ timeout | int > 0 }}'
         task['async'] = '{{ timeout }}'
         task['poll'] = 5
