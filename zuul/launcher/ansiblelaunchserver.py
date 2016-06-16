@@ -454,8 +454,7 @@ class LaunchServer(object):
             job.sendWorkComplete()
 
     def runReaper(self):
-        # We don't actually care if all the events are processed
-        while self._reaper_running:
+        while self._reaper_running or not self.termination_queue.empty():
             try:
                 item = self.termination_queue.get()
                 self.log.debug("Got termination event %s" % (item,))
@@ -465,7 +464,19 @@ class LaunchServer(object):
                 self.log.debug("Joining %s" % (item,))
                 worker.thread.join()
                 self.log.debug("Joined %s" % (item,))
-                del self.node_workers[item]
+                try:
+                    del self.node_workers[item]
+                except Exception:
+                    self.log.exception("Exception while removing "
+                                       "worker:")
+
+                return_uuid = str(uuid4().hex)
+                data = dict(name=worker.name)
+                name = 'node_return:zuul'
+                return_job = gear.Job(name, json.dumps(data),
+                                      unique=return_uuid)
+                self.log.debug("Submitting node return job: %s", return_job)
+                self.gearman.submitJob(return_job, timeout=300)
             except Exception:
                 self.log.exception("Exception while processing "
                                    "termination events:")
