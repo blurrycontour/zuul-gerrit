@@ -16,6 +16,24 @@
       "revId": "33bcb50568df4979ee3d5ec56957d5f73d56e00a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7aa08908_3d4a2656",
+        "filename": "etc/status/public_html/zuul.app.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-16T06:27:22Z",
+      "side": 1,
+      "message": "Right, it\u0027s the overridden thing that would be unexpected by somebody passing this through.\n\nThat said, I didn\u0027t consider the backwards compatibility point. Not sure if we need to maintain it or not though.",
+      "parentUuid": "7aa08908_e13cd7c9",
+      "revId": "33bcb50568df4979ee3d5ec56957d5f73d56e00a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
