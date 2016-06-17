@@ -3,7 +3,7 @@ pipelines:
     manager: IndependentPipelineManager
     require:
       approval:
-        - username: jenkins
+        - username: zuul
           older-than: 48h
     trigger:
       gerrit:
@@ -21,7 +21,7 @@ pipelines:
       gerrit:
         - event: comment-added
           require-approval:
-            - username: jenkins
+            - username: zuul
               older-than: 48h
     success:
       gerrit:

@@ -8,11 +8,11 @@ pipelines:
       review_gerrit:
         - event: comment-added
           require-approval:
-            - username: jenkins
+            - username: zuul
               older-than: 48h
         - event: comment-added
           require-approval:
-            - email: jenkins@example.com
+            - email: zuul@example.com
               newer-than: 48h
         - event: comment-added
           require-approval:
@@ -20,8 +20,8 @@ pipelines:
         - event: comment-added
           require-approval:
             - approved: 1
-              username: jenkins
-              email: jenkins@example.com
+              username: zuul
+              email: zuul@example.com
     success:
       review_gerrit:
         verified: 1
