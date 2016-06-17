@@ -1024,6 +1024,11 @@ class NodeWorker(object):
         task = dict(copy=copy)
         tasks.append(task)
 
+        debug_args = dict(msg="Async timeout set to "
+                          "{{ timeout | int - elapsed_time }} seconds")
+        task = dict(debug=debug_args)
+        tasks.append(task)
+
         runner = dict(command=remote_path,
                       cwd=parameters['WORKSPACE'],
                       parameters=parameters)
