@@ -73,10 +73,13 @@ class Server(zuul.cmd.ZuulApp):
         signal.signal(signal.SIGUSR1, signal.SIG_IGN)
         self.sched.exit()
         self.sched.join()
+        self.stop_ssh_agent()
         self.stop_gear_server()
+        os._exit(0)
 
     def term_handler(self, signum, frame):
         self.stop_gear_server()
+        self.stop_ssh_agent()
         os._exit(0)
 
     def test_config(self, job_list_path):
@@ -160,6 +163,8 @@ class Server(zuul.cmd.ZuulApp):
 
         self.setup_logging('zuul', 'log_config')
         self.log = logging.getLogger("zuul.Server")
+
+        self.start_ssh_agent()
 
         self.sched = zuul.scheduler.Scheduler(self.config)
         # TODO(jhesketh): Move swift into a connection?

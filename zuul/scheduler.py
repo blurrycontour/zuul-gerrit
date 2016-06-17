@@ -802,7 +802,6 @@ class Scheduler(threading.Thread):
         if self._exit:
             self.log.debug("Exiting")
             self._save_queue()
-            os._exit(0)
 
     def _doReconfigureEvent(self, event):
         # This is called in the scheduler loop after another thread submits
