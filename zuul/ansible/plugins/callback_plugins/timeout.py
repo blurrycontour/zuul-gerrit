@@ -51,7 +51,7 @@ class CallbackModule(CallbackBase):
             overall_timeout = manager.extra_vars.get('timeout')
             if str(overall_timeout) != 'None':
                 timeout = int(overall_timeout) - int(self._elapsed_time)
-                facts['timeout'] = timeout
+                facts['new_timeout'] = timeout
 
             manager.set_nonpersistent_facts(result._host, facts)
         self._task_start_time = None
