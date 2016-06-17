@@ -17,19 +17,19 @@
                                 "jobs": [
                                     {
                                         "name": "zuul-merge",
-                                        "url": "#!/jenkins.example.org/job/zuul-merge/201",
+                                        "url": "#!/zuul.example.org/job/zuul-merge/201",
                                         "result": "SUCCESS",
                                         "voting": true
                                     },
                                     {
                                         "name": "zuul-lint",
-                                        "url": "#!/jenkins.example.org/job/zuul-lint/201",
+                                        "url": "#!/zuul.example.org/job/zuul-lint/201",
                                         "result": "SUCCESS",
                                         "voting": true
                                     },
                                     {
                                         "name": "zuul-test",
-                                        "url": "#!/jenkins.example.org/job/zuul-test/201",
+                                        "url": "#!/zuul.example.org/job/zuul-test/201",
                                         "result": "SUCCESS",
                                         "voting": true
                                     }
@@ -44,7 +44,7 @@
                                 "jobs": [
                                     {
                                         "name": "gerrit-merge",
-                                        "url": "#!/jenkins.example.org/job/gerrit-merge/203",
+                                        "url": "#!/zuul.example.org/job/gerrit-merge/203",
                                         "result": "SUCCESS",
                                         "voting": false
                                     }
@@ -64,7 +64,7 @@
                                 "jobs": [
                                     {
                                         "name": "gerrit-merge",
-                                        "url": "#!/jenkins.example.org/job/gerrit-merge/202",
+                                        "url": "#!/zuul.example.org/job/gerrit-merge/202",
                                         "result": "UNSTABLE",
                                         "voting": false
                                     }
@@ -79,19 +79,19 @@
                                 "jobs": [
                                     {
                                         "name": "zuul-merge",
-                                        "url": "#!/jenkins.example.org/job/zuul-merge/204",
+                                        "url": "#!/zuul.example.org/job/zuul-merge/204",
                                         "result": "SUCCESS",
                                         "voting": true
                                     },
                                     {
                                         "name": "zuul-lint",
-                                        "url": "#!/jenkins.example.org/job/zuul-lint/204",
+                                        "url": "#!/zuul.example.org/job/zuul-lint/204",
                                         "result": "FAILURE",
                                         "voting": true
                                     },
                                     {
                                         "name": "zuul-test",
-                                        "url": "#!/jenkins.example.org/job/zuul-test/204",
+                                        "url": "#!/zuul.example.org/job/zuul-test/204",
                                         "result": null,
                                         "voting": true
                                     }
@@ -120,25 +120,25 @@
                                 "jobs": [
                                     {
                                         "name": "zuul-lint",
-                                        "url": "#!/jenkins.example.org/job/zuul-lint/200",
+                                        "url": "#!/zuul.example.org/job/zuul-lint/200",
                                         "result": "SUCCESS",
                                         "voting": true
                                     },
                                     {
                                         "name": "zuul-test",
-                                        "url": "#!/jenkins.example.org/job/zuul-test/200",
+                                        "url": "#!/zuul.example.org/job/zuul-test/200",
                                         "result": "FAILURE",
                                         "voting": true
                                     },
                                     {
                                         "name": "zuul-regression-python2",
-                                        "url": "#!/jenkins.example.org/job/zuul-regression-python2/200",
+                                        "url": "#!/zuul.example.org/job/zuul-regression-python2/200",
                                         "result": "SUCCESS",
                                         "voting": true
                                     },
                                     {
                                         "name": "zuul-regression-python3",
-                                        "url": "#!/jenkins.example.org/job/zuul-regression-python3/200",
+                                        "url": "#!/zuul.example.org/job/zuul-regression-python3/200",
                                         "result": "FAILURE",
                                         "voting": true
                                     },
