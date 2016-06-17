@@ -37,6 +37,8 @@ import zuul.ansible.library
 import zuul.ansible.plugins.callback_plugins
 from zuul.lib import commandsocket
 
+import ara.callback
+
 ANSIBLE_WATCHDOG_GRACE = 5 * 60
 ANSIBLE_DEFAULT_TIMEOUT = 2 * 60 * 60
 ANSIBLE_DEFAULT_POST_TIMEOUT = 10 * 60
@@ -49,6 +51,9 @@ def boolify(x):
     if isinstance(x, str):
         return bool(int(x))
     return bool(x)
+
+def fileDirectory(file):
+    return os.path.dirname(os.path.abspath(file))
 
 
 class LaunchGearWorker(gear.Worker):
@@ -109,6 +114,8 @@ class JobDir(object):
         self.playbook = os.path.join(self.ansible_root, 'playbook')
         self.post_playbook = os.path.join(self.ansible_root, 'post_playbook')
         self.config = os.path.join(self.ansible_root, 'ansible.cfg')
+        self.ara_database = os.path.join(self.ansible_root, 'ara.sqlite')
+        self.ara_report = os.path.join(self.ansible_root, 'ara_report')
         self.script_root = os.path.join(self.ansible_root, 'scripts')
         os.makedirs(self.script_root)
         self.logs = os.path.join(self.ansible_root, 'logs')
@@ -878,6 +885,8 @@ class NodeWorker(object):
 
     def _makeSCPTask(self, jobdir, publisher, parameters):
         tasks = []
+        ara_report = dict(shell="ara generate %s" % jobdir.ara_report)
+        tasks.append(ara_report)
         for scpfile in publisher['scp']['files']:
             scproot = tempfile.mkdtemp(dir=jobdir.staging_root)
             os.chmod(scproot, 0o755)
@@ -1174,15 +1183,19 @@ class NodeWorker(object):
                 jobdir.logs, 'ansible.txt'))
             config.write('gathering = explicit\n')
 
-            callback_path = zuul.ansible.plugins.callback_plugins.__file__
-            callback_path = os.path.abspath(callback_path)
-            callback_path = os.path.dirname(callback_path)
-            config.write('callback_plugins = %s\n' % callback_path)
+            callbacks = map(fileDirectory, [
+                zuul.ansible.plugins.callback_plugins.__file__,
+                ara.callback.__file__
+            ])
+            config.write('callback_plugins = %s\n' % ':'.join(callbacks))
 
             library_path = zuul.ansible.library.__file__
             library_path = os.path.abspath(library_path)
             library_path = os.path.dirname(library_path)
             config.write('library = %s\n' % library_path)
+
+            config.write('[ara]')
+            config.write('database = sqlite:///%s\n' % jobdir.ara_database)
 
         return timeout
 
