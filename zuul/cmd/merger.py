@@ -51,12 +51,15 @@ class Merger(zuul.cmd.ZuulApp):
         signal.signal(signal.SIGUSR1, signal.SIG_IGN)
         self.merger.stop()
         self.merger.join()
+        self.stop_ssh_agent()
 
     def main(self):
         # See comment at top of file about zuul imports
         import zuul.merger.server
 
         self.setup_logging('merger', 'log_config')
+
+        self.start_ssh_agent()
 
         self.merger = zuul.merger.server.MergeServer(self.config,
                                                      self.connections)
