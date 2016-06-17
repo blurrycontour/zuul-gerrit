@@ -1029,8 +1029,8 @@ class NodeWorker(object):
                       cwd=parameters['WORKSPACE'],
                       parameters=parameters)
         task = dict(zuul_runner=runner)
-        task['when'] = '{{ timeout | int > 0 }}'
-        task['async'] = '{{ timeout }}'
+        task['when'] = '{{ elapsed_time < timeout | float }}'
+        task['async'] = '{{ timeout | float - elapsed_time }}'
         task['poll'] = 5
         tasks.append(task)
 
