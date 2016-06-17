@@ -27,18 +27,22 @@ import os
 import socket
 import sys
 import signal
+import threading
 
 import zuul.cmd
 import zuul.launcher.ansiblelaunchserver
+from zuul.lib import commandsocket
 
 # No zuul imports that pull in paramiko here; it must not be
 # imported until after the daemonization.
 # https://github.com/paramiko/paramiko/issues/59
 # Similar situation with gear and statsd.
 
+COMMANDS = ['reconfigure', 'stop', 'pause', 'unpause', 'release', 'graceful',
+            'verbose', 'unverbose']
+
 
 class Launcher(zuul.cmd.ZuulApp):
-
     def parse_arguments(self):
         parser = argparse.ArgumentParser(description='Zuul launch worker.')
         parser.add_argument('-c', dest='config',
@@ -69,20 +73,69 @@ class Launcher(zuul.cmd.ZuulApp):
         s.sendall('%s\n' % cmd)
 
     def exit_handler(self):
+        # Stop command processing
+        self._command_running = False
+        self.command_socket.stop()
+        self.command_thread.join()
         self.launcher.stop()
         self.launcher.join()
+
+    def runCommand(self):
+        while self._command_running:
+            try:
+                command = self.command_socket.get()
+                self.command_map[command]()
+            except Exception:
+                self.log.exception("Exception while processing command")
+
+    def reconfigure(self):
+        self.log.debug("Reconfiguration triggered")
+        self.read_config()
+        self.setup_logging('launcher', 'log_config')
+        try:
+            self.launcher.reconfigure(self.config)
+        except Exception:
+            self.log.exception("Reconfiguration failed:")
 
     def main(self, daemon=True):
         # See comment at top of file about zuul imports
 
         self.setup_logging('launcher', 'log_config')
-
         self.log = logging.getLogger("zuul.Launcher")
 
         LaunchServer = zuul.launcher.ansiblelaunchserver.LaunchServer
         self.launcher = LaunchServer(self.config,
                                      keep_jobdir=self.args.keep_jobdir)
         self.launcher.start()
+
+        self._command_running = True
+        self.command_map = dict(
+            reconfigure=self.reconfigure,
+            stop=self.exit_handler,
+            pause=self.launcher.pause,
+            unpause=self.launcher.unpause,
+            release=self.launcher.release,
+            graceful=self.launcher.graceful,
+            verbose=self.launcher.verboseOn,
+            unverbose=self.launcher.verboseOff,
+        )
+
+        # NOTE(jhesketh): we currently don't support reloading the state dir
+        # and therefore the socket.
+        if self.config.has_option('zuul', 'state_dir'):
+            state_dir = os.path.expanduser(
+                self.config.get('zuul', 'state_dir'))
+        else:
+            state_dir = '/var/lib/zuul'
+        path = os.path.join(state_dir, 'launcher.socket')
+        self.command_socket = commandsocket.CommandSocket(path)
+
+        # Start command socket
+        self.log.debug("Starting command processor")
+        self.command_socket.start()
+        self.command_thread = threading.Thread(target=self.runCommand)
+        self.command_thread.daemon = True
+        self.command_thread.start()
 
         signal.signal(signal.SIGUSR2, zuul.cmd.stack_dump_handler)
         if daemon:
