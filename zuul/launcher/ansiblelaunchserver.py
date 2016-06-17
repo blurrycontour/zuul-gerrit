@@ -1032,6 +1032,7 @@ class NodeWorker(object):
         task['when'] = '{{ timeout | int > 0 }}'
         task['async'] = '{{ timeout }}'
         task['poll'] = 5
+        task['register'] = 'timeout'
         tasks.append(task)
 
         filetask = dict(path=remote_path,
