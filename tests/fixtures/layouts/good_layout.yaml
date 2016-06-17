@@ -13,7 +13,7 @@ pipelines:
         - event: comment-added
           require-approval:
             - verified: [-1, -2]
-              username: jenkins
+              username: zuul
           approval:
             - workflow: 1
     success:
@@ -40,7 +40,7 @@ pipelines:
       current-patchset: True
       approval:
         - verified: [1, 2]
-          username: jenkins
+          username: zuul
         - workflow: 1
     reject:
       approval:

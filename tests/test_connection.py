@@ -44,7 +44,7 @@ class TestConnections(ZuulTestCase):
         self.assertEqual(A.patchsets[-1]['approvals'][0]['type'], 'VRFY')
         self.assertEqual(A.patchsets[-1]['approvals'][0]['value'], '1')
         self.assertEqual(A.patchsets[-1]['approvals'][0]['by']['username'],
-                         'jenkins')
+                         'zuul')
 
         B = self.fake_review_gerrit.addFakeChange('org/project', 'master', 'B')
         self.worker.addFailTest('project-test2', B)

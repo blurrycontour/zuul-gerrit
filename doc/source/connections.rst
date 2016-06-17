@@ -47,7 +47,7 @@ Zuul will need access to a Gerrit user.
 Create an SSH keypair for Zuul to use if there isn't one already, and
 create a Gerrit user with that key::
 
-  cat ~/id_rsa.pub | ssh -p29418 gerrit.example.com gerrit create-account --ssh-key - --full-name Jenkins jenkins
+  cat ~/id_rsa.pub | ssh -p29418 gerrit.example.com gerrit create-account --ssh-key - --full-name Zuul zuul
 
 Give that user whatever permissions will be needed on the projects you
 want Zuul to gate.  For instance, you may want to grant ``Verified

@@ -8,7 +8,7 @@ pipelines:
       current-patchset: True
       approval:
         - verified: [1, 2]
-          username: jenkins
+          username: zuul
         - workflow: 1
     reject:
       # Reject only takes 'approval', has no need for open etc..

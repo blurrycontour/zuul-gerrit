@@ -3,7 +3,7 @@ pipelines:
     manager: IndependentPipelineManager
     require:
       approval:
-        - username: jenkins
+        - username: zuul
           verified: [1, 2]
     reject:
       approval:
@@ -24,7 +24,7 @@ pipelines:
       gerrit:
         - event: comment-added
           require-approval:
-            - username: jenkins
+            - username: zuul
               verified: [1, 2]
           reject-approval:
             - verified: [-1, -2]
