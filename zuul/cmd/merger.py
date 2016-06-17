@@ -51,6 +51,10 @@ class Merger(zuul.cmd.ZuulApp):
         signal.signal(signal.SIGUSR1, signal.SIG_IGN)
         self.merger.stop()
         self.merger.join()
+        self.stop_ssh_agent()
+
+    def term_handler(self, signum, frame):
+        self.stop_ssh_agent()
 
     def main(self):
         # See comment at top of file about zuul imports
@@ -64,6 +68,7 @@ class Merger(zuul.cmd.ZuulApp):
 
         signal.signal(signal.SIGUSR1, self.exit_handler)
         signal.signal(signal.SIGUSR2, zuul.cmd.stack_dump_handler)
+        signal.signal(signal.SIGTERM, self.term_handler)
         while True:
             try:
                 signal.pause()
@@ -74,6 +79,7 @@ class Merger(zuul.cmd.ZuulApp):
 
 def main():
     server = Merger()
+    server.start_ssh_agent()
     server.parse_arguments()
 
     server.read_config()
