@@ -24,6 +24,8 @@ import signal
 import sys
 import traceback
 
+from subprocess import Popen, PIPE
+
 yappi = extras.try_import('yappi')
 
 import zuul.lib.connections
@@ -93,3 +95,14 @@ class ZuulApp(object):
     def configure_connections(self):
         self.connections = zuul.lib.connections.configure_connections(
             self.config)
+
+    def start_ssh_agent(self):
+        stdoutdata = Popen(['ssh-agent', '-s'], stdout=PIPE).communicate()[0]
+        for line in stdoutdata.splitlines():
+            agent_var = line.split(';')[0]
+            if '=' in agent_var:
+                (env_var, env_val) = agent_var.split('=')
+                os.environ[env_var] = env_val
+
+    def stop_ssh_agent(self):
+        Popen(['ssh-agent', '-k'], stdout=PIPE)
