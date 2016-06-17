@@ -9,7 +9,7 @@ layout_config=/etc/zuul/layout.yaml
 log_config=/etc/zuul/logging.conf
 pidfile=/var/run/zuul/zuul.pid
 state_dir=/var/lib/zuul
-status_url=https://jenkins.example.com/zuul/status
+status_url=https://zuul.example.com/zuul/status
 
 [merger]
 git_dir=/var/lib/zuul/git
@@ -30,8 +30,8 @@ logserver_prefix=http://logs.example.org/server.app/
 driver=gerrit
 server=review.example.com
 ;baseurl=https://review.example.com/r
-user=jenkins
-sshkey=/home/jenkins/.ssh/id_rsa
+user=zuul
+sshkey=/home/zuul/.ssh/id_rsa
 
 [connection smtp]
 driver=smtp

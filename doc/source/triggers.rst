@@ -69,7 +69,7 @@ the following options.
   username, i.e. Gerrit account name.  If you want to specify several
   username filters, you must use a YAML list.  Make sure to use non greedy
   matchers and to escapes dots!
-  Example: ``username: ^jenkins$``.
+  Example: ``username: ^zuul$``.
 
   **username_filter** (deprecated)
   A deprecated alternate spelling of *username*.  Only one of *username* or

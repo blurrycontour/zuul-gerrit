@@ -52,14 +52,14 @@ class TestRequirements(ZuulTestCase):
         self.assertEqual(len(self.history), 0)
 
         # Add a too-old +1, should not be enqueued
-        A.addApproval('VRFY', 1, username='jenkins',
+        A.addApproval('VRFY', 1, username='zuul',
                       granted_on=time.time() - 72 * 60 * 60)
         self.fake_gerrit.addEvent(comment)
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 0)
 
         # Add a recent +1
-        self.fake_gerrit.addEvent(A.addApproval('VRFY', 1, username='jenkins'))
+        self.fake_gerrit.addEvent(A.addApproval('VRFY', 1, username='zuul'))
         self.fake_gerrit.addEvent(comment)
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 1)
@@ -96,7 +96,7 @@ class TestRequirements(ZuulTestCase):
         self.assertEqual(len(self.history), 0)
 
         # Add an old +1 which should be enqueued
-        A.addApproval('VRFY', 1, username='jenkins',
+        A.addApproval('VRFY', 1, username='zuul',
                       granted_on=time.time() - 72 * 60 * 60)
         self.fake_gerrit.addEvent(comment)
         self.waitUntilSettled()
@@ -128,7 +128,7 @@ class TestRequirements(ZuulTestCase):
         self.assertEqual(len(self.history), 0)
 
         # Add an approval from Jenkins
-        A.addApproval('VRFY', 1, username='jenkins')
+        A.addApproval('VRFY', 1, username='zuul')
         self.fake_gerrit.addEvent(comment)
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 1)
@@ -159,7 +159,7 @@ class TestRequirements(ZuulTestCase):
         self.assertEqual(len(self.history), 0)
 
         # Add an approval from Jenkins
-        A.addApproval('VRFY', 1, username='jenkins')
+        A.addApproval('VRFY', 1, username='zuul')
         self.fake_gerrit.addEvent(comment)
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 1)
@@ -189,14 +189,14 @@ class TestRequirements(ZuulTestCase):
         # No approval from Jenkins so should not be enqueued
         self.assertEqual(len(self.history), 0)
 
-        # A -1 from jenkins should not cause it to be enqueued
-        A.addApproval('VRFY', -1, username='jenkins')
+        # A -1 from zuul should not cause it to be enqueued
+        A.addApproval('VRFY', -1, username='zuul')
         self.fake_gerrit.addEvent(comment)
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 0)
 
         # A +1 should allow it to be enqueued
-        A.addApproval('VRFY', 1, username='jenkins')
+        A.addApproval('VRFY', 1, username='zuul')
         self.fake_gerrit.addEvent(comment)
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 1)
@@ -226,20 +226,20 @@ class TestRequirements(ZuulTestCase):
         # No approval from Jenkins so should not be enqueued
         self.assertEqual(len(self.history), 0)
 
-        # A -1 from jenkins should not cause it to be enqueued
-        A.addApproval('VRFY', -1, username='jenkins')
+        # A -1 from zuul should not cause it to be enqueued
+        A.addApproval('VRFY', -1, username='zuul')
         self.fake_gerrit.addEvent(comment)
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 0)
 
-        # A -2 from jenkins should not cause it to be enqueued
-        A.addApproval('VRFY', -2, username='jenkins')
+        # A -2 from zuul should not cause it to be enqueued
+        A.addApproval('VRFY', -2, username='zuul')
         self.fake_gerrit.addEvent(comment)
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 0)
 
-        # A +1 from jenkins should allow it to be enqueued
-        A.addApproval('VRFY', 1, username='jenkins')
+        # A +1 from zuul should allow it to be enqueued
+        A.addApproval('VRFY', 1, username='zuul')
         self.fake_gerrit.addEvent(comment)
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 1)
@@ -253,7 +253,7 @@ class TestRequirements(ZuulTestCase):
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 1)
 
-        B.addApproval('VRFY', 2, username='jenkins')
+        B.addApproval('VRFY', 2, username='zuul')
         self.fake_gerrit.addEvent(comment)
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 2)
@@ -345,12 +345,12 @@ class TestRequirements(ZuulTestCase):
         self.assertEqual(len(self.history), 1)
         self.assertEqual(self.history[0].name, job)
 
-        # add in a comment from jenkins user which shouldn't trigger
-        self.fake_gerrit.addEvent(A.addApproval('VRFY', 1, username='jenkins'))
+        # add in a comment from zuul user which shouldn't trigger
+        self.fake_gerrit.addEvent(A.addApproval('VRFY', 1, username='zuul'))
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 1)
 
-        # Check future reviews also won't trigger as a 'jenkins' user has
+        # Check future reviews also won't trigger as a 'zuul' user has
         # commented previously
         self.fake_gerrit.addEvent(A.addApproval('CRVW', 1,
                                                 username='reviewer'))
@@ -358,12 +358,12 @@ class TestRequirements(ZuulTestCase):
         self.assertEqual(len(self.history), 1)
 
     def test_pipeline_reject_username(self):
-        "Test negative pipeline requirement: no comment from jenkins"
+        "Test negative pipeline requirement: no comment from zuul"
         return self._test_require_reject_username('org/project1',
                                                   'project1-pipeline')
 
     def test_trigger_reject_username(self):
-        "Test negative trigger requirement: no comment from jenkins"
+        "Test negative trigger requirement: no comment from zuul"
         return self._test_require_reject_username('org/project2',
                                                   'project2-trigger')
 
@@ -379,14 +379,14 @@ class TestRequirements(ZuulTestCase):
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 0)
 
-        # First positive vote should not queue until jenkins has +1'd
+        # First positive vote should not queue until zuul has +1'd
         comment = A.addApproval('VRFY', 1, username='reviewer_a')
         self.fake_gerrit.addEvent(comment)
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 0)
 
         # Jenkins should put in a +1 which will also queue
-        comment = A.addApproval('VRFY', 1, username='jenkins')
+        comment = A.addApproval('VRFY', 1, username='zuul')
         self.fake_gerrit.addEvent(comment)
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 1)
