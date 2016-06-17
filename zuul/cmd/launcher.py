@@ -72,6 +72,21 @@ class Launcher(zuul.cmd.ZuulApp):
         self.launcher.stop()
         self.launcher.join()
 
+    def term_handler(self):
+        self.launcher.graceful()
+        self.launcher.join()
+
+    def reconfigure_handler(self, signum, frame):
+        signal.signal(signal.SIGHUP, signal.SIG_IGN)
+        self.log.debug("Reconfiguration triggered")
+        self.read_config()
+        self.setup_logging('launcher', 'log_config')
+        try:
+            self.launcher.reconfigure(self.config)
+        except Exception:
+            self.log.exception("Reconfiguration failed:")
+        signal.signal(signal.SIGHUP, self.reconfigure_handler)
+
     def main(self, daemon=True):
         # See comment at top of file about zuul imports
 
@@ -85,6 +100,9 @@ class Launcher(zuul.cmd.ZuulApp):
         self.launcher.start()
 
         signal.signal(signal.SIGUSR2, zuul.cmd.stack_dump_handler)
+        signal.signal(signal.SIGHUP, self.reconfigure_handler)
+        signal.signal(signal.SIGUSR1, self.exit_handler)
+        signal.signal(signal.SIGTERM, self.term_handler)
         if daemon:
             self.launcher.join()
         else:

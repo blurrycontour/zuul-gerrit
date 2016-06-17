@@ -130,7 +130,6 @@ class LaunchServer(object):
     node_section_re = re.compile('node "(.*?)"')
 
     def __init__(self, config, keep_jobdir=False):
-        self.config = config
         self.keep_jobdir = keep_jobdir
         self.hostname = socket.gethostname()
         self.registered_functions = set()
@@ -150,12 +149,9 @@ class LaunchServer(object):
             graceful=self.graceful,
         )
 
-        if config.has_option('launcher', 'accept_nodes'):
-            self.accept_nodes = config.getboolean('launcher',
-                                                  'accept_nodes')
-        else:
-            self.accept_nodes = True
-
+        self.loadConfig(config)
+        # NOTE(jhesketh): we currently don't support reloading the state dir
+        # and therefore the socket.
         if self.config.has_option('zuul', 'state_dir'):
             state_dir = os.path.expanduser(
                 self.config.get('zuul', 'state_dir'))
@@ -163,6 +159,13 @@ class LaunchServer(object):
             state_dir = '/var/lib/zuul'
         path = os.path.join(state_dir, 'launcher.socket')
         self.command_socket = commandsocket.CommandSocket(path)
+
+    def loadConfig(self, config):
+        if config.has_option('launcher', 'accept_nodes'):
+            self.accept_nodes = config.getboolean('launcher',
+                                                  'accept_nodes')
+        else:
+            self.accept_nodes = True
 
         for section in config.sections():
             m = self.site_section_re.match(section)
@@ -197,6 +200,8 @@ class LaunchServer(object):
                     d['labels'] = []
                 self.static_nodes[nodename] = d
                 continue
+
+        self.config = config
 
     def start(self):
         self._gearman_running = True
@@ -283,8 +288,10 @@ class LaunchServer(object):
             self.worker.unRegisterFunction(function)
         self.registered_functions = new_functions
 
-    def reconfigure(self):
+    def reconfigure(self, config=None):
         self.log.debug("Reconfiguring")
+        if config:
+            self.loadConfig(config)
         self.loadJobs()
         for node in self.node_workers.values():
             try:
