@@ -35,15 +35,10 @@ import zmq
 
 import zuul.ansible.library
 import zuul.ansible.plugins.callback_plugins
-from zuul.lib import commandsocket
 
 ANSIBLE_WATCHDOG_GRACE = 5 * 60
 ANSIBLE_DEFAULT_TIMEOUT = 2 * 60 * 60
 ANSIBLE_DEFAULT_POST_TIMEOUT = 10 * 60
-
-
-COMMANDS = ['reconfigure', 'stop', 'pause', 'unpause', 'release', 'graceful',
-            'verbose', 'unverbose']
 
 
 def boolify(x):
@@ -131,7 +126,6 @@ class LaunchServer(object):
     node_section_re = re.compile('node "(.*?)"')
 
     def __init__(self, config, keep_jobdir=False):
-        self.config = config
         self.options = dict(
             verbose=False
         )
@@ -145,31 +139,14 @@ class LaunchServer(object):
         self.termination_queue = Queue.Queue()
         self.sites = {}
         self.static_nodes = {}
-        self.command_map = dict(
-            reconfigure=self.reconfigure,
-            stop=self.stop,
-            pause=self.pause,
-            unpause=self.unpause,
-            release=self.release,
-            graceful=self.graceful,
-            verbose=self.verboseOn,
-            unverbose=self.verboseOff,
-        )
 
-        if config.has_option('launcher', 'accept_nodes'):
-            self.accept_nodes = config.getboolean('launcher',
-                                                  'accept_nodes')
-        else:
-            self.accept_nodes = True
-        self.config_accept_nodes = self.accept_nodes
-
-        if self.config.has_option('zuul', 'state_dir'):
+        # NOTE(jhesketh): we currently don't support reloading the state dir
+        # dynamically. Load it once here.
+        if config.has_option('zuul', 'state_dir'):
             state_dir = os.path.expanduser(
-                self.config.get('zuul', 'state_dir'))
+                config.get('zuul', 'state_dir'))
         else:
             state_dir = '/var/lib/zuul'
-        path = os.path.join(state_dir, 'launcher.socket')
-        self.command_socket = commandsocket.CommandSocket(path)
         ansible_dir = os.path.join(state_dir, 'ansible')
         plugins_dir = os.path.join(ansible_dir, 'plugins')
         self.callback_dir = os.path.join(plugins_dir, 'callback_plugins')
@@ -188,6 +165,16 @@ class LaunchServer(object):
             zuul.ansible.library.__file__))
         for fn in os.listdir(library_path):
             shutil.copy(os.path.join(library_path, fn), self.library_dir)
+
+        self.loadConfig(config)
+
+    def loadConfig(self, config):
+        if config.has_option('launcher', 'accept_nodes'):
+            self.accept_nodes = config.getboolean('launcher',
+                                                  'accept_nodes')
+        else:
+            self.accept_nodes = True
+        self.config_accept_nodes = self.accept_nodes
 
         for section in config.sections():
             m = self.site_section_re.match(section)
@@ -223,11 +210,12 @@ class LaunchServer(object):
                 self.static_nodes[nodename] = d
                 continue
 
+        self.config = config
+
     def start(self):
         self._gearman_running = True
         self._zmq_running = True
         self._reaper_running = True
-        self._command_running = True
 
         # Setup ZMQ
         self.zcontext = zmq.Context()
@@ -235,6 +223,8 @@ class LaunchServer(object):
         self.zsocket.bind("tcp://*:8888")
 
         # Setup Gearman
+        # NOTE(jhesketh): we currently don't support reloading the gearman
+        # configuration.
         server = self.config.get('gearman', 'server')
         if self.config.has_option('gearman', 'port'):
             port = self.config.get('gearman', 'port')
@@ -247,13 +237,6 @@ class LaunchServer(object):
         self.worker.waitForServer()
         self.log.debug("Registering")
         self.register()
-
-        # Start command socket
-        self.log.debug("Starting command processor")
-        self.command_socket.start()
-        self.command_thread = threading.Thread(target=self.runCommand)
-        self.command_thread.daemon = True
-        self.command_thread.start()
 
         # Load JJB config
         self.loadJobs()
@@ -309,8 +292,10 @@ class LaunchServer(object):
             self.worker.unRegisterFunction(function)
         self.registered_functions = new_functions
 
-    def reconfigure(self):
+    def reconfigure(self, config=None):
         self.log.debug("Reconfiguring")
+        if config:
+            self.loadConfig(config)
         self.loadJobs()
         for node in self.node_workers.values():
             try:
@@ -388,14 +373,8 @@ class LaunchServer(object):
         # Stop ZMQ afterwords so that the send queue is flushed
         self._zmq_running = False
         self.zmq_send_queue.put(None)
-        self.zmq_send_queue.join()
-        # Stop command processing
-        self._command_running = False
-        self.command_socket.stop()
-        # Join the gearman thread which was stopped earlier.
-        self.gearman_thread.join()
-        # The command thread is joined in the join() method of this
-        # class, which is called by the command shell.
+
+        self.join()
         self.log.debug("Stopped")
 
     def verboseOn(self):
@@ -407,15 +386,8 @@ class LaunchServer(object):
         self.options['verbose'] = False
 
     def join(self):
-        self.command_thread.join()
-
-    def runCommand(self):
-        while self._command_running:
-            try:
-                command = self.command_socket.get()
-                self.command_map[command]()
-            except Exception:
-                self.log.exception("Exception while processing command")
+        self.zmq_send_queue.join()
+        self.gearman_thread.join()
 
     def runZMQ(self):
         while self._zmq_running or not self.zmq_send_queue.empty():
