@@ -1101,6 +1101,8 @@ class NodeWorker(object):
             tasks = []
             main_block = []
             error_block = []
+            variables = []
+
             tasks.append(dict(block=main_block,
                               rescue=error_block))
 
@@ -1133,7 +1135,8 @@ class NodeWorker(object):
             error_block.append(task)
             error_block.append(dict(fail=dict(msg='FAILURE')))
 
-            play = dict(hosts='node', name='Job body',
+            variables.append(dict(timeout=timeout))
+            play = dict(hosts='node', name='Job body', vars=variables,
                         tasks=tasks)
             playbook.write(yaml.safe_dump([play], default_flow_style=False))
 
@@ -1196,8 +1199,7 @@ class NodeWorker(object):
         env_copy = os.environ.copy()
         env_copy['LOGNAME'] = 'zuul'
 
-        cmd = ['ansible-playbook', jobdir.playbook,
-               '-e', 'timeout=%s' % timeout, '-v']
+        cmd = ['ansible-playbook', jobdir.playbook, '-v']
         self.log.debug("Ansible command: %s" % (cmd,))
 
         self.ansible_job_proc = subprocess.Popen(
