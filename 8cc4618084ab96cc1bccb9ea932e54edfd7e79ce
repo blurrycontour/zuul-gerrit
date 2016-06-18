@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7aa08908_73d90856",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1011,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2016-06-18T15:34:28Z",
+      "side": 0,
+      "message": "timeout was unused here. I should likely move this into another patch.",
+      "revId": "8cc4618084ab96cc1bccb9ea932e54edfd7e79ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
