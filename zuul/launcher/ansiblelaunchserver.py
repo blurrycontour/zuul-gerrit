@@ -1008,7 +1008,7 @@ class NodeWorker(object):
         tasks.append(task)
         return tasks
 
-    def _makeBuilderTask(self, jobdir, builder, parameters, timeout):
+    def _makeBuilderTask(self, jobdir, builder, parameters):
         tasks = []
         script_fn = '%s.sh' % str(uuid.uuid4().hex)
         script_path = os.path.join(jobdir.script_root, script_fn)
@@ -1103,6 +1103,7 @@ class NodeWorker(object):
             tasks = []
             main_block = []
             error_block = []
+            variables = []
 
             shellargs = "ssh-keyscan %s > %s" % (
                 self.host, jobdir.known_hosts)
@@ -1132,8 +1133,7 @@ class NodeWorker(object):
             for builder in jjb_job.get('builders', []):
                 if 'shell' in builder:
                     main_block.extend(
-                        self._makeBuilderTask(jobdir, builder,
-                                              parameters, timeout))
+                        self._makeBuilderTask(jobdir, builder, parameters))
             task = dict(zuul_log=dict(msg="Job complete, result: SUCCESS"))
             main_block.append(task)
 
@@ -1141,7 +1141,9 @@ class NodeWorker(object):
             error_block.append(task)
             error_block.append(dict(fail=dict(msg='FAILURE')))
 
-            play = dict(hosts='node', name='Job body',
+            variables.append(dict(timeout=timeout))
+
+            play = dict(hosts='node', name='Job body', vars=variables,
                         pre_tasks=pre_tasks, tasks=tasks)
             playbook.write(yaml.safe_dump([play], default_flow_style=False))
 
@@ -1208,8 +1210,7 @@ class NodeWorker(object):
         env_copy = os.environ.copy()
         env_copy['LOGNAME'] = 'zuul'
 
-        cmd = ['ansible-playbook', jobdir.playbook,
-               '-e', 'timeout=%s' % timeout, '-v']
+        cmd = ['ansible-playbook', jobdir.playbook, '-v']
         self.log.debug("Ansible command: %s" % (cmd,))
 
         self.ansible_job_proc = subprocess.Popen(
