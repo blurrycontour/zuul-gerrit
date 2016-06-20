@@ -1182,7 +1182,10 @@ class NodeWorker(object):
             library_path = zuul.ansible.library.__file__
             library_path = os.path.abspath(library_path)
             library_path = os.path.dirname(library_path)
-            config.write('library = %s\n' % library_path)
+            config.write('library = %s\n\n' % library_path)
+
+            config.write('[ssh_connection]\n')
+            config.write('pipelining = True\n')
 
         return timeout
 
