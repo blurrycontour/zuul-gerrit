@@ -22,6 +22,23 @@
       "revId": "beee5c971817ec661394e55e41928101097afca9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a9d85d2_4818151e",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1173,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2016-06-20T18:41:57Z",
+      "side": 1,
+      "message": "It shouldn\u0027t - these are on the launcher host, not on the worker node",
+      "revId": "beee5c971817ec661394e55e41928101097afca9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
