@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a9d85d2_486015cf",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1173,
+      "author": {
+        "id": 6816
+      },
+      "writtenOn": "2016-06-20T18:38:08Z",
+      "side": 1,
+      "message": "Hmm, will this interfere with our use of the user\u0027s home directory in our tox config? See https://review.openstack.org/331251 for an example.",
+      "range": {
+        "startLine": 1173,
+        "startChar": 12,
+        "endLine": 1173,
+        "endChar": 71
+      },
+      "revId": "beee5c971817ec661394e55e41928101097afca9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
