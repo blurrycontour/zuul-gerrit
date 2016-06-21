@@ -15,11 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
-import datetime
 import getpass
 import os
 import subprocess
 import threading
+
+from datetime import datetime
 
 
 class Console(object):
@@ -31,8 +32,10 @@ class Console(object):
         self.logfile.close()
 
     def addLine(self, ln):
-        ts = datetime.datetime.now()
-        outln = '%s %s' % (str(ts), ln)
+        # Note this format is "inspired" by the old Jenkins format; it
+        # is kept so log parsing/formatting remains consistent.
+        ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+        outln = '%s | %s' % (ts, ln)
         self.logfile.write(outln)
 
 
