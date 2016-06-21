@@ -877,7 +877,7 @@ class NodeWorker(object):
                 # run it again.
                 return result
 
-            post_status = self.runAnsiblePostPlaybook(jobdir, job_status)
+            post_status = self.runAnsiblePostPlaybook(jobdir)
             if not post_status:
                 status = 'POST_FAILURE'
             elif job_status:
@@ -1287,14 +1287,13 @@ class NodeWorker(object):
             return None
         return ret == 0
 
-    def runAnsiblePostPlaybook(self, jobdir, success):
+    def runAnsiblePostPlaybook(self, jobdir):
         # Set LOGNAME env variable so Ansible log_path log reports
         # the correct user.
         env_copy = os.environ.copy()
         env_copy['LOGNAME'] = 'zuul'
 
-        cmd = ['ansible-playbook', jobdir.post_playbook,
-               '-e', 'success=%s' % success, '-v']
+        cmd = ['ansible-playbook', jobdir.post_playbook, '-v']
         self.log.debug("Ansible post command: %s" % (cmd,))
 
         self.ansible_post_proc = subprocess.Popen(
