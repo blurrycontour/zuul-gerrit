@@ -1293,8 +1293,7 @@ class NodeWorker(object):
         env_copy = os.environ.copy()
         env_copy['LOGNAME'] = 'zuul'
 
-        cmd = ['ansible-playbook', jobdir.post_playbook,
-               '-e', 'success=%s' % success, '-v']
+        cmd = ['ansible-playbook', jobdir.post_playbook, '-v']
         self.log.debug("Ansible post command: %s" % (cmd,))
 
         self.ansible_post_proc = subprocess.Popen(
