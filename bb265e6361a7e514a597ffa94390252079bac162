@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3aaa91ec_4ee6a8e8",
+        "filename": "zuul/connection/gerrit.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-27T03:28:07Z",
+      "side": 1,
+      "message": "Why did you change from using the ssh-wrapper method?",
+      "range": {
+        "startLine": 242,
+        "startChar": 12,
+        "endLine": 242,
+        "endChar": 16
+      },
+      "revId": "bb265e6361a7e514a597ffa94390252079bac162",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
