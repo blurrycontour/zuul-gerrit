@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "3aaa91ec_61b415d1",
+        "filename": "zuul/connection/gerrit.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2016-06-28T05:06:01Z",
+      "side": 1,
+      "message": "Is this necessary? self._ssh already throws an exception if the command returns an error. Therefore handling contents in err (if this case ever happend) could just see debug logging of the command and bail out.\n\nsimpleQuery also does not handle contents in err.",
+      "parentUuid": "3aaa91ec_cb888ac9",
+      "range": {
+        "startLine": 352,
+        "startChar": 13,
+        "endLine": 352,
+        "endChar": 16
+      },
+      "revId": "7c44cda6916b482769012886e61cc43e050b7d02",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3aaa91ec_ab69be27",
         "filename": "zuul/connection/gerrit.py",
         "patchSetId": 3
@@ -36,6 +60,30 @@
       "writtenOn": "2016-06-28T03:51:35Z",
       "side": 1,
       "message": "You could probably drop this part",
+      "range": {
+        "startLine": 415,
+        "startChar": 19,
+        "endLine": 415,
+        "endChar": 31
+      },
+      "revId": "7c44cda6916b482769012886e61cc43e050b7d02",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3aaa91ec_c1e6a915",
+        "filename": "zuul/connection/gerrit.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 415,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2016-06-28T05:06:01Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "3aaa91ec_ab69be27",
       "range": {
         "startLine": 415,
         "startChar": 19,
