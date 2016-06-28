@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3aaa91ec_cb888ac9",
+        "filename": "zuul/connection/gerrit.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-28T03:51:35Z",
+      "side": 1,
+      "message": "Possible want to capture and/or raise something if there\u0027s anything on stderr",
+      "range": {
+        "startLine": 352,
+        "startChar": 13,
+        "endLine": 352,
+        "endChar": 16
+      },
+      "revId": "7c44cda6916b482769012886e61cc43e050b7d02",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3aaa91ec_ab69be27",
+        "filename": "zuul/connection/gerrit.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 415,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-06-28T03:51:35Z",
+      "side": 1,
+      "message": "You could probably drop this part",
+      "range": {
+        "startLine": 415,
+        "startChar": 19,
+        "endLine": 415,
+        "endChar": 31
+      },
+      "revId": "7c44cda6916b482769012886e61cc43e050b7d02",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
