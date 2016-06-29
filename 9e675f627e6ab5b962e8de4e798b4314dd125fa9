@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3aaa91ec_345494fc",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 897,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2016-06-29T23:50:52Z",
+      "side": 0,
+      "message": "It looks like we\u0027ll still return {} here if runAnsiblePlaybook() returns None.",
+      "revId": "9e675f627e6ab5b962e8de4e798b4314dd125fa9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3aaa91ec_14599835",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 912,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2016-06-29T23:50:52Z",
+      "side": 0,
+      "message": "And also {} here if _aborted_job is set",
+      "revId": "9e675f627e6ab5b962e8de4e798b4314dd125fa9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
