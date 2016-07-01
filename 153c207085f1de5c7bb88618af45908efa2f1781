@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3aaa91ec_8947cebb",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 598,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-07-01T16:13:06Z",
+      "side": 1,
+      "message": "This needs to be getboolean, otherwise we will end up with string values which eval to True, and it will be difficult to disable.",
+      "revId": "153c207085f1de5c7bb88618af45908efa2f1781",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
