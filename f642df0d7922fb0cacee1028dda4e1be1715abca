@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1aa78d24_e7f3f408",
+        "filename": "zuul/launcher/gearman.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-04T12:49:27Z",
+      "side": 1,
+      "message": "I think the correct fix is to add to zuul.lib.swift a flag of whether it was configured properly or not (which is why this self.swift.connection is trying to do).\n\nActually, that already exists.. We can just change this to check if self.swift.storage_url is not empty.",
+      "range": {
+        "startLine": 227,
+        "startChar": 37,
+        "endLine": 227,
+        "endChar": 47
+      },
+      "revId": "f642df0d7922fb0cacee1028dda4e1be1715abca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
