@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "1aa78d24_07cc4088",
+        "filename": "zuul/connection/gerrit.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-04T12:52:18Z",
+      "side": 1,
+      "message": "Okay, that makes sense",
+      "parentUuid": "3aaa91ec_61b415d1",
+      "range": {
+        "startLine": 352,
+        "startChar": 13,
+        "endLine": 352,
+        "endChar": 16
+      },
+      "revId": "7c44cda6916b482769012886e61cc43e050b7d02",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3aaa91ec_ab69be27",
         "filename": "zuul/connection/gerrit.py",
         "patchSetId": 3
