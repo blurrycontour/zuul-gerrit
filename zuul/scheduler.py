@@ -191,12 +191,14 @@ class MergeCompletedEvent(ResultEvent):
     :arg str commit: The SHA of the merged commit (changes with refs).
     """
 
-    def __init__(self, build_set, zuul_url, merged, updated, commit):
+    def __init__(self, build_set, zuul_url, merged, updated, commit,
+                 files):
         self.build_set = build_set
         self.zuul_url = zuul_url
         self.merged = merged
         self.updated = updated
         self.commit = commit
+        self.files = files
 
 
 class NodesProvisionedEvent(ResultEvent):
@@ -358,11 +360,12 @@ class Scheduler(threading.Thread):
         self.wake_event.set()
         self.log.debug("Done adding complete event for build: %s" % build)
 
-    def onMergeCompleted(self, build_set, zuul_url, merged, updated, commit):
+    def onMergeCompleted(self, build_set, zuul_url, merged, updated,
+                         commit, files):
         self.log.debug("Adding merge complete event for build set: %s" %
                        build_set)
-        event = MergeCompletedEvent(build_set, zuul_url,
-                                    merged, updated, commit)
+        event = MergeCompletedEvent(build_set, zuul_url, merged,
+                                    updated, commit, files)
         self.result_event_queue.put(event)
         self.wake_event.set()
 
@@ -607,6 +610,8 @@ class Scheduler(threading.Thread):
     def _areAllBuildsComplete(self):
         self.log.debug("Checking if all builds are complete")
         waiting = False
+        if self.merger.areMergesOutstanding():
+            waiting = True
         for pipeline in self.layout.pipelines.values():
             for item in pipeline.getAllItems():
                 for build in item.current_build_set.getBuilds():
