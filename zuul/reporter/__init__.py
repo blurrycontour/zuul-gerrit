@@ -105,7 +105,7 @@ class BaseReporter(object):
         else:
             url_pattern = None
 
-        for job in pipeline.getJobs(item):
+        for job in item.getJobs():
             build = item.current_build_set.getBuild(job.name)
             result = build.result
             pattern = url_pattern
