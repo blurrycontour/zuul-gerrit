@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1aa78d24_e9b1ac90",
+        "filename": "tests/test_cloner.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 594,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-07-11T23:50:04Z",
+      "side": 1,
+      "message": "We don\u0027t need to wait until settled here (there are no async processes happening in the background).",
+      "revId": "23d81beb01ebf1d01da6c485cff35ed2adff95d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1aa78d24_c9ae702d",
+        "filename": "tests/test_cloner.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 624,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-07-11T23:50:04Z",
+      "side": 1,
+      "message": "Same.",
+      "revId": "23d81beb01ebf1d01da6c485cff35ed2adff95d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1aa78d24_89b8e876",
+        "filename": "zuul/cmd/cloner.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-07-11T23:50:04Z",
+      "side": 1,
+      "message": "We might want to put in a sanity check here to indicate that a ZUUL_NEWREV alse requires ZUUL_PROJECT.",
+      "revId": "23d81beb01ebf1d01da6c485cff35ed2adff95d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
