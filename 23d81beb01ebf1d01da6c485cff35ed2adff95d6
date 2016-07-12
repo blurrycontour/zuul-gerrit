@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1aa78d24_fc14c344",
+        "filename": "tests/test_cloner.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 594,
+      "author": {
+        "id": 12612
+      },
+      "writtenOn": "2016-07-12T02:54:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1aa78d24_e9b1ac90",
+      "revId": "23d81beb01ebf1d01da6c485cff35ed2adff95d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1aa78d24_c9ae702d",
         "filename": "tests/test_cloner.py",
         "patchSetId": 14
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "1aa78d24_dc110754",
+        "filename": "tests/test_cloner.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 624,
+      "author": {
+        "id": 12612
+      },
+      "writtenOn": "2016-07-12T02:54:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1aa78d24_c9ae702d",
+      "revId": "23d81beb01ebf1d01da6c485cff35ed2adff95d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1aa78d24_89b8e876",
         "filename": "zuul/cmd/cloner.py",
         "patchSetId": 14
@@ -47,6 +83,24 @@
       "writtenOn": "2016-07-11T23:50:04Z",
       "side": 1,
       "message": "We might want to put in a sanity check here to indicate that a ZUUL_NEWREV alse requires ZUUL_PROJECT.",
+      "revId": "23d81beb01ebf1d01da6c485cff35ed2adff95d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1aa78d24_3c1beb74",
+        "filename": "zuul/cmd/cloner.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 12612
+      },
+      "writtenOn": "2016-07-12T02:54:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1aa78d24_89b8e876",
       "revId": "23d81beb01ebf1d01da6c485cff35ed2adff95d6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
