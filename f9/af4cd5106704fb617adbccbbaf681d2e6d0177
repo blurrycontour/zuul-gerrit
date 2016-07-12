@@ -1,0 +1,13 @@
+Code-Review+1: Timothy R. Chavez <tchavez@us.ibm.com>
+Code-Review+1: Glauco Oliveira <gvinici@thoughtworks.com>
+Code-Review+2: Joshua Hesketh <joshua.hesketh@rackspace.com>
+Code-Review+1: Antoine Musso <hashar@free.fr>
+Code-Review+1: Anderson Mesquita <andersonvom@gmail.com>
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Tue, 12 Jul 2016 23:24:06 +0000
+Reviewed-on: https://review.openstack.org/235521
+Project: openstack-infra/zuul
+Branch: refs/heads/master
