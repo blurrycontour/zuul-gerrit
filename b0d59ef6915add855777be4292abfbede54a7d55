@@ -52,6 +52,24 @@
       "revId": "b0d59ef6915add855777be4292abfbede54a7d55",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1aa78d24_65580032",
+        "filename": "tox.ini",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2016-07-12T23:34:12Z",
+      "side": 1,
+      "message": "The py3 stuff wont happen in the master/v2.5 branches, so setting it in [testenv] would have been fine. This also works.",
+      "parentUuid": "bae84128_dac1bee5",
+      "revId": "b0d59ef6915add855777be4292abfbede54a7d55",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
