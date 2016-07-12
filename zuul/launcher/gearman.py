@@ -227,6 +227,16 @@ class Gearman(object):
     def updateBuildParams(self, job, item, params):
         """Allow the job to modify and add build parameters"""
 
+        if callable(job.parameter_function):
+            pargs = inspect.getargspec(job.parameter_function)
+            if len(pargs.args) == 2:
+                job.parameter_function(item, params)
+            else:
+                job.parameter_function(item, job, params)
+            self.log.debug("Custom parameter function used for job %s, "
+                           "change: %s, params: %s" % (job, item.change,
+                                                       params))
+
         # NOTE(jhesketh): The params need to stay in a key=value data pair
         # as workers cannot necessarily handle lists.
 
@@ -259,16 +269,6 @@ class Gearman(object):
                 # given  in the form of NAME_PARAMETER=VALUE
                 for key, value in swift_instructions.items():
                     params['_'.join(['SWIFT', name, key])] = value
-
-        if callable(job.parameter_function):
-            pargs = inspect.getargspec(job.parameter_function)
-            if len(pargs.args) == 2:
-                job.parameter_function(item, params)
-            else:
-                job.parameter_function(item, job, params)
-            self.log.debug("Custom parameter function used for job %s, "
-                           "change: %s, params: %s" % (job, item.change,
-                                                       params))
 
     def launch(self, job, item, pipeline, dependent_items=[]):
         uuid = str(uuid4().hex)
