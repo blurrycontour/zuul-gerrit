@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1aa78d24_d4597237",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 997,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2016-07-13T18:27:40Z",
+      "side": 1,
+      "message": "This entire method could be simplified as:\n\n   return self.files in (\u0027zuul.yaml\u0027, \u0027.zuul.yaml\u0027)\n\nNot a minus one though.",
+      "revId": "fa9000bcc59b6260ac93576b2333dcc583c1eaa9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
