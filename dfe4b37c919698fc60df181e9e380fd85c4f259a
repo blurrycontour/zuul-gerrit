@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1aa78d24_7d24d50d",
+        "filename": "doc/source/connections.rst",
+        "patchSetId": 36
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-07-13T23:01:33Z",
+      "side": 1,
+      "message": "I don\u0027t think this should be an option.  The schema should be wholly controlled by Zuul.  If folks want to manipulate it, they can use views.",
+      "revId": "dfe4b37c919698fc60df181e9e380fd85c4f259a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1aa78d24_1d0f9189",
+        "filename": "setup.cfg",
+        "patchSetId": 36
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-07-13T23:01:33Z",
+      "side": 1,
+      "message": "Probably don\u0027t need postgres for the \"mysql reporter\".\n\nMaybe this should be two extras; one for each?  Can SQLAlchemy and alembic be extras as well?\n\nI continue to have reservations about indicating that we support postgres in any way without testing or volunteers to actually do the work to make sure it works.  Other projects have had significant problems with this.  I would prefer we omit it now and add it when it is properly resourced.",
+      "revId": "dfe4b37c919698fc60df181e9e380fd85c4f259a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1aa78d24_bd475dbb",
+        "filename": "zuul/alembic/sql_reporter/versions/4d3ebd7f06b9_set_up_initial_reporter_tables.py",
+        "patchSetId": 36
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-07-13T23:01:33Z",
+      "side": 1,
+      "message": "Start and end times will round to seconds since the epoch.  Maybe these should be DateTime?",
+      "revId": "dfe4b37c919698fc60df181e9e380fd85c4f259a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1aa78d24_9d4421b8",
+        "filename": "zuul/alembic/sql_reporter/versions/4d3ebd7f06b9_set_up_initial_reporter_tables.py",
+        "patchSetId": 36
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-07-13T23:01:33Z",
+      "side": 1,
+      "message": "The UUID is already unique.  We should drop job_name from this and make UUID the PK.\n\nHaving said that, since we\u0027re doing joins, we might want to add an autoincremented integer column and use that for the PK and for joining with the metadata table.\n\nThe UUID column can be smaller.",
+      "revId": "dfe4b37c919698fc60df181e9e380fd85c4f259a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1aa78d24_fd0f2589",
+        "filename": "zuul/alembic/sql_reporter/versions/4d3ebd7f06b9_set_up_initial_reporter_tables.py",
+        "patchSetId": 36
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-07-13T23:01:33Z",
+      "side": 1,
+      "message": "build_job_name is not needed in this table or constraint.\n\nIf we use an autoincrement integer as the PK, we can drop uuid from this table.",
+      "revId": "dfe4b37c919698fc60df181e9e380fd85c4f259a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1aa78d24_dd14e9a0",
+        "filename": "zuul/alembic/sql_reporter/versions/4d3ebd7f06b9_set_up_initial_reporter_tables.py",
+        "patchSetId": 36
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-07-13T23:01:33Z",
+      "side": 1,
+      "message": "So far, the metadata included are \"changeid\" and \"url\".  Why not just make those columns on the build table?  Alembic makes it fairly easy for us to change that schema over time.",
+      "revId": "dfe4b37c919698fc60df181e9e380fd85c4f259a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1aa78d24_3d0a4d7a",
+        "filename": "zuul/alembic/sql_reporter/versions/4d3ebd7f06b9_set_up_initial_reporter_tables.py",
+        "patchSetId": 36
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-07-13T23:01:33Z",
+      "side": 1,
+      "message": "There is no need to support downgrade.  I\u0027d prefer we drop this now so that people don\u0027t feel compelled to write downgrade methods in the future.",
+      "revId": "dfe4b37c919698fc60df181e9e380fd85c4f259a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
