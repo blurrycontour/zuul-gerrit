@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1aa78d24_be28f886",
+        "filename": "zuul/layoutvalidator.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-07-13T22:00:15Z",
+      "side": 1,
+      "message": "All YAML keys should use hyphens, not underscores.",
+      "revId": "d2c8c5c9cb90895f04da1245b08b1b9c6360f4b4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
