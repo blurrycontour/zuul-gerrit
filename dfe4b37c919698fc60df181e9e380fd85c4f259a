@@ -118,6 +118,57 @@
       "revId": "dfe4b37c919698fc60df181e9e380fd85c4f259a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1aa78d24_7d2335bf",
+        "filename": "zuul/connection/sql.py",
+        "patchSetId": 36
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2016-07-13T23:15:17Z",
+      "side": 1,
+      "message": "Forgive my naivete around the overall schema\u0027s use cases, but what\u0027s the reasoning behind this unique constraint? Is there a concern that one might accidentally use a uuid twice to refer to the same job, and that would be confusing? You end up paying a 1530-byte-per-record penalty to have the constraint (assuming you allow the columns to all be utf8)\n\nIf this is absolutely necessary for data consistency, I\u0027d recommend explicitly setting the charset to \u0027ascii\u0027 for both of these, which would at least drop it down to 510 byte keys.\n\nAlso further, uuid is 36 bytes with the dashes. Perhaps drop the uuid columns in all of the tables to String(36).",
+      "revId": "dfe4b37c919698fc60df181e9e380fd85c4f259a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1aa78d24_803f9ab4",
+        "filename": "zuul/connection/sql.py",
+        "patchSetId": 36
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2016-07-13T23:15:17Z",
+      "side": 1,
+      "message": "This join would perform significantly faster (especially in instances where the optimizer needs to build temp tables) if this table just had a bigint, and not the full sized (36 byte or 255 byte) UUID. As we discussed on IRC, MySQL is going to have fixed-width b-tree keys, and since utf8 columns are potentially 3 bytes-per-char, a varchar(255) will become a 765 byte index key. So at the very least, you will want to make sure all uuid\u0027s are ascii. But even better may be to have an auto incrementing bigint that is used for joins instead, like we do in subunit2sql. The UUID then just becomes the publicly visible Unique ID, and thus is only used for single key lookups.",
+      "revId": "dfe4b37c919698fc60df181e9e380fd85c4f259a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1aa78d24_5d07591d",
+        "filename": "zuul/connection/sql.py",
+        "patchSetId": 36
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2016-07-13T23:15:17Z",
+      "side": 1,
+      "message": "Same as above.",
+      "revId": "dfe4b37c919698fc60df181e9e380fd85c4f259a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
