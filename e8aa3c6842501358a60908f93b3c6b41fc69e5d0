@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1aa78d24_88fc2173",
+        "filename": "zuul/cmd/cloner.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-13T00:28:21Z",
+      "side": 0,
+      "message": "This is required by recently merged cloner changes",
+      "range": {
+        "startLine": 21,
+        "startChar": 7,
+        "endLine": 21,
+        "endChar": 10
+      },
+      "revId": "e8aa3c6842501358a60908f93b3c6b41fc69e5d0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
