@@ -3490,7 +3490,7 @@ jobs:
             if time.time() - start > 10:
                 raise Exception("Timeout waiting for gearman server to report "
                                 + "back to the client")
-            build = self.launcher.builds.values()[0]
+            build = list(self.launcher.builds.values())[0]
             if build.worker.name == "My Worker":
                 break
             else:
@@ -3716,7 +3716,7 @@ For CI problems and help debugging, contact ci@example.org"""
             if time.time() - start > 10:
                 raise Exception("Timeout waiting for gearman server to report "
                                 + "back to the client")
-            build = self.launcher.builds.values()[0]
+            build = list(self.launcher.builds.values())[0]
             if build.worker.name == "My Worker":
                 break
             else:

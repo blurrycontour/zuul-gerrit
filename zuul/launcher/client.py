@@ -371,7 +371,7 @@ class LaunchClient(object):
         # ZUUL_NEWREV
 
         all_items = dependent_items + [item]
-        merger_items = map(make_merger_item, all_items)
+        merger_items = list(map(make_merger_item, all_items))
 
         params['job'] = job.name
         params['items'] = merger_items
