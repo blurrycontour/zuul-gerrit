@@ -18,10 +18,11 @@ import time
 
 import gear
 
+from zuul import gear_job_wrapper
+
 
 class RPCFailure(Exception):
     pass
-
 
 class RPCClient(object):
     log = logging.getLogger("zuul.RPCClient")
@@ -35,9 +36,10 @@ class RPCClient(object):
 
     def submitJob(self, name, data):
         self.log.debug("Submitting job %s with data %s" % (name, data))
-        job = gear.Job(name,
-                       json.dumps(data),
-                       unique=str(time.time()))
+        job = gear_job_wrapper.GearJobWrapper.gear_job(
+            name,
+            json.dumps(data),
+            unique=str(time.time()))
         self.gearman.submitJob(job, timeout=300)
 
         self.log.debug("Waiting for job completion")
@@ -78,7 +80,7 @@ class RPCClient(object):
         if job.failure:
             return False
         else:
-            return json.loads(job.data[0])
+            return json.loads(job.data[0].decode('utf-8'))
 
     def shutdown(self):
         self.gearman.shutdown()

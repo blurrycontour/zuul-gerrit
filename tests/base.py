@@ -45,6 +45,7 @@ from git import GitCommandError
 
 import zuul.connection.gerrit
 import zuul.connection.smtp
+from zuul import gear_job_wrapper
 import zuul.scheduler
 import zuul.webapp
 import zuul.rpclistener
@@ -772,6 +773,7 @@ class FakeGearmanServer(gear.Server):
     def getJobForConnection(self, connection, peek=False):
         for queue in [self.high_queue, self.normal_queue, self.low_queue]:
             for job in queue:
+                job = gear_job_wrapper.GearJobWrapper(job=job)
                 if not hasattr(job, 'waiting'):
                     if job.name.startswith('build:'):
                         job.waiting = self.hold_jobs_in_queue
@@ -794,6 +796,7 @@ class FakeGearmanServer(gear.Server):
                 len(self.low_queue))
         self.log.debug("releasing queued job %s (%s)" % (regex, qlen))
         for job in self.getQueue():
+            job = gear_job_wrapper.GearJobWrapper(job=job)
             cmd, name = job.name.split(':')
             if cmd != 'build':
                 continue
@@ -865,7 +868,7 @@ class BaseTestCase(testtools.TestCase):
             # If timeout value is invalid do not set a timeout.
             test_timeout = 0
         if test_timeout > 0:
-            self.useFixture(fixtures.Timeout(test_timeout, gentle=False))
+            self.useFixture(fixtures.Timeout(test_timeout, gentle=True))
 
         if (os.environ.get('OS_STDOUT_CAPTURE') == 'True' or
             os.environ.get('OS_STDOUT_CAPTURE') == '1'):
@@ -1395,7 +1398,7 @@ class ZuulTestCase(BaseTestCase):
             params = json.loads(job.arguments)
             if (params['job'] == name and
                 (project is None or params['ZUUL_PROJECT'] == project)):
-                result = json.loads(job.data[-1])
+                result = json.loads(job.data[-1].decode('utf-8'))
                 ret = BuildHistory(job=job,
                                    name=params['job'],
                                    result=result['result'])

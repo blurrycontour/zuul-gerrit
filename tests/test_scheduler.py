@@ -1077,6 +1077,7 @@ jobs:
         queue = self.gearman_server.getQueue()
         job_A = None
         for job in queue:
+            job = gear_job_wrapper.GearJobWrapper(job=job)
             if 'project-merge' in job.name:
                 job_A = job
         ref_A = self.getParameter(job_A, 'ZUUL_REF')
@@ -1089,6 +1090,7 @@ jobs:
         queue = self.gearman_server.getQueue()
         job_B = None
         for job in queue:
+            job = gear_job_wrapper.GearJobWrapper(job=job)
             if 'project-merge' in job.name:
                 job_B = job
         ref_B = self.getParameter(job_B, 'ZUUL_REF')
@@ -1100,6 +1102,7 @@ jobs:
         self.waitUntilSettled()
         queue = self.gearman_server.getQueue()
         for job in queue:
+            job = gear_job_wrapper.GearJobWrapper(job=job)
             if 'project-merge' in job.name:
                 job_C = job
         ref_C = self.getParameter(job_C, 'ZUUL_REF')

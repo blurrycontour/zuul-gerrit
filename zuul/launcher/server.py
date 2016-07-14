@@ -25,6 +25,7 @@ import traceback
 import gear
 import yaml
 
+from zuul import gear_job_wrapper
 import zuul.merger
 
 
@@ -194,7 +195,7 @@ class LaunchServer(object):
         self.log.debug("Starting launch listener")
         while self._running:
             try:
-                job = self.worker.getJob()
+                job = gear_job_wrapper.GearJobWrapper(self.worker.getJob())
                 try:
                     if job.name == 'launcher:launch':
                         self.log.debug("Got launch job: %s" % job.unique)

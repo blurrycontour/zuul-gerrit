@@ -18,6 +18,8 @@ import logging
 
 from tests.base import ZuulTestCase
 
+from zuul import gear_job_wrapper
+
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(name)-32s '
                     '%(levelname)-8s %(message)s')
