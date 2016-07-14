@@ -22,6 +22,7 @@ import time
 import threading
 from uuid import uuid4
 
+from zuul import gear_job_wrapper
 import zuul.model
 from zuul.model import Build
 
@@ -88,7 +89,7 @@ def getJobData(job):
     d = job.data[-1]
     if not d:
         return {}
-    return json.loads(d)
+    return json.loads(d.decode('utf-8'))
 
 
 class ZuulGearmanClient(gear.Client):
@@ -392,8 +393,8 @@ class LaunchClient(object):
             self.sched.onBuildCompleted(build, 'SUCCESS')
             return build
 
-        gearman_job = gear.Job('launcher:launch', json.dumps(params),
-                               unique=uuid)
+        gearman_job = gear_job_wrapper.GearJobWrapper.gear_job(
+            'launcher:launch', json.dumps(params), unique=uuid)
         build.__gearman_job = gearman_job
         self.builds[uuid] = build
 
@@ -533,8 +534,9 @@ class LaunchClient(object):
         stop_uuid = str(uuid4().hex)
         data = dict(name=build.job.name,
                     number=build.number)
-        stop_job = gear.Job("stop:%s" % build.__gearman_manager,
-                            json.dumps(data), unique=stop_uuid)
+        stop_job = gear_job_wrapper.GearJobWrapper.gear_job(
+            "stop:%s" % build.__gearman_manager,
+            json.dumps(data), unique=stop_uuid)
         self.meta_jobs[stop_uuid] = stop_job
         self.log.debug("Submitting stop job: %s", stop_job)
         self.gearman.submitJob(stop_job, precedence=gear.PRECEDENCE_HIGH,
@@ -556,7 +558,8 @@ class LaunchClient(object):
         data = dict(name=build.job.name,
                     number=build.number,
                     html_description=desc)
-        desc_job = gear.Job(name, json.dumps(data), unique=desc_uuid)
+        desc_job = gear_job_wrapper.GearJobWrapper.gear_job(
+            name, json.dumps(data), unique=desc_uuid)
         self.meta_jobs[desc_uuid] = desc_job
         self.log.debug("Submitting describe job: %s", desc_job)
         self.gearman.submitJob(desc_job, precedence=gear.PRECEDENCE_LOW,

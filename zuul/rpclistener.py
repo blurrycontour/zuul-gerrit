@@ -21,6 +21,7 @@ import traceback
 import gear
 import six
 
+from zuul import gear_job_wrapper
 from zuul import model
 
 
@@ -65,7 +66,7 @@ class RPCListener(object):
         self.log.debug("Starting RPC listener")
         while self._running:
             try:
-                job = self.worker.getJob()
+                job = gear_job_wrapper.GearJobWrapper(self.worker.getJob())
                 self.log.debug("Received job %s" % job.name)
                 z, jobname = job.name.split(':')
                 attrname = 'handle_' + jobname
@@ -76,7 +77,7 @@ class RPCListener(object):
                             f(job)
                         except Exception:
                             self.log.exception("Exception while running job")
-                            job.sendWorkException(traceback.format_exc())
+                            job.sendWorkException(traceback.format_exc().encode('utf-8'))
                     else:
                         job.sendWorkFail()
                 else:

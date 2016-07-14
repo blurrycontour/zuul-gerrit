@@ -19,6 +19,7 @@ import traceback
 
 import gear
 
+from zuul import gear_job_wrapper
 from zuul.merger import merger
 
 
@@ -83,7 +84,7 @@ class MergeServer(object):
         self.log.debug("Starting merge listener")
         while self._running:
             try:
-                job = self.worker.getJob()
+                job = gear_job_wrapper.GearJobWrapper(self.worker.getJob())
                 try:
                     if job.name == 'merger:merge':
                         self.log.debug("Got merge job: %s" % job.unique)

@@ -35,6 +35,7 @@ import zmq
 
 import zuul.ansible.library
 import zuul.ansible.plugins.callback_plugins
+from zuul import gear_job_wrapper
 from zuul.lib import commandsocket
 
 ANSIBLE_WATCHDOG_GRACE = 5 * 60
@@ -433,7 +434,8 @@ class LaunchServer(object):
     def run(self):
         while self._gearman_running:
             try:
-                job = self.worker.getJob()
+                job = gear_job_wrapper.GearJobWrapper.from_gear_job(
+                    self.worker.getJob())
                 try:
                     if job.name.startswith('node_assign:'):
                         self.log.debug("Got node_assign job: %s" % job.unique)

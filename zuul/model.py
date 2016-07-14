@@ -1568,7 +1568,7 @@ class JobTimeData(object):
     def load(self):
         if not os.path.exists(self.path):
             return
-        with open(self.path) as f:
+        with open(self.path, 'rb') as f:
             data = struct.unpack(self.format, f.read())
         version = data[0]
         if version != self.version:
@@ -1584,7 +1584,7 @@ class JobTimeData(object):
         data.extend(self.failure_times)
         data.extend(self.results)
         data = struct.pack(self.format, *data)
-        with open(tmpfile, 'w') as f:
+        with open(tmpfile, 'wb') as f:
             f.write(data)
         os.rename(tmpfile, self.path)
 

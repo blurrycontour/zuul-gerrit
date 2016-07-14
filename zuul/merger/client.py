@@ -19,6 +19,7 @@ from uuid import uuid4
 
 import gear
 
+from  zuul import gear_job_wrapper
 import zuul.model
 
 
@@ -28,7 +29,7 @@ def getJobData(job):
     d = job.data[-1]
     if not d:
         return {}
-    return json.loads(d)
+    return json.loads(d.decode('utf-8'))
 
 
 class MergeGearmanClient(gear.Client):
@@ -97,9 +98,11 @@ class MergeClient(object):
     def submitJob(self, name, data, build_set,
                   precedence=zuul.model.PRECEDENCE_NORMAL):
         uuid = str(uuid4().hex)
-        job = MergeJob(name,
-                       json.dumps(data),
-                       unique=uuid)
+        job = gear_job_wrapper.GearJobWrapper.gear_job(
+            name,
+            json.dumps(data),
+            unique=uuid,
+            cls=MergeJob)
         job.build_set = build_set
         self.log.debug("Submitting job %s with data %s" % (job, data))
         self.jobs.add(job)
