@@ -160,7 +160,7 @@ class ProjectTemplateParser(object):
             elif isinstance(conf_job, dict):
                 # A dictionary in a job tree may override params, or
                 # be the root of a sub job tree, or both.
-                jobname, attrs = dict.items()[0]
+                jobname, attrs = list(dict.items())[0]
                 jobs = attrs.pop('jobs')
                 if attrs:
                     # We are overriding params, so make a new job def

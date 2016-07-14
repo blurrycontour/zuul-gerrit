@@ -956,7 +956,7 @@ class Changeish(object):
         raise NotImplementedError()
 
     def filterJobs(self, jobs):
-        return filter(lambda job: job.changeMatches(self), jobs)
+        return list(filter(lambda job: job.changeMatches(self), jobs))
 
     def getRelatedChanges(self):
         return set()
@@ -1446,7 +1446,7 @@ class UnparsedAbideConfig(object):
                 raise Exception("Configuration item dictionaries must have "
                                 "a single key (when parsing %s)" %
                                 (conf,))
-            key, value = item.items()[0]
+            key, value = list(item.items())[0]
             if key == 'tenant':
                 self.tenants.append(value)
             else:
@@ -1485,7 +1485,7 @@ class UnparsedTenantConfig(object):
                 raise Exception("Configuration item dictionaries must have "
                                 "a single key (when parsing %s)" %
                                 (conf,))
-            key, value = item.items()[0]
+            key, value = list(item.items())[0]
             if key == 'project':
                 self.projects.append(value)
             elif key == 'job':

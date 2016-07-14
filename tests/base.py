@@ -1386,7 +1386,7 @@ class ZuulTestCase(BaseTestCase):
             self.sched.wake_event.wait(0.1)
 
     def countJobResults(self, jobs, result):
-        jobs = filter(lambda x: x.result == result, jobs)
+        jobs = list(filter(lambda x: x.result == result, jobs))
         return len(jobs)
 
     def getJobFromHistory(self, name, project=None):
@@ -1434,7 +1434,7 @@ class ZuulTestCase(BaseTestCase):
         raise Exception("Key %s not found in reported stats" % key)
 
     def getPipeline(self, name):
-        return self.sched.abide.tenants.values()[0].layout.pipelines.get(name)
+        return list(self.sched.abide.tenants.values())[0].layout.pipelines.get(name)
 
     def updateConfigLayout(self, path):
         root = os.path.join(self.test_root, "config")
