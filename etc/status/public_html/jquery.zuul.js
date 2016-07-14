@@ -507,9 +507,42 @@
                     .addClass('zuul-pipeline col-md-4')
                     .append(this.pipeline_header(pipeline, count));
 
+                var sorted_change_queues = pipeline.change_queues.sort(function (lhs, rhs) {
+                    var lhs_length = 0;
+                    var rhs_length = 0;
+                    $.each(lhs.heads, function (head_i, changes) {
+                        lhs_length += changes.length;
+                    });
+                    $.each(rhs.heads, function (head_i, changes) {
+                        rhs_length += changes.length;
+                    });
+                    return lhs_length - rhs_length;
+                });
+                var id_to_live_change = {};
+                var id_to_zuul_ref_position = {};
                 $.each(pipeline.change_queues,
                        function (queue_i, change_queue) {
                     $.each(change_queue.heads, function (head_i, changes) {
+                        $.each(changes, function (change_i, change) {
+                            if (change.live) {
+                                id_to_live_change[change.id] = change;
+                            }
+                            id_to_zuul_ref_position[change.id] = change.zuul_ref;
+                        });
+                    });
+                });
+
+                $.each(pipeline.change_queues,
+                       function (queue_i, change_queue) {
+                    var filtered_change_queue_heads = $.grep(change_queue.heads, function (changes, head_i) {
+                        return changes.some(function (change) {
+                            return id_to_zuul_ref_position[change.id] == change.zuul_ref;
+                        });
+                    });
+                    if (filtered_change_queue_heads.length == 0) {
+                        return;  // Skip this queue
+                    }
+                    $.each(filtered_change_queue_heads, function (head_i, changes) {
                         if (pipeline.change_queues.length > 1 &&
                             head_i === 0) {
                             var name = change_queue.name;
@@ -528,7 +561,10 @@
                             );
                         }
 
-                        $.each(changes, function (change_i, change) {
+                        var changes_to_display = $.map(changes, function (change, change_i) {
+                            return id_to_live_change[change.id] || change;
+                        });
+                        $.each(changes_to_display, function (change_i, change) {
                             var $change_box =
                                 format.change_with_status_tree(
                                     change, change_queue);
