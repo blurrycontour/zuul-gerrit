@@ -22,6 +22,30 @@
       "revId": "f642df0d7922fb0cacee1028dda4e1be1715abca",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fad55976_f82bb331",
+        "filename": "zuul/launcher/gearman.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2016-07-15T20:06:19Z",
+      "side": 1,
+      "message": "That\u0027s a good idea, next patchset uses swift.storage_url instead of swift.connection here.",
+      "parentUuid": "1aa78d24_e7f3f408",
+      "range": {
+        "startLine": 227,
+        "startChar": 37,
+        "endLine": 227,
+        "endChar": 47
+      },
+      "revId": "f642df0d7922fb0cacee1028dda4e1be1715abca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
