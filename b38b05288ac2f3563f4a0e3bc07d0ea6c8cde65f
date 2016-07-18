@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "dada55a8_c7e4f13c",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-07-18T16:33:00Z",
+      "side": 1,
+      "message": "After it\u0027s fulfilled then the build should be running, so it will be aborted and the nodes returned.",
+      "revId": "b38b05288ac2f3563f4a0e3bc07d0ea6c8cde65f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dada55a8_86e4db3b",
         "filename": "zuul/model.py",
         "patchSetId": 2
@@ -48,6 +65,23 @@
     },
     {
       "key": {
+        "uuid": "dada55a8_27d06d53",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 727,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-07-18T16:33:00Z",
+      "side": 1,
+      "message": "We will only return one request.  Put another way, a buildset only has one noderequest for a given job.  This gets that single node request for that single job.  The instance variable is plural because it contains all of the node requests for all of this buildset\u0027s jobs.",
+      "revId": "b38b05288ac2f3563f4a0e3bc07d0ea6c8cde65f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dada55a8_06cf4bb1",
         "filename": "zuul/model.py",
         "patchSetId": 2
@@ -59,6 +93,23 @@
       "writtenOn": "2016-07-18T06:18:18Z",
       "side": 1,
       "message": "(nit) I know this space should be clean but is it worth checking for collisions in this dictionary just in case there are two request events for the same buildset? (ie just more hardening)",
+      "revId": "b38b05288ac2f3563f4a0e3bc07d0ea6c8cde65f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dada55a8_07d56942",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 731,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-07-18T16:33:00Z",
+      "side": 1,
+      "message": "Probably not a bad idea.",
       "revId": "b38b05288ac2f3563f4a0e3bc07d0ea6c8cde65f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -111,6 +162,23 @@
     },
     {
       "key": {
+        "uuid": "dada55a8_67ca65a3",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-07-18T16:33:00Z",
+      "side": 1,
+      "message": "Yep, thanks.",
+      "revId": "b38b05288ac2f3563f4a0e3bc07d0ea6c8cde65f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dada55a8_66af27e4",
         "filename": "zuul/nodepool.py",
         "patchSetId": 2
@@ -128,6 +196,23 @@
         "endLine": 48,
         "endChar": 12
       },
+      "revId": "b38b05288ac2f3563f4a0e3bc07d0ea6c8cde65f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dada55a8_47cf61b0",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-07-18T16:33:00Z",
+      "side": 1,
+      "message": "Well, not right now -- if we do, then any tests that use it would fail, and the object of this patch is to sketch out a skeleton implementation, then fill it in later once we finalize the zuul-nodepool protocol, but otherwise actually execute this code in the tests.",
       "revId": "b38b05288ac2f3563f4a0e3bc07d0ea6c8cde65f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
