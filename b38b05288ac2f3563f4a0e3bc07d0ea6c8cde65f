@@ -1,0 +1,136 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dada55a8_66960796",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-18T06:18:18Z",
+      "side": 1,
+      "message": "what if the cancellation comes after the request is fulfilled? We should return the nodes if appropriate.",
+      "range": {
+        "startLine": 377,
+        "startChar": 32,
+        "endLine": 377,
+        "endChar": 45
+      },
+      "revId": "b38b05288ac2f3563f4a0e3bc07d0ea6c8cde65f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dada55a8_86e4db3b",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 727,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-18T06:18:18Z",
+      "side": 1,
+      "message": "(nit) should possibly be plural",
+      "range": {
+        "startLine": 727,
+        "startChar": 8,
+        "endLine": 727,
+        "endChar": 25
+      },
+      "revId": "b38b05288ac2f3563f4a0e3bc07d0ea6c8cde65f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dada55a8_06cf4bb1",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 731,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-18T06:18:18Z",
+      "side": 1,
+      "message": "(nit) I know this space should be clean but is it worth checking for collisions in this dictionary just in case there are two request events for the same buildset? (ie just more hardening)",
+      "revId": "b38b05288ac2f3563f4a0e3bc07d0ea6c8cde65f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dada55a8_6668c7bb",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-18T06:18:18Z",
+      "side": 1,
+      "message": "I think you want req.id here",
+      "range": {
+        "startLine": 39,
+        "startChar": 22,
+        "endLine": 39,
+        "endChar": 24
+      },
+      "revId": "b38b05288ac2f3563f4a0e3bc07d0ea6c8cde65f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dada55a8_4665c3df",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-18T06:18:18Z",
+      "side": 1,
+      "message": "ditto",
+      "range": {
+        "startLine": 40,
+        "startChar": 30,
+        "endLine": 40,
+        "endChar": 32
+      },
+      "revId": "b38b05288ac2f3563f4a0e3bc07d0ea6c8cde65f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dada55a8_66af27e4",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-18T06:18:18Z",
+      "side": 1,
+      "message": "(nit) probably better to raise not implemented",
+      "range": {
+        "startLine": 48,
+        "startChar": 8,
+        "endLine": 48,
+        "endChar": 12
+      },
+      "revId": "b38b05288ac2f3563f4a0e3bc07d0ea6c8cde65f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
