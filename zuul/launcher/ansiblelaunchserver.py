@@ -279,7 +279,7 @@ class LaunchServer(object):
         # Start static workers
         for node in self.static_nodes.values():
             self.log.debug("Creating static node with arguments: %s" % (node,))
-            self._launchWorker(node)
+            self._launchWorker(node, offline=False)
 
     def loadJobs(self):
         self.log.debug("Loading jobs")
@@ -467,14 +467,14 @@ class LaunchServer(object):
         job.sendWorkData(json.dumps(data))
         job.sendWorkComplete()
 
-    def _launchWorker(self, args):
+    def _launchWorker(self, args, offline=True):
         worker = NodeWorker(self.config, self.jobs, self.builds,
                             self.sites, args['name'], args['host'],
                             args['description'], args['labels'],
                             self.hostname, self.zmq_send_queue,
                             self.termination_queue, self.keep_jobdir,
                             self.callback_dir, self.library_dir,
-                            self.options)
+                            self.options, offline=offline)
         self.node_workers[worker.name] = worker
 
         worker.thread = threading.Thread(target=worker.run)
@@ -550,13 +550,14 @@ class NodeWorker(object):
     def __init__(self, config, jobs, builds, sites, name, host,
                  description, labels, manager_name, zmq_send_queue,
                  termination_queue, keep_jobdir, callback_dir,
-                 library_dir, options):
+                 library_dir, options, offline):
         self.log = logging.getLogger("zuul.NodeWorker.%s" % (name,))
         self.log.debug("Creating node worker %s" % (name,))
         self.config = config
         self.jobs = jobs
         self.builds = builds
         self.sites = sites
+        self.offline = offline
         self.name = name
         self.host = host
         self.description = description
@@ -789,7 +790,10 @@ class NodeWorker(object):
 
         # Make sure we can parse what we need from the job first
         args = json.loads(job.arguments)
-        offline = boolify(args.get('OFFLINE_NODE_WHEN_COMPLETE', False))
+        # Only check OFFLINE_NODE_WHEN_COMPLETE if worker supports offline mode.
+        if self.offline:
+            self.offline = boolify(
+                args.get('OFFLINE_NODE_WHEN_COMPLETE', False))
         job_name = job.name.split(':')[1]
 
         # Initialize the result so we have something regardless of
@@ -828,7 +832,7 @@ class NodeWorker(object):
             self.log.exception("Exception while clearing build record")
 
         self._job_complete_event.set()
-        if offline and self._running:
+        if self.offline and self._running:
             self.stop()
 
     def sendStartEvent(self, name, parameters):
