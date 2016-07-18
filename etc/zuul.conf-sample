@@ -37,6 +37,7 @@ server=review.example.com
 user=jenkins
 sshkey=/home/jenkins/.ssh/id_rsa
 ;keepalive=60
+event_delay=10
 
 [connection smtp]
 driver=smtp
