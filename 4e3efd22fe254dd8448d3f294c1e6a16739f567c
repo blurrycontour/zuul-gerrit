@@ -1,0 +1,141 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dada55a8_86e21b9e",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-18T07:06:04Z",
+      "side": 1,
+      "message": "Probably a nit, but I\u0027m not a huge fan of returning two different types.\n\nWhy not leave this method alone and implement a new method (that calls this one) for returning files?",
+      "revId": "4e3efd22fe254dd8448d3f294c1e6a16739f567c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dada55a8_a6fc7f3f",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-18T07:06:04Z",
+      "side": 1,
+      "message": "this is all a bit icky to me (see previous comment)",
+      "revId": "4e3efd22fe254dd8448d3f294c1e6a16739f567c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dada55a8_269fef04",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-18T07:06:04Z",
+      "side": 1,
+      "message": "Yes, that feels more appropriate.",
+      "range": {
+        "startLine": 150,
+        "startChar": 22,
+        "endLine": 150,
+        "endChar": 26
+      },
+      "revId": "4e3efd22fe254dd8448d3f294c1e6a16739f567c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dada55a8_26440f73",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 668,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-18T07:06:04Z",
+      "side": 1,
+      "message": "(nit) For the future we should consider some kind of cache management such as writing these to disk or storing elsewhere other than memory. Maybe also some timeouts and garbage collection. Basically I\u0027m concerned about the potential growth of these files across 1,000+ repos.",
+      "revId": "4e3efd22fe254dd8448d3f294c1e6a16739f567c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dada55a8_8655fb1e",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 786,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-18T07:06:04Z",
+      "side": 1,
+      "message": "I like the term shadow layout. We should consider that name for this attribute.",
+      "revId": "4e3efd22fe254dd8448d3f294c1e6a16739f567c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dada55a8_61af11e4",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 614,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-18T07:06:04Z",
+      "side": 1,
+      "message": "why not return immediately here... Is it just so we catch the debug on line 619 below? If so, we aren\u0027t debugging which mergers are outstanding themselves.",
+      "range": {
+        "startLine": 614,
+        "startChar": 12,
+        "endLine": 614,
+        "endChar": 19
+      },
+      "revId": "4e3efd22fe254dd8448d3f294c1e6a16739f567c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dada55a8_41ac8ded",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 621,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-18T07:06:04Z",
+      "side": 1,
+      "message": "(nit) we could break here for similar reasons as previous comment",
+      "range": {
+        "startLine": 621,
+        "startChar": 24,
+        "endLine": 621,
+        "endChar": 31
+      },
+      "revId": "4e3efd22fe254dd8448d3f294c1e6a16739f567c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
