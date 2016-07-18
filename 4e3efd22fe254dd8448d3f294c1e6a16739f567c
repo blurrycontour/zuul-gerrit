@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "dada55a8_071d6973",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-07-18T16:47:43Z",
+      "side": 1,
+      "message": "This one as originally written loses the data needed for files, so we\u0027d have to do it the other way around.  I\u0027m not seeing a clean way to satisfy your objection, but maybe I\u0027m not seeing the whole picture -- perhaps you could propose a cleanup in a followup change?",
+      "revId": "4e3efd22fe254dd8448d3f294c1e6a16739f567c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dada55a8_a6fc7f3f",
         "filename": "zuul/merger/server.py",
         "patchSetId": 5
@@ -76,6 +93,23 @@
     },
     {
       "key": {
+        "uuid": "dada55a8_c72cf1ad",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 668,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-07-18T16:47:43Z",
+      "side": 1,
+      "message": "As it stands right now, this is a transient object that only exists when we decide that we need to load some configuration, so it\u0027s not going to become a memory hog.  We may need to cache some of this stuff more heavily, at which point that may become more of an issue.",
+      "revId": "4e3efd22fe254dd8448d3f294c1e6a16739f567c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dada55a8_8655fb1e",
         "filename": "zuul/model.py",
         "patchSetId": 5
@@ -87,6 +121,23 @@
       "writtenOn": "2016-07-18T07:06:04Z",
       "side": 1,
       "message": "I like the term shadow layout. We should consider that name for this attribute.",
+      "revId": "4e3efd22fe254dd8448d3f294c1e6a16739f567c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dada55a8_27186d84",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 786,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-07-18T16:47:43Z",
+      "side": 1,
+      "message": "Yeah, maybe so.",
       "revId": "4e3efd22fe254dd8448d3f294c1e6a16739f567c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -110,6 +161,23 @@
         "endLine": 614,
         "endChar": 19
       },
+      "revId": "4e3efd22fe254dd8448d3f294c1e6a16739f567c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dada55a8_67126564",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 614,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-07-18T16:47:43Z",
+      "side": 1,
+      "message": "That\u0027s a good point, we should probably debug here then return.",
       "revId": "4e3efd22fe254dd8448d3f294c1e6a16739f567c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
