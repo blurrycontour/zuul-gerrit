@@ -669,27 +669,6 @@ class Worker(object):
         return '<Worker %s>' % self.name
 
 
-class RepoFiles(object):
-    # When we ask a merger to prepare a future multiple-repo state and
-    # collect files so that we can dynamically load our configuration,
-    # this class provides easy access to that data.
-    def __init__(self):
-        self.projects = {}
-
-    def __repr__(self):
-        return '<RepoFiles %s>' % self.projects
-
-    def setFiles(self, items):
-        self.projects = {}
-        for item in items:
-            project = self.projects.setdefault(item['project'], {})
-            branch = project.setdefault(item['branch'], {})
-            branch.update(item['files'])
-
-    def getFile(self, project, branch, fn):
-        return self.projects.get(project, {}).get(branch, {}).get(fn)
-
-
 class BuildSet(object):
     # Merge states:
     NEW = 1
@@ -717,7 +696,6 @@ class BuildSet(object):
         self.merge_state = self.NEW
         self.nodes = {}  # job -> nodes
         self.node_requests = {}  # job -> reqs
-        self.files = RepoFiles()
         self.layout = None
 
     def __repr__(self):

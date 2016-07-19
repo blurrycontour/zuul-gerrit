@@ -107,10 +107,9 @@ class MergeClient(object):
                                timeout=300)
         return job
 
-    def mergeChanges(self, items, build_set, files=None,
+    def mergeChanges(self, items, build_set,
                      precedence=zuul.model.PRECEDENCE_NORMAL):
-        data = dict(items=items,
-                    files=files)
+        data = dict(items=items)
         self.submitJob('merger:merge', data, build_set, precedence)
 
     def updateRepo(self, project, url, build_set,
@@ -119,12 +118,13 @@ class MergeClient(object):
                     url=url)
         self.submitJob('merger:update', data, build_set, precedence)
 
-    def getFiles(self, project, url, branch, files,
+    def getFiles(self, files, project, url, branch=None, commit=None,
                  precedence=zuul.model.PRECEDENCE_HIGH):
         data = dict(project=project,
                     url=url,
                     branch=branch,
-                    files=files)
+                    files=files,
+                    commit=commit)
         job = self.submitJob('merger:cat', data, None, precedence)
         return job
 
@@ -134,15 +134,13 @@ class MergeClient(object):
         merged = data.get('merged', False)
         updated = data.get('updated', False)
         commit = data.get('commit')
-        files = data.get('files', {})
-        job.files = files
         self.log.info("Merge %s complete, merged: %s, updated: %s, "
                       "commit: %s" %
                       (job, merged, updated, commit))
         job.setComplete()
-        if job.build_set:
+        if job.name in ['merger:merge', 'merger:update']:
             self.sched.onMergeCompleted(job.build_set, zuul_url,
-                                        merged, updated, commit, files)
+                                        merged, updated, commit)
         # The test suite expects the job to be removed from the
         # internal account after the wake flag is set.
         self.jobs.remove(job)

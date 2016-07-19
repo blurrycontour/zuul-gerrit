@@ -338,10 +338,8 @@ class Merger(object):
                 return None
         return commit
 
-    def mergeChanges(self, items, files=None):
+    def mergeChanges(self, items):
         recent = {}
-        commit = None
-        read_files = []
         for item in items:
             if item.get("number") and item.get("patchset"):
                 self.log.debug("Merging for change %s,%s." %
@@ -351,17 +349,11 @@ class Merger(object):
                                (item["newrev"], item["oldrev"]))
             commit = self._mergeItem(item, recent)
             if not commit:
-                return None
-            if files:
-                repo = self.getRepo(item['project'], item['url'])
-                repo_files = repo.getFiles(files, commit=commit)
-                read_files.append(dict(project=item['project'],
-                                       branch=item['branch'],
-                                       files=repo_files))
-        if files:
-            return commit.hexsha, read_files
-        return commit.hexsha
+                return False
+        return True
 
-    def getFiles(self, project, url, branch, files):
+    def getFiles(self, files, project, url, branch='master', commit=None):
         repo = self.getRepo(project, url)
+        if commit:
+            return repo.getFiles(files, commit=commit)
         return repo.getFiles(files, branch=branch)

@@ -197,7 +197,6 @@ class MergeCompletedEvent(ResultEvent):
         self.merged = merged
         self.updated = updated
         self.commit = commit
-        self.files = files
 
 
 class NodesProvisionedEvent(ResultEvent):
@@ -346,11 +345,11 @@ class Scheduler(threading.Thread):
         self.log.debug("Done adding complete event for build: %s" % build)
 
     def onMergeCompleted(self, build_set, zuul_url, merged, updated,
-                         commit, files):
+                         commit):
         self.log.debug("Adding merge complete event for build set: %s" %
                        build_set)
         event = MergeCompletedEvent(build_set, zuul_url, merged,
-                                    updated, commit, files)
+                                    updated, commit)
         self.result_event_queue.put(event)
         self.wake_event.set()
 

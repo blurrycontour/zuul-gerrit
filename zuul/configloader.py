@@ -495,8 +495,8 @@ class TenantParser(object):
             # Get main config files.  These files are permitted the
             # full range of configuration.
             url = source.getGitUrl(project)
-            job = merger.getFiles(project.name, url, 'master',
-                                  files=['zuul.yaml', '.zuul.yaml'])
+            job = merger.getFiles(['zuul.yaml', '.zuul.yaml'],
+                                  project.name, url, 'master')
             job.project = project
             job.config_repo = True
             jobs.append(job)
@@ -506,8 +506,8 @@ class TenantParser(object):
             # set of options.
             url = source.getGitUrl(project)
             # TODOv3(jeblair): config should be branch specific
-            job = merger.getFiles(project.name, url, 'master',
-                                  files=['.zuul.yaml'])
+            job = merger.getFiles(['zuul.yaml', '.zuul.yaml'],
+                                  project.name, url, 'master')
             job.project = project
             job.config_repo = False
             jobs.append(job)
@@ -610,7 +610,9 @@ class ConfigLoader(object):
         config = tenant.config_repos_config.copy()
         for source, project in tenant.project_repos:
             # TODOv3(jeblair): config should be branch specific
-            data = files.getFile(project.name, 'master', '.zuul.yaml')
+            data = files.get('.zuul.yaml')
+            if not data:
+                data = files.get('zuul.yaml')
             if not data:
                 data = project.unparsed_config
             if not data:

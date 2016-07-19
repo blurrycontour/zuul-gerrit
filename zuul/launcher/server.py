@@ -234,7 +234,8 @@ class LaunchServer(object):
                 task.wait()
             self.log.debug("Job %s: git updates complete" % (job.unique,))
             merger = self._getMerger(jobdir.git_root)
-            commit = merger.mergeChanges(args['items'])  # noqa
+            ret = merger.mergeChanges(args['items'])  # noqa
+            # TODO(jhesketh): ensure changes merged successfully
 
             # TODOv3: Ansible the ansible thing here.
             self.prepareAnsibleFiles(jobdir, args)
@@ -292,8 +293,8 @@ class LaunchServer(object):
         args = json.loads(job.arguments)
         task = self.update(args['project'], args['url'])
         task.wait()
-        files = self.merger.getFiles(args['project'], args['url'],
-                                     args['branch'], args['files'])
+        files = self.merger.getFiles(args['files'], args['project'],
+                                     args['url'], args['branch'])
         result = dict(updated=True,
                       files=files,
                       zuul_url=self.zuul_url)
@@ -301,11 +302,7 @@ class LaunchServer(object):
 
     def merge(self, job):
         args = json.loads(job.arguments)
-        ret = self.merger.mergeChanges(args['items'], args.get('files'))
-        result = dict(merged=(ret is not None),
+        ret = self.merger.mergeChanges(args['items'])
+        result = dict(merged=ret,
                       zuul_url=self.zuul_url)
-        if args.get('files'):
-            result['commit'], result['files'] = ret
-        else:
-            result['commit'] = ret
         job.sendWorkComplete(json.dumps(result))

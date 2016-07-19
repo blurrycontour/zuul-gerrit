@@ -442,11 +442,18 @@ class BasePipelineManager(object):
         if build_set.merge_state == build_set.COMPLETE:
             if build_set.unable_to_merge:
                 return None
+            # Grab changed files
+            files_job = self.sched.merger.getFiles(['zuul.yaml', '.zuul.yaml'],
+                                                   item.change.project.name,
+                                                   build_set.zuul_url,
+                                                   commit=build_set.commit)
+            files_job.wait()
+
             # Load layout
             loader = zuul.configloader.ConfigLoader()
-            self.log.debug("Load dynamic layout with %s" % build_set.files)
+            self.log.debug("Load dynamic layout with %s" % files_job.files)
             layout = loader.createDynamicLayout(item.pipeline.layout.tenant,
-                                                build_set.files)
+                                                files_job.files)
             return layout
         build_set.merge_state = build_set.PENDING
         self.log.debug("Preparing dynamic layout for: %s" % item.change)
@@ -456,7 +463,6 @@ class BasePipelineManager(object):
         merger_items = map(self._makeMergerItem, all_items)
         self.sched.merger.mergeChanges(merger_items,
                                        item.current_build_set,
-                                       ['.zuul.yaml'],
                                        self.pipeline.precedence)
 
     def prepareLayout(self, item):
@@ -616,7 +622,6 @@ class BasePipelineManager(object):
         build_set.zuul_url = event.zuul_url
         if event.merged:
             build_set.commit = event.commit
-            build_set.files.setFiles(event.files)
         elif event.updated:
             if not isinstance(item.change, NullChange):
                 build_set.commit = item.change.newrev
