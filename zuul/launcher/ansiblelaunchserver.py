@@ -596,6 +596,10 @@ class NodeWorker(object):
             self.username = config.get('launcher', 'username')
         else:
             self.username = 'zuul'
+        if self.config.has_option('launcher', 'static_nodes'):
+            self.static_nodes = boolify(config.get('launcher', 'static_nodes'))
+        else:
+            self.static_nodes = False
         self.callback_dir = callback_dir
         self.library_dir = library_dir
         self.options = options
@@ -798,6 +802,12 @@ class NodeWorker(object):
         self._sent_complete_event = False
         self._aborted_job = False
         self._watchog_timeout = False
+
+        # If the worker is set to only have static nodes and we try to
+        # launch a job there which would offline the node, abort early
+        if offline and self.static_nodes:
+            self.log.error("Single-use jobs are not for static workers")
+            return None
 
         try:
             self.sendStartEvent(job_name, args)
