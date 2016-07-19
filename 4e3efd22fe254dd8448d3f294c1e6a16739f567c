@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "dada55a8_741e6864",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-19T13:58:49Z",
+      "side": 1,
+      "message": "I see your point.\n\nI just noticed that despite merging multiple items this only returns one commit. This function needs a fair bit of tidying up.\n\nI\u0027ve had a go at it here but the solution isn\u0027t perfect: https://review.openstack.org/344248",
+      "parentUuid": "dada55a8_071d6973",
+      "revId": "4e3efd22fe254dd8448d3f294c1e6a16739f567c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dada55a8_a6fc7f3f",
         "filename": "zuul/merger/server.py",
         "patchSetId": 5
