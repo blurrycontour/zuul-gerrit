@@ -22,6 +22,23 @@
       "revId": "4317e9faae71b855fbac3da9b2f66d7024318352",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dada55a8_818740d6",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-07-19T20:16:17Z",
+      "side": 1,
+      "message": "I agree on all counts.",
+      "revId": "4317e9faae71b855fbac3da9b2f66d7024318352",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
