@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dada55a8_d9b94d7b",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-19T12:01:44Z",
+      "side": 1,
+      "message": "I\u0027m not a huge fan of this internal object being tracked as part of the schema here.\n\nI think the fix is possibly very complicated though and involves parsing objects sooner which may make merging attributes more difficult.",
+      "range": {
+        "startLine": 75,
+        "startChar": 16,
+        "endLine": 75,
+        "endChar": 31
+      },
+      "revId": "4317e9faae71b855fbac3da9b2f66d7024318352",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
