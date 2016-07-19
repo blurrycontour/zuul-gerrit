@@ -82,6 +82,24 @@
     },
     {
       "key": {
+        "uuid": "dada55a8_ce2341a6",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 727,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-19T11:32:53Z",
+      "side": 1,
+      "message": "Yep, sorry, my mistake.",
+      "parentUuid": "dada55a8_27d06d53",
+      "revId": "b38b05288ac2f3563f4a0e3bc07d0ea6c8cde65f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dada55a8_06cf4bb1",
         "filename": "zuul/model.py",
         "patchSetId": 2
