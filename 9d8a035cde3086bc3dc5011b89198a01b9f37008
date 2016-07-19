@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dada55a8_b27c6bec",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-19T14:08:54Z",
+      "side": 1,
+      "message": "(nit) worker",
+      "range": {
+        "startLine": 7,
+        "startChar": 32,
+        "endLine": 7,
+        "endChar": 36
+      },
+      "revId": "9d8a035cde3086bc3dc5011b89198a01b9f37008",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dada55a8_12a0d742",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 795,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-19T14:08:54Z",
+      "side": 1,
+      "message": "Once this is set to false, this step will be skipped on any subsequent jobs. It\u0027s unlikely but you may have a job run on a node-type that doesn\u0027t offline, but then the next job does want to offline and destroy the node. In this scenario zuul wouldn\u0027t behave as expected.\n\nI\u0027d recommend using a cleaner namespace such as \u0027allow_offline\u0027.",
+      "range": {
+        "startLine": 795,
+        "startChar": 17,
+        "endLine": 795,
+        "endChar": 24
+      },
+      "revId": "9d8a035cde3086bc3dc5011b89198a01b9f37008",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
