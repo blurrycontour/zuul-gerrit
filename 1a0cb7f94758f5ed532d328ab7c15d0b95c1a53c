@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dada55a8_70baeac1",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 810,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-07-19T14:56:41Z",
+      "side": 1,
+      "message": "I think this would trigger an infinite relaunch loop.",
+      "revId": "1a0cb7f94758f5ed532d328ab7c15d0b95c1a53c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
