@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dada55a8_7254b320",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1437,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-19T14:10:19Z",
+      "side": 1,
+      "message": "woops, too long",
+      "revId": "5cf5d311794dfc6879cb7a219fe35262623ea13b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
