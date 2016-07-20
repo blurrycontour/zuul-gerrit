@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "dada55a8_f056a3cc",
+        "filename": "doc/source/connections.rst",
+        "patchSetId": 36
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-20T23:57:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1aa78d24_7d24d50d",
+      "revId": "dfe4b37c919698fc60df181e9e380fd85c4f259a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1aa78d24_1d0f9189",
         "filename": "setup.cfg",
         "patchSetId": 36
@@ -30,6 +48,24 @@
       "writtenOn": "2016-07-13T23:01:33Z",
       "side": 1,
       "message": "Probably don\u0027t need postgres for the \"mysql reporter\".\n\nMaybe this should be two extras; one for each?  Can SQLAlchemy and alembic be extras as well?\n\nI continue to have reservations about indicating that we support postgres in any way without testing or volunteers to actually do the work to make sure it works.  Other projects have had significant problems with this.  I would prefer we omit it now and add it when it is properly resourced.",
+      "revId": "dfe4b37c919698fc60df181e9e380fd85c4f259a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dada55a8_f3c86daa",
+        "filename": "setup.cfg",
+        "patchSetId": 36
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-20T23:57:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1aa78d24_1d0f9189",
       "revId": "dfe4b37c919698fc60df181e9e380fd85c4f259a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "dada55a8_b30715c9",
+        "filename": "zuul/alembic/sql_reporter/versions/4d3ebd7f06b9_set_up_initial_reporter_tables.py",
+        "patchSetId": 36
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-20T23:57:11Z",
+      "side": 1,
+      "message": "Seconds are probably enough granularity for zuul jobs. I can change it if you think it\u0027s needed though.",
+      "parentUuid": "1aa78d24_bd475dbb",
+      "revId": "dfe4b37c919698fc60df181e9e380fd85c4f259a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1aa78d24_9d4421b8",
         "filename": "zuul/alembic/sql_reporter/versions/4d3ebd7f06b9_set_up_initial_reporter_tables.py",
         "patchSetId": 36
@@ -64,6 +118,24 @@
       "writtenOn": "2016-07-13T23:01:33Z",
       "side": 1,
       "message": "The UUID is already unique.  We should drop job_name from this and make UUID the PK.\n\nHaving said that, since we\u0027re doing joins, we might want to add an autoincremented integer column and use that for the PK and for joining with the metadata table.\n\nThe UUID column can be smaller.",
+      "revId": "dfe4b37c919698fc60df181e9e380fd85c4f259a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dada55a8_063fbd24",
+        "filename": "zuul/alembic/sql_reporter/versions/4d3ebd7f06b9_set_up_initial_reporter_tables.py",
+        "patchSetId": 36
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-20T23:57:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1aa78d24_9d4421b8",
       "revId": "dfe4b37c919698fc60df181e9e380fd85c4f259a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "dada55a8_a614f19f",
+        "filename": "zuul/alembic/sql_reporter/versions/4d3ebd7f06b9_set_up_initial_reporter_tables.py",
+        "patchSetId": 36
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-20T23:57:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1aa78d24_fd0f2589",
+      "revId": "dfe4b37c919698fc60df181e9e380fd85c4f259a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1aa78d24_dd14e9a0",
         "filename": "zuul/alembic/sql_reporter/versions/4d3ebd7f06b9_set_up_initial_reporter_tables.py",
         "patchSetId": 36
@@ -98,6 +188,24 @@
       "writtenOn": "2016-07-13T23:01:33Z",
       "side": 1,
       "message": "So far, the metadata included are \"changeid\" and \"url\".  Why not just make those columns on the build table?  Alembic makes it fairly easy for us to change that schema over time.",
+      "revId": "dfe4b37c919698fc60df181e9e380fd85c4f259a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dada55a8_86c3adec",
+        "filename": "zuul/alembic/sql_reporter/versions/4d3ebd7f06b9_set_up_initial_reporter_tables.py",
+        "patchSetId": 36
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-20T23:57:11Z",
+      "side": 1,
+      "message": "This was to match the os-health/subunit2sql style which I haven\u0027t looked at in a while.. I\u0027m going to leave this for the moment and get os-health people to take a look and see if we need to do anything to make it easier for them to consume.",
+      "parentUuid": "1aa78d24_dd14e9a0",
       "revId": "dfe4b37c919698fc60df181e9e380fd85c4f259a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "dada55a8_531699f1",
+        "filename": "zuul/alembic/sql_reporter/versions/4d3ebd7f06b9_set_up_initial_reporter_tables.py",
+        "patchSetId": 36
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-20T23:57:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1aa78d24_3d0a4d7a",
+      "revId": "dfe4b37c919698fc60df181e9e380fd85c4f259a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1aa78d24_7d2335bf",
         "filename": "zuul/connection/sql.py",
         "patchSetId": 36
@@ -132,6 +258,24 @@
       "writtenOn": "2016-07-13T23:15:17Z",
       "side": 1,
       "message": "Forgive my naivete around the overall schema\u0027s use cases, but what\u0027s the reasoning behind this unique constraint? Is there a concern that one might accidentally use a uuid twice to refer to the same job, and that would be confusing? You end up paying a 1530-byte-per-record penalty to have the constraint (assuming you allow the columns to all be utf8)\n\nIf this is absolutely necessary for data consistency, I\u0027d recommend explicitly setting the charset to \u0027ascii\u0027 for both of these, which would at least drop it down to 510 byte keys.\n\nAlso further, uuid is 36 bytes with the dashes. Perhaps drop the uuid columns in all of the tables to String(36).",
+      "revId": "dfe4b37c919698fc60df181e9e380fd85c4f259a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dada55a8_29b2924c",
+        "filename": "zuul/connection/sql.py",
+        "patchSetId": 36
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-20T23:57:11Z",
+      "side": 1,
+      "message": "Using a primary key instead.",
+      "parentUuid": "1aa78d24_7d2335bf",
       "revId": "dfe4b37c919698fc60df181e9e380fd85c4f259a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
