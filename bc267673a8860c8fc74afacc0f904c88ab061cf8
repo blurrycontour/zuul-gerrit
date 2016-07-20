@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dada55a8_7e7c39b5",
+        "filename": "zuul/alembic/sql_reporter/versions/4d3ebd7f06b9_set_up_initial_reporter_tables.py",
+        "patchSetId": 37
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-07-20T16:06:20Z",
+      "side": 1,
+      "message": "Should we take SpamapS suggestion and make this 36 byte ascii?",
+      "revId": "bc267673a8860c8fc74afacc0f904c88ab061cf8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dada55a8_de4ba585",
+        "filename": "zuul/alembic/sql_reporter/versions/4d3ebd7f06b9_set_up_initial_reporter_tables.py",
+        "patchSetId": 37
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-07-20T16:06:20Z",
+      "side": 1,
+      "message": "Should these be DateTime?",
+      "revId": "bc267673a8860c8fc74afacc0f904c88ab061cf8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dada55a8_be507133",
+        "filename": "zuul/alembic/sql_reporter/versions/4d3ebd7f06b9_set_up_initial_reporter_tables.py",
+        "patchSetId": 37
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-07-20T16:06:20Z",
+      "side": 1,
+      "message": "So far the metadata included are \"changeid\" and \"url\".  Why not just make those columns on the build table?  Alembic makes it fairly easy for us to change that schema over time.",
+      "revId": "bc267673a8860c8fc74afacc0f904c88ab061cf8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
