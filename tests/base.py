@@ -643,6 +643,7 @@ class RecordingLaunchServer(zuul.launcher.server.LaunchServer):
     def __init__(self, *args, **kw):
         super(RecordingLaunchServer, self).__init__(*args, **kw)
         self.job_history = []
+        self.build_history = []
 
     def launch(self, job):
         self.job_history.append(job)
@@ -650,6 +651,12 @@ class RecordingLaunchServer(zuul.launcher.server.LaunchServer):
 
         def sendWorkComplete(data=b''):
             job.data.append(data)
+            params = json.loads(job.arguments)
+            result = json.loads(job.data[-1])
+            build = BuildHistory(job=job,
+                                 name=params['job'],
+                                 result=result['result'])
+            self.build_history.append(build)
             gear.WorkerJob.sendWorkComplete(job, data)
 
         job.sendWorkComplete = sendWorkComplete
@@ -910,6 +917,18 @@ class BaseTestCase(testtools.TestCase):
 class ZuulTestCase(BaseTestCase):
     config_file = 'zuul.conf'
 
+    def _startWorker(self):
+        self.worker = FakeWorker('fake_worker', self)
+        self.worker.addServer('127.0.0.1', self.gearman_server.port)
+        self.gearman_server.worker = self.worker
+        self.builds = self.worker.builds
+        self.history = self.worker.build_history
+
+    def _startMerger(self):
+        self.merge_server = zuul.merger.server.MergeServer(self.config,
+                                                           self.connections)
+        self.merge_server.start()
+
     def setUp(self):
         super(ZuulTestCase, self).setUp()
         if USE_TEMPDIR:
@@ -988,10 +1007,6 @@ class ZuulTestCase(BaseTestCase):
         self.configure_connections()
         self.sched.registerConnections(self.connections)
 
-        self.ansible_server = RecordingLaunchServer(
-            self.config, self.connections)
-        self.ansible_server.start()
-
         def URLOpenerFactory(*args, **kw):
             if isinstance(args[0], urllib.request.Request):
                 return old_urlopen(*args, **kw)
@@ -999,6 +1014,9 @@ class ZuulTestCase(BaseTestCase):
 
         old_urlopen = urllib.request.urlopen
         urllib.request.urlopen = URLOpenerFactory
+
+        self._startMerger()
+        self._startWorker()
 
         self.launcher = zuul.launcher.client.LaunchClient(
             self.config, self.sched, self.swift)
@@ -1383,17 +1401,10 @@ class ZuulTestCase(BaseTestCase):
         jobs = filter(lambda x: x.result == result, jobs)
         return len(jobs)
 
-    def getJobFromHistory(self, name, project=None):
-        history = self.ansible_server.job_history
-        for job in history:
-            params = json.loads(job.arguments)
-            if (params['job'] == name and
-                (project is None or params['ZUUL_PROJECT'] == project)):
-                result = json.loads(job.data[-1])
-                ret = BuildHistory(job=job,
-                                   name=params['job'],
-                                   result=result['result'])
-                return ret
+    def getJobFromHistory(self, name):
+        for job in self.history:
+            if job.name == name:
+                return job
         raise Exception("Unable to find job %s in history" % name)
 
     def assertEmptyQueues(self):
@@ -1461,3 +1472,13 @@ tenants:
         repo.heads[branch].checkout()
         if tag:
             repo.create_tag(tag)
+
+
+class AnsibleZuulTestCase(ZuulTestCase):
+    """ZuulTestCase but with an actual ansible launcher running"""
+
+    def _startWorker(self):
+        self.ansible_server = RecordingLaunchServer(
+            self.config, self.connections)
+        self.ansible_server.start()
+        self.history = self.ansible_server.build_history
