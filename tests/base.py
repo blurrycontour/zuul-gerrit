@@ -910,6 +910,16 @@ class BaseTestCase(testtools.TestCase):
 class ZuulTestCase(BaseTestCase):
     config_file = 'zuul.conf'
 
+    def _startWorker(self):
+        self.worker = FakeWorker('fake_worker', self)
+        self.worker.addServer('127.0.0.1', self.gearman_server.port)
+        self.gearman_server.worker = self.worker
+
+    def _startMerger(self):
+        self.merge_server = zuul.merger.server.MergeServer(self.config,
+                                                           self.connections)
+        self.merge_server.start()
+
     def setUp(self):
         super(ZuulTestCase, self).setUp()
         if USE_TEMPDIR:
@@ -988,10 +998,6 @@ class ZuulTestCase(BaseTestCase):
         self.configure_connections()
         self.sched.registerConnections(self.connections)
 
-        self.ansible_server = RecordingLaunchServer(
-            self.config, self.connections)
-        self.ansible_server.start()
-
         def URLOpenerFactory(*args, **kw):
             if isinstance(args[0], urllib.request.Request):
                 return old_urlopen(*args, **kw)
@@ -999,6 +1005,9 @@ class ZuulTestCase(BaseTestCase):
 
         old_urlopen = urllib.request.urlopen
         urllib.request.urlopen = URLOpenerFactory
+
+        self._startMerger()
+        self._startWorker()
 
         self.launcher = zuul.launcher.client.LaunchClient(
             self.config, self.sched, self.swift)
@@ -1461,3 +1470,12 @@ tenants:
         repo.heads[branch].checkout()
         if tag:
             repo.create_tag(tag)
+
+
+class AnsibleZuulTestCase(ZuulTestCase):
+    """ZuulTestCase but with an actual ansible launcher running"""
+
+    def _startWorker(self):
+        self.ansible_server = RecordingLaunchServer(
+            self.config, self.connections)
+        self.ansible_server.start()
