@@ -194,11 +194,6 @@ class LaunchClient(object):
             port = config.get('gearman', 'port')
         else:
             port = 4730
-        if config.has_option('gearman', 'check_job_registration'):
-            self.job_registration = config.getboolean(
-                'gearman', 'check_job_registration')
-        else:
-            self.job_registration = True
 
         self.gearman = ZuulGearmanClient(self)
         self.gearman.addServer(server, port)
@@ -397,13 +392,6 @@ class LaunchClient(object):
         build.__gearman_job = gearman_job
         self.builds[uuid] = build
 
-        if self.job_registration and not self.isJobRegistered(
-                gearman_job.name):
-            self.log.error("Job %s is not registered with Gearman" %
-                           gearman_job)
-            self.onBuildCompleted(gearman_job, 'NOT_REGISTERED')
-            return build
-
         if pipeline.precedence == zuul.model.PRECEDENCE_NORMAL:
             precedence = gear.PRECEDENCE_NORMAL
         elif pipeline.precedence == zuul.model.PRECEDENCE_HIGH:
@@ -547,9 +535,6 @@ class LaunchClient(object):
         except AttributeError:
             # We haven't yet received the first data packet that tells
             # us where the job is running.
-            return False
-
-        if self.job_registration and not self.isJobRegistered(name):
             return False
 
         desc_uuid = str(uuid4().hex)
