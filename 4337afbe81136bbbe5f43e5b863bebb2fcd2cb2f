@@ -96,6 +96,23 @@
     },
     {
       "key": {
+        "uuid": "dada55a8_0f2225a3",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-07-26T15:33:24Z",
+      "side": 1,
+      "message": "Yes, a job may need more than one password.  An example:\n  auth:\n    password:\n      PYPI_PASSWORD: pypi-password-key\n      MAVEN_PASSWORD: maven-password-key\n    swift-tempurl:\n      container: foo\n      max-file-count: 4\n    swift:\n      ...\n    afs:\n      principle: afs-principal\n      path: /afs/...\n      acl: rlidw\nWe\u0027re only implementing the first two right now.  The passward auth section would look up \u0027pypi-password-key\u0027 and store it in the job parameter PYPI_PASSWORD.  The swift-tempurl section would contain the same things that are currently in the \u0027swift\u0027 job definition.  The \u0027swift\u0027 section would contain whatever we would need to support real authenticated swift access in the future, if we decide to implement that (I don\u0027t know if it makes sense).",
+      "revId": "4337afbe81136bbbe5f43e5b863bebb2fcd2cb2f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dada55a8_d5c70996",
         "filename": "zuul/launcher/client.py",
         "patchSetId": 3
