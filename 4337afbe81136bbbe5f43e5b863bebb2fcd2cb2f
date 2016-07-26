@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dada55a8_b5289534",
+        "filename": "tests/test_model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-26T13:38:14Z",
+      "side": 1,
+      "message": "Lets add a check for inherit: False being set explicitly too",
+      "range": {
+        "startLine": 151,
+        "startChar": 27,
+        "endLine": 151,
+        "endChar": 31
+      },
+      "revId": "4337afbe81136bbbe5f43e5b863bebb2fcd2cb2f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dada55a8_959c71c1",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-26T13:38:14Z",
+      "side": 1,
+      "message": "I\u0027m confused by this. Why not just str?",
+      "range": {
+        "startLine": 56,
+        "startChar": 36,
+        "endLine": 56,
+        "endChar": 44
+      },
+      "revId": "4337afbe81136bbbe5f43e5b863bebb2fcd2cb2f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dada55a8_d5c70996",
+        "filename": "zuul/launcher/client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-26T13:38:14Z",
+      "side": 1,
+      "message": "I\u0027m not sure if this is quite right...\n\nThe self.swift object holds the connection or tempkey details etc. The job.swift was part of the layout where a different job could define different prefix or swift destinations (if that makes sense). Take a look at the swift docs in v2. Also happy to expand if needed.",
+      "revId": "4337afbe81136bbbe5f43e5b863bebb2fcd2cb2f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dada55a8_b5437512",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 560,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-07-26T13:38:14Z",
+      "side": 1,
+      "message": "This doesn\u0027t actually check the boolean value of inherit.",
+      "range": {
+        "startLine": 560,
+        "startChar": 27,
+        "endLine": 560,
+        "endChar": 34
+      },
+      "revId": "4337afbe81136bbbe5f43e5b863bebb2fcd2cb2f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
