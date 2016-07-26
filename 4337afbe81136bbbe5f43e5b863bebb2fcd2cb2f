@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "dada55a8_989025ef",
+        "filename": "tests/test_model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 1106
+      },
+      "writtenOn": "2016-07-26T14:18:59Z",
+      "side": 1,
+      "message": "makes sense",
+      "parentUuid": "dada55a8_b5289534",
+      "range": {
+        "startLine": 151,
+        "startChar": 27,
+        "endLine": 151,
+        "endChar": 31
+      },
+      "revId": "4337afbe81136bbbe5f43e5b863bebb2fcd2cb2f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dada55a8_959c71c1",
         "filename": "zuul/configloader.py",
         "patchSetId": 3
@@ -36,6 +60,30 @@
       "writtenOn": "2016-07-26T13:38:14Z",
       "side": 1,
       "message": "I\u0027m confused by this. Why not just str?",
+      "range": {
+        "startLine": 56,
+        "startChar": 36,
+        "endLine": 56,
+        "endChar": 44
+      },
+      "revId": "4337afbe81136bbbe5f43e5b863bebb2fcd2cb2f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dada55a8_1541a063",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1106
+      },
+      "writtenOn": "2016-07-26T14:18:59Z",
+      "side": 1,
+      "message": "The examples from the spec point that the \u0027auth\u0027 key may contain a \u0027password\u0027 key, which in turn contains another dict with password name/password value (look at the pypipassword example):\n\nhttp://specs.openstack.org/openstack-infra/infra-specs/specs/zuulv3.html#jobs\n\nI\u0027m not sure if the intent of the doc is that a job may contain a list of different passwords or it\u0027s just a draft and we can just assume that a job will only contain one password.\nIf the latter, then I\u0027d change the schema to look like:\n\nauth \u003d {\u0027password\u0027: str,\n        \u0027inherit\u0027: bool,\n        \u0027swift\u0027: to_list(swift),\n       }\n\nas you say",
+      "parentUuid": "dada55a8_959c71c1",
       "range": {
         "startLine": 56,
         "startChar": 36,
@@ -65,6 +113,24 @@
     },
     {
       "key": {
+        "uuid": "dada55a8_b809a997",
+        "filename": "zuul/launcher/client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 1106
+      },
+      "writtenOn": "2016-07-26T14:18:59Z",
+      "side": 1,
+      "message": "There is a TODO item on the Job class definition that points the swift stuff should be moved to auth:\n\nhttp://git.openstack.org/cgit/openstack-infra/zuul/tree/zuul/model.py?h\u003dfeature/zuulv3#n358\n\nAlso, the http://specs.openstack.org/openstack-infra/infra-specs/specs/zuulv3.html#jobs section shows swift should be nested within auth.\n\nThat\u0027s why I made this change here, because I take it as the swift dict is going nested within auth.\n\nDo you mean we should keep both?",
+      "parentUuid": "dada55a8_d5c70996",
+      "revId": "4337afbe81136bbbe5f43e5b863bebb2fcd2cb2f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dada55a8_b5437512",
         "filename": "zuul/model.py",
         "patchSetId": 3
@@ -76,6 +142,30 @@
       "writtenOn": "2016-07-26T13:38:14Z",
       "side": 1,
       "message": "This doesn\u0027t actually check the boolean value of inherit.",
+      "range": {
+        "startLine": 560,
+        "startChar": 27,
+        "endLine": 560,
+        "endChar": 34
+      },
+      "revId": "4337afbe81136bbbe5f43e5b863bebb2fcd2cb2f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dada55a8_7529fc9a",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 560,
+      "author": {
+        "id": 1106
+      },
+      "writtenOn": "2016-07-26T14:18:59Z",
+      "side": 1,
+      "message": "right, thanks",
+      "parentUuid": "dada55a8_b5437512",
       "range": {
         "startLine": 560,
         "startChar": 27,
