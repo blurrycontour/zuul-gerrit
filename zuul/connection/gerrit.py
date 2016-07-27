@@ -20,6 +20,7 @@ import time
 from six.moves import queue as Queue
 from six.moves import urllib
 import paramiko
+import paho.mqtt.client as mqtt
 import logging
 import pprint
 import voluptuous as v
@@ -128,6 +129,51 @@ class GerritEventConnector(threading.Thread):
                 self.log.exception("Exception moving Gerrit event:")
             finally:
                 self.connection.eventDone()
+
+
+class GermqttWatcher(threading.Thread):
+    log = logging.getLogger("gerrit.GermqttWatcher")
+    poll_timeout = 500
+
+    def __init__(self, gerrit_connection, hostname, port=1883, websocket=False,
+                 base_topic='gerrit'):
+        threading.Thread.__init__(self)
+        self.hostname = hostname
+        self.port = port
+        self.websocket = websocket
+        self.gerrit_connection = gerrit_connection
+        self._stopped = False
+        self.base_topic = base_topic
+
+    def _read(self, payload):
+        data = jso.loads(payload)
+        self.log.debug("Received data from Gerrit event stream: \n%s" %
+                       pprint.pformat(data))
+        self.gerrit_connection.addEvent(data)
+
+    def _run(self):
+        try:
+            if self.websocket:
+                client = mqtt.Client(transport='websocket')
+            else:
+                client = mqtt.Client()
+
+            def _subscribe_on_connect(client, userdata, flags, rc):
+                client.subscribe(self.base_topic + '/#')
+
+            def _call_on_message(client, userdata, msg):
+                self._read(msg.payload)
+
+            client.connect(self.hostname, self.port)
+            client.loop(timeout=self.poll_timeout)
+
+        except Exception:
+            self.log.exception("Exception on germqtt event stream")
+            time.sleep(5)
+
+    def run(self):
+        while not self._stopped:
+            self._run()
 
 
 class GerritWatcher(threading.Thread):
