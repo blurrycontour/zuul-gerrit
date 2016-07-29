@@ -13,7 +13,7 @@
 import logging
 
 from zuul import model
-from zuul.manager import PipelineManager, DynamicChangeQueueContextManager
+from zuul.manager.base import PipelineManager, DynamicChangeQueueContextManager
 
 
 class IndependentPipelineManager(PipelineManager):
