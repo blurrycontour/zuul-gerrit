@@ -67,14 +67,22 @@ def normalizeCategory(name):
     return re.sub(' ', '-', name)
 
 
+
 class Pipeline(object):
     """A configuration that ties triggers, reporters, managers and sources.
 
-    Source is where changes should come from. It is a named connection to
+    Source
+        Where changes should come from. It is a named connection to
         an external service defined in zuul.conf
-    Trigger is a description of which events should be processed
-    Manager is responsible for enqueing and dequeing Changes
-    Reporters communicate success and failure results somewhere
+
+    Trigger
+        A description of which events should be processed
+
+    Manager
+        Responsible for enqueing and dequeing Changes
+
+    Reporter
+        Communicates success and failure results somewhere
     """
     def __init__(self, name, layout):
         self.name = name
