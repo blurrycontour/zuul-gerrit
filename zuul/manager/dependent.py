@@ -13,7 +13,7 @@
 import logging
 
 from zuul import model
-from zuul.manager import PipelineManager, StaticChangeQueueContextManager
+from zuul.manager.base import PipelineManager, StaticChangeQueueContextManager
 
 
 class DependentPipelineManager(PipelineManager):
