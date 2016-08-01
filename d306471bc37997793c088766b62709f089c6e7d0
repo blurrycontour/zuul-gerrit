@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bacf61ea_816cfe08",
+        "filename": "doc/source/internals.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-08-01T16:54:58Z",
+      "side": 1,
+      "message": "\u0027essential for people\u0027",
+      "revId": "d306471bc37997793c088766b62709f089c6e7d0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bacf61ea_616f4afc",
+        "filename": "doc/source/internals.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-08-01T16:54:58Z",
+      "side": 1,
+      "message": "It would be good to make this plural somehow.  If you can\u0027t suffix an \u0027s\u0027, maybe \"contains one or more instances of the ChangeQueue class\".",
+      "revId": "d306471bc37997793c088766b62709f089c6e7d0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bacf61ea_c17a76bc",
+        "filename": "doc/source/internals.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-08-01T16:54:58Z",
+      "side": 1,
+      "message": "Maybe this section should not exist yet?",
+      "revId": "d306471bc37997793c088766b62709f089c6e7d0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bacf61ea_a175c2cb",
+        "filename": "zuul/manager/dependent.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-08-01T16:54:58Z",
+      "side": 1,
+      "message": "Nearest Non-Failing Item",
+      "revId": "d306471bc37997793c088766b62709f089c6e7d0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
