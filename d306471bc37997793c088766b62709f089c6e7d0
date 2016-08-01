@@ -53,6 +53,46 @@
     },
     {
       "key": {
+        "uuid": "bacf61ea_277a8288",
+        "filename": "zuul/manager/dependent.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2016-08-01T17:21:07Z",
+      "side": 1,
+      "message": "s/creates puts/puts/",
+      "range": {
+        "startLine": 22,
+        "startChar": 33,
+        "endLine": 22,
+        "endChar": 40
+      },
+      "revId": "d306471bc37997793c088766b62709f089c6e7d0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bacf61ea_a76672ea",
+        "filename": "zuul/manager/dependent.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2016-08-01T17:21:07Z",
+      "side": 1,
+      "message": "Don\u0027t we need backticks around the class here?",
+      "revId": "d306471bc37997793c088766b62709f089c6e7d0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bacf61ea_a175c2cb",
         "filename": "zuul/manager/dependent.py",
         "patchSetId": 3
