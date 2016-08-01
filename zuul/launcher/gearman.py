@@ -364,6 +364,7 @@ class Gearman(object):
                 gearman_job.name):
             self.log.error("Job %s is not registered with Gearman" %
                            gearman_job)
+            build.canceled = True
             self.onBuildCompleted(gearman_job, 'NOT_REGISTERED')
             return build
 
