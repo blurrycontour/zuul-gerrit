@@ -322,21 +322,6 @@ class Project(object):
         return '<Project %s>' % (self.name)
 
 
-# TODOv3(jeblair): remove; unused
-class Inheritable(object):
-    def __init__(self, parent=None):
-        self.parent = parent
-
-    def __getattribute__(self, name):
-        parent = object.__getattribute__(self, 'parent')
-        try:
-            return object.__getattribute__(self, name)
-        except AttributeError:
-            if parent:
-                return getattr(parent, name)
-            raise
-
-
 class Job(object):
     attributes = dict(
         timeout=None,
