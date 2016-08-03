@@ -87,6 +87,10 @@ class Cloner(object):
             self.log.info("Creating repo %s from cache %s",
                           project, git_cache)
             new_repo = git.Repo.clone_from(git_cache, dest)
+            self.log.info("Updating repo %s with branches/tags from cache %s",
+                          project, git_cache)
+            new_repo.fetchFrom(git_cache, '+refs/heads/*:refs/heads/* '
+                               '+refs/tags/*:refs/tags/*')
             self.log.info("Updating origin remote in repo %s to %s",
                           project, git_upstream)
             new_repo.remotes.origin.config_writer.set('url', git_upstream)
