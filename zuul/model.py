@@ -1618,9 +1618,9 @@ class UnparsedTenantConfig(object):
             elif key == 'pipeline':
                 self.pipelines.append(value)
             else:
-                raise Exception("Configuration item not recognized "
+                raise Exception("Configuration item `%s` not recognized "
                                 "(when parsing %s)" %
-                                (conf,))
+                                (item, conf,))
 
 
 class Layout(object):
