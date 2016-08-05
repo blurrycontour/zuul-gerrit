@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bacf61ea_d5587e8c",
+        "filename": "doc/source/reporters.rst",
+        "patchSetId": 39
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2016-08-05T16:20:33Z",
+      "side": 1,
+      "message": "The table names are hardcoded, so you really need to have a separate schema if you want to store different reports.",
+      "revId": "9c0c12b8b2b3627adc5f20e20a78bd926733bd09",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bacf61ea_471a25c7",
+        "filename": "zuul/alembic/sql_reporter/versions/4d3ebd7f06b9_set_up_initial_reporter_tables.py",
+        "patchSetId": 39
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2016-08-05T16:20:33Z",
+      "side": 1,
+      "message": "this could likely be a tinyint, not that it matters",
+      "revId": "9c0c12b8b2b3627adc5f20e20a78bd926733bd09",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bacf61ea_2729f1e6",
+        "filename": "zuul/alembic/sql_reporter/versions/4d3ebd7f06b9_set_up_initial_reporter_tables.py",
+        "patchSetId": 39
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2016-08-05T16:20:33Z",
+      "side": 1,
+      "message": "How is result different from message? Since we have the score above, wouldn\u0027t it make more sense to have a text field and put the whole formatted result text into it if we\u0027re going to store anything at all? But I mostly wonder about the usefulness of storing anything other than -2, -1, +1 or +2",
+      "revId": "9c0c12b8b2b3627adc5f20e20a78bd926733bd09",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bacf61ea_e7fcf973",
+        "filename": "zuul/alembic/sql_reporter/versions/4d3ebd7f06b9_set_up_initial_reporter_tables.py",
+        "patchSetId": 39
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2016-08-05T16:20:33Z",
+      "side": 1,
+      "message": "How about a DateTime? It\u0027s friendlier if you need to do queries on it.",
+      "revId": "9c0c12b8b2b3627adc5f20e20a78bd926733bd09",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bacf61ea_27fbb17a",
+        "filename": "zuul/alembic/sql_reporter/versions/4d3ebd7f06b9_set_up_initial_reporter_tables.py",
+        "patchSetId": 39
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2016-08-05T16:20:33Z",
+      "side": 1,
+      "message": "DateTime",
+      "revId": "9c0c12b8b2b3627adc5f20e20a78bd926733bd09",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bacf61ea_07f78dd3",
+        "filename": "zuul/alembic/sql_reporter/versions/4d3ebd7f06b9_set_up_initial_reporter_tables.py",
+        "patchSetId": 39
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2016-08-05T16:20:33Z",
+      "side": 1,
+      "message": "I don\u0027t think an actual db-level foreign key is useful. HOWEVER, an index on build_id almost certainly is gonna be desired to handle the join. (foreign keys in mysql are constraints, not indexes, so even if you keep the db-level FK, you need to add an index too)",
+      "revId": "9c0c12b8b2b3627adc5f20e20a78bd926733bd09",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bacf61ea_ea6cc0d1",
+        "filename": "zuul/reporter/sql.py",
+        "patchSetId": 39
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2016-08-05T16:20:33Z",
+      "side": 1,
+      "message": "Combining these like this removes the ability to do a query that is \"show me all of the results for change change.number\"\n\nHonestly, rather than a KV table, I\u0027d stick change_number, patchset and url into the main table. MySQL from 5.6 onwards has online add column and online add index, so we should be able to add additional metadata as needed without worrying too much about cost. That said, if we find that not to be true, we can always add addition 1-to-1 tables for each new metadata that we want to add as needed, again without downtime cost.\n\nSo I guess that\u0027s to say, as much as I understand the motivation of putting in a KV table to allow future flexibility without needing to do migrations, I think the efficiency and query flexibility gained by just doing the data in declared columns will make things more happy.\n\nWe should likely put an index on change_number as well as a one on change_number, patchset  if we go with my suggestion.",
+      "revId": "9c0c12b8b2b3627adc5f20e20a78bd926733bd09",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
