@@ -21,9 +21,6 @@ from tests.base import ZuulTestCase
 
 
 class TestGerritConnection(testtools.TestCase):
-    def setUp(self):
-        self.skip("Disabled for early v3 development")
-
     log = logging.getLogger("zuul.test_connection")
 
     def test_driver_name(self):
@@ -32,17 +29,14 @@ class TestGerritConnection(testtools.TestCase):
 
 
 class TestConnections(ZuulTestCase):
-    def setUp(self):
-        self.skip("Disabled for early v3 development")
-
-    def setup_config(self, config_file='zuul-connections-same-gerrit.conf'):
-        super(TestConnections, self).setup_config(config_file)
+    config_file = 'zuul-connections-same-gerrit.conf'
+    tenant_config_file = 'config/zuul-connections-same-gerrit/main.yaml'
 
     def test_multiple_connections(self):
         "Test multiple connections to the one gerrit"
 
-        A = self.fake_review_gerrit.addFakeChange('org/project', 'master', 'A')
-        self.fake_review_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
 
         self.waitUntilSettled()
 
@@ -52,9 +46,9 @@ class TestConnections(ZuulTestCase):
         self.assertEqual(A.patchsets[-1]['approvals'][0]['by']['username'],
                          'jenkins')
 
-        B = self.fake_review_gerrit.addFakeChange('org/project', 'master', 'B')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
         self.worker.addFailTest('project-test2', B)
-        self.fake_review_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
 
         self.waitUntilSettled()
 
