@@ -104,6 +104,40 @@
     },
     {
       "key": {
+        "uuid": "bacf61ea_a0330713",
+        "filename": "zuul/alembic/sql_reporter/versions/4d3ebd7f06b9_set_up_initial_reporter_tables.py",
+        "patchSetId": 39
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-08-05T17:03:49Z",
+      "side": 1,
+      "message": "I\u0027m in favor of dropping the constraint but adding the index.",
+      "revId": "9c0c12b8b2b3627adc5f20e20a78bd926733bd09",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bacf61ea_8036c300",
+        "filename": "zuul/reporter/sql.py",
+        "patchSetId": 39
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-08-05T17:03:49Z",
+      "side": 1,
+      "message": "message and params dont appear to ever be able to be set.  These aren\u0027t on the base class\u0027s version of this method, and the only call to .report() in zuul is in the scheduler and it doesn\u0027t supply them.",
+      "revId": "9c0c12b8b2b3627adc5f20e20a78bd926733bd09",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bacf61ea_ea6cc0d1",
         "filename": "zuul/reporter/sql.py",
         "patchSetId": 39
@@ -115,6 +149,23 @@
       "writtenOn": "2016-08-05T16:20:33Z",
       "side": 1,
       "message": "Combining these like this removes the ability to do a query that is \"show me all of the results for change change.number\"\n\nHonestly, rather than a KV table, I\u0027d stick change_number, patchset and url into the main table. MySQL from 5.6 onwards has online add column and online add index, so we should be able to add additional metadata as needed without worrying too much about cost. That said, if we find that not to be true, we can always add addition 1-to-1 tables for each new metadata that we want to add as needed, again without downtime cost.\n\nSo I guess that\u0027s to say, as much as I understand the motivation of putting in a KV table to allow future flexibility without needing to do migrations, I think the efficiency and query flexibility gained by just doing the data in declared columns will make things more happy.\n\nWe should likely put an index on change_number as well as a one on change_number, patchset  if we go with my suggestion.",
+      "revId": "9c0c12b8b2b3627adc5f20e20a78bd926733bd09",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bacf61ea_e0397ff3",
+        "filename": "zuul/reporter/sql.py",
+        "patchSetId": 39
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-08-05T17:03:49Z",
+      "side": 1,
+      "message": "What happens in a post pipeline?  Maybe we should add a test for that.",
       "revId": "9c0c12b8b2b3627adc5f20e20a78bd926733bd09",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
