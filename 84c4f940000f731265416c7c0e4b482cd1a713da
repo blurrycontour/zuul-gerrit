@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bacf61ea_f8bdafb1",
+        "filename": "zuul/lib/cloner.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2016-08-05T19:52:45Z",
+      "side": 0,
+      "message": "As James Blair pointed out in IRC we could just reuse the zuul.merger.Repo class here instead which already has logic similar to that below, and so avoid both new and existing code duplication.",
+      "revId": "84c4f940000f731265416c7c0e4b482cd1a713da",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
