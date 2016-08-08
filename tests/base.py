@@ -670,6 +670,7 @@ class RecordingLaunchServer(zuul.launcher.server.LaunchServer):
     """
     def __init__(self, *args, **kw):
         self._run_ansible = kw.pop('_run_ansible', False)
+        self._testcase = kw.pop('_testcase', False)
         super(RecordingLaunchServer, self).__init__(*args, **kw)
         self.hold_jobs_in_build = False
         self.lock = threading.Lock()
@@ -693,9 +694,13 @@ class RecordingLaunchServer(zuul.launcher.server.LaunchServer):
 
     def shouldFailTest(self, name, ref):
         l = self.fail_tests.get(name, [])
+        self.log.debug("should %s %s fail?", name, ref)
         for change in l:
-            if self.test.ref_has_change(ref, change):
+            self.log.debug("should fail change? %s", change)
+            if self._testcase.ref_has_change(ref, change):
+                self.log.debug("should: yes")
                 return True
+        self.log.debug("should: no")
         return False
 
     def release(self, regex=None):
@@ -1053,7 +1058,8 @@ class ZuulTestCase(BaseTestCase):
         self._startMerger()
 
         self.launch_server = RecordingLaunchServer(
-            self.config, self.connections, _run_ansible=self.run_ansible)
+            self.config, self.connections, _run_ansible=self.run_ansible,
+            _testcase=self)
         self.launch_server.start()
         self.history = self.launch_server.build_history
         self.builds = self.launch_server.running_builds
@@ -1262,14 +1268,17 @@ class ZuulTestCase(BaseTestCase):
         return commit.hexsha
 
     def ref_has_change(self, ref, change):
+        self.log.debug("ref has change? %s %s", ref, change)
         path = os.path.join(self.git_root, change.project)
         repo = git.Repo(path)
         try:
             for commit in repo.iter_commits(ref):
+                self.log.debug("commit msg %s change subject %s", commit.message.strip(), ('%s-1' % change.subject))
                 if commit.message.strip() == ('%s-1' % change.subject):
                     return True
         except GitCommandError:
-            pass
+            #pass
+            raise
         return False
 
     def orderedRelease(self):
