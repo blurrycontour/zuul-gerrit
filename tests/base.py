@@ -617,9 +617,7 @@ class FakeBuild(object):
         self.log.debug("Build %s continuing" % self.unique)
 
         result = 'SUCCESS'
-        if (('ZUUL_REF' in self.parameters) and
-            self.launch_server.shouldFailTest(self.name,
-                                              self.parameters['ZUUL_REF'])):
+        if (('ZUUL_REF' in self.parameters) and self.shouldFail()):
             result = 'FAILURE'
         if self.aborted:
             result = 'ABORTED'
@@ -628,6 +626,13 @@ class FakeBuild(object):
             result = 'RUN_ERROR'
 
         return result
+
+    def shouldFail(self):
+        changes = self.launch_server.fail_tests.get(self.name, [])
+        for change in changes:
+            if self.hasChanges(change):
+                return True
+        return False
 
     def hasChanges(self, *changes):
         """Return whether this build has certain changes in its git repos.
@@ -670,6 +675,7 @@ class RecordingLaunchServer(zuul.launcher.server.LaunchServer):
     """
     def __init__(self, *args, **kw):
         self._run_ansible = kw.pop('_run_ansible', False)
+        self._testcase = kw.pop('_testcase', False)
         super(RecordingLaunchServer, self).__init__(*args, **kw)
         self.hold_jobs_in_build = False
         self.lock = threading.Lock()
@@ -680,23 +686,18 @@ class RecordingLaunchServer(zuul.launcher.server.LaunchServer):
         self.fail_tests = {}
         self.job_builds = {}
 
-    def addFailTest(self, name, change):
+    def failJob(self, name, change):
         """Instruct the launcher to report matching builds as failures.
 
         :arg str name: The name of the job to fail.
-        :arg change: TODO: document
+        :arg Change change: The :py:class:`~tests.base.FakeChange`
+            instance which should cause the job to fail.  This job
+            will also fail for changes depending on this change.
 
         """
         l = self.fail_tests.get(name, [])
         l.append(change)
         self.fail_tests[name] = l
-
-    def shouldFailTest(self, name, ref):
-        l = self.fail_tests.get(name, [])
-        for change in l:
-            if self.test.ref_has_change(ref, change):
-                return True
-        return False
 
     def release(self, regex=None):
         """Release a held build.
@@ -1053,7 +1054,8 @@ class ZuulTestCase(BaseTestCase):
         self._startMerger()
 
         self.launch_server = RecordingLaunchServer(
-            self.config, self.connections, _run_ansible=self.run_ansible)
+            self.config, self.connections, _run_ansible=self.run_ansible,
+            _testcase=self)
         self.launch_server.start()
         self.history = self.launch_server.build_history
         self.builds = self.launch_server.running_builds
@@ -1264,6 +1266,8 @@ class ZuulTestCase(BaseTestCase):
         return commit.hexsha
 
     def ref_has_change(self, ref, change):
+        # TODOv3(jeblair): this should probably be removed in favor of
+        # build.hasChanges
         path = os.path.join(self.git_root, change.project)
         repo = git.Repo(path)
         try:
