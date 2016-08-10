@@ -721,7 +721,7 @@ class RecordingLaunchServer(zuul.launcher.server.LaunchServer):
         self.log.debug("Done releasing builds %s (%s)" %
                        (regex, len(self.running_builds)))
 
-    def launch(self, job):
+    def launchJob(self, job):
         with self._build_counter_lock:
             self.build_counter += 1
             build_counter = self.build_counter
@@ -730,7 +730,17 @@ class RecordingLaunchServer(zuul.launcher.server.LaunchServer):
         job.build = build
         self.running_builds.append(build)
         self.job_builds[job.unique] = build
-        super(RecordingLaunchServer, self).launch(job)
+        super(RecordingLaunchServer, self).launchJob(job)
+
+    def stopJob(self, job):
+        self.log.debug("handle stop")
+        parameters = json.loads(job.arguments)
+        uuid = parameters['uuid']
+        for build in self.running_builds:
+            if build.unique == uuid:
+                build.aborted = True
+                build.release()
+        super(RecordingLaunchServer, self).stopJob(job)
 
     def runAnsible(self, jobdir, job):
         build = self.job_builds[job.unique]

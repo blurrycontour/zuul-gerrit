@@ -17,6 +17,7 @@ import json
 import logging
 import os
 import shutil
+import socket
 import subprocess
 import tempfile
 import threading
@@ -113,6 +114,7 @@ class LaunchServer(object):
 
     def __init__(self, config, connections={}):
         self.config = config
+        self.hostname = socket.gethostname()
         self.zuul_url = config.get('merger', 'zuul_url')
 
         if self.config.has_option('merger', 'git_dir'):
@@ -161,7 +163,7 @@ class LaunchServer(object):
 
     def register(self):
         self.worker.registerFunction("launcher:launch")
-        # TODOv3: abort
+        self.worker.registerFunction("launcher:stop:%s" % self.hostname)
         self.worker.registerFunction("merger:merge")
         self.worker.registerFunction("merger:cat")
 
@@ -204,7 +206,10 @@ class LaunchServer(object):
                 try:
                     if job.name == 'launcher:launch':
                         self.log.debug("Got launch job: %s" % job.unique)
-                        self.launch(job)
+                        self.launchJob(job)
+                    elif job.name.startswith('launcher:stop'):
+                        self.log.debug("Got stop job: %s" % job.unique)
+                        self.stopJob(job)
                     elif job.name == 'merger:cat':
                         self.log.debug("Got cat job: %s" % job.unique)
                         self.cat(job)
@@ -220,7 +225,7 @@ class LaunchServer(object):
             except Exception:
                 self.log.exception("Exception while getting job")
 
-    def launch(self, job):
+    def launchJob(self, job):
         thread = threading.Thread(target=self._launch, args=(job,))
         thread.start()
 
@@ -254,6 +259,10 @@ class LaunchServer(object):
 
             result = dict(result=result)
             job.sendWorkComplete(json.dumps(result))
+
+    def stopJob(self, job):
+        #TODOv3: implement.
+        job.sendWorkComplete()
 
     def getHostList(self, args):
         # TODOv3: This should get the appropriate nodes from nodepool,

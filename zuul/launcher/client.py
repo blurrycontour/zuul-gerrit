@@ -473,7 +473,7 @@ class LaunchClient(object):
             # internal dict after it's added to the report queue.
             del self.builds[job.unique]
         else:
-            if not job.name.startswith("stop:"):
+            if not job.name.startswith("launcher:stop:"):
                 self.log.error("Unable to find build %s" % job.unique)
 
     def onWorkStatus(self, job):
@@ -519,9 +519,8 @@ class LaunchClient(object):
 
     def cancelRunningBuild(self, build):
         stop_uuid = str(uuid4().hex)
-        data = dict(name=build.job.name,
-                    number=build.number)
-        stop_job = gear.Job("stop:%s" % build.__gearman_manager,
+        data = dict(uuid=build.job.unique),
+        stop_job = gear.Job("launcher:stop:%s" % build.__gearman_manager,
                             json.dumps(data), unique=stop_uuid)
         self.meta_jobs[stop_uuid] = stop_job
         self.log.debug("Submitting stop job: %s", stop_job)
