@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9ad45d7e_cd2c999b",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1139,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2016-08-10T21:35:05Z",
+      "side": 1,
+      "message": "as a nit (no need to change here, just be aware of the extra reference to the event_queue going forward), I don\u0027t particularly like to track the event queues directly like this since we can track them from self.connections.connections . This comes from the fact that without careful cleanup we can leak objects and cause memory bloat during test runs due to lingering references. It is unlikely this is a case here, but without a careful eye on values such as things can get out of control rapidly.",
+      "range": {
+        "startLine": 1138,
+        "startChar": 0,
+        "endLine": 1139,
+        "endChar": 67
+      },
+      "revId": "7fc8daa372ecaf6736960989958a9796be9128c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
