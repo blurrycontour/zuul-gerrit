@@ -22,6 +22,23 @@
       "revId": "7fc8daa372ecaf6736960989958a9796be9128c2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad45d7e_1a7060a3",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1139,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-08-11T21:53:27Z",
+      "side": 1,
+      "message": "Yes, I\u0027d be fine if we changed it as you suggest, but wanted to try to keep this minimal.",
+      "revId": "7fc8daa372ecaf6736960989958a9796be9128c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
