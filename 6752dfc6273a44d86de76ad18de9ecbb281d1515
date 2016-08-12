@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "9ad45d7e_169acbc5",
+        "filename": "zuul/launcher/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 432,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-08-12T15:58:36Z",
+      "side": 1,
+      "message": "I think that would be a fine change to make as a followup.",
+      "revId": "6752dfc6273a44d86de76ad18de9ecbb281d1515",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ad45d7e_85f5e7cc",
         "filename": "zuul/launcher/server.py",
         "patchSetId": 2
@@ -36,6 +53,23 @@
       "writtenOn": "2016-08-12T15:21:26Z",
       "side": 1,
       "message": "SO - the assumption of one launch server to one host strikes me as similar to how nova-compute works, and even though the nova cores have maintained that one should not need to run more than one compute per host, there have been instances where that\u0027s the \u0027right\u0027 choice.\n\nI do not have an immediate suggestion as to what such a scenario might be  - but it tickles me \"this pattern has burned us elsewhere in the past few years\" trigger.",
+      "revId": "6752dfc6273a44d86de76ad18de9ecbb281d1515",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad45d7e_f69e17b7",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-08-12T15:58:36Z",
+      "side": 1,
+      "message": "It\u0027s not important to the functioning of the system, just that it be unique across workers.  We could give this a suffix; maybe a PID?",
       "revId": "6752dfc6273a44d86de76ad18de9ecbb281d1515",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
