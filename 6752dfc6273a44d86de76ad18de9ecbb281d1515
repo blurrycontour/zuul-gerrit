@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9ad45d7e_333bb33a",
+        "filename": "zuul/launcher/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 432,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-08-12T11:11:53Z",
+      "side": 1,
+      "message": "not uuid?\n\nperhaps we should have a started boolean or something rather than using url as an indication of started. Mostly in case we later change how/when the url is built.",
+      "range": {
+        "startLine": 432,
+        "startChar": 17,
+        "endLine": 432,
+        "endChar": 20
+      },
+      "revId": "6752dfc6273a44d86de76ad18de9ecbb281d1515",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
