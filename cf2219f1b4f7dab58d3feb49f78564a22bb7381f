@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "9ad45d7e_38a37e51",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 631,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-08-12T15:42:15Z",
+      "side": 1,
+      "message": "If by \"job\" you mean the test method itself (like TestScheduler.test_foo()), then the answer is that that method may otherwise have no reference to the build.  It would only be able to get one if it asked the launcher to hold builds, which it is not required to do.  Sometimes one may want to say \"make the test-project fail\", then equeue a change and watch it fail without doing the stepwise hold/release dance.  Also, since Zuul might cancel/relaunch jobs, the test author would have to remember to keep setting the failure flag each time.",
+      "revId": "cf2219f1b4f7dab58d3feb49f78564a22bb7381f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ad45d7e_1325cf5b",
         "filename": "tests/base.py",
         "patchSetId": 2
@@ -36,6 +53,23 @@
       "writtenOn": "2016-08-12T11:02:39Z",
       "side": 1,
       "message": "What is this used for? (-1)",
+      "revId": "cf2219f1b4f7dab58d3feb49f78564a22bb7381f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ad45d7e_9888aac8",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 678,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-08-12T15:42:15Z",
+      "side": 1,
+      "message": "Nothing anymore.  :)",
       "revId": "cf2219f1b4f7dab58d3feb49f78564a22bb7381f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
