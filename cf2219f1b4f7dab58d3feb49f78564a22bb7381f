@@ -42,6 +42,24 @@
     },
     {
       "key": {
+        "uuid": "7ac969e8_0d577203",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 631,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-08-13T01:09:19Z",
+      "side": 1,
+      "message": "Right, I was thinking we could have a helper for the test (yes, sorry, that\u0027s what I meant by job) to grab the build. Your second point thought makes sense.",
+      "parentUuid": "9ad45d7e_38a37e51",
+      "revId": "cf2219f1b4f7dab58d3feb49f78564a22bb7381f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ad45d7e_1325cf5b",
         "filename": "tests/base.py",
         "patchSetId": 2
