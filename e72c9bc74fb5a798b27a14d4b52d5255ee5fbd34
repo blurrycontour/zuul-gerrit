@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3ac371cc_413ad5ce",
+        "filename": "zuul/ansible/library/zuul_console.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-08-14T14:47:50Z",
+      "side": 1,
+      "message": "Putting sys.exit(1) as the sole content of an exception handler means that if there is any error, the operator will have no indication of what it is.  If you simply remove the exception handler here, the program will still exit, but this time, an exception will be printed and the operator will be very appreciative.",
+      "revId": "e72c9bc74fb5a798b27a14d4b52d5255ee5fbd34",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3ac371cc_2137d9e4",
+        "filename": "zuul/ansible/library/zuul_console.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-08-14T14:47:50Z",
+      "side": 1,
+      "message": "Same thing.  Don\u0027t even bother closing.  The interpreter will do that for you.",
+      "revId": "e72c9bc74fb5a798b27a14d4b52d5255ee5fbd34",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
