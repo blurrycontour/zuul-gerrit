@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3ac371cc_7c7a5689",
+        "filename": "doc/source/connections.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-08-18T02:29:44Z",
+      "side": 1,
+      "message": "(nit) Perhaps worth noting that this is the default.",
+      "revId": "9f0a3229f784b5f3b33a15c8c1365a3c18ab8f2e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
