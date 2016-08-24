@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1ac06dbe_2f64e4e3",
+        "filename": "zuul/manager/dependent.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-08-24T13:56:19Z",
+      "side": 1,
+      "message": "Should this be elif queue_name?\n\nYou\u0027re checking for queue_name but if that fails you still use it on lines 59+60 below.\n\nOtherwise we need to create a unique name for the queue somehow.",
+      "range": {
+        "startLine": 49,
+        "startChar": 12,
+        "endLine": 49,
+        "endChar": 16
+      },
+      "revId": "e945500e5812e7530d100599f24161bb6e46b797",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ac06dbe_af8bb41d",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-08-24T13:56:19Z",
+      "side": 1,
+      "message": "Name is supplied into the ChangeQueue. This is a pretty big side-effect in the sense that it wouldn\u0027t be expected.\n\nI think the queue names need to be rethought some (see other comment).",
+      "revId": "e945500e5812e7530d100599f24161bb6e46b797",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
