@@ -1280,6 +1280,11 @@ class NodeWorker(object):
             tasks = []
             tasks.append(dict(shell=shellargs, delegate_to='127.0.0.1'))
 
+            shellargs = "ssh-keygen -lf %s > %s" % (
+                jobdir.known_hosts,
+                os.path.join(jobdir.ansible_root, 'ssh_host_key'))
+            tasks.append(dict(shell=shellargs, delegate_to='127.0.0.1'))
+
             task = dict(file=dict(path='/tmp/console.html', state='absent'))
             tasks.append(task)
 
