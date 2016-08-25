@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "fa7ab95a_b12a2ae6",
+        "filename": "zuul/manager/dependent.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-08-25T21:34:58Z",
+      "side": 1,
+      "message": "Yup, this is a problem.",
+      "revId": "e945500e5812e7530d100599f24161bb6e46b797",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1ac06dbe_af8bb41d",
         "filename": "zuul/model.py",
         "patchSetId": 1
