@@ -91,7 +91,7 @@ class WebApp(threading.Thread):
         # support legacy status.json as well as new /status
         if path == '/status.json' or path == '/status':
             return "status"
-        m = re.match('/status/change/(\d+,\d+)$', path)
+        m = re.match('/status/change/(\d+,\d+|[0-9a-f]{40})$', path)
         if m:
             return m.group(1)
         return None
