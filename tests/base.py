@@ -541,14 +541,16 @@ class FakeStatsd(threading.Thread):
 class FakeBuild(object):
     log = logging.getLogger("zuul.test")
 
-    def __init__(self, launch_server, job, node):
+    def __init__(self, launch_server, job):
         self.daemon = True
         self.launch_server = launch_server
         self.job = job
         self.jobdir = None
         self.uuid = job.unique
-        self.node = node
         self.parameters = json.loads(job.arguments)
+        self.node = None
+        if len(self.parameters.get('nodes')) == 1:
+            self.node = self.parameters['nodes'][0]['image']
         self.unique = self.parameters['ZUUL_UUID']
         self.name = self.parameters['job']
         self.wait_condition = threading.Condition()
@@ -707,8 +709,7 @@ class RecordingLaunchServer(zuul.launcher.server.LaunchServer):
                        (regex, len(self.running_builds)))
 
     def launchJob(self, job):
-        node = None
-        build = FakeBuild(self, job, node)
+        build = FakeBuild(self, job)
         job.build = build
         self.running_builds.append(build)
         self.job_builds[job.unique] = build
