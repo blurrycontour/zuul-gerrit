@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "fa7ab95a_04bb84c5",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 551,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-08-26T06:19:01Z",
+      "side": 1,
+      "message": "It was called node in v2 (there are several references to this in test_scheduler).  I suspect we will want more information about nodes here later (so this may end up being build.node.image by the time we are done).  But I\u0027ll grant that right now it\u0027s better called image, so I can change everything.  Could we do that in a follow up though since updating all the existing references is really a separate change from this, and I don\u0027t really want to make this longer than necessary?",
+      "revId": "2f45f618e508879aaf60db3773f0cf23a1ad2472",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa7ab95a_2e814c4b",
         "filename": "tests/test_scheduler.py",
         "patchSetId": 1
@@ -42,6 +59,23 @@
         "endLine": 65,
         "endChar": 32
       },
+      "revId": "2f45f618e508879aaf60db3773f0cf23a1ad2472",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa7ab95a_e4b5c0d0",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-08-26T06:19:01Z",
+      "side": 1,
+      "message": "Yeah, the node names are for use by ansible (they go in the inventory file).  We\u0027re not doing anything interesting with that right now, and 99% of the time we\u0027re just going to call them \u0027controller\u0027 anyway.  But using a different image for a different job variant (for a specific branch) is more interesting.\n\n(To elaborate -- a python27 job for master will get a node called \u0027controller\u0027 which was created from an \u0027ubuntu-xenial\u0027 image.  But a python27 job for stable/mitaka will get a node called \u0027controller\u0027 from an \u0027ubuntu-trusty\u0027 image.",
       "revId": "2f45f618e508879aaf60db3773f0cf23a1ad2472",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
