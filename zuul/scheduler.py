@@ -35,7 +35,7 @@ from zuul.model import ChangeishFilter, NullChange
 from zuul import change_matcher, exceptions
 from zuul import version as zuul_version
 
-statsd = extras.try_import('statsd.statsd')
+statsd = extras.try_import('statsd')
 
 
 def deep_format(obj, paramdict):

@@ -2087,7 +2087,7 @@ jobs:
     def test_statsd(self):
         "Test each of the statsd methods used in the scheduler"
         import extras
-        statsd = extras.try_import('statsd.statsd')
+        statsd = extras.try_import('statsd')
         statsd.incr('test-incr')
         statsd.timing('test-timing', 3)
         statsd.gauge('test-gauge', 12)
