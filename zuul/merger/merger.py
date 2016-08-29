@@ -43,12 +43,13 @@ class ZuulReference(git.Reference):
 class Repo(object):
     log = logging.getLogger("zuul.Repo")
 
-    def __init__(self, remote, local, email, username):
+    def __init__(self, remote, local, email, username, reset_branch):
         self.remote_url = remote
         self.local_path = local
         self.email = email
         self.username = username
         self._initialized = False
+        self.reset_branch = reset_branch
         try:
             self._ensure_cloned()
         except:
@@ -95,8 +96,8 @@ class Repo(object):
                 continue
             repo.create_head(ref.remote_head, ref, force=True)
 
-        # Reset to remote HEAD (usually origin/master)
-        repo.head.reference = origin.refs['HEAD']
+        # Reset to remote branch (default is HEAD)
+        repo.head.reference = origin.refs[self.reset_branch]
         reset_repo_to_head(repo)
         repo.git.clean('-x', '-f', '-d')
 
@@ -195,7 +196,8 @@ class Repo(object):
 class Merger(object):
     log = logging.getLogger("zuul.Merger")
 
-    def __init__(self, working_root, connections, email, username):
+    def __init__(self, working_root, connections, email, username,
+                 reset_branch):
         self.repos = {}
         self.working_root = working_root
         if not os.path.exists(working_root):
@@ -203,6 +205,7 @@ class Merger(object):
         self._makeSSHWrappers(working_root, connections)
         self.email = email
         self.username = username
+        self.reset_branch = reset_branch
 
     def _makeSSHWrappers(self, working_root, connections):
         for connection_name, connection in connections.items():
@@ -223,7 +226,8 @@ class Merger(object):
         repo = None
         try:
             path = os.path.join(self.working_root, project)
-            repo = Repo(url, path, self.email, self.username)
+            repo = Repo(url, path, self.email, self.username,
+                        self.reset_branch)
 
             self.repos[project] = repo
         except Exception:

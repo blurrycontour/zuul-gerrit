@@ -97,7 +97,8 @@ class Cloner(object):
             remote=git_upstream,
             local=dest,
             email=None,
-            username=None)
+            username=None,
+            reset_branch='HEAD')
 
         if not repo.isInitialized():
             raise Exception("Error cloning %s to %s" % (git_upstream, dest))

@@ -19,6 +19,16 @@ server and requires the ``gearman``, ``gerrit``, ``merger``, and
 ``zuul`` sections (indicated fields only).  Be sure the zuul_url is
 set appropriately on each host that runs a zuul-merger.
 
+An example for merger section in **zuul.conf**::
+
+    [merger]
+    git_dir=/git
+    zuul_url=http://zuul.example.com
+
+You can change Merger's reset behaviour by setting reset_branch
+in the configuration. It will reset the repo branch to the one
+specificed with reset_branch.
+
 Zuul References
 ~~~~~~~~~~~~~~~
 
