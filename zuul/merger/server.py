@@ -29,6 +29,11 @@ class MergeServer(object):
         self.config = config
         self.zuul_url = config.get('merger', 'zuul_url')
 
+        if self.config.has_option('merger', 'reset_branch'):
+            merge_reset_branch = self.config.get('merger', 'reset_branch')
+        else:
+            merge_reset_branch = 'HEAD'
+
         if self.config.has_option('merger', 'git_dir'):
             merge_root = self.config.get('merger', 'git_dir')
         else:
@@ -45,7 +50,7 @@ class MergeServer(object):
             merge_name = None
 
         self.merger = merger.Merger(merge_root, connections, merge_email,
-                                    merge_name)
+                                    merge_name, merge_reset_branch)
 
     def start(self):
         self._running = True
