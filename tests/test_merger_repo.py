@@ -52,7 +52,7 @@ class TestMergerRepo(ZuulTestCase):
             msg='.git file in submodule should be a file')
 
         work_repo = Repo(parent_path, self.workspace_root,
-                         'none@example.org', 'User Name')
+                         'none@example.org', 'User Name', 'HEAD')
         self.assertTrue(
             os.path.isdir(os.path.join(self.workspace_root, 'subdir')),
             msg='Cloned repository has a submodule placeholder directory')
