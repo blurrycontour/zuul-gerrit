@@ -56,6 +56,23 @@
       "revId": "e945500e5812e7530d100599f24161bb6e46b797",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa7ab95a_1af5c3eb",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-08-30T18:18:52Z",
+      "side": 1,
+      "message": "If the user supplies a (non-empty) name, we use it.  Otherwise, we automatically generate a name based on the projects in the queue.  I think this behavior makes sense -- we can rely on queues always having names.  This is also the current behavior.",
+      "revId": "e945500e5812e7530d100599f24161bb6e46b797",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
