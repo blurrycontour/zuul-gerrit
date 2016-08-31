@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa7ab95a_3c88b1c6",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-08-31T02:45:43Z",
+      "side": 1,
+      "message": "This will just take the first project added rather than combining a list of projects as was the previous behaviour.",
+      "revId": "0dcef7a575b0f230d94e73ba1e636cdac6da17e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
