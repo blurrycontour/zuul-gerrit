@@ -219,7 +219,8 @@ class Merger(object):
         name = os.path.join(merge_root, wrapper_name)
         fd = open(name, 'w')
         fd.write('#!/bin/bash\n')
-        fd.write('ssh -i %s $@\n' % key)
+        fd.write('ssh -o UserKnownHostsFile=/dev/null -o'
+                 'StrictHostKeyChecking=no -i %s $@\n' % key)
         fd.close()
         os.chmod(name, 0o755)
 
