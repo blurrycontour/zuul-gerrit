@@ -1106,14 +1106,14 @@ class NodeWorker(object):
         tasks.append(task)
 
         runner = dict(command=remote_path,
-                      cwd=parameters['WORKSPACE'],
-                      parameters=parameters)
+                      cwd=parameters['WORKSPACE'])
         task = dict(zuul_runner=runner)
         task['name'] = ('zuul_runner with {{ timeout | int - elapsed_time }} '
                         'second timeout')
         task['when'] = '{{ elapsed_time < timeout | int }}'
         task['async'] = '{{ timeout | int - elapsed_time }}'
         task['poll'] = 5
+        task['environment'] = parameters
         tasks.append(task)
 
         filetask = dict(path=remote_path,
