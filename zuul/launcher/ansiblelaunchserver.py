@@ -1095,15 +1095,14 @@ class NodeWorker(object):
         task = dict(copy=copy)
         tasks.append(task)
 
-        runner = dict(command=remote_path,
-                      cwd=parameters['WORKSPACE'])
-        task = dict(command=runner)
+        task = dict(command=remote_path)
         task['name'] = ('command with {{ timeout | int - elapsed_time }} '
                         'second timeout')
         task['when'] = '{{ elapsed_time < timeout | int }}'
         task['async'] = '{{ timeout | int - elapsed_time }}'
         task['poll'] = 5
         task['environment'] = parameters
+        task['args'] = dict(chdir=parameters['WORKSPACE'])
         tasks.append(task)
 
         filetask = dict(path=remote_path,
