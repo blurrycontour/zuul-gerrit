@@ -1106,14 +1106,14 @@ class NodeWorker(object):
         tasks.append(task)
 
         runner = dict(command=remote_path,
-                      cwd=parameters['WORKSPACE'],
-                      parameters=parameters)
+                      cwd=parameters['WORKSPACE'])
         task = dict(zuul_runner=runner)
         task['name'] = ('zuul_runner with {{ timeout | int - elapsed_time }} '
                         'second timeout')
         task['when'] = '{{ elapsed_time < timeout | int }}'
         task['async'] = '{{ timeout | int - elapsed_time }}'
         task['poll'] = 5
+        task['environment'] = parameters
         tasks.append(task)
 
         filetask = dict(path=remote_path,
@@ -1268,6 +1268,8 @@ class NodeWorker(object):
             config.write('gathering = explicit\n')
             config.write('callback_plugins = %s\n' % self.callback_dir)
             config.write('library = %s\n' % self.library_dir)
+            # TODO(mordred) This can be removed once we're using ansible 2.2
+            config.write('module_set_locale = False\n')
             # bump the timeout because busy nodes may take more than
             # 10s to respond
             config.write('timeout = 30\n')
