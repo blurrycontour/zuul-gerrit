@@ -1088,6 +1088,99 @@ class NodeWorker(object):
         tasks.append(task)
         return tasks
 
+    def _makeAFSTask(self, jobdir, publisher, parameters):
+        tasks = []
+        afs = publisher['afs']
+
+        # It is possible that this could be done in one rsync step,
+        # however, the current rysnc from the host is complicated (so
+        # that we can match the behavior of ant), and then rsync to
+        # afs is complicated and involves a pre-processing step in
+        # both locations (so that we can exclude directories).  Each
+        # is well understood individually so it is easier to compose
+        # them in series than combine them together.  A better,
+        # longer-lived solution (with better testing) would do just
+        # that.
+        afsroot = tempfile.mkdtemp(dir=jobdir.staging_root)
+        afscontent = os.path.join(afsroot, 'content')
+
+        src = parameters['WORKSPACE']
+        if not src.endswith('/'):
+            src = src + '/'
+        rsync_opts = self._getRsyncOptions(afs['source'],
+                                           parameters)
+        syncargs = dict(src=src,
+                        dest=afscontent,
+                        copy_links='yes',
+                        mode='pull')
+        if rsync_opts:
+            syncargs['rsync_opts'] = rsync_opts
+        task = dict(synchronize=syncargs,
+                    when='success')
+        task.update(self.retry_args)
+        tasks.append(task)
+
+        afstarget = afs['target']
+        afstarget = self._substituteVariables(afstarget, parameters)
+        afstarget = os.path.normpath(afstarget)
+        if not afstarget.startswith('/afs'):
+            raise Exception("Target path %s is not below AFS root" %
+                            (afstarget,))
+
+        src_markers_file = os.path.join(afsroot, 'src-markers')
+        dst_markers_file = os.path.join(afsroot, 'dst-markers')
+        exclude_file = os.path.join(afsroot, 'exclude')
+
+        find_pipe = ["find {path} -name .root-marker -printf '%P\n'",
+                     "xargs -I{{}} dirname {{}}",
+                     "sort > {file}"]
+        find_pipe = ' | '.join(find_pipe)
+
+        # Find the list of root markers in the just-completed build
+        # (usually there will only be one, but some builds produce
+        # content at the root *and* at a tag location).
+        task = dict(shell=find_pipe.format(path=afscontent,
+                                           file=src_markers_file),
+                    when='success',
+                    delegate_to='127.0.0.1')
+        tasks.append(task)
+
+        # Find the list of root markers that already exist in the
+        # published site.
+        task = dict(shell=find_pipe.format(path=afstarget,
+                                           file=dst_markers_file),
+                    when='success',
+                    delegate_to='127.0.0.1')
+        tasks.append(task)
+
+        # Create a file to use as an exclusion list that contains
+        # directories that have root markers in the published site and
+        # do not have root markers in the built site.
+        exclude_command = "comm -23 {dst} {src} > {exclude}".format(
+            src=src_markers_file,
+            dst=dst_markers_file,
+            exclude=exclude_file)
+        task = dict(shell=exclude_command,
+                    when='success',
+                    delegate_to='127.0.0.1')
+        tasks.append(task)
+
+        # Perform the rsync with the exclusion list.
+        rsync_cmd = [
+            '/usr/bin/rsync', '-rtp', '--safe-links', '--delete-after',
+            '--exclude-from={exclude}', '{src}/', '{dst}/',
+        ]
+        shellargs = ' '.join(rsync_cmd).format(
+            src=afscontent,
+            dst=afstarget,
+            exclude=exclude_file)
+        task = dict(shell=shellargs,
+                    when='success',
+                    delegate_to='127.0.0.1')
+        tasks.append(task)
+
+        return tasks
+
     def _makeBuilderTask(self, jobdir, builder, parameters):
         tasks = []
         script_fn = '%s.sh' % str(uuid.uuid4().hex)
@@ -1241,6 +1334,9 @@ class NodeWorker(object):
                                                        parameters))
                     if 'ftp' in publisher:
                         block.extend(self._makeFTPTask(jobdir, publisher,
+                                                       parameters))
+                    if 'afs' in publisher:
+                        block.extend(self._makeAFSTask(jobdir, publisher,
                                                        parameters))
                 blocks.append(block)
 
