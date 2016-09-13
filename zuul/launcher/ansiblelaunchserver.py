@@ -111,9 +111,7 @@ class JobDir(object):
         self.playbook = os.path.join(self.ansible_root, 'playbook')
         self.post_playbook = os.path.join(self.ansible_root, 'post_playbook')
         self.config = os.path.join(self.ansible_root, 'ansible.cfg')
-        self.script_root = os.path.join(self.ansible_root, 'scripts')
         self.ansible_log = os.path.join(self.ansible_root, 'ansible_log.txt')
-        os.makedirs(self.script_root)
         self.staging_root = os.path.join(self.root, 'staging')
         os.makedirs(self.staging_root)
 
@@ -1080,22 +1078,23 @@ class NodeWorker(object):
 
     def _makeBuilderTask(self, jobdir, builder, parameters):
         tasks = []
-        script_fn = '%s.sh' % str(uuid.uuid4().hex)
-        script_path = os.path.join(jobdir.script_root, script_fn)
-        with open(script_path, 'w') as script:
-            data = builder['shell']
-            if not data.startswith('#!'):
-                data = '#!/bin/bash -x\n %s' % (data,)
-            script.write(data)
 
-        remote_path = os.path.join('/tmp', script_fn)
-        copy = dict(src=script_path,
-                    dest=remote_path,
-                    mode=0o555)
-        task = dict(copy=copy)
-        tasks.append(task)
+        data = builder['shell']
+        # Ansible shell blocks do not honor shebang lines. That's fine - but
+        # we do have a bunch of scripts that have either nothing, -x, -xe,
+        # -ex or -eux. Transform those into leading set commands
+        if data.startswith('#!'):
+            data_lines = data.split('\n')
+            data_lines.reverse()
+            shebang = data_lines.pop()
+            flags = shebang.strip().split('-')
+            if len(flags) > 1:
+                for flag in flags[1]:
+                    data_lines.append('set -%s' % flag)
+            data_lines.reverse()
+            data = '\n'.join(data_lines)
 
-        task = dict(command=remote_path)
+        task = dict(shell=data)
         task['name'] = ('command with {{ timeout | int - elapsed_time }} '
                         'second timeout')
         task['when'] = '{{ elapsed_time < timeout | int }}'
@@ -1105,9 +1104,6 @@ class NodeWorker(object):
         task['args'] = dict(chdir=parameters['WORKSPACE'])
         tasks.append(task)
 
-        filetask = dict(path=remote_path,
-                        state='absent')
-        task = dict(file=filetask)
         tasks.append(task)
 
         return tasks
