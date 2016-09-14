@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a8ec9b2_96f3249e",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1159,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2016-09-14T15:56:47Z",
+      "side": 1,
+      "message": "Just to be safe, puppet-zuul should add the dependency for comm for our launchers.",
+      "revId": "b511eeb18866096bf111c9c9bd3b5f7a4bd69c02",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
