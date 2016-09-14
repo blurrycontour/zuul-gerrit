@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this file.  If not, see <http://www.gnu.org/licenses/>.
 
+import math
 import time
 
 from ansible.executor.task_result import TaskResult
@@ -46,7 +47,7 @@ class CallbackModule(CallbackBase):
             self._elapsed_time += task_time
         if self._play and result._host:
             manager = self._play.get_variable_manager()
-            facts = dict(elapsed_time=int(self._elapsed_time))
+            facts = dict(elapsed_time=int(math.ceil(self._elapsed_time)))
 
             manager.set_nonpersistent_facts(result._host, facts)
         self._task_start_time = None

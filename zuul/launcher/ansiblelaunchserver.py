@@ -178,9 +178,17 @@ class LaunchServer(object):
         self.callback_dir = os.path.join(plugins_dir, 'callback')
         if not os.path.exists(self.callback_dir):
             os.makedirs(self.callback_dir)
+        self.action_dir = os.path.join(plugins_dir, 'action')
+        if not os.path.exists(self.action_dir):
+            os.makedirs(self.action_dir)
         self.library_dir = os.path.join(ansible_dir, 'library')
         if not os.path.exists(self.library_dir):
             os.makedirs(self.library_dir)
+
+        action_path = os.path.dirname(os.path.abspath(
+            zuul.ansible.plugins.action.__file__))
+        for fn in os.listdir(action_path):
+            shutil.copy(os.path.join(callback_path, fn), self.action_dir)
 
         callback_path = os.path.dirname(os.path.abspath(
             zuul.ansible.plugins.callback.__file__))
@@ -477,6 +485,7 @@ class LaunchServer(object):
                             self.hostname, self.zmq_send_queue,
                             self.termination_queue, self.keep_jobdir,
                             self.callback_dir, self.library_dir,
+                            self.action_dir,
                             self.options)
         self.node_workers[worker.name] = worker
 
@@ -558,7 +567,7 @@ class NodeWorker(object):
     def __init__(self, config, jobs, builds, sites, name, host,
                  description, labels, manager_name, zmq_send_queue,
                  termination_queue, keep_jobdir, callback_dir,
-                 library_dir, options):
+                 library_dir, action_dir, options):
         self.log = logging.getLogger("zuul.NodeWorker.%s" % (name,))
         self.log.debug("Creating node worker %s" % (name,))
         self.config = config
@@ -606,6 +615,7 @@ class NodeWorker(object):
             self.username = 'zuul'
         self.callback_dir = callback_dir
         self.library_dir = library_dir
+        self.action_dir = action_dir
         self.options = options
 
     def isAlive(self):
@@ -1107,11 +1117,10 @@ class NodeWorker(object):
             data = '\n'.join(data_lines)
 
         task = dict(shell=data)
+        # TODO(mordred): replace the name parameter here with a log statement
+        # in the callback plugin
         task['name'] = ('command with {{ timeout | int - elapsed_time }} '
                         'second timeout')
-        task['when'] = '{{ elapsed_time < timeout | int }}'
-        task['async'] = '{{ timeout | int - elapsed_time }}'
-        task['poll'] = 5
         task['environment'] = parameters
         task['args'] = dict(chdir=parameters['WORKSPACE'])
         if shell:
@@ -1266,6 +1275,7 @@ class NodeWorker(object):
             config.write('log_path = %s\n' % jobdir.ansible_log)
             config.write('gathering = explicit\n')
             config.write('callback_plugins = %s\n' % self.callback_dir)
+            config.write('action_plugins = %s\n' % self.action_dir)
             config.write('library = %s\n' % self.library_dir)
             # bump the timeout because busy nodes may take more than
             # 10s to respond
