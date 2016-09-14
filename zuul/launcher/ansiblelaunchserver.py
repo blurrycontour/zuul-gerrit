@@ -1097,10 +1097,12 @@ class NodeWorker(object):
             data = '\n'.join(data_lines)
 
         task = dict(shell=data)
+        # TODO(mordred): replace the name parameter here with a log statement
+        # in the callback plugin
         task['name'] = ('command with {{ timeout | int - elapsed_time }} '
                         'second timeout')
         task['when'] = '{{ elapsed_time < timeout | int }}'
-        task['async'] = '{{ timeout | int - elapsed_time }}'
+        task['async'] = None
         task['poll'] = 5
         task['environment'] = parameters
         task['args'] = dict(chdir=parameters['WORKSPACE'])
