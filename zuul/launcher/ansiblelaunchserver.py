@@ -1134,7 +1134,7 @@ class NodeWorker(object):
         dst_markers_file = os.path.join(afsroot, 'dst-markers')
         exclude_file = os.path.join(afsroot, 'exclude')
 
-        find_pipe = ["find {path} -name .root-marker -printf '%P\n'",
+        find_pipe = ["/usr/bin/find {path} -name .root-marker -printf '%P\n'",
                      "xargs -I{{}} dirname {{}}",
                      "sort > {file}"]
         find_pipe = ' | '.join(find_pipe)
@@ -1159,7 +1159,7 @@ class NodeWorker(object):
         # Create a file to use as an exclusion list that contains
         # directories that have root markers in the published site and
         # do not have root markers in the built site.
-        exclude_command = "comm -23 {dst} {src} > {exclude}".format(
+        exclude_command = "/usr/bin/comm -23 {dst} {src} > {exclude}".format(
             src=src_markers_file,
             dst=dst_markers_file,
             exclude=exclude_file)
