@@ -194,21 +194,21 @@ class LaunchServer(object):
         for fn in os.listdir(library_path):
             shutil.copy(os.path.join(library_path, fn), self.library_dir)
 
+        def get_config_default(section, option, default):
+            if config.has_option(section, option):
+                return config.get(section, option)
+            return default
+
         for section in config.sections():
             m = self.site_section_re.match(section)
             if m:
                 sitename = m.group(1)
                 d = {}
-                d['host'] = config.get(section, 'host')
-                d['user'] = config.get(section, 'user')
-                if config.has_option(section, 'pass'):
-                    d['pass'] = config.get(section, 'pass')
-                else:
-                    d['pass'] = ''
-                if config.has_option(section, 'root'):
-                    d['root'] = config.get(section, 'root')
-                else:
-                    d['root'] = '/'
+                d['host'] = get_config_default(section, 'host', None)
+                d['user'] = get_config_default(section, 'user', '')
+                d['pass'] = get_config_default(section, 'pass', '')
+                d['root'] = get_config_default(section, 'root', '/')
+                d['keytab'] = get_config_default(section, 'keytab', None)
                 self.sites[sitename] = d
                 continue
             m = self.node_section_re.match(section)
@@ -217,10 +217,7 @@ class LaunchServer(object):
                 d = {}
                 d['name'] = nodename
                 d['host'] = config.get(section, 'host')
-                if config.has_option(section, 'description'):
-                    d['description'] = config.get(section, 'description')
-                else:
-                    d['description'] = ''
+                d['description'] = get_config_default(section, 'description', '')
                 if config.has_option(section, 'labels'):
                     d['labels'] = config.get(section, 'labels').split(',')
                 else:
@@ -1091,6 +1088,10 @@ class NodeWorker(object):
     def _makeAFSTask(self, jobdir, publisher, parameters):
         tasks = []
         afs = publisher['afs']
+        site = afs['site']
+        if site not in self.sites:
+            raise Exception("Undefined AFS site: %s" % site)
+        site = self.sites[site]
 
         # It is possible that this could be done in one rsync step,
         # however, the current rysnc from the host is complicated (so
@@ -1122,9 +1123,10 @@ class NodeWorker(object):
 
         afstarget = afs['target']
         afstarget = self._substituteVariables(afstarget, parameters)
+        afstarget = os.path.join(site['root'], afstarget)
         afstarget = os.path.normpath(afstarget)
-        if not afstarget.startswith('/afs'):
-            raise Exception("Target path %s is not below AFS root" %
+        if not afstarget.startswith(site['root']):
+            raise Exception("Target path %s is not below site root" %
                             (afstarget,))
 
         src_markers_file = os.path.join(afsroot, 'src-markers')
@@ -1167,13 +1169,15 @@ class NodeWorker(object):
 
         # Perform the rsync with the exclusion list.
         rsync_cmd = [
+            '/usr/bin/k5start', '-k', '{keytab}', '--',
             '/usr/bin/rsync', '-rtp', '--safe-links', '--delete-after',
             '--exclude-from={exclude}', '{src}/', '{dst}/',
         ]
         shellargs = ' '.join(rsync_cmd).format(
             src=afscontent,
             dst=afstarget,
-            exclude=exclude_file)
+            exclude=exclude_file,
+            keytab=site['keytab'])
         task = dict(shell=shellargs,
                     when='success',
                     delegate_to='127.0.0.1')
