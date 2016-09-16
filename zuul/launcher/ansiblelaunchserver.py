@@ -39,6 +39,7 @@ from zuul.lib import commandsocket
 
 ANSIBLE_WATCHDOG_GRACE = 5 * 60
 ANSIBLE_DEFAULT_TIMEOUT = 2 * 60 * 60
+ANSIBLE_DEFAULT_PRE_TIMEOUT = 10 * 60
 ANSIBLE_DEFAULT_POST_TIMEOUT = 10 * 60
 
 
@@ -149,6 +150,8 @@ class JobDir(object):
         os.makedirs(self.ansible_root)
         self.known_hosts = os.path.join(self.ansible_root, 'known_hosts')
         self.inventory = os.path.join(self.ansible_root, 'inventory')
+        self.vars = os.path.join(self.ansible_root, 'vars.yaml')
+        self.pre_playbook = os.path.join(self.ansible_root, 'pre_playbook')
         self.playbook = os.path.join(self.ansible_root, 'playbook')
         self.post_playbook = os.path.join(self.ansible_root, 'post_playbook')
         self.config = os.path.join(self.ansible_root, 'ansible.cfg')
@@ -638,6 +641,7 @@ class NodeWorker(object):
         self._aborted_job = False
         self._watchdog_timeout = False
         self._sent_complete_event = False
+        self.ansible_pre_proc = None
         self.ansible_job_proc = None
         self.ansible_post_proc = None
         self.workspace_root = config.get('launcher', 'workspace_root')
@@ -918,6 +922,7 @@ class NodeWorker(object):
                                'SUCCESS', {})
 
     def runJob(self, job, args):
+        self.ansible_pre_proc = None
         self.ansible_job_proc = None
         self.ansible_post_proc = None
         result = None
@@ -942,6 +947,12 @@ class NodeWorker(object):
             job.sendWorkData(json.dumps(data))
             job.sendWorkStatus(0, 100)
 
+            pre_status = self.runAnsiblePrePlaybook(jobdir)
+            if pre_status is None:
+                # These should really never fail, so return None and have
+                # zuul try again
+                return result
+
             job_status = self.runAnsiblePlaybook(jobdir, timeout)
             if job_status is None:
                 # The result of the job is indeterminate.  Zuul will
@@ -951,10 +962,6 @@ class NodeWorker(object):
             post_status = self.runAnsiblePostPlaybook(jobdir, job_status)
             if not post_status:
                 result = 'POST_FAILURE'
-            elif job_status:
-                result = 'SUCCESS'
-            else:
-                result = 'FAILURE'
 
             if self._aborted_job and not self._watchdog_timeout:
                 # A Null result will cause zuul to relaunch the job if
@@ -1138,9 +1145,8 @@ class NodeWorker(object):
         (executable, shell) = deal_with_shebang(builder['shell'])
 
         task = dict(shell=shell)
-        task['name'] = ('command with {{ timeout | int - elapsed_time }} '
-                        'second timeout')
-        task['environment'] = parameters
+        task['name'] = "shell task imported from JJB"
+        task['environment'] = "'{{ zuul.environment }}'"
         task['args'] = dict(chdir=parameters['WORKSPACE'])
         if executable:
             task['args']['executable'] = executable
@@ -1206,53 +1212,53 @@ class NodeWorker(object):
         if timeout_var:
             parameters[timeout_var] = str(timeout * 1000)
 
-        with open(jobdir.playbook, 'w') as playbook:
-            pre_tasks = []
-            tasks = []
-            main_block = []
-            error_block = []
-            variables = []
+        with open(jobdir.vars, 'w') as vars_yaml:
+            variables = dict(
+                timeout=timeout,
+                environment=parameters,
+            )
+            zuul_vars = dict(zuul=variables)
+            vars_yaml.write(
+                yaml.safe_dump(zuul_vars, default_flow_style=False))
+
+        with open(jobdir.pre_playbook, 'w') as pre_playbook:
 
             shellargs = "ssh-keyscan {{ ansible_host }} > %s" % (
                 jobdir.known_hosts)
-            pre_tasks.append(dict(shell=shellargs,
-                             delegate_to='127.0.0.1'))
-
-            tasks.append(dict(block=main_block,
-                              rescue=error_block))
+            tasks = []
+            tasks.append(dict(shell=shellargs, delegate_to='127.0.0.1'))
 
             task = dict(file=dict(path='/tmp/console.html', state='absent'))
-            main_block.append(task)
+            tasks.append(task)
 
             task = dict(zuul_console=dict(path='/tmp/console.html',
                                           port=19885))
-            main_block.append(task)
+            tasks.append(task)
 
             task = dict(file=dict(path=parameters['WORKSPACE'],
                                   state='directory'))
-            main_block.append(task)
+            tasks.append(task)
 
             msg = [
                 "Launched by %s" % self.manager_name,
                 "Building remotely on %s in workspace %s" % (
                     self.name, parameters['WORKSPACE'])]
             task = dict(zuul_log=dict(msg=msg))
-            main_block.append(task)
+            tasks.append(task)
+
+            play = dict(hosts='node', name='Job setup', tasks=tasks)
+            pre_playbook.write(
+                yaml.safe_dump([play], default_flow_style=False))
+
+        with open(jobdir.playbook, 'w') as playbook:
+            tasks = []
 
             for builder in jjb_job.get('builders', []):
                 if 'shell' in builder:
-                    main_block.extend(
+                    tasks.extend(
                         self._makeBuilderTask(jobdir, builder, parameters))
-            task = dict(zuul_log=dict(msg="Job complete, result: SUCCESS"))
-            main_block.append(task)
 
-            task = dict(zuul_log=dict(msg="Job complete, result: FAILURE"))
-            error_block.append(task)
-            error_block.append(dict(fail=dict(msg='FAILURE')))
-
-            variables.append(dict(timeout=timeout))
-            play = dict(hosts='node', name='Job body', vars=variables,
-                        pre_tasks=pre_tasks, tasks=tasks)
+            play = dict(hosts='node', name='Job body', tasks=tasks)
             playbook.write(yaml.safe_dump([play], default_flow_style=False))
 
         early_publishers, late_publishers = self._transformPublishers(jjb_job)
@@ -1275,6 +1281,14 @@ class NodeWorker(object):
             # we run the log publisher regardless of whether the rest
             # of the publishers succeed.
             tasks = []
+
+            task = dict(zuul_log=dict(
+                msg="Job complete, result: SUCCESS", when='success'))
+            blocks[0].insert(0, task)
+            task = dict(zuul_log=dict(
+                msg="Job complete, result: FAILURE", when='not success'))
+            blocks[0].insert(0, task)
+
             tasks.append(dict(block=blocks[0],
                               always=blocks[1]))
 
@@ -1313,6 +1327,46 @@ class NodeWorker(object):
         self.log.warning(msg)
         self.abortRunningProc(proc)
 
+    def runAnsiblePrePlaybook(self, jobdir):
+        # Set LOGNAME env variable so Ansible log_path log reports
+        # the correct user.
+        env_copy = os.environ.copy()
+        env_copy['LOGNAME'] = 'zuul'
+
+        if self.options['verbose']:
+            verbose = '-vvv'
+        else:
+            verbose = '-v'
+
+        cmd = ['ansible-playbook', jobdir.pre_playbook,
+               '-e@%s' % jobdir.vars, verbose]
+        self.log.debug("Ansible pre command: %s" % (cmd,))
+
+        self.ansible_pre_proc = subprocess.Popen(
+            cmd,
+            cwd=jobdir.ansible_root,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            preexec_fn=os.setsid,
+            env=env_copy,
+        )
+        ret = None
+        watchdog = Watchdog(ANSIBLE_DEFAULT_PRE_TIMEOUT,
+                            self._ansibleTimeout,
+                            (self.ansible_pre_proc,
+                             "Ansible pre timeout exceeded"))
+        watchdog.start()
+        try:
+            for line in iter(self.ansible_pre_proc.stdout.readline, b''):
+                line = line[:1024].rstrip()
+                self.log.debug("Ansible pre output: %s" % (line,))
+            ret = self.ansible_pre_proc.wait()
+        finally:
+            watchdog.stop()
+        self.log.debug("Ansible pre exit code: %s" % (ret,))
+        self.ansible_pre_proc = None
+        return ret == 0
+
     def runAnsiblePlaybook(self, jobdir, timeout):
         # Set LOGNAME env variable so Ansible log_path log reports
         # the correct user.
@@ -1324,7 +1378,8 @@ class NodeWorker(object):
         else:
             verbose = '-v'
 
-        cmd = ['ansible-playbook', jobdir.playbook, verbose]
+        cmd = ['ansible-playbook', jobdir.playbook, verbose,
+               '-e@%s' % jobdir.vars]
         self.log.debug("Ansible command: %s" % (cmd,))
 
         self.ansible_job_proc = subprocess.Popen(
@@ -1373,7 +1428,9 @@ class NodeWorker(object):
             verbose = '-v'
 
         cmd = ['ansible-playbook', jobdir.post_playbook,
-               '-e', 'success=%s' % success, verbose]
+               '-e', 'success=%s' % success,
+               '-e@%s' % jobdir.vars,
+               verbose]
         self.log.debug("Ansible post command: %s" % (cmd,))
 
         self.ansible_post_proc = subprocess.Popen(
