@@ -1,0 +1,18 @@
+- hosts: node
+  name: Prep Tasks
+  tasks:
+  - delegate_to: 127.0.0.1
+    shell: ssh-keyscan 2001:4800:1ae1:18:f816:3eff:fe68:991c > /tmp/tmpeb6j1Q/ansible/known_hosts
+  - file:
+      path: /tmp/console.html
+      state: absent
+  - zuul_console:
+      path: /tmp/console.html
+      port: 19885
+  - file:
+      path: /home/jenkins/workspace/gate-os-client-config-pep8-ubuntu-xenial
+      state: directory
+  - zuul_log:
+      msg:
+      - Launched by zl04
+      - Building remotely on ubuntu-xenial-osic-cloud1-4227281 in workspace /home/jenkins/workspace/gate-os-client-config-pep8-ubuntu-xenial
