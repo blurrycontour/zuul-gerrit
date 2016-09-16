@@ -57,7 +57,7 @@ class ActionModule(action.ActionBase):
         # plugin, this will happily report 0. Obviously we can just avoid
         # bugs in the callback plugin, but maybe let's not do it.
         elapsed = fact_cache[hostname].get('elapsed_time', 0)
-        play_timeout = task_vars['timeout']
+        play_timeout = task_vars['zuul']['timeout']
         if play_timeout is None:
             return {
                 'msg': 'zuul requires a global timeout to be set',
