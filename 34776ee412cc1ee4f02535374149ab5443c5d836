@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a8ec9b2_e08eecce",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2016-09-16T13:01:48Z",
+      "side": 1,
+      "message": "You could just do:\n\n  nodes[name] \u003d node[\u0027image\u0027]",
+      "revId": "34776ee412cc1ee4f02535374149ab5443c5d836",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a8ec9b2_8379b2ca",
+        "filename": "zuul/launcher/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2016-09-16T13:01:48Z",
+      "side": 1,
+      "message": "Is \u0027node\u0027 a dict or class object here (appears to me to be a dict)? If a dict, this would be simpler, no?\n\n    nodes.append(node)\n\nUnless there are other attributes that you may not want to include (I\u0027m not seeing any ATM), in which case, ignore this.",
+      "revId": "34776ee412cc1ee4f02535374149ab5443c5d836",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
