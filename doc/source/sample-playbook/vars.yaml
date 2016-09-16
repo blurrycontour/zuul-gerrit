@@ -1,0 +1,24 @@
+zuul:
+  timeout: 2
+  environment:
+    BASE_LOG_PATH: 78/368778/1/check/
+    BUILD_TIMEOUT: '1800000'
+    JOB_TAGS: ''
+    LOG_PATH: 78/368778/1/check/gate-os-client-config-pep8-ubuntu-xenial/a73970b/
+    OFFLINE_NODE_WHEN_COMPLETE: '1'
+    TOX_TESTENV_PASSENV: ZUUL_PIPELINE ZUUL_UUID ZUUL_VOTING ZUUL_CHANGE_IDS
+      ZUUL_PATCHSET ZUUL_BRANCH ZUUL_REF ZUUL_COMMIT ZUUL_URL ZUUL_CHANGE ZUUL_CHANGES
+      ZUUL_PROJECT
+    WORKSPACE: /home/jenkins/workspace/gate-os-client-config-pep8-ubuntu-xenial
+    ZUUL_BRANCH: master
+    ZUUL_CHANGE: '368778'
+    ZUUL_CHANGES: openstack/os-client-config:master:refs/changes/76/368776/1^openstack/os-client-config:master:refs/changes/77/368777/1^openstack/os-client-config:master:refs/changes/78/368778/1
+    ZUUL_CHANGE_IDS: 368776,1 368777,1 368778,1
+    ZUUL_COMMIT: 4db9cdb7d023841496941bc8449aa675d8e721ca
+    ZUUL_PATCHSET: '1'
+    ZUUL_PIPELINE: check
+    ZUUL_PROJECT: openstack/os-client-config
+    ZUUL_REF: refs/zuul/master/Zfdc4b5b5b261481e8c60a63efdba6227
+    ZUUL_URL: http://zm05.openstack.org/p
+    ZUUL_UUID: a73970b2029a4f3980873e77fb208cf1
+    ZUUL_VOTING: '1'

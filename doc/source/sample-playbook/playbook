@@ -1,0 +1,125 @@
+- hosts: node
+  name: Job body
+  pre_tasks:
+  - delegate_to: 127.0.0.1
+    shell: ssh-keyscan 2001:4800:1ae1:18:f816:3eff:fe68:991c > /tmp/tmpeb6j1Q/ansible/known_hosts
+  tasks:
+  - block:
+    - file:
+        path: /tmp/console.html
+        state: absent
+    - zuul_console:
+        path: /tmp/console.html
+        port: 19885
+    - file:
+        path: /home/jenkins/workspace/gate-os-client-config-pep8-ubuntu-xenial
+        state: directory
+    - zuul_log:
+        msg:
+        - Launched by zl04
+        - Building remotely on ubuntu-xenial-osic-cloud1-4227281 in workspace /home/jenkins/workspace/gate-os-client-config-pep8-ubuntu-xenial
+    - copy:
+        dest: /tmp/255765148e414ac6b7fe5e87e07b8bf5.sh
+        mode: 365
+        src: /tmp/tmpeb6j1Q/ansible/scripts/255765148e414ac6b7fe5e87e07b8bf5.sh
+    - async: '{{ timeout | int - elapsed_time }}'
+      name: zuul_runner with {{ timeout | int - elapsed_time }} second timeout
+      poll: 5
+      when: '{{ elapsed_time < timeout | int }}'
+      zuul_runner:
+        command: /tmp/255765148e414ac6b7fe5e87e07b8bf5.sh
+        cwd: /home/jenkins/workspace/gate-os-client-config-pep8-ubuntu-xenial
+        parameters: &id001
+          BASE_LOG_PATH: 78/368778/1/check/
+          BUILD_TIMEOUT: '1800000'
+          JOB_TAGS: ''
+          LOG_PATH: 78/368778/1/check/gate-os-client-config-pep8-ubuntu-xenial/a73970b/
+          OFFLINE_NODE_WHEN_COMPLETE: '1'
+          TOX_TESTENV_PASSENV: ZUUL_PIPELINE ZUUL_UUID ZUUL_VOTING ZUUL_CHANGE_IDS
+            ZUUL_PATCHSET ZUUL_BRANCH ZUUL_REF ZUUL_COMMIT ZUUL_URL ZUUL_CHANGE ZUUL_CHANGES
+            ZUUL_PROJECT
+          WORKSPACE: /home/jenkins/workspace/gate-os-client-config-pep8-ubuntu-xenial
+          ZUUL_BRANCH: master
+          ZUUL_CHANGE: '368778'
+          ZUUL_CHANGES: openstack/os-client-config:master:refs/changes/76/368776/1^openstack/os-client-config:master:refs/changes/77/368777/1^openstack/os-client-config:master:refs/changes/78/368778/1
+          ZUUL_CHANGE_IDS: 368776,1 368777,1 368778,1
+          ZUUL_COMMIT: 4db9cdb7d023841496941bc8449aa675d8e721ca
+          ZUUL_PATCHSET: '1'
+          ZUUL_PIPELINE: check
+          ZUUL_PROJECT: openstack/os-client-config
+          ZUUL_REF: refs/zuul/master/Zfdc4b5b5b261481e8c60a63efdba6227
+          ZUUL_URL: http://zm05.openstack.org/p
+          ZUUL_UUID: a73970b2029a4f3980873e77fb208cf1
+          ZUUL_VOTING: '1'
+    - file:
+        path: /tmp/255765148e414ac6b7fe5e87e07b8bf5.sh
+        state: absent
+    - copy:
+        dest: /tmp/00c4604ef2c04adc9f557384d2577021.sh
+        mode: 365
+        src: /tmp/tmpeb6j1Q/ansible/scripts/00c4604ef2c04adc9f557384d2577021.sh
+    - async: '{{ timeout | int - elapsed_time }}'
+      name: zuul_runner with {{ timeout | int - elapsed_time }} second timeout
+      poll: 5
+      when: '{{ elapsed_time < timeout | int }}'
+      zuul_runner:
+        command: /tmp/00c4604ef2c04adc9f557384d2577021.sh
+        cwd: /home/jenkins/workspace/gate-os-client-config-pep8-ubuntu-xenial
+        parameters: *id001
+    - file:
+        path: /tmp/00c4604ef2c04adc9f557384d2577021.sh
+        state: absent
+    - copy:
+        dest: /tmp/bc9ffd91574c415f9402e19738e62931.sh
+        mode: 365
+        src: /tmp/tmpeb6j1Q/ansible/scripts/bc9ffd91574c415f9402e19738e62931.sh
+    - async: '{{ timeout | int - elapsed_time }}'
+      name: zuul_runner with {{ timeout | int - elapsed_time }} second timeout
+      poll: 5
+      when: '{{ elapsed_time < timeout | int }}'
+      zuul_runner:
+        command: /tmp/bc9ffd91574c415f9402e19738e62931.sh
+        cwd: /home/jenkins/workspace/gate-os-client-config-pep8-ubuntu-xenial
+        parameters: *id001
+    - file:
+        path: /tmp/bc9ffd91574c415f9402e19738e62931.sh
+        state: absent
+    - copy:
+        dest: /tmp/69318c84d0c1451aa7ada301ae28a036.sh
+        mode: 365
+        src: /tmp/tmpeb6j1Q/ansible/scripts/69318c84d0c1451aa7ada301ae28a036.sh
+    - async: '{{ timeout | int - elapsed_time }}'
+      name: zuul_runner with {{ timeout | int - elapsed_time }} second timeout
+      poll: 5
+      when: '{{ elapsed_time < timeout | int }}'
+      zuul_runner:
+        command: /tmp/69318c84d0c1451aa7ada301ae28a036.sh
+        cwd: /home/jenkins/workspace/gate-os-client-config-pep8-ubuntu-xenial
+        parameters: *id001
+    - file:
+        path: /tmp/69318c84d0c1451aa7ada301ae28a036.sh
+        state: absent
+    - copy:
+        dest: /tmp/de9f9705c72e4b16aacd7a6060c26703.sh
+        mode: 365
+        src: /tmp/tmpeb6j1Q/ansible/scripts/de9f9705c72e4b16aacd7a6060c26703.sh
+    - async: '{{ timeout | int - elapsed_time }}'
+      name: zuul_runner with {{ timeout | int - elapsed_time }} second timeout
+      poll: 5
+      when: '{{ elapsed_time < timeout | int }}'
+      zuul_runner:
+        command: /tmp/de9f9705c72e4b16aacd7a6060c26703.sh
+        cwd: /home/jenkins/workspace/gate-os-client-config-pep8-ubuntu-xenial
+        parameters: *id001
+    - file:
+        path: /tmp/de9f9705c72e4b16aacd7a6060c26703.sh
+        state: absent
+    - zuul_log:
+        msg: 'Job complete, result: SUCCESS'
+    rescue:
+    - zuul_log:
+        msg: 'Job complete, result: FAILURE'
+    - fail:
+        msg: FAILURE
+  vars:
+  - timeout: 1800
