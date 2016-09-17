@@ -1,6 +1,4 @@
-#!/usr/bin/python
-
-# Copyright (c) 2016 Red Hat
+# Copyright 2016 Red Hat, Inc.
 #
 # This module is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,17 +13,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
-from ansible.module_utils.basic import _load_params
+import os
+
+# NOTE(mordred) This is still not safe, because if the chdir task parameter
+# So we need to actually get config in here from the launcher, since the
+# launcher dir is the thing we want to consider the "safe" location
 
 
-def main():
-    params = _load_params()
-    print '''
-{{
-  "msg": "Error: Use of the {module} module is forbidden",
-  "failed": true
-}}'''.format(module=params['_ansible_module_name'])
+def _is_safe_path(path):
+    if os.path.isabs(path):
+        return False
+    if not os.path.abspath(os.path.expanduser(path)).startswith(
+            os.path.abspath(os.path.curdir):
+        return False
+    return True
 
-
-if __name__ == '__main__':
-    main()
