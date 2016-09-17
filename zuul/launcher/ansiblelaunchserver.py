@@ -175,9 +175,17 @@ class LaunchServer(object):
         self.callback_dir = os.path.join(plugins_dir, 'callback')
         if not os.path.exists(self.callback_dir):
             os.makedirs(self.callback_dir)
+        self.action_dir = os.path.join(plugins_dir, 'action')
+        if not os.path.exists(self.action_dir):
+            os.makedirs(self.action_dir)
         self.library_dir = os.path.join(ansible_dir, 'library')
         if not os.path.exists(self.library_dir):
             os.makedirs(self.library_dir)
+
+        action_path = os.path.dirname(os.path.abspath(
+            zuul.ansible.plugins.action.__file__))
+        for fn in os.listdir(action_path):
+            shutil.copy(os.path.join(callback_path, fn), self.action_dir)
 
         callback_path = os.path.dirname(os.path.abspath(
             zuul.ansible.plugins.callback.__file__))
@@ -474,6 +482,7 @@ class LaunchServer(object):
                             self.hostname, self.zmq_send_queue,
                             self.termination_queue, self.keep_jobdir,
                             self.callback_dir, self.library_dir,
+                            self.action_dir,
                             self.options)
         self.node_workers[worker.name] = worker
 
@@ -550,7 +559,7 @@ class NodeWorker(object):
     def __init__(self, config, jobs, builds, sites, name, host,
                  description, labels, manager_name, zmq_send_queue,
                  termination_queue, keep_jobdir, callback_dir,
-                 library_dir, options):
+                 library_dir, action_dir, options):
         self.log = logging.getLogger("zuul.NodeWorker.%s" % (name,))
         self.log.debug("Creating node worker %s" % (name,))
         self.config = config
@@ -604,6 +613,7 @@ class NodeWorker(object):
             self.register_labels = True
         self.callback_dir = callback_dir
         self.library_dir = library_dir
+        self.action_dir = action_dir
         self.options = options
 
     def isAlive(self):
@@ -1269,6 +1279,7 @@ class NodeWorker(object):
             config.write('log_path = %s\n' % jobdir.ansible_log)
             config.write('gathering = explicit\n')
             config.write('callback_plugins = %s\n' % self.callback_dir)
+            config.write('action_plugins = %s\n' % self.action_dir)
             config.write('library = %s\n' % self.library_dir)
 
             config.write('[ssh_connection]\n')
