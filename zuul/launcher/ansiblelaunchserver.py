@@ -34,7 +34,7 @@ import jenkins_jobs.formatter
 import zmq
 
 import zuul.ansible.library
-import zuul.ansible.plugins.callback_plugins
+import zuul.ansible.plugins.callback
 from zuul.lib import commandsocket
 
 ANSIBLE_WATCHDOG_GRACE = 5 * 60
@@ -177,7 +177,7 @@ class LaunchServer(object):
         self.command_socket = commandsocket.CommandSocket(path)
         ansible_dir = os.path.join(state_dir, 'ansible')
         plugins_dir = os.path.join(ansible_dir, 'plugins')
-        self.callback_dir = os.path.join(plugins_dir, 'callback_plugins')
+        self.callback_dir = os.path.join(plugins_dir, 'callback')
         if not os.path.exists(self.callback_dir):
             os.makedirs(self.callback_dir)
         self.library_dir = os.path.join(ansible_dir, 'library')
@@ -185,7 +185,7 @@ class LaunchServer(object):
             os.makedirs(self.library_dir)
 
         callback_path = os.path.dirname(os.path.abspath(
-            zuul.ansible.plugins.callback_plugins.__file__))
+            zuul.ansible.plugins.callback.__file__))
         for fn in os.listdir(callback_path):
             shutil.copy(os.path.join(callback_path, fn), self.callback_dir)
 
