@@ -238,6 +238,91 @@ def _getRsyncOptions(source)
     return rsync_opts
 
 
+def _makeSCPTask(publisher):
+    tasks = []
+    for scpfile in publisher['scp']['files']:
+        task = dict(
+            name="Make local temp dir for %s" % scpfile['source'],
+            command="mktemp -d {{ zuul.vars.staging_root }}",
+            delegate_to='127.0.0.1',
+            register='tmp_dir')
+        tasks.append(task)
+
+        site = publisher['scp']['site']
+        if scpfile.get('copy-console'):
+            # Include the local ansible directory in the console
+            # upload.  This uploads the playbook and ansible logs.
+            copyargs = dict(src="'{{ zuul.vars.ansible_root }}'",
+                            dest="'{{ tmp_dir }}/_zuul_ansible'")
+            task = dict(copy=copyargs,
+                        name="Copy local ansible directory",
+                        delegate_to='127.0.0.1')
+            # This is a local copy and should not fail, so does
+            # not need a retry stanza.
+            tasks.append(task)
+
+            # Fetch the console log from the remote host.
+            src = '/tmp/console.html'
+            rsync_opts = []
+        else:
+            src = "'{{ zuul.environment.WORKSPACE }}'"
+            rsync_opts = _getRsyncOptions(scpfile['source'])
+
+        syncargs = dict(src=src,
+                        dest="'{{ tmp_dir }}'",
+                        copy_links='yes',
+                        mode='pull')
+        if rsync_opts:
+            syncargs['rsync_opts'] = rsync_opts
+        task = dict(synchronize=syncargs,
+                    name='rsync logs %s' % scpfile['source'])
+        if not scpfile.get('copy-after-failure'):
+            task['when'] = 'success'
+        task.update(RETRY_ARGS)
+        tasks.append(task)
+
+        task = _makeSCPTaskLocalAction(site, scpfile)
+        task.update(RETRY_ARGS)
+        tasks.append(task)
+    return tasks
+
+def _makeSCPTaskLocalAction(site, scpfile):
+    dest = scpfile['target'].lstrip('/')
+    dest = _substituteVariables(dest)
+    dest = os.path.join(site['root'], dest)
+    dest = os.path.normpath(dest)
+    if not dest.startswith(site['root']):
+        raise Exception("Target path %s is not below site root" %
+                        (dest,))
+
+    rsync_cmd = [
+        '/usr/bin/rsync', '--delay-updates', '-F',
+        '--compress', '-rt', '--safe-links',
+        '--rsync-path="mkdir -p {dest} && rsync"',
+        '--rsh="/usr/bin/ssh -i {{ zuul.vars.private_key_file }} -S none '
+        '-o StrictHostKeyChecking=no -q"',
+        '--out-format="<<CHANGED>>%i %n%L"',
+        '{source}',
+        '''"{{ zuul.sites['{site}'].user }}'''
+        '''@{{ zuul.sites['{site}'].host }}:{dest}"'''
+    ]
+    if scpfile.get('keep-hierarchy'):
+        source = '"{{ tmp_dir }}/"'
+    else:
+        source = '`/usr/bin/find "{{ tmp_dir }}" -type f`'
+    shellargs = ' '.join(rsync_cmd).format(
+        source=source,
+        dest=dest,
+        site=site)
+    task = dict(shell=shellargs,
+                name='Publish logs %s' % scproot['source'],
+                delegate_to='127.0.0.1')
+    if not scpfile.get('copy-after-failure'):
+        task['when'] = 'success'
+
+    return task
+
+
 class LaunchServer(object):
     log = logging.getLogger("zuul.LaunchServer")
     site_section_re = re.compile('site "(.*?)"')
@@ -1045,92 +1130,6 @@ class NodeWorker(object):
     def getHostList(self):
         return [('node', dict(
             ansible_host=self.host, ansible_user=self.username))]
-
-    def _makeSCPTask(self, jobdir, publisher, parameters):
-        tasks = []
-        for scpfile in publisher['scp']['files']:
-            task = dict(
-                name="Make local temp dir for %s" % scpfile['source'],
-                command="mktemp -d {{ zuul.vars.staging_root }}",
-                delegate_to='127.0.0.1',
-                register='tmp_dir')
-            tasks.append(task)
-
-            site = publisher['scp']['site']
-            if scpfile.get('copy-console'):
-                # Include the local ansible directory in the console
-                # upload.  This uploads the playbook and ansible logs.
-                copyargs = dict(src="'{{ zuul.vars.ansible_root }}'",
-                                dest="'{{ tmp_dir }}/_zuul_ansible'")
-                task = dict(copy=copyargs,
-                            name="Copy local ansible directory",
-                            delegate_to='127.0.0.1')
-                # This is a local copy and should not fail, so does
-                # not need a retry stanza.
-                tasks.append(task)
-
-                # Fetch the console log from the remote host.
-                src = '/tmp/console.html'
-                rsync_opts = []
-            else:
-                src = "'{{ zuul.environment.WORKSPACE }}'"
-                rsync_opts = _getRsyncOptions(scpfile['source'])
-
-            syncargs = dict(src=src,
-                            dest="'{{ tmp_dir }}'",
-                            copy_links='yes',
-                            mode='pull')
-            if rsync_opts:
-                syncargs['rsync_opts'] = rsync_opts
-            task = dict(synchronize=syncargs,
-                        name='rsync logs %s' % scpfile['source'])
-            if not scpfile.get('copy-after-failure'):
-                task['when'] = 'success'
-            task.update(RETRY_ARGS)
-            tasks.append(task)
-
-            task = self._makeSCPTaskLocalAction(site, scpfile)
-            task.update(RETRY_ARGS)
-            tasks.append(task)
-        return tasks
-
-    def _makeSCPTaskLocalAction(self, site, scpfile):
-        dest = scpfile['target'].lstrip('/')
-        dest = _substituteVariables(dest)
-        dest = os.path.join(site['root'], dest)
-        dest = os.path.normpath(dest)
-        if not dest.startswith(site['root']):
-            raise Exception("Target path %s is not below site root" %
-                            (dest,))
-
-        rsync_cmd = [
-            '/usr/bin/rsync', '--delay-updates', '-F',
-            '--compress', '-rt', '--safe-links',
-            '--rsync-path="mkdir -p {dest} && rsync"',
-            '--rsh="/usr/bin/ssh -i {private_key_file} -S none '
-            '-o StrictHostKeyChecking=no -q"',
-            '--out-format="<<CHANGED>>%i %n%L"',
-            '{source}',
-            '''"{{ zuul.sites['{site}'].user }}'''
-            '''@{{ zuul.sites['{site}'].host }}:{dest}"'''
-        ]
-        if scpfile.get('keep-hierarchy'):
-            source = '"{{ tmp_dir }}/"'
-        else:
-            source = '`/usr/bin/find "{{ tmp_dir }}" -type f`'
-        shellargs = ' '.join(rsync_cmd).format(
-            source=source,
-            dest=dest,
-            private_key_file=self.private_key_file,
-            site=site)
-        task = dict(shell=shellargs,
-                    name='Publish logs %s' % scproot['source'],
-                    delegate_to='127.0.0.1')
-        if not scpfile.get('copy-after-failure'):
-            task['when'] = 'success'
-
-        return task
-
     def _makeFTPTask(self, jobdir, publisher, parameters):
         tasks = []
         ftp = publisher['ftp']
@@ -1216,6 +1215,7 @@ class NodeWorker(object):
         zuul_vars['ansible_root'] = jobdir.ansible_root + '/'
         # NOTE: This is not safe until we finish killing FTP publisher support
         zuul_vars['sites'] = self.sites
+        zuul_vars['private_key_file'] = self.private_key_file
 
         with open(jobdir.vars, 'w') as vars_yaml:
             variables = dict(
@@ -1269,8 +1269,7 @@ class NodeWorker(object):
                 block.append(task)
                 for publisher in publishers:
                     if 'scp' in publisher:
-                        block.extend(self._makeSCPTask(jobdir, publisher,
-                                                       parameters))
+                        block.extend(_makeSCPTask(publisher))
                     if 'ftp' in publisher:
                         block.extend(self._makeFTPTask(jobdir, publisher,
                                                        parameters))
