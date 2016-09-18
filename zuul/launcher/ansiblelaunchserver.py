@@ -174,6 +174,34 @@ def _makeBuilderTask(builder):
 
     return tasks
 
+def _transformPublishers(jjb_job, log=None):
+    early_publishers = []
+    late_publishers = []
+    old_publishers = jjb_job.get('publishers', [])
+    for publisher in old_publishers:
+        early_scpfiles = []
+        late_scpfiles = []
+        if 'scp' not in publisher:
+            early_publishers.append(publisher)
+            continue
+        copy_console = False
+        for scpfile in publisher['scp']['files']:
+            if scpfile.get('copy-console'):
+                scpfile['keep-hierarchy'] = True
+                late_scpfiles.append(scpfile)
+                copy_console = True
+            else:
+                early_scpfiles.append(scpfile)
+        publisher['scp']['files'] = early_scpfiles + late_scpfiles
+        if copy_console:
+            late_publishers.append(publisher)
+        else:
+            early_publishers.append(publisher)
+    publishers = early_publishers + late_publishers
+    if old_publishers != publishers and log:
+        log.debug("Transformed job publishers")
+    return early_publishers, late_publishers
+
 
 class LaunchServer(object):
     log = logging.getLogger("zuul.LaunchServer")
@@ -1152,34 +1180,6 @@ class NodeWorker(object):
         tasks.append(task)
         return tasks
 
-    def _transformPublishers(self, jjb_job):
-        early_publishers = []
-        late_publishers = []
-        old_publishers = jjb_job.get('publishers', [])
-        for publisher in old_publishers:
-            early_scpfiles = []
-            late_scpfiles = []
-            if 'scp' not in publisher:
-                early_publishers.append(publisher)
-                continue
-            copy_console = False
-            for scpfile in publisher['scp']['files']:
-                if scpfile.get('copy-console'):
-                    scpfile['keep-hierarchy'] = True
-                    late_scpfiles.append(scpfile)
-                    copy_console = True
-                else:
-                    early_scpfiles.append(scpfile)
-            publisher['scp']['files'] = early_scpfiles + late_scpfiles
-            if copy_console:
-                late_publishers.append(publisher)
-            else:
-                early_publishers.append(publisher)
-        publishers = early_publishers + late_publishers
-        if old_publishers != publishers:
-            self.log.debug("Transformed job publishers")
-        return early_publishers, late_publishers
-
     def prepareAnsibleFiles(self, jobdir, gearman_job, args):
         job_name = gearman_job.name.split(':')[1]
         jjb_job = self.jobs[job_name]
@@ -1248,7 +1248,8 @@ class NodeWorker(object):
 
         _writeMainPlaybook(jobdir.playbook, jjb_job)
 
-        early_publishers, late_publishers = self._transformPublishers(jjb_job)
+        early_publishers, late_publishers = _transformPublishers(
+            jjb_job, log=self.log)
 
         with open(jobdir.post_playbook, 'w') as playbook:
             blocks = []
