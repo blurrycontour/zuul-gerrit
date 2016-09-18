@@ -1,17 +1,132 @@
 - hosts: node
   name: Publishers
   tasks:
-  - always:
-    - copy:
-        dest: /tmp/tmpeb6j1Q/staging/tmpjcNaOd/_zuul_ansible
-        src: /tmp/tmpeb6j1Q/ansible/
-      delegate_to: 127.0.0.1
+    block:
+    - zuul_log:
+        msg: 'Job complete, result: {{ job_result }}'
+    - command: 'mktemp -d -p {{ zuul.vars.staging_root }}'
+      register: tmp_dir
     - delay: 30
       register: task_result
       retries: 3
       synchronize:
         copy_links: 'yes'
-        dest: /tmp/tmpeb6j1Q/staging/tmpjcNaOd
+        dest: '{{ tmp_dir }}'
+        mode: pull
+        rsync_opts:
+        - --include="**/*nose_results.html"
+        - --include="*/"
+        - --exclude="*"
+        - --prune-empty-dirs
+        src: '{{ zuul.environment.WORKSPACE }}'
+      until: task_result.rc == 0
+    - delay: 30
+      delegate_to: 127.0.0.1
+      register: task_result
+      retries: 3
+      shell: /usr/bin/rsync --delay-updates -F --compress -rt --safe-links --rsync-path="mkdir -p {{ zuul.sites['static.openstack.org'] }}/logs/{{ zuul.environment.LOG_PATH }} && rsync" --rsh="/usr/bin/ssh -i {{ zuul.vars.private_key_file }} -S none -o StrictHostKeyChecking=no -q" --out-format="<<CHANGED>>%i %n%L" `/usr/bin/find "{{ tmp_dir }}" -type f` "{{ zuul.sites['static.openstack.org'].user }}@{{ zuul.sites['static.openstack.org'].host }}:{{ zuul.sites['static.openstack.org'] }}/logs/{{ zuul.environment.LOG_PATH }}"
+      until: task_result.rc == 0
+    - command: 'mktemp -d -p {{ zuul.vars.staging_root }}'
+      register: tmp_dir
+    - delay: 30
+      register: task_result
+      retries: 3
+      synchronize:
+        copy_links: 'yes'
+        dest: '{{ tmp_root }}'
+        mode: pull
+        rsync_opts:
+        - --include="**/*testr_results.html.gz"
+        - --include="*/"
+        - --exclude="*"
+        - --prune-empty-dirs
+        src: '{{ zuul.environment.WORKSPACE }}'
+      until: task_result.rc == 0
+    - delay: 30
+      delegate_to: 127.0.0.1
+      register: task_result
+      retries: 3
+      shell: /usr/bin/rsync --delay-updates -F --compress -rt --safe-links --rsync-path="mkdir -p {{ zuul.sites['static.openstack.org'] }}/logs/{{ zuul.environment.LOG_PATH }} && rsync" --rsh="/usr/bin/ssh -i {{ zuul.vars.private_key_file }} -S none -o StrictHostKeyChecking=no -q" --out-format="<<CHANGED>>%i %n%L" `/usr/bin/find "{{ tmp_dir }}" -type f` "{{ zuul.sites['static.openstack.org'].user }}@{{ zuul.sites['static.openstack.org'].host }}:{{ zuul.sites['static.openstack.org'] }}/logs/{{ zuul.environment.LOG_PATH }}"
+      until: task_result.rc == 0
+    - command: 'mktemp -d -p {{ zuul.vars.staging_root }}'
+      register: tmp_dir
+    - delay: 30
+      register: task_result
+      retries: 3
+      synchronize:
+        copy_links: 'yes'
+        dest: '{{ tmp_root }}'
+        mode: pull
+        rsync_opts:
+        - --include="/.testrepository/tmp*"
+        - --include="*/"
+        - --exclude="*"
+        - --prune-empty-dirs
+        src: '{{ zuul.environment.WORKSPACE }}'
+      until: task_result.rc == 0
+    - delay: 30
+      delegate_to: 127.0.0.1
+      register: task_result
+      retries: 3
+      shell: /usr/bin/rsync --delay-updates -F --compress -rt --safe-links --rsync-path="mkdir -p {{ zuul.sites['static.openstack.org'] }}/logs/{{ zuul.environment.LOG_PATH }} && rsync" --rsh="/usr/bin/ssh -i {{ zuul.vars.private_key_file }} -S none -o StrictHostKeyChecking=no -q" --out-format="<<CHANGED>>%i %n%L" `/usr/bin/find "{{ tmp_dir }}" -type f` "{{ zuul.sites['static.openstack.org'].user }}@{{ zuul.sites['static.openstack.org'].host }}:{{ zuul.sites['static.openstack.org'] }}/logs/{{ zuul.environment.LOG_PATH }}"
+      until: task_result.rc == 0
+    - command: 'mktemp -d -p {{ zuul.vars.staging_root }}'
+      register: tmp_dir
+    - delay: 30
+      register: task_result
+      retries: 3
+      synchronize:
+        copy_links: 'yes'
+        dest: '{{ tmp_root }}'
+        mode: pull
+        rsync_opts:
+        - --include="**/*testrepository.subunit.gz"
+        - --include="*/"
+        - --exclude="*"
+        - --prune-empty-dirs
+        src: '{{ zuul.environment.WORKSPACE }}'
+      until: task_result.rc == 0
+    - delay: 30
+      delegate_to: 127.0.0.1
+      register: task_result
+      retries: 3
+      shell: /usr/bin/rsync --delay-updates -F --compress -rt --safe-links --rsync-path="mkdir -p {{ zuul.sites['static.openstack.org'] }}/logs/{{ zuul.environment.LOG_PATH }} && rsync" --rsh="/usr/bin/ssh -i {{ zuul.vars.private_key_file }} -S none -o StrictHostKeyChecking=no -q" --out-format="<<CHANGED>>%i %n%L" `/usr/bin/find "{{ tmp_dir }}" -type f` "{{ zuul.sites['static.openstack.org'].user }}@{{ zuul.sites['static.openstack.org'].host }}:{{ zuul.sites['static.openstack.org'] }}/logs/{{ zuul.environment.LOG_PATH }}"
+      until: task_result.rc == 0
+    - command: 'mktemp -d -p {{ zuul.vars.staging_root }}'
+      register: tmp_dir
+    - delay: 30
+      register: task_result
+      retries: 3
+      synchronize:
+        copy_links: 'yes'
+        dest: '{{ tmp_root }}'
+        mode: pull
+        rsync_opts:
+        - --include="/.tox/*/log/*"
+        - --include="*/"
+        - --exclude="*"
+        - --prune-empty-dirs
+        src: '{{ zuul.environment.WORKSPACE }}'
+      until: task_result.rc == 0
+    - delay: 30
+      delegate_to: 127.0.0.1
+      register: task_result
+      retries: 3
+      shell: /usr/bin/rsync --delay-updates -F --compress -rt --safe-links --rsync-path="mkdir -p {{ zuul.sites['static.openstack.org'] }}/logs/{{ zuul.environment.LOG_PATH }} && rsync" --rsh="/usr/bin/ssh -i {{ zuul.vars.private_key_file }} -S none -o StrictHostKeyChecking=no -q" --out-format="<<CHANGED>>%i %n%L" `/usr/bin/find "{{ tmp_dir }}" -type f` "{{ zuul.sites['static.openstack.org'].user }}@{{ zuul.sites['static.openstack.org'].host }}:{{ zuul.sites['static.openstack.org'] }}/logs/{{ zuul.environment.LOG_PATH }}"
+      until: task_result.rc == 0
+    always:
+    - copy:
+        dest: '{{ tmp_dir }}/_zuul_ansible'
+        src: '{{ zuul.vars.ansible_root }}'
+      delegate_to: 127.0.0.1
+    - command: 'mktemp -d -p {{ zuul.vars.staging_root }}'
+      register: tmp_dir
+    - delay: 30
+      register: task_result
+      retries: 3
+      synchronize:
+        copy_links: 'yes'
+        dest: '{{ tmp_dir }}'
         mode: pull
         src: /tmp/console.html
       until: task_result.rc == 0
@@ -19,132 +134,5 @@
       delegate_to: 127.0.0.1
       register: task_result
       retries: 3
-      shell: /usr/bin/rsync --delay-updates -F --compress -rt --safe-links --rsync-path="mkdir
-        -p /srv/static/logs/78/368778/1/check/gate-os-client-config-pep8-ubuntu-xenial/a73970b
-        && rsync" --rsh="/usr/bin/ssh -i /var/lib/zuul/ssh/id_rsa -S none -o StrictHostKeyChecking=no
-        -q" --out-format="<<CHANGED>>%i %n%L" "/tmp/tmpeb6j1Q/staging/tmpjcNaOd/"
-        "jenkins@static.openstack.org:/srv/static/logs/78/368778/1/check/gate-os-client-config-pep8-ubuntu-xenial/a73970b"
-      until: task_result.rc == 0
-    block:
-    - zuul_log:
-        msg: 'Job complete, result: {{ job_result }}'
-    - delay: 30
-      register: task_result
-      retries: 3
-      synchronize:
-        copy_links: 'yes'
-        dest: /tmp/tmpeb6j1Q/staging/tmpppyAHs
-        mode: pull
-        rsync_opts:
-        - --include="**/*nose_results.html"
-        - --include="*/"
-        - --exclude="*"
-        - --prune-empty-dirs
-        src: /home/jenkins/workspace/gate-os-client-config-pep8-ubuntu-xenial/
-      until: task_result.rc == 0
-    - delay: 30
-      delegate_to: 127.0.0.1
-      register: task_result
-      retries: 3
-      shell: /usr/bin/rsync --delay-updates -F --compress -rt --safe-links --rsync-path="mkdir
-        -p /srv/static/logs/78/368778/1/check/gate-os-client-config-pep8-ubuntu-xenial/a73970b
-        && rsync" --rsh="/usr/bin/ssh -i /var/lib/zuul/ssh/id_rsa -S none -o StrictHostKeyChecking=no
-        -q" --out-format="<<CHANGED>>%i %n%L" `/usr/bin/find "/tmp/tmpeb6j1Q/staging/tmpppyAHs"
-        -type f` "jenkins@static.openstack.org:/srv/static/logs/78/368778/1/check/gate-os-client-config-pep8-ubuntu-xenial/a73970b"
-      until: task_result.rc == 0
-    - delay: 30
-      register: task_result
-      retries: 3
-      synchronize:
-        copy_links: 'yes'
-        dest: /tmp/tmpeb6j1Q/staging/tmpPlwxu9
-        mode: pull
-        rsync_opts:
-        - --include="**/*testr_results.html.gz"
-        - --include="*/"
-        - --exclude="*"
-        - --prune-empty-dirs
-        src: /home/jenkins/workspace/gate-os-client-config-pep8-ubuntu-xenial/
-      until: task_result.rc == 0
-    - delay: 30
-      delegate_to: 127.0.0.1
-      register: task_result
-      retries: 3
-      shell: /usr/bin/rsync --delay-updates -F --compress -rt --safe-links --rsync-path="mkdir
-        -p /srv/static/logs/78/368778/1/check/gate-os-client-config-pep8-ubuntu-xenial/a73970b
-        && rsync" --rsh="/usr/bin/ssh -i /var/lib/zuul/ssh/id_rsa -S none -o StrictHostKeyChecking=no
-        -q" --out-format="<<CHANGED>>%i %n%L" `/usr/bin/find "/tmp/tmpeb6j1Q/staging/tmpPlwxu9"
-        -type f` "jenkins@static.openstack.org:/srv/static/logs/78/368778/1/check/gate-os-client-config-pep8-ubuntu-xenial/a73970b"
-      until: task_result.rc == 0
-    - delay: 30
-      register: task_result
-      retries: 3
-      synchronize:
-        copy_links: 'yes'
-        dest: /tmp/tmpeb6j1Q/staging/tmpk2QbGs
-        mode: pull
-        rsync_opts:
-        - --include="/.testrepository/tmp*"
-        - --include="*/"
-        - --exclude="*"
-        - --prune-empty-dirs
-        src: /home/jenkins/workspace/gate-os-client-config-pep8-ubuntu-xenial/
-      until: task_result.rc == 0
-    - delay: 30
-      delegate_to: 127.0.0.1
-      register: task_result
-      retries: 3
-      shell: /usr/bin/rsync --delay-updates -F --compress -rt --safe-links --rsync-path="mkdir
-        -p /srv/static/logs/78/368778/1/check/gate-os-client-config-pep8-ubuntu-xenial/a73970b
-        && rsync" --rsh="/usr/bin/ssh -i /var/lib/zuul/ssh/id_rsa -S none -o StrictHostKeyChecking=no
-        -q" --out-format="<<CHANGED>>%i %n%L" `/usr/bin/find "/tmp/tmpeb6j1Q/staging/tmpk2QbGs"
-        -type f` "jenkins@static.openstack.org:/srv/static/logs/78/368778/1/check/gate-os-client-config-pep8-ubuntu-xenial/a73970b"
-      until: task_result.rc == 0
-    - delay: 30
-      register: task_result
-      retries: 3
-      synchronize:
-        copy_links: 'yes'
-        dest: /tmp/tmpeb6j1Q/staging/tmpThz9lm
-        mode: pull
-        rsync_opts:
-        - --include="**/*testrepository.subunit.gz"
-        - --include="*/"
-        - --exclude="*"
-        - --prune-empty-dirs
-        src: /home/jenkins/workspace/gate-os-client-config-pep8-ubuntu-xenial/
-      until: task_result.rc == 0
-    - delay: 30
-      delegate_to: 127.0.0.1
-      register: task_result
-      retries: 3
-      shell: /usr/bin/rsync --delay-updates -F --compress -rt --safe-links --rsync-path="mkdir
-        -p /srv/static/logs/78/368778/1/check/gate-os-client-config-pep8-ubuntu-xenial/a73970b
-        && rsync" --rsh="/usr/bin/ssh -i /var/lib/zuul/ssh/id_rsa -S none -o StrictHostKeyChecking=no
-        -q" --out-format="<<CHANGED>>%i %n%L" `/usr/bin/find "/tmp/tmpeb6j1Q/staging/tmpThz9lm"
-        -type f` "jenkins@static.openstack.org:/srv/static/logs/78/368778/1/check/gate-os-client-config-pep8-ubuntu-xenial/a73970b"
-      until: task_result.rc == 0
-    - delay: 30
-      register: task_result
-      retries: 3
-      synchronize:
-        copy_links: 'yes'
-        dest: /tmp/tmpeb6j1Q/staging/tmp1q5l9T
-        mode: pull
-        rsync_opts:
-        - --include="/.tox/*/log/*"
-        - --include="*/"
-        - --exclude="*"
-        - --prune-empty-dirs
-        src: /home/jenkins/workspace/gate-os-client-config-pep8-ubuntu-xenial/
-      until: task_result.rc == 0
-    - delay: 30
-      delegate_to: 127.0.0.1
-      register: task_result
-      retries: 3
-      shell: /usr/bin/rsync --delay-updates -F --compress -rt --safe-links --rsync-path="mkdir
-        -p /srv/static/logs/78/368778/1/check/gate-os-client-config-pep8-ubuntu-xenial/a73970b/tox
-        && rsync" --rsh="/usr/bin/ssh -i /var/lib/zuul/ssh/id_rsa -S none -o StrictHostKeyChecking=no
-        -q" --out-format="<<CHANGED>>%i %n%L" `/usr/bin/find "/tmp/tmpeb6j1Q/staging/tmp1q5l9T"
-        -type f` "jenkins@static.openstack.org:/srv/static/logs/78/368778/1/check/gate-os-client-config-pep8-ubuntu-xenial/a73970b/tox"
+      shell: /usr/bin/rsync --delay-updates -F --compress -rt --safe-links --rsync-path="mkdir -p {{ zuul.sites['static.openstack.org'] }}/logs/{{ zuul.environment.LOG_PATH }} && rsync" --rsh="/usr/bin/ssh -i {{ zuul.vars.private_key_file }} -S none -o StrictHostKeyChecking=no -q" --out-format="<<CHANGED>>%i %n%L" `/usr/bin/find "{{ tmp_dir }}" -type f` "{{ zuul.sites['static.openstack.org'].user }}@{{ zuul.sites['static.openstack.org'].host }}:{{ zuul.sites['static.openstack.org'] }}/logs/{{ zuul.environment.LOG_PATH }}"
       until: task_result.rc == 0

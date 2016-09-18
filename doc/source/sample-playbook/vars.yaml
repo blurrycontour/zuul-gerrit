@@ -1,5 +1,48 @@
 zuul:
   timeout: 2
+  vars:
+    ansible_root: /tmp/tmpeb6j1Q/ansible/
+    staging_root: /tmp/tmpeb6j1Q/staging
+    private_key_file: /var/lib/zuul/ssh/id_rsa
+    sites:
+      'tarballs.openstack.org':
+        host: 'tarballs.openstack.org'
+        user: 'jenkins'
+        root: '/srv/static'
+
+      'yaml2ical':
+        host: 'eavesdrop.openstack.org'
+        user: 'jenkins'
+        root: '/srv/yaml2ical'
+
+      'static.openstack.org':
+        host: 'static.openstack.org'
+        user: 'jenkins'
+        root: '/srv/static'
+
+      'docs.openstack.org':
+        host: 'ftp3.ftptoyoursite.com'
+        user: 'openstackdocs'
+        root: '/web/content'
+
+      'afs-docs':
+        root: '/afs/openstack.org/docs'
+        keytab: '/etc/zuul-launcher.keytab'
+
+      'api.openstack.org':
+        host: 'ftp3.ftptoyoursite.com'
+        user: 'cloudapidocs'
+        root: '/web/content'
+
+      'developer.openstack.org':
+        host: 'ftp3.ftptoyoursite.com'
+        user: 'clouddevdocs'
+        root: '/web/content'
+
+      'afs-developer-docs':
+        root: '/afs/openstack.org/developer-docs'
+        keytab: '/etc/zuul-launcher.keytab'
+
   environment:
     BASE_LOG_PATH: 78/368778/1/check/
     BUILD_TIMEOUT: '1800000'
