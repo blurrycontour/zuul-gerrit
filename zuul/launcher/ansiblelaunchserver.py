@@ -45,6 +45,11 @@ ANSIBLE_DEFAULT_POST_TIMEOUT = 10 * 60
 COMMANDS = ['reconfigure', 'stop', 'pause', 'unpause', 'release', 'graceful',
             'verbose', 'unverbose']
 
+RETRY_ARGS = dict(register='task_result',
+                  until='task_result.rc == 0',
+                  retries=3,
+                  delay=30)
+
 
 def boolify(x):
     if isinstance(x, str):
@@ -167,7 +172,7 @@ def _makeBuilderTask(builder):
     task = dict(shell=data)
     task['name'] = "shell task imported from JJB"
     task['environment'] = "'{{ zuul.environment }}'"
-    task['args'] = "'{{ zuul.vars.WORKSPACE }}'"
+    task['args'] = "'{{ zuul.environment.WORKSPACE }}'"
     if shell:
         task['args']['shell'] = shell
     tasks.append(task)
@@ -201,6 +206,36 @@ def _transformPublishers(jjb_job, log=None):
     if old_publishers != publishers and log:
         log.debug("Transformed job publishers")
     return early_publishers, late_publishers
+
+
+def _substituteVariables(text):
+    def lookup(match):
+        return '{{ %s }}' % match.group(1)
+    return re.sub('\$([A-Za-z0-9_]+)', lookup, text)
+
+
+def _getRsyncOptions(source)
+    # Treat the publisher source as a filter; ant and rsync behave
+    # fairly close in this manner, except for leading directories.
+    source = _substituteVariables(source)
+    # If the source starts with ** then we want to match any
+    # number of directories, so don't anchor the include filter.
+    # If it does not start with **, then the intent is likely to
+    # at least start by matching an immediate file or subdirectory
+    # (even if later we have a ** in the middle), so in this case,
+    # anchor it to the root of the transfer (the workspace).
+    if not source.startswith('**'):
+        source = os.path.join('/', source)
+    # These options mean: include the thing we want, include any
+    # directories (so that we continue to search for the thing we
+    # want no matter how deep it is), exclude anything that
+    # doesn't match the thing we want or is a directory, then get
+    # rid of empty directories left over at the end.
+    rsync_opts = ['--include="%s"' % source,
+                  '--include="*/"',
+                  '--exclude="*"',
+                  '--prune-empty-dirs']
+    return rsync_opts
 
 
 class LaunchServer(object):
@@ -634,10 +669,6 @@ class LaunchServer(object):
 
 
 class NodeWorker(object):
-    retry_args = dict(register='task_result',
-                      until='task_result.rc == 0',
-                      retries=3,
-                      delay=30)
 
     def __init__(self, config, jobs, builds, sites, name, host,
                  description, labels, manager_name, zmq_send_queue,
@@ -1015,46 +1046,21 @@ class NodeWorker(object):
         return [('node', dict(
             ansible_host=self.host, ansible_user=self.username))]
 
-    def _substituteVariables(self, text, variables):
-        def lookup(match):
-            return variables.get(match.group(1), '')
-        return re.sub('\$([A-Za-z0-9_]+)', lookup, text)
-
-    def _getRsyncOptions(self, source, parameters):
-        # Treat the publisher source as a filter; ant and rsync behave
-        # fairly close in this manner, except for leading directories.
-        source = self._substituteVariables(source, parameters)
-        # If the source starts with ** then we want to match any
-        # number of directories, so don't anchor the include filter.
-        # If it does not start with **, then the intent is likely to
-        # at least start by matching an immediate file or subdirectory
-        # (even if later we have a ** in the middle), so in this case,
-        # anchor it to the root of the transfer (the workspace).
-        if not source.startswith('**'):
-            source = os.path.join('/', source)
-        # These options mean: include the thing we want, include any
-        # directories (so that we continue to search for the thing we
-        # want no matter how deep it is), exclude anything that
-        # doesn't match the thing we want or is a directory, then get
-        # rid of empty directories left over at the end.
-        rsync_opts = ['--include="%s"' % source,
-                      '--include="*/"',
-                      '--exclude="*"',
-                      '--prune-empty-dirs']
-        return rsync_opts
-
     def _makeSCPTask(self, jobdir, publisher, parameters):
         tasks = []
         for scpfile in publisher['scp']['files']:
-            scproot = tempfile.mkdtemp(dir=jobdir.staging_root)
-            os.chmod(scproot, 0o755)
+            task = dict(
+                command="mktemp -d {{ zuul.vars.staging_root }}",
+                delegate_to='127.0.0.1',
+                register='tmp_dir')
+            tasks.append(task)
 
             site = publisher['scp']['site']
             if scpfile.get('copy-console'):
                 # Include the local ansible directory in the console
                 # upload.  This uploads the playbook and ansible logs.
-                copyargs = dict(src=jobdir.ansible_root + '/',
-                                dest=os.path.join(scproot, '_zuul_ansible'))
+                copyargs = dict(src="'{{ zuul.vars.ansible_root }}'",
+                                dest="'{{ tmp_dir }}/_zuul_ansible'")
                 task = dict(copy=copyargs,
                             delegate_to='127.0.0.1')
                 # This is a local copy and should not fail, so does
@@ -1065,14 +1071,11 @@ class NodeWorker(object):
                 src = '/tmp/console.html'
                 rsync_opts = []
             else:
-                src = parameters['WORKSPACE']
-                if not src.endswith('/'):
-                    src = src + '/'
-                rsync_opts = self._getRsyncOptions(scpfile['source'],
-                                                   parameters)
+                src = "'{{ zuul.environment.WORKSPACE }}'"
+                rsync_opts = _getRsyncOptions(scpfile['source'])
 
             syncargs = dict(src=src,
-                            dest=scproot,
+                            dest="'{{ tmp_dir }}'",
                             copy_links='yes',
                             mode='pull')
             if rsync_opts:
@@ -1080,21 +1083,17 @@ class NodeWorker(object):
             task = dict(synchronize=syncargs)
             if not scpfile.get('copy-after-failure'):
                 task['when'] = 'success'
-            task.update(self.retry_args)
+            task.update(RETRY_ARGS)
             tasks.append(task)
 
-            task = self._makeSCPTaskLocalAction(
-                site, scpfile, scproot, parameters)
-            task.update(self.retry_args)
+            task = self._makeSCPTaskLocalAction(site, scpfile)
+            task.update(RETRY_ARGS)
             tasks.append(task)
         return tasks
 
-    def _makeSCPTaskLocalAction(self, site, scpfile, scproot, parameters):
-        if site not in self.sites:
-            raise Exception("Undefined SCP site: %s" % (site,))
-        site = self.sites[site]
+    def _makeSCPTaskLocalAction(self, site, scpfile):
         dest = scpfile['target'].lstrip('/')
-        dest = self._substituteVariables(dest, parameters)
+        dest = _substituteVariables(dest)
         dest = os.path.join(site['root'], dest)
         dest = os.path.normpath(dest)
         if not dest.startswith(site['root']):
@@ -1108,18 +1107,19 @@ class NodeWorker(object):
             '--rsh="/usr/bin/ssh -i {private_key_file} -S none '
             '-o StrictHostKeyChecking=no -q"',
             '--out-format="<<CHANGED>>%i %n%L"',
-            '{source}', '"{user}@{host}:{dest}"'
+            '{source}',
+            '''"{{ zuul.sites['{site}'].user }}'''
+            '''@{{ zuul.sites['{site}'].host }}:{dest}"'''
         ]
         if scpfile.get('keep-hierarchy'):
-            source = '"%s/"' % scproot
+            source = '"{{ tmp_dir }}/"'
         else:
-            source = '`/usr/bin/find "%s" -type f`' % scproot
+            source = '`/usr/bin/find "{{ tmp_dir }}" -type f`'
         shellargs = ' '.join(rsync_cmd).format(
             source=source,
             dest=dest,
             private_key_file=self.private_key_file,
-            host=site['host'],
-            user=site['user'])
+            site=site)
         task = dict(shell=shellargs,
                     delegate_to='127.0.0.1')
         if not scpfile.get('copy-after-failure'):
@@ -1141,10 +1141,7 @@ class NodeWorker(object):
         ftpscript = os.path.join(ftproot, 'script')
 
         src = parameters['WORKSPACE']
-        if not src.endswith('/'):
-            src = src + '/'
-        rsync_opts = self._getRsyncOptions(ftp['source'],
-                                           parameters)
+        rsync_opts = _getRsyncOptions(ftp['source'], parameters)
         syncargs = dict(src=src,
                         dest=ftpcontent,
                         copy_links='yes',
@@ -1153,7 +1150,7 @@ class NodeWorker(object):
             syncargs['rsync_opts'] = rsync_opts
         task = dict(synchronize=syncargs,
                     when='success')
-        task.update(self.retry_args)
+        task.update(RETRY_ARGS)
         tasks.append(task)
         task = dict(shell='lftp -f %s' % ftpscript,
                     when='success',
@@ -1164,7 +1161,7 @@ class NodeWorker(object):
         while ftpsource[-1] == '/':
             ftpsource = ftpsource[:-1]
         ftptarget = ftp['target'].lstrip('/')
-        ftptarget = self._substituteVariables(ftptarget, parameters)
+        ftptarget = _substituteVariables(ftptarget)
         ftptarget = os.path.join(site['root'], ftptarget)
         ftptarget = os.path.normpath(ftptarget)
         if not ftptarget.startswith(site['root']):
@@ -1176,7 +1173,7 @@ class NodeWorker(object):
             script.write('open %s\n' % site['host'])
             script.write('user %s %s\n' % (site['user'], site['pass']))
             script.write('mirror -R %s %s\n' % (ftpsource, ftptarget))
-        task.update(self.retry_args)
+        task.update(RETRY_ARGS)
         tasks.append(task)
         return tasks
 
@@ -1186,6 +1183,7 @@ class NodeWorker(object):
 
         parameters = args.copy()
         parameters['WORKSPACE'] = os.path.join(self.workspace_root, job_name)
+        parameters['WORKSPACE'] += '/'
 
         with open(jobdir.inventory, 'w') as inventory:
             for host_name, host_vars in self.getHostList():
@@ -1209,10 +1207,17 @@ class NodeWorker(object):
         if timeout_var:
             parameters[timeout_var] = str(timeout * 1000)
 
+        zuul_vars = {}
+        zuul_vars['staging_root'] = jobdir.staging_root
+        zuul_vars['ansible_root'] = jobdir.ansible_root + '/'
+        # NOTE: This is not safe until we finish killing FTP publisher support
+        zuul_vars['sites'] = self.sites
+
         with open(jobdir.vars, 'w') as vars_yaml:
             variables = dict(
                 timeout=timeout,
                 environment=parameters,
+                vars=zuul_vars,
             )
             zuul_vars = dict(zuul=variables)
             vars_yaml.write(
