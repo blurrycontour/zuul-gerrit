@@ -243,7 +243,7 @@ def _makeSCPTask(publisher):
     for scpfile in publisher['scp']['files']:
         task = dict(
             name="Make local temp dir for %s" % scpfile['source'],
-            command="mktemp -d {{ zuul.vars.staging_root }}",
+            command="mktemp -d -p {{ zuul.vars.staging_root }}",
             delegate_to='127.0.0.1',
             register='tmp_dir')
         tasks.append(task)
