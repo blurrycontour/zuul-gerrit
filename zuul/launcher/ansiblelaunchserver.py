@@ -1050,6 +1050,7 @@ class NodeWorker(object):
         tasks = []
         for scpfile in publisher['scp']['files']:
             task = dict(
+                name="Make local temp dir for %s" % scpfile['source'],
                 command="mktemp -d {{ zuul.vars.staging_root }}",
                 delegate_to='127.0.0.1',
                 register='tmp_dir')
@@ -1062,6 +1063,7 @@ class NodeWorker(object):
                 copyargs = dict(src="'{{ zuul.vars.ansible_root }}'",
                                 dest="'{{ tmp_dir }}/_zuul_ansible'")
                 task = dict(copy=copyargs,
+                            name="Copy local ansible directory",
                             delegate_to='127.0.0.1')
                 # This is a local copy and should not fail, so does
                 # not need a retry stanza.
@@ -1080,7 +1082,8 @@ class NodeWorker(object):
                             mode='pull')
             if rsync_opts:
                 syncargs['rsync_opts'] = rsync_opts
-            task = dict(synchronize=syncargs)
+            task = dict(synchronize=syncargs,
+                        name='rsync logs %s' % scpfile['source'])
             if not scpfile.get('copy-after-failure'):
                 task['when'] = 'success'
             task.update(RETRY_ARGS)
@@ -1121,6 +1124,7 @@ class NodeWorker(object):
             private_key_file=self.private_key_file,
             site=site)
         task = dict(shell=shellargs,
+                    name='Publish logs %s' % scproot['source'],
                     delegate_to='127.0.0.1')
         if not scpfile.get('copy-after-failure'):
             task['when'] = 'success'
