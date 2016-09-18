@@ -130,6 +130,51 @@ class JobDir(object):
             shutil.rmtree(self.root)
 
 
+def _writeMainPlaybook(playbook_path, jjb_job):
+
+    with open(playbook_path, 'w') as playbook:
+        tasks = []
+
+        for builder in jjb_job.get('builders', []):
+            if 'shell' in builder:
+                tasks.extend(_makeBuilderTask(builder))
+
+        play = dict(hosts='node', name='Job body',
+                    pre_tasks=pre_tasks, tasks=tasks)
+        playbook.write(yaml.safe_dump([play], default_flow_style=False))
+
+
+def _makeBuilderTask(builder):
+    tasks = []
+
+    data = builder['shell']
+    shell = None
+    # Ansible shell blocks do not honor shebang lines. That's fine - but
+    # we do have a bunch of scripts that have either nothing, -x, -xe,
+    # -ex or -eux. Transform those into leading set commands
+    if data.startswith('#!'):
+        data_lines = data.split('\n')
+        data_lines.reverse()
+        shebang = data_lines.pop()
+        flags = shebang.strip().split('-')
+        if len(flags) > 1:
+            for flag in flags[1]:
+                data_lines.append('set -%s' % flag)
+        shell = flags[0][2:].strip()
+        data_lines.reverse()
+        data = '\n'.join(data_lines)
+
+    task = dict(shell=data)
+    task['name'] = "shell task imported from JJB"
+    task['environment'] = "'{{ zuul.environment }}'"
+    task['args'] = "'{{ zuul.vars.WORKSPACE }}'"
+    if shell:
+        task['args']['shell'] = shell
+    tasks.append(task)
+
+    return tasks
+
+
 class LaunchServer(object):
     log = logging.getLogger("zuul.LaunchServer")
     site_section_re = re.compile('site "(.*?)"')
@@ -1107,38 +1152,6 @@ class NodeWorker(object):
         tasks.append(task)
         return tasks
 
-    def _makeBuilderTask(self, jobdir, builder, parameters):
-        tasks = []
-
-        data = builder['shell']
-        shell = None
-        # Ansible shell blocks do not honor shebang lines. That's fine - but
-        # we do have a bunch of scripts that have either nothing, -x, -xe,
-        # -ex or -eux. Transform those into leading set commands
-        if data.startswith('#!'):
-            data_lines = data.split('\n')
-            data_lines.reverse()
-            shebang = data_lines.pop()
-            flags = shebang.strip().split('-')
-            if len(flags) > 1:
-                for flag in flags[1]:
-                    data_lines.append('set -%s' % flag)
-            shell = flags[0][2:].strip()
-            data_lines.reverse()
-            data = '\n'.join(data_lines)
-
-        task = dict(shell=data)
-        task['name'] = "shell task imported from JJB"
-        task['environment'] = "'{{ zuul.environment }}'"
-        task['args'] = dict(chdir=parameters['WORKSPACE'])
-        if shell:
-            task['args']['shell'] = shell
-        tasks.append(task)
-
-        tasks.append(task)
-
-        return tasks
-
     def _transformPublishers(self, jjb_job):
         early_publishers = []
         late_publishers = []
@@ -1233,18 +1246,7 @@ class NodeWorker(object):
             play = dict(hosts='node', name='Job setup', tasks=tasks)
             playbook.write(yaml.safe_dump([play], default_flow_style=False))
 
-        with open(jobdir.playbook, 'w') as playbook:
-            tasks = []
-
-            for builder in jjb_job.get('builders', []):
-                if 'shell' in builder:
-                    tasks.extend(
-                        self._makeBuilderTask(jobdir, builder, parameters))
-
-
-            play = dict(hosts='node', name='Job body',
-                        pre_tasks=pre_tasks, tasks=tasks)
-            playbook.write(yaml.safe_dump([play], default_flow_style=False))
+        _writeMainPlaybook(jobdir.playbook, jjb_job)
 
         early_publishers, late_publishers = self._transformPublishers(jjb_job)
 
