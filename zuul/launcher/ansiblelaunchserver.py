@@ -1264,9 +1264,6 @@ class NodeWorker(object):
             blocks = []
             for publishers in [early_publishers, late_publishers]:
                 block = []
-                task = dict(zuul_log=dict(
-                    msg="Job complete, result: {{ job_result }}"))
-                block.append(task)
                 for publisher in publishers:
                     if 'scp' in publisher:
                         block.extend(_makeSCPTask(publisher))
@@ -1280,6 +1277,10 @@ class NodeWorker(object):
             # we run the log publisher regardless of whether the rest
             # of the publishers succeed.
             tasks = []
+
+            task = dict(zuul_log=dict(
+                msg="Job complete, result: {{ job_result }}"))
+            blocks[0].insert(0, task)
 
             error_block.append(dict(fail=dict(msg='FAILURE')))
             tasks.append(dict(block=blocks[0],
