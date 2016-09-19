@@ -4,28 +4,15 @@
     block:
     - zuul_log:
         msg: 'Job complete, result: {{ job_result }}'
-    - command: 'mktemp -d -p {{ zuul.vars.staging_root }}'
-      register: tmp_dir
-    - delay: 30
-      register: task_result
-      retries: 3
-      synchronize:
-        copy_links: 'yes'
-        dest: '{{ tmp_dir }}'
-        mode: pull
-        rsync_opts:
-        - --include="**/*nose_results.html"
-        - --include="*/"
-        - --exclude="*"
-        - --prune-empty-dirs
-        src: '{{ zuul.environment.WORKSPACE }}'
-      until: task_result.rc == 0
-    - delay: 30
-      delegate_to: 127.0.0.1
-      register: task_result
-      retries: 3
-      shell: /usr/bin/rsync --delay-updates -F --compress -rt --safe-links --rsync-path="mkdir -p {{ zuul.sites['static.openstack.org'] }}/logs/{{ zuul.environment.LOG_PATH }} && rsync" --rsh="/usr/bin/ssh -i {{ zuul.vars.private_key_file }} -S none -o StrictHostKeyChecking=no -q" --out-format="<<CHANGED>>%i %n%L" `/usr/bin/find "{{ tmp_dir }}" -type f` "{{ zuul.sites['static.openstack.org'].user }}@{{ zuul.sites['static.openstack.org'].host }}:{{ zuul.sites['static.openstack.org'] }}/logs/{{ zuul.environment.LOG_PATH }}"
-      until: task_result.rc == 0
+  roles:
+  - publish:
+      rsync_opts:
+      - --include="**/*nose_results.html"
+      - --include="*/"
+      - --exclude="*"
+      - --prune-empty-dirs
+      src: '{{ zuul.environment.WORKSPACE }}'
+      publish_site: static.openstack.org
     - command: 'mktemp -d -p {{ zuul.vars.staging_root }}'
       register: tmp_dir
     - delay: 30

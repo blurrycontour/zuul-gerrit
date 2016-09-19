@@ -1,0 +1,21 @@
+- command: 'mktemp -d -p {{ zuul.vars.staging_root }}'
+  register: tmp_dir
+- synchronize:
+    copy_links: 'yes'
+    dest: '{{ tmp_dir }}'
+    mode: pull
+    rsync_opts: '{{ rsync_opts }}'
+    - --include="**/*nose_results.html"
+    - --include="*/"
+    - --exclude="*"
+    - --prune-empty-dirs
+    src: '{{ src }}'
+  retries: '{{ zuul.vars.retry_count }}'
+  delay: '{{ zuul.vars.retry_delay }}'
+  register: task_result
+  until: task_result.rc == 0
+- delay: 30
+  delegate_to: 127.0.0.1
+  register: task_result
+  retries: 3
+  shell: /usr/bin/rsync --delay-updates -F --compress -rt --safe-links --rsync-path="mkdir -p {{ zuul.sites[publish_site] }}/logs/{{ zuul.environment.LOG_PATH }} && rsync" --rsh="/usr/bin/ssh -i {{ zuul.vars.private_key_file }} -S none -o StrictHostKeyChecking=no -q" --out-format="<<CHANGED>>%i %n%L" `/usr/bin/find "{{ tmp_dir }}" -type f` "{{ zuul.sites[publish_site].user }}@{{ zuul.sites[publish_site].host }}:{{ zuul.sites[publish_site] }}/logs/{{ zuul.environment.LOG_PATH }}"
