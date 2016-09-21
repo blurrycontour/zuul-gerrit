@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7a8ec9b2_d169f68d",
+        "filename": "doc/source/reporters.rst",
+        "patchSetId": 39
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-09-21T10:36:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bacf61ea_d5587e8c",
+      "revId": "9c0c12b8b2b3627adc5f20e20a78bd926733bd09",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bacf61ea_471a25c7",
         "filename": "zuul/alembic/sql_reporter/versions/4d3ebd7f06b9_set_up_initial_reporter_tables.py",
         "patchSetId": 39
