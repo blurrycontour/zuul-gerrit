@@ -751,8 +751,13 @@ class QueueItem(object):
                                      pipeline=self.pipeline,
                                      job=job,
                                      build=build)
+            except KeyError:
+                self.log.exception("Unable to format url_pattern")
+                self.log.debug('url_pattern: %s' % pattern)
+                self.log.debug('build.parameters: %s' % build.parameters)
             except Exception:
-                pass  # FIXME: log this or something?
+                self.log.exception("Unknown error formatting url_pattern")
+
         if not url:
             url = build.url or job.name
         return (result, url)
