@@ -13,6 +13,7 @@
 # under the License.
 
 import copy
+import logging
 import os
 import re
 import struct
@@ -687,6 +688,7 @@ class BuildSet(object):
 
 class QueueItem(object):
     """A changish inside of a Pipeline queue"""
+    log = logging.getLogger("zuul.QueueItem")
 
     def __init__(self, queue, change):
         self.pipeline = queue.pipeline
@@ -751,8 +753,13 @@ class QueueItem(object):
                                      pipeline=self.pipeline,
                                      job=job,
                                      build=build)
+            except KeyError:
+                self.log.exception("Unable to format url_pattern")
+                self.log.debug('url_pattern: %s' % pattern)
+                self.log.debug('build.parameters: %s' % build.parameters)
             except Exception:
-                pass  # FIXME: log this or something?
+                self.log.exception("Unknown error formatting url_pattern")
+
         if not url:
             url = build.url or job.name
         return (result, url)
