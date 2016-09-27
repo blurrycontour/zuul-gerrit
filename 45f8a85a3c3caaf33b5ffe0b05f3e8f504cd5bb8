@@ -16,6 +16,23 @@
       "revId": "45f8a85a3c3caaf33b5ffe0b05f3e8f504cd5bb8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a8bc5a2_1d5db348",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 763,
+      "author": {
+        "id": 6039
+      },
+      "writtenOn": "2016-09-27T17:52:35Z",
+      "side": 1,
+      "message": "@Ramy we don\u0027t because we set a default here if url is unset",
+      "revId": "45f8a85a3c3caaf33b5ffe0b05f3e8f504cd5bb8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
