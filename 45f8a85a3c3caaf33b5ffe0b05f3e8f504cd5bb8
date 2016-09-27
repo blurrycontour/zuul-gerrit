@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a8bc5a2_ca070016",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 756,
+      "author": {
+        "id": 9624
+      },
+      "writtenOn": "2016-09-27T16:58:35Z",
+      "side": 1,
+      "message": "need to set a default url here",
+      "revId": "45f8a85a3c3caaf33b5ffe0b05f3e8f504cd5bb8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
