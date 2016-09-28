@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a98d1f4_568634ba",
+        "filename": "zuul/ansible/library/command.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2016-09-28T14:09:42Z",
+      "side": 0,
+      "message": "Looks like this was removed in Id5d8567774a90664ea8d67c355661678d7206088",
+      "revId": "9f4e179cca8609b0884d159ac17f790dc3c2b999",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
