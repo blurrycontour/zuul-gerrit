@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a98d1f4_e9ad8932",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1334,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-09-28T22:57:08Z",
+      "side": 1,
+      "message": "maybe we should set a pre timeout constant as well, even if they are the same value.",
+      "revId": "e83f52548f396e261cc8bda820e56b655ca6c0a6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a98d1f4_09ab951e",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1336,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-09-28T22:57:08Z",
+      "side": 1,
+      "message": "pre_proc",
+      "revId": "e83f52548f396e261cc8bda820e56b655ca6c0a6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a98d1f4_29a8511f",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1340,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-09-28T22:57:08Z",
+      "side": 1,
+      "message": "pre_proc",
+      "revId": "e83f52548f396e261cc8bda820e56b655ca6c0a6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a98d1f4_4963dd1a",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1347,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-09-28T22:57:08Z",
+      "side": 1,
+      "message": "pre_proc",
+      "revId": "e83f52548f396e261cc8bda820e56b655ca6c0a6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a98d1f4_696899f6",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1412,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-09-28T22:57:08Z",
+      "side": 1,
+      "message": "I feel like we\u0027re passing the same thing in twice.  One is an integer, the other a string.  Can we just use \u0027success\u0027 and push the conditional into ansible?  (Many of the other tasks are \u0027when: success\u0027 anyway...)",
+      "revId": "e83f52548f396e261cc8bda820e56b655ca6c0a6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
