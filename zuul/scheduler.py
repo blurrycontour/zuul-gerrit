@@ -1705,10 +1705,8 @@ class BasePipelineManager(object):
             item.reported = not self._reportItem(item)
         if self.changes_merge:
             succeeded = self.pipeline.didAllJobsSucceed(item)
-            merged = item.reported
-            if merged:
-                merged = self.pipeline.source.isMerged(item.change,
-                                                       item.change.branch)
+            merged = self.pipeline.source.isMerged(item.change,
+                                                   item.change.branch)
             self.log.info("Reported change %s status: all-succeeded: %s, "
                           "merged: %s" % (item.change, succeeded, merged))
             change_queue = item.queue
