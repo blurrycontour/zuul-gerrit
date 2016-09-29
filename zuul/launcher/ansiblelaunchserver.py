@@ -1332,7 +1332,7 @@ class NodeWorker(object):
 
         task = dict(shell=shell)
         task['name'] = "shell task imported from JJB"
-        task['environment'] = "'{{ zuul.environment }}'"
+        task['environment'] = "{{ zuul.environment }}"
         task['args'] = dict(chdir=parameters['WORKSPACE'])
         if executable:
             task['args']['executable'] = executable
