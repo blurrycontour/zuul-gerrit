@@ -115,12 +115,12 @@ import subprocess
 import traceback
 import threading
 
-from ansible.module_utils.basic import AnsibleModule, heuristic_log_sanitize
+from ansible.module_utils.basic import (AnsibleModule, heuristic_log_sanitize,
+                                        to_native, to_bytes, to_text)
 from ansible.module_utils.pycompat24 import get_exception, literal_eval
 from ansible.module_utils.six import b
 from ansible.module_utils.six import (PY2, PY3, binary_type, integer_types,
                                       iteritems, text_type, string_types)
-from ansible.module_utils._text import to_native, to_bytes, to_text
 
 
 PASSWD_ARG_RE = re.compile(r'^[-]{0,2}pass[-]?(word|wd)?')
