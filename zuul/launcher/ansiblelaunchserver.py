@@ -34,6 +34,7 @@ import jenkins_jobs.formatter
 import zmq
 
 import zuul.ansible.library
+import zuul.ansible.plugins.action
 import zuul.ansible.plugins.callback
 from zuul.lib import commandsocket
 
