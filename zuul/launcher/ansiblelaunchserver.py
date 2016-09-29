@@ -1044,7 +1044,7 @@ class NodeWorker(object):
                 syncargs['rsync_opts'] = rsync_opts
             task = dict(synchronize=syncargs)
             if not scpfile.get('copy-after-failure'):
-                task['when'] = 'success'
+                task['when'] = 'success|bool'
             task.update(self.retry_args)
             tasks.append(task)
 
@@ -1088,7 +1088,7 @@ class NodeWorker(object):
         task = dict(shell=shellargs,
                     delegate_to='127.0.0.1')
         if not scpfile.get('copy-after-failure'):
-            task['when'] = 'success'
+            task['when'] = 'success|bool'
 
         return task
 
@@ -1117,11 +1117,11 @@ class NodeWorker(object):
         if rsync_opts:
             syncargs['rsync_opts'] = rsync_opts
         task = dict(synchronize=syncargs,
-                    when='success')
+                    when='success|bool')
         task.update(self.retry_args)
         tasks.append(task)
         task = dict(shell='lftp -f %s' % ftpscript,
-                    when='success',
+                    when='success|bool',
                     delegate_to='127.0.0.1')
         ftpsource = ftpcontent
         if ftp.get('remove-prefix'):
@@ -1182,7 +1182,7 @@ class NodeWorker(object):
         if rsync_opts:
             syncargs['rsync_opts'] = rsync_opts
         task = dict(synchronize=syncargs,
-                    when='success')
+                    when='success|bool')
         task.update(self.retry_args)
         tasks.append(task)
 
@@ -1210,7 +1210,7 @@ class NodeWorker(object):
         # content at the root *and* at a tag location).
         task = dict(shell=find_pipe.format(path=afssource,
                                            file=src_markers_file),
-                    when='success',
+                    when='success|bool',
                     delegate_to='127.0.0.1')
         tasks.append(task)
 
@@ -1218,7 +1218,7 @@ class NodeWorker(object):
         # published site.
         task = dict(shell=find_pipe.format(path=afstarget,
                                            file=dst_markers_file),
-                    when='success',
+                    when='success|bool',
                     delegate_to='127.0.0.1')
         tasks.append(task)
 
@@ -1230,7 +1230,7 @@ class NodeWorker(object):
             dst=dst_markers_file,
             exclude=exclude_file)
         task = dict(shell=exclude_command,
-                    when='success',
+                    when='success|bool',
                     delegate_to='127.0.0.1')
         tasks.append(task)
 
@@ -1256,7 +1256,7 @@ class NodeWorker(object):
                        src=src_markers_file,
                        filter=filter_file))
         task = dict(shell=command,
-                    when='success',
+                    when='success|bool',
                     delegate_to='127.0.0.1')
         tasks.append(task)
 
@@ -1272,7 +1272,7 @@ class NodeWorker(object):
                        exclude=exclude_file,
                        filter=filter_file))
         task = dict(shell=command,
-                    when='success',
+                    when='success|bool',
                     delegate_to='127.0.0.1')
         tasks.append(task)
 
@@ -1290,7 +1290,7 @@ class NodeWorker(object):
                        exclude=exclude_file,
                        filter=filter_file))
         task = dict(shell=command,
-                    when='success',
+                    when='success|bool',
                     delegate_to='127.0.0.1')
         tasks.append(task)
 
@@ -1319,7 +1319,7 @@ class NodeWorker(object):
             keytab=site['keytab'])
 
         task = dict(shell=shellargs,
-                    when='success',
+                    when='success|bool',
                     delegate_to='127.0.0.1')
         tasks.append(task)
 
@@ -1471,11 +1471,11 @@ class NodeWorker(object):
             # of the publishers succeed.
             tasks = []
 
-            task = dict(zuul_log=dict(
-                msg="Job complete, result: SUCCESS", when='success'))
+            task = dict(zuul_log=dict(msg="Job complete, result: SUCCESS"),
+                        when='success|bool')
             blocks[0].insert(0, task)
-            task = dict(zuul_log=dict(
-                msg="Job complete, result: FAILURE", when='not success'))
+            task = dict(zuul_log=dict(msg="Job complete, result: FAILURE"),
+                        when='not success|bool')
             blocks[0].insert(0, task)
 
             tasks.append(dict(block=blocks[0],
