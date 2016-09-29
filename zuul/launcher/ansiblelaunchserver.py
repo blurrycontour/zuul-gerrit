@@ -65,6 +65,9 @@ def deal_with_shebang(data):
     split_line = shebang.split()
     # Strip the # and the !
     executable = split_line[0][2:]
+    if executable == '/bin/sh':
+        # Ansible default
+        executable = None
     if len(split_line) > 1:
         flag_x = False
         flag_e = False
