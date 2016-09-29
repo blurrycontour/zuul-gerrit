@@ -968,6 +968,10 @@ class NodeWorker(object):
             post_status = self.runAnsiblePostPlaybook(jobdir, job_status)
             if not post_status:
                 result = 'POST_FAILURE'
+            elif job_status:
+                result = 'SUCCESS'
+            else:
+                result = 'FAILURE'
 
             if self._aborted_job and not self._watchdog_timeout:
                 # A Null result will cause zuul to relaunch the job if
