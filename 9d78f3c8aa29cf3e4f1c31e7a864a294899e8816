@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a98d1f4_a10998df",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 960,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-09-29T20:43:54Z",
+      "side": 0,
+      "message": "I think we still need these somewhere.",
+      "revId": "9d78f3c8aa29cf3e4f1c31e7a864a294899e8816",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
