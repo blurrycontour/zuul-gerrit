@@ -93,7 +93,6 @@ class ActionModule(action.ActionBase):
         interval = self._task.poll or 1
 
         while True:
-            time.sleep(interval)
             if not proc.is_alive():
                 break
             if (time.time() - start_time) >= timeout:
@@ -102,9 +101,10 @@ class ActionModule(action.ActionBase):
                 # be solved for long-lived slaves people are managing.
                 proc.terminate()
                 return {
-                    'msg': 'Task timeed out',
+                    'msg': 'Task timed out',
                     'failed': True
                 }
+            time.sleep(interval)
         proc.join()
         results = merge_hash(results, recv_pipe.recv())
         for field in ('_ansible_notify',):
