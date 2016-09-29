@@ -115,12 +115,9 @@ import subprocess
 import traceback
 import threading
 
-from ansible.module_utils.basic import (AnsibleModule, heuristic_log_sanitize,
-                                        to_native, to_bytes, to_text)
-from ansible.module_utils.pycompat24 import get_exception, literal_eval
-from ansible.module_utils.six import b
-from ansible.module_utils.six import (PY2, PY3, binary_type, integer_types,
-                                      iteritems, text_type, string_types)
+from ansible.module_utils.basic import AnsibleModule, heuristic_log_sanitize
+# ZUUL: Hardcode python2 until we're on ansible 2.2
+from ast import literal_eval
 
 
 PASSWD_ARG_RE = re.compile(r'^[-]{0,2}pass[-]?(word|wd)?')
@@ -191,15 +188,13 @@ def zuul_run_command(self, args, check_rc=False, close_fds=True, executable=None
         if use_unsafe_shell:
             args = " ".join([pipes.quote(x) for x in args])
             shell = True
-    elif isinstance(args, (binary_type, text_type)) and use_unsafe_shell:
+    elif isinstance(args, (str, unicode)) and use_unsafe_shell:
         shell = True
-    elif isinstance(args, (binary_type, text_type)):
+    elif isinstance(args, (str, unicode)):
         # On python2.6 and below, shlex has problems with text type
-        # On python3, shlex needs a text type.
-        if PY2:
-            args = to_bytes(args, errors='surrogate_or_strict')
-        elif PY3:
-            args = to_text(args, errors='surrogateescape')
+        # ZUUL: Hardcode python2 until we're on ansible 2.2
+        if isinstance(args, unicode):
+            args = args.encode('utf-8')
         args = shlex.split(args)
     else:
         msg = "Argument 'args' to run_command must be list or string"
@@ -207,11 +202,6 @@ def zuul_run_command(self, args, check_rc=False, close_fds=True, executable=None
 
     prompt_re = None
     if prompt_regex:
-        if isinstance(prompt_regex, text_type):
-            if PY3:
-                prompt_regex = to_bytes(prompt_regex, errors='surrogateescape')
-            elif PY2:
-                prompt_regex = to_bytes(prompt_regex, errors='surrogate_or_strict')
         try:
             prompt_re = re.compile(prompt_regex, re.MULTILINE)
         except re.error:
@@ -258,13 +248,8 @@ def zuul_run_command(self, args, check_rc=False, close_fds=True, executable=None
     # in reporting later, which strips out things like
     # passwords from the args list
     to_clean_args = args
-    if PY2:
-        if isinstance(args, text_type):
-            to_clean_args = to_bytes(args)
-    else:
-        if isinstance(args, binary_type):
-            to_clean_args = to_text(args)
-    if isinstance(args, (text_type, binary_type)):
+    # ZUUL: Hardcode python2 until we're on ansible 2.2
+    if isinstance(args, (unicode, str)):
         to_clean_args = shlex.split(to_clean_args)
 
     clean_args = []
@@ -346,10 +331,10 @@ def zuul_run_command(self, args, check_rc=False, close_fds=True, executable=None
         rc = cmd.returncode
     except (OSError, IOError):
         e = get_exception()
-        self.fail_json(rc=e.errno, msg=to_native(e), cmd=clean_args)
+        self.fail_json(rc=e.errno, msg=str(e), cmd=clean_args)
     except Exception:
         e = get_exception()
-        self.fail_json(rc=257, msg=to_native(e), exception=traceback.format_exc(), cmd=clean_args)
+        self.fail_json(rc=257, msg=str(e), exception=traceback.format_exc(), cmd=clean_args)
 
     # Restore env settings
     for key, val in old_env_vals.items():
@@ -460,14 +445,14 @@ def main():
     delta = endd - startd
 
     if out is None:
-        out = b('')
+        out = ''
     if err is None:
-        err = b('')
+        err = ''
 
     module.exit_json(
         cmd      = args,
-        stdout   = out.rstrip(b("\r\n")),
-        stderr   = err.rstrip(b("\r\n")),
+        stdout   = out.rstrip("\r\n"),
+        stderr   = err.rstrip("\r\n"),
         rc       = rc,
         start    = str(startd),
         end      = str(endd),
