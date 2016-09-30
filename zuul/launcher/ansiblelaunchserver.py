@@ -45,6 +45,30 @@ ANSIBLE_DEFAULT_POST_TIMEOUT = 10 * 60
 COMMANDS = ['reconfigure', 'stop', 'pause', 'unpause', 'release', 'graceful',
             'verbose', 'unverbose']
 
+# Teach pyyaml to output multi-line strings in | blocks
+# from:
+# http://stackoverflow.com/questions/8640959/how-can-i-control-what-scalar-form-pyyaml-uses-for-my-data  flake8: noqa
+def should_use_block(value):
+    for c in u"\u000a\u000d\u001c\u001d\u001e\u0085\u2028\u2029":
+        if c in value:
+            return True
+    return False
+
+
+def my_represent_scalar(self, tag, value, style=None):
+    if style is None:
+        if should_use_block(value):
+            style='|'
+        else:
+            style = self.default_style
+
+    node = yaml.representer.ScalarNode(tag, value, style=style)
+    if self.alias_key is not None:
+        self.represented_objects[self.alias_key] = node
+    return node
+
+yaml.representer.BaseRepresenter.represent_scalar = my_represent_scalar
+
 
 def boolify(x):
     if isinstance(x, str):
