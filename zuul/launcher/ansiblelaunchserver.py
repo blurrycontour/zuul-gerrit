@@ -1180,7 +1180,7 @@ class NodeWorker(object):
         filter_file = os.path.join(afsroot, 'filter')
 
         find_pipe = [
-            "/usr/bin/find {path} -name .root-marker -printf '%P\n'",
+            "/usr/bin/find {path} -name .root-marker -printf '/%P\n'",
             "/usr/bin/xargs -I{{}} dirname {{}}",
             "/usr/bin/sort > {file}"]
         find_pipe = ' | '.join(find_pipe)
@@ -1264,7 +1264,7 @@ class NodeWorker(object):
         # then we should omit the '/*' exclusion so that it is
         # implicitly included.
 
-        command = ("grep '^/$' {exclude} && "
+        command = ("/bin/grep '^/$' {exclude} && "
                    "echo '- /*' >> {filter} || "
                    "/bin/true".format(
                        exclude=exclude_file,
