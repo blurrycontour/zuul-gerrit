@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a98d1f4_a4114a06",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-10-03T02:08:16Z",
+      "side": 1,
+      "message": "Instead of all these conditionals why not just do:\n  data_lines.append(\u0027set %s\u0027 % opt)\n\nThen we can also just support all flags instead of a subset.",
+      "range": {
+        "startLine": 77,
+        "startChar": 16,
+        "endLine": 77,
+        "endChar": 22
+      },
+      "revId": "a192814194dd26978f78a38eb52eefc60bf1254d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
