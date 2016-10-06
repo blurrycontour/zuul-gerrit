@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a95cdbc_44cf0d7f",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 387,
+      "author": {
+        "id": 16615
+      },
+      "writtenOn": "2016-10-06T06:58:27Z",
+      "side": 1,
+      "message": "Syntax error?",
+      "range": {
+        "startLine": 387,
+        "startChar": 16,
+        "endLine": 387,
+        "endChar": 29
+      },
+      "revId": "a672511072d1308004be198bd2518db7b408c59b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
