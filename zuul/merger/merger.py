@@ -16,6 +16,7 @@
 import git
 import os
 import logging
+import urlparse
 
 import zuul.model
 
@@ -226,7 +227,8 @@ class Merger(object):
     def addProject(self, project, url):
         repo = None
         try:
-            path = os.path.join(self.working_root, project)
+            parsed = urlparse.urlparse(url)
+            path = os.path.join(self.working_root, parsed.hostname, project)
             repo = Repo(url, path, self.email, self.username)
 
             self.repos[project] = repo
