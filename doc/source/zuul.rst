@@ -177,6 +177,12 @@ can be found on the :doc:`merger` page.
   Path to PID lock file for the merger process.
   ``pidfile=/var/run/zuul-merger/merger.pid``
 
+**append_hostname**
+  Optional: Append hostname of git URL to **git_dir**. This is usefully when zuul is
+  connected to 2 gerrit instances so zuul-merger doesn't have namespace
+  collisions between each gerrits git repos.
+  ``append_hostname=false``
+
 .. _swift:
 
 swift

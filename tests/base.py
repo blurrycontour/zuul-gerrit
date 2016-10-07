@@ -461,7 +461,8 @@ class FakeGerritConnection(zuul.connection.gerrit.GerritConnection):
         pass
 
     def getGitUrl(self, project):
-        return os.path.join(self.upstream_root, project.name)
+        path = os.path.join(self.upstream_root, project.name)
+        return 'file://localhost%s' % (path)
 
 
 class BuildHistory(object):

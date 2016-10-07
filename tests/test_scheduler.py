@@ -1524,6 +1524,39 @@ jobs:
         self.assertEqual(A.data['status'], 'MERGED')
         self.assertEqual(A.reported, 2)
 
+    def test_merger_repack_large_change_append(self):
+        "Test that the merger works with large changes after a repack"
+
+        self.config.set('merger', 'append_hostname', 'true')
+        self.merge_server.stop()
+        self.merge_server.join()
+        self.merge_server = zuul.merger.server.MergeServer(self.config,
+                                                           self.connections)
+        self.merge_server.start()
+        # https://bugs.launchpad.net/zuul/+bug/1078946
+        # This test assumes the repo is already cloned; make sure it is
+        url = self.fake_gerrit.getGitUrl(
+            self.sched.layout.projects['org/project1'])
+        self.merge_server.merger.addProject('org/project1', url)
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        A.addPatchset(large=True)
+        path = os.path.join(self.upstream_root, "org/project1")
+        print(repack_repo(path))
+        path = os.path.join(self.git_root, "localhost/org/project1")
+        print(repack_repo(path))
+
+        A.addApproval('CRVW', 2)
+        self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        self.waitUntilSettled()
+        self.assertEqual(self.getJobFromHistory('project1-merge').result,
+                         'SUCCESS')
+        self.assertEqual(self.getJobFromHistory('project1-test1').result,
+                         'SUCCESS')
+        self.assertEqual(self.getJobFromHistory('project1-test2').result,
+                         'SUCCESS')
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2)
+
     def test_nonexistent_job(self):
         "Test launching a job that doesn't exist"
         # Set to the state immediately after a restart
