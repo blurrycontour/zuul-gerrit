@@ -44,8 +44,13 @@ class MergeServer(object):
         else:
             merge_name = None
 
+        if self.config.has_option('merger', 'append_hostname'):
+            append_hostname = self.config.getboolean('merger', 'append_hostname')
+        else:
+            append_hostname = False
+
         self.merger = merger.Merger(merge_root, connections, merge_email,
-                                    merge_name)
+                                    merge_name, append_hostname)
 
     def start(self):
         self._running = True

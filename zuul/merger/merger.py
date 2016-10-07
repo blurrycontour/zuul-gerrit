@@ -16,6 +16,7 @@
 import git
 import os
 import logging
+import urlparse
 
 import zuul.model
 
@@ -199,7 +200,8 @@ class Repo(object):
 class Merger(object):
     log = logging.getLogger("zuul.Merger")
 
-    def __init__(self, working_root, connections, email, username):
+    def __init__(self, working_root, connections, email, username,
+            append_hostname):
         self.repos = {}
         self.working_root = working_root
         if not os.path.exists(working_root):
@@ -207,6 +209,7 @@ class Merger(object):
         self._makeSSHWrappers(working_root, connections)
         self.email = email
         self.username = username
+        self.append_hostname = append_hostname
 
     def _makeSSHWrappers(self, working_root, connections):
         for connection_name, connection in connections.items():
@@ -226,7 +229,18 @@ class Merger(object):
     def addProject(self, project, url):
         repo = None
         try:
-            path = os.path.join(self.working_root, project)
+            parsed = None
+            root = self.working_root
+
+            if self.append_hostname:
+                parsed = urlparse.urlparse(url)
+
+            if parsed:
+                root = os.path.join(self.working_root, parsed.hostname)
+            elif self.append_hostname:
+                self.log.debug("Unable to find hostname in url: %s" % url)
+
+            path = os.path.join(root, project)
             repo = Repo(url, path, self.email, self.username)
 
             self.repos[project] = repo
