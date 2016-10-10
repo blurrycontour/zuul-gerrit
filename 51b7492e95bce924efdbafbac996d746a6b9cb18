@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a95cdbc_b20faf35",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 557,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-10-10T09:41:12Z",
+      "side": 1,
+      "message": "This isn\u0027t assigned to anything and the project object doesn\u0027t look to be modified?",
+      "range": {
+        "startLine": 557,
+        "startChar": 12,
+        "endLine": 557,
+        "endChar": 18
+      },
+      "revId": "51b7492e95bce924efdbafbac996d746a6b9cb18",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
