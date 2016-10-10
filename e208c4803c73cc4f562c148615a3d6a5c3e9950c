@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a95cdbc_ed023ab3",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-10-10T09:51:15Z",
+      "side": 1,
+      "message": "I\u0027m not sure about overwriting branches here... I might be missing something about how this is intended to work though.\n\nIf a project currently holds a zuul.conf with various different scenarios for different branches, and then a stable/* branch is created all of a sudden those other jobs will match.\n\nIs the intention here to enforce projects to have a zuul.conf per branch thus superseding the \u0027branches\u0027 directive? Is the \u0027branches\u0027 directive then only used for the more centrally defined job parameters?\n\nEither way this magic changing could be quite confusing to users.. perhaps we should rethink having \u0027branches\u0027 at all.",
+      "range": {
+        "startLine": 161,
+        "startChar": 14,
+        "endLine": 161,
+        "endChar": 22
+      },
+      "revId": "e208c4803c73cc4f562c148615a3d6a5c3e9950c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
