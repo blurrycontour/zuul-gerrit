@@ -125,6 +125,8 @@ jobs:
     tags:
       - project1
       - extratag
+  - name: project-testbranch
+    branch: feature1
 
 project-templates:
   - name: test-one-and-two
@@ -259,3 +261,7 @@ projects:
   - name: org/no-jobs-project
     check:
       - project-testfile
+
+  - name: org/branch-jobs-project
+    check:
+      - project-testbranch

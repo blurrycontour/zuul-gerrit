@@ -2147,6 +2147,24 @@ jobs:
         self.assertIn('Build succeeded', A.messages[0])
         self.assertIn('Build succeeded', B.messages[0])
 
+    def test_branch_jobs(self):
+        "Test that branch jobs run only when appropriate"
+        project = 'org/branch-jobs-project'
+        self.create_branch(project, 'feature1')
+        A = self.fake_gerrit.addFakeChange(project, 'feature1', 'A')
+        B = self.fake_gerrit.addFakeChange(project, 'master', 'B')
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+
+        self.waitUntilSettled()
+
+        branch_jobs = [x for x in self.history
+                      if x.name == 'project-testbranch']
+
+        self.assertEqual(len(branch_jobs), 1)
+        self.assertEqual(branch_jobs[0].changes, '1,1')
+
     def test_file_jobs(self):
         "Test that file jobs run only when appropriate"
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
