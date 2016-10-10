@@ -930,6 +930,7 @@ class ZuulTestCase(BaseTestCase):
         self.init_repo("org/conflict-project")
         self.init_repo("org/noop-project")
         self.init_repo("org/experimental-project")
+        self.init_repo("org/branch-jobs-project")
         self.init_repo("org/no-jobs-project")
 
         self.statsd = FakeStatsd()
