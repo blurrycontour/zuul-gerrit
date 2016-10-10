@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a95cdbc_88dfe438",
+        "filename": "tests/fixtures/config/duplicate-pipeline/git/common-config/zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-10-10T10:14:24Z",
+      "side": 1,
+      "message": "why is this one here?\n\nWere you trying to check two different tests for the pipelines, or the same test was ran in each?",
+      "range": {
+        "startLine": 35,
+        "startChar": 18,
+        "endLine": 35,
+        "endChar": 23
+      },
+      "revId": "5d99b935819579c2cf975deb5afc319c9acce992",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a95cdbc_88ad249d",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 4672,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-10-10T10:14:24Z",
+      "side": 1,
+      "message": "(nit) we could probably have a helper to load this in so that we don\u0027t need a new class for each config file",
+      "range": {
+        "startLine": 4672,
+        "startChar": 4,
+        "endLine": 4672,
+        "endChar": 22
+      },
+      "revId": "5d99b935819579c2cf975deb5afc319c9acce992",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a95cdbc_a8a660ab",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 4683,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-10-10T10:14:24Z",
+      "side": 1,
+      "message": "it\u0027d be useful to have a way of checking these tests were in the expected pipelines rather than accidentally ran twice in the one pipeline.",
+      "revId": "5d99b935819579c2cf975deb5afc319c9acce992",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
