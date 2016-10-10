@@ -464,6 +464,8 @@ class Job(object):
         self._branches = []
         self.files = []
         self._files = []
+        self.topics = []
+        self._topics = []
         self.skip_if_matcher = None
         self.swift = {}
 
@@ -494,6 +496,9 @@ class Job(object):
         if other.files:
             self.files = other.files[:]
             self._files = other._files[:]
+        if other.topics:
+            self.topics = other.topics[:]
+            self._topics = other._topics[:]
         if other.skip_if_matcher:
             self.skip_if_matcher = other.skip_if_matcher.copy()
         if other.swift:
@@ -528,6 +533,14 @@ class Job(object):
                     if f.match(cf):
                         matches_file = True
         if self.files and not matches_file:
+            return False
+
+        matches_topic = False
+        for topic in self.topics:
+            if hasattr(change, 'topic') and change.topic is not None \
+                    and topic.match(change.topic):
+                matches_topic = True
+        if self.topics and not matches_topic:
             return False
 
         if self.skip_if_matcher and self.skip_if_matcher.matches(change):
@@ -924,6 +937,7 @@ class Change(Changeish):
     def __init__(self, project):
         super(Change, self).__init__(project)
         self.branch = None
+        self.topic = None
         self.number = None
         self.url = None
         self.patchset = None

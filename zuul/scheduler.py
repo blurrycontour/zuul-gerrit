@@ -556,6 +556,10 @@ class Scheduler(threading.Thread):
             if files:
                 job._files = files
                 job.files = [re.compile(x) for x in files]
+            topics = toList(config_job.get('topic'))
+            if topics:
+                job._topics = topics
+                job.topics = [re.compile(x) for x in topics]
             skip_if_matcher = self._parseSkipIf(config_job)
             if skip_if_matcher:
                 job.skip_if_matcher = skip_if_matcher

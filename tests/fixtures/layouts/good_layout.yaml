@@ -87,6 +87,8 @@ jobs:
   - name: project-testfile
     files:
       - 'tools/.*-requires'
+  - name: project-topic
+    topic: feature1
 
 projects:
   - name: test-org/test
