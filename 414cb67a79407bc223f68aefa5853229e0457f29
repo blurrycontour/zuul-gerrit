@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a95cdbc_232ef3fa",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-10-10T10:41:45Z",
+      "side": 1,
+      "message": "Are we intending on using the post_playbook?",
+      "range": {
+        "startLine": 81,
+        "startChar": 13,
+        "endLine": 81,
+        "endChar": 26
+      },
+      "revId": "414cb67a79407bc223f68aefa5853229e0457f29",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
