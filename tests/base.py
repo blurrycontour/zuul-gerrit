@@ -104,7 +104,7 @@ class FakeChange(object):
                   'VRFY': ('Verified', -2, 2)}
 
     def __init__(self, gerrit, number, project, branch, subject,
-                 status='NEW', upstream_root=None):
+                 status='NEW', upstream_root=None, topic=None):
         self.gerrit = gerrit
         self.reported = 0
         self.queried = 0
@@ -112,6 +112,7 @@ class FakeChange(object):
         self.number = number
         self.project = project
         self.branch = branch
+        self.topic = topic
         self.subject = subject
         self.latest_patchset = 0
         self.depends_on_change = None
@@ -120,6 +121,7 @@ class FakeChange(object):
         self.messages = []
         self.data = {
             'branch': branch,
+            'topic': topic,
             'comments': [],
             'commitMessage': subject,
             'createdOn': time.time(),
@@ -208,6 +210,7 @@ class FakeChange(object):
         event = {"type": "patchset-created",
                  "change": {"project": self.project,
                             "branch": self.branch,
+                            "topic": self.topic,
                             "id": "I5459869c07352a31bfb1e7a8cac379cabfcb25af",
                             "number": str(self.number),
                             "subject": self.subject,
@@ -221,6 +224,7 @@ class FakeChange(object):
         event = {"type": "change-restored",
                  "change": {"project": self.project,
                             "branch": self.branch,
+                            "topic": self.topic,
                             "id": "I5459869c07352a31bfb1e7a8cac379cabfcb25af",
                             "number": str(self.number),
                             "subject": self.subject,
@@ -235,6 +239,7 @@ class FakeChange(object):
         event = {"type": "change-abandoned",
                  "change": {"project": self.project,
                             "branch": self.branch,
+                            "topic": self.topic,
                             "id": "I5459869c07352a31bfb1e7a8cac379cabfcb25af",
                             "number": str(self.number),
                             "subject": self.subject,
@@ -249,6 +254,7 @@ class FakeChange(object):
         event = {"type": "comment-added",
                  "change": {"project": self.project,
                             "branch": self.branch,
+                            "topic": self.topic,
                             "id": "I5459869c07352a31bfb1e7a8cac379cabfcb25af",
                             "number": str(self.number),
                             "subject": self.subject,
@@ -285,6 +291,7 @@ class FakeChange(object):
                             'name': 'Patchset Author',
                             'username': 'author_phil'},
                  'change': {'branch': self.branch,
+                            'topic': self.topic,
                             'id': 'Iaa69c46accf97d0598111724a38250ae76a22c87',
                             'number': str(self.number),
                             'owner': {'email': 'owner@example.com',
@@ -396,11 +403,12 @@ class FakeGerritConnection(zuul.connection.gerrit.GerritConnection):
         self.queries = []
         self.upstream_root = upstream_root
 
-    def addFakeChange(self, project, branch, subject, status='NEW'):
+    def addFakeChange(self, project, branch, subject, status='NEW',
+                      topic=None):
         self.change_number += 1
         c = FakeChange(self, self.change_number, project, branch, subject,
                        upstream_root=self.upstream_root,
-                       status=status)
+                       status=status, topic=topic)
         self.changes[self.change_number] = c
         return c
 
@@ -932,6 +940,7 @@ class ZuulTestCase(BaseTestCase):
         self.init_repo("org/experimental-project")
         self.init_repo("org/branch-jobs-project")
         self.init_repo("org/no-jobs-project")
+        self.init_repo("org/topic-jobs-project")
 
         self.statsd = FakeStatsd()
         # note, use 127.0.0.1 rather than localhost to avoid getting ipv6

@@ -2186,6 +2186,39 @@ jobs:
         self.assertEqual(B.data['status'], 'MERGED')
         self.assertEqual(B.reported, 2)
 
+    def test_topic_jobs(self):
+        "Test that topic jobs run only when appropriate"
+        project = 'org/topic-jobs-project'
+
+        # should run job (direct match)
+        A = self.fake_gerrit.addFakeChange(project, 'master', 'A',
+                                           topic='feature1')
+
+        # should not run job (wrong topic)
+        B = self.fake_gerrit.addFakeChange(project, 'master', 'B',
+                                           topic='feature2')
+
+        # should run job (regex match)
+        C = self.fake_gerrit.addFakeChange(project, 'master', 'C',
+                                           topic='feature1_and_feature2')
+
+        # should not run job (no topic)
+        D = self.fake_gerrit.addFakeChange(project, 'master', 'D')
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(D.getPatchsetCreatedEvent(1))
+
+        self.waitUntilSettled()
+
+        topic_jobs = [x for x in self.history
+                      if x.name == 'project-testtopic']
+
+        self.assertEqual(len(topic_jobs), 2)
+        self.assertEqual(topic_jobs[0].changes, '1,1')
+        self.assertEqual(topic_jobs[1].changes, '3,1')
+
     def _test_skip_if_jobs(self, branch, should_skip):
         "Test that jobs with a skip-if filter run only when appropriate"
         self.config.set('zuul', 'layout_config',

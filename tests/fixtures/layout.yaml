@@ -127,6 +127,8 @@ jobs:
       - extratag
   - name: project-testbranch
     branch: feature1
+  - name: project-testtopic
+    topic: feature1
 
 project-templates:
   - name: test-one-and-two
@@ -265,3 +267,7 @@ projects:
   - name: org/branch-jobs-project
     check:
       - project-testbranch
+
+  - name: org/topic-jobs-project
+    check:
+      - project-testtopic

@@ -245,6 +245,10 @@ class GerritSource(BaseSource):
             raise exceptions.ChangeNotFound(change.number, change.patchset)
         change.project = self.sched.getProject(data['project'])
         change.branch = data['branch']
+        if 'topic' in data:
+            change.topic = data['topic']
+        else:
+            change.topic = None
         change.url = data['url']
         max_ps = 0
         files = []
