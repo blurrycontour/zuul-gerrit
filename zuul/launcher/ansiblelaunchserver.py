@@ -1270,9 +1270,9 @@ class NodeWorker(object):
 
         return tasks
 
-    def _makeBuilderTask(self, jobdir, builder, parameters):
+    def _makeBuilderTask(self, jobdir, builder, parameters, sequence):
         tasks = []
-        script_fn = '%s.sh' % str(uuid.uuid4().hex)
+        script_fn = '%02d-%s.sh' % str(sequence, uuid.uuid4().hex)
         script_path = os.path.join(jobdir.script_root, script_fn)
         with open(script_path, 'w') as script:
             data = builder['shell']
@@ -1395,10 +1395,13 @@ class NodeWorker(object):
             task = dict(zuul_log=dict(msg=msg))
             main_block.append(task)
 
+            sequence = 0
             for builder in jjb_job.get('builders', []):
                 if 'shell' in builder:
+                    sequence += 1
                     main_block.extend(
-                        self._makeBuilderTask(jobdir, builder, parameters))
+                        self._makeBuilderTask(jobdir, builder, parameters,
+                                              sequence))
             task = dict(zuul_log=dict(msg="Job complete, result: SUCCESS"))
             main_block.append(task)
 
