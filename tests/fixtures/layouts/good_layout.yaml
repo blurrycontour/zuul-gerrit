@@ -87,6 +87,12 @@ jobs:
   - name: project-testfile
     files:
       - 'tools/.*-requires'
+  - name: project-semaphore
+    semaphore: foo
+
+  # mutex is implicitly a semaphore for backwards compatibility
+  - name: project-mutex
+    mutex: bar
 
 projects:
   - name: test-org/test
@@ -100,3 +106,7 @@ projects:
       - test-thing
     post:
       - test-post
+
+semaphores:
+  - name: foo
+    max: 3
