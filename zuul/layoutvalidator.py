@@ -79,6 +79,10 @@ class LayoutSchema(object):
     project_template = {v.Required('name'): str}
     project_templates = [project_template]
 
+    semaphore = {v.Required('name'): str,
+                 'max': int,
+                 }
+
     swift = {v.Required('name'): str,
              'container': str,
              'expiry': int,
@@ -104,6 +108,7 @@ class LayoutSchema(object):
            'hold-following-changes': bool,
            'voting': bool,
            'mutex': str,
+           'semaphore': str,
            'tags': toList(str),
            'parameter-function': str,
            'branch': toList(str),
@@ -274,6 +279,7 @@ class LayoutSchema(object):
                            'jobs': self.jobs,
                            'project-templates': project_templates,
                            v.Required('projects'): projects,
+                           'semaphores': [self.semaphore],
                            })
         return schema
 

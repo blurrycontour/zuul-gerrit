@@ -60,66 +60,72 @@ def deep_format(obj, paramdict):
     return ret
 
 
-class MutexHandler(object):
-    log = logging.getLogger("zuul.MutexHandler")
+class SemaphoreHandler(object):
+    log = logging.getLogger("zuul.SemaphoreHandler")
 
     def __init__(self):
-        self.mutexes = {}
+        self.semaphores = {}
+        self.semaphores_max_count = {}
+
+    def configure(self, semaphores):
+        self.semaphores_max_count = semaphores
 
     def acquire(self, item, job):
-        if not job.mutex:
+        if not job.semaphore:
             return True
-        mutex_name = job.mutex
-        m = self.mutexes.get(mutex_name)
+        semaphore_name = job.semaphore
+        m = self.semaphores.get(semaphore_name)
         if not m:
-            # The mutex is not held, acquire it
-            self._acquire(mutex_name, item, job.name)
+            # The semaphore is not held, acquire it
+            self._acquire(semaphore_name, item, job.name)
             return True
-        held_item, held_job_name = m
-        if held_item is item and held_job_name == job.name:
-            # This item already holds the mutex
+        if (item, job.name) in m:
+            # This item already holds the semaphore
             return True
-        held_build = held_item.current_build_set.getBuild(held_job_name)
-        if held_build and held_build.result:
-            # The build that held the mutex is complete, release it
-            # and let the new item have it.
-            self.log.error("Held mutex %s being released because "
-                           "the build that holds it is complete" %
-                           (mutex_name,))
-            self._release(mutex_name, item, job.name)
-            self._acquire(mutex_name, item, job.name)
+
+        # semaphore is there, check max
+        if len(m) < self.semaphores_max_count.get(semaphore_name, 1):
+            self._acquire(semaphore_name, item, job.name)
             return True
+
         return False
 
     def release(self, item, job):
-        if not job.mutex:
+        if not job.semaphore:
             return
-        mutex_name = job.mutex
-        m = self.mutexes.get(mutex_name)
+        semaphore_name = job.semaphore
+        m = self.semaphores.get(semaphore_name)
         if not m:
-            # The mutex is not held, nothing to do
-            self.log.error("Mutex can not be released for %s "
-                           "because the mutex is not held" %
+            # The semaphore is not held, nothing to do
+            self.log.error("Semaphore can not be released for %s "
+                           "because the semaphore is not held" %
                            (item,))
             return
-        held_item, held_job_name = m
-        if held_item is item and held_job_name == job.name:
-            # This item holds the mutex
-            self._release(mutex_name, item, job.name)
+        if (item, job.name) in m:
+            # This item is a holder of the semaphore
+            self._release(semaphore_name, item, job.name)
             return
-        self.log.error("Mutex can not be released for %s "
+        self.log.error("Semaphore can not be released for %s "
                        "which does not hold it" %
                        (item,))
 
-    def _acquire(self, mutex_name, item, job_name):
-        self.log.debug("Job %s of item %s acquiring mutex %s" %
-                       (job_name, item, mutex_name))
-        self.mutexes[mutex_name] = (item, job_name)
+    def _acquire(self, semaphore_name, item, job_name):
+        self.log.debug("Job %s of item %s acquiring semaphore %s" %
+                       (job_name, item, semaphore_name))
+        if semaphore_name not in self.semaphores:
+            self.semaphores[semaphore_name] = []
+        self.semaphores[semaphore_name].append((item, job_name))
 
-    def _release(self, mutex_name, item, job_name):
-        self.log.debug("Job %s of item %s releasing mutex %s" %
-                       (job_name, item, mutex_name))
-        del self.mutexes[mutex_name]
+    def _release(self, semaphore_name, item, job_name):
+        self.log.debug("Job %s of item %s releasing semaphore %s" %
+                       (job_name, item, semaphore_name))
+        sem_item = (item, job_name)
+        if sem_item in self.semaphores[semaphore_name]:
+            self.semaphores[semaphore_name].remove(sem_item)
+
+        # cleanup if there is no user of the semaphore anymore
+        if len(self.semaphores[semaphore_name]) == 0:
+            del self.semaphores[semaphore_name]
 
 
 class ManagementEvent(object):
@@ -246,7 +252,7 @@ class Scheduler(threading.Thread):
         self._stopped = False
         self.launcher = None
         self.merger = None
-        self.mutex = MutexHandler()
+        self.semaphore = SemaphoreHandler()
         self.connections = dict()
         # Despite triggers being part of the pipeline, there is one trigger set
         # per scheduler. The pipeline handles the trigger filters but since
@@ -498,6 +504,12 @@ class Scheduler(threading.Thread):
                     manager.event_filters += trigger.getEventFilters(
                         conf_pipeline['trigger'][trigger_name])
 
+        semaphores = {}
+        for conf_semaphore in data.get('semaphores', []):
+            semaphores[conf_semaphore.get('name')] = conf_semaphore.get(
+                'max', 1)
+        self.semaphore.configure(semaphores)
+
         for project_template in data.get('project-templates', []):
             # Make sure the template only contains valid pipelines
             tpl = dict(
@@ -534,7 +546,11 @@ class Scheduler(threading.Thread):
                 job.voting = m
             m = config_job.get('mutex', None)
             if m is not None:
-                job.mutex = m
+                job.semaphore = m
+            m = config_job.get('semaphore', None)
+            if m is not None:
+                job.semaphore = m
+
             tags = toList(config_job.get('tags'))
             if tags:
                 # Tags are merged via a union rather than a
@@ -867,7 +883,7 @@ class Scheduler(threading.Thread):
                             "Exception while canceling build %s "
                             "for change %s" % (build, item.change))
                     finally:
-                        self.mutex.release(build.build_set.item, build.job)
+                        self.semaphore.release(build.build_set.item, build.job)
             self.layout = layout
             self.maintainConnectionCache()
             for trigger in self.triggers.values():
@@ -1204,8 +1220,8 @@ class BasePipelineManager(object):
                     tags.append('[hold]')
                 if not tree.job.voting:
                     tags.append('[nonvoting]')
-                if tree.job.mutex:
-                    tags.append('[mutex: %s]' % tree.job.mutex)
+                if tree.job.semaphore:
+                    tags.append('[semaphore: %s]' % tree.job.semaphore)
                 tags = ' '.join(tags)
                 self.log.info("%s%s%s %s" % (istr, repr(tree.job),
                                              efilters, tags))
@@ -1526,7 +1542,7 @@ class BasePipelineManager(object):
                                    "for change %s:" % (job, item.change))
 
     def launchJobs(self, item):
-        jobs = self.pipeline.findJobsToRun(item, self.sched.mutex)
+        jobs = self.pipeline.findJobsToRun(item, self.sched.semaphore)
         if jobs:
             self._launchJobs(item, jobs)
 
@@ -1543,7 +1559,7 @@ class BasePipelineManager(object):
                 self.log.exception("Exception while canceling build %s "
                                    "for change %s" % (build, item.change))
             finally:
-                self.sched.mutex.release(build.build_set.item, build.job)
+                self.sched.semaphore.release(build.build_set.item, build.job)
             build.result = 'CANCELED'
             canceled = True
         self.updateBuildDescriptions(old_build_set)
@@ -1684,7 +1700,7 @@ class BasePipelineManager(object):
         item = build.build_set.item
 
         self.pipeline.setResult(item, build)
-        self.sched.mutex.release(item, build.job)
+        self.sched.semaphore.release(item, build.job)
         self.log.debug("Item %s status is now:\n %s" %
                        (item, item.formatStatus()))
         return True

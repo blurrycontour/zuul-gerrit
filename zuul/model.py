@@ -140,7 +140,7 @@ class Pipeline(object):
             return []
         return item.change.filterJobs(tree.getJobs())
 
-    def _findJobsToRun(self, job_trees, item, mutex):
+    def _findJobsToRun(self, job_trees, item, semaphore):
         torun = []
         if item.item_ahead:
             # Only run jobs if any 'hold' jobs on the change ahead
@@ -159,23 +159,24 @@ class Pipeline(object):
                 else:
                     # There is no build for the root of this job tree,
                     # so we should run it.
-                    if mutex.acquire(item, job):
-                        # If this job needs a mutex, either acquire it or make
-                        # sure that we have it before running the job.
+                    if semaphore.acquire(item, job):
+                        # If this job needs a semaphore, either acquire it or
+                        # make sure that we have it before running the job.
                         torun.append(job)
             # If there is no job, this is a null job tree, and we should
             # run all of its jobs.
             if result == 'SUCCESS' or not job:
-                torun.extend(self._findJobsToRun(tree.job_trees, item, mutex))
+                torun.extend(self._findJobsToRun(
+                    tree.job_trees, item, semaphore))
         return torun
 
-    def findJobsToRun(self, item, mutex):
+    def findJobsToRun(self, item, semaphore):
         if not item.live:
             return []
         tree = self.getJobTree(item.change.project)
         if not tree:
             return []
-        return self._findJobsToRun(tree.job_trees, item, mutex)
+        return self._findJobsToRun(tree.job_trees, item, semaphore)
 
     def haveAllJobsStarted(self, item):
         for job in self.getJobs(item):
@@ -451,7 +452,7 @@ class Job(object):
         self.success_pattern = None
         self.parameter_function = None
         self.tags = set()
-        self.mutex = None
+        self.semaphore = None
         # A metajob should only supply values for attributes that have
         # been explicitly provided, so avoid setting boolean defaults.
         if self.is_metajob:
@@ -498,8 +499,8 @@ class Job(object):
             self.skip_if_matcher = other.skip_if_matcher.copy()
         if other.swift:
             self.swift.update(other.swift)
-        if other.mutex:
-            self.mutex = other.mutex
+        if other.semaphore:
+            self.semaphore = other.semaphore
         # Tags are merged via a union rather than a destructive copy
         # because they are intended to accumulate as metajobs are
         # applied.
