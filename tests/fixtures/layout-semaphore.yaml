@@ -13,9 +13,13 @@ pipelines:
 
 jobs:
   - name: mutex-one
-    mutex: test-mutex
+    semaphore: test-semaphore
   - name: mutex-two
-    mutex: test-mutex
+    semaphore: test-semaphore
+  - name: semaphore-one
+    semaphore: test-semaphore-two
+  - name: semaphore-two
+    semaphore: test-semaphore-two
 
 projects:
   - name: org/project
@@ -23,3 +27,13 @@ projects:
       - project-test1
       - mutex-one
       - mutex-two
+
+  - name: org/project1
+    check:
+      - project-test1
+      - semaphore-one
+      - semaphore-two
+
+semaphores:
+  - name: test-semaphore-two
+    max: 2
