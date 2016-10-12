@@ -1269,7 +1269,7 @@ class NodeWorker(object):
 
     def _makeBuilderTask(self, jobdir, builder, parameters, sequence):
         tasks = []
-        script_fn = '%02d.sh' % sequence
+        script_fn = '%02d-%s.sh' % (sequence, str(uuid.uuid4().hex))
         script_path = os.path.join(jobdir.script_root, script_fn)
         with open(script_path, 'w') as script:
             data = builder['shell']
