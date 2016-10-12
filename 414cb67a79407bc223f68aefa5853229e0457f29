@@ -22,6 +22,24 @@
       "revId": "414cb67a79407bc223f68aefa5853229e0457f29",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa6399be_0fda6e78",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2016-10-12T22:16:02Z",
+      "side": 1,
+      "message": "Yah. And in fact, there will also be a pre_playbook.\n\nThat may expand into a list of pre and post playbooks - but yeah.",
+      "parentUuid": "1a95cdbc_232ef3fa",
+      "revId": "414cb67a79407bc223f68aefa5853229e0457f29",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
