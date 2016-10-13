@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa6399be_eda7ca08",
+        "filename": "zuul/ansible/library/command.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2016-10-13T23:07:28Z",
+      "side": 1,
+      "message": "In this set of headers explaining things maybe also include a link to the version of the command module that was forked from? to make comparisons easier later. Followup change is fine for that.",
+      "revId": "d1ddd284b85b60a9109ead78d29c93d1fd7c4300",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
