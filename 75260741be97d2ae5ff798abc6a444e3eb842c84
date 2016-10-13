@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa6399be_d3f49988",
+        "filename": "README.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-10-13T05:49:50Z",
+      "side": 1,
+      "message": "could link to http://docs.openstack.org/developer/hacking/",
+      "revId": "75260741be97d2ae5ff798abc6a444e3eb842c84",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
