@@ -57,6 +57,23 @@
       "revId": "e208c4803c73cc4f562c148615a3d6a5c3e9950c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa6399be_90bbc5e4",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-10-13T23:55:01Z",
+      "side": 1,
+      "message": "Yes, that should probably be documented.  We\u0027re not updating the documentation yet.",
+      "revId": "e208c4803c73cc4f562c148615a3d6a5c3e9950c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
