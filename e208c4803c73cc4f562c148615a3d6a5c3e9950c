@@ -39,6 +39,24 @@
       "revId": "e208c4803c73cc4f562c148615a3d6a5c3e9950c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa6399be_35790ec9",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-10-13T21:58:22Z",
+      "side": 1,
+      "message": "Should we make it clear somehow that \u0027branches\u0027 /only/ applies to config repos?",
+      "parentUuid": "fa6399be_58a9647a",
+      "revId": "e208c4803c73cc4f562c148615a3d6a5c3e9950c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
