@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa6399be_866fe4fa",
+        "filename": "tests/fixtures/config/single-tenant/git/common-config/zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2016-10-14T20:30:13Z",
+      "side": 1,
+      "message": "I need to fix this, otherwise I get the following errors:\n\nTraceback (most recent call last):\n  File \"zuul/scheduler.py\", line 649, in run\n    while pipeline.manager.processQueue():\n  File \"zuul/manager/__init__.py\", line 570, in processQueue\n    item, nnfi)\n  File \"zuul/manager/__init__.py\", line 528, in _processOneItem\n    ready \u003d self.prepareLayout(item)\n  File \"zuul/manager/__init__.py\", line 482, in prepareLayout\n    item.freezeJobTree()\n  File \"zuul/model.py\", line 757, in freezeJobTree\n    self.job_tree \u003d layout.createJobTree(self)\n  File \"zuul/model.py\", line 1773, in createJobTree\n    project_tree \u003d project_config.pipelines[item.pipeline.name].job_tree\nKeyError: \u0027check\u0027",
+      "revId": "7ed06cc69998420dc4324637f89e21c78007df3a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
