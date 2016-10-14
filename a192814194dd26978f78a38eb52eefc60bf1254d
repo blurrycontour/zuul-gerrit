@@ -22,6 +22,23 @@
       "revId": "a192814194dd26978f78a38eb52eefc60bf1254d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa6399be_cd98226d",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 1313,
+      "author": {
+        "id": 14760
+      },
+      "writtenOn": "2016-10-14T17:27:45Z",
+      "side": 1,
+      "message": "I\u0027m not sure I like that I can\u0027t just download the script file anymore.\n\nI like that it is not many script files. But would like it better if it was one file that I could download directly.",
+      "revId": "a192814194dd26978f78a38eb52eefc60bf1254d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
