@@ -1770,9 +1770,14 @@ class Layout(object):
 
     def createJobTree(self, item):
         project_config = self.project_configs[item.change.project.name]
-        project_tree = project_config.pipelines[item.pipeline.name].job_tree
+        project_tree = None
         ret = JobTree(None)
-        self._createJobTree(item.change, project_tree.job_trees, ret)
+
+        if item.pipeline.name in project_config.pipelines:
+            project_tree = \
+                project_config.pipelines[item.pipeline.name].job_tree
+            self._createJobTree(item.change, project_tree.job_trees, ret)
+
         return ret
 
 
