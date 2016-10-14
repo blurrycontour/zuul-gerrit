@@ -3911,7 +3911,6 @@ For CI problems and help debugging, contact ci@example.org"""
         running_items = client.get_running_jobs()
         self.assertEqual(0, len(running_items))
 
-    @skip("Disabled for early v3 development")
     def test_nonvoting_pipeline(self):
         "Test that a nonvoting pipeline (experimental) can still report"
 
@@ -3919,10 +3918,13 @@ For CI problems and help debugging, contact ci@example.org"""
                                            'master', 'A')
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
+
+        self.assertEqual(self.getJobFromHistory('project-merge').result,
+                         'SUCCESS')
         self.assertEqual(
             self.getJobFromHistory('experimental-project-test').result,
             'SUCCESS')
-        self.assertEqual(A.reported, 1)
+        self.assertEqual(A.reported, 2)
 
     @skip("Disabled for early v3 development")
     def test_crd_gate(self):
