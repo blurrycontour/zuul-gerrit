@@ -30,7 +30,10 @@ class IndependentPipelineManager(PipelineManager):
         if existing:
             return DynamicChangeQueueContextManager(existing)
         if change.project not in self.pipeline.getProjects():
-            self.pipeline.addProject(change.project)
+            # TODOv3(pabelanger): Determine if this is necessary for foreign
+            # projects
+            # self.pipeline.addProject(change.project)
+            return DynamicChangeQueueContextManager(None)
         change_queue = model.ChangeQueue(self.pipeline)
         change_queue.addProject(change.project)
         self.pipeline.addQueue(change_queue)
