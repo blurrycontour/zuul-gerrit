@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa6399be_49bcffba",
+        "filename": "tests/fixtures/config/single-tenant/git/common-config/zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2016-10-14T20:59:27Z",
+      "side": 1,
+      "message": "I had to define the noop job here, otherwise our pipelines queues would not be empty. Would be interested in some feedback here",
+      "revId": "9335eec341424e0de1c83b30e83f95d85f945c93",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
