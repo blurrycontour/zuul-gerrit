@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa6399be_13ff3435",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 862,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2016-10-18T15:27:23Z",
+      "side": 1,
+      "message": "Because the default has changed above I think you also need to change this block to handle INFO instead of DEBUG. As is there is no handling for INFO and you should get DEBUG all the time.",
+      "revId": "71e8e806d2825b40377072097d0911b25a6c2eb7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
