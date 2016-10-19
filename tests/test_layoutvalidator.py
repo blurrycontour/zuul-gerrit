@@ -31,8 +31,6 @@ LAYOUT_RE = re.compile(r'^(good|bad)_.*\.yaml$')
 
 
 class TestLayoutValidator(testtools.TestCase):
-    def setUp(self):
-        self.skip("Disabled for early v3 development")
 
     def test_layouts(self):
         """Test layout file validation"""
@@ -53,21 +51,22 @@ class TestLayoutValidator(testtools.TestCase):
                                            'zuul_default.conf')
             config = ConfigParser.ConfigParser()
             config.read(config_file)
-            connections = zuul.lib.connections.configure_connections(config)
+            cr = zuul.lib.connections.ConnectionRegistry()
+            cr.configure(config)
 
             layout = os.path.join(FIXTURE_DIR, 'layouts', fn)
             data = yaml.load(open(layout))
             validator = zuul.layoutvalidator.LayoutValidator()
             if m.group(1) == 'good':
                 try:
-                    validator.validate(data, connections)
+                    validator.validate(data, cr.connections)
                 except voluptuous.Invalid as e:
                     raise Exception(
                         'Unexpected YAML syntax error in %s:\n  %s' %
                         (fn, str(e)))
             else:
                 try:
-                    validator.validate(data, connections)
+                    validator.validate(data, cr.connections)
                     raise Exception("Expected a YAML syntax error in %s." %
                                     fn)
                 except voluptuous.Invalid as e:
