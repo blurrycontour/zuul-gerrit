@@ -105,6 +105,7 @@ EXAMPLES = '''
 import datetime
 import glob
 import pipes
+import pty
 import re
 import shlex
 import os
@@ -145,16 +146,9 @@ class Console(object):
 def follow(fd):
     newline_warning = False
     with Console() as console:
-        while True:
-            line = fd.readline()
-            if not line:
-                break
-            if not line.endswith('\n'):
-                line += '\n'
-                newline_warning = True
-            console.addLine(line)
-        if newline_warning:
-            console.addLine('[Zuul] No trailing newline\n')
+        data = os.read(fd, 1024)
+        console.addLine(data)
+        return data
 
 
 # Taken from ansible/module_utils/basic.py ... forking the method for now
@@ -300,39 +294,28 @@ def zuul_run_command(self, args, check_rc=False, close_fds=True, executable=None
 
     try:
 
+        args = shlex.split(args)
+        if shell:
+            if not executable:
+                executable = os.environ.get('SHELL', 'sh')
+            args.reverse()
+            args.append(executable)
+            args.reverse()
+        if isinstance(args, list):
+            running = ' '.join(args)
+        else:
+            running = args
         if self._debug:
-            if isinstance(args, list):
-                running = ' '.join(args)
-            else:
-                running = args
             self.log('Executing: ' + running)
         # ZUUL: Replaced the excution loop with the zuul_runner run function
-        cmd = subprocess.Popen(args, **kwargs)
-        t = threading.Thread(target=follow, args=(cmd.stdout,))
-        t.daemon = True
-        t.start()
-        ret = cmd.wait()
-        # Give the thread that is writing the console log up to 10 seconds
-        # to catch up and exit.  If it hasn't done so by then, it is very
-        # likely stuck in readline() because it spawed a child that is
-        # holding stdout or stderr open.
-        t.join(10)
+        rc = pty.spawn(args, follow)
         with Console() as console:
-            if t.isAlive():
-                console.addLine("[Zuul] standard output/error still open "
-                                "after child exited")
-            console.addLine("[Zuul] Task exit code: %s\n" % ret)
-
-        # ZUUL: If the console log follow thread *is* stuck in readline,
-        # we can't close stdout (attempting to do so raises an
-        # exception) , so this is disabled.
-        # cmd.stdout.close()
+            console.addLine("[Zuul] Task exit code: %s\n" % rc)
 
         # ZUUL: stdout and stderr are in the console log file
         stdout = ''
         stderr = ''
 
-        rc = cmd.returncode
     except (OSError, IOError):
         e = get_exception()
         self.fail_json(rc=e.errno, msg=str(e), cmd=clean_args)
@@ -439,8 +422,8 @@ def main():
     if warn:
         warnings = check_command(args)
 
-    if not shell:
-        args = shlex.split(args)
+    #if not shell:
+    args = shlex.split(args)
     startd = datetime.datetime.now()
 
     rc, out, err = zuul_run_command(module, args, executable=executable, use_unsafe_shell=shell, environ_update=environ)
