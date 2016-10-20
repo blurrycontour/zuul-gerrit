@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa6399be_ed38bbd5",
+        "filename": "zuul/ansible/library/command.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 2472
+      },
+      "writtenOn": "2016-10-20T16:00:16Z",
+      "side": 1,
+      "message": "These 3 lines could be args.insert(0, executable) couldn\u0027t they?",
+      "revId": "cd1ae553554f13c5f283898217aa16060115c78e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
