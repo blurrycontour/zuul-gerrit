@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa6399be_1f40b633",
+        "filename": "zuul/ansible/library/command.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2016-10-20T16:17:55Z",
+      "side": 0,
+      "message": "You\u0027ve stopped using this variable below.",
+      "revId": "7aaf5d2f7665d89673c79d3a093169558eb604cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
