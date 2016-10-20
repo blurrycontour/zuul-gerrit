@@ -116,7 +116,6 @@ import traceback
 import threading
 
 from ansible.module_utils.basic import AnsibleModule, heuristic_log_sanitize
-from ansible.module_utils.basic import get_exception
 # ZUUL: Hardcode python2 until we're on ansible 2.2
 from ast import literal_eval
 
