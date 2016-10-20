@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "fa6399be_0d016faf",
+        "filename": "zuul/ansible/library/command.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2016-10-20T16:02:18Z",
+      "side": 1,
+      "message": "I think this assumes that a line is never more than 1023 bytes long (\\n) terminated. Because console.Addline is going to assume that it got a whole line and prefix it with a timestamp.",
+      "revId": "cd1ae553554f13c5f283898217aa16060115c78e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa6399be_ed38bbd5",
         "filename": "zuul/ansible/library/command.py",
         "patchSetId": 1
