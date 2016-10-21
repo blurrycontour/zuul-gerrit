@@ -19,6 +19,11 @@ pipelines:
         verified: -2
 
 projects:
+  - name: org/project
+    check:
+      - integration
+    gate:
+      - integration
 
   - name: org/project1
     gate:
