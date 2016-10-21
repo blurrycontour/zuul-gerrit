@@ -16,6 +16,24 @@
       "revId": "26533ff865a57ba7ec2d819e05b947c118a07281",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da6895a0_47cf4cb0",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 743,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2016-10-21T05:06:14Z",
+      "side": 1,
+      "message": "right, will add that",
+      "parentUuid": "da6895a0_1bb936ea",
+      "revId": "26533ff865a57ba7ec2d819e05b947c118a07281",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
