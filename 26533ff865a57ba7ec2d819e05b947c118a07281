@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da6895a0_1bb936ea",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 743,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-10-21T00:58:53Z",
+      "side": 1,
+      "message": "(nit) add a \"(depreciated)\" tag.",
+      "revId": "26533ff865a57ba7ec2d819e05b947c118a07281",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
