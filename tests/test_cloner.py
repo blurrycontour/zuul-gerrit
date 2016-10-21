@@ -730,3 +730,69 @@ class TestCloner(ZuulTestCase):
                               'Project %s commit for build %s should '
                               'be correct' % (project, 0))
         shutil.rmtree(self.workspace_root)
+
+    def test_extra_project_check(self):
+        # This performs a clone for a pre-merge job (check) with an
+        # extra project which does not appear in the dependency chain.
+        # It should checkout the upstream branch tip.
+        self.worker.hold_jobs_in_build = True
+
+        projects = ['org/project1', 'org/project2']
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+        # Start builds for both changes separately.
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+
+        self.waitUntilSettled()
+        self.assertEquals(2, len(self.builds), "Two builds are running")
+
+        self.builds[1].release()
+        self.waitUntilSettled()
+        self.assertEquals(1, len(self.builds), "One build is running")
+
+        for build in self.builds:
+            self.log.debug(build)
+
+        upstream = self.getUpstreamRepos(projects)
+        old_project2_commit = str(upstream['org/project2'].commit('master'))
+
+        # Merge change B before the job for A gets around to cloning.
+        B.setMerged()
+
+        new_project2_commit = str(upstream['org/project2'].commit('master'))
+
+        # Make sure that moved the master pointer for project2.
+        self.assertNotEqual(old_project2_commit, new_project2_commit)
+
+        states = [
+            {'org/project1': self.builds[0].parameters['ZUUL_COMMIT'],
+             'org/project2': new_project2_commit,
+             },
+        ]
+
+        for number, build in enumerate(self.builds):
+            self.log.debug("Build parameters: %s", build.parameters)
+            cloner = zuul.lib.cloner.Cloner(
+                git_base_url=self.upstream_root,
+                projects=projects,
+                workspace=self.workspace_root,
+                zuul_branch=build.parameters['ZUUL_BRANCH'],
+                zuul_ref=build.parameters['ZUUL_REF'],
+                zuul_url=self.git_root,
+            )
+            cloner.execute()
+            work = self.getWorkspaceRepos(projects)
+            state = states[number]
+
+            for project in projects:
+                self.assertEquals(state[project],
+                                  str(work[project].commit('HEAD')),
+                                  'Project %s commit for build %s should '
+                                  'be correct' % (project, number))
+
+            shutil.rmtree(self.workspace_root)
+
+        self.worker.hold_jobs_in_build = False
+        self.worker.release()
+        self.waitUntilSettled()
