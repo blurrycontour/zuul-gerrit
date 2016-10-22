@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da6895a0_7da11da9",
+        "filename": "tests/fixtures/layout-cloner.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2016-10-22T08:02:55Z",
+      "side": 1,
+      "message": "this should have been in the other change set",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 20
+      },
+      "revId": "7f486cf49d6fe332574efe0b7ceae91f37a4cbf8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
