@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da6895a0_3dc96579",
+        "filename": "tests/fixtures/layout-cloner.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2016-10-22T08:01:15Z",
+      "side": 1,
+      "message": "This extra pipeline seems to trigger the failures",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 19
+      },
+      "revId": "9666fe36eb7b58fb1a719efb882e46a1bf9d7be0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
