@@ -832,8 +832,14 @@ class Scheduler(threading.Thread):
         if self.last_reconfigured:
             data['last_reconfigured'] = self.last_reconfigured * 1000
 
-        pipelines = []
-        data['pipelines'] = pipelines
-        for pipeline in self.layout.pipelines.values():
-            pipelines.append(pipeline.formatStatusJSON(url_pattern))
+        tenants = []
+        data['tenants'] = tenants
+        for tenant in self.abide.tenants.values():
+            pipelines = []
+            tenants.append({
+                'name': tenant.name,
+                'pipelines': pipelines,
+            })
+            for pipeline in tenant.layout.pipelines.values():
+                pipelines.append(pipeline.formatStatusJSON(url_pattern))
         return json.dumps(data)
