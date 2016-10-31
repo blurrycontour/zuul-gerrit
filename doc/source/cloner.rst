@@ -59,7 +59,9 @@ Usage
 -----
 The general options that apply are:
 
-.. program-output:: zuul-cloner --help
+.. runblock:: console
+
+    $ zuul-cloner --help
 
 
 Ref lookup order

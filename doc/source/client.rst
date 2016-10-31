@@ -18,13 +18,17 @@ Usage
 -----
 The general options that apply to all subcommands are:
 
-.. program-output:: zuul --help
+.. runblock:: console
+
+    $ zuul --help
 
 The following subcommands are supported:
 
 Enqueue
 ^^^^^^^
-.. program-output:: zuul enqueue --help
+.. runblock:: console
+
+    $ zuul enqueue --help
 
 Example::
 
@@ -34,7 +38,9 @@ Note that the format of change id is <number>,<patchset>.
 
 Promote
 ^^^^^^^
-.. program-output:: zuul promote --help
+.. runblock:: console
+
+    $ zuul promote --help
 
 Example::
 
@@ -44,7 +50,9 @@ Note that the format of changes id is <number>,<patchset>.
 
 Show
 ^^^^
-.. program-output:: zuul show --help
+.. runblock:: console
+
+    $ zuul show --help
 
 Example::
 
