@@ -1710,7 +1710,6 @@ jobs:
         self.assertEqual(A.data['status'], 'MERGED')
         self.assertEqual(A.reported, 2)
 
-    @skip("Disabled for early v3 development")
     def test_single_nonexistent_post_job(self):
         "Test launching a single post job that doesn't exist"
         e = {
@@ -1727,7 +1726,7 @@ jobs:
         }
         # Set to the state immediately after a restart
         self.resetGearmanServer()
-        self.launcher.negative_function_cache_ttl = 0
+        self.launch_server.negative_function_cache_ttl = 0
 
         self.fake_gerrit.addEvent(e)
         self.waitUntilSettled()
