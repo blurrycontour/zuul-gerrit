@@ -1,0 +1,10 @@
+Code-Review+1: Andreas Jaeger <jaegerandi@gmail.com>
+Code-Review+2: Clark Boylan <cboylan@sapwetik.org>
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Workflow+1: Monty Taylor <mordred@inaugust.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Tue, 01 Nov 2016 16:05:46 +0000
+Reviewed-on: https://review.openstack.org/392206
+Project: openstack-infra/zuul
+Branch: refs/heads/master
