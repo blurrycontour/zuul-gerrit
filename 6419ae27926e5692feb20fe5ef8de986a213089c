@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba5da102_ba3d0291",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2016-11-02T12:53:27Z",
+      "side": 0,
+      "message": "I think we also want to assertNotIn too. This was dropped in your recent patchset.",
+      "revId": "6419ae27926e5692feb20fe5ef8de986a213089c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
