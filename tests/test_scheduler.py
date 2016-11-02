@@ -809,7 +809,6 @@ jobs:
         self.assertEqual(B.reported, 2)
         self.assertEqual(C.reported, 2)
 
-    @skip("Disabled for early v3 development")
     def test_needed_changes_enqueue(self):
         "Test that a needed change is enqueued ahead"
         #          A      Given a git tree like this, if we enqueue
@@ -859,7 +858,7 @@ jobs:
         # triggering events.  Since it will have the changes cached
         # already (without approvals), we need to clear the cache
         # first.
-        for connection in self.connections.values():
+        for connection in self.connections.connections.values():
             connection.maintainCache([])
 
         self.launch_server.hold_jobs_in_build = True
