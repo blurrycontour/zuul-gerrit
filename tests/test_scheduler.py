@@ -1445,7 +1445,6 @@ jobs:
         for build in self.builds:
             self.assertEqual(build.parameters['ZUUL_VOTING'], '0')
 
-    @skip("Disabled for early v3 development")
     def test_check_queue_success(self):
         "Test successful check queue jobs."
 
@@ -1463,7 +1462,6 @@ jobs:
         self.assertEqual(self.getJobFromHistory('project-test2').result,
                          'SUCCESS')
 
-    @skip("Disabled for early v3 development")
     def test_check_queue_failure(self):
         "Test failed check queue jobs."
 
@@ -1688,7 +1686,6 @@ jobs:
 
         self.assertEqual(len(self.history), 0)
 
-    @skip("Disabled for early v3 development")
     def test_new_patchset_dequeues_old(self):
         "Test that a new patchset causes the old to be dequeued"
         # D -> C (depends on B) -> B (depends on A) -> A -> M
