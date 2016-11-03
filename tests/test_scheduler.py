@@ -1251,24 +1251,6 @@ jobs:
         self.assertNotEqual(commit_A, commit_B, commit_C)
 
     @skip("Disabled for early v3 development")
-    def test_one_job_project(self):
-        "Test that queueing works with one job"
-        A = self.fake_gerrit.addFakeChange('org/one-job-project',
-                                           'master', 'A')
-        B = self.fake_gerrit.addFakeChange('org/one-job-project',
-                                           'master', 'B')
-        A.addApproval('code-review', 2)
-        B.addApproval('code-review', 2)
-        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
-        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
-        self.waitUntilSettled()
-
-        self.assertEqual(A.data['status'], 'MERGED')
-        self.assertEqual(A.reported, 2)
-        self.assertEqual(B.data['status'], 'MERGED')
-        self.assertEqual(B.reported, 2)
-
-    @skip("Disabled for early v3 development")
     def test_job_from_templates_launched(self):
         "Test whether a job generated via a template can be launched"
 
@@ -4695,3 +4677,24 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertIn(
             '- docs-draft-test2 https://server/job/docs-draft-test2/1/',
             body[3])
+
+
+class TestSchedulerOneJobProject(ZuulTestCase):
+    tenant_config_file = 'config/one-job-project/main.yaml'
+
+    def test_one_job_project(self):
+        "Test that queueing works with one job"
+        A = self.fake_gerrit.addFakeChange('org/one-job-project',
+                                           'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/one-job-project',
+                                           'master', 'B')
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(B.data['status'], 'MERGED')
+        self.assertEqual(B.reported, 2)
