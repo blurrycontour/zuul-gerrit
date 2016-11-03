@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba5da102_c74381ad",
+        "filename": "tests/fixtures/layout.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2016-11-03T16:51:16Z",
+      "side": 0,
+      "message": "I couldn\u0027t find anything in the zuulv3 spec, but we have lost the ability to use template variables.",
+      "revId": "1af21aa2fb020c9b6afb26bc587daa00d8f8e2b8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
