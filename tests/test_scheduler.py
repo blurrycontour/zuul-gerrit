@@ -1730,7 +1730,6 @@ jobs:
         self.assertEqual(D.reported, 2)
         self.assertEqual(len(self.history), 9)  # 3 each for A, B, D.
 
-    @skip("Disabled for early v3 development")
     def test_new_patchset_check(self):
         "Test a new patchset in check"
 
@@ -1738,7 +1737,8 @@ jobs:
 
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
-        check_pipeline = self.sched.layout.pipelines['check']
+        tenant = self.sched.abide.tenants.get('tenant-one')
+        check_pipeline = tenant.layout.pipelines['check']
 
         # Add two git-dependent changes
         B.setDependsOn(A, 1)
