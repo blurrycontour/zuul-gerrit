@@ -1445,7 +1445,6 @@ jobs:
         for build in self.builds:
             self.assertEqual(build.parameters['ZUUL_VOTING'], '0')
 
-    @skip("Disabled for early v3 development")
     def test_check_queue_success(self):
         "Test successful check queue jobs."
 
