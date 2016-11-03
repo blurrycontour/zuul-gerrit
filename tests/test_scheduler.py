@@ -1941,7 +1941,6 @@ jobs:
         self.launch_server.release()
         self.waitUntilSettled()
 
-    @skip("Disabled for early v3 development")
     def test_zuul_url_return(self):
         "Test if ZUUL_URL is returning when zuul_url is set in zuul.conf"
         self.assertTrue(self.sched.config.has_option('merger', 'zuul_url'))
@@ -1960,7 +1959,6 @@ jobs:
         self.launch_server.release()
         self.waitUntilSettled()
 
-    @skip("Disabled for early v3 development")
     def test_new_patchset_dequeues_old_on_head(self):
         "Test that a new patchset causes the old to be dequeued (at head)"
         # D -> C (depends on B) -> B (depends on A) -> A -> M
@@ -2004,7 +2002,6 @@ jobs:
         self.assertEqual(D.reported, 2)
         self.assertEqual(len(self.history), 7)
 
-    @skip("Disabled for early v3 development")
     def test_new_patchset_dequeues_old_without_dependents(self):
         "Test that a new patchset causes only the old to be dequeued"
         self.launch_server.hold_jobs_in_build = True
@@ -2036,7 +2033,6 @@ jobs:
         self.assertEqual(C.reported, 2)
         self.assertEqual(len(self.history), 9)
 
-    @skip("Disabled for early v3 development")
     def test_new_patchset_dequeues_old_independent_queue(self):
         "Test that a new patchset causes the old to be dequeued (independent)"
         self.launch_server.hold_jobs_in_build = True
