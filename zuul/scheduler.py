@@ -500,7 +500,8 @@ class Scheduler(threading.Thread):
                                                           last_head):
                         new_jobs = item.getJobs()
                         for build in item.current_build_set.getBuilds():
-                            job = item.layout.getJob(build.job.name)
+                            job = item.job_tree.getJobTreeForJob(
+                                build.job.name)
                             if job and job in new_jobs:
                                 build.job = job
                             else:
