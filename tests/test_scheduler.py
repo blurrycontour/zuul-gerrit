@@ -1672,7 +1672,7 @@ jobs:
                 "oldRev": "90f173846e3af9154517b88543ffbd1691f31366",
                 "newRev": "d479a0bfcb34da57a31adb2a595c0cf687812543",
                 "refName": "master",
-                "project": "org/project",
+                "project": "org/project1",
             }
         }
         # Set to the state immediately after a restart
@@ -3159,7 +3159,6 @@ jobs:
         self.assertEqual(A.reported, 2)
         self.assertEqual(r, True)
 
-    @skip("Disabled for early v3 development")
     def test_client_enqueue_ref(self):
         "Test that the RPC client can enqueue a ref"
 
