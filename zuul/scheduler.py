@@ -586,8 +586,9 @@ class Scheduler(threading.Thread):
                 ignore_requirements=True)
 
     def _doEnqueueEvent(self, event):
-        project = self.layout.projects.get(event.project_name)
-        pipeline = self.layout.pipelines[event.forced_pipeline]
+        tenant = self.abide.tenants.get(event.tenant_name)
+        project = tenant.layout.project_configs.get(event.project_name)
+        pipeline = tenant.layout.pipelines[event.forced_pipeline]
         change = pipeline.source.getChange(event, project)
         self.log.debug("Event %s for change %s was directly assigned "
                        "to pipeline %s" % (event, change, self))

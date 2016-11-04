@@ -3135,7 +3135,6 @@ jobs:
         self.launch_server.release('.*')
         self.waitUntilSettled()
 
-    @skip("Disabled for early v3 development")
     def test_client_enqueue_change(self):
         "Test that the RPC client can enqueue a change"
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
@@ -3144,7 +3143,8 @@ jobs:
 
         client = zuul.rpcclient.RPCClient('127.0.0.1',
                                           self.gearman_server.port)
-        r = client.enqueue(pipeline='gate',
+        r = client.enqueue(tenant='tenant-one',
+                           pipeline='gate',
                            project='org/project',
                            trigger='gerrit',
                            change='1,1')
@@ -3159,13 +3159,13 @@ jobs:
         self.assertEqual(A.reported, 2)
         self.assertEqual(r, True)
 
-    @skip("Disabled for early v3 development")
     def test_client_enqueue_ref(self):
         "Test that the RPC client can enqueue a ref"
 
         client = zuul.rpcclient.RPCClient('127.0.0.1',
                                           self.gearman_server.port)
         r = client.enqueue_ref(
+            tenant='tenant-one',
             pipeline='post',
             project='org/project',
             trigger='gerrit',
@@ -3178,14 +3178,14 @@ jobs:
         self.assertIn('project-post', job_names)
         self.assertEqual(r, True)
 
-    @skip("Disabled for early v3 development")
     def test_client_enqueue_negative(self):
         "Test that the RPC client returns errors"
         client = zuul.rpcclient.RPCClient('127.0.0.1',
                                           self.gearman_server.port)
         with testtools.ExpectedException(zuul.rpcclient.RPCFailure,
                                          "Invalid project"):
-            r = client.enqueue(pipeline='gate',
+            r = client.enqueue(tenant='tenant-one',
+                               pipeline='gate',
                                project='project-does-not-exist',
                                trigger='gerrit',
                                change='1,1')
@@ -3194,7 +3194,8 @@ jobs:
 
         with testtools.ExpectedException(zuul.rpcclient.RPCFailure,
                                          "Invalid pipeline"):
-            r = client.enqueue(pipeline='pipeline-does-not-exist',
+            r = client.enqueue(tenant='tenant-one',
+                               pipeline='pipeline-does-not-exist',
                                project='org/project',
                                trigger='gerrit',
                                change='1,1')
@@ -3203,7 +3204,8 @@ jobs:
 
         with testtools.ExpectedException(zuul.rpcclient.RPCFailure,
                                          "Invalid trigger"):
-            r = client.enqueue(pipeline='gate',
+            r = client.enqueue(tenant='tenant-one',
+                               pipeline='gate',
                                project='org/project',
                                trigger='trigger-does-not-exist',
                                change='1,1')
@@ -3212,7 +3214,8 @@ jobs:
 
         with testtools.ExpectedException(zuul.rpcclient.RPCFailure,
                                          "Invalid change"):
-            r = client.enqueue(pipeline='gate',
+            r = client.enqueue(tenant='tenant-one',
+                               pipeline='gate',
                                project='org/project',
                                trigger='gerrit',
                                change='1,1')
