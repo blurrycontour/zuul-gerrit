@@ -27,6 +27,8 @@ from zuul.model import Build
 
 
 def make_merger_item(item):
+    print '1111111111111111111111111111111111'
+    print item
     # Create a dictionary with all info about the item needed by
     # the merger.
     number = None
