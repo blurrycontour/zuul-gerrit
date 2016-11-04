@@ -16,6 +16,24 @@
       "revId": "6419ae27926e5692feb20fe5ef8de986a213089c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba5da102_07870b13",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 16615
+      },
+      "writtenOn": "2016-11-04T17:41:14Z",
+      "side": 0,
+      "message": "Yes, the message is different now and don\u0027t include dup1 or dup2. This is A.message[0]:\n\n\u0027Build succeeded.\\n\\n- project-test1 https://server/job : SUCCESS in 0s\\n\u0027\n\nAny suggestions on how to keep the assertNotIn logic?",
+      "parentUuid": "ba5da102_ba3d0291",
+      "revId": "6419ae27926e5692feb20fe5ef8de986a213089c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
