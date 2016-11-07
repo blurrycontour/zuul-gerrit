@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a629dbe_cd13695b",
+        "filename": "zuul/ansible/library/zuul_afs.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2016-11-07T22:45:25Z",
+      "side": 1,
+      "message": "Since your command is already invoking bash do you need to set shell\u003dTrue here?\n\nAlso check_output can raise CalledProcessError, perhaps we should wrap this in a try/except and add return code info to output as well? Then in module.exit_json() below we can be a bit more specific about whether or not things have succeeded.",
+      "revId": "33a74ef51c8b0aefa2334a053b5105a04e8aa4f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
