@@ -34,6 +34,24 @@
       "revId": "6419ae27926e5692feb20fe5ef8de986a213089c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a629dbe_95e7c511",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2016-11-07T16:58:15Z",
+      "side": 0,
+      "message": "Ya, looks like this has changed a little.  I think what we could do is add success-message into zuul.yaml for each pipeline:\n\nsuccess-message: Build succeeded (dup1).\nsuccess-message: Build succeeded (dup2).\n\nThen we can restore the assertNotIn logic.",
+      "parentUuid": "ba5da102_07870b13",
+      "revId": "6419ae27926e5692feb20fe5ef8de986a213089c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
