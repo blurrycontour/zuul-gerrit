@@ -466,6 +466,8 @@ class Job(object):
         self._files = []
         self.skip_if_matcher = None
         self.swift = {}
+        # Number of attempts to launch a job before giving up.
+        self.attempts = 3
 
     def __str__(self):
         return self.name

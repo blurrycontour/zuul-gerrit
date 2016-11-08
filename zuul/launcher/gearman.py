@@ -158,6 +158,7 @@ class Gearman(object):
         self.sched = sched
         self.swift = swift
         self.builds = {}
+        self.tries = {}
         self.meta_jobs = {}  # A list of meta-jobs like stop or describe
 
         server = config.get('gearman', 'server')
@@ -348,6 +349,10 @@ class Gearman(object):
             name = "build:%s:%s" % (job.name, params['ZUUL_NODE'])
         else:
             name = "build:%s" % job.name
+
+        if name not in self.tries:
+            self.tries[name] = 1
+
         build = Build(job, uuid)
         build.parameters = params
 
@@ -365,6 +370,12 @@ class Gearman(object):
             self.log.error("Job %s is not registered with Gearman" %
                            gearman_job)
             self.onBuildCompleted(gearman_job, 'NOT_REGISTERED')
+            return build
+
+        # NOTE(pabelanger): Rather then looping forever, check to see if job
+        # has passed attempts limit.
+        if self.tries[name] > job.attempts:
+            self.onBuildCompleted(gearman_job, 'JOB_LIMIT')
             return build
 
         if pipeline.precedence == zuul.model.PRECEDENCE_NORMAL:
@@ -441,9 +452,15 @@ class Gearman(object):
                     result = data.get('result')
                 if result is None:
                     build.retry = True
+                    self.tries[job.name] += 1
+                else:
+                    if job.name in self.tries:
+                        del self.tries[job.name]
+
                 self.log.info("Build %s complete, result %s" %
                               (job, result))
                 self.sched.onBuildCompleted(build, result)
+
             # The test suite expects the build to be removed from the
             # internal dict after it's added to the report queue.
             del self.builds[job.unique]
@@ -479,6 +496,8 @@ class Gearman(object):
 
     def cancelJobInQueue(self, build):
         job = build.__gearman_job
+        if job.name in self.tries:
+            del self.tries[job.name]
 
         req = gear.CancelJobAdminRequest(job.handle)
         job.connection.sendAdminRequest(req, timeout=300)
