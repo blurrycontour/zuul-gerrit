@@ -466,6 +466,8 @@ class Job(object):
         self._files = []
         self.skip_if_matcher = None
         self.swift = {}
+        # Number of attempts to launch a job before giving up.
+        self.attempts = 2
 
     def __str__(self):
         return self.name
@@ -646,6 +648,7 @@ class BuildSet(object):
         self.unable_to_merge = False
         self.failing_reasons = []
         self.merge_state = self.NEW
+        self.tries = 0
 
     def __repr__(self):
         return '<BuildSet item: %s #builds: %s merge state: %s>' % (
@@ -674,6 +677,7 @@ class BuildSet(object):
         build.build_set = self
 
     def removeBuild(self, build):
+        self.tries += 1
         del self.builds[build.job.name]
 
     def getBuild(self, job_name):

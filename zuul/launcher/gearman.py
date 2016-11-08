@@ -348,6 +348,7 @@ class Gearman(object):
             name = "build:%s:%s" % (job.name, params['ZUUL_NODE'])
         else:
             name = "build:%s" % job.name
+
         build = Build(job, uuid)
         build.parameters = params
 
@@ -365,6 +366,12 @@ class Gearman(object):
             self.log.error("Job %s is not registered with Gearman" %
                            gearman_job)
             self.onBuildCompleted(gearman_job, 'NOT_REGISTERED')
+            return build
+
+        # NOTE(pabelanger): Rather then looping forever, check to see if job
+        # has passed attempts limit.
+        if item.current_build_set.tries > job.attempts:
+            self.onBuildCompleted(gearman_job, 'RETRY_LIMIT')
             return build
 
         if pipeline.precedence == zuul.model.PRECEDENCE_NORMAL:
