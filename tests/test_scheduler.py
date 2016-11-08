@@ -4481,3 +4481,32 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertIn(
             '- docs-draft-test2 https://server/job/docs-draft-test2/1/',
             body[3])
+
+    def test_rerun_on_abort(self):
+        "Test that if a worker fails to run a job, it is run again"
+        self.worker.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        #A.addApproval('CRVW', 2)
+        #self.fake_gerrit.addEvent(A.addApproval('APRV', 1))
+        self.waitUntilSettled()
+
+        self.worker.release('.*-merge')
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 2)
+        self.builds[0].requeue = True
+        self.worker.release('.*-test*')
+        self.waitUntilSettled()
+
+        for x in range(2):
+            self.assertEqual(len(self.builds), 1)
+            self.builds[0].requeue = True
+            self.worker.release('.*-test1')
+            self.waitUntilSettled()
+
+        self.worker.hold_jobs_in_build = False
+        self.worker.release()
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 5)
+        self.assertEqual(self.countJobResults(self.history, 'SUCCESS'), 2)
