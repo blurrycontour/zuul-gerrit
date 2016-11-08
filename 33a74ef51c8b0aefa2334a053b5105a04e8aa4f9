@@ -33,6 +33,23 @@
       "revId": "33a74ef51c8b0aefa2334a053b5105a04e8aa4f9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a629dbe_f1dd3e43",
+        "filename": "zuul/ansible/library/zuul_afs.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-11-08T17:09:02Z",
+      "side": 1,
+      "message": "Actually, I just tested this with a failure, and I\u0027m happy with the output that we get from Ansible.  We will get the full traceback of the CalledProcessError, along with the command it tried to run (which will include enough information to determine which subpath this failed on if that\u0027s the case) along with the exit code.  And Ansible will report the task as failed.",
+      "revId": "33a74ef51c8b0aefa2334a053b5105a04e8aa4f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
