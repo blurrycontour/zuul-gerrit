@@ -16,6 +16,23 @@
       "revId": "33a74ef51c8b0aefa2334a053b5105a04e8aa4f9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a629dbe_6d16b456",
+        "filename": "zuul/ansible/library/zuul_afs.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-11-08T17:01:31Z",
+      "side": 1,
+      "message": "Well, the whole thing is a string that ends up getting formatted.  I could reconfigure it like that, but this was a pretty straightforward port from the ansible form we used before, so I\u0027d just as soon leave it.  Even if I did change it, only the k5start would be passed in as argv, the bulk of the command would still be a shell blob, so it\u0027s not much of a win.\n\nAnd yes, we should do something with return codes here.",
+      "revId": "33a74ef51c8b0aefa2334a053b5105a04e8aa4f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
