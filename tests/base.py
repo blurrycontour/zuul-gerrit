@@ -601,7 +601,7 @@ class FakeBuild(threading.Thread):
                                        self.parameters['ZUUL_REF'])):
             result = 'FAILURE'
         if self.aborted:
-            result = 'ABORTED'
+            result = None
 
         if self.run_error:
             work_fail = True

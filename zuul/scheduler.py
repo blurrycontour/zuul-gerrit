@@ -1511,6 +1511,9 @@ class BasePipelineManager(object):
         self.log.debug("Launching jobs for change %s" % item.change)
         dependent_items = self.getDependentItems(item)
         for job in jobs:
+            # NOTE(pabelanger): Keep track of how many times we try to launch a
+            # job.
+            job.tries += 1
             self.log.debug("Found job %s for change %s" % (job, item.change))
             try:
                 build = self.sched.launcher.launch(job, item,
@@ -1522,6 +1525,11 @@ class BasePipelineManager(object):
             except:
                 self.log.exception("Exception while launching job %s "
                                    "for change %s:" % (job, item.change))
+
+            # TODO(pabelanger): Make this a per-job setting?
+            if job.tries > 2:
+                self.sched.launcher.cancel(build)
+                build.result = 'CANCELED'
 
     def launchJobs(self, item):
         jobs = self.pipeline.findJobsToRun(item, self.sched.mutex)

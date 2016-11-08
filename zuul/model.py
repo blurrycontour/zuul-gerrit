@@ -466,6 +466,7 @@ class Job(object):
         self._files = []
         self.skip_if_matcher = None
         self.swift = {}
+        self.tries = 0
 
     def __str__(self):
         return self.name
