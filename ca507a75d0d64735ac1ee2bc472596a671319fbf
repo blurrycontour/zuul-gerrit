@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a629dbe_f158defc",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 469,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2016-11-08T17:07:29Z",
+      "side": 1,
+      "message": "This won\u0027t work, as jobs affect all pipelines.",
+      "revId": "ca507a75d0d64735ac1ee2bc472596a671319fbf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
