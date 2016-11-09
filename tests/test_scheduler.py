@@ -4599,8 +4599,13 @@ class TestDuplicatePipeline(ZuulTestCase):
     def test_duplicate_pipelines(self):
         "Test that a change matching multiple pipelines works"
 
+        self.launch_server.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         self.fake_gerrit.addEvent(A.getChangeRestoredEvent())
+        self.waitUntilSettled()
+
+        self.launch_server.hold_jobs_in_build = False
+        self.launch_server.release()
         self.waitUntilSettled()
 
         self.assertHistory([
@@ -4608,7 +4613,7 @@ class TestDuplicatePipeline(ZuulTestCase):
                  pipeline='dup1'),
             dict(name='project-test1', result='SUCCESS', changes='1,1',
                  pipeline='dup2'),
-        ], ordered=False)
+        ])
 
         self.assertEqual(len(A.messages), 2)
 
