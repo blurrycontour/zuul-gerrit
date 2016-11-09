@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a629dbe_33914348",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1895,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-11-09T18:39:25Z",
+      "side": 1,
+      "message": "This test will ultimately no longer be needed, but we can remove it with the code.",
+      "revId": "c7d5701e23f091b88b750169ea2a468912608e89",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
