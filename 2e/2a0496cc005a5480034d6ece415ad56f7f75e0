@@ -1,0 +1,10 @@
+Code-Review+2: Joshua Hesketh <joshua.hesketh@rackspace.com>
+Code-Review+1: Jesse Keating <omgjlk@us.ibm.com>
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Wed, 09 Nov 2016 17:03:29 +0000
+Reviewed-on: https://review.openstack.org/391687
+Project: openstack-infra/zuul
+Branch: refs/heads/feature/zuulv3
