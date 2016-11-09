@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a629dbe_465437fe",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4678,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-11-09T18:56:26Z",
+      "side": 1,
+      "message": "As clarkb points out, we\u0027re not actually setting the flags that caused jobs to pause for orderedRelease to be effective.  Instead we can add ordered\u003dFalse to assertHistory and it won\u0027t care anymore.",
+      "revId": "cb946d603a0cd2d25db9b4ec87bcd07193985ff5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
