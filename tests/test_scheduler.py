@@ -4675,6 +4675,7 @@ class TestDuplicatePipeline(ZuulTestCase):
         self.fake_gerrit.addEvent(A.getChangeRestoredEvent())
         self.waitUntilSettled()
 
+        self.orderedRelease()
         self.assertHistory([
             dict(name='project-test1', result='SUCCESS', changes='1,1',
                  pipeline='dup1'),
