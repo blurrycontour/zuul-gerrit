@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a629dbe_745d3346",
+        "filename": "zuul/ansible/library/zuul_afs.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2016-11-10T16:21:18Z",
+      "side": 1,
+      "message": "If all of these things are always \u0027str\u0027 types, you do not need type\u003d\u0027raw\u0027 (and, in fact, should not use it).",
+      "revId": "bafbc5b328a3584dc0d8f2c84e0306e84f083475",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
