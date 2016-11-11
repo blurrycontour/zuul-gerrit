@@ -743,18 +743,24 @@ class Scheduler(threading.Thread):
             for tenant in self.abide.tenants.values():
                 reconfigured_tenant = False
                 for pipeline in tenant.layout.pipelines.values():
-                    # Get the change even if the project is unknown to
-                    # us for the use of updating the cache if there is
-                    # another change depending on this foreign one.
-                    try:
-                        change = pipeline.source.getChange(event)
-                    except exceptions.ChangeNotFound as e:
-                        self.log.debug("Unable to get change %s from "
-                                       "source %s (most likely looking "
-                                       "for a change from another "
-                                       "connection trigger)",
-                                       e.change, pipeline.source)
-                        continue
+                    if not (event.change_number or event.ref):
+                        change = NullChange(project)
+                    else:
+                        if event.connection_name != \
+                              pipeline.source.connection.connection_name:
+                            continue
+                        # Get the change even if the project is unknown to
+                        # us for the use of updating the cache if there is
+                        # another change depending on this foreign one.
+                        try:
+                            change = pipeline.source.getChange(event)
+                        except exceptions.ChangeNotFound as e:
+                            self.log.debug("Unable to get change %s from "
+                                           "source %s (most likely looking "
+                                           "for a change from another "
+                                           "connection trigger)",
+                                           e.change, pipeline.source)
+                            continue
                     if (event.type == 'change-merged' and
                         hasattr(change, 'files') and
                         not reconfigured_tenant and

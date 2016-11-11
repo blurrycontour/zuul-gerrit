@@ -1583,6 +1583,7 @@ class Changeish(object):
 
     def __init__(self, project):
         self.project = project
+        self.connection_name = None
 
     def getBasePath(self):
         base_path = ''
@@ -1748,6 +1749,7 @@ class TriggerEvent(object):
         self.type = None
         # For management events (eg: enqueue / promote)
         self.tenant_name = None
+        self.connection_name = None
         self.project_name = None
         self.trigger_name = None
         # Representation of the user account that performed the event.
