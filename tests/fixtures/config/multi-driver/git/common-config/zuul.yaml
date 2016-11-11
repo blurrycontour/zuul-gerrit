@@ -1,0 +1,48 @@
+- pipeline:
+    name: check_github
+    manager: independent
+    source:
+      github
+    trigger:
+      github:
+        - event:
+            - pr-open
+            - pr-change
+            - pr-reopen
+    success:
+      github:
+        status: true
+    failure:
+      github:
+        status: true
+
+- pipeline:
+    name: check_gerrit
+    manager: independent
+    source: gerrit
+    trigger:
+      gerrit:
+        - event: patchset-created
+    success:
+      gerrit:
+        verify: 1
+    failure:
+      gerrit:
+        verify: 1
+
+- job:
+    name: project-gerrit
+- job:
+    name: project1-github
+
+- project:
+    name: org/project
+    check_gerrit:
+      jobs:
+        - project-gerrit
+
+- project:
+    name: org/project1
+    check_github:
+      jobs:
+        - project1-github
