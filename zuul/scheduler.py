@@ -706,6 +706,10 @@ class Scheduler(threading.Thread):
             for tenant in self.abide.tenants.values():
                 reconfigured_tenant = False
                 for pipeline in tenant.layout.pipelines.values():
+                    # Do not trigger on mis-matched triggers
+                    ptriggers = [tr.name for tr in pipeline.triggers]
+                    if event.trigger_name not in ptriggers:
+                        continue
                     # Get the change even if the project is unknown to
                     # us for the use of updating the cache if there is
                     # another change depending on this foreign one.
