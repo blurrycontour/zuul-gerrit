@@ -77,6 +77,7 @@ class TimerDriver(Driver, TriggerInterface):
     def _onTrigger(self, tenant, pipeline_name, timespec):
         for project_name in tenant.layout.project_configs.keys():
             event = TriggerEvent()
+            event.trigger_name = self.name
             event.type = 'timer'
             event.timespec = timespec
             event.forced_pipeline = pipeline_name
