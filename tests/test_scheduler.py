@@ -4217,7 +4217,6 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertIn('Build succeeded', A.messages[0])
         self.assertIn('Build succeeded', B.messages[0])
 
-    @skip("Disabled for early v3 development")
     def _test_crd_check_reconfiguration(self, project1, project2):
         "Test cross-repo dependencies re-enqueued in independent pipelines"
 
@@ -4236,8 +4235,9 @@ For CI problems and help debugging, contact ci@example.org"""
 
         # Make sure the items still share a change queue, and the
         # first one is not live.
-        self.assertEqual(len(self.sched.layout.pipelines['check'].queues), 1)
-        queue = self.sched.layout.pipelines['check'].queues[0]
+        tenant = self.sched.abide.tenants.get('tenant-one')
+        self.assertEqual(len(tenant.layout.pipelines['check'].queues), 1)
+        queue = tenant.layout.pipelines['check'].queues[0]
         first_item = queue.queue[0]
         for item in queue.queue:
             self.assertEqual(item.queue, first_item.queue)
@@ -4254,9 +4254,8 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertEqual(B.reported, 0)
 
         self.assertEqual(self.history[0].changes, '2,1 1,1')
-        self.assertEqual(len(self.sched.layout.pipelines['check'].queues), 0)
+        self.assertEqual(len(tenant.layout.pipelines['check'].queues), 0)
 
-    @skip("Disabled for early v3 development")
     def test_crd_check_reconfiguration(self):
         self._test_crd_check_reconfiguration('org/project1', 'org/project2')
 
