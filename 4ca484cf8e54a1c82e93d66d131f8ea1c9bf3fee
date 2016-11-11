@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a629dbe_c365301e",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 4510,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-11-11T22:22:10Z",
+      "side": 1,
+      "message": "Let\u0027s check that it reported once (A.reported \u003d\u003d 1) and that the project-test1 job reported RETRY_LIMIT.",
+      "revId": "4ca484cf8e54a1c82e93d66d131f8ea1c9bf3fee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
