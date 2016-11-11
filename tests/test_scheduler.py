@@ -563,7 +563,6 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(B.reported, 2)
         self.assertEqual(C.reported, 2)
 
-    @skip("Disabled for early v3 development")
     def _test_time_database(self, iteration):
         self.launch_server.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
@@ -574,16 +573,17 @@ class TestScheduler(ZuulTestCase):
 
         data = json.loads(self.sched.formatStatusJSON())
         found_job = None
-        for pipeline in data['pipelines']:
-            if pipeline['name'] != 'gate':
-                continue
-            for queue in pipeline['change_queues']:
-                for head in queue['heads']:
-                    for item in head:
-                        for job in item['jobs']:
-                            if job['name'] == 'project-merge':
-                                found_job = job
-                                break
+        for tenant in data['tenants']:
+            for pipeline in tenant['pipelines']:
+                if pipeline['name'] != 'gate':
+                    continue
+                for queue in pipeline['change_queues']:
+                    for head in queue['heads']:
+                        for item in head:
+                            for job in item['jobs']:
+                                if job['name'] == 'project-merge':
+                                    found_job = job
+                                    break
 
         self.assertIsNotNone(found_job)
         if iteration == 1:
@@ -598,7 +598,6 @@ class TestScheduler(ZuulTestCase):
         self.launch_server.release()
         self.waitUntilSettled()
 
-    @skip("Disabled for early v3 development")
     def test_time_database(self):
         "Test the time database"
 
