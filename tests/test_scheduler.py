@@ -4057,7 +4057,6 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertEqual(A.data['status'], 'NEW')
         self.assertEqual(B.data['status'], 'NEW')
 
-    @skip("Disabled for early v3 development")
     def test_crd_gate_unknown(self):
         "Test unknown projects in dependent pipeline"
         self.init_repo("org/unknown")
@@ -4259,7 +4258,7 @@ For CI problems and help debugging, contact ci@example.org"""
     def test_crd_check_reconfiguration(self):
         self._test_crd_check_reconfiguration('org/project1', 'org/project2')
 
-    @skip("Disabled for early v3 development")
+#    @skip("Disabled for early v3 development")
     def test_crd_undefined_project(self):
         """Test that undefined projects in dependencies are handled for
         independent pipelines"""
