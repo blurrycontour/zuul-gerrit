@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a629dbe_f610195c",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-11-14T05:14:32Z",
+      "side": 1,
+      "message": "I don\u0027t think these should be here. Just invalid tenant.",
+      "range": {
+        "startLine": 119,
+        "startChar": 12,
+        "endLine": 119,
+        "endChar": 66
+      },
+      "revId": "8330f58003bdbb21b1562abc2019e6a50e7f4d54",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
