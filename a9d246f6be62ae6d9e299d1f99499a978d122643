@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a629dbe_190dbe37",
+        "filename": "bindep.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-11-14T05:16:49Z",
+      "side": 1,
+      "message": "not strictly needed by tests",
+      "range": {
+        "startLine": 1,
+        "startChar": 73,
+        "endLine": 1,
+        "endChar": 78
+      },
+      "revId": "a9d246f6be62ae6d9e299d1f99499a978d122643",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
