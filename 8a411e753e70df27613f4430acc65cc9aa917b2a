@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a77a97e_4cd9f582",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 345,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2016-11-16T08:46:59Z",
+      "side": 1,
+      "message": "No test coverage on these two lines FYI",
+      "revId": "8a411e753e70df27613f4430acc65cc9aa917b2a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a77a97e_6ce87111",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 373,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2016-11-16T08:46:59Z",
+      "side": 1,
+      "message": "Nor is there any coverage on this case",
+      "revId": "8a411e753e70df27613f4430acc65cc9aa917b2a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a77a97e_8ce30d33",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2016-11-16T08:46:59Z",
+      "side": 1,
+      "message": "This condition is also uncovered.",
+      "revId": "8a411e753e70df27613f4430acc65cc9aa917b2a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a77a97e_acd0c954",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2016-11-16T08:46:59Z",
+      "side": 1,
+      "message": "stop method not called in tests",
+      "revId": "8a411e753e70df27613f4430acc65cc9aa917b2a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
