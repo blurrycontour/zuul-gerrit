@@ -1262,19 +1262,6 @@ class ZuulTestCase(BaseTestCase):
         commit = repo.index.commit('Creating a fake commit')
         return commit.hexsha
 
-    def ref_has_change(self, ref, change):
-        # TODOv3(jeblair): this should probably be removed in favor of
-        # build.hasChanges
-        path = os.path.join(self.git_root, change.project)
-        repo = git.Repo(path)
-        try:
-            for commit in repo.iter_commits(ref):
-                if commit.message.strip() == ('%s-1' % change.subject):
-                    return True
-        except GitCommandError:
-            pass
-        return False
-
     def orderedRelease(self):
         # Run one build at a time to ensure non-race order:
         while len(self.builds):
