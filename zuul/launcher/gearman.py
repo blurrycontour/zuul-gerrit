@@ -508,6 +508,7 @@ class Gearman(object):
         self.log.debug("Submitting stop job: %s", stop_job)
         self.gearman.submitJob(stop_job, precedence=gear.PRECEDENCE_HIGH,
                                timeout=300)
+        self.sched.mutex.release(build.build_set.item, build.job)
         return True
 
     def setBuildDescription(self, build, desc):
