@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "7a77a97e_68d62729",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 807,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-11-18T10:22:14Z",
+      "side": 1,
+      "message": "Remove todo?",
+      "range": {
+        "startLine": 807,
+        "startChar": 10,
+        "endLine": 807,
+        "endChar": 16
+      },
+      "revId": "6349d1511af4686f570019aef9f3f07b603f9ecc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a77a97e_f082e0c7",
         "filename": "zuul/webapp.py",
         "patchSetId": 3
