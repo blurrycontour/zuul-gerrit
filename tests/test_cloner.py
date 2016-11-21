@@ -74,7 +74,7 @@ class TestCloner(ZuulTestCase):
 
         self.waitUntilSettled()
 
-        self.assertEquals(1, len(self.builds), "One build is running")
+        self.assertEqual(1, len(self.builds), "One build is running")
 
         B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
         B.setMerged()
@@ -102,14 +102,14 @@ class TestCloner(ZuulTestCase):
             state = states[number]
 
             for project in projects:
-                self.assertEquals(state[project],
-                                  str(work[project].commit('HEAD')),
-                                  'Project %s commit for build %s should '
-                                  'be correct' % (project, number))
+                self.assertEqual(state[project],
+                                 str(work[project].commit('HEAD')),
+                                 'Project %s commit for build %s should '
+                                 'be correct' % (project, number))
 
         work = self.getWorkspaceRepos(projects)
         upstream_repo_path = os.path.join(self.upstream_root, 'org/project1')
-        self.assertEquals(
+        self.assertEqual(
             work['org/project1'].remotes.origin.url,
             upstream_repo_path,
             'workspace repo origin should be upstream, not cache'
@@ -132,7 +132,7 @@ class TestCloner(ZuulTestCase):
 
         self.waitUntilSettled()
 
-        self.assertEquals(2, len(self.builds), "Two builds are running")
+        self.assertEqual(2, len(self.builds), "Two builds are running")
 
         upstream = self.getUpstreamRepos(projects)
         states = [
@@ -160,10 +160,10 @@ class TestCloner(ZuulTestCase):
             state = states[number]
 
             for project in projects:
-                self.assertEquals(state[project],
-                                  str(work[project].commit('HEAD')),
-                                  'Project %s commit for build %s should '
-                                  'be correct' % (project, number))
+                self.assertEqual(state[project],
+                                 str(work[project].commit('HEAD')),
+                                 'Project %s commit for build %s should '
+                                 'be correct' % (project, number))
 
             shutil.rmtree(self.workspace_root)
 
@@ -191,7 +191,7 @@ class TestCloner(ZuulTestCase):
 
         self.waitUntilSettled()
 
-        self.assertEquals(3, len(self.builds), "Three builds are running")
+        self.assertEqual(3, len(self.builds), "Three builds are running")
 
         upstream = self.getUpstreamRepos(projects)
         states = [
@@ -231,10 +231,10 @@ class TestCloner(ZuulTestCase):
             state = states[number]
 
             for project in projects:
-                self.assertEquals(state[project],
-                                  str(work[project].commit('HEAD')),
-                                  'Project %s commit for build %s should '
-                                  'be correct' % (project, number))
+                self.assertEqual(state[project],
+                                 str(work[project].commit('HEAD')),
+                                 'Project %s commit for build %s should '
+                                 'be correct' % (project, number))
             shutil.rmtree(self.workspace_root)
 
         self.worker.hold_jobs_in_build = False
@@ -271,7 +271,7 @@ class TestCloner(ZuulTestCase):
 
         self.waitUntilSettled()
 
-        self.assertEquals(5, len(self.builds), "Five builds are running")
+        self.assertEqual(5, len(self.builds), "Five builds are running")
 
         # Check the old side of the upgrade first
         upstream = self.getUpstreamRepos(projects)
@@ -347,11 +347,11 @@ class TestCloner(ZuulTestCase):
             state = states[number]
 
             for project in projects:
-                self.assertEquals(state[project],
-                                  str(work[project].commit('HEAD')),
-                                  'Project %s commit for build %s should '
-                                  'be correct on old side of upgrade' %
-                                  (project, number))
+                self.assertEqual(state[project],
+                                 str(work[project].commit('HEAD')),
+                                 'Project %s commit for build %s should '
+                                 'be correct on old side of upgrade' %
+                                 (project, number))
             shutil.rmtree(self.workspace_root)
 
         # Check the new side of the upgrade
@@ -410,11 +410,11 @@ class TestCloner(ZuulTestCase):
             state = states[number]
 
             for project in projects:
-                self.assertEquals(state[project],
-                                  str(work[project].commit('HEAD')),
-                                  'Project %s commit for build %s should '
-                                  'be correct on old side of upgrade' %
-                                  (project, number))
+                self.assertEqual(state[project],
+                                 str(work[project].commit('HEAD')),
+                                 'Project %s commit for build %s should '
+                                 'be correct on old side of upgrade' %
+                                 (project, number))
             shutil.rmtree(self.workspace_root)
 
         self.worker.hold_jobs_in_build = False
@@ -445,7 +445,7 @@ class TestCloner(ZuulTestCase):
 
         self.waitUntilSettled()
 
-        self.assertEquals(4, len(self.builds), "Four builds are running")
+        self.assertEqual(4, len(self.builds), "Four builds are running")
 
         upstream = self.getUpstreamRepos(projects)
         states = [
@@ -497,10 +497,10 @@ class TestCloner(ZuulTestCase):
             state = states[number]
 
             for project in projects:
-                self.assertEquals(state[project],
-                                  str(work[project].commit('HEAD')),
-                                  'Project %s commit for build %s should '
-                                  'be correct' % (project, number))
+                self.assertEqual(state[project],
+                                 str(work[project].commit('HEAD')),
+                                 'Project %s commit for build %s should '
+                                 'be correct' % (project, number))
             shutil.rmtree(self.workspace_root)
 
         self.worker.hold_jobs_in_build = False
@@ -534,7 +534,7 @@ class TestCloner(ZuulTestCase):
 
         projects = ['org/project']
 
-        self.assertEquals(2, len(builds), "Two builds are running")
+        self.assertEqual(2, len(builds), "Two builds are running")
 
         upstream = self.getUpstreamRepos(projects)
         states = [
@@ -644,10 +644,10 @@ class TestCloner(ZuulTestCase):
             state = states[number]
 
             for project in projects:
-                self.assertEquals(state[project],
-                                  str(work[project].commit('HEAD')),
-                                  'Project %s commit for build %s should '
-                                  'be correct' % (project, number))
+                self.assertEqual(state[project],
+                                 str(work[project].commit('HEAD')),
+                                 'Project %s commit for build %s should '
+                                 'be correct' % (project, number))
 
             shutil.rmtree(self.workspace_root)
 
