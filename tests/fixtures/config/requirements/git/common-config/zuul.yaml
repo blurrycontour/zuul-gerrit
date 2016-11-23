@@ -1,0 +1,5 @@
+- job:
+    name: project1-job
+
+- job:
+    name: project2-job
