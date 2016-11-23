@@ -251,21 +251,18 @@ class TestRequirements(ZuulTestCase):
         self.assertEqual(len(self.history), 2)
         self.assertEqual(self.history[1].name, job)
 
-    @skip("Disabled for early v3 development")
     def test_pipeline_require_current_patchset(self):
-        "Test pipeline requirement: current-patchset"
-        self.updateConfigLayout(
-            'tests/fixtures/layout-requirement-current-patchset.yaml')
+        self.updateConfigLayout('current-patchset')
         self.sched.reconfigure(self.config)
-        self.registerJobs()
+
         # Create two patchsets and let their tests settle out. Then
         # comment on first patchset and check that no additional
         # jobs are run.
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        self.fake_gerrit.addEvent(A.addApproval('CRVW', 1))
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        self.fake_gerrit.addEvent(A.addApproval('code-review', 1))
         self.waitUntilSettled()
         A.addPatchset()
-        self.fake_gerrit.addEvent(A.addApproval('CRVW', 1))
+        self.fake_gerrit.addEvent(A.addApproval('code-review', 1))
         self.waitUntilSettled()
 
         self.assertEqual(len(self.history), 2)  # one job for each ps
@@ -280,41 +277,34 @@ class TestRequirements(ZuulTestCase):
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 3)
 
-    @skip("Disabled for early v3 development")
     def test_pipeline_require_open(self):
-        "Test pipeline requirement: open"
-        self.updateConfigLayout(
-            'tests/fixtures/layout-requirement-open.yaml')
+        self.updateConfigLayout('open')
         self.sched.reconfigure(self.config)
-        self.registerJobs()
 
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A',
                                            status='MERGED')
-        self.fake_gerrit.addEvent(A.addApproval('CRVW', 2))
+        self.fake_gerrit.addEvent(A.addApproval('code-review', 2))
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 0)
 
-        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
-        self.fake_gerrit.addEvent(B.addApproval('CRVW', 2))
+        B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
+        self.fake_gerrit.addEvent(B.addApproval('code-review', 2))
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 1)
 
-    @skip("Disabled for early v3 development")
     def test_pipeline_require_status(self):
         "Test pipeline requirement: status"
-        self.updateConfigLayout(
-            'tests/fixtures/layout-requirement-status.yaml')
+        self.updateConfigLayout('status')
         self.sched.reconfigure(self.config)
-        self.registerJobs()
 
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A',
                                            status='MERGED')
-        self.fake_gerrit.addEvent(A.addApproval('CRVW', 2))
+        self.fake_gerrit.addEvent(A.addApproval('code-review', 2))
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 0)
 
-        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
-        self.fake_gerrit.addEvent(B.addApproval('CRVW', 2))
+        B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
+        self.fake_gerrit.addEvent(B.addApproval('code-review', 2))
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 1)
 

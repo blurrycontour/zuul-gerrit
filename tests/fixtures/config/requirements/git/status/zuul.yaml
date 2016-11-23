@@ -1,8 +1,10 @@
-pipelines:
-  - name: check
-    manager: IndependentPipelineManager
+- pipeline:
+    name: check
+    manager: independent
+    source:
+      gerrit
     require:
-      open: True
+      status: NEW
     trigger:
       gerrit:
         - event: patchset-created
@@ -14,7 +16,8 @@ pipelines:
       gerrit:
         verified: -1
 
-projects:
-  - name: org/project
+- project:
+    name: org/project1
     check:
-      - project-check
+      jobs:
+        - project1-job
