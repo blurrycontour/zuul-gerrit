@@ -103,34 +103,30 @@ class TestRequirements(ZuulTestCase):
         self.assertEqual(len(self.history), 1)
         self.assertEqual(self.history[0].name, job)
 
-    @skip("Disabled for early v3 development")
     def test_pipeline_require_approval_username(self):
         "Test pipeline requirement: approval username"
         return self._test_require_approval_username('org/project1',
-                                                    'project1-pipeline')
+                                                    'project1-job')
 
-    @skip("Disabled for early v3 development")
     def test_trigger_require_approval_username(self):
         "Test trigger requirement: approval username"
         return self._test_require_approval_username('org/project2',
-                                                    'project2-trigger')
+                                                    'project2-job')
 
     def _test_require_approval_username(self, project, job):
-        self.updateConfigLayout(
-            'tests/fixtures/layout-requirement-username.yaml')
+        self.updateConfigLayout('username')
         self.sched.reconfigure(self.config)
-        self.registerJobs()
 
         A = self.fake_gerrit.addFakeChange(project, 'master', 'A')
         # A comment event that we will keep submitting to trigger
-        comment = A.addApproval('CRVW', 2, username='nobody')
+        comment = A.addApproval('code-review', 2, username='nobody')
         self.fake_gerrit.addEvent(comment)
         self.waitUntilSettled()
         # No approval from Jenkins so should not be enqueued
         self.assertEqual(len(self.history), 0)
 
         # Add an approval from Jenkins
-        A.addApproval('VRFY', 1, username='jenkins')
+        A.addApproval('verified', 1, username='jenkins')
         self.fake_gerrit.addEvent(comment)
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 1)
