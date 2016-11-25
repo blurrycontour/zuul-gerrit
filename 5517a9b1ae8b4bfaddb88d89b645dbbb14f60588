@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a74a57a_73c3b2ed",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1014,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2016-11-25T19:21:06Z",
+      "side": 1,
+      "message": "don\u0027t think we need to add this to all tests, you should be able to only all self.init_repo(\u0027org/docs\u0027) for your specific tests",
+      "revId": "5517a9b1ae8b4bfaddb88d89b645dbbb14f60588",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
