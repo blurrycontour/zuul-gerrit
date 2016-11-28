@@ -117,10 +117,10 @@ class Cloner(object):
             return False
         except GitCommandError as error:
             # Bail out if fetch fails due to infrastructure reasons
-            if error.stderr.startswith('fatal: unable to access'):
+            if u'fatal: unable to access' in error.stderr.decode():
                 raise
-            self.log.debug("Project %s in Zuul does not have ref %s",
-                           project, ref)
+            self.log.debug("Project %s in Zuul does not have ref %s (%s)",
+                           project, ref, error.stderr)
             return False
 
     def prepareRepo(self, project, dest):
