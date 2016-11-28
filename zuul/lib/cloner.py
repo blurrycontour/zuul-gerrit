@@ -26,6 +26,14 @@ from zuul import exceptions
 from zuul.lib.clonemapper import CloneMapper
 from zuul.merger.merger import Repo
 
+# git messages to look for when checking for infrastructure failure
+# these are normalized to lowercase
+GIT_INFRA_FAILURE_MESSAGES = [
+    u'fatal: authentication failed',
+    u'fatal: could not read username',
+    u'fatal: unable to access',
+]
+
 
 class Cloner(object):
     log = logging.getLogger("zuul.Cloner")
@@ -142,10 +150,12 @@ class Cloner(object):
             return False
         except GitCommandError as error:
             # Bail out if fetch fails due to infrastructure reasons
-            if error.stderr.startswith('fatal: unable to access'):
+            normalized_msg = error.stderr.decode().lower()
+            if any(fail_msg in normalized_msg
+                   for fail_msg in GIT_INFRA_FAILURE_MESSAGES):
                 raise
-            self.log.debug("Repo %s does not have ref %s",
-                           remote, ref)
+            self.log.debug("Repo %s does not have ref %s (%s)",
+                           remote, ref, error.stderr)
             return False
 
     def prepareRepo(self, project, dest):
