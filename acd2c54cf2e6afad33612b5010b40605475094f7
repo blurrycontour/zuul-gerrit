@@ -34,6 +34,40 @@
       "revId": "acd2c54cf2e6afad33612b5010b40605475094f7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a74a57a_6a3d2ddc",
+        "filename": "tests/fixtures/config/requirements/git/newer-than/zuul.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-11-28T21:37:12Z",
+      "side": 1,
+      "message": "I suspect we\u0027re looking at another manifestation of Story #2000804 where the job \"definition\" in a project-pipeline configuration is able to stand in for a normal job definition.  I think when we fix that, this should break as Paul expects.\n\nThe call to \u0027reconfigure()\u0027 should entirely replace the configuration (including dropping the project1-job and project2-job definitions from common-config), so I think their inclusion is a red herring.\n\nLet\u0027s go ahead and add the definitions for project1-job and project2-job to the newer-than repo so that this doesn\u0027t complicate the fix to 2000804, and I\u0027ve added a note on that story to make sure that we handle this case (assuming that it is related).",
+      "revId": "acd2c54cf2e6afad33612b5010b40605475094f7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a74a57a_4a3a31e8",
+        "filename": "tests/test_requirements.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-11-28T21:37:12Z",
+      "side": 1,
+      "message": "We\u0027re still figuring out where to draw the line on making new config repo fixtures, but since this test doesn\u0027t use anything from common-config, it\u0027s a good candidate to be its own new class (eg TestRequirementsNewerThan (but still keep it in this file)).  I don\u0027t feel strongly about this at the moment.",
+      "revId": "acd2c54cf2e6afad33612b5010b40605475094f7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
