@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a74a57a_a93397f5",
+        "filename": "tests/fixtures/config/requirements/git/vote1/zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-11-29T22:38:12Z",
+      "side": 1,
+      "message": "Add job definitions?",
+      "revId": "c075bd3489a7c40aab653c2f9576946adefb3720",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
