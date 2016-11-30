@@ -59,6 +59,7 @@ class GerritEventConnector(threading.Thread):
         event = TriggerEvent()
         event.type = data.get('type')
         event.trigger_name = 'gerrit'
+        event.trigger_source = self.connection.connection_name
         change = data.get('change')
         if change:
             event.project_name = change.get('project')
