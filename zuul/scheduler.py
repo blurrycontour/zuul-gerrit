@@ -1022,14 +1022,10 @@ class Scheduler(threading.Thread):
                 # Get the change even if the project is unknown to us for the
                 # use of updating the cache if there is another change
                 # depending on this foreign one.
-                try:
-                    change = pipeline.source.getChange(event, project)
-                except exceptions.ChangeNotFound as e:
-                    self.log.debug("Unable to get change %s from source %s. "
-                                   "(most likely looking for a change from "
-                                   "another connection trigger)",
-                                   e.change, pipeline.source)
+                connection_name = pipeline.source.connection.connection_name
+                if event.trigger_source != connection_name:
                     continue
+                change = pipeline.source.getChange(event, project)
                 if not project or project.foreign:
                     self.log.debug("Project %s not found" % event.project_name)
                     continue
