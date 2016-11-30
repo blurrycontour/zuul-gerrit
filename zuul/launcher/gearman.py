@@ -287,6 +287,19 @@ class Gearman(object):
         params['ZUUL_PIPELINE'] = pipeline.name
         params['ZUUL_URL'] = item.current_build_set.zuul_url
         params['ZUUL_VOTING'] = job.voting and '1' or '0'
+
+        if self.config.has_option('merger', 'append_hostname') and \
+                self.config.getboolean('merger', 'append_hostname'):
+            if params['ZUUL_URL'][-1] == '/':
+                params['ZUUL_URL'] = params['ZUUL_URL'][:-1]
+            connection_hostname = self.config.get('connection %s' % (
+                item.pipeline.source.connection.connection_name),
+                'server')
+            self.log.debug('Appending hostname %s to ZUUL_URL' % (
+                connection_hostname))
+            params['ZUUL_URL'] = "%s/%s" % (params['ZUUL_URL'],
+                                            connection_hostname)
+
         if hasattr(item.change, 'refspec'):
             changes_str = '^'.join(
                 ['%s:%s:%s' % (i.change.project.name, i.change.branch,
