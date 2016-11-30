@@ -1053,15 +1053,15 @@ class ZuulTestCase(BaseTestCase):
             if con_driver == 'gerrit':
                 if con_config['server'] not in self.gerrit_changes_dbs.keys():
                     self.gerrit_changes_dbs[con_config['server']] = {}
-                if con_config['server'] not in self.gerrit_queues_dbs.keys():
-                    self.gerrit_queues_dbs[con_config['server']] = \
+                if con_name not in self.gerrit_queues_dbs.keys():
+                    self.gerrit_queues_dbs[con_name] = \
                         Queue.Queue()
                     self.event_queues.append(
-                        self.gerrit_queues_dbs[con_config['server']])
+                        self.gerrit_queues_dbs[con_name])
                 self.connections[con_name] = FakeGerritConnection(
                     con_name, con_config,
                     changes_db=self.gerrit_changes_dbs[con_config['server']],
-                    queues_db=self.gerrit_queues_dbs[con_config['server']],
+                    queues_db=self.gerrit_queues_dbs[con_name],
                     upstream_root=self.upstream_root
                 )
                 setattr(self, 'fake_' + con_name, self.connections[con_name])

@@ -1040,6 +1040,7 @@ class TriggerEvent(object):
         self.type = None
         self.project_name = None
         self.trigger_name = None
+        self.trigger_source = None
         # Representation of the user account that performed the event.
         self.account = None
         # patchset-created, comment-added, etc.
