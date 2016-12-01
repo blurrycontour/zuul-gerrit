@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a71b18c_1fc74813",
+        "filename": "tests/fixtures/config/single-tenant/git/layout-inheritance/zuul.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-12-01T19:40:57Z",
+      "side": 1,
+      "message": "If I understand the test correctly, you want to do the same things here to the \"empty\" jobs that you did to the \"full\" jobs above -- you\u0027re just testing that these things work correctly when placed in the project-pipeline config versus the job config.  If that\u0027s the case, we don\u0027t want \"ignoreme\" listed here -- above, we only set README.",
+      "revId": "e4bf904340bc9a1c7a94c3a6cdb4967101c6037c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a71b18c_3fcc0435",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2260,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-12-01T19:40:57Z",
+      "side": 1,
+      "message": "The fact that you want nomatch-starts-empty to run here also suggests that we should not have \u0027ignoreme\u0027 in the config.",
+      "revId": "e4bf904340bc9a1c7a94c3a6cdb4967101c6037c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
