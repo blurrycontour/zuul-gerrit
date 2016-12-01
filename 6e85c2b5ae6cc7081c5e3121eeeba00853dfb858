@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a71b18c_6d608fcf",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2016-12-01T23:05:13Z",
+      "side": 1,
+      "message": "s/desipite/despite/",
+      "revId": "6e85c2b5ae6cc7081c5e3121eeeba00853dfb858",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a71b18c_8d9b2bc9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2016-12-01T23:05:13Z",
+      "side": 1,
+      "message": "Feels like this should go in a specific story for documenting how job defs work. But we can always \u0027git log\u0027 to find it again. :)",
+      "revId": "6e85c2b5ae6cc7081c5e3121eeeba00853dfb858",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
