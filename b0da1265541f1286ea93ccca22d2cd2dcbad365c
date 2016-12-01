@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a71b18c_cafee96a",
+        "filename": "tests/fixtures/config/single-tenant/git/layout-inheritance/zuul.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2016-12-01T22:46:45Z",
+      "side": 1,
+      "message": "Good eye spotting this problem. Indeed, I want this to _not_ match all irrelevant files and thus, to run.",
+      "revId": "b0da1265541f1286ea93ccca22d2cd2dcbad365c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a71b18c_ea03a571",
+        "filename": "tests/test_model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2016-12-01T22:46:45Z",
+      "side": 1,
+      "message": "Oops!! Let\u0027s remember to remove this",
+      "revId": "b0da1265541f1286ea93ccca22d2cd2dcbad365c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
