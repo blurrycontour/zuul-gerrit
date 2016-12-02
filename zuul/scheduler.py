@@ -452,6 +452,23 @@ class Scheduler(threading.Thread):
             os.mkdir(d)
         return d
 
+    def _get_project_key_dir(self):
+        if self.config.has_option('zuul', 'state_dir'):
+            state_dir = os.path.expanduser(self.config.get('zuul',
+                                                           'state_dir'))
+        else:
+            state_dir = '/var/lib/zuul'
+        key_dir = os.path.join(state_dir, 'keys')
+        if not os.path.exists(key_dir):
+            os.mkdir(key_dir)
+        private = os.path.join(key_dir, 'private')
+        if not os.path.exists(private):
+            os.mkdir(private)
+        public = os.path.join(key_dir, 'public')
+        if not os.path.exists(public):
+            os.mkdir(public)
+        return key_dir
+
     def _save_queue(self):
         pickle_file = self._get_queue_pickle_file()
         events = []
@@ -507,6 +524,7 @@ class Scheduler(threading.Thread):
             loader = configloader.ConfigLoader()
             abide = loader.loadConfig(
                 self.config.get('zuul', 'tenant_config'),
+                self._get_project_key_dir(),
                 self, self.merger, self.connections)
             for tenant in abide.tenants.values():
                 self._reconfigureTenant(tenant)
@@ -523,6 +541,7 @@ class Scheduler(threading.Thread):
             loader = configloader.ConfigLoader()
             abide = loader.reloadTenant(
                 self.config.get('zuul', 'tenant_config'),
+                self._get_project_key_dir(),
                 self, self.merger, self.connections,
                 self.abide, event.tenant)
             tenant = abide.tenants[event.tenant.name]
