@@ -303,3 +303,22 @@ class TestBrokenConfig(ZuulTestCase):
 
     def test_broken_config_on_startup(self):
         pass
+
+
+class TestProjectKeys(ZuulTestCase):
+    # Test that we can generate project keys
+    create_project_keys = True
+    tenant_config_file = 'config/in-repo/main.yaml'
+
+    def test_in_repo_config(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.waitUntilSettled()
+        self.assertEqual(self.getJobFromHistory('project-test1').result,
+                         'SUCCESS')
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2,
+                         "A should report start and success")
+        self.assertIn('tenant-one-gate', A.messages[1],
+                      "A should transit tenant-one gate")
