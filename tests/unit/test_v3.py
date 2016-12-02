@@ -303,3 +303,31 @@ class TestBrokenConfig(ZuulTestCase):
 
     def test_broken_config_on_startup(self):
         pass
+
+
+class TestProjectKeys(ZuulTestCase):
+    # Test that we can generate project keys
+
+    # Normally the test infrastructure copies a static key in place
+    # for each project before starting tests.  This saves time because
+    # Zuul's automatic key-generation on startup can be slow.  To make
+    # sure we exercise that code, in this test we allow Zuul to create
+    # keys for the project on startup.
+    create_project_keys = True
+    tenant_config_file = 'config/in-repo/main.yaml'
+
+    def test_in_repo_config(self):
+        # This is a basic "did a job run?" test because if the key
+        # generation code exploded, we won't load the configuration or
+        # be able to run a job.
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.waitUntilSettled()
+        self.assertEqual(self.getJobFromHistory('project-test1').result,
+                         'SUCCESS')
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2,
+                         "A should report start and success")
+        self.assertIn('tenant-one-gate', A.messages[1],
+                      "A should transit tenant-one gate")
