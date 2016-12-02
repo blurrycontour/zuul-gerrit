@@ -1209,6 +1209,11 @@ class ZuulTestCase(BaseTestCase):
         different tenant/project layout while using the standard main
         configuration.
 
+    :cvar bool create_project_keys: Indicates whether Zuul should
+        auto-generate keys for each project, or whether the test
+        infrastructure should insert dummy keys to save time during
+        startup.  Defaults to False.
+
     The following are instance variables that are useful within test
     methods:
 
@@ -1240,6 +1245,7 @@ class ZuulTestCase(BaseTestCase):
 
     config_file = 'zuul.conf'
     run_ansible = False
+    create_project_keys = False
 
     def _startMerger(self):
         self.merge_server = zuul.merger.server.MergeServer(self.config,
@@ -1527,6 +1533,32 @@ class ZuulTestCase(BaseTestCase):
         repo.head.reference = master
         zuul.merger.merger.reset_repo_to_head(repo)
         repo.git.clean('-x', '-f', '-d')
+
+        # Make sure we set up an RSA key for the project so that we
+        # don't spend time generating one:
+
+        if self.create_project_keys:
+            return
+
+        self.log.debug("Installing test keys for project %s" % (project,))
+
+        key_root = os.path.join(self.state_root, 'keys')
+        if not os.path.isdir(key_root):
+            os.makedirs(key_root)
+        private_key_file = key_root + '/private/' + project + '.key'
+        public_key_file = key_root + '/public/' + project + '.pem'
+        private_key_dir = os.path.dirname(private_key_file)
+        public_key_dir = os.path.dirname(public_key_file)
+        if not os.path.isdir(private_key_dir):
+            os.makedirs(private_key_dir)
+        if not os.path.isdir(public_key_dir):
+            os.makedirs(public_key_dir)
+        with open(os.path.join(FIXTURE_DIR, 'private.key')) as i:
+            with open(private_key_file, 'w') as o:
+                o.write(i.read())
+        with open(os.path.join(FIXTURE_DIR, 'public.pem')) as i:
+            with open(public_key_file, 'w') as o:
+                o.write(i.read())
 
     def create_branch(self, project, branch):
         path = os.path.join(self.upstream_root, project)
