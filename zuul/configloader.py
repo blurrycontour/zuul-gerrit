@@ -13,14 +13,19 @@
 from contextlib import contextmanager
 import copy
 import os
+import os.path
 import logging
 import six
+from six.moves import configparser as ConfigParser
 import yaml
 import pprint
 import textwrap
 
 import voluptuous as vs
 
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives import serialization
 from zuul import model
 import zuul.manager.dependent
 import zuul.manager.independent
@@ -475,6 +480,7 @@ class ProjectParser(object):
                 project_pipeline.queue_name = queue_name
             if pipeline_defined:
                 project.pipelines[pipeline.name] = project_pipeline
+
         return project
 
 
@@ -683,13 +689,14 @@ class TenantParser(object):
         return vs.Schema(tenant)
 
     @staticmethod
-    def fromYaml(base, connections, scheduler, merger, conf, cached):
+    def fromYaml(base, project_key_dir, connections, scheduler, merger, conf,
+                 cached):
         TenantParser.getSchema(connections)(conf)
         tenant = model.Tenant(conf['name'])
         tenant.unparsed_config = conf
         unparsed_config = model.UnparsedTenantConfig()
         tenant.config_repos, tenant.project_repos = \
-            TenantParser._loadTenantConfigRepos(connections, conf)
+            TenantParser._loadTenantConfigRepos(project_key_dir, connections, conf)
         for source, repo in tenant.config_repos:
             tenant.addConfigRepo(source, repo)
         for source, repo in tenant.project_repos:
@@ -709,7 +716,82 @@ class TenantParser(object):
         return tenant
 
     @staticmethod
-    def _loadTenantConfigRepos(connections, conf_tenant):
+    def _loadProjectKeys(project_key_dir, project):
+        project.private_key_file = (project_key_dir + '/private/' + project.name + '.key')
+        project.public_key_file = (project_key_dir + '/public/' + project.name + '.pem')
+
+        TenantParser._generateKeys(project)
+        TenantParser._loadKeys(project)
+
+    @staticmethod
+    def _generateKeys(project):
+        if not os.path.isfile(project.private_key_file):
+            TenantParser.log.info(
+                "Generating RSA keypair for project %s" % project.name
+            )
+            # Generate private RSA key
+            private_key = rsa.generate_private_key(
+                public_exponent=65537,
+                key_size=4096,
+                backend=default_backend()
+            )
+            # Serialize private key
+            pem_private_key = private_key.private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.TraditionalOpenSSL,
+                encryption_algorithm=serialization.NoEncryption()
+            )
+
+            public_key = private_key.public_key()
+            # Serialize public key
+            pem_public_key = public_key.public_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PublicFormat.SubjectPublicKeyInfo
+            )
+
+            # Dump keys to filesystem
+            with open(project.private_key_file, 'wb') as f:
+                f.write(pem_private_key)
+
+            with open(project.public_key_file, 'wb') as f:
+                f.write(pem_public_key)
+
+    @staticmethod
+    def _loadKeys(project):
+        # Check the key files specified are there
+        if not os.path.isfile(project.private_key_file):
+            raise Exception(
+                'Private key file {0} not valid'.format(project.private_key_file))
+        if not os.path.isfile(project.public_key_file):
+            raise Exception(
+                'Public key file {0} not valid'.format(project.public_key_file))
+
+        # Load private key
+        with open(project.private_key_file, "rb") as f:
+            project.private_key = serialization.load_pem_private_key(
+                f.read(),
+                password=None,
+                backend=default_backend()
+            )
+
+        # Extract public key from private
+        public_key = project.private_key.public_key()
+        pem = public_key.public_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PublicFormat.SubjectPublicKeyInfo
+        )
+
+        # Extract markers and keep just the key payload
+        pem_payload = '\n'.join(pem.splitlines()[1:-1])
+
+        with open(project.public_key_file, "rb") as f:
+            if pem_payload != '\n'.join(f.read().splitlines()[1:-1]):
+                raise Exception('Public key and private key do not match')
+
+        project.public_key = public_key
+
+    @staticmethod
+    def _loadTenantConfigRepos(project_key_dir, connections, conf_tenant):
         config_repos = []
         project_repos = []
 
@@ -718,10 +800,12 @@ class TenantParser(object):
 
             for conf_repo in conf_source.get('config-repos', []):
                 project = source.getProject(conf_repo)
+                TenantParser._loadProjectKeys(project_key_dir, project)
                 config_repos.append((source, project))
 
             for conf_repo in conf_source.get('project-repos', []):
                 project = source.getProject(conf_repo)
+                TenantParser._loadProjectKeys(project_key_dir, project)
                 project_repos.append((source, project))
 
         return config_repos, project_repos
@@ -871,7 +955,8 @@ class ConfigLoader(object):
                             config_path)
         return config_path
 
-    def loadConfig(self, config_path, scheduler, merger, connections):
+    def loadConfig(self, config_path, project_key_dir, scheduler, merger,
+                   connections):
         abide = model.Abide()
 
         config_path = self.expandConfigPath(config_path)
@@ -884,13 +969,14 @@ class ConfigLoader(object):
 
         for conf_tenant in config.tenants:
             # When performing a full reload, do not use cached data.
-            tenant = TenantParser.fromYaml(base, connections, scheduler,
-                                           merger, conf_tenant, cached=False)
+            tenant = TenantParser.fromYaml(
+                base, project_key_dir, connections, scheduler, merger,
+                conf_tenant, cached=False)
             abide.tenants[tenant.name] = tenant
         return abide
 
-    def reloadTenant(self, config_path, scheduler, merger, connections,
-                     abide, tenant):
+    def reloadTenant(self, config_path, project_key_dir, scheduler,
+                     merger, connections, abide, tenant):
         new_abide = model.Abide()
         new_abide.tenants = abide.tenants.copy()
 
@@ -898,9 +984,9 @@ class ConfigLoader(object):
         base = os.path.dirname(os.path.realpath(config_path))
 
         # When reloading a tenant only, use cached data if available.
-        new_tenant = TenantParser.fromYaml(base, connections, scheduler,
-                                           merger, tenant.unparsed_config,
-                                           cached=True)
+        new_tenant = TenantParser.fromYaml(
+            base, project_key_dir, connections, scheduler, merger,
+            tenant.unparsed_config, cached=True)
         new_abide.tenants[tenant.name] = new_tenant
         return new_abide
 
