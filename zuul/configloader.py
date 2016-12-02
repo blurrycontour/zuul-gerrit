@@ -11,12 +11,17 @@
 # under the License.
 
 import os
+import os.path
 import logging
 import six
+from six.moves import configparser as ConfigParser
 import yaml
 
 import voluptuous as vs
 
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives import serialization
 from zuul import model
 import zuul.manager.dependent
 import zuul.manager.independent
@@ -247,7 +252,9 @@ class ProjectParser(object):
         project = {vs.Required('name'): str,
                    'templates': [str],
                    'merge-mode': vs.Any('merge', 'merge-resolve',
-                                        'cherry-pick')}
+                                        'cherry-pick'),
+                   'public_key_file': str,
+                   'private_key_file': str}
         for p in layout.pipelines.values():
             project[p.name] = {'queue': str,
                                'jobs': [vs.Any(str, dict)]}
@@ -259,6 +266,14 @@ class ProjectParser(object):
         # configuration for in-repo configs.
         ProjectParser.getSchema(layout)(conf)
         conf_templates = conf.pop('templates', [])
+        private_key_file = conf.pop('private_key_file', None)
+        public_key_file = conf.pop('public_key_file', None)
+
+        if ((private_key_file and public_key_file is None) or
+            (private_key_file is None and public_key_file)):
+            raise Exception('Private and public keys'
+                            ' must be specified together')
+
         # The way we construct a project definition is by parsing the
         # definition as a template, then applying all of the
         # templates, including the newly parsed one, in order.
@@ -290,7 +305,103 @@ class ProjectParser(object):
                 project_pipeline.queue_name = queue_name
             if pipeline_defined:
                 project.pipelines[pipeline.name] = project_pipeline
+
+        if private_key_file is None:
+            # Generate keys if not defined in config
+            ProjectParser._generateKeys(project)
+        else:
+            # Validate the keys specified are sane
+            ProjectParser._validateKeys(private_key_file, public_key_file)
+
         return project
+
+    @staticmethod
+    def _generateKeys(project):
+        # Find a zuul.conf file
+        locations = ['/etc/zuul/zuul.conf', '~/zuul.conf']
+
+        zc = None
+        for zp in locations:
+            if os.path.exists(os.path.expanduser(zp)):
+                zc = ConfigParser.ConfigParser()
+                zc.read(os.path.expanduser(zp))
+                break
+
+        if zc is None:
+            raise Exception("Unable to locate config file in %s" % locations)
+
+        # Get state_dir from config file, default to /var/lib/zuul if undefined
+        if zc.has_option('zuul', 'state_dir'):
+            state_dir = os.path.expanduser(zc.get('zuul', 'state_dir'))
+        else:
+            state_dir = '/var/lib/zuul'
+
+        project.private_key_file = (state_dir + '/private/' + project.name +
+                                    '.key')
+        project.public_key_file = state_dir + '/keys/' + project.name + '.pem'
+
+        if not os.path.isfile(project.private_key_file):
+            ProjectParser.log.debug(
+                "Generating RSA keypair for project %s" % project.name
+            )
+            # Generate private RSA key
+            private_key = rsa.generate_private_key(
+                public_exponent=65537,
+                key_size=4096,
+                backend=default_backend()
+            )
+            # Serialize private key
+            pem_private_key = private_key.private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.TraditionalOpenSSL,
+                encryption_algorithm=serialization.NoEncryption()
+            )
+
+            public_key = private_key.public_key()
+            # Serialize public key
+            pem_public_key = public_key.public_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PublicFormat.SubjectPublicKeyInfo
+            )
+
+            # Dump keys to filesystem
+            with open(project.private_key_file, 'wb') as f:
+                f.write(pem_private_key)
+
+            with open(project.public_key_file, 'wb') as f:
+                f.write(pem_public_key)
+
+    @staticmethod
+    def _validateKeys(private_key_file, public_key_file):
+        # Check the key files specified are there
+        if not os.path.isfile(private_key_file):
+            raise Exception(
+                'Private key file {0} not valid'.format(private_key_file))
+        if not os.path.isfile(public_key_file):
+            raise Exception(
+                'Public key file {0} not valid'.format(public_key_file))
+
+        # Load private key
+        with open(private_key_file, "rb") as f:
+            private_key = serialization.load_pem_private_key(
+                f.read(),
+                password=None,
+                backend=default_backend()
+            )
+
+        # Extract public key from private
+        public_key = private_key.public_key()
+        pem = public_key.public_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PublicFormat.SubjectPublicKeyInfo
+        )
+
+        # Extract markers and keep just the key payload
+        pem_payload = '\n'.join(pem.splitlines()[1:-1])
+
+        with open(public_key_file, "rb") as f:
+            if pem_payload != '\n'.join(f.read().splitlines()[1:-1]):
+                raise Exception('Public key and private key do not match')
 
 
 class PipelineParser(object):
