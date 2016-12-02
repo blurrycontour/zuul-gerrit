@@ -1592,6 +1592,8 @@ class ProjectConfig(object):
     def __init__(self, name):
         self.name = name
         self.pipelines = {}
+        self.private_key_file = None
+        self.public_key_file = None
 
 
 class UnparsedAbideConfig(object):

@@ -11,12 +11,16 @@
 # under the License.
 
 import os
+import os.path
 import logging
 import six
 import yaml
 
 import voluptuous as vs
 
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives import serialization
 from zuul import model
 import zuul.manager.dependent
 import zuul.manager.independent
@@ -240,7 +244,9 @@ class ProjectParser(object):
     @staticmethod
     def getSchema(layout):
         project = {vs.Required('name'): str,
-                   'templates': [str]}
+                   'templates': [str],
+                   'public_key_file': str,
+                   'private_key_file': str}
         for p in layout.pipelines.values():
             project[p.name] = {'queue': str,
                                'jobs': [vs.Any(str, dict)]}
@@ -252,6 +258,8 @@ class ProjectParser(object):
         # configuration for in-repo configs.
         ProjectParser.getSchema(layout)(conf)
         conf_templates = conf.pop('templates', [])
+        private_key_file = conf.pop('private_key_file', None)
+        public_key_file = conf.pop('public_key_file', None)
         # The way we construct a project definition is by parsing the
         # definition as a template, then applying all of the
         # templates, including the newly parsed one, in order.
@@ -281,7 +289,50 @@ class ProjectParser(object):
                 project_pipeline.queue_name = queue_name
             if pipeline_defined:
                 project.pipelines[pipeline.name] = project_pipeline
+
+        if private_key_file is None:
+            # Generate keys if not defined in config
+            ProjectParser.generateKeys(project)
+
         return project
+
+    @staticmethod
+    def generateKeys(project):
+        project.private_key_file = '/var/lib/zuul/private/' + project.name
+        project.public_key_file = '/var/lib/zuul/keys/' + project.name
+
+        if not os.path.isfile(private_key_file):
+            ProjectParser.log.debug(
+                "Generating RSA keypair for project %s" % project.name
+            )
+            # Generate private RSA key
+            private_key = rsa.generate_private_key(
+                public_exponent=65537,
+                key_size=4096,
+                backend=default_backend()
+            )
+            # Serialize private key
+            pem_private_key = private_key.private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.TraditionalOpenSSL,
+                encryption_algorithm=serialization.NoEncryption()
+            )
+
+            public_key = private_key.public_key()
+            # Serialize public key
+            pem_public_key = public_key.public_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PublicFormat.SubjectPublicKeyInfo
+            )
+
+            # Dump keys to filesystem
+            f = open(private_key_file, 'wb')
+            f.write(pem_private_key)
+            f.close()
+
+            f = open(public_key_file, 'wb')
+            f.write(pem_public_key)
+            f.close()
 
 
 class PipelineParser(object):
