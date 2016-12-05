@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a71b18c_a8321ca5",
+        "filename": "zuul/connection/github.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2016-12-05T20:14:01Z",
+      "side": 1,
+      "message": "Hard setting a git_host here makes it impossible to support a github enterprise install, which will have a different host URL. It would be better to allow this be set in the connection config itself, with a default of \u0027github.com\u0027.",
+      "revId": "96144f56d1f51c2232e87f5e3f4ff3d93a02fdaf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
