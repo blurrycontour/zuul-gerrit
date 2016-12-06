@@ -22,6 +22,30 @@
       "revId": "07d8775c0dfe82a0c8b81078107f601614ed4863",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a71b18c_c4762a05",
+        "filename": "zuul/connection/github.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 10035
+      },
+      "writtenOn": "2016-12-06T21:30:56Z",
+      "side": 1,
+      "message": "I agree that it\u0027d be awesome to have some coverage here but I cant think of a non painful way to do it where were actually testing something useful. The best idea I have is to use requests-mock and mock out a valid response to the login call, but thats going to be a pain because we have to dig inside of github3 (to access the requests session) as well as mock out enough of the response call to make github3 think its actually logged in.\n\nIf we can come up with something saner im all for it, but IMO the amount of code for that test isnt quite worth it for the one function call.",
+      "parentUuid": "3a71b18c_199b2b19",
+      "range": {
+        "startLine": 212,
+        "startChar": 16,
+        "endLine": 212,
+        "endChar": 20
+      },
+      "revId": "07d8775c0dfe82a0c8b81078107f601614ed4863",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
