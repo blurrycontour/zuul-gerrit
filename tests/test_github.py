@@ -128,3 +128,8 @@ class TestGithub(ZuulTestCase):
         """Test that git_ssh option gives git url with ssh"""
         url = self.fake_github_ssh.real_getGitUrl('org/project')
         self.assertEqual('ssh://git@github.com/org/project.git', url)
+
+    def test_git_enterprise_url(self):
+        """Test that git_url option gives git url with proper host"""
+        url = self.fake_github_ent.real_getGitUrl('org/project')
+        self.assertEqual('ssh://git@github.enterprise.io/org/project.git', url)
