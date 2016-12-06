@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a71b18c_199b2b19",
+        "filename": "zuul/connection/github.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 1420
+      },
+      "writtenOn": "2016-12-06T21:07:04Z",
+      "side": 1,
+      "message": "you should add a test case to test this path, because github3.enterprise_login() is still going to raise an AttributeError",
+      "range": {
+        "startLine": 212,
+        "startChar": 16,
+        "endLine": 212,
+        "endChar": 20
+      },
+      "revId": "07d8775c0dfe82a0c8b81078107f601614ed4863",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
