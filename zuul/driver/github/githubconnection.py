@@ -238,17 +238,17 @@ class GithubConnection(BaseConnection):
     log = logging.getLogger("connection.github")
     payload_path = 'payload'
     git_user = 'git'
-    git_host = 'github.com'
 
     def __init__(self, driver, connection_name, connection_config):
         super(GithubConnection, self).__init__(
             driver, connection_name, connection_config)
         self.github = None
-        self.canonical_hostname = self.connection_config.get(
-                'canonical_hostname', 'github.com')
         self._change_cache = {}
         self.projects = {}
         self._git_ssh = bool(self.connection_config.get('sshkey', None))
+        self.git_host = self.connection_config.get('git_host', 'github.com')
+        self.canonical_hostname = self.connection_config.get(
+                'canonical_hostname', self.git_host)
 
     def onLoad(self):
 
@@ -263,7 +263,11 @@ class GithubConnection(BaseConnection):
     def _authenticateGithubAPI(self):
         token = self.connection_config.get('api_token', None)
         if token is not None:
-            self.github = github3.login(token=token)
+            if self.git_host != 'github.com':
+                url = 'https://%s/' % self.git_host
+                self.github = github3.enterprise_login(token=token, url=url)
+            else:
+                self.github = github3.login(token=token)
             self.log.info("Github API Authentication successful.")
         else:
             self.github = None
