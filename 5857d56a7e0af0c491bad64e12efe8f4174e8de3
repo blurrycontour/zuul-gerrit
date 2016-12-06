@@ -25,6 +25,24 @@
     },
     {
       "key": {
+        "uuid": "3a71b18c_8737e64b",
+        "filename": "README.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2016-12-06T15:14:07Z",
+      "side": 1,
+      "message": "Note that line 142 is \"Move Infra to Zuul v3\"\n\nThis (and the comments below) make me think that we could use a preamble to this section, or just an exapnsion of this sentence, that communicate what this roadmap is aiming to lay out.",
+      "parentUuid": "3a71b18c_c9e2f32e",
+      "revId": "5857d56a7e0af0c491bad64e12efe8f4174e8de3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a71b18c_093eab8b",
         "filename": "README.rst",
         "patchSetId": 1
@@ -42,6 +60,24 @@
         "endLine": 143,
         "endChar": 25
       },
+      "revId": "5857d56a7e0af0c491bad64e12efe8f4174e8de3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a71b18c_870e068a",
+        "filename": "README.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2016-12-06T15:14:07Z",
+      "side": 1,
+      "message": "v3. I do not believe we ever intend to land it against master - so it\u0027ll need to get ported.",
+      "parentUuid": "3a71b18c_093eab8b",
       "revId": "5857d56a7e0af0c491bad64e12efe8f4174e8de3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -71,6 +107,41 @@
     },
     {
       "key": {
+        "uuid": "3a71b18c_e7e41aad",
+        "filename": "README.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2016-12-06T15:14:07Z",
+      "side": 1,
+      "message": "Aiming zuul to be a tool that people can use for whatever they want, rather than a tool aimed just at OpenStack that other people can use if they like.",
+      "parentUuid": "3a71b18c_894abb24",
+      "revId": "5857d56a7e0af0c491bad64e12efe8f4174e8de3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a71b18c_6743aa6c",
+        "filename": "README.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2016-12-06T15:14:07Z",
+      "side": 1,
+      "message": "I might quibble that we could begin using zuul v3 to run tests on ansible before we implement support for non-OpenStack clouds.",
+      "revId": "5857d56a7e0af0c491bad64e12efe8f4174e8de3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a71b18c_69fb9fc1",
         "filename": "README.rst",
         "patchSetId": 1
@@ -88,6 +159,24 @@
         "endLine": 146,
         "endChar": 49
       },
+      "revId": "5857d56a7e0af0c491bad64e12efe8f4174e8de3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a71b18c_87460679",
+        "filename": "README.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2016-12-06T15:14:07Z",
+      "side": 1,
+      "message": "I think the reason it\u0027s on this list is to put it in context for people as to when we\u0027re going to start working on it. As in - it\u0027s _very_ low in the priority queue right now, but we do intend to get to it.",
+      "parentUuid": "3a71b18c_69fb9fc1",
       "revId": "5857d56a7e0af0c491bad64e12efe8f4174e8de3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
