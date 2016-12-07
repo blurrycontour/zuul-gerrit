@@ -1478,6 +1478,8 @@ class NodeWorker(object):
         self.log.debug("Ansible exit code: %s" % (ret,))
         self.ansible_job_proc = None
         if self._watchdog_timeout:
+            # Reset timeout flag for the next time
+            self._watchdog_timeout = False
             return False
         if ret == 3:
             # AnsibleHostUnreachable: We had a network issue connecting to
