@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a71b18c_d2a6af52",
+        "filename": "tests/test_connection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-12-07T23:13:41Z",
+      "side": 1,
+      "message": "I guess we could have unique git repos?",
+      "range": {
+        "startLine": 80,
+        "startChar": 10,
+        "endLine": 80,
+        "endChar": 14
+      },
+      "revId": "8deea350a0955cb14684ebb876cc0d6e26db55e4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a71b18c_52ba9f6f",
+        "filename": "tests/test_connection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-12-07T23:13:41Z",
+      "side": 1,
+      "message": "so this is confusing to me because the job names for the two projects in zuul.yaml are the same. Is it possible to check the project name here too (or rename the jobs slightly to do so) to make sure it\u0027s doing what we want?",
+      "range": {
+        "startLine": 97,
+        "startChar": 23,
+        "endLine": 97,
+        "endChar": 30
+      },
+      "revId": "8deea350a0955cb14684ebb876cc0d6e26db55e4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
