@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a71b18c_28af41e4",
+        "filename": "zuul/lib/connections.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2016-12-08T23:31:17Z",
+      "side": 1,
+      "message": "Is this left over debugging?",
+      "revId": "095e5a2c731b333ca456d425ce5e90e038aad59f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a71b18c_88b4d535",
+        "filename": "zuul/lib/connections.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2016-12-08T23:31:17Z",
+      "side": 1,
+      "message": "More left over prints?",
+      "revId": "095e5a2c731b333ca456d425ce5e90e038aad59f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a71b18c_c8840d5f",
+        "filename": "zuul/lib/connections.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2016-12-08T23:31:17Z",
+      "side": 1,
+      "message": "and here",
+      "revId": "095e5a2c731b333ca456d425ce5e90e038aad59f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
