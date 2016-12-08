@@ -23,8 +23,8 @@ class ZuulTrigger(BaseTrigger):
     name = 'zuul'
     log = logging.getLogger("zuul.ZuulTrigger")
 
-    def __init__(self, trigger_config={}, connection=None):
-        super(ZuulTrigger, self).__init__(trigger_config, connection)
+    def __init__(self, connection, config=None):
+        super(ZuulTrigger, self).__init__(connection, config)
         self._handle_parent_change_enqueued_events = False
         self._handle_project_change_merged_events = False
 
