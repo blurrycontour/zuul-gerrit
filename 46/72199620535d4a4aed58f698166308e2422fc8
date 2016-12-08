@@ -1,0 +1,11 @@
+Code-Review+2: Paul Belanger <pabelanger@redhat.com>
+Code-Review+2: Joshua Hesketh <joshua.hesketh@rackspace.com>
+Code-Review+1: ShangXiao <shangxiaobj@inspur.com>
+Code-Review+1: Clint 'SpamapS' Byrum <clint@fewbar.com>
+Workflow+1: Joshua Hesketh <joshua.hesketh@rackspace.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Thu, 08 Dec 2016 03:49:04 +0000
+Reviewed-on: https://review.openstack.org/395722
+Project: openstack-infra/zuul
+Branch: refs/heads/feature/zuulv3
