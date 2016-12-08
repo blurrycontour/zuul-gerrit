@@ -385,7 +385,7 @@ class FakeChange(object):
         self.reported += 1
 
 
-class FakeGerritConnection(zuul.connection.gerrit.GerritConnection):
+class FakeGerritConnection(zuul.driver.gerrit.gerritconnection.GerritConnection):
     """A Fake Gerrit connection for use in tests.
 
     This subclasses
@@ -395,9 +395,9 @@ class FakeGerritConnection(zuul.connection.gerrit.GerritConnection):
 
     log = logging.getLogger("zuul.test.FakeGerritConnection")
 
-    def __init__(self, connection_name, connection_config,
+    def __init__(self, driver, connection_name, connection_config,
                  changes_db=None, upstream_root=None):
-        super(FakeGerritConnection, self).__init__(connection_name,
+        super(FakeGerritConnection, self).__init__(driver, connection_name,
                                                    connection_config)
 
         self.event_queue = Queue.Queue()
@@ -1053,6 +1053,7 @@ class ZuulTestCase(BaseTestCase):
 
         self.useFixture(fixtures.MonkeyPatch('swiftclient.client.Connection',
                                              FakeSwiftClientConnection))
+
         self.swift = zuul.lib.swift.Swift(self.config)
 
         self.event_queues = [
@@ -1104,7 +1105,22 @@ class ZuulTestCase(BaseTestCase):
         self.addCleanup(self.shutdown)
 
     def configure_connections(self):
-        # Register connections from the config
+        # Set up gerrit related fakes
+        # Set a changes database so multiple FakeGerrit's can report back to
+        # a virtual canonical database given by the configured hostname
+        self.gerrit_changes_dbs = {}
+        def getGerritConnection(driver, name, config):
+            db = self.gerrit_changes_dbs.setdefault(config['server'], {})
+            con = FakeGerritConnection(driver, name, config,
+                                       changes_db=db,
+                                       upstream_root=self.upstream_root)
+            setattr(self, 'fake_' + name, con)
+            return con
+
+        self.useFixture(fixtures.MonkeyPatch('zuul.driver.gerrit.GerritDriver.getConnection',
+                                             getGerritConnection))
+
+        # Set up smtp related fakes
         self.smtp_messages = []
 
         def FakeSMTPFactory(*args, **kw):
@@ -1113,10 +1129,11 @@ class ZuulTestCase(BaseTestCase):
 
         self.useFixture(fixtures.MonkeyPatch('smtplib.SMTP', FakeSMTPFactory))
 
-        # Set a changes database so multiple FakeGerrit's can report back to
-        # a virtual canonical database given by the configured hostname
-        self.gerrit_changes_dbs = {}
+        # Register connections from the config using fakes
         self.connections = zuul.lib.connections.ConnectionRegistry()
+        self.connections.configure(self.config)
+        return
+
 
         for section_name in self.config.sections():
             con_match = re.match(r'^connection ([\'\"]?)(.*)(\1)$',

@@ -14,15 +14,25 @@
 
 import re
 
-import zuul.connection.gerrit
-import zuul.connection.smtp
-
+import zuul.driver.zuul
+import zuul.driver.gerrit
+import zuul.driver.smtp
 
 class ConnectionRegistry(object):
     """A registry of connections"""
 
     def __init__(self):
         self.connections = {}
+        self.drivers = {}
+
+        self.registerDriver(zuul.driver.zuul.ZuulDriver())
+        self.registerDriver(zuul.driver.gerrit.GerritDriver())
+        self.registerDriver(zuul.driver.smtp.SMTPDriver())
+
+    def registerDriver(self, driver):
+        if driver.name in self.drivers:
+            raise Exception("Driver %s already registered" % driver.name)
+        self.drivers[driver.name] = driver
 
     def registerScheduler(self, sched, load=True):
         for connection_name, connection in self.connections.items():
@@ -35,6 +45,7 @@ class ConnectionRegistry(object):
             connection.onStop()
 
     def configure(self, config):
+        print 'configure'
         # Register connections from the config
         # TODO(jhesketh): import connection modules dynamically
         connections = {}
@@ -52,79 +63,53 @@ class ConnectionRegistry(object):
                                 % con_name)
 
             con_driver = con_config['driver']
-
-            # TODO(jhesketh): load the required class automatically
-            if con_driver == 'gerrit':
-                connections[con_name] = \
-                    zuul.connection.gerrit.GerritConnection(con_name,
-                                                            con_config)
-            elif con_driver == 'smtp':
-                connections[con_name] = \
-                    zuul.connection.smtp.SMTPConnection(con_name, con_config)
-            else:
+            if con_driver not in self.drivers:
                 raise Exception("Unknown driver, %s, for connection %s"
                                 % (con_config['driver'], con_name))
+
+            driver = self.drivers[con_driver]
+            print 'driver', driver
+            connection = driver.getConnection(con_name, con_config)
+            print 'connection', connection
+            connections[con_name] = connection
 
         # If the [gerrit] or [smtp] sections still exist, load them in as a
         # connection named 'gerrit' or 'smtp' respectfully
 
         if 'gerrit' in config.sections():
+            driver = self.drivers['gerrit']
             connections['gerrit'] = \
-                zuul.connection.gerrit.GerritConnection(
+                driver.getConnection(
                     'gerrit', dict(config.items('gerrit')))
 
         if 'smtp' in config.sections():
+            driver = self.drivers['smtp']
             connections['smtp'] = \
-                zuul.connection.smtp.SMTPConnection(
+                driver.getConnection(
                     'smtp', dict(config.items('smtp')))
 
         self.connections = connections
 
-    def _getDriver(self, dtype, connection_name, driver_config={}):
-        # Instantiate a driver such as a trigger, source or reporter
-        # TODO(jhesketh): Make this list dynamic or use entrypoints etc.
-        # Stevedore was not a good fit here due to the nature of triggers.
-        # Specifically we don't want to load a trigger per a pipeline as one
-        # trigger can listen to a stream (from gerrit, for example) and the
-        # scheduler decides which eventfilter to use. As such we want to load
-        # trigger+connection pairs uniquely.
-        drivers = {
-            'source': {
-                'gerrit': 'zuul.source.gerrit:GerritSource',
-            },
-            'trigger': {
-                'gerrit': 'zuul.trigger.gerrit:GerritTrigger',
-                'timer': 'zuul.trigger.timer:TimerTrigger',
-                'zuul': 'zuul.trigger.zuultrigger:ZuulTrigger',
-            },
-            'reporter': {
-                'gerrit': 'zuul.reporter.gerrit:GerritReporter',
-                'smtp': 'zuul.reporter.smtp:SMTPReporter',
-            },
-        }
-
-        # TODO(jhesketh): Check the connection_name exists
-        if connection_name in self.connections.keys():
-            driver_name = self.connections[connection_name].driver_name
+    def _getDriver(self, connection_name):
+        if connection_name in self.connections:
             connection = self.connections[connection_name]
+            driver = self.connections[connection_name].driver
         else:
             # In some cases a driver may not be related to a connection. For
             # example, the 'timer' or 'zuul' triggers.
-            driver_name = connection_name
             connection = None
-        driver = drivers[dtype][driver_name].split(':')
-        driver_instance = getattr(
-            __import__(driver[0], fromlist=['']), driver[1])(
-                driver_config, connection
-        )
+            driver = self.drivers[connection_name]
 
-        return driver_instance
+        return connection, driver
 
     def getSource(self, connection_name):
-        return self._getDriver('source', connection_name)
+        connection, driver = self._getDriver(connection_name)
+        return driver.getSource(connection)
 
     def getReporter(self, connection_name, driver_config={}):
-        return self._getDriver('reporter', connection_name, driver_config)
+        connection, driver = self._getDriver(connection_name)
+        return driver.getReporter(connection)
 
     def getTrigger(self, connection_name, driver_config={}):
-        return self._getDriver('trigger', connection_name, driver_config)
+        connection, driver = self._getDriver(connection_name)
+        return driver.getTrigger(connection)
