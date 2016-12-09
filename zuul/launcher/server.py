@@ -24,6 +24,7 @@ import tempfile
 import threading
 import time
 import traceback
+import zmq
 
 import gear
 import yaml
@@ -156,6 +157,7 @@ class LaunchServer(object):
         self.keep_jobdir = keep_jobdir
         # TODOv3(mordred): make the launcher name more unique --
         # perhaps hostname+pid.
+        self.zmq_send_queue = Queue.Queue()
         self.hostname = socket.gethostname()
         self.zuul_url = config.get('merger', 'zuul_url')
         self.command_map = dict(
@@ -216,6 +218,14 @@ class LaunchServer(object):
     def start(self):
         self._running = True
         self._command_running = True
+        self._zmq_running = True
+
+        # Setup ZMQ
+        self.zcontext = zmq.Context()
+        self.zsocket = self.zcontext.socket(zmq.PUB)
+        self.zsocket.bind("tcp://*:8888")
+
+        # Setup gearman
         server = self.config.get('gearman', 'server')
         if self.config.has_option('gearman', 'port'):
             port = self.config.get('gearman', 'port')
@@ -233,6 +243,12 @@ class LaunchServer(object):
         self.command_thread = threading.Thread(target=self.runCommand)
         self.command_thread.daemon = True
         self.command_thread.start()
+
+        # Start ZMQ worker thread
+        self.log.debug("Starting ZMQ processor")
+        self.zmq_thread = threading.Thread(target=self.runZMQ)
+        self.zmq_thread.daemon = True
+        self.zmq_thread.start()
 
         self.log.debug("Starting worker")
         self.update_thread = threading.Thread(target=self._updateLoop)
@@ -252,6 +268,12 @@ class LaunchServer(object):
         self.log.debug("Stopping")
         self._running = False
         self.worker.shutdown()
+
+        # Stop ZMQ afterwords so that the send queue is flushed
+        self._zmq_running = False
+        self.zmq_send_queue.put(None)
+        self.zmq_send_queue.join()
+
         self._command_running = False
         self.command_socket.stop()
         self.log.debug("Stopped")
@@ -296,6 +318,19 @@ class LaunchServer(object):
                     self.command_map[command]()
             except Exception:
                 self.log.exception("Exception while processing command")
+
+    def runZMQ(self):
+        while self._zmq_running or not self.zmq_send_queue.empty():
+            try:
+                item = self.zmq_send_queue.get()
+                self.log.debug("Got ZMQ event %s" % (item,))
+                if item is None:
+                    continue
+                self.zsocket.send(item)
+            except Exception:
+                self.log.exception("Exception while processing ZMQ events")
+            finally:
+                self.zmq_send_queue.task_done()
 
     def _updateLoop(self):
         while self._running:
@@ -399,6 +434,32 @@ class LaunchServer(object):
                 return
             result = dict(result=result)
             job.sendWorkComplete(json.dumps(result))
+
+    def sendStartEvent(self, name, parameters):
+        build = dict(node_name=self.name,
+                     host_name=self.manager_name,
+                     parameters=parameters)
+
+        event = dict(name=name,
+                     build=build)
+
+        item = "onStarted %s" % json.dumps(event)
+        self.log.debug("Sending over ZMQ: %s" % (item,))
+        self.zmq_send_queue.put(item)
+
+    def sendCompleteEvent(self, name, status, parameters):
+        build = dict(status=status,
+                     node_name=self.name,
+                     host_name=self.manager_name,
+                     parameters=parameters)
+
+        event = dict(name=name,
+                     build=build)
+
+        item = "onFinalized %s" % json.dumps(event)
+        self.log.debug("Sending over ZMQ: %s" % (item,))
+        self.zmq_send_queue.put(item)
+        self._sent_complete_event = True
 
     def stopJob(self, job):
         # TODOv3: implement.
