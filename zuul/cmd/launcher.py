@@ -52,7 +52,7 @@ class Launcher(zuul.cmd.ZuulApp):
                             action='store_true',
                             help='keep local jobdirs after run completes')
         parser.add_argument('command',
-                            choices=zuul.launcher.ansiblelaunchserver.COMMANDS,
+                            choices=zuul.launcher.server.COMMANDS,
                             nargs='?')
 
         self.args = parser.parse_args()

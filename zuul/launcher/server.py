@@ -33,6 +33,8 @@ import zuul.ansible.library
 from zuul.lib import commandsocket
 
 ANSIBLE_WATCHDOG_GRACE = 5 * 60
+COMMANDS = ['reconfigure', 'stop', 'pause', 'unpause', 'release', 'graceful',
+            'verbose', 'unverbose']
 
 
 class Watchdog(object):
@@ -163,6 +165,8 @@ class LaunchServer(object):
             graceful=self.graceful,
             verbose=self.verboseOn,
             unverbose=self.verboseOff,
+            reconfigure=self.reconfigure,
+            release=self.release,
         )
 
         if self.config.has_option('merger', 'git_dir'):
@@ -269,6 +273,14 @@ class LaunchServer(object):
         pass
 
     def verboseOff(self):
+        # TODOv3: implement
+        pass
+
+    def reconfigure(self):
+        # TODOv3: implement
+        pass
+
+    def release(self):
         # TODOv3: implement
         pass
 
