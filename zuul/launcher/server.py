@@ -357,6 +357,11 @@ class LaunchServer(object):
             else:
                 commit = args['items'][-1]['newrev']  # noqa
 
+            if not commit:
+                # merger could not merge, likely a conflict
+                job.sendWorkFail()
+                return
+
             # TODOv3: Ansible the ansible thing here.
             self.prepareAnsibleFiles(jobdir, args)
 

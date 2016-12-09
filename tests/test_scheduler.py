@@ -923,19 +923,16 @@ class TestScheduler(ZuulTestCase):
         a = source.getChange(event, refresh=True)
         self.assertTrue(source.canMerge(a, mgr.getSubmitAllowNeeds()))
 
-    @skip("Disabled for early v3 development")
     def test_build_configuration_conflict(self):
-        "Test that merge conflicts are handled"
+        self.launch_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addPatchset({'conflict': 'contentA'})
 
-        self.gearman_server.hold_jobs_in_queue = True
-        A = self.fake_gerrit.addFakeChange('org/conflict-project',
-                                           'master', 'A')
-        A.addPatchset(['conflict'])
-        B = self.fake_gerrit.addFakeChange('org/conflict-project',
-                                           'master', 'B')
-        B.addPatchset(['conflict'])
-        C = self.fake_gerrit.addFakeChange('org/conflict-project',
-                                           'master', 'C')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        B.addPatchset({'conflict': 'contentB'})
+
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+
         A.addApproval('code-review', 2)
         B.addApproval('code-review', 2)
         C.addApproval('code-review', 2)
@@ -944,21 +941,13 @@ class TestScheduler(ZuulTestCase):
         self.fake_gerrit.addEvent(C.addApproval('approved', 1))
         self.waitUntilSettled()
 
+        # all 3 reported starting
         self.assertEqual(A.reported, 1)
         self.assertEqual(B.reported, 1)
         self.assertEqual(C.reported, 1)
 
-        self.gearman_server.release('.*-merge')
-        self.waitUntilSettled()
-        self.gearman_server.release('.*-merge')
-        self.waitUntilSettled()
-        self.gearman_server.release('.*-merge')
-        self.waitUntilSettled()
-
-        self.assertEqual(len(self.history), 2)  # A and C merge jobs
-
-        self.gearman_server.hold_jobs_in_queue = False
-        self.gearman_server.release()
+        self.launch_server.hold_jobs_in_build = False
+        self.launch_server.release()
         self.waitUntilSettled()
 
         self.assertEqual(A.data['status'], 'MERGED')
