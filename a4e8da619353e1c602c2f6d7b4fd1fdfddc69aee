@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a71b18c_bfb9beee",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-12-09T06:16:12Z",
+      "side": 1,
+      "message": "Both of these should be removed for v3.",
+      "revId": "a4e8da619353e1c602c2f6d7b4fd1fdfddc69aee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
