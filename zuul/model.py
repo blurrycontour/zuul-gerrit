@@ -1230,6 +1230,15 @@ class EventFilter(BaseFilter):
         return ret
 
     def matches(self, event, change):
+        # First check whether the event matches the gerrit connection which
+        # triggered it when there are multiple gerrits.
+        matches_connection = False
+        if self.trigger.connection is not None:
+            if self.trigger.connection.connection_name == event.trigger_name:
+                matches_connection = True
+        if self.trigger.connection and not matches_connection:
+            return False
+
         # event types are ORed
         matches_type = False
         for etype in self.types:

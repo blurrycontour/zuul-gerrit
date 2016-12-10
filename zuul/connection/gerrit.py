@@ -58,7 +58,7 @@ class GerritEventConnector(threading.Thread):
         time.sleep(max((ts + self.delay) - now, 0.0))
         event = TriggerEvent()
         event.type = data.get('type')
-        event.trigger_name = 'gerrit'
+        event.trigger_name = self.connection.connection_name
         change = data.get('change')
         if change:
             event.project_name = change.get('project')
