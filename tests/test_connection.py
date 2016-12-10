@@ -79,6 +79,8 @@ class TestMultipleGerrits(ZuulTestCase):
         self.assertEqual(1, len(self.builds))
         self.assertEqual('project-another-gerrit', self.builds[0].name)
         self.assertTrue(self.job_has_changes(self.builds[0], A))
+        self.assertTrue('another_gerrit',
+                        self.builds[0].parameters['ZUUL_PIPELINE'])
 
         self.worker.hold_jobs_in_build = False
         self.worker.release()
