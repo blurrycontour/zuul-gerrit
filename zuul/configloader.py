@@ -63,20 +63,20 @@ class NodeSetParser(object):
 class JobParser(object):
     @staticmethod
     def getSchema():
-        swift_tmpurl = {vs.Required('name'): str,
-                        'container': str,
-                        'expiry': int,
-                        'max_file_size': int,
-                        'max-file-size': int,
-                        'max_file_count': int,
-                        'max-file-count': int,
-                        'logserver_prefix': str,
-                        'logserver-prefix': str,
-                        }
+        swift = {vs.Required('name'): str,
+                 'container': str,
+                 'expiry': int,
+                 'max_file_size': int,
+                 'max-file-size': int,
+                 'max_file_count': int,
+                 'max-file-count': int,
+                 'logserver_prefix': str,
+                 'logserver-prefix': str,
+                }
 
         auth = {'secrets': to_list(str),
                 'inherit': bool,
-                'swift-tmpurl': to_list(swift_tmpurl),
+                'swift': to_list(swift),
                 }
 
         node = {vs.Required('name'): str,

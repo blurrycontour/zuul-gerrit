@@ -382,6 +382,7 @@ class PipelineManager(object):
 
         jobs = item.findJobsToRun(self.sched.mutex)
         if jobs:
+            import pdb; pdb.set_trace()
             self._launchJobs(item, jobs)
 
     def cancelJobs(self, item, prime=True):

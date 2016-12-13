@@ -1,0 +1,81 @@
+- pipeline:
+    name: check
+    manager: independent
+    source:
+      gerrit
+    trigger:
+      gerrit:
+        - event: patchset-created
+    success:
+      gerrit:
+        verified: 1
+    failure:
+      gerrit:
+        verified: -1
+
+- pipeline:
+    name: post
+    manager: independent
+    source:
+      gerrit
+    trigger:
+      gerrit:
+        - event: ref-updated
+          ref: ^(?!refs/).*$
+
+- pipeline:
+    name: gate
+    manager: dependent
+    failure-message: Build failed.  For information on how to proceed, see http://wiki.example.org/Test_Failures
+    source:
+      gerrit
+    trigger:
+      gerrit:
+        - event: comment-added
+          approval:
+            - approved: 1
+    success:
+      gerrit:
+        verified: 2
+        submit: true
+    failure:
+      gerrit:
+        verified: -2
+    start:
+      gerrit:
+        verified: 0
+    precedence: high
+
+- job:
+    name: ^.*$
+    auth:
+      swift:
+        - name: logs
+
+- job:
+    name: test-merge
+    timeout: 99
+
+- job:
+    name: test-test
+    timeout: 99
+
+- project:
+    name: org/project
+    gate:
+      jobs:
+        - test-merge:
+            failure-message: Unable to merge change
+            timeout: 40
+            auth:
+              inherit: true
+              swift:
+                - name: logs
+                  container: merge_logs
+        - test-test:
+            timeout: 40
+            auth:
+              inherit: true
+              swift:
+                - name: MOSTLY
+                  container: stash

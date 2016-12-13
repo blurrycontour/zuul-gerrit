@@ -3664,13 +3664,10 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertNotIn('logs.example.com', B.messages[1])
         self.assertNotIn('SKIPPED', B.messages[1])
 
-    @skip("Disabled for early v3 development")
     def test_swift_instructions(self):
         "Test that the correct swift instructions are sent to the workers"
-        self.updateConfigLayout(
-            'tests/fixtures/layout-swift.yaml')
+        self.updateConfigLayout('layout-swift')
         self.sched.reconfigure(self.config)
-        self.registerJobs()
 
         self.launch_server.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
