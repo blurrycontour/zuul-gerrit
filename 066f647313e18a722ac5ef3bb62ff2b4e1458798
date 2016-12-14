@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a6eadb0_e601d007",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 361,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2016-12-14T19:28:13Z",
+      "side": 1,
+      "message": "This seems like it would be useful as a debug log message.",
+      "revId": "066f647313e18a722ac5ef3bb62ff2b4e1458798",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
