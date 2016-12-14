@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a6eadb0_8eb838e7",
+        "filename": "zuul/driver/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2016-12-14T17:41:55Z",
+      "side": 1,
+      "message": "Lol",
+      "revId": "a4c9bdffe39086becf2f3bc86467207439f3ccc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a6eadb0_4e670025",
+        "filename": "zuul/lib/connections.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2016-12-14T17:41:55Z",
+      "side": 1,
+      "message": "Wouldn\u0027t registerScheduler be inherited by the base driver class, with a simple pass action? Won\u0027t it then be safe to just always call registerScheduler()? Either something interesting will happen, or the fall through to pass would happen. Unless I\u0027m misunderstanding things.",
+      "revId": "a4c9bdffe39086becf2f3bc86467207439f3ccc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a6eadb0_ce7310e6",
+        "filename": "zuul/lib/connections.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2016-12-14T17:41:55Z",
+      "side": 1,
+      "message": "Same question here.",
+      "revId": "a4c9bdffe39086becf2f3bc86467207439f3ccc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
