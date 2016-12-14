@@ -1332,32 +1332,37 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(B.reported, 2)
         self.assertEqual(C.reported, 2)
 
-    @skip("Disabled for early v3 development")
     def test_nonvoting_job(self):
         "Test that non-voting jobs don't vote."
+        self.updateConfigLayout('layout-nonvoting-job')
+        self.sched.reconfigure(self.config)
 
-        A = self.fake_gerrit.addFakeChange('org/nonvoting-project',
+        A = self.fake_gerrit.addFakeChange('org/project',
                                            'master', 'A')
         A.addApproval('code-review', 2)
-        self.launch_server.failJob('nonvoting-project-test2', A)
+        self.launch_server.failJob('project-test-nonvoting', A)
         self.fake_gerrit.addEvent(A.addApproval('approved', 1))
 
         self.waitUntilSettled()
 
         self.assertEqual(A.data['status'], 'MERGED')
         self.assertEqual(A.reported, 2)
+
         self.assertEqual(
-            self.getJobFromHistory('nonvoting-project-merge').result,
+            self.getJobFromHistory('project-merge').result,
             'SUCCESS')
         self.assertEqual(
-            self.getJobFromHistory('nonvoting-project-test1').result,
+            self.getJobFromHistory('project-test').result,
             'SUCCESS')
         self.assertEqual(
-            self.getJobFromHistory('nonvoting-project-test2').result,
+            self.getJobFromHistory('project-test-nonvoting').result,
             'FAILURE')
 
-        for build in self.builds:
+        for build in [b for b in self.history if 'nonvoting' in b.name]:
             self.assertEqual(build.parameters['ZUUL_VOTING'], '0')
+
+        for build in [b for b in self.history if 'nonvoting' not in b.name]:
+            self.assertEqual(build.parameters['ZUUL_VOTING'], '1')
 
     def test_check_queue_success(self):
         "Test successful check queue jobs."
