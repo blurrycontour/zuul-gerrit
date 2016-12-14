@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a6eadb0_7f2464ae",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 934,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-12-14T18:22:45Z",
+      "side": 1,
+      "message": "This is the line I refer to in the commit message.",
+      "revId": "7f7ddbdfa0ccc4f844066f751c21de0378e8e50d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
