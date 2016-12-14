@@ -93,6 +93,30 @@
       "revId": "8deea350a0955cb14684ebb876cc0d6e26db55e4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a6eadb0_af19927b",
+        "filename": "tests/test_connection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-12-14T07:13:11Z",
+      "side": 1,
+      "message": "I think that\u0027d be useful since project-test2 exists in another_check for each project.",
+      "parentUuid": "3a71b18c_e78a8fbe",
+      "range": {
+        "startLine": 97,
+        "startChar": 23,
+        "endLine": 97,
+        "endChar": 30
+      },
+      "revId": "8deea350a0955cb14684ebb876cc0d6e26db55e4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
