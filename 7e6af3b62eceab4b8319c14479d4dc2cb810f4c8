@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a6eadb0_712c5899",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 544,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-12-15T22:58:02Z",
+      "side": 1,
+      "message": "This might be the result of a terminology mixup.  The exceptions.MergeFailure previously tested here was referring to a change in gerrit actually landing in the repo.  Not a speculative merge of the change before landing.  Unfortunately, \u0027merge\u0027 is regularly used to describe both.  This alteration is probably why test_two_failed_changes_at_head failed.  I\u0027m surprised more didn\u0027t fail; maybe they haven\u0027t been re-enabled yet.",
+      "revId": "7e6af3b62eceab4b8319c14479d4dc2cb810f4c8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a6eadb0_b12270a1",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 659,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-12-15T22:58:02Z",
+      "side": 1,
+      "message": "IIUC, this change is so that in the case of a merge conflict on a config change, *something* gets reported.  This seems sensible, but we may want to alter the comments around here since I think... (see below)",
+      "revId": "7e6af3b62eceab4b8319c14479d4dc2cb810f4c8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a6eadb0_d13d2cc5",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 664,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-12-15T22:58:02Z",
+      "side": 1,
+      "message": "...this comment is no longer valid.",
+      "revId": "7e6af3b62eceab4b8319c14479d4dc2cb810f4c8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}

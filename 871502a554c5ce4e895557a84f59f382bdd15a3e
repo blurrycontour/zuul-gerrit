@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a6eadb0_911f345a",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 647,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-12-15T22:58:02Z",
+      "side": 0,
+      "message": "This removal is related to the above comment.",
+      "revId": "871502a554c5ce4e895557a84f59f382bdd15a3e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
