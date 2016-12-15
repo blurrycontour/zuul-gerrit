@@ -541,15 +541,7 @@ class PipelineManager(object):
             self.dequeueItem(item)
             changed = True
         if ((not item_ahead) and item.areAllJobsComplete() and item.live):
-            try:
-                self.reportItem(item)
-            except exceptions.MergeFailure:
-                failing_reasons.append("it did not merge")
-                for item_behind in item.items_behind:
-                    self.log.info("Resetting builds for change %s because the "
-                                  "item ahead, %s, failed to merge" %
-                                  (item_behind.change, item))
-                    self.cancelJobs(item_behind)
+            self.reportItem(item)
             self.dequeueItem(item)
             changed = True
         elif not failing_reasons and item.live:
@@ -558,6 +550,16 @@ class PipelineManager(object):
         if failing_reasons:
             self.log.debug("%s is a failing item because %s" %
                            (item, failing_reasons))
+            if item.didMergerFail():
+                self.reportItem(item)
+                for item_behind in item.items_behind:
+                    self.log.info("Resetting builds for change %s because the "
+                                  "item ahead, %s, failed to merge" %
+                                  (item_behind.change, item))
+                    self.cancelJobs(item_behind)
+                self.dequeueItem(item)
+                changed = True
+
         return (changed, nnfi)
 
     def processQueue(self):
@@ -643,8 +645,6 @@ class PipelineManager(object):
                 change_queue.decreaseWindowSize()
                 self.log.debug("%s window size decreased to %s" %
                                (change_queue, change_queue.window))
-                raise exceptions.MergeFailure(
-                    "Change %s failed to merge" % item.change)
             else:
                 change_queue.increaseWindowSize()
                 self.log.debug("%s window size increased to %s" %
@@ -656,7 +656,10 @@ class PipelineManager(object):
     def _reportItem(self, item):
         self.log.debug("Reporting change %s" % item.change)
         ret = True  # Means error as returned by trigger.report
-        if not item.getJobs():
+        if item.didMergerFail():
+            actions = self.pipeline.merge_failure_actions
+            item.setReportedResult('MERGER_FAILURE')
+        elif not item.getJobs():
             # We don't send empty reports with +1,
             # and the same for -1's (merge failures or transient errors)
             # as they cannot be followed by +1's
@@ -667,9 +670,6 @@ class PipelineManager(object):
             actions = self.pipeline.success_actions
             item.setReportedResult('SUCCESS')
             self.pipeline._consecutive_failures = 0
-        elif item.didMergerFail():
-            actions = self.pipeline.merge_failure_actions
-            item.setReportedResult('MERGER_FAILURE')
         else:
             actions = self.pipeline.failure_actions
             item.setReportedResult('FAILURE')

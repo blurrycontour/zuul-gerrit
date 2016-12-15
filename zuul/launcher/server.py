@@ -529,8 +529,9 @@ class LaunchServer(object):
         ret = self.merger.mergeChanges(args['items'], args.get('files'))
         result = dict(merged=(ret is not None),
                       zuul_url=self.zuul_url)
-        if args.get('files'):
-            result['commit'], result['files'] = ret
-        else:
-            result['commit'] = ret
+        if ret:
+            if args.get('files'):
+                result['commit'], result['files'] = ret
+            else:
+                result['commit'] = ret
         job.sendWorkComplete(json.dumps(result))
