@@ -16,6 +16,24 @@
       "revId": "533a5995697c53916e8149118b40a0e3ae846f95",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a6eadb0_ae0bef22",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 1420
+      },
+      "writtenOn": "2016-12-15T22:25:06Z",
+      "side": 1,
+      "message": "OK ya, makes sense. I\u0027ve started working on enabling conflict detection for all changes within the scheduler, but found its actually not functional ATM for config changes either. I think ive fixed that at https://review.openstack.org/#/c/411467/  I\u0027ll be adding a change on top of that to enable checking for all commits, and then stack this on that.",
+      "parentUuid": "1a6eadb0_8b25455d",
+      "revId": "533a5995697c53916e8149118b40a0e3ae846f95",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
