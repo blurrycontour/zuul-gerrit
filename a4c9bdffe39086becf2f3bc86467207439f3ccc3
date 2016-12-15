@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "1a6eadb0_f88e922c",
+        "filename": "zuul/driver/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-12-15T18:56:01Z",
+      "side": 1,
+      "message": "Possibly so.  Or, perhaps as a concrete base class that we expect drivers to inherit from.  I\u0027m pretty open to options here.  I like the idea of landing this structural change then tweaking the API before we release it.",
+      "revId": "a4c9bdffe39086becf2f3bc86467207439f3ccc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a6eadb0_8eb838e7",
         "filename": "zuul/driver/__init__.py",
         "patchSetId": 4
@@ -77,6 +94,23 @@
     },
     {
       "key": {
+        "uuid": "1a6eadb0_1880aef6",
+        "filename": "zuul/lib/connections.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-12-15T18:56:01Z",
+      "side": 1,
+      "message": "Yes, this is the sort of thing we should tighten up before release.  Are we duck-typing or inheriting.  I kind of left the door open to both right now.",
+      "revId": "a4c9bdffe39086becf2f3bc86467207439f3ccc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a6eadb0_ce7310e6",
         "filename": "zuul/lib/connections.py",
         "patchSetId": 4
@@ -111,6 +145,23 @@
         "endLine": 333,
         "endChar": 40
       },
+      "revId": "a4c9bdffe39086becf2f3bc86467207439f3ccc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a6eadb0_d889d627",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-12-15T18:56:01Z",
+      "side": 1,
+      "message": "Oh interesting.  I actually don\u0027t think this is a general-case method for drivers.  I think it\u0027s okay to special case the *zuul* driver inside of Zuul -- it\u0027s a pretty special driver in the first place, creating synthetic events based on internal actions.  We could even put this on the scheduler itself, but for code organization, it seems nice to have it in the zuul driver.  I\u0027d like to leave it as an internal API.  Maybe we could make it more clear that\u0027s what it is?",
       "revId": "a4c9bdffe39086becf2f3bc86467207439f3ccc3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
