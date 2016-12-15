@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "1a6eadb0_56c92e58",
+        "filename": "zuul/driver/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-12-15T12:36:24Z",
+      "side": 1,
+      "message": "Is this worth doing as an ABC?",
+      "range": {
+        "startLine": 16,
+        "startChar": 13,
+        "endLine": 16,
+        "endChar": 19
+      },
+      "revId": "a4c9bdffe39086becf2f3bc86467207439f3ccc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a6eadb0_8eb838e7",
         "filename": "zuul/driver/__init__.py",
         "patchSetId": 4
@@ -36,6 +59,24 @@
     },
     {
       "key": {
+        "uuid": "1a6eadb0_968bc667",
+        "filename": "zuul/lib/connections.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-12-15T12:36:24Z",
+      "side": 1,
+      "message": "I guess you could have a driver that doesn\u0027t inherit from the base class for some odd reason. Nevertheless extra hardening shouldn\u0027t hurt.",
+      "parentUuid": "1a6eadb0_4e670025",
+      "revId": "a4c9bdffe39086becf2f3bc86467207439f3ccc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a6eadb0_ce7310e6",
         "filename": "zuul/lib/connections.py",
         "patchSetId": 4
@@ -47,6 +88,52 @@
       "writtenOn": "2016-12-14T17:41:55Z",
       "side": 1,
       "message": "Same question here.",
+      "revId": "a4c9bdffe39086becf2f3bc86467207439f3ccc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a6eadb0_5625ae06",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-12-15T12:36:24Z",
+      "side": 1,
+      "message": "(-1) I feel like this should be a method on the base Driver that is called for each driver rather than special casing a driver here.",
+      "range": {
+        "startLine": 333,
+        "startChar": 24,
+        "endLine": 333,
+        "endChar": 40
+      },
+      "revId": "a4c9bdffe39086becf2f3bc86467207439f3ccc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a6eadb0_f6807ac1",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 652,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-12-15T12:36:24Z",
+      "side": 1,
+      "message": "ditto",
+      "range": {
+        "startLine": 652,
+        "startChar": 16,
+        "endLine": 652,
+        "endChar": 27
+      },
       "revId": "a4c9bdffe39086becf2f3bc86467207439f3ccc3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
