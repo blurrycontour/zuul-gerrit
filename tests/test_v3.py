@@ -110,3 +110,38 @@ class TestInRepoConfig(AnsibleZuulTestCase):
                          "A should report start and success")
         self.assertIn('tenant-one-gate', A.messages[1],
                       "A should transit tenant-one gate")
+
+    def test_dynamic_config_conflict(self):
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: project-test-%(x)s
+
+            - project:
+                name: org/project
+                tenant-one-gate:
+                  jobs:
+                    - project-test-%(x)s
+            """)
+
+        A_conf = in_repo_conf % {'x': 'A'}
+        B_conf = in_repo_conf % {'x': 'B'}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files={'.zuul.yaml':  A_conf}
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B',
+                                           files={'.zuul.yaml':  B_conf}
+
+        A.addApproval('code-review', 2)
+        B.addApproval('code-review', 2)
+
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('approved', 1))
+
+        self.waitUntilSettled()
+        self.assertEqual(self.getJobFromHistory('project-test-A').result,
+                         'SUCCESS')
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2,
+                         "A should report start and success")
+        self.assertIn('tenant-one-gate', A.messages[1],
+                      "A should transit tenant-one gate")
