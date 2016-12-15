@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a6eadb0_8b25455d",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-12-15T21:59:07Z",
+      "side": 1,
+      "message": "This will send back a null result which will cause the scheduler to re-run the job (based on the assumption things failed so bad the launcher either could not report back or did not know what to report back).  Instead, we should sendWorkComplete with some indication that the merge failed.  Since I think we decided that we should have the scheduler test for merges in all cases, generally merge conflicts should be detected before we get to this point (once we re-enable that).  I think that means we don\u0027t need to do anything special (like add a new attribute to the return payload that triggers special merge-conflict handling -- since it should have already been handled).  So if we hit the case here, we can just treat it as a normal (albiet unexpected) failure.  So we can just call sendWorkComplete with result\u003d\u0027MERGE_FAILURE\u0027 I think.",
+      "revId": "533a5995697c53916e8149118b40a0e3ae846f95",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
