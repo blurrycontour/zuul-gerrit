@@ -242,14 +242,14 @@ class Merger(object):
             path = os.path.join(root, project)
             repo = Repo(url, path, self.email, self.username)
 
-            self.repos[project] = repo
+            self.repos["%s/%s" % (url, project)] = repo
         except Exception:
             self.log.exception("Unable to add project %s" % project)
         return repo
 
     def getRepo(self, project, url):
-        if project in self.repos:
-            return self.repos[project]
+        if "%s/%s" % (url, project) in self.repos:
+            return self.repos["%s/%s" % (url, project)]
         if not url:
             raise Exception("Unable to set up repo for project %s"
                             " without a url" % (project,))
@@ -343,7 +343,7 @@ class Merger(object):
         for key, mrc in recent.items():
             project, branch = key
             try:
-                repo = self.getRepo(project, None)
+                repo = self.getRepo(project, item['url'])
                 zuul_ref = branch + '/' + item['ref']
                 repo.createZuulRef(zuul_ref, mrc)
             except Exception:
