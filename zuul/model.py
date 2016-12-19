@@ -480,6 +480,8 @@ class Job(object):
         return self.name.startswith('^')
 
     def copy(self, other):
+        if other.queue_name:
+            self.queue_name = other.queue_name
         if other.failure_message:
             self.failure_message = other.failure_message
         if other.success_message:
