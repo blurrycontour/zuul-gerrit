@@ -168,6 +168,24 @@
     },
     {
       "key": {
+        "uuid": "1a6eadb0_b0c0612c",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-12-19T00:32:28Z",
+      "side": 1,
+      "message": "So it is a special driver partly because of this, but it doesn\u0027t need to be a special case.\n\nWe could expose this as a driver hook and leave it to a driver to choose to implement. We may find a use outside of the zuul driver in the future.\n\nThat said, if we want to hard-code it as a special case I don\u0027t feel strongly enough to block on it. My preference, however, is not to special case it.",
+      "parentUuid": "1a6eadb0_d889d627",
+      "revId": "a4c9bdffe39086becf2f3bc86467207439f3ccc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a6eadb0_f6807ac1",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 4
