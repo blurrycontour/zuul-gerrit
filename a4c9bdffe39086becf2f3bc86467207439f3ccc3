@@ -186,6 +186,23 @@
     },
     {
       "key": {
+        "uuid": "1a6eadb0_ef801349",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-12-19T17:13:45Z",
+      "side": 1,
+      "message": "That makes sense.  Since we\u0027re working on establishing a public API, I\u0027d rather be very conservative in what we say is going to be part of that API and are going to support indefinitely.  I can\u0027t imagine, right now, that any other driver would need this, so I\u0027d like to omit it from that API.  However, if we find ourselves in the position of seeing another driver that could benefit from this, I agree with your proposed course.  This is easily forward-compatible with that, so let\u0027s leave this as-is -- a private API for now and open it up later if needed.",
+      "revId": "a4c9bdffe39086becf2f3bc86467207439f3ccc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a6eadb0_f6807ac1",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 4
