@@ -1017,22 +1017,19 @@ class Scheduler(threading.Thread):
         self.log.debug("Processing trigger event %s" % event)
         try:
             project = self.layout.projects.get(event.project_name)
+            if not project or project.foreign:
+                self.log.debug("Project %s not found" % event.project_name)
+                return
 
             for pipeline in self.layout.pipelines.values():
                 if (event.trigger_source and event.trigger_source !=
                         pipeline.source.connection.connection_name):
                     continue
-                # Get the change even if the project is unknown to us for the
-                # use of updating the cache if there is another change
-                # depending on this foreign one.
                 try:
                     change = pipeline.source.getChange(event, project)
                 except exceptions.ChangeNotFound as e:
                     self.log.error("Unable to get change %s from source %s.",
                                    e.change, pipeline.source)
-                    continue
-                if not project or project.foreign:
-                    self.log.debug("Project %s not found" % event.project_name)
                     continue
                 if event.type == 'patchset-created':
                     pipeline.manager.removeOldVersionsOfChange(change)
