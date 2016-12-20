@@ -128,6 +128,29 @@
     },
     {
       "key": {
+        "uuid": "1a6eadb0_d072cfe2",
+        "filename": "zuul/lib/connections.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 7191
+      },
+      "writtenOn": "2016-12-20T23:58:31Z",
+      "side": 1,
+      "message": "why should we be able to fetch a source/reporter/trigger based on the connection? Shouldn\u0027t this go via driver manager now?",
+      "range": {
+        "startLine": 121,
+        "startChar": 15,
+        "endLine": 121,
+        "endChar": 25
+      },
+      "revId": "a4c9bdffe39086becf2f3bc86467207439f3ccc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a6eadb0_5625ae06",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 4
