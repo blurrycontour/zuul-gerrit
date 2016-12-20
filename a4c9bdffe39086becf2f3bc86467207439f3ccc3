@@ -203,6 +203,24 @@
     },
     {
       "key": {
+        "uuid": "1a6eadb0_50923f4c",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 7191
+      },
+      "writtenOn": "2016-12-20T23:37:01Z",
+      "side": 1,
+      "message": "So does it make sense for zuul driver to operate as a driver at all? From what i can see there are a number of things that are unique to the zuul driver which should basically be considered core parts of how zuul works rather than something you can add/remove. \n\nI see that you need a source for the trigger, but maybe this should be more inbuilt that it is currently?",
+      "parentUuid": "1a6eadb0_ef801349",
+      "revId": "a4c9bdffe39086becf2f3bc86467207439f3ccc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a6eadb0_f6807ac1",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 4
