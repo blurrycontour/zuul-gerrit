@@ -151,6 +151,30 @@
     },
     {
       "key": {
+        "uuid": "1a6eadb0_d3773939",
+        "filename": "zuul/lib/connections.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-12-21T00:21:20Z",
+      "side": 1,
+      "message": "I think this is because in the config the trigger/source/reporter etc is referred to by the connection name so that the $reporter has the context.",
+      "parentUuid": "1a6eadb0_d072cfe2",
+      "range": {
+        "startLine": 121,
+        "startChar": 15,
+        "endLine": 121,
+        "endChar": 25
+      },
+      "revId": "a4c9bdffe39086becf2f3bc86467207439f3ccc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a6eadb0_5625ae06",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 4
@@ -238,6 +262,24 @@
       "side": 1,
       "message": "So does it make sense for zuul driver to operate as a driver at all? From what i can see there are a number of things that are unique to the zuul driver which should basically be considered core parts of how zuul works rather than something you can add/remove. \n\nI see that you need a source for the trigger, but maybe this should be more inbuilt that it is currently?",
       "parentUuid": "1a6eadb0_ef801349",
+      "revId": "a4c9bdffe39086becf2f3bc86467207439f3ccc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a6eadb0_73266569",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-12-21T00:21:20Z",
+      "side": 1,
+      "message": "Personally I can\u0027t see the harm of having it exposed as part of the API. Drivers currently live in-tree which means we\u0027ll review (or at least see) anything else that may want to use this. We\u0027ll also be able to change the interface across all the drivers at once if we want to make a change.\n\nGranted this gets more complicated if we don\u0027t want our drivers in tree (or want to support additional 3rd party drivers etc).\n\nHowever I still dislike the special casing. I think it is because it doesn\u0027t group the driver neatly up into its own module.\n\nIf we are going to special case it I think Jamie\u0027s suggestion of it not being a driver may make some sense.",
+      "parentUuid": "1a6eadb0_50923f4c",
       "revId": "a4c9bdffe39086becf2f3bc86467207439f3ccc3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
