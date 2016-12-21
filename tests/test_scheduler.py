@@ -1393,7 +1393,6 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(self.getJobFromHistory('project-test2').result,
                          'FAILURE')
 
-    @skip("Disabled for early v3 development")
     def test_dependent_behind_dequeue(self):
         "test that dependent changes behind dequeued changes work"
         # This complicated test is a reproduction of a real life bug
