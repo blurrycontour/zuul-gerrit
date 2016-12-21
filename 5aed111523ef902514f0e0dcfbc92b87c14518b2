@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a6eadb0_4fbd2367",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 673,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2016-12-21T12:53:59Z",
+      "side": 1,
+      "message": "I think this is where my confusion came from. This could be read as: \"If we are removing a build, we\u0027ve tried once, so increment\", in which case adding a build means we haven\u0027t tried yet but are about to.",
+      "range": {
+        "startLine": 673,
+        "startChar": 0,
+        "endLine": 673,
+        "endChar": 39
+      },
+      "revId": "5aed111523ef902514f0e0dcfbc92b87c14518b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
