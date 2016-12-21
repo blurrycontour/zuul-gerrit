@@ -155,6 +155,26 @@
               - project-test2
 
 - project:
+    name: org/project3
+    check:
+      jobs:
+        - project-merge:
+            jobs:
+              - project-test1
+              - project-test2
+              - project1-project2-integration
+    gate:
+      jobs:
+        - project-merge:
+            jobs:
+              - project-test1
+              - project-test2
+              - project1-project2-integration
+    post:
+      jobs:
+        - project-post
+
+- project:
     name: org/experimental-project
     experimental:
       jobs:

@@ -1393,7 +1393,6 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(self.getJobFromHistory('project-test2').result,
                          'FAILURE')
 
-    @skip("Disabled for early v3 development")
     def test_dependent_behind_dequeue(self):
         "test that dependent changes behind dequeued changes work"
         # This complicated test is a reproduction of a real life bug
@@ -1477,8 +1476,8 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(E.reported, 2)
         self.assertEqual(F.reported, 2)
 
-        self.assertEqual(self.countJobResults(self.history, 'ABORTED'), 15)
-        self.assertEqual(len(self.history), 44)
+        self.assertEqual(self.countJobResults(self.history, 'ABORTED'), 9)
+        self.assertEqual(len(self.history), 34)
 
     def test_merger_repack(self):
         "Test that the merger works after a repack"
