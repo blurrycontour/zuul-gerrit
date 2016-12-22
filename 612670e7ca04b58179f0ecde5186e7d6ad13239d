@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da4df55a_93124561",
+        "filename": "tests/fixtures/config/single-tenant/git/common-config/zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-12-22T23:58:57Z",
+      "side": 1,
+      "message": "Add project-1-project2-integration here.",
+      "revId": "612670e7ca04b58179f0ecde5186e7d6ad13239d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da4df55a_b3174950",
+        "filename": "tests/fixtures/config/single-tenant/git/common-config/zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2016-12-22T23:58:57Z",
+      "side": 1,
+      "message": "Add \"queue: integrated\" here.",
+      "revId": "612670e7ca04b58179f0ecde5186e7d6ad13239d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
