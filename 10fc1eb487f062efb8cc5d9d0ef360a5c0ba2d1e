@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da4df55a_f040190a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2016-12-22T00:38:40Z",
+      "side": 1,
+      "message": "I find them extremely useful when verifying that I understand what led to something happening.",
+      "revId": "10fc1eb487f062efb8cc5d9d0ef360a5c0ba2d1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
