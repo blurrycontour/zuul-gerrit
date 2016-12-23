@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da4df55a_d9ebe7ae",
+        "filename": "zuul/reporter/github.py",
+        "patchSetId": 40
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 6039
+      },
+      "writtenOn": "2016-12-23T21:57:36Z",
+      "side": 1,
+      "message": "Since message will always be None, we should just always call _formatItemReport",
+      "revId": "adac52d09c5ad91c9de287ec1c300c80183f4769",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
