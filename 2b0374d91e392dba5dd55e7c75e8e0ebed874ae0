@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da4df55a_f940aba7",
+        "filename": "zuul/reporter/github.py",
+        "patchSetId": 33
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 6039
+      },
+      "writtenOn": "2016-12-23T22:03:35Z",
+      "side": 1,
+      "message": "The status_url option refers to the zuul status page (e.g. http://status.openstack.org/zuul/), not a link to the job/build status, is this the url you mean to put in the github status?",
+      "revId": "2b0374d91e392dba5dd55e7c75e8e0ebed874ae0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
