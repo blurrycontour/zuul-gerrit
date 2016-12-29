@@ -266,7 +266,8 @@ class TestGithubDriver(ZuulTestCase):
                      (A.number, A.head_sha))
         self.assertEqual('check', check_status['context'])
         self.assertEqual('success', check_status['state'])
-        self.assertEqual('', check_status['url'])
+        log_url = ('http://logs.example.com/org/project/1/%s' % A.head_sha)
+        self.assertEqual(log_url, check_status['url'])
 
         # pipeline does not report start status, we should only have 2
         self.executor_server.hold_jobs_in_build = True
