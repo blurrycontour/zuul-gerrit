@@ -255,16 +255,23 @@ class TestGithub(ZuulTestCase):
         self.assertEqual('success', check_status['state'])
         self.assertEqual(check_url, check_status['url'])
 
-        # pipeline does not report any status
+        # trigger reporting pipeline
         self.worker.hold_jobs_in_build = True
         self.fake_github.emitEvent(
             A.getCommentAddedEvent('reporting check'))
         self.waitUntilSettled()
+        # pipeline does not report start status
         self.assertNotIn('reporting', A.statuses)
         self.worker.hold_jobs_in_build = False
         self.worker.release()
         self.waitUntilSettled()
-        self.assertNotIn('reporting', A.statuses)
+        # pipeline reports success/failure status
+        self.assertIn('reporting', A.statuses)
+        report_status = A.statuses['reporting']
+        status_url = report_status['url']
+        expected_url = ('http://logs.example.com/org/project/1/%s' %
+                        A.head_sha)
+        self.assertEqual(expected_url, status_url)
 
     def test_report_pull_comment(self):
         # pipeline reports comment on success

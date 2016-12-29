@@ -61,9 +61,14 @@ pipelines:
     success:
       github:
         comment: false
+        status: true
+        status_url: http://logs.example.com/{change.project.name}/{change.number}/{change.patchset}
     failure:
       github:
         comment: false
+        status: true
+        status_url: http://logs.example.com/{change.project.name}/{change.number}/{change.patchset}
+
 
   - name: merge
     description: Pipeline for merging the pull request
