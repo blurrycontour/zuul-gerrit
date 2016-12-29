@@ -14,6 +14,7 @@
 
 import abc
 import copy
+import logging
 import os
 import re
 import struct
@@ -1161,6 +1162,7 @@ class QueueItem(object):
     holds the current `BuildSet` as well as all previous `BuildSets` that were
     produced for this `QueueItem`.
     """
+    log = logging.getLogger("zuul.QueueItem")
 
     def __init__(self, queue, change):
         self.pipeline = queue.pipeline
@@ -1418,6 +1420,25 @@ class QueueItem(object):
             fakebuild.result = 'SKIPPED'
             self.addBuild(fakebuild)
 
+    def formatUrlPattern(self, url_pattern, job=None, build=None):
+        url = None
+        try:
+            url = url_pattern.format(change=self.change,
+                                     pipeline=self.pipeline,
+                                     job=job,
+                                     build=build,
+                                     item=self)
+        except KeyError:
+            self.log.exception("Unknown key in url_pattern")
+            self.log.debug("url_pattern: %s" % url_pattern)
+        except AttributeError:
+            self.log.exception("Unknown attribute in url_pattern")
+            self.log.debug("url_pattern: %s" % url_pattern)
+        except Exception:
+            self.log.exception("Unknown error formatting url_pattern")
+
+        return url
+
     def formatJobResult(self, job, url_pattern=None):
         build = self.current_build_set.getBuild(job.name)
         result = build.result
@@ -1434,13 +1455,7 @@ class QueueItem(object):
                 pattern = job.failure_url
         url = None
         if pattern:
-            try:
-                url = pattern.format(change=self.change,
-                                     pipeline=self.pipeline,
-                                     job=job,
-                                     build=build)
-            except Exception:
-                pass  # FIXME: log this or something?
+            url = self.formatUrlPattern(pattern, job, build)
         if not url:
             url = build.url or job.name
         return (result, url)

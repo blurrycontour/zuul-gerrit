@@ -18,12 +18,14 @@
         status: true
     success:
       github:
-        status: true
         comment: true
+        status: true
+        status_url: http://logs.example.com/{change.project.name}/{change.number}/{change.patchset}
     failure:
       github:
-        status: true
         comment: true
+        status: true
+        status_url: http://logs.example.com/{change.project.name}/{change.number}/{change.patchset}
 
 - pipeline:
     name: gate

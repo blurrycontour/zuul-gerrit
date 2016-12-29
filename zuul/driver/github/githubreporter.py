@@ -30,6 +30,7 @@ class GithubReporter(BaseReporter):
         super(GithubReporter, self).__init__(driver, connection, config)
         self._github_status_value = None
         self._set_commit_status = self.config.get('status', False)
+        self._status_url = self.config.get('status_url', '')
         self._create_comment = self.config.get('comment', False)
         self._merge = self.config.get('merge', False)
         self._labels = self.config.get('label', [])
@@ -73,15 +74,20 @@ class GithubReporter(BaseReporter):
         sha = item.change.patchset
         context = pipeline.name
         state = self._github_status_value
+
         url = ''
         if self._action == 'start':
-            if self.connection.sched.config.has_option('zuul', 'status_url'):
+            if self._status_url:
+                # Check for a status_url in the reporter (from layout.yaml)
+                url = item.formatUrlPattern(self._status_url)
+            elif self.connection.sched.config.has_option('zuul', 'status_url'):
+                # Fall back to the zuul server status_url (from zuul.conf)
                 url = self.connection.sched.config.get('zuul', 'status_url')
-            if self.connection.sched.config.has_option(
-                    'zuul', 'status_url_with_change'):
-                url = '%s/#%s,%s' % (url,
-                                     item.change.number,
-                                     item.change.patchset)
+                if self.connection.sched.config.has_option(
+                        'zuul', 'status_url_with_change'):
+                    url = '%s/#%s,%s' % (url,
+                                         item.change.number,
+                                         item.change.patchset)
         description = ''
         if pipeline.description:
             description = pipeline.description
@@ -158,6 +164,7 @@ def getSchema():
         'status': bool,
         'comment': bool,
         'merge': bool,
-        'label': toList(str)
+        'label': toList(str),
+        'status_url': toList(str)
     })
     return github_reporter
