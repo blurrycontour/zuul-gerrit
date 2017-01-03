@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "ba5201f7_63eb41b1",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-01-03T16:17:38Z",
+      "side": 1,
+      "message": "Should we add a duplicate check on request.state here to prevent an unnecessary ZK call when the callback is triggered?",
+      "revId": "dce6ceac8e500cefce218b44530f2f0a0f586300",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba5201f7_b291f59b",
         "filename": "zuul/zk.py",
         "patchSetId": 4
