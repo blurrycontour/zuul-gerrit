@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "ba5201f7_e0a56004",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-01-03T18:48:46Z",
+      "side": 1,
+      "message": "Oh, nope. Nevermind my statement. The node isn\u0027t returned to the callback.",
+      "parentUuid": "ba5201f7_63eb41b1",
+      "revId": "dce6ceac8e500cefce218b44530f2f0a0f586300",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba5201f7_b291f59b",
         "filename": "zuul/zk.py",
         "patchSetId": 4
