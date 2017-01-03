@@ -16,6 +16,24 @@
       "revId": "2b0374d91e392dba5dd55e7c75e8e0ebed874ae0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba5201f7_bdb54b32",
+        "filename": "zuul/reporter/github.py",
+        "patchSetId": 33
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 15215
+      },
+      "writtenOn": "2017-01-03T14:22:01Z",
+      "side": 1,
+      "message": "Yes. As the pipeline can contain multiple jobs, I can\u0027t link to all of them. However, it makes sense to link to zuul status page only when the pipeline is in progress, so I\u0027ve changed it in https://review.openstack.org/#/c/191312/41 that the link is removed when the pipeline finishes.\nLink(s) to the build(s) is always put into a comment.\n\nAlso please see change https://review.openstack.org/#/c/325300/4 which allows to add a link with a filter for the particular Github pull request.",
+      "parentUuid": "da4df55a_f940aba7",
+      "revId": "2b0374d91e392dba5dd55e7c75e8e0ebed874ae0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
