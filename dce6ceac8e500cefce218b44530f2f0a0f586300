@@ -51,6 +51,23 @@
       "revId": "dce6ceac8e500cefce218b44530f2f0a0f586300",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba5201f7_2ff593ca",
+        "filename": "zuul/zk.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-01-03T21:34:20Z",
+      "side": 1,
+      "message": "Good point, we don\u0027t want to re-register the watches, we want to re-submit the requests.  I\u0027m working on a change for that now.  I\u0027ll look into the DataWatch API after that (I think it will be helpful to have the use case around this a little more fleshed out.  In the change I\u0027m writing to handle disconnects, I will alter the TODO to reflect that.",
+      "revId": "dce6ceac8e500cefce218b44530f2f0a0f586300",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
