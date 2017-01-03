@@ -10,9 +10,11 @@
         - event: pr-comment
           comment: 'test me'
     success:
-      github: 'TEST PASSES'
+      github:
+        comment: true
     failure:
-      github: 'TEST FAILED'
+      github:
+        comment: true
 
 - job:
     name: project-test1
