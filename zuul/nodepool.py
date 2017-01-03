@@ -39,6 +39,14 @@ class Nodepool(object):
     def returnNodes(self, nodes, used=True):
         pass
 
+    def refreshRequests(self):
+        for req in self.requests.values():
+            if not self._updateNodeRequest(req):
+                self.log.info("Re-submitting lost node request %s" %
+                              (req,))
+                self.sched.zk.submitNodeRequest(req)
+                self._updateNodeRequest(req)
+
     def _updateNodeRequest(self, request):
         self.log.debug("Updating node request: %s" % (request,))
 

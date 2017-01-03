@@ -186,6 +186,7 @@ class ZooKeeper(object):
         '''
         self.client = None
         self._became_lost = False
+        self._connection_listeners = set()
 
     def _dictToStr(self, data):
         return json.dumps(data)
@@ -206,6 +207,10 @@ class ZooKeeper(object):
             self.log.debug("ZooKeeper connection: SUSPENDED")
         else:
             self.log.debug("ZooKeeper connection: CONNECTED")
+            if self._became_lost:
+                for listener in self._connection_listeners:
+                    listener()
+                self._became_lost = False
 
     @property
     def connected(self):
@@ -225,6 +230,9 @@ class ZooKeeper(object):
 
     def resetLostFlag(self):
         self._became_lost = False
+
+    def addConnectionListener(self, listener):
+        self._connection_listeners.add(listener)
 
     def connect(self, host_list, read_only=False):
         '''
@@ -297,13 +305,18 @@ class ZooKeeper(object):
             will be updated with the results of the read.
         :param callable watcher: A watch function to be called when the
             node request is updated.
+
+        :returns: True if the NodeRequest was read, False if it does
+        not exist.
+
         '''
 
         path = '%s/%s' % (self.REQUEST_ROOT, node_request.id)
         try:
             data, stat = self.client.get(path, watch=watcher)
         except kze.NoNodeError:
-            return
+            return False
         data = self._strToDict(data)
         node_request.updateFromDict(data)
-        # TODOv3(jeblair): re-register watches on disconnect
+        return True
+        # TODOv3(jeblair): look into using DataWatch API

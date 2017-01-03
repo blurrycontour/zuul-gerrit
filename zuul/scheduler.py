@@ -153,6 +153,13 @@ class EnqueueEvent(ManagementEvent):
         self.trigger_event = trigger_event
 
 
+class ZooKeeperDisconnectEvent(ManagementEvent):
+    """Report a ZooKeeper disconnection
+
+    """
+    pass
+
+
 class ResultEvent(object):
     """An event that needs to modify the pipeline state due to a
     result from an external system."""
@@ -287,6 +294,14 @@ class Scheduler(threading.Thread):
 
     def setZooKeeper(self, zk):
         self.zk = zk
+        self.zk.addConnectionListener(self.onZooKeeperConnectionLost)
+
+    def onZooKeeperConnectionLost(self):
+        self.log.debug("Adding ZK connection lost event")
+        event = ZooKeeperDisconnectEvent()
+        self.management_event_queue.put(event)
+        self.wake_event.set()
+        self.log.debug("Done adding ZK connection lost event")
 
     def addEvent(self, event):
         self.log.debug("Adding trigger event: %s" % event)
@@ -602,6 +617,11 @@ class Scheduler(threading.Thread):
                       (project, change, pipeline))
         pipeline.manager.addChange(change, ignore_requirements=True)
 
+    def _doZooKeeperDisconnectEvent(self):
+        # When ZooKeeper has been disconnected, make sure that we
+        # re-create any outstanding nodepool requests if needed.
+        self.nodepool.refreshRequests()
+
     def _areAllBuildsComplete(self):
         self.log.debug("Checking if all builds are complete")
         if self.merger.areMergesOutstanding():
@@ -722,6 +742,8 @@ class Scheduler(threading.Thread):
                 self._doPromoteEvent(event)
             elif isinstance(event, EnqueueEvent):
                 self._doEnqueueEvent(event.trigger_event)
+            elif isinstance(event, ZooKeeperDisconnectEvent):
+                self._doZooKeeperDisconnectEvent()
             else:
                 self.log.error("Unable to handle event %s" % event)
             event.done()
