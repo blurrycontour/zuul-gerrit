@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba5201f7_b291f59b",
+        "filename": "zuul/zk.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-01-03T15:06:00Z",
+      "side": 1,
+      "message": "Do you _really_ want to re-register them on disconnect? These are ephemeral nodes, so they won\u0027t be there to watch anymore if a disconnect does happen.\n\nBut as an FYI, having already experimented with this API, you want to use the DataWatch API (which handles re-registering watches automatically). You should NOT use the \u0027watch\u0027 parameter in the get() call above. Rather, do this after the get():\n\n    dw \u003d DataWatch(client\u003dself.client, path\u003dpath, func\u003dwatcher)",
+      "revId": "dce6ceac8e500cefce218b44530f2f0a0f586300",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
