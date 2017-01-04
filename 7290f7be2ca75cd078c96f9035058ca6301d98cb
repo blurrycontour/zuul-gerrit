@@ -22,6 +22,30 @@
       "revId": "7290f7be2ca75cd078c96f9035058ca6301d98cb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba5201f7_b93c5fe3",
+        "filename": "tests/test_cloner.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 669,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2017-01-04T07:56:51Z",
+      "side": 1,
+      "message": "Removed it, it\u0027s not needed.",
+      "parentUuid": "da6895a0_1df6618f",
+      "range": {
+        "startLine": 669,
+        "startChar": 6,
+        "endLine": 669,
+        "endChar": 51
+      },
+      "revId": "7290f7be2ca75cd078c96f9035058ca6301d98cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
