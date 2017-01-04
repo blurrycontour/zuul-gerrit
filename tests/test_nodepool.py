@@ -69,6 +69,14 @@ class TestNodepool(BaseTestCase):
         self.waitForRequests()
         self.assertEqual(len(self.provisioned_requests), 1)
         self.assertEqual(request.state, 'fulfilled')
+        for node in nodeset.getNodes():
+            self.assertIsNotNone(node.lock)
+            self.assertEqual(node.state, 'ready')
+
+        # Mark the nodes in use
+        self.nodepool.useNodeset(nodeset)
+        for node in nodeset.getNodes():
+            self.assertEqual(node.state, 'in-use')
 
     def test_node_request_disconnect(self):
         # Test that node requests are re-submitted after disconnect
