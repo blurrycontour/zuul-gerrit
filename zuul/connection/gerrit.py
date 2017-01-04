@@ -146,10 +146,19 @@ class GerritWatcher(threading.Thread):
 
     def _read(self, fd):
         l = fd.readline()
-        data = json.loads(l)
-        self.log.debug("Received data from Gerrit event stream: \n%s" %
-                       pprint.pformat(data))
-        self.gerrit_connection.addEvent(data)
+        # If json is not valid, catch the exception
+        try:
+            data = json.loads(l)
+            self.log.debug("Received data from Gerrit event stream: \n%s" %
+                           pprint.pformat(data))
+            self.gerrit_connection.addEvent(data)
+        except ValueError:
+            # Gerrit may close ssh connection remotely,
+            # in that particular case, select is sending
+            # POLLIN events continuously, but stdout is empty
+            if l == '':
+                raise Exception("event on ssh connection")
+            self.log.debug("Value Error Gerrit Watcher {!r}".format(l))
 
     def _listen(self, stdout, stderr):
         poll = select.poll()
