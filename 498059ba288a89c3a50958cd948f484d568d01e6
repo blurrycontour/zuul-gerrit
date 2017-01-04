@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba5201f7_95865ed9",
+        "filename": "tests/base.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 878,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-01-04T21:22:53Z",
+      "side": 1,
+      "message": "ZUUL_ZK_HOST?",
+      "revId": "498059ba288a89c3a50958cd948f484d568d01e6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba5201f7_151c2ec0",
+        "filename": "tests/base.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 899,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-01-04T21:22:53Z",
+      "side": 1,
+      "message": "zuul_test?",
+      "revId": "498059ba288a89c3a50958cd948f484d568d01e6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
