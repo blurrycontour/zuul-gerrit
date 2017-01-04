@@ -355,7 +355,7 @@ class Node(object):
         self.image = image
 
     def __repr__(self):
-        return '<Node %s:%s>' % (self.name, self.image)
+        return '<Node %s:%s id: %s>' % (self.name, self.image, self.id)
 
 
 class NodeSet(object):
@@ -371,6 +371,12 @@ class NodeSet(object):
     def __init__(self, name=None):
         self.name = name or ''
         self.nodes = OrderedDict()
+
+    def copy(self):
+        n = NodeSet(self.name)
+        for name, node in self.nodes.items():
+            n.addNode(Node(node.name, node.image))
+        return n
 
     def addNode(self, node):
         if node.name in self.nodes:
@@ -413,7 +419,7 @@ class NodeRequest(object):
         self.state_time = time.time()
 
     def __repr__(self):
-        return '<NodeRequest %s>' % (self.nodeset,)
+        return '<NodeRequest %s %s>' % (self.id, self.nodeset)
 
     def toDict(self):
         d = {}
