@@ -405,7 +405,8 @@ class PipelineManager(object):
             if not was_running:
                 try:
                     nodeset = build.build_set.getJobNodeSet(build.job.name)
-                    self.nodepool.returnNodeset(nodeset)
+                    self.sched.nodepool.returnNodeset(nodeset)
+                    build.build_set.removeJobNodeSet(build.job.name)
                 except Exception:
                     self.log.exception("Unable to return nodeset %s for "
                                        "canceled build request %s" %
@@ -611,7 +612,8 @@ class PipelineManager(object):
 
         try:
             nodeset = build.build_set.getJobNodeSet(build.job.name)
-            self.nodepool.returnNodeset(nodeset)
+            self.sched.nodepool.returnNodeset(nodeset)
+            build.build_set.removeJobNodeSet(build.job.name)
         except Exception:
             self.log.exception("Unable to return nodeset %s" % (nodeset,))
 
