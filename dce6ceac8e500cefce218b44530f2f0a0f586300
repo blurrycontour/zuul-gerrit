@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "ba5201f7_fd64c522",
+        "filename": "tests/base.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 920,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-01-05T21:29:13Z",
+      "side": 1,
+      "message": "Should define a variable for each state rather than use strings.",
+      "revId": "dce6ceac8e500cefce218b44530f2f0a0f586300",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba5201f7_9d5d7949",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-01-05T21:29:13Z",
+      "side": 1,
+      "message": "Need some state variables.",
+      "revId": "dce6ceac8e500cefce218b44530f2f0a0f586300",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba5201f7_63eb41b1",
         "filename": "zuul/nodepool.py",
         "patchSetId": 4
@@ -31,6 +65,40 @@
       "side": 1,
       "message": "Oh, nope. Nevermind my statement. The node isn\u0027t returned to the callback.",
       "parentUuid": "ba5201f7_63eb41b1",
+      "revId": "dce6ceac8e500cefce218b44530f2f0a0f586300",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba5201f7_9d2499c5",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-01-05T21:29:13Z",
+      "side": 1,
+      "message": "Ditto state var.",
+      "revId": "dce6ceac8e500cefce218b44530f2f0a0f586300",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba5201f7_bdfa3d41",
+        "filename": "zuul/zk.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-01-05T21:29:13Z",
+      "side": 1,
+      "message": "This can be done in a later review, but these states do not apply to node requests.",
       "revId": "dce6ceac8e500cefce218b44530f2f0a0f586300",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
