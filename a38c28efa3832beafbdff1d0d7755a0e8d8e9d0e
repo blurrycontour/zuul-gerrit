@@ -16,6 +16,23 @@
       "revId": "a38c28efa3832beafbdff1d0d7755a0e8d8e9d0e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba5201f7_0333ea14",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-01-05T22:22:12Z",
+      "side": 1,
+      "message": "Since the requests are ephemeral nodes (and can disappear at any time if zuul is disconnected), I think we\u0027ve already encoded the idea that a request node that disappears is one that is canceled.  In that case nodepool will hold a lock on a request that doesn\u0027t exist anymore.  I think it needs to notice that and then start the process of cleaning up any nodes it has created or allocated as a result of the request.\n\nIn fact, there\u0027s a second codepath that calls deleteNodeRequest *before* the request is complete -- when zuul cancels a build before the node request is fulfilled.\n\nIn other words, the request lock is there only to make sure that only one nodepool launcher is handling it, but isn\u0027t part of the interaction with zuul (which only does 2 things to a request: create and delete -- it never changes an already submitted request).",
+      "revId": "a38c28efa3832beafbdff1d0d7755a0e8d8e9d0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
