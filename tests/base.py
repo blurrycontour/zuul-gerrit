@@ -1654,7 +1654,6 @@ class ZuulTestCase(BaseTestCase):
         start = time.time()
         while time.time() < (start + 5):
             for stat in self.statsd.stats:
-                pprint.pprint(self.statsd.stats)
                 k, v = stat.split(':')
                 if key == k:
                     if value is None and kind is None:
@@ -1667,7 +1666,6 @@ class ZuulTestCase(BaseTestCase):
                             return
             time.sleep(0.1)
 
-        pprint.pprint(self.statsd.stats)
         raise Exception("Key %s not found in reported stats" % key)
 
     def assertBuilds(self, builds):
