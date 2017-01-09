@@ -22,6 +22,23 @@
       "revId": "5aed111523ef902514f0e0dcfbc92b87c14518b2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba5201f7_ffb456d5",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 673,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-01-09T18:34:54Z",
+      "side": 1,
+      "message": "Understandable confusion.  I think it represents the number off attempts including the current or next build.  We should probably add a comment to that effect.",
+      "revId": "5aed111523ef902514f0e0dcfbc92b87c14518b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
