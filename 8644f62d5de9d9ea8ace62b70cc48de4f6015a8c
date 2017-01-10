@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba5201f7_da84c05e",
+        "filename": "zuul/driver/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-01-10T22:00:23Z",
+      "side": 1,
+      "message": "How does this play out if we want one zuul to handle changes for more than one github, or more than one zuul? Can each tenant override connection details?",
+      "revId": "8644f62d5de9d9ea8ace62b70cc48de4f6015a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
