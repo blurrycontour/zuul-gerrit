@@ -16,6 +16,24 @@
       "revId": "8644f62d5de9d9ea8ace62b70cc48de4f6015a8c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba5201f7_e5fc6e40",
+        "filename": "zuul/driver/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-01-11T11:39:16Z",
+      "side": 1,
+      "message": "This is handled by the getConnection method",
+      "parentUuid": "ba5201f7_da84c05e",
+      "revId": "8644f62d5de9d9ea8ace62b70cc48de4f6015a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
