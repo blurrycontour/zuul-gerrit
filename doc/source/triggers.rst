@@ -126,6 +126,8 @@ following options.
 
     *unlabeled* - label removed from pull request
 
+    *review* - review added on pull request
+
     *push* - head reference updated (pushed to branch)
 
   **branch**
@@ -147,6 +149,11 @@ following options.
   labeled with a ``recheck`` label. ``label: 'do not test'`` will match a
   ``unlabeled`` action when a label with name ``do not test`` is removed from
   the pull request.
+
+  **state**
+  This is only used for ``review`` actions.  It accepts a list of strings
+  each of which is matched to the review state, which can be one of
+  ``approved``, ``comment``, or ``request_changes``.
 
   Additionally a ``push`` event can be configured, with an ``ref`` field. This
   field is treated as a regular expression and multiple refs may be listed.
