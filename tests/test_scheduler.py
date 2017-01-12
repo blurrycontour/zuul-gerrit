@@ -1038,14 +1038,14 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(len(self.history), 1)
         self.assertIn('project-post', job_names)
 
-    @skip("Disabled for early v3 development")
     def test_build_configuration_branch(self):
         "Test that the right commits are on alternate branches"
 
-        self.gearman_server.hold_jobs_in_queue = True
-        A = self.fake_gerrit.addFakeChange('org/project', 'mp', 'A')
-        B = self.fake_gerrit.addFakeChange('org/project', 'mp', 'B')
-        C = self.fake_gerrit.addFakeChange('org/project', 'mp', 'C')
+        self.create_branch('org/project2', 'mp')
+        self.launch_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project2', 'mp', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project2', 'mp', 'B')
+        C = self.fake_gerrit.addFakeChange('org/project2', 'mp', 'C')
         A.addApproval('code-review', 2)
         B.addApproval('code-review', 2)
         C.addApproval('code-review', 2)
@@ -1054,24 +1054,15 @@ class TestScheduler(ZuulTestCase):
         self.fake_gerrit.addEvent(C.addApproval('approved', 1))
         self.waitUntilSettled()
 
-        self.gearman_server.release('.*-merge')
+        self.assertTrue(self.builds[-1].hasChanges(A))
+        self.launch_server.release('.*-merge')
         self.waitUntilSettled()
-        self.gearman_server.release('.*-merge')
+        self.assertTrue(self.builds[-1].hasChanges(A, B))
+        self.launch_server.release('.*-merge')
         self.waitUntilSettled()
-        self.gearman_server.release('.*-merge')
-        self.waitUntilSettled()
-        queue = self.gearman_server.getQueue()
-        ref = self.getParameter(queue[-1], 'ZUUL_REF')
-        self.gearman_server.hold_jobs_in_queue = False
-        self.gearman_server.release()
-        self.waitUntilSettled()
-
-        path = os.path.join(self.git_root, "org/project")
-        repo = git.Repo(path)
-        repo_messages = [c.message.strip() for c in repo.iter_commits(ref)]
-        repo_messages.reverse()
-        correct_messages = ['initial commit', 'mp commit', 'A-1', 'B-1', 'C-1']
-        self.assertEqual(repo_messages, correct_messages)
+        self.assertTrue(self.builds[-1].hasChanges(A, B, C))
+        self.launch_server.hold_jobs_in_build = False
+        self.launch_server.release()
 
     @skip("Disabled for early v3 development")
     def test_build_configuration_branch_interaction(self):
