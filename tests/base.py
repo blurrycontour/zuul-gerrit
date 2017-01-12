@@ -546,6 +546,22 @@ class FakeGithubPullRequest(object):
         }
         return (name, data)
 
+    def getReviewAddedEvent(self, review):
+        name = 'pull_request_review'
+        data = {
+            'action': 'submitted',
+            'review': {
+                'state': review
+            },
+            'repository': {
+                'full_name': self.project
+            },
+            'sender': {
+                'login': 'ghuser'
+            }
+        }
+        return (name, data)
+
     def addLabel(self, name):
         if name not in self.labels:
             self.labels.append(name)

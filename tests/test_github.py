@@ -100,6 +100,18 @@ class TestGithub(ZuulTestCase):
         self.waitUntilSettled()
         self.assertEqual(0, len(self.history))
 
+    def test_review_event(self):
+        A = self.fake_github.openFakePullRequest('org/project', 'master', 'A')
+        self.fake_github.emitEvent(A.getReviewAddedEvent('approved'))
+        self.waitUntilSettled()
+        self.assertEqual(3, len(self.history))
+
+    def test_review_unmatched_event(self):
+        A = self.fake_github.openFakePullRequest('org/project', 'master', 'A')
+        self.fake_github.emitEvent(A.getReviewAddedEvent('comment'))
+        self.waitUntilSettled()
+        self.assertEqual(0, len(self.history))
+
     def test_tag_event(self):
         self.worker.hold_jobs_in_build = True
 

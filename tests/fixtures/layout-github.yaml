@@ -34,6 +34,8 @@ pipelines:
       github:
         - event: pr-label
           label: 'merge'
+        - event: pr-review
+          state: 'approve'
     start:
       github:
         status: true
