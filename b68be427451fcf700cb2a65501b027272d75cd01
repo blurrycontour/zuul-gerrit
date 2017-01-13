@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a3c09a3_dd6862bd",
+        "filename": "tests/fixtures/layout-github.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1420
+      },
+      "writtenOn": "2017-01-13T22:24:03Z",
+      "side": 1,
+      "message": "s/state/label/, as per config schema, this",
+      "range": {
+        "startLine": 38,
+        "startChar": 10,
+        "endLine": 38,
+        "endChar": 15
+      },
+      "revId": "b68be427451fcf700cb2a65501b027272d75cd01",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
