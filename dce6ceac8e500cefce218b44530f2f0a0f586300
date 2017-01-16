@@ -105,6 +105,74 @@
     },
     {
       "key": {
+        "uuid": "7a3c09a3_0ed18e57",
+        "filename": "zuul/zk.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-01-16T18:00:25Z",
+      "side": 1,
+      "message": "fwiw, I would find the consuming code easier to read if this was _dictToJson - since it\u0027s clear at the calling site what string format that\u0027s going to turn the dict in to.",
+      "revId": "dce6ceac8e500cefce218b44530f2f0a0f586300",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a3c09a3_6ece92b5",
+        "filename": "zuul/zk.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-01-16T18:00:25Z",
+      "side": 1,
+      "message": "Same as above",
+      "revId": "dce6ceac8e500cefce218b44530f2f0a0f586300",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a3c09a3_8e7d7e1e",
+        "filename": "zuul/zk.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 290,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-01-16T18:00:25Z",
+      "side": 1,
+      "message": "This patch removes id from the NodeRequest, but then it\u0027s set here. Should this be setting node_request.uid ? Or should NodeRequest get another attribute that\u0027s for the returned request_id?",
+      "revId": "dce6ceac8e500cefce218b44530f2f0a0f586300",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a3c09a3_cef3069d",
+        "filename": "zuul/zk.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-01-16T18:00:25Z",
+      "side": 1,
+      "message": "Same note as above on .id",
+      "revId": "dce6ceac8e500cefce218b44530f2f0a0f586300",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba5201f7_b291f59b",
         "filename": "zuul/zk.py",
         "patchSetId": 4
