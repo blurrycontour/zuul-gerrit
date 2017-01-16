@@ -122,6 +122,23 @@
     },
     {
       "key": {
+        "uuid": "7a3c09a3_49cb90a5",
+        "filename": "zuul/zk.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-01-16T18:09:00Z",
+      "side": 1,
+      "message": "This is copied/synced with zk.py in nodepool (in case we end up making a third-party library, or maybe making this an external facing interface in nodepool that we import into zuul), so I\u0027d like to keep it in sync for now.  I do agree with the substance of your comment and that we could probably change it (later, in both places).",
+      "revId": "dce6ceac8e500cefce218b44530f2f0a0f586300",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a3c09a3_6ece92b5",
         "filename": "zuul/zk.py",
         "patchSetId": 4
@@ -150,6 +167,23 @@
       "writtenOn": "2017-01-16T18:00:25Z",
       "side": 1,
       "message": "This patch removes id from the NodeRequest, but then it\u0027s set here. Should this be setting node_request.uid ? Or should NodeRequest get another attribute that\u0027s for the returned request_id?",
+      "revId": "dce6ceac8e500cefce218b44530f2f0a0f586300",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a3c09a3_69ce8cb5",
+        "filename": "zuul/zk.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 290,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-01-16T18:09:00Z",
+      "side": 1,
+      "message": "The previous model was more of a placeholder.  Now that I realize we need to keep track of the \u0027zookeeper id\u0027 of the node request, I\u0027m calling that the .id attribute to sync with what we do in nodepool.  The \"zuul unique id\" becomes .uid.  In a later change, I realize that we really should initialize .id to None, so that gets added into the model class.\n\nSo, short answer, mostly your last thing:  NodeRequest.id is the attribute for the returned request_id, and uid is now for internal zuul tracking.",
       "revId": "dce6ceac8e500cefce218b44530f2f0a0f586300",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
