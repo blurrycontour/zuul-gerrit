@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "7a3c09a3_63e46bab",
+        "filename": "tests/base.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 877,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-01-18T17:16:48Z",
+      "side": 1,
+      "message": "Crazy thought: If the test suite accidentally gets pointed at a real ZK, it could cause havoc. Perhaps FakeNodepool should be at /fakenodepool ?",
+      "revId": "dce6ceac8e500cefce218b44530f2f0a0f586300",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba5201f7_fd64c522",
         "filename": "tests/base.py",
         "patchSetId": 4
