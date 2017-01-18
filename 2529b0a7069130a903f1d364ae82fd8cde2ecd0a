@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a3c09a3_9cda8716",
+        "filename": "tools/nodepool-integration-test.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-01-18T22:38:28Z",
+      "side": 1,
+      "message": "I think pip install will need root or be installed to a virtualenv.\n\nAlso you may want to do a bindep install of system deps first.",
+      "revId": "2529b0a7069130a903f1d364ae82fd8cde2ecd0a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a3c09a3_fc070b7f",
+        "filename": "tools/nodepool-integration-test.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-01-18T22:38:28Z",
+      "side": 1,
+      "message": "I think pip install will need root or be installed to a virtualenv.\n\nAlso you may want to do a bindep install of system deps first.",
+      "revId": "2529b0a7069130a903f1d364ae82fd8cde2ecd0a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
