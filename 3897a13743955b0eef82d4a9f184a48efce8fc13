@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a3c09a3_e8803af9",
+        "filename": "tests/test_nodepool.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-01-18T17:00:36Z",
+      "side": 1,
+      "message": "2017?",
+      "revId": "3897a13743955b0eef82d4a9f184a48efce8fc13",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
