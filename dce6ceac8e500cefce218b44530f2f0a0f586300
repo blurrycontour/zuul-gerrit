@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "7a3c09a3_9e28d087",
+        "filename": "tests/base.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 877,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-01-18T17:21:20Z",
+      "side": 1,
+      "message": "The tests run under a fixture that sets a per-test chroot in the kazoo zookeeper driver, so there shouldn\u0027t be any leakage or interaction with production systems or even other tests.",
+      "revId": "dce6ceac8e500cefce218b44530f2f0a0f586300",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba5201f7_fd64c522",
         "filename": "tests/base.py",
         "patchSetId": 4
