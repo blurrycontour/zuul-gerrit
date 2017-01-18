@@ -34,6 +34,23 @@
       "revId": "62295d322e65a6954b9fc5bc95471f8127ef337a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a3c09a3_e3805bf9",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-01-18T17:12:59Z",
+      "side": 1,
+      "message": "Agreed.  That is fixed in I77f8869b9d751ccd6c9f398ed03ef5ac482cc204",
+      "revId": "62295d322e65a6954b9fc5bc95471f8127ef337a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
