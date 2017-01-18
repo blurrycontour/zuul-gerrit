@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "7a3c09a3_3e66fcec",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 373,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-01-18T17:22:25Z",
+      "side": 1,
+      "message": "Yeah, I almost did that here, but kept the global states because that\u0027s the way it was in nodepool.  We can switch this later.",
+      "revId": "a38c28efa3832beafbdff1d0d7755a0e8d8e9d0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba5201f7_a325be09",
         "filename": "zuul/nodepool.py",
         "patchSetId": 6
