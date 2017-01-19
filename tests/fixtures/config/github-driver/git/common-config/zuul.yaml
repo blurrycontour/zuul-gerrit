@@ -64,9 +64,11 @@
     success:
       github:
         comment: false
+        status: true
     failure:
       github:
         comment: false
+        status: true
 
 - pipeline:
     name: merge
