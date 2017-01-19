@@ -215,7 +215,31 @@ class GithubWebhookListener():
 
         event.title = pr_body.get('title')
 
+        # get the statuses
+        owner, project = event.project_name.split('/')
+        event.statuses = self._get_statuses(owner, project, event.patch_number)
+
         return event
+
+    def _get_statuses(self, owner, project, sha):
+        # A ref can have more than one status from each context,
+        # however the API returns them in order, newest first.
+        # So we can keep track of which contexts we've already seen
+        # and throw out the rest. Our unique key is based on
+        # the user and the context, since context is free form and anybody
+        # can put whatever they want there. We want to ensure we track it
+        # by user, so that we can require/trigger by user too.
+        seen = []
+        statuses = []
+        for status in self.connection.getCommitStatuses(owner, project, sha):
+            user = status.get('creator').get('login')
+            context = status.get('context')
+            state = status.get('state')
+            if "%s:%s" % (user, context) not in seen:
+                statuses.append("%s:%s:%s" % (user, context, state))
+                seen.append("%s:%s" % (user, context))
+
+        return statuses
 
     def _get_sender(self, body):
         login = body.get('sender').get('login')
@@ -353,6 +377,16 @@ class GithubConnection(BaseConnection):
         log_rate_limit(self.log, self.github)
         if not result:
             raise Exception('Pull request was not merged')
+
+    def getCommitStatuses(self, owner, project, sha):
+        repository = self.github.repository(owner, project)
+        commit = repository.commit(sha)
+        # make a list out of the statuses so that we complete our
+        # API transaction
+        statuses = [status.as_dict() for status in commit.statuses()]
+
+        log_rate_limit(self.log, self.github)
+        return statuses
 
     def setCommitStatus(self, owner, project, sha, state,
                         url='', description='', context=''):

@@ -244,10 +244,14 @@ class TestGithubDriver(ZuulTestCase):
         A = self.fake_github.openFakePullRequest('org/project', 'master', 'A')
         self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
         self.waitUntilSettled()
-        self.assertIn('check', A.statuses)
-        check_status = A.statuses['check']
+        # We should have a status container for the head sha
+        self.assertIn(A.head_sha, A.statuses.keys())
+        # We should only have one status for the head sha
+        self.assertEqual(1, len(A.statuses[A.head_sha]))
+        check_status = A.statuses[A.head_sha][0]
         check_url = ('http://zuul.example.com/status/#%s,%s' %
                      (A.number, A.head_sha))
+        self.assertEqual('check', check_status['context'])
         self.assertEqual('Standard check', check_status['description'])
         self.assertEqual('pending', check_status['state'])
         self.assertEqual(check_url, check_status['url'])
@@ -255,21 +259,29 @@ class TestGithubDriver(ZuulTestCase):
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
         self.waitUntilSettled()
-        check_status = A.statuses['check']
-        self.assertEqual('Standard check', check_status['description'])
+        # We should only have two statuses for the head sha
+        self.assertEqual(2, len(A.statuses[A.head_sha]))
+        check_status = A.statuses[A.head_sha][0]
+        check_url = ('http://zuul.example.com/status/#%s,%s' %
+                     (A.number, A.head_sha))
+        self.assertEqual('check', check_status['context'])
         self.assertEqual('success', check_status['state'])
         self.assertEqual('', check_status['url'])
 
-        # pipeline does not report any status
+        # pipeline does not report start status, we should only have 2
         self.executor_server.hold_jobs_in_build = True
         self.fake_github.emitEvent(
             A.getCommentAddedEvent('reporting check'))
         self.waitUntilSettled()
-        self.assertNotIn('reporting', A.statuses)
+        self.assertEqual(2, len(A.statuses[A.head_sha]))
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
         self.waitUntilSettled()
-        self.assertNotIn('reporting', A.statuses)
+        # pipeline reports success/failure status
+        self.assertEqual(3, len(A.statuses[A.head_sha]))
+        report_status = A.statuses[A.head_sha][0]
+        self.assertEqual('reporting', report_status['context'])
+        self.assertEqual('success', report_status['state'])
 
     def test_report_pull_comment(self):
         # pipeline reports comment on success
