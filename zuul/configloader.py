@@ -143,12 +143,14 @@ class JobParser(object):
             # accumulate onto any previously applied tags from
             # metajobs.
             job.tags = job.tags.union(set(tags))
-        # The source attributes may not be overridden -- they are
-        # always supplied by the config loader.  They correspond to
-        # the Project instance of the repo where it originated, and
-        # the branch name.
+        # The source attributes and playbook may not be overridden --
+        # they are always supplied by the config loader.  They
+        # correspond to the Project instance of the repo where it
+        # originated, and the branch name.
         job.source_project = conf.get('_source_project')
         job.source_branch = conf.get('_source_branch')
+        # TODOv3(jeblair): verify the playbook exists; remove hardcoded extension
+        job.playbook = os.path.join('playbooks', job.name + '.yaml')
         job.failure_message = conf.get('failure-message', job.failure_message)
         job.success_message = conf.get('success-message', job.success_message)
         job.failure_url = conf.get('failure-url', job.failure_url)
