@@ -1749,6 +1749,10 @@ class ZuulTestCase(BaseTestCase):
         zuul.merger.merger.reset_repo_to_head(repo)
         for fn, content in files.items():
             fn = os.path.join(path, fn)
+            try:
+                os.makedirs(os.path.dirname(fn))
+            except OSError:
+                pass
             with open(fn, 'w') as f:
                 f.write(content)
             repo.index.add([fn])
