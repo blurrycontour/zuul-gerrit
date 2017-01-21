@@ -16,6 +16,23 @@
       "revId": "dd169aac104369bf9179c31a7da98ecf3092e861",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a3905b3_86a39bff",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-01-21T15:42:53Z",
+      "side": 1,
+      "message": "Agreed -- I think what we probably want to do to satisfy both of these todos is to look for jobname.yaml or jobname.yml or raise an error, does that sound right?",
+      "revId": "dd169aac104369bf9179c31a7da98ecf3092e861",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
