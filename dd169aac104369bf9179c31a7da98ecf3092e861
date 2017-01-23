@@ -53,6 +53,23 @@
     },
     {
       "key": {
+        "uuid": "5a3905b3_c300ec36",
+        "filename": "tests/fixtures/config/ansible/git/org_project/.zuul.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-01-23T23:05:10Z",
+      "side": 1,
+      "message": "Fixed in next change.",
+      "revId": "dd169aac104369bf9179c31a7da98ecf3092e861",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a3905b3_d1dc8475",
         "filename": "zuul/configloader.py",
         "patchSetId": 4
@@ -151,6 +168,23 @@
       "side": 1,
       "message": "OH! I missed that this was a /directory/ name, and not a filename. It\u0027s using the directory + the job name to find a playbook within. Interesting.\n\nThis then requires the pipeline to have defined job names at least, and leaves it up to the project to define the meaning of the job. Is there going to be a model where the repo itself defines the jobs themselves?",
       "parentUuid": "5a3905b3_323e6128",
+      "revId": "dd169aac104369bf9179c31a7da98ecf3092e861",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a3905b3_e3fb2845",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-01-23T23:05:10Z",
+      "side": 1,
+      "message": "Ah yep.  Currently the model is that any time a job is defined, zuul expects to find a playbook in the playbooks/ directory of the same repo in which it is defined.\n\nSo yes, you definitely can define a job and its playbook in a project repo, but no, you can\u0027t define a job and have the playbook for it in a different repo.  *Roles* however, can be in other repos (a later change will implement that).",
       "revId": "dd169aac104369bf9179c31a7da98ecf3092e861",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
