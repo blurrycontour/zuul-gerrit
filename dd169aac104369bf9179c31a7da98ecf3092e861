@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "5a3905b3_182fd1a1",
+        "filename": "tests/fixtures/config/ansible/git/org_project/.zuul.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-01-23T17:09:17Z",
+      "side": 1,
+      "message": "red blob",
+      "revId": "dd169aac104369bf9179c31a7da98ecf3092e861",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a3905b3_d1dc8475",
         "filename": "zuul/configloader.py",
         "patchSetId": 4
