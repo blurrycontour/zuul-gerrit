@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "5a3905b3_124325b3",
+        "filename": "tests/base.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1754,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-01-23T20:54:42Z",
+      "side": 1,
+      "message": "Agreed.  I would have done something better if this weren\u0027t just for tests (where a real error is likely to make something blow up anyway).",
+      "revId": "dd169aac104369bf9179c31a7da98ecf3092e861",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a3905b3_182fd1a1",
         "filename": "tests/fixtures/config/ansible/git/org_project/.zuul.yaml",
         "patchSetId": 4
@@ -99,6 +116,23 @@
       "writtenOn": "2017-01-23T18:19:24Z",
       "side": 1,
       "message": "Why plural here? There are multiple plays in a playbook. More than one playbook would be more than one file, or are you anticipating that the base playbook will import other playbooks?",
+      "revId": "dd169aac104369bf9179c31a7da98ecf3092e861",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a3905b3_323e6128",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-01-23T20:54:42Z",
+      "side": 1,
+      "message": "I\u0027m anticipating that a given repo may have multiple playbooks.  In particular, our config repos (eg \"project-config\") may have tens or hundreds of playbooks each for various jobs.  A given project repo (eg \"shade\") may even have a handful of playbooks for some custom jobs.\n\nSo this accounts for:\n  openstack-infra/project-config/playbooks/python27.yaml\n  openstack-infra/project-config/playbooks/python35.yaml\n  openstack-infra/project-config/playbooks/flake8.yaml\netc.",
       "revId": "dd169aac104369bf9179c31a7da98ecf3092e861",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
