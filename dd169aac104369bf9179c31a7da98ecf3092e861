@@ -136,6 +136,24 @@
       "revId": "dd169aac104369bf9179c31a7da98ecf3092e861",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a3905b3_48817a8e",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-01-23T21:57:01Z",
+      "side": 1,
+      "message": "OH! I missed that this was a /directory/ name, and not a filename. It\u0027s using the directory + the job name to find a playbook within. Interesting.\n\nThis then requires the pipeline to have defined job names at least, and leaves it up to the project to define the meaning of the job. Is there going to be a model where the repo itself defines the jobs themselves?",
+      "parentUuid": "5a3905b3_323e6128",
+      "revId": "dd169aac104369bf9179c31a7da98ecf3092e861",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
