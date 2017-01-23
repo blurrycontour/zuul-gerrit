@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "5a3905b3_497c29b5",
+        "filename": "tests/base.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1754,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-01-23T18:19:24Z",
+      "side": 1,
+      "message": "Looks like you\u0027re trying to pre-make the directory, and maybe accepting an error where the directory already exists? The OSError seems to catch a lot of things though, should it be narrowed down, or just allowed to fail elsewhere if say permissions are not right?",
+      "revId": "dd169aac104369bf9179c31a7da98ecf3092e861",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a3905b3_182fd1a1",
         "filename": "tests/fixtures/config/ansible/git/org_project/.zuul.yaml",
         "patchSetId": 4
@@ -47,6 +64,41 @@
       "writtenOn": "2017-01-21T15:42:53Z",
       "side": 1,
       "message": "Agreed -- I think what we probably want to do to satisfy both of these todos is to look for jobname.yaml or jobname.yml or raise an error, does that sound right?",
+      "revId": "dd169aac104369bf9179c31a7da98ecf3092e861",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a3905b3_64774ca0",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-01-23T18:19:24Z",
+      "side": 1,
+      "message": "Yeah that sounds right. A find first with an eventual error.",
+      "parentUuid": "5a3905b3_86a39bff",
+      "revId": "dd169aac104369bf9179c31a7da98ecf3092e861",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a3905b3_c47e4069",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-01-23T18:19:24Z",
+      "side": 1,
+      "message": "Why plural here? There are multiple plays in a playbook. More than one playbook would be more than one file, or are you anticipating that the base playbook will import other playbooks?",
       "revId": "dd169aac104369bf9179c31a7da98ecf3092e861",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
