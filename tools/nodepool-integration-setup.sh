@@ -16,8 +16,3 @@ sudo pip install .
 cd $WORKSPACE
 
 bash -xe openstack-infra/nodepool/tools/zuul-nodepool-integration/start.sh
-
-# TODO(jeblair): something useful and save logs
-sleep 30
-cat /tmp/nodepool/log/nodepool-builder.log
-cat /tmp/nodepool/log/nodepool-launcher.log
