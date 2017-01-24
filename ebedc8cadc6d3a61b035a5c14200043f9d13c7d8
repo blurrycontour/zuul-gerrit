@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a3905b3_579e7607",
+        "filename": "tools/nodepool-integration-test.sh",
+        "patchSetId": 6
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-01-24T01:11:48Z",
+      "side": 1,
+      "message": "Should probably pushd/popd these and maybe begin by pushd $WORKSPACE?",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 2
+      },
+      "revId": "ebedc8cadc6d3a61b035a5c14200043f9d13c7d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a3905b3_b775dacb",
+        "filename": "tools/nodepool-integration-test.sh",
+        "patchSetId": 6
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-01-24T01:11:48Z",
+      "side": 1,
+      "message": "Should this script follow the same namespace for clarity?",
+      "range": {
+        "startLine": 18,
+        "startChar": 40,
+        "endLine": 18,
+        "endChar": 65
+      },
+      "revId": "ebedc8cadc6d3a61b035a5c14200043f9d13c7d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
