@@ -11,11 +11,33 @@
       github:
         comment: true
 
+- pipeline:
+    name: trigger
+    manager: independent
+    trigger:
+      github:
+        - event: status
+          status: 'zuul:check:success'
+    success:
+      github:
+        comment: true
+    failure:
+      github:
+        status: true
+
 - job:
     name: project1-pipeline
+- job:
+    name: project2-trigger
 
 - project:
     name: org/project1
     pipeline:
       jobs:
         - project1-pipeline
+
+- project:
+    name: org/project2
+    trigger:
+      jobs:
+        - project2-trigger
