@@ -206,6 +206,29 @@
       "revId": "dd169aac104369bf9179c31a7da98ecf3092e861",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a3905b3_280a578a",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-01-24T10:03:19Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this return False or something if the branch failed to check out?",
+      "range": {
+        "startLine": 269,
+        "startChar": 8,
+        "endLine": 269,
+        "endChar": 12
+      },
+      "revId": "dd169aac104369bf9179c31a7da98ecf3092e861",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
