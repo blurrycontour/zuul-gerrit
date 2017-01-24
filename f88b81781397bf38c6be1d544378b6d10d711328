@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "5a3905b3_7ef4ef86",
+        "filename": "tests/nodepool/test_nodepool_integration.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-01-24T23:31:19Z",
+      "side": 1,
+      "message": "Not yet, but there should be.  ;)\n\nThis is basically just asserting that the internal returnNodeSet method is doing the right thing with the data structures on this side of the zookeeper divide.  It\u0027s not even checking that it did anything in zookeeper.\n\nWhat we should do is extend this test to watch nodepool delete the nodes.  There is probably an unavoidable race condition there if we tried to check that the state was set to \u0027used\u0027 in zookeeper.  But we can check that the nodes are actually deleted without racing.",
+      "revId": "f88b81781397bf38c6be1d544378b6d10d711328",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a3905b3_7b47a11d",
         "filename": "tests/nodepool/test_nodepool_integration.py",
         "patchSetId": 1
@@ -36,6 +53,23 @@
     },
     {
       "key": {
+        "uuid": "5a3905b3_9ef19b98",
+        "filename": "tests/nodepool/test_nodepool_integration.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-01-24T23:31:19Z",
+      "side": 1,
+      "message": "Node requests are ephemeral nodes which *do* go away on a disconnect.  Therefore, if zuul gets disconnected but still wants a request, it needs to re-submit it.",
+      "revId": "f88b81781397bf38c6be1d544378b6d10d711328",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a3905b3_bb8ca980",
         "filename": "tests/nodepool/test_nodepool_integration.py",
         "patchSetId": 1
@@ -47,6 +81,23 @@
       "writtenOn": "2017-01-24T22:59:46Z",
       "side": 1,
       "message": "I think this is supposed to be self.nodepool not self.fake_nodepool as intent is testing against real nodepool here.",
+      "revId": "f88b81781397bf38c6be1d544378b6d10d711328",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a3905b3_beee57b2",
+        "filename": "tests/nodepool/test_nodepool_integration.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-01-24T23:31:19Z",
+      "side": 1,
+      "message": "Yeah, the skipped tests need major reworking if we want to test nodepool for real.",
       "revId": "f88b81781397bf38c6be1d544378b6d10d711328",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
