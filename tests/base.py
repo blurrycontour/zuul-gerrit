@@ -706,10 +706,9 @@ class FakeGithubPullRequest(object):
         repo = self._getRepo()
         return repo.references[self._getPRReference()].commit.hexsha
 
-    def setStatus(self, sha, state, url, description, context):
+    def setStatus(self, sha, state, url, description, context, user='zuul'):
         # Since we're bypassing github API, which would require a user, we
         # hard set the user as 'zuul' here.
-        user = 'zuul'
         # insert the status at the top of the list, to simulate that it
         # is the most recent set status
         self.statuses[sha].insert(0, ({
@@ -749,6 +748,21 @@ class FakeGithubPullRequest(object):
             },
             'sender': {
                 'login': 'ghuser'
+            }
+        }
+        return (name, data)
+
+    def getCommitStatusEvent(self, context, state='success', user='zuul'):
+        name = 'status'
+        data = {
+            'state': state,
+            'sha': self.head_sha,
+            'description': 'Test results for %s: %s' % (self.head_sha, state),
+            'target_url': 'http://zuul/%s' % self.head_sha,
+            'branches': [],
+            'context': context,
+            'sender': {
+                'login': user
             }
         }
         return (name, data)
@@ -838,6 +852,14 @@ class FakeGithubConnection(githubconnection.GithubConnection):
             }
         }
         return data
+
+    def getPullBySha(self, sha):
+        prs = list(set([p for p in self.pull_requests if sha == p.head_sha]))
+        if len(prs) > 1:
+            raise Exception('Multiple pulls found with head sha: %s' % sha)
+        pr = prs[0]
+        owner, project = pr.project.split('/')
+        return self.getPull(owner, project, pr.number)
 
     def getPullFileNames(self, owner, project, number):
         pr = self.pull_requests[number - 1]
