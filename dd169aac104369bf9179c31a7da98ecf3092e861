@@ -188,6 +188,24 @@
       "revId": "dd169aac104369bf9179c31a7da98ecf3092e861",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a3905b3_4566b72a",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-01-24T05:43:32Z",
+      "side": 1,
+      "message": "That\u0027s... not quite what I was asking.\n\nWhat it looks like is that in order for Zuul to do \"something\" with a repo, a job has to be defined within the zuul configuration. If a job is defined, then zuul will look within the repo for a playbook that matches. I\u0027m assuming that means that a repo owner has to tell the zuul maintainer \"Hey, I want to run jobs X, Y, and Z.\" Zuul maintainer configures zuul to run those jobs for check or gate or whatever.\n\nWhat I\u0027m curious about, is if there is a way to bypass that zuul configuration step, so that the repo owner can define the jobs they want ran (and thus the playbooks looked for) within their own repo. End user decides they want to add job Q, they do it directly in their own repo (as a change request even!) along with the playbook to match. No interaction with Zuul admins, work just gets done.",
+      "parentUuid": "5a3905b3_e3fb2845",
+      "revId": "dd169aac104369bf9179c31a7da98ecf3092e861",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
