@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a3905b3_1ba4dd06",
+        "filename": "tests/nodepool/test_nodepool_integration.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-01-24T22:59:46Z",
+      "side": 1,
+      "message": "Is there a potential race here with nodepool locking the nodes then transitioning them from used to deleting?",
+      "revId": "f88b81781397bf38c6be1d544378b6d10d711328",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a3905b3_7b47a11d",
+        "filename": "tests/nodepool/test_nodepool_integration.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-01-24T22:59:46Z",
+      "side": 1,
+      "message": "As a question on how zookeeper works, I didn\u0027t think that writes to zk\u0027s filesystem went away when a writer goes away? EG these things wouldn\u0027t necessarily be resubmitted so much as addressed and noted once the writer reconnects?",
+      "revId": "f88b81781397bf38c6be1d544378b6d10d711328",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a3905b3_bb8ca980",
+        "filename": "tests/nodepool/test_nodepool_integration.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-01-24T22:59:46Z",
+      "side": 1,
+      "message": "I think this is supposed to be self.nodepool not self.fake_nodepool as intent is testing against real nodepool here.",
+      "revId": "f88b81781397bf38c6be1d544378b6d10d711328",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a3905b3_7b6ec197",
+        "filename": "tests/nodepool/test_nodepool_integration.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-01-24T22:59:46Z",
+      "side": 1,
+      "message": "See above comment about self.fake_nodepool vs self.nodepool.",
+      "revId": "f88b81781397bf38c6be1d544378b6d10d711328",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
