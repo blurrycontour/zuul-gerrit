@@ -209,6 +209,23 @@
     },
     {
       "key": {
+        "uuid": "5a3905b3_951a6d7b",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-01-24T17:18:46Z",
+      "side": 1,
+      "message": "Oh, absolutely.  That\u0027s described in paragraph 3 of this section: http://specs.openstack.org/openstack-infra/infra-specs/specs/zuulv3.html#tenants (and referenced a few more times in the spec as well).  Here are two tests that show both in-repo config as well as adding a new job in a change (and having it self-test): http://git.openstack.org/cgit/openstack-infra/zuul/tree/tests/test_v3.py?h\u003dfeature/zuulv3#n70\n\nSo, back to this change -- that shows how the definition of a job can be in almost any repo, and so this code expects to find the playbook for that job in the same repo in which it is defined (whether it\u0027s a config repo or a project repo).",
+      "revId": "dd169aac104369bf9179c31a7da98ecf3092e861",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a3905b3_280a578a",
         "filename": "zuul/merger/merger.py",
         "patchSetId": 4
@@ -226,6 +243,23 @@
         "endLine": 269,
         "endChar": 12
       },
+      "revId": "dd169aac104369bf9179c31a7da98ecf3092e861",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a3905b3_7529819a",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-01-24T17:18:46Z",
+      "side": 1,
+      "message": "Oh, you\u0027re right.  I was thinking this needed to follow the \"checkout branch if exists otherwise master\" pattern, but we\u0027re passing the branch where we expect the playbook to be (and any decisions about that should probably have been made ahead of time by the scheduler rather than leaving the launcher to figure it out).  So this probably should just check out the branch or raise an exception.",
       "revId": "dd169aac104369bf9179c31a7da98ecf3092e861",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
