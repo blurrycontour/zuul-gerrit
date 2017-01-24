@@ -129,6 +129,8 @@ following options.
 
     *tag* - new tag created
 
+    *status* - status set on commit
+
   **branch**
   The branch associated with the event. Example: ``master``.  This
   field is treated as a regular expression, and multiple branches may
@@ -162,6 +164,11 @@ following options.
   each of which is matched to the review state, which can be one of
   ``approved``, ``comment``, or ``request_changes``.
 
+  **status**
+  This is only used for ``status`` events. It accepts a list of strings each of
+  which matches the user setting the status, the status context, and the status
+  itself in the format of ``user:context:status``.  For example,
+  ``zuul_github_ci_bot:check_pipeline:success``.
 
 GitHub Configuration
 ~~~~~~~~~~~~~~~~~~~~
