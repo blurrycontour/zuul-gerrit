@@ -135,10 +135,11 @@ class GerritWatcher(threading.Thread):
     poll_timeout = 500
 
     def __init__(self, gerrit_connection, username, hostname, port=29418,
-                 keyfile=None):
+                 keyfile=None, keepalive_interval=0):
         threading.Thread.__init__(self)
         self.username = username
         self.keyfile = keyfile
+        self.keepalive_interval = keepalive_interval
         self.hostname = hostname
         self.port = port
         self.gerrit_connection = gerrit_connection
@@ -172,6 +173,10 @@ class GerritWatcher(threading.Thread):
                            username=self.username,
                            port=self.port,
                            key_filename=self.keyfile)
+            transport = client.get_transport()
+            transport.set_keepalive(self.keepalive_interval)
+            self.log.debug("paramiko.SSHClient keepalive interval is set to %d"
+                           % self.keepalive_interval)
 
             stdin, stdout, stderr = client.exec_command("gerrit stream-events")
 
@@ -224,6 +229,8 @@ class GerritConnection(BaseConnection):
         self.server = self.connection_config.get('server')
         self.port = int(self.connection_config.get('port', 29418))
         self.keyfile = self.connection_config.get('sshkey', None)
+        self.keepalive_interval = \
+            int(self.connection_config.get('keepalive_interval', 0))
         self.watcher_thread = None
         self.event_queue = None
         self.client = None
@@ -461,7 +468,8 @@ class GerritConnection(BaseConnection):
             self.user,
             self.server,
             self.port,
-            keyfile=self.keyfile)
+            keyfile=self.keyfile,
+            keepalive_interval=self.keepalive_interval)
         self.watcher_thread.start()
 
     def _stop_event_connector(self):
