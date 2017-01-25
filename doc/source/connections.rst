@@ -38,6 +38,11 @@ Create a connection with gerrit.
   Path to SSH key to use when logging into above server.
   ``sshkey=/home/zuul/.ssh/id_rsa``
 
+**keepalive_interval**
+  Optional: set keepalive packets interval in seconds for gerrit stream-events connection.
+  Defaults to ``0`` - keepalive is disabled.
+  ``keepalive_interval=240``
+
 
 Gerrit Configuration
 ~~~~~~~~~~~~~~~~~~~~
