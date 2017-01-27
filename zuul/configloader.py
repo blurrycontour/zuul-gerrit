@@ -504,6 +504,7 @@ class TenantParser(object):
     def fromYaml(base, connections, scheduler, merger, conf):
         TenantParser.getSchema(connections)(conf)
         tenant = model.Tenant(conf['name'])
+        tenant.unparsed_config = conf
         unparsed_config = model.UnparsedTenantConfig()
         tenant.config_repos, tenant.project_repos = \
             TenantParser._loadTenantConfigRepos(connections, conf)
@@ -543,6 +544,10 @@ class TenantParser(object):
         jobs = []
 
         for (source, project) in config_repos:
+            # If we have cached data (this is a reconfiguration) use it.
+            if project.unparsed_config:
+                config_repos_config.extend(project.unparsed_config)
+                continue
             # Get main config files.  These files are permitted the
             # full range of configuration.
             url = source.getGitUrl(project)
@@ -554,6 +559,10 @@ class TenantParser(object):
             jobs.append(job)
 
         for (source, project) in project_repos:
+            # If we have cached data (this is a reconfiguration) use it.
+            if project.unparsed_config:
+                project_repos_config.extend(project.unparsed_config)
+                continue
             # Get in-project-repo config files which have a restricted
             # set of options.
             url = source.getGitUrl(project)
@@ -664,6 +673,19 @@ class ConfigLoader(object):
                                            merger, conf_tenant)
             abide.tenants[tenant.name] = tenant
         return abide
+
+    def reloadTenant(self, config_path, scheduler, merger, connections,
+                     abide, tenant):
+        new_abide = model.Abide()
+        new_abide.tenants = abide.tenants.copy()
+
+        config_path = self.expandConfigPath(config_path)
+        base = os.path.dirname(os.path.realpath(config_path))
+
+        new_tenant = TenantParser.fromYaml(base, connections, scheduler,
+                                           merger, tenant.unparsed_config)
+        new_abide.tenants[tenant.name] = new_tenant
+        return new_abide
 
     def createDynamicLayout(self, tenant, files):
         config = tenant.config_repos_config.copy()
