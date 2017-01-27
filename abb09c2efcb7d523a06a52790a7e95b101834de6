@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a461143_7df3ce9e",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 637,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-01-27T00:13:53Z",
+      "side": 1,
+      "message": "Note: this method is now intended to be generic and serve all three playbook running methods, however, the proc attribute is singular.  I\u0027m not sure what the next patch will require of this, but it should either be addressed there or in this one.",
+      "revId": "abb09c2efcb7d523a06a52790a7e95b101834de6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
