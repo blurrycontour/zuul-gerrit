@@ -1,2 +1,3 @@
+screen [test]
 libjpeg-dev [test]
 zookeeperd [platform:dpkg]
