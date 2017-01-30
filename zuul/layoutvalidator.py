@@ -185,6 +185,7 @@ class LayoutSchema(object):
                 'gerrit': 'zuul.trigger.gerrit',
             },
             'reporter': {
+                'fedmsg': 'zuul.reporter.fedmsg',
                 'gerrit': 'zuul.reporter.gerrit',
                 'smtp': 'zuul.reporter.smtp',
             },
@@ -316,6 +317,7 @@ class LayoutValidator(object):
                 'gerrit': 'zuul.trigger.gerrit',
             },
             'reporter': {
+                'fedmsg': 'zuul.reporter.fedmsg',
                 'gerrit': 'zuul.reporter.gerrit',
                 'smtp': 'zuul.reporter.smtp',
             },

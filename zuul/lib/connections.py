@@ -14,6 +14,7 @@
 
 import re
 
+import zuul.driver.fedmsg
 import zuul.driver.zuul
 import zuul.driver.gerrit
 import zuul.driver.smtp
@@ -34,6 +35,7 @@ class ConnectionRegistry(object):
         self.registerDriver(zuul.driver.zuul.ZuulDriver())
         self.registerDriver(zuul.driver.gerrit.GerritDriver())
         self.registerDriver(zuul.driver.smtp.SMTPDriver())
+        self.registerDriver(zuul.driver.fedmsg.FedmsgDriver())
 
     def registerDriver(self, driver):
         if driver.name in self.drivers:
