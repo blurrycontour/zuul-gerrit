@@ -36,6 +36,7 @@ import tempfile
 import threading
 import time
 
+import fedmsg
 import git
 import gear
 import fixtures
@@ -507,6 +508,30 @@ class FakeURLOpener(object):
             ret += '%04x%s' % (len(r) + 4, r)
         ret += '0000'
         return ret
+
+class FakeFedmsg(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
+        self.stopped = False
+        self.config = dict(
+            endpoints={
+                "zuul.localhost": [
+                    "tcp://127.0.0.1:12345",
+                ],
+            },
+        )
+        self.messages = []
+
+    def run(self):
+        for name, endpoint, topic, msg in fedmsg.tail_messages(**self.config):
+            if self.stopped:
+                break
+            self.messages.append(msg)
+
+    def stop(self):
+        self.stopped = True
+        fedmsg.publish(
+            name='zuul.localhost', topic='zuul', msg='stop')
 
 
 class FakeStatsd(threading.Thread):
@@ -1205,6 +1230,9 @@ class ZuulTestCase(BaseTestCase):
         self.init_repo("org/experimental-project")
         self.init_repo("org/no-jobs-project")
 
+        self.fedmsg = FakeFedmsg()
+        self.fedmsg.start()
+
         self.statsd = FakeStatsd()
         # note, use 127.0.0.1 rather than localhost to avoid getting ipv6
         # see: https://github.com/jsocol/pystatsd/issues/61
@@ -1390,6 +1418,7 @@ class ZuulTestCase(BaseTestCase):
 
     def shutdown(self):
         self.log.debug("Shutting down after tests")
+
         self.launch_client.stop()
         self.merge_server.stop()
         self.merge_server.join()
@@ -1397,6 +1426,8 @@ class ZuulTestCase(BaseTestCase):
         self.launch_server.stop()
         self.sched.stop()
         self.sched.join()
+        self.fedmsg.stop()
+        self.fedmsg.join()
         self.statsd.stop()
         self.statsd.join()
         self.webapp.stop()
