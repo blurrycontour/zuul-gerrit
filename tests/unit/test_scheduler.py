@@ -2787,6 +2787,40 @@ class TestScheduler(ZuulTestCase):
             self.assertEqual(len(self.builds), 0)
             self.assertEqual(len(self.history), x * 2)
 
+    def test_check_fedmsg(self):
+        self.updateConfigLayout('layout-fedmsg')
+        self.sched.reconfigure(self.config)
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.waitUntilSettled()
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.fedmsg_messages), 4)
+        message = {
+            'change': '1',
+            'message': 'Starting check jobs.',
+            'patchset': '1',
+            'pipeline': 'check',
+            'project': 'org/project',
+            'ref': u'refs/changes/1/1/1',
+            'zuul_ref': None
+        }
+        result = self.fedmsg_messages[0]
+        # Validate zuul_ref before we overwrite it.
+        self.assertTrue(result['zuul_ref'])
+        result['zuul_ref'] = None
+        # Validate item informaiton
+        self.assertEqual(result, message)
+        # Validate static job fields
+        self.assertEqual(self.fedmsg_messages[2]['job_name'], 'project-merge')
+        self.assertEqual(
+            self.fedmsg_messages[2]['log_url'],
+            'https://server/job/project-merge/0/')
+        self.assertEqual(self.fedmsg_messages[2]['result'], 'SUCCESS')
+        self.assertTrue(self.fedmsg_messages[2]['voting'])
+
     @simple_layout('layouts/smtp.yaml')
     def test_check_smtp_pool(self):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')

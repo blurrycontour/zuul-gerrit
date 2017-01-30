@@ -1,0 +1,32 @@
+- pipeline:
+    name: check
+    manager: independent
+    trigger:
+      gerrit:
+        - event: patchset-created
+    start:
+      fedmsg:
+        topic: zuul
+    success:
+      gerrit:
+        verified: 1
+      fedmsg:
+        topic: zuul
+    failure:
+      gerrit:
+        verified: -1
+
+- job:
+    name: project-merge
+    hold-following-changes: true
+
+- job:
+    name: project-test1
+
+- project:
+    name: org/project
+    check:
+      jobs:
+        - project-merge
+        - project-test1:
+            dependencies: project-merge
