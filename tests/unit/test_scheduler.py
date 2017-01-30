@@ -2841,6 +2841,36 @@ class TestScheduler(ZuulTestCase):
                                          'layout-idle'))
             repo.git.reset('--hard', before)
 
+    def test_check_fedmsg(self):
+        self.updateConfigLayout('layout-fedmsg')
+        self.sched.reconfigure(self.config)
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.waitUntilSettled()
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.fedmsg_messages), 5)
+        message = {
+            'change': '1',
+            'message': 'Starting check jobs.',
+            'patchset': '1',
+            'pipeline': 'check',
+            'project': 'org/project',
+            'ref': u'refs/changes/1/1/1',
+            'zuul_ref': None
+        }
+        # Validate item informaiton
+        self.assertEqual(self.fedmsg_messages[0], message)
+        # Validate static job fields
+        self.assertEqual(self.fedmsg_messages[2]['job_name'], 'project-merge')
+        self.assertEqual(
+            self.fedmsg_messages[2]['log_url'],
+            'https://server/job/project-merge/0/')
+        self.assertEqual(self.fedmsg_messages[2]['result'], 'SUCCESS')
+        self.assertTrue(self.fedmsg_messages[2]['voting'])
+
     def test_check_smtp_pool(self):
         self.updateConfigLayout('layout-smtp')
         self.sched.reconfigure(self.config)

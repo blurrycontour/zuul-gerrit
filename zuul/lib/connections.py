@@ -15,6 +15,7 @@
 import logging
 import re
 
+import zuul.driver.fedmsg
 import zuul.driver.zuul
 import zuul.driver.gerrit
 import zuul.driver.git
@@ -43,6 +44,7 @@ class ConnectionRegistry(object):
         self.registerDriver(zuul.driver.smtp.SMTPDriver())
         self.registerDriver(zuul.driver.timer.TimerDriver())
         self.registerDriver(zuul.driver.sql.SQLDriver())
+        self.registerDriver(zuul.driver.fedmsg.FedmsgDriver())
 
     def registerDriver(self, driver):
         if driver.name in self.drivers:

@@ -11,6 +11,41 @@ There are three stages when a report can be handled. That is on:
 Start, Success or Failure. Each stage can have multiple reports.
 For example, you can set verified on Gerrit and send an email.
 
+Fedmsg
+------
+
+fedmsg (FEDerated MeSsaGe bus) is a brokerless messaging architecture
+to send and receive messages to and from applications.  For more information
+we encourage you to read about it at http://www.fedmsg.com/.
+
+A :ref:`connection` that uses the fedmsg driver must be supplied to the
+trigger.
+
+Fedmsg Configuration
+~~~~~~~~~~~~~~~~~~~~
+
+fedmsg has its own configuration management system. As a result, fedmsg
+configuration should be added into the /etc/fedmsg.d folder. Specific settings
+can be found in the fedmsg documentation
+http://www.fedmsg.com/en/latest/config/#module-fedmsg.config
+
+Each pipeline can define a separate topic to publish messages. EG::
+
+  pipelines:
+    - name: post-merge
+      manager: IndependentPipelineManager
+      source: my_gerrit
+      trigger:
+        my_gerrit:
+          - event: change-merged
+      success:
+        fedmsg:
+          topic: public
+      failure:
+        fedmsg:
+          topic: private
+
+
 Gerrit
 ------
 

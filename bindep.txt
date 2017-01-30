@@ -3,6 +3,7 @@
 
 mysql-client [test]
 mysql-server [test]
+screen [test]
 libjpeg-dev [test]
 zookeeperd [platform:dpkg]
 build-essential [platform:dpkg]
