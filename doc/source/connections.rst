@@ -11,6 +11,13 @@ then referred to from the :ref:`layoutyaml`. This makes it possible to
 receive events from gerrit via one connection and post results from another
 connection that may report back as a different user.
 
+Fedmsg
+------
+
+Create a connection with fedmsg.
+
+**driver=fedmsg**
+
 Gerrit
 ------
 
