@@ -2922,6 +2922,18 @@ class TestScheduler(ZuulTestCase):
             self.assertEqual(len(self.builds), 0)
             self.assertEqual(len(self.history), x * 2)
 
+    def test_check_fedmsg(self):
+        self.updateConfigLayout('layout-fedmsg')
+        self.sched.reconfigure(self.config)
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.waitUntilSettled()
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.fedmsg_messages), 2)
+
     def test_check_smtp_pool(self):
         self.updateConfigLayout('layout-smtp')
         self.sched.reconfigure(self.config)
