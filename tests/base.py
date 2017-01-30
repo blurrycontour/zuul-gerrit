@@ -2267,6 +2267,17 @@ class ZuulTestCase(BaseTestCase):
 
         self.useFixture(fixtures.MonkeyPatch('smtplib.SMTP', FakeSMTPFactory))
 
+        # Set up fedmsg related fakes
+        self.fedmsg_messages = []
+
+        def fakeFedmsgPublish(topic, msg):
+            log = logging.getLogger('zuul.FakeFedmsgPubish')
+            log.info('Publishing message via fedmsg')
+            self.fedmsg_messages.append(msg)
+
+        self.useFixture(fixtures.MonkeyPatch(
+            'fedmsg.publish', fakeFedmsgPublish))
+
         # Register connections from the config using fakes
         self.connections = zuul.lib.connections.ConnectionRegistry()
         self.connections.configure(self.config, source_only=source_only)
