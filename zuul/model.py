@@ -506,7 +506,31 @@ class NodeRequest(object):
         self.state_time = data['state_time']
 
 
+class PlaybookContext(object):
+    """A reference to a playbook in the context of a project.
+
+    Jobs refer to objects of this class for their main, pre, and post
+    playbooks so that we can keep track of which repos and security
+    contexts are needed in order to run them."""
+
+    def __init__(self, project, branch, path, secure):
+        self.project = project
+        self.branch = branch
+        self.path = path
+        self.secure = secure
+
+    def toDict(self):
+        # Render to a dict to use in passing json to the launcher
+        return dict(
+            connection=self.project.connection_name,
+            project=self.project.name,
+            branch=self.branch,
+            path=self.path,
+            secure=self.secure)
+
+
 class Job(object):
+
     """A Job represents the defintion of actions to perform."""
 
     attributes = dict(
@@ -515,8 +539,9 @@ class Job(object):
         nodeset=NodeSet(),
         auth={},
         workspace=None,
-        pre_run=None,
-        post_run=None,
+        pre_run=[],
+        post_run=[],
+        run=None,
         voting=None,
         hold_following_changes=None,
         failure_message=None,
@@ -534,7 +559,6 @@ class Job(object):
         source_project=None,
         source_branch=None,
         source_configrepo=None,
-        playbook=None,
     )
 
     def __init__(self, name):
@@ -568,11 +592,15 @@ class Job(object):
         if not isinstance(other, Job):
             raise Exception("Job unable to inherit from %s" % (other,))
         for k, v in self.attributes.items():
-            if getattr(other, k) != v and k != 'auth':
+            if (getattr(other, k) != v and k not in
+                set(['auth', 'pre_run', 'post_run'])):
                 setattr(self, k, getattr(other, k))
         # Inherit auth only if explicitly allowed
         if other.auth and 'inherit' in other.auth and other.auth['inherit']:
             setattr(self, 'auth', getattr(other, 'auth'))
+        # Pre and post run are lists; make a copy
+        self.pre_run = other.pre_run + self.pre_run
+        self.post_run = self.post_run + other.post_run
 
     def changeMatches(self, change):
         if self.branch_matcher and not self.branch_matcher.matches(change):
