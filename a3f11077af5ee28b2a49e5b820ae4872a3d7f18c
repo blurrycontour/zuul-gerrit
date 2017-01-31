@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a461143_a923c354",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-01-31T12:38:55Z",
+      "side": 1,
+      "message": "I know the finally from the try clause will still run, but at first glance this makes it look like this method will stop here. I\u0027d suggest instead of returning that we use an else to put the rest of the code in",
+      "range": {
+        "startLine": 362,
+        "startChar": 16,
+        "endLine": 362,
+        "endChar": 22
+      },
+      "revId": "a3f11077af5ee28b2a49e5b820ae4872a3d7f18c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
