@@ -389,11 +389,41 @@ class GithubConnection(BaseConnection):
         log_rate_limit(self.log, self.github)
         return filenames
 
+    def getPullReviews(self, owner, project, number):
+        # make a list out of the reviews so that we complete our
+        # API transaction
+        reviews = [review.as_dict() for review in
+                   self.github.pull_request(owner, project, number).reviews()]
+        log_rate_limit(self.log, self.github)
+        return reviews
+
     def getUser(self, login):
         return GithubUser(self.github, login)
 
     def getUserUri(self, login):
         return 'https://%s/%s' % (self.git_host, login)
+
+    def getRepoPermission(self, owner, project, login):
+        # This gets around a missing API call
+        # need preview header
+        headers = {'Accept': 'application/vnd.github.korra-preview'}
+
+        # Create a repo object
+        repository = self.github.repository(owner, project)
+        # Build up a URL
+        url = repository._build_url('collaborators', login, 'permission',
+                                    base_url=repository._api)
+        # Get the data
+        perms = repository._get(url, headers=headers)
+
+        log_rate_limit(self.log, self.github)
+
+        # no known user, maybe deleted since review?
+        if perms.status_code == 404:
+            return 'none'
+
+        # get permissions from the data
+        return perms.json()['permission']
 
     def commentPull(self, owner, project, pr_number, message):
         pull_request = self.github.issue(owner, project, pr_number)

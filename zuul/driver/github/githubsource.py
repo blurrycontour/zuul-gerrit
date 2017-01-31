@@ -63,6 +63,7 @@ class GithubSource(BaseSource):
             change.files = self.getPullFiles(project, change.number)
             change.title = event.title
             change.status = event.statuses
+            change.approvals = self.getPullReviews(project, change.number)
             change.source_event = event
         elif event.ref:
             change = Ref(project)
@@ -101,6 +102,58 @@ class GithubSource(BaseSource):
         """Get filenames of the pull request"""
         owner, project = project.name.split('/')
         return self.connection.getPullFileNames(owner, project, number)
+
+    def getPullReviews(self, project, number):
+        """Get reviews of the pull request"""
+        owner, project = project.name.split('/')
+        reviews = self.connection.getPullReviews(owner, project, number)
+        # We are mapping reviews to something that looks gerrit approvals
+        # 'APPROVE' and 'REQUEST_CHANGES' are a review type of
+        # 'review', where as `COMMENT` is a type of 'comment'.
+        # Users with write access get a value of 2/-2 whereas users without
+        # write access get a value of 1/-1.
+
+        approvals = []
+        for review in reviews:
+            approval = {
+                'by': {
+                    'username': review.get('user').get('login'),
+                    'email': review.get('user').get('email'),
+                },
+                'grantedOn': review.get('provided'),
+            }
+
+            # Determine type
+            if review.get('state') == 'COMMENT':
+                approval['type'] = 'comment'
+                approval['description'] = 'comment'
+                approval['value'] = '0'
+            else:
+                approval['type'] = 'review'
+                approval['description'] = 'review'
+
+            # Get user's rights
+            user_can_write = False
+            permission = self.connection.getRepoPermission(
+                owner, project, review.get('user').get('login'))
+            if permission in ['admin', 'write']:
+                user_can_write = True
+
+            # Determine value
+            if review.get('state') == 'APPROVE':
+                if user_can_write:
+                    approval['value'] = '2'
+                else:
+                    approval['value'] = '1'
+            elif review.get('state') == 'REQUEST_CHANGES':
+                if user_can_write:
+                    approval['value'] = '-2'
+                else:
+                    approval['value'] = '-1'
+
+            approvals.append(approval)
+
+        return approvals
 
     def _ghTimestampToDate(self, timestamp):
         return time.strptime(timestamp, '%Y-%m-%dT%H:%M:%SZ')
