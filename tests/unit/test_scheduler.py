@@ -2392,6 +2392,7 @@ class TestScheduler(ZuulTestCase):
         self.waitUntilSettled()
 
         self.sched.reconfigure(self.config)
+        self.waitUntilSettled()
 
         self.launch_server.hold_jobs_in_build = False
         self.launch_server.release()
