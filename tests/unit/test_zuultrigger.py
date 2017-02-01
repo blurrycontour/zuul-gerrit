@@ -18,10 +18,6 @@ import logging
 
 from tests.base import ZuulTestCase
 
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s %(name)-32s '
-                    '%(levelname)-8s %(message)s')
-
 
 class TestZuulTriggerParentChangeEnqueued(ZuulTestCase):
     tenant_config_file = 'config/zuultrigger/parent-change-enqueued/main.yaml'

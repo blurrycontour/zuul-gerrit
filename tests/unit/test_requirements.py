@@ -19,10 +19,6 @@ import time
 
 from tests.base import ZuulTestCase
 
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s %(name)-32s '
-                    '%(levelname)-8s %(message)s')
-
 
 class TestRequirementsApprovalNewerThan(ZuulTestCase):
     """Requirements with a newer-than comment requirement"""
