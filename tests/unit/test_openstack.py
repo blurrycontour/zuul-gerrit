@@ -18,10 +18,6 @@ import logging
 
 from tests.base import AnsibleZuulTestCase
 
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s %(name)-32s '
-                    '%(levelname)-8s %(message)s')
-
 
 class TestOpenStack(AnsibleZuulTestCase):
     # A temporary class to experiment with how openstack can use

@@ -36,10 +36,6 @@ from tests.base import (
     repack_repo,
 )
 
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s %(name)-32s '
-                    '%(levelname)-8s %(message)s')
-
 
 class TestScheduler(ZuulTestCase):
     tenant_config_file = 'config/single-tenant/main.yaml'
