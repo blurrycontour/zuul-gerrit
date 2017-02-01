@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a461143_47d93ff2",
+        "filename": "zuul/connection/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1054
+      },
+      "writtenOn": "2017-02-01T10:13:03Z",
+      "side": 1,
+      "message": "I wonder if it would be better to use a non-blocking readline on the channel instead of trying to access private members?\n\ne.g.\n\n    def _read(self, fd):\n        while True:\n            line \u003d fd.readline()\n            if not line:\n                break\n            data \u003d json.loads(line)\n            self.log.debug(\"Received data from Gerrit event stream: \\n%s\" %\n                           pprint.pformat(data))\n            self.gerrit_connection.addEvent(data)\n\n    def _listen(self, stdout, stderr):\n        poll \u003d select.poll()\n        poll.register(stdout.channel)\n        # make process channel non-blocking\n        fd \u003d stdout.channel.fileno()\n        flags \u003d fcntl.fcntl(fd, fcntl.F_GETFL)\n        fcntl.fcntl(fd, fcntl.F_SETFL, flags | os.O_NONBLOCK)\n        # need to check if connection shutdown when using\n        # non blocking reads as no error thrown otherwise.\n        while not self._stopped and not stdout.channel.exit_status_ready():\n            ret \u003d poll.poll(self.poll_timeout)\n            for (fd, event) in ret:\n                if fd \u003d\u003d stdout.channel.fileno():\n                    if event \u003d\u003d select.POLLIN:\n                        self._read(stdout)\n                    else:\n                        raise Exception(\"event on ssh connection\")",
+      "revId": "eecae351aa5f98a5a103550616e2231b11f4c0e3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
