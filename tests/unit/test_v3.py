@@ -20,10 +20,6 @@ import textwrap
 
 from tests.base import AnsibleZuulTestCase
 
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s %(name)-32s '
-                    '%(levelname)-8s %(message)s')
-
 
 class TestMultipleTenants(AnsibleZuulTestCase):
     # A temporary class to hold new tests while others are disabled
