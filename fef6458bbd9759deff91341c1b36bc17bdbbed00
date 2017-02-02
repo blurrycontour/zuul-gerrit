@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "1a430d35_ced0e3cc",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-02-02T23:36:49Z",
+      "side": 1,
+      "message": "So that when a job inherits from another, it nests.  That seems to be the most sensible behavior, especially when you think that the most ancestral job is likely to do things like push repos onto the host and collect logs.  Other jobs which inherit from it are likely to depend on that (one may have a pre-playbook which installs something from a prepared repo and a post-playbook which copies some logs into the location from which they are later collected).",
+      "revId": "fef6458bbd9759deff91341c1b36bc17bdbbed00",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a430d35_6b7441fd",
         "filename": "zuul/launcher/client.py",
         "patchSetId": 12
