@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "1a430d35_8e9a5bc4",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-02-02T23:27:06Z",
+      "side": 1,
+      "message": "Could you explain somewhere why pre gets added to the end of the pre_run list, but post gets added to the start of the post_run list?",
+      "revId": "fef6458bbd9759deff91341c1b36bc17bdbbed00",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a430d35_6b7441fd",
         "filename": "zuul/launcher/client.py",
         "patchSetId": 12
