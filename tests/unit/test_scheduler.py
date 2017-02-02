@@ -1638,27 +1638,32 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(A.reported, 0, "Abandoned change should not report")
         self.assertEqual(B.reported, 1, "Change should report")
 
-    @skip("Disabled for early v3 development")
     def test_abandoned_not_timer(self):
         "Test that an abandoned change does not cancel timer jobs"
 
         self.launch_server.hold_jobs_in_build = True
 
         # Start timer trigger - also org/project
-        self.updateConfigLayout(
-            'tests/fixtures/layout-idle.yaml')
+        self.updateConfigLayout('layout-idle')
         self.sched.reconfigure(self.config)
-        self.registerJobs()
         # The pipeline triggers every second, so we should have seen
         # several by now.
         time.sleep(5)
         self.waitUntilSettled()
         # Stop queuing timer triggered jobs so that the assertions
         # below don't race against more jobs being queued.
-        self.updateConfigLayout(
-            'tests/fixtures/layout-no-timer.yaml')
+        # Must be in same repo, so overwrite config with another one
+        idle_upstream = os.path.join(self.test_root,
+                                     'upstream', 'layout-idle')
+        idle_path = os.path.join(idle_upstream, 'zuul.yaml')
+        no_timer_path = os.path.join(self.test_root, 'upstream',
+                                     'layout-no-timer', 'zuul.yaml')
+
+        shutil.copyfile(no_timer_path, idle_path)
+        repo = git.Repo(idle_upstream)
+        repo.index.add(('zuul.yaml',))
+        repo.index.commit('Removing timer jobs')
         self.sched.reconfigure(self.config)
-        self.registerJobs()
         self.assertEqual(len(self.builds), 2, "Two timer jobs")
 
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
