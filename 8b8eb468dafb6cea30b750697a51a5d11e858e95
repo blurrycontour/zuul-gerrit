@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a430d35_2e37a7e4",
+        "filename": "tests/base.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 566,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-02-02T23:17:07Z",
+      "side": 1,
+      "message": "I believe we can remove this.",
+      "revId": "8b8eb468dafb6cea30b750697a51a5d11e858e95",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
