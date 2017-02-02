@@ -1172,6 +1172,7 @@ class ZuulTestCase(BaseTestCase):
             ).path
         else:
             tmp_root = os.environ.get("ZUUL_TEST_ROOT")
+        os.environ['TMPDIR'] = tmp_root
         self.test_root = os.path.join(tmp_root, "zuul-test")
         self.upstream_root = os.path.join(self.test_root, "upstream")
         self.git_root = os.path.join(self.test_root, "git")
