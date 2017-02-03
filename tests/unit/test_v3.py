@@ -125,6 +125,8 @@ class TestAnsible(AnsibleZuulTestCase):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
+        build = self.getJobFromHistory('faillocal')
+        self.assertEqual(build.result, 'FAILURE')
         build = self.getJobFromHistory('python27')
         self.assertEqual(build.result, 'SUCCESS')
         flag_path = os.path.join(self.test_root, build.uuid + '.flag')
