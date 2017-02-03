@@ -572,33 +572,33 @@ class Job(object):
 
     """A Job represents the defintion of actions to perform."""
 
-    attributes = dict(
-        timeout=None,
-        # variables={},
-        nodeset=NodeSet(),
-        auth={},
-        workspace=None,
-        pre_run=[],
-        post_run=[],
-        run=None,
-        voting=None,
-        hold_following_changes=None,
-        failure_message=None,
-        success_message=None,
-        failure_url=None,
-        success_url=None,
-        # Matchers.  These are separate so they can be individually
-        # overidden.
-        branch_matcher=None,
-        file_matcher=None,
-        irrelevant_file_matcher=None,  # skip-if
-        tags=set(),
-        mutex=None,
-        attempts=3,
-        source_context=None,
-    )
-
     def __init__(self, name):
+        self.attributes = dict(
+            timeout=None,
+            # variables={},
+            nodeset=NodeSet(),
+            auth={},
+            workspace=None,
+            pre_run=[],
+            post_run=[],
+            run=None,
+            voting=None,
+            hold_following_changes=None,
+            failure_message=None,
+            success_message=None,
+            failure_url=None,
+            success_url=None,
+            # Matchers.  These are separate so they can be individually
+            # overidden.
+            branch_matcher=None,
+            file_matcher=None,
+            irrelevant_file_matcher=None,  # skip-if
+            tags=set(),
+            mutex=None,
+            attempts=3,
+            source_context=None,
+        )
+
         self.name = name
         for k, v in self.attributes.items():
             setattr(self, k, v)
