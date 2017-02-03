@@ -1,6 +1,12 @@
+- job:
+    name: faillocal
+    pre-run: pre
+    post-run: post
+
 - project:
     name: org/project
 
     check:
       jobs:
         - python27
+        - faillocal

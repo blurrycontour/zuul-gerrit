@@ -1,0 +1,5 @@
+- hosts: all
+  tasks:
+    - copy:
+        src: /etc/passwd
+        dest: "{{zuul._test.test_root}}/{{zuul.uuid}}.passwd"
