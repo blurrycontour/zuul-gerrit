@@ -19,6 +19,7 @@ import struct
 import time
 from uuid import uuid4
 import extras
+import traceback
 
 OrderedDict = extras.try_imports(['collections.OrderedDict',
                                   'ordereddict.OrderedDict'])
@@ -623,12 +624,17 @@ class Job(object):
         return self.name
 
     def __repr__(self):
-        return '<Job %s branches: %s>' % (self.name, self.branch_matcher)
+        return '<Job %s branches: %s pre:%s post:%s>' % (self.name,
+                                                         self.branch_matcher,
+                                                         self.pre_run,
+                                                         self.post_run)
 
     def inheritFrom(self, other):
         """Copy the inheritable attributes which have been set on the other
         job to this job."""
 
+        print('inheritFrom: %s %s' % (self, other))
+        traceback.print_stack()
         if not isinstance(other, Job):
             raise Exception("Job unable to inherit from %s" % (other,))
         for k, v in self.attributes.items():

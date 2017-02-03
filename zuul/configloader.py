@@ -110,6 +110,7 @@ class JobParser(object):
 
     @staticmethod
     def fromYaml(layout, conf):
+        print("jobparser: %s" % conf)
         JobParser.getSchema()(conf)
 
         job = model.Job(conf['name'])
@@ -151,6 +152,7 @@ class JobParser(object):
         pre_run_name = conf.get('pre-run')
         # Append the pre-run command
         if pre_run_name:
+            print ("jobparser pre-run: %s" % pre_run_name)
             pre_run_name = os.path.join('playbooks', pre_run_name)
             pre_run = model.PlaybookContext(job.source_context,
                                             pre_run_name)
@@ -158,6 +160,7 @@ class JobParser(object):
         # Prepend the post-run command
         post_run_name = conf.get('post-run')
         if post_run_name:
+            print ("jobparser post-run: %s" % post_run_name)
             post_run_name = os.path.join('playbooks', post_run_name)
             post_run = model.PlaybookContext(job.source_context,
                                              post_run_name)
