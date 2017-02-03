@@ -1244,7 +1244,7 @@ class ZuulTestCase(BaseTestCase):
                       (self.gearman_server.port,))
         print("Gearman server on port %s" %
               (self.gearman_server.port,))
-        # .
+        # ..
 
         gerritsource.GerritSource.replication_timeout = 1.5
         gerritsource.GerritSource.replication_retry_interval = 0.5
