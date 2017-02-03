@@ -29,7 +29,9 @@ import yaml
 import gear
 
 import zuul.merger
+import zuul.ansible.action
 import zuul.ansible.library
+import zuul.ansible.restricted_action
 from zuul.lib import commandsocket
 
 ANSIBLE_WATCHDOG_GRACE = 5 * 60
@@ -81,6 +83,8 @@ class JobDir(object):
         os.makedirs(self.git_root)
         self.ansible_root = os.path.join(self.root, 'ansible')
         os.makedirs(self.ansible_root)
+        self.secure_ansible_root = os.path.join(self.ansible_root, 'secure')
+        os.makedirs(self.secure_ansible_root)
         self.known_hosts = os.path.join(self.ansible_root, 'known_hosts')
         self.inventory = os.path.join(self.ansible_root, 'inventory')
         self.vars = os.path.join(self.ansible_root, 'vars.yaml')
@@ -90,6 +94,8 @@ class JobDir(object):
         self.pre_playbooks = []
         self.post_playbooks = []
         self.config = os.path.join(self.ansible_root, 'ansible.cfg')
+        self.secure_config = os.path.join(
+            self.secure_ansible_root, 'ansible.cfg')
         self.ansible_log = os.path.join(self.ansible_root, 'ansible_log.txt')
 
     def addPrePlaybook(self):
@@ -225,11 +231,27 @@ class LaunchServer(object):
         self.library_dir = os.path.join(ansible_dir, 'library')
         if not os.path.exists(self.library_dir):
             os.makedirs(self.library_dir)
+        self.action_dir = os.path.join(ansible_dir, 'action')
+        if not os.path.exists(self.action_dir):
+            os.makedirs(self.action_dir)
+        self.restricted_action_dir = os.path.join(
+            ansible_dir, 'restricted_action')
+        if not os.path.exists(self.restricted_action_dir):
+            os.makedirs(self.restricted_action_dir)
 
         library_path = os.path.dirname(os.path.abspath(
             zuul.ansible.library.__file__))
         for fn in os.listdir(library_path):
             shutil.copy(os.path.join(library_path, fn), self.library_dir)
+        action_path = os.path.dirname(os.path.abspath(
+            zuul.ansible.action.__file__))
+        for fn in os.listdir(action_path):
+            shutil.copy(os.path.join(action_path, fn), self.action_dir)
+        restricted_action_path = os.path.dirname(os.path.abspath(
+            zuul.ansible.restricted_action.__file__))
+        for fn in os.listdir(restricted_action_path):
+            shutil.copy(os.path.join(restricted_action_path, fn),
+                        self.restricted_action_dir)
 
         self.job_workers = {}
 
@@ -556,10 +578,28 @@ class AnsibleJob(object):
             hosts.append((node['name'], dict(ansible_connection='local')))
         return hosts
 
-    def findPlaybook(self, path):
+    def _blockPluginDirs(fn):
+        '''Prevent execution of playbooks with plugins
+
+        Plugins are loaded from roles and also if there is a plugin dir
+        adjacent to the playbook. Role exclusion will be handled elsewhere,
+        but while we're looking for playbooks, throw an error if the playbook
+        exists in a location that would cause a plugin to get loaded if the
+        playbook is not in a secure repository.
+        '''
+        playbook_dir = os.path.dirname(os.path.abspath(fn))
+        for entry in os.listdir(playbook_dir):
+            if os.path.isdir(entry) and entry.endswith('_plugins'):
+                raise Exception(
+                    "Ansible plugin dir %s found adjacent to playbook %s in"
+                    " non-secure repo." % (entry, playbook))
+
+    def findPlaybook(self, path, secure=False):
         for ext in ['.yaml', '.yml']:
             fn = path + ext
             if os.path.exists(fn):
+                if not secure:
+                    self._blockPluginDirs(fn)
                 return fn
         raise Exception("Unable to find playbook %s" % path)
 
@@ -595,7 +635,8 @@ class AnsibleJob(object):
                     path = os.path.join(self.jobdir.git_root,
                                         project.name,
                                         playbook['path'])
-                    jobdir_playbook.path = self.findPlaybook(path)
+                    jobdir_playbook.path = self.findPlaybook(
+                        path, playbook['secure'])
                     return
         # The playbook repo is either a config repo, or it isn't in
         # the stack of changes we are testing, so check out the branch
@@ -607,7 +648,7 @@ class AnsibleJob(object):
         path = os.path.join(jobdir_playbook.root,
                             project.name,
                             playbook['path'])
-        jobdir_playbook.path = self.findPlaybook(path)
+        jobdir_playbook.path = self.findPlaybook(path, playbook['secure'])
 
     def prepareAnsibleFiles(self, args):
         with open(self.jobdir.inventory, 'w') as inventory:
@@ -621,7 +662,11 @@ class AnsibleJob(object):
             zuul_vars = dict(zuul=args['zuul'])
             vars_yaml.write(
                 yaml.safe_dump(zuul_vars, default_flow_style=False))
-        with open(self.jobdir.config, 'w') as config:
+        self.writeAnsibleConfig(self.jobdir.config)
+        self.writeAnsibleConfig(self.jobdir.secure_config, secure=True)
+
+    def writeAnsibleConfig(self, config_path, secure=False):
+        with open(config_path, 'w') as config:
             config.write('[defaults]\n')
             config.write('hostfile = %s\n' % self.jobdir.inventory)
             config.write('local_tmp = %s/.ansible/local_tmp\n' %
@@ -637,6 +682,13 @@ class AnsibleJob(object):
             # bump the timeout because busy nodes may take more than
             # 10s to respond
             config.write('timeout = 30\n')
+            if secure:
+                config.write('action_plugins = %s\n'
+                             % self.launcher_server.action_dir)
+            else:
+                config.write('action_plugins = %s:%s\n'
+                             % (self.launcher_server.action_dir,
+                                self.launcher_server.restricted_action_dir))
 
             config.write('[ssh_connection]\n')
             # NB: when setting pipelining = True, keep_remote_files
@@ -670,9 +722,14 @@ class AnsibleJob(object):
                 self.log.exception("Exception while killing "
                                    "ansible process:")
 
-    def runAnsible(self, cmd, timeout):
+    def runAnsible(self, cmd, timeout, secure=False):
         env_copy = os.environ.copy()
         env_copy['LOGNAME'] = 'zuul'
+
+        if secure:
+            cwd = self.jobdir.secure_ansible_root
+        else:
+            cwd = self.jobdir.ansible_root
 
         with self.proc_lock:
             if self.aborted:
@@ -680,7 +737,7 @@ class AnsibleJob(object):
             self.log.debug("Ansible command: %s" % (cmd,))
             self.proc = subprocess.Popen(
                 cmd,
-                cwd=self.jobdir.ansible_root,
+                cwd=cwd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 preexec_fn=os.setsid,
@@ -735,4 +792,4 @@ class AnsibleJob(object):
         # TODOv3: get this from the job
         timeout = 60
 
-        return self.runAnsible(cmd, timeout)
+        return self.runAnsible(cmd=cmd, timeout=timeout, secure=playbook.secure)
