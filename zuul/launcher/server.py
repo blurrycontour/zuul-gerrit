@@ -29,6 +29,7 @@ import yaml
 import gear
 
 import zuul.merger
+import zuul.ansible.action
 import zuul.ansible.library
 from zuul.lib import commandsocket
 
@@ -81,6 +82,8 @@ class JobDir(object):
         os.makedirs(self.git_root)
         self.ansible_root = os.path.join(self.root, 'ansible')
         os.makedirs(self.ansible_root)
+        self.secure_ansible_root = os.path.join(self.ansible_root, 'secure')
+        os.makedirs(self.secure_ansible_root)
         self.known_hosts = os.path.join(self.ansible_root, 'known_hosts')
         self.inventory = os.path.join(self.ansible_root, 'inventory')
         self.vars = os.path.join(self.ansible_root, 'vars.yaml')
@@ -90,6 +93,8 @@ class JobDir(object):
         self.pre_playbooks = []
         self.post_playbooks = []
         self.config = os.path.join(self.ansible_root, 'ansible.cfg')
+        self.secure_config = os.path.join(
+            self.secure_ansible_root, 'ansible.cfg')
         self.ansible_log = os.path.join(self.ansible_root, 'ansible_log.txt')
 
     def addPrePlaybook(self):
@@ -225,11 +230,18 @@ class LaunchServer(object):
         self.library_dir = os.path.join(ansible_dir, 'library')
         if not os.path.exists(self.library_dir):
             os.makedirs(self.library_dir)
+        self.action_dir = os.path.join(ansible_dir, 'action')
+        if not os.path.exists(self.action_dir):
+            os.makedirs(self.action_dir)
 
         library_path = os.path.dirname(os.path.abspath(
             zuul.ansible.library.__file__))
         for fn in os.listdir(library_path):
             shutil.copy(os.path.join(library_path, fn), self.library_dir)
+        action_path = os.path.dirname(os.path.abspath(
+            zuul.ansible.action.__file__))
+        for fn in os.listdir(action_path):
+            shutil.copy(os.path.join(action_path, fn), self.action_dir)
 
         self.job_workers = {}
 
@@ -621,7 +633,11 @@ class AnsibleJob(object):
             zuul_vars = dict(zuul=args['zuul'])
             vars_yaml.write(
                 yaml.safe_dump(zuul_vars, default_flow_style=False))
-        with open(self.jobdir.config, 'w') as config:
+        self.writeAnsibleConfig(self.jobdir.config)
+        self.writeAnsibleConfig(self.jobdir.secure_config, secure=True)
+
+    def writeAnsibleConfig(self, config_path, secure=False):
+        with open(config_path, 'w') as config:
             config.write('[defaults]\n')
             config.write('hostfile = %s\n' % self.jobdir.inventory)
             config.write('local_tmp = %s/.ansible/local_tmp\n' %
@@ -637,6 +653,9 @@ class AnsibleJob(object):
             # bump the timeout because busy nodes may take more than
             # 10s to respond
             config.write('timeout = 30\n')
+            if not secure:
+                config.write('action_plugins = %s\n'
+                             % self.launcher_server.action_dir)
 
             config.write('[ssh_connection]\n')
             # NB: when setting pipelining = True, keep_remote_files
@@ -670,9 +689,14 @@ class AnsibleJob(object):
                 self.log.exception("Exception while killing "
                                    "ansible process:")
 
-    def runAnsible(self, cmd, timeout):
+    def runAnsible(self, cmd, timeout, secure=False):
         env_copy = os.environ.copy()
         env_copy['LOGNAME'] = 'zuul'
+
+        if secure:
+            cwd = self.jobdir.secure_ansible_root
+        else:
+            cwd = self.jobdir.ansible_root
 
         with self.proc_lock:
             if self.aborted:
@@ -680,7 +704,7 @@ class AnsibleJob(object):
             self.log.debug("Ansible command: %s" % (cmd,))
             self.proc = subprocess.Popen(
                 cmd,
-                cwd=self.jobdir.ansible_root,
+                cwd=cwd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 preexec_fn=os.setsid,
@@ -735,4 +759,4 @@ class AnsibleJob(object):
         # TODOv3: get this from the job
         timeout = 60
 
-        return self.runAnsible(cmd, timeout)
+        return self.runAnsible(cmd=cmd, timeout=timeout, secure=playbook.secure)
