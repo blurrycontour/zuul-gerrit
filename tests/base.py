@@ -998,9 +998,6 @@ class ZuulTestCase(BaseTestCase):
             self.sched.trigger_event_queue
         ]
 
-        self.configure_connections()
-        self.sched.registerConnections(self.connections)
-
         def URLOpenerFactory(*args, **kw):
             if isinstance(args[0], urllib.request.Request):
                 return old_urlopen(*args, **kw)
@@ -1008,6 +1005,9 @@ class ZuulTestCase(BaseTestCase):
 
         old_urlopen = urllib.request.urlopen
         urllib.request.urlopen = URLOpenerFactory
+
+        self.configure_connections()
+        self.sched.registerConnections(self.connections)
 
         self.merge_server = zuul.merger.server.MergeServer(self.config,
                                                            self.connections)

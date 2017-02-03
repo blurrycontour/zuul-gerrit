@@ -230,6 +230,23 @@ class GerritConnection(BaseConnection):
 
         self.baseurl = self.connection_config.get('baseurl',
                                                   'https://%s' % self.server)
+        baseurl_user = self.connection_config.get('baseurl_user', None)
+        baseurl_password = self.connection_config.get('baseurl_password', None)
+        if baseurl_user is not None and baseurl_password is not None:
+            self.log.debug("Use HTTP Digest authentication for %s" %
+                           self.baseurl)
+
+            password_mgr = urllib.request.HTTPPasswordMgrWithDefaultRealm()
+            password_mgr.add_password(None, self.baseurl,
+                                      baseurl_user, baseurl_password)
+
+            handler = urllib.request.HTTPDigestAuthHandler(password_mgr)
+            self.opener = urllib.request.build_opener(handler)
+            self.urlopen = self.opener.open
+        else:
+            self.log.debug("Do not use HTTP Digest authentication for %s" %
+                           self.baseurl)
+            self.urlopen = urllib.request.urlopen
 
         self._change_cache = {}
         self.gerrit_event_connector = None
@@ -388,7 +405,8 @@ class GerritConnection(BaseConnection):
         url = "%s/p/%s/info/refs?service=git-upload-pack" % (
             self.baseurl, project)
         try:
-            data = urllib.request.urlopen(url).read()
+            self.log.debug("HTTP read %s" % url)
+            data = self.urlopen(url).read()
         except:
             self.log.error("Cannot get references from %s" % url)
             raise  # keeps urllib error informations

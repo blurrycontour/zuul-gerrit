@@ -30,6 +30,12 @@ Create a connection with gerrit.
   Optional: path to Gerrit web interface. Defaults to ``https://<value
   of server>/``. ``baseurl=https://review.example.com/review_site/``
 
+**baseurl_user**
+  Optional: Specify the user name to use for Gerrit web interface authentication.
+
+**baseurl_password**
+  Optional: Specify the user password to use for Gerrit web interface authentication.
+
 **user**
   User name to use when logging into above server via ssh.
   ``user=zuul``
