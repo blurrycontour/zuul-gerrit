@@ -369,6 +369,16 @@ class Project(object):
     def __repr__(self):
         return '<Project %s>' % (self.name)
 
+    def __eq__(self, other):
+        # Compare the name and all inheritable attributes to determine
+        # whether two jobs with the same name are identically
+        # configured.  Useful upon reconfiguration.
+        if not isinstance(other, Project):
+            return False
+        if self.name != other.name:
+            return False
+        return True
+
 
 class Node(object):
     """A single node for use by a job.
