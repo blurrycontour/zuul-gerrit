@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a430d35_c214c645",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2289,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-02-06T20:36:27Z",
+      "side": 1,
+      "message": "Do we have any idea why our build ID has changed from 1 to 0?",
+      "revId": "77a12c78d8383ca20e84e452bc6e78e01d7421ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
