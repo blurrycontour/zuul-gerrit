@@ -576,8 +576,7 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(B.reported, 2)
         self.assertEqual(C.reported, 2)
 
-    @skip("Disabled for early v3 development")
-    def _test_time_database(self, iteration):
+    def _test_time_database(self, iteration, tenant):
         self.executor_server.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         A.addApproval('code-review', 2)
@@ -585,7 +584,7 @@ class TestScheduler(ZuulTestCase):
         self.waitUntilSettled()
         time.sleep(2)
 
-        data = json.loads(self.sched.formatStatusJSON())
+        data = json.loads(self.sched.formatStatusJSON(tenant))
         found_job = None
         for pipeline in data['pipelines']:
             if pipeline['name'] != 'gate':
@@ -611,12 +610,11 @@ class TestScheduler(ZuulTestCase):
         self.executor_server.release()
         self.waitUntilSettled()
 
-    @skip("Disabled for early v3 development")
     def test_time_database(self):
         "Test the time database"
 
-        self._test_time_database(1)
-        self._test_time_database(2)
+        self._test_time_database(1, 'tenant-one')
+        self._test_time_database(2, 'tenant-one')
 
     def test_two_failed_changes_at_head(self):
         "Test that changes are reparented correctly if 2 fail at head"

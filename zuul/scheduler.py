@@ -840,9 +840,10 @@ class Scheduler(threading.Thread):
             self.log.warning("Build %s is not associated with a pipeline" %
                              (build,))
             return
+        tenant_name = build.pipeline.layout.tenant.name
         try:
             build.estimated_time = float(self.time_database.getEstimatedTime(
-                build.job.name))
+                tenant_name, build.job.name))
         except Exception:
             self.log.exception("Exception estimating build time:")
         pipeline.manager.onBuildStarted(event.build)
@@ -870,9 +871,10 @@ class Scheduler(threading.Thread):
             return
         if build.end_time and build.start_time and build.result:
             duration = build.end_time - build.start_time
+            tenant_name = build.pipeline.layout.tenant.name
             try:
                 self.time_database.update(
-                    build.job.name, duration, build.result)
+                    tenant_name, build.job.name, duration, build.result)
             except Exception:
                 self.log.exception("Exception recording build time:")
         pipeline.manager.onBuildCompleted(event.build)

@@ -2387,10 +2387,12 @@ class TimeDataBase(object):
             td.load()
         return td
 
-    def getEstimatedTime(self, name):
-        return self._getTD(name).getEstimatedTime()
+    def getEstimatedTime(self, tenant, name):
+        path = "%s.%s" % (tenant, name)
+        return self._getTD(path).getEstimatedTime()
 
-    def update(self, name, elapsed, result):
-        td = self._getTD(name)
+    def update(self, tenant, name, elapsed, result):
+        path = "%s.%s" % (tenant, name)
+        td = self._getTD(path)
         td.add(elapsed, result)
         td.save()
