@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a430d35_882add2a",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2077,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-02-06T21:29:38Z",
+      "side": 1,
+      "message": "This changed in our configuration file",
+      "revId": "904ab9045170be4c232cf49d27e76983cacb7b5a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
