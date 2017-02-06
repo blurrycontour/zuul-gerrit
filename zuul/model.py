@@ -163,7 +163,7 @@ class Pipeline(object):
             items.extend(shared_queue.queue)
         return items
 
-    def formatStatusJSON(self):
+    def formatStatusJSON(self, status_pattern=None):
         j_pipeline = dict(name=self.name,
                           description=self.description)
         j_queues = []
@@ -180,7 +180,7 @@ class Pipeline(object):
                     if j_changes:
                         j_queue['heads'].append(j_changes)
                     j_changes = []
-                j_changes.append(e.formatJSON())
+                j_changes.append(e.formatJSON(status_pattern))
                 if (len(j_changes) > 1 and
                         (j_changes[-2]['remaining_time'] is not None) and
                         (j_changes[-1]['remaining_time'] is not None)):
@@ -1632,7 +1632,7 @@ class QueueItem(object):
             url = build.url or job.name
         return (result, url)
 
-    def formatJSON(self):
+    def formatJSON(self, status_pattern=None):
         ret = {}
         ret['active'] = self.active
         ret['live'] = self.live
@@ -1674,6 +1674,12 @@ class QueueItem(object):
             if build:
                 result = build.result
                 build_url = build.url
+                if status_pattern:
+                    build_url = status_pattern.format(change=self.change,
+                                                      pipeline=self.pipeline,
+                                                      job=job,
+                                                      build=build)
+
                 (unused, report_url) = self.formatJobResult(job)
                 if build.start_time:
                     if build.end_time:
