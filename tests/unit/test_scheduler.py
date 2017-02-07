@@ -2684,7 +2684,11 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(A.reported, 2)
 
         # Delete org/new-project zuul repo. Should be recloned.
-        shutil.rmtree(os.path.join(self.git_root, "org/delete-project"))
+        p = 'org/delete-project'
+        if os.path.exists(os.path.join(self.merger_git_root, p)):
+            shutil.rmtree(os.path.join(self.merger_git_root, p))
+        if os.path.exists(os.path.join(self.launcher_git_root, p)):
+            shutil.rmtree(os.path.join(self.launcher_git_root, p))
 
         B = self.fake_gerrit.addFakeChange('org/delete-project', 'master', 'B')
 
