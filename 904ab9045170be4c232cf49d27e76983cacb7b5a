@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "1a430d35_3b33c8f7",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2074,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-02-07T17:06:36Z",
+      "side": 1,
+      "message": "The reason the __eq__ method is needed below is because we\u0027re constructing these fake project objects in order to get the queues.  In v3 since we want to have project objects uniquely represent a given project from a given source, this is contrary to our api.  Instead, we should get the actual projects.  This code sholud work:\n\n        source \u003d tenant.layout.pipelines[\u0027gate\u0027].source\n        project1 \u003d source.getProject(\u0027org/project1\u0027)\n        project2 \u003d source.getProject(\u0027org/project2\u0027)",
+      "revId": "904ab9045170be4c232cf49d27e76983cacb7b5a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a430d35_882add2a",
         "filename": "tests/unit/test_scheduler.py",
         "patchSetId": 2
@@ -13,6 +30,23 @@
       "writtenOn": "2017-02-06T21:29:38Z",
       "side": 1,
       "message": "This changed in our configuration file",
+      "revId": "904ab9045170be4c232cf49d27e76983cacb7b5a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a430d35_5b3094e8",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 380,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-02-07T17:06:36Z",
+      "side": 1,
+      "message": "Hrm, I think one of the things we want to make certain of in v3 is that projects with the same name from different sources aren\u0027t equal, so I\u0027m not certain this is desirable.\n\nI see why this is required -- it\u0027s in the test.",
       "revId": "904ab9045170be4c232cf49d27e76983cacb7b5a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
