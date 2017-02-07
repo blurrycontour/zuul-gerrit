@@ -16,6 +16,23 @@
       "revId": "77a12c78d8383ca20e84e452bc6e78e01d7421ab",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a430d35_7f18db1e",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2289,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-02-07T17:33:23Z",
+      "side": 1,
+      "message": "Yes, it\u0027s currently hard-coded to 0 in zuul/launcher/server.py.  The URL is incorrect -- we don\u0027t actually have a working job streaming url at all at the moment.  This change is probably okay -- we can update it (and indeed will be required to do so) when we fix the actual url.",
+      "revId": "77a12c78d8383ca20e84e452bc6e78e01d7421ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
