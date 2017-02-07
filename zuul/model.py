@@ -1420,6 +1420,11 @@ class JobTimeData(object):
         self.results = list(data[21:32])
 
     def save(self):
+        # job name may contain '/'s
+        try:
+            os.makedirs(os.path.dirname(self.path))
+        except OSError:
+            pass
         tmpfile = self.path + '.tmp'
         data = [self.version]
         data.extend(self.success_times)
