@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a430d35_bd05b046",
+        "filename": "zuul/ansible/paths.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-02-08T20:30:44Z",
+      "side": 1,
+      "message": "s/because if/because of/",
+      "revId": "296c41be879869cbd19be7c89ade01bab514c201",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
