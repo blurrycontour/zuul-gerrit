@@ -526,6 +526,8 @@ class Scheduler(threading.Thread):
                         new_jobs = item.getJobs()
                         for build in item.current_build_set.getBuilds():
                             jobtree = item.job_tree.getJobTreeForJob(build.job)
+                            maybejob = item.job_tree.job_trees[0].job
+                            self.log.error("XXX job %s maybe %s %s", build.job, maybejob, build.job==maybejob)
                             if jobtree and jobtree.job in new_jobs:
                                 build.job = jobtree.job
                             else:

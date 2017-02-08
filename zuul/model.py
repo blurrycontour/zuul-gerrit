@@ -404,6 +404,16 @@ class Node(object):
     def __repr__(self):
         return '<Node %s %s:%s>' % (self.id, self.name, self.image)
 
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __eq__(self, other):
+        if not isinstance(other, Node):
+            return False
+        return (self.name == other.name and
+                self.image == other.image and
+                self.id == other.id)
+
     def toDict(self):
         d = {}
         d['state'] = self.state
@@ -626,6 +636,7 @@ class Job(object):
             return False
         for k, v in self.attributes.items():
             if getattr(self, k) != getattr(other, k):
+                print 'XXX %s %s != %s' % (k, getattr(self, k), getattr(other, k))
                 return False
         return True
 
@@ -684,6 +695,9 @@ class JobTree(object):
     def __init__(self, job):
         self.job = job
         self.job_trees = []
+
+    def __repr__(self):
+        return '<JobTree %s %s>' % (self.job, self.job_trees)
 
     def addJob(self, job):
         if job not in [x.job for x in self.job_trees]:
