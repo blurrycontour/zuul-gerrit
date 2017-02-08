@@ -112,12 +112,40 @@ class JobParser(object):
     def fromYaml(layout, conf):
         JobParser.getSchema()(conf)
 
+        source_context = conf.get('_source_context')
+
         job = model.Job(conf['name'])
         if 'auth' in conf:
             job.auth = conf.get('auth')
+
+        # Set the pre/post playbooks before inheritance to allow the
+        # inheritance algorithm to nest them correctly.
+        for pre_run_name in as_list(conf.get('pre-run')):
+            full_pre_run_name = os.path.join('playbooks', pre_run_name)
+            pre_run = model.PlaybookContext(source_context,
+                                            full_pre_run_name)
+            job.pre_run.append(pre_run)
+        for post_run_name in as_list(conf.get('post-run')):
+            full_post_run_name = os.path.join('playbooks', post_run_name)
+            post_run = model.PlaybookContext(source_context,
+                                            full_post_run_name)
+            job.post_run.append(post_run)
+        # Set the run command before inheritance so that it is ordered
+        # correctly.
+        run_name = job.name
+        run_name = os.path.join('playbooks', run_name)
+        run = model.PlaybookContext(source_context, run_name)
+        job.run = [run]
+
         if 'parent' in conf:
             parent = layout.getJob(conf['parent'])
-            job.inheritFrom(parent, 'parent while parsing')
+            job.inheritFrom(parent, variant=False,
+                            comment='parent while parsing')
+
+        # The source attribute may not be overridden or inherited --
+        # it is always supplied by the config loader and corresponds
+        # to the project and branch where it originated.
+        job.source_context = source_context
         job.timeout = conf.get('timeout', job.timeout)
         job.workspace = conf.get('workspace', job.workspace)
         job.voting = conf.get('voting', True)
@@ -143,30 +171,6 @@ class JobParser(object):
             # accumulate onto any previously applied tags from
             # metajobs.
             job.tags = job.tags.union(set(tags))
-        # The source attribute and playbook info may not be
-        # overridden -- they are always supplied by the config loader.
-        # They correspond to the Project instance of the repo where it
-        # originated, and the branch name.
-        job.source_context = conf.get('_source_context')
-        pre_run_name = conf.get('pre-run')
-        # Append the pre-run command
-        if pre_run_name:
-            pre_run_name = os.path.join('playbooks', pre_run_name)
-            pre_run = model.PlaybookContext(job.source_context,
-                                            pre_run_name)
-            job.pre_run.append(pre_run)
-        # Prepend the post-run command
-        post_run_name = conf.get('post-run')
-        if post_run_name:
-            post_run_name = os.path.join('playbooks', post_run_name)
-            post_run = model.PlaybookContext(job.source_context,
-                                             post_run_name)
-            job.post_run.insert(0, post_run)
-        # Set the run command
-        run_name = job.name
-        run_name = os.path.join('playbooks', run_name)
-        run = model.PlaybookContext(job.source_context, run_name)
-        job.run = run
         job.failure_message = conf.get('failure-message', job.failure_message)
         job.success_message = conf.get('success-message', job.success_message)
         job.failure_url = conf.get('failure-url', job.failure_url)
@@ -314,7 +318,7 @@ class ProjectParser(object):
                     template_pipeline = template.pipelines[pipeline.name]
                     project_pipeline.job_tree.inheritFrom(
                         template_pipeline.job_tree,
-                        'job tree while parsing')
+                        comment='job tree while parsing')
                     if template_pipeline.queue_name:
                         queue_name = template_pipeline.queue_name
             if queue_name:
