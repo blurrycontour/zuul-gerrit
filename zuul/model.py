@@ -590,7 +590,7 @@ class Job(object):
             workspace=None,
             pre_run=[],
             post_run=[],
-            run=None,
+            run=[],
             voting=None,
             hold_following_changes=None,
             failure_message=None,
@@ -637,24 +637,41 @@ class Job(object):
                                                      self.branch_matcher,
                                                      self.source_context)
 
-    def inheritFrom(self, other, comment='unknown'):
+    def inheritFrom(self, other, variant=True, comment='unknown'):
         """Copy the inheritable attributes which have been set on the other
         job to this job."""
-
         if not isinstance(other, Job):
             raise Exception("Job unable to inherit from %s" % (other,))
         self.inheritance_path.extend(other.inheritance_path)
         self.inheritance_path.append('%s %s' % (repr(other), comment))
+
         for k, v in self.attributes.items():
             if (getattr(other, k) != v and k not in
-                set(['auth', 'pre_run', 'post_run', 'inheritance_path'])):
+                set(['auth', 'pre_run', 'post_run', 'run',
+                     'inheritance_path'])):
                 setattr(self, k, getattr(other, k))
         # Inherit auth only if explicitly allowed
         if other.auth and 'inherit' in other.auth and other.auth['inherit']:
             setattr(self, 'auth', getattr(other, 'auth'))
-        # Pre and post run are lists; make a copy
-        self.pre_run = other.pre_run + self.pre_run
-        self.post_run = self.post_run + other.post_run
+        if variant is True:
+            # Variants may not modify the playbook, only the run
+            # conditions and variables.
+            if other.run != self.attributes['run']:
+                self.run = other.run[:]
+            if other.pre_run != self.attributes['pre_run']:
+                self.pre_run = other.pre_run[:]
+            if other.post_run != self.attributes['post_run']:
+                self.post_run = other.post_run[:]
+        elif variant is False:
+            # Real inheritance may modify the playbook.  The 'run'
+            # attribute is a list of potential playbooks to try, in
+            # order.  Make the newest descendant the first one to try,
+            # followed by any ancestor candidates.
+            self.run = self.run + other.run
+            self.pre_run = other.pre_run + self.pre_run
+            self.post_run = self.post_run + other.post_run
+        else:
+            raise Exception("Invalid value for variant")
 
     def changeMatches(self, change):
         if self.branch_matcher and not self.branch_matcher.matches(change):
@@ -713,13 +730,13 @@ class JobTree(object):
     def inheritFrom(self, other, comment='unknown'):
         if other.job:
             self.job = Job(other.job.name)
-            self.job.inheritFrom(other.job, comment)
+            self.job.inheritFrom(other.job, comment=comment)
         for other_tree in other.job_trees:
             this_tree = self.getJobTreeForJob(other_tree.job)
             if not this_tree:
                 this_tree = JobTree(None)
                 self.job_trees.append(this_tree)
-            this_tree.inheritFrom(other_tree, comment)
+            this_tree.inheritFrom(other_tree, comment=comment)
 
 
 class Build(object):
@@ -1990,8 +2007,9 @@ class Layout(object):
             for variant in self.getJobs(job.name):
                 if variant.changeMatches(change):
                     if variant not in inherited:
-                        frozen_job.inheritFrom(variant,
-                                               'variant while freezing')
+                        frozen_job.inheritFrom(
+                            variant,
+                            comment='variant while freezing')
                         inherited.add(variant)
             if not inherited:
                 # A change must match at least one defined job variant
@@ -2002,7 +2020,7 @@ class Layout(object):
                 # Only update from the job in the tree if it is
                 # unique, otherwise we might unset an attribute we
                 # have overloaded.
-                frozen_job.inheritFrom(job, 'tree job while freezing')
+                frozen_job.inheritFrom(job, comment='tree job while freezing')
             parent.job_trees.append(frozen_tree)
             self._createJobTree(change, tree.job_trees, frozen_tree)
 
