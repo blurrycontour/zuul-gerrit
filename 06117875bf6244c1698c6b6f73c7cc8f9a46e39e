@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a430d35_fde498ac",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2736,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-02-08T20:30:01Z",
+      "side": 1,
+      "message": "Where is the openstack tenant coming from? I would have expected this to be tenant-one.",
+      "revId": "06117875bf6244c1698c6b6f73c7cc8f9a46e39e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
