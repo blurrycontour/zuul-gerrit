@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a430d35_bc2c0403",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 571,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-02-08T00:11:58Z",
+      "side": 1,
+      "message": "This might be a good place to check that the playbook doesn\u0027t include any plugins.",
+      "revId": "67dba6dac2ab145bff9572784ac538dd60481168",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
