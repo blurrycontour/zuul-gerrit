@@ -20,7 +20,7 @@ import zuul.connection.smtp
 
 
 def configure_connections(config):
-    log = logging.getLogger("configure_connections")
+    log = logging.getLogger("zuul.connection")
     # Register connections from the config
 
     # TODO(jhesketh): import connection modules dynamically

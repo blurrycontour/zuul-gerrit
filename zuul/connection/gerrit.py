@@ -118,7 +118,7 @@ class GerritEventConnector(threading.Thread):
 
 
 class GerritWatcher(threading.Thread):
-    log = logging.getLogger("gerrit.GerritWatcher")
+    log = logging.getLogger("zuul.gerrit.GerritWatcher")
 
     def __init__(self, gerrit_connection, username, hostname, port=29418,
                  keyfile=None):
@@ -194,7 +194,7 @@ class GerritWatcher(threading.Thread):
 
 class GerritConnection(BaseConnection):
     driver_name = 'gerrit'
-    log = logging.getLogger("connection.gerrit")
+    log = logging.getLogger("zuul.connection.gerrit")
 
     def __init__(self, connection_name, connection_config):
         super(GerritConnection, self).__init__(connection_name,
