@@ -45,6 +45,9 @@
     require:
       approval:
         - review: 2
+    reject:
+      approval:
+        - review: -2
     trigger:
       github:
         - event: pr-comment
@@ -60,6 +63,39 @@
       approval:
         - username: 'derp'
           review: 2
+    reject:
+      approval:
+        - review: -2
+    trigger:
+      github:
+        - event: pr-comment
+          comment: 'test me'
+    success:
+      github:
+        comment: true
+
+- pipeline:
+    name: newer_than
+    manager: independent
+    require:
+      approval:
+        - review: 2
+          newer-than: 1d
+    trigger:
+      github:
+        - event: pr-comment
+          comment: 'test me'
+    success:
+      github:
+        comment: true
+
+- pipeline:
+    name: older_than
+    manager: independent
+    require:
+      approval:
+        - review: 2
+          older-than: 1d
     trigger:
       github:
         - event: pr-comment
@@ -78,6 +114,10 @@
     name: project4-reviewreq
 - job:
     name: project5-reviewuserstate
+- job:
+    name: project6-newerthan
+- job:
+    name: project7-olderthan
 
 - project:
     name: org/project1
@@ -108,3 +148,15 @@
     reviewuserstate:
       jobs:
         - project5-reviewuserstate
+
+- project:
+    name: org/project6
+    newer_than:
+      jobs:
+        - project6-newerthan
+
+- project:
+    name: org/project7
+    older_than:
+      jobs:
+        - project7-olderthan
