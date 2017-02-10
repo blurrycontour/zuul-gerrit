@@ -37,6 +37,22 @@ class TestMergerRepo(ZuulTestCase):
         super(TestMergerRepo, self).setUp()
         self.workspace_root = os.path.join(self.test_root, 'workspace')
 
+    def test_ensure_cloned__directory_exists(self):
+        git_url = os.path.join(self.upstream_root, 'org/project1')
+
+        Repo(git_url,
+             os.path.join(self.workspace_root, 'project/plugin'),
+             'none@example.org', 'Jane Smith')
+        self.assertTrue(os.path.exists(
+            os.path.join(self.workspace_root, 'project', 'plugin', '.git')))
+
+        Repo(git_url,
+             os.path.join(self.workspace_root, 'project'),
+             'none@example.org', 'Jane Smith')
+        self.assertTrue(os.path.exists(
+            os.path.join(self.workspace_root, 'project', '.git')),
+            'Must have managed to clone project after project/plugin')
+
     def test_ensure_cloned(self):
         parent_path = os.path.join(self.upstream_root, 'org/project1')
 
