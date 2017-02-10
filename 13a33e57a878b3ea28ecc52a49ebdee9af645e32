@@ -19,6 +19,40 @@
     },
     {
       "key": {
+        "uuid": "fa31d9ce_9726c714",
+        "filename": "zuul/change_matcher.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-02-10T17:40:30Z",
+      "side": 1,
+      "message": "I wish python did this for us... So easy to forget.",
+      "revId": "13a33e57a878b3ea28ecc52a49ebdee9af645e32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa31d9ce_37f35b75",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-02-10T17:40:30Z",
+      "side": 1,
+      "message": "Is this attribute still used?",
+      "revId": "13a33e57a878b3ea28ecc52a49ebdee9af645e32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa31d9ce_32044914",
         "filename": "zuul/launcher/server.py",
         "patchSetId": 4
@@ -30,6 +64,91 @@
       "writtenOn": "2017-02-10T17:35:43Z",
       "side": 1,
       "message": "for my money, I drop this else. Less LOC \u003d less cognitive load. But #nitpick #notaminusone",
+      "revId": "13a33e57a878b3ea28ecc52a49ebdee9af645e32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa31d9ce_bc3c9230",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 595,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-02-10T17:40:30Z",
+      "side": 1,
+      "message": "My brain is melting on this line. Why wouldn\u0027t you just do:\n\n    self.attributes \u003d {}\n\n?",
+      "revId": "13a33e57a878b3ea28ecc52a49ebdee9af645e32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa31d9ce_fc1d2abe",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 645,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-02-10T17:40:30Z",
+      "side": 1,
+      "message": "Re above comment we seem to do that here later anyways. Is the above code removable?",
+      "revId": "13a33e57a878b3ea28ecc52a49ebdee9af645e32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa31d9ce_d74bdf57",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 682,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-02-10T17:40:30Z",
+      "side": 1,
+      "message": "This may be related to the above comments, but we appear to be using a default implementation here so I don\u0027t think it will affect the self.attributes \u003d {}.\n\nAlso can this just be removed?",
+      "revId": "13a33e57a878b3ea28ecc52a49ebdee9af645e32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa31d9ce_bc5bb253",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 725,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-02-10T17:40:30Z",
+      "side": 1,
+      "message": "Does this imply you can apply a variant from a final job to a non final job without making the current job final?",
+      "revId": "13a33e57a878b3ea28ecc52a49ebdee9af645e32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa31d9ce_7787930f",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2105,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-02-10T17:40:30Z",
+      "side": 1,
+      "message": "Should this be in an else block to avoid the exception in applyVariant if frozen_job is final from the line above? Pretty sure we need to avoid applying a variant on a possibly final job here.\n\nThough on reading the tests we may need to try/except instead? as some things like voting are modifiable on final jobs.",
       "revId": "13a33e57a878b3ea28ecc52a49ebdee9af645e32",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
