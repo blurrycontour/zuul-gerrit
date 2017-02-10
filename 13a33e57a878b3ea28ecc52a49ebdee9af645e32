@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa31d9ce_12ff4502",
+        "filename": "tests/unit/test_model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-02-10T17:35:43Z",
+      "side": 1,
+      "message": "\u0027\u0027\u0027 Test standard job inheritance \u0027\u0027\u0027 is the more conventional way to do this so that a test runner can in theory display it (but I\u0027m pretty sure our test runner does not make use of that)",
+      "revId": "13a33e57a878b3ea28ecc52a49ebdee9af645e32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa31d9ce_32044914",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 579,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-02-10T17:35:43Z",
+      "side": 1,
+      "message": "for my money, I drop this else. Less LOC \u003d less cognitive load. But #nitpick #notaminusone",
+      "revId": "13a33e57a878b3ea28ecc52a49ebdee9af645e32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
