@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "fa31d9ce_b4a58605",
+        "filename": "tests/unit/test_model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-02-10T18:00:01Z",
+      "side": 1,
+      "message": "Yeah, I became less fastidious about that once our test runner stopped doing that, mostly because some of the tests are complicated enough to need a paragraph description.  Which, of course, could still be a docstring but wouldn\u0027t display well in nose.",
+      "revId": "13a33e57a878b3ea28ecc52a49ebdee9af645e32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa31d9ce_9726c714",
         "filename": "zuul/change_matcher.py",
         "patchSetId": 4
@@ -30,6 +47,23 @@
       "writtenOn": "2017-02-10T17:40:30Z",
       "side": 1,
       "message": "I wish python did this for us... So easy to forget.",
+      "revId": "13a33e57a878b3ea28ecc52a49ebdee9af645e32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa31d9ce_d4aafad3",
+        "filename": "zuul/change_matcher.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-02-10T18:00:01Z",
+      "side": 1,
+      "message": "I forgot.  :(",
       "revId": "13a33e57a878b3ea28ecc52a49ebdee9af645e32",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +87,23 @@
     },
     {
       "key": {
+        "uuid": "fa31d9ce_f4affee0",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-02-10T18:00:01Z",
+      "side": 1,
+      "message": "Yes, it\u0027s the \"pointer\" to the playbook we\u0027ve actually chosen to run, whereas playbooks is the list of candidates.  These would make good code comments.  I will add.",
+      "revId": "13a33e57a878b3ea28ecc52a49ebdee9af645e32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa31d9ce_32044914",
         "filename": "zuul/launcher/server.py",
         "patchSetId": 4
@@ -70,6 +121,23 @@
     },
     {
       "key": {
+        "uuid": "fa31d9ce_14ad72e9",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 579,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-02-10T18:00:01Z",
+      "side": 1,
+      "message": "Indeed, I usually would, so this is probably leftover from editing.",
+      "revId": "13a33e57a878b3ea28ecc52a49ebdee9af645e32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa31d9ce_bc3c9230",
         "filename": "zuul/model.py",
         "patchSetId": 4
@@ -81,6 +149,23 @@
       "writtenOn": "2017-02-10T17:40:30Z",
       "side": 1,
       "message": "My brain is melting on this line. Why wouldn\u0027t you just do:\n\n    self.attributes \u003d {}\n\n?",
+      "revId": "13a33e57a878b3ea28ecc52a49ebdee9af645e32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa31d9ce_146652ed",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 595,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-02-10T18:00:01Z",
+      "side": 1,
+      "message": "Oh, yeah, this is left over from an earlier implementation.  This can be removed.",
       "revId": "13a33e57a878b3ea28ecc52a49ebdee9af645e32",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -121,6 +206,23 @@
     },
     {
       "key": {
+        "uuid": "fa31d9ce_346356de",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 682,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-02-10T18:00:01Z",
+      "side": 1,
+      "message": "Yep.",
+      "revId": "13a33e57a878b3ea28ecc52a49ebdee9af645e32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa31d9ce_bc5bb253",
         "filename": "zuul/model.py",
         "patchSetId": 4
@@ -138,6 +240,40 @@
     },
     {
       "key": {
+        "uuid": "fa31d9ce_5460cace",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 725,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-02-10T18:00:01Z",
+      "side": 1,
+      "message": "No, because the next stanza will copy this over.  This is only so that we don\u0027t set \u0027final\u0027 at the start or in the middle of the application, since we check it below.  E.g., if we copied \"pre_run\", \"final\", then \"post_run\" we would erroneously raise the exception below because we had set finaly.  So this makes sure we copy \"pre_run\", \"post_run\", then, below, \"final\".",
+      "revId": "13a33e57a878b3ea28ecc52a49ebdee9af645e32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa31d9ce_749b0eca",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 735,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-02-10T18:00:01Z",
+      "side": 1,
+      "message": "This is the comment that is meant to explain that.",
+      "revId": "13a33e57a878b3ea28ecc52a49ebdee9af645e32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa31d9ce_7787930f",
         "filename": "zuul/model.py",
         "patchSetId": 4
@@ -149,6 +285,23 @@
       "writtenOn": "2017-02-10T17:40:30Z",
       "side": 1,
       "message": "Should this be in an else block to avoid the exception in applyVariant if frozen_job is final from the line above? Pretty sure we need to avoid applying a variant on a possibly final job here.\n\nThough on reading the tests we may need to try/except instead? as some things like voting are modifiable on final jobs.",
+      "revId": "13a33e57a878b3ea28ecc52a49ebdee9af645e32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa31d9ce_94a082f6",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2105,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-02-10T18:00:01Z",
+      "side": 1,
+      "message": "Right, it\u0027s the second thing.  Some things are able to be modified in a finalized job, so we\u0027ll need to catch exceptions.  We don\u0027t do that at all yet -- I think it\u0027s complicated enough to warrant its own change.",
       "revId": "13a33e57a878b3ea28ecc52a49ebdee9af645e32",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
