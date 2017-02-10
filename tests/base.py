@@ -16,6 +16,7 @@
 # under the License.
 
 from six.moves import configparser as ConfigParser
+import errno
 import gc
 import hashlib
 import json
@@ -1761,7 +1762,13 @@ class ZuulTestCase(BaseTestCase):
 
     def updateConfigLayout(self, path):
         root = os.path.join(self.test_root, "config")
-        os.makedirs(root)
+        try:
+            os.makedirs(root)
+        except OSError as e:
+            if e.errno == errno.EEXIST:
+                pass
+            else:
+                raise
         f = tempfile.NamedTemporaryFile(dir=root, delete=False)
         f.write("""
 - tenant:
