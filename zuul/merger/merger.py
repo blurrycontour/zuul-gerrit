@@ -62,7 +62,8 @@ class Repo(object):
         if not repo_is_cloned:
             self.log.debug("Cloning from %s to %s" % (self.remote_url,
                                                       self.local_path))
-            git.Repo.clone_from(self.remote_url, self.local_path)
+            Repo.init_from(self.remote_url, self.local_path)
+
         repo = git.Repo(self.local_path)
         if self.email:
             repo.config_writer().set_value('user', 'email',
@@ -72,6 +73,15 @@ class Repo(object):
                                            self.username)
         repo.config_writer().write()
         self._initialized = True
+
+    @staticmethod
+    def init_from(url, to_path):
+        repo = git.Repo.init(to_path, mkdir=True)
+        origin = repo.create_remote('origin', url)
+        origin.fetch(refspec='+refs/heads/*:refs/remotes/origin/*')
+        repo.git.remote('set-head', 'origin', '--auto')
+        repo.git.checkout('origin/HEAD')
+        return repo
 
     def isInitialized(self):
         return self._initialized
