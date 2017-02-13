@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa31d9ce_43644748",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 571,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-02-13T16:56:27Z",
+      "side": 1,
+      "message": "add self arg",
+      "revId": "50203a5c6bef791e335a920be96b7b902002781e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
