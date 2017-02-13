@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa31d9ce_d4f3b608",
+        "filename": "zuul/connection/github.py",
+        "patchSetId": 41
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 7191
+      },
+      "writtenOn": "2017-02-13T00:51:37Z",
+      "side": 1,
+      "message": "I\u0027d really like these to be configured to listen on a different port that overload the webapp. \n\nThe webapp should be considered purely the status viewer and then the github listener on it\u0027s own port. Particularly because I want to configure these individually behind apache and their own SSL.",
+      "revId": "c5ebffec821519b4fd443b3221ea2a25345a1ed3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
