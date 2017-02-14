@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa31d9ce_e2541fff",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1661,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-02-14T17:05:39Z",
+      "side": 1,
+      "message": "This is a red flag for me -- this shows that even when we update the upstream repo, when zuul asks mergers for the contents of the zuul.yaml config file, the mergers don\u0027t have the updated content.  There are other tests that exercise this, however, they put changes through the whole system, and in that process, the merger repos get updated as a matter of course.  This is probably the first time we\u0027ve made a change \"out-of-band\".  I think I see a solution.  I will make a new change for that, rebase this on it and remove these three lines.",
+      "revId": "5ee02a8f35f3527a7bda7abd1f7ba73a880722f8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
