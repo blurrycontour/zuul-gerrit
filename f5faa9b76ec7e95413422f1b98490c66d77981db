@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa31d9ce_9a2d80aa",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1764,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-02-14T23:29:48Z",
+      "side": 1,
+      "message": "This code is now in conflict.  Current branch tip has:\n\n +        if not os.path.exists(root):\n +            os.makedirs(root)\n\nThis is more code, but it is not subject to race conditions (however, we don\u0027t expect this to race).  I would be happy with either.",
+      "revId": "f5faa9b76ec7e95413422f1b98490c66d77981db",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
