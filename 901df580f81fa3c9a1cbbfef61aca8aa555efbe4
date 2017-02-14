@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa31d9ce_67cd9eb6",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1808,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-02-14T17:44:19Z",
+      "side": 1,
+      "message": "We\u0027ll want to drop this based on 433798.",
+      "revId": "901df580f81fa3c9a1cbbfef61aca8aa555efbe4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa31d9ce_47c89aa8",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2796,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-02-14T17:44:19Z",
+      "side": 1,
+      "message": "With the fix in 433798, we\u0027ll need a new approach here.  Committing a revert would probably be the most realistic thing (though forcing a reset of the branch would also work).",
+      "revId": "901df580f81fa3c9a1cbbfef61aca8aa555efbe4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
