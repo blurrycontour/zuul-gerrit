@@ -16,6 +16,7 @@ import re
 
 import zuul.driver.zuul
 import zuul.driver.gerrit
+import zuul.driver.git
 import zuul.driver.smtp
 from zuul.connection import BaseConnection
 
@@ -33,6 +34,7 @@ class ConnectionRegistry(object):
 
         self.registerDriver(zuul.driver.zuul.ZuulDriver())
         self.registerDriver(zuul.driver.gerrit.GerritDriver())
+        self.registerDriver(zuul.driver.git.GitDriver())
         self.registerDriver(zuul.driver.smtp.SMTPDriver())
 
     def registerDriver(self, driver):
