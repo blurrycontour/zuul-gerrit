@@ -18,7 +18,7 @@ from zuul.source import BaseSource
 
 class GerritSource(BaseSource):
     name = 'gerrit'
-    log = logging.getLogger("zuul.source.Gerrit")
+    log = logging.getLogger("zuul.GerritSource")
 
     def getRefSha(self, project, ref):
         return self.connection.getRefSha(project, ref)
