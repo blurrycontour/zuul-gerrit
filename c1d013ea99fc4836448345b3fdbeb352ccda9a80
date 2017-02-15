@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa31d9ce_56711c43",
+        "filename": "tests/base.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1079,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-02-15T04:00:52Z",
+      "side": 1,
+      "message": "(nit) Should probably check if this is already set or not. If it\u0027s set, use the provided one to allow tests to set this. Otherwise default tests to 0.0.",
+      "range": {
+        "startLine": 1079,
+        "startChar": 16,
+        "endLine": 1079,
+        "endChar": 26
+      },
+      "revId": "c1d013ea99fc4836448345b3fdbeb352ccda9a80",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
