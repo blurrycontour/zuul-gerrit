@@ -16,6 +16,24 @@
       "revId": "f5faa9b76ec7e95413422f1b98490c66d77981db",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa31d9ce_371ae217",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1764,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-02-15T06:24:50Z",
+      "side": 1,
+      "message": "As this is just during testing and actually unrelated to this patch I think I\u0027ll just remove this part from it.",
+      "parentUuid": "fa31d9ce_9a2d80aa",
+      "revId": "f5faa9b76ec7e95413422f1b98490c66d77981db",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
