@@ -34,6 +34,13 @@ Create a connection with gerrit.
   User name to use when logging into above server via ssh.
   ``user=zuul``
 
+**password**
+  Password to use when logging into above server via HTTP. Currently
+  only used when polling for merge completion, and only necessary if
+  anonymous read access isn't enabled for all Gerrit projects that
+  Zuul will merge changes into.
+  ``password=hunter2``
+
 **sshkey**
   Path to SSH key to use when logging into above server.
   ``sshkey=/home/zuul/.ssh/id_rsa``

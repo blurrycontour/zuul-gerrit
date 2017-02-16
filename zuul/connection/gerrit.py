@@ -224,6 +224,7 @@ class GerritConnection(BaseConnection):
                             '%s' % self.connection_name)
 
         self.user = self.connection_config.get('user')
+        self.password = self.connection_config.get('password')
         self.server = self.connection_config.get('server')
         self.port = int(self.connection_config.get('port', 29418))
         self.keyfile = self.connection_config.get('sshkey', None)
@@ -237,6 +238,17 @@ class GerritConnection(BaseConnection):
 
         self._change_cache = {}
         self.gerrit_event_connector = None
+
+        if self.password is not None:
+            auth_handler = urllib.request.HTTPBasicAuthHandler()
+            auth_handler.add_password(realm="Gerrit Code Review",
+                                      uri=self.baseurl,
+                                      user=self.user,
+                                      passwd=self.password)
+            opener = urllib.request.build_opener(auth_handler)
+            self.urlopen = opener.open
+        else:
+            self.urlopen = urllib.request.urlopen
 
     def getCachedChange(self, key):
         if key in self._change_cache:
@@ -394,7 +406,7 @@ class GerritConnection(BaseConnection):
         url = "%s/p/%s/info/refs?service=git-upload-pack" % (
             self.baseurl, project)
         try:
-            data = urllib.request.urlopen(url).read()
+            data = self.urlopen(url).read()
         except:
             self.log.error("Cannot get references from %s" % url)
             raise  # keeps urllib error informations
