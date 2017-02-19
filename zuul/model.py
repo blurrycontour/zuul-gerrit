@@ -478,7 +478,8 @@ class NodeSet(object):
 class NodeRequest(object):
     """A request for a set of nodes."""
 
-    def __init__(self, build_set, job, nodeset):
+    def __init__(self, requestor, build_set, job, nodeset):
+        self.requestor = requestor
         self.build_set = build_set
         self.job = job
         self.nodeset = nodeset
@@ -513,7 +514,7 @@ class NodeRequest(object):
         d = {}
         nodes = [n.image for n in self.nodeset.getNodes()]
         d['node_types'] = nodes
-        d['requestor'] = 'zuul'  # TODOv3(jeblair): better descriptor
+        d['requestor'] = self.requestor
         d['state'] = self.state
         d['state_time'] = self.state_time
         return d
