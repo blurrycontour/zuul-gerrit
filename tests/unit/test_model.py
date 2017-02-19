@@ -206,7 +206,7 @@ class TestJob(BaseTestCase):
                 ]
             }
         }])
-        layout.addProjectConfig(project_config, update_pipeline=False)
+        layout.addProjectConfig(project_config)
 
         change = model.Change(project)
         # Test master
@@ -415,7 +415,7 @@ class TestJob(BaseTestCase):
                 ]
             }
         }])
-        layout.addProjectConfig(project_config, update_pipeline=False)
+        layout.addProjectConfig(project_config)
 
         change = model.Change(project)
         change.branch = 'master'
@@ -480,7 +480,7 @@ class TestJob(BaseTestCase):
                 ]
             }
         }])
-        layout.addProjectConfig(project_config, update_pipeline=False)
+        layout.addProjectConfig(project_config)
 
         change = model.Change(project)
         change.branch = 'master'
