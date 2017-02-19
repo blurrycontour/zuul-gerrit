@@ -650,6 +650,11 @@ class Job(object):
 
     """A Job represents the defintion of actions to perform.
 
+    A Job is an abstract configuration concept.  It describes what,
+    where, and under what circumstances something should be run
+    (contrast this with Build which is a concrete single execution of
+    a Job).
+
     NB: Do not modify attributes of this class, set them directly
     (e.g., "job.run = ..." rather than "job.run.append(...)").
     """
@@ -905,7 +910,12 @@ class JobTree(object):
 
 
 class Build(object):
-    """A Build is an instance of a single running Job."""
+    """A Build is an instance of a single execution of a Job.
+
+    While a Job describes what to run, a Build describes an actual
+    execution of that Job.  Each build is associated with exactly one
+    Job (related builds are grouped together in a BuildSet).
+    """
 
     def __init__(self, job, uuid):
         self.job = job
@@ -956,10 +966,18 @@ class Worker(object):
 
 
 class RepoFiles(object):
-    """RepoFiles holds config-file content for per-project job config."""
-    # When we ask a merger to prepare a future multiple-repo state and
-    # collect files so that we can dynamically load our configuration,
-    # this class provides easy access to that data.
+    """RepoFiles holds config-file content for per-project job config.
+
+    When Zuul asks a merger to prepare a future multiple-repo state
+    and collect Zuul configuration files so that we can dynamically
+    load our configuration, this class provides cached access to that
+    data for use by the Change which updated the config files and any
+    changes that follow it in a ChangeQueue.
+
+    It is attached to a BuildSet since the content of Zuul
+    configuration files can change with each new BuildSet.
+    """
+
     def __init__(self):
         self.projects = {}
 
@@ -978,10 +996,21 @@ class RepoFiles(object):
 
 
 class BuildSet(object):
-    """Contains the Builds for a Change representing potential future state.
+    """A collection of Builds for one specific potential future repository
+    state.
 
-    A BuildSet also holds the UUID used to produce the Zuul Ref that builders
-    check out.
+    When Zuul launches Jobs for a change, it creates a Build to
+    represent each execution of each job.  When Zuul launches Jobs for
+    a Change, it creates a BuildSet to keep track of all the Builds
+    running for that Change.  When Zuul re-launches Jobs for a Change
+    with a different configuration, all of the running Builds in the
+    BuildSet for that change are aborted, and a new BuildSet is
+    created to hold the Builds for the Jobs being launched with the
+    new configuration.
+
+    A BuildSet also holds the UUID used to produce the Zuul Ref that
+    builders check out.
+
     """
     # Merge states:
     NEW = 1
