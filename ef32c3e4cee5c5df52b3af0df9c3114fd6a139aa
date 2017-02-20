@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da36d5c6_7337a6b0",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 764,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-02-20T19:20:10Z",
+      "side": 1,
+      "message": "I\u0027m not sure if this is true. I think you need to check change.updatesConfig() still",
+      "range": {
+        "startLine": 764,
+        "startChar": 54,
+        "endLine": 764,
+        "endChar": 61
+      },
+      "revId": "ef32c3e4cee5c5df52b3af0df9c3114fd6a139aa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
