@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da36d5c6_d3b052f7",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 769,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-02-20T19:26:57Z",
+      "side": 1,
+      "message": "Do you think we should break here in case the new config has changed the pipelines? And if so, should we reprocess the event after applying the new config?",
+      "range": {
+        "startLine": 769,
+        "startChar": 29,
+        "endLine": 769,
+        "endChar": 46
+      },
+      "revId": "c2a5ed79429f757a2e4da1361c394575333a86e9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
