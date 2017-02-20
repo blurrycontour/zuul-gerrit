@@ -19,9 +19,24 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+import os
+import getpass
+import multiprocessing
+import signal
+import sys
+
 from ansible import constants as C
 from ansible.plugins import callback
 from ansible.utils.color import colorize, hostcolor
+
+
+def _get_logger():
+    # This is how ansible.utils.display.display write to log files. We want
+    # to do the same thing in our daemon subprocess that will be writing log
+    # lines in an interleaved manner.
+    mypid = str(os.getpid())
+    user = getpass.getuser()
+    return logging.getLogger("p=%s u=%s | " % (mypid, user))
 
 
 class CallbackModule(callback.CallbackBase):
@@ -40,6 +55,9 @@ class CallbackModule(callback.CallbackBase):
         self._play = None
         self._last_task_banner = None
         self._untrusted = C.DISPLAY_ARGS_TO_STDOUT
+        self._daemon_running = False
+        self._daemon_stamp = 'daemon-stamp'
+        self._daemon_pidfile = 'daemon-pid'
         super(CallbackModule, self).__init__()
 
     def _should_verbose(self, result, level=0):
@@ -161,13 +179,29 @@ class CallbackModule(callback.CallbackBase):
     def v2_playbook_on_no_hosts_remaining(self):
         self._display.banner("NO MORE HOSTS LEFT")
 
+    def read_log(self):
+        # TODO(mordred) Actually read file, rather than just writing the
+        # word Foo
+        import time
+        while True:
+            self._display.display("Foo")
+            time.sleep(1)
+
     def v2_playbook_on_task_start(self, task, is_conditional):
 
         if self._play.strategy != 'free':
             self._print_task_banner(task)
         if task.action == 'command':
-            # TODO(mordred): Spawn a reading thread to read the remote logfile
-            self._display.display("Reading logs goes here")
+            if not os.path.exists(self._daemon_stamp):
+                open(self._daemon_stamp, 'w').write('')
+                p = multiprocessing.Process(
+                    target=self.read_log)
+                p.daemon = True
+                p.start()
+                open(self._daemon_pidfile, 'w').write(str(p.pid))
+
+                # TODO(mordred): Connect to remote host and get the file
+                self._display.display("Reading logs goes here")
 
     def _print_task_banner(self, task):
         # args can be specified as no_log in several places: in the task or in
@@ -303,6 +337,10 @@ class CallbackModule(callback.CallbackBase):
                 colorize(u'unreachable', t['unreachable'], None),
                 colorize(u'failed', t['failures'], None)),
             )
+        if os.path.exists(self._daemon_pidfile):
+            pid = open(self._daemon_pidfile, 'r').read()
+            os.unlink(self._daemon_pidfile)
+            os.unlink(self._daemon_stamp)
 
     def v2_playbook_on_start(self, playbook):
         if self._display.verbosity > 1:
