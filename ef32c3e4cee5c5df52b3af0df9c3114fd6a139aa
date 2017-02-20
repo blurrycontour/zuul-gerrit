@@ -22,6 +22,23 @@
       "revId": "ef32c3e4cee5c5df52b3af0df9c3114fd6a139aa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da36d5c6_d35db2ea",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 764,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-02-20T19:21:33Z",
+      "side": 1,
+      "message": "Er, true inasumch as the comment is in the wrong place -- but we do check the files below.",
+      "revId": "ef32c3e4cee5c5df52b3af0df9c3114fd6a139aa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
