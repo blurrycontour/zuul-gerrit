@@ -35,8 +35,10 @@ from zuul.model import ChangeishFilter, NullChange
 from zuul import change_matcher, exceptions
 from zuul import version as zuul_version
 
-statsd = extras.try_import('statsd.statsd')
-
+statsd = None
+statsd_cl = extras.try_import('statsd.StatsClient')
+if statsd_cl:
+    statsd = statsd_cl()
 
 def deep_format(obj, paramdict):
     """Apply the paramdict via str.format() to all string objects found within
