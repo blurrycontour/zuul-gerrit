@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da36d5c6_3f3b113a",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-02-21T16:00:49Z",
+      "side": 1,
+      "message": "I believe this import is zuul.zk not zuul.zookeeper.",
+      "revId": "9e5203aef7d704b1cb7fefd5eec348babdb44331",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da36d5c6_5f78c5f2",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-02-21T16:00:49Z",
+      "side": 1,
+      "message": "This is mostly a nit but for consistency and grepping purposes can we call this var zookeeper_hosts too?",
+      "revId": "9e5203aef7d704b1cb7fefd5eec348babdb44331",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
