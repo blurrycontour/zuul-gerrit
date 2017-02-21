@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da36d5c6_08aff194",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 753,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-02-21T16:59:06Z",
+      "side": 1,
+      "message": "ansible_connection here",
+      "range": {
+        "startLine": 753,
+        "startChar": 15,
+        "endLine": 753,
+        "endChar": 33
+      },
+      "revId": "3e74986ee2c7b51aa1bbbd8b2f8391d3fb514bb7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da36d5c6_2896754c",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 603,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-02-21T16:59:06Z",
+      "side": 1,
+      "message": "ansible_host here",
+      "range": {
+        "startLine": 603,
+        "startChar": 45,
+        "endLine": 603,
+        "endChar": 57
+      },
+      "revId": "3e74986ee2c7b51aa1bbbd8b2f8391d3fb514bb7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
