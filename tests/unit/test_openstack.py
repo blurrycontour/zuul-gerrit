@@ -14,6 +14,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import os
+
 from tests.base import AnsibleZuulTestCase
 
 
@@ -54,3 +56,25 @@ class TestOpenStack(AnsibleZuulTestCase):
                          "A should report start and success")
         self.assertEqual(self.getJobFromHistory('python27').node,
                          'ubuntu-trusty')
+
+    def test_dsvm_keystone_repo(self):
+        A = self.fake_gerrit.addFakeChange('openstack/nova', 'master', 'A')
+        A.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.waitUntilSettled()
+
+        keystone_git_dir = os.path.join(self.launcher_git_root,
+                                        'openstack', 'keystone', '.git')
+        self.assertTrue(os.path.exists(keystone_git_dir),
+            msg='openstack/keystone should be cloned.')
+
+    def test_dsvm_nova_repo(self):
+        A = self.fake_gerrit.addFakeChange('openstack/keystone', 'master', 'A')
+        A.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.waitUntilSettled()
+
+        nova_git_dir = os.path.join(self.launcher_git_root,
+                                        'openstack', 'nova', '.git')
+        self.assertTrue(os.path.exists(nova_git_dir),
+            msg='openstack/nova should be cloned.')
