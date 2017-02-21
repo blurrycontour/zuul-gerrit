@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da36d5c6_3ee86ae2",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-02-21T20:18:59Z",
+      "side": 1,
+      "message": "From an aesthetics POV, shouldn\u0027t this function go elsewhere, below all the hook points? Maybe even prepend a _ on it to make it more obvious that it\u0027s not a hook point but a private class function?",
+      "revId": "ff0392da87ee0e68f95693542a38d375ce76ada0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da36d5c6_bea1baab",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-02-21T20:18:59Z",
+      "side": 1,
+      "message": "Love these magic numbers.",
+      "revId": "ff0392da87ee0e68f95693542a38d375ce76ada0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da36d5c6_3ed22a01",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-02-21T20:18:59Z",
+      "side": 1,
+      "message": "Is there anything that closes this file? Is this basically trying to do a \"touch\" on the file?",
+      "revId": "ff0392da87ee0e68f95693542a38d375ce76ada0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
