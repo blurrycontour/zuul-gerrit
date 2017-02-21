@@ -747,6 +747,13 @@ class RecordingLaunchServer(zuul.launcher.server.LaunchServer):
                 build.release()
         super(RecordingLaunchServer, self).stopJob(job)
 
+    def getHostList(self, args):
+        hosts = super(RecordingLaunchServer, self).getHostList(args)
+        for name, d in hosts:
+            d['ansible_connection'] = 'local'
+        hosts.append(('localhost', dict(ansible_connection='local')))
+        return hosts
+
 
 class RecordingAnsibleJob(zuul.launcher.server.AnsibleJob):
     def runPlaybooks(self):
