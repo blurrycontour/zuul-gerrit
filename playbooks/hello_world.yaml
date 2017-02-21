@@ -1,0 +1,8 @@
+- hosts: controller
+  tasks:
+    - name: "Hello World"
+      shell: "echo 'Hello World'"
+- hosts: compute
+  tasks:
+    - name: "Ohai"
+      shell: "echo 'Hello There'"
