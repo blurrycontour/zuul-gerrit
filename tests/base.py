@@ -758,7 +758,7 @@ class RecordingAnsibleJob(zuul.launcher.server.AnsibleJob):
         self.launcher_server.lock.acquire()
         self.launcher_server.build_history.append(
             BuildHistory(name=build.name, result=result, changes=build.changes,
-                         node=build.node, uuid=build.unique,
+                         node=build.node, uuid=build.unique, jobdir=build.jobdir,
                          parameters=build.parameters,
                          pipeline=build.parameters['ZUUL_PIPELINE'])
         )

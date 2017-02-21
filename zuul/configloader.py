@@ -115,6 +115,7 @@ class JobParser(object):
                'run': str,
                '_source_context': model.SourceContext,
                'roles': to_list(role),
+               'repos': to_list(str),
                }
 
         return vs.Schema(job)
@@ -168,6 +169,10 @@ class JobParser(object):
             run_name = os.path.join('playbooks', job.name)
             run = model.PlaybookContext(job.source_context, run_name)
             job.implied_run = (run,) + job.implied_run
+        if 'repos' in conf:
+            job.repos = conf.get('repos')
+        else:
+            job.repos = []
 
         for k in JobParser.simple_attributes:
             a = k.replace('-', '_')
