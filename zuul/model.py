@@ -705,6 +705,7 @@ class Job(object):
         # accessible via configuration.
         self.other_attributes = dict(
             name=None,
+            repos=None,
             source_context=None,
             inheritance_path=(),
         )
