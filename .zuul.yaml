@@ -1,0 +1,13 @@
+- job:
+    name: hello_world
+    nodes:
+      - name: controller
+        image: ubuntu-xenial
+      - name: compute
+        image: ubuntu-xenial
+
+- project:
+    name: openstack-infra/zuul
+    check:
+      jobs:
+        - hello_world
