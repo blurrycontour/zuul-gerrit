@@ -1,0 +1,15 @@
+- nodeset:
+    name: nodeset1
+    nodes:
+      - name: controller
+        image: ubuntu-xenial
+
+- job:
+    name: hello_world
+    nodes: nodeset1
+
+- project:
+    name: openstack-infra/zuul
+    check:
+      jobs:
+        - hello_world
