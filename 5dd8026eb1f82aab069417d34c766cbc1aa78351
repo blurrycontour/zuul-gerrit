@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da36d5c6_d97ccd74",
+        "filename": ".zuul.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-02-21T18:23:28Z",
+      "side": 1,
+      "message": "i could get behind worker as a node name",
+      "revId": "5dd8026eb1f82aab069417d34c766cbc1aa78351",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
