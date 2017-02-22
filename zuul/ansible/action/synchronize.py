@@ -13,9 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
+import ansible.plugins.action
+import imp
+synchronize = imp.load_module(
+    'zuul.ansible.protected.action.synchronize',
+    *imp.find_module('normal', ansible.plugins.action.__path__))
 
 from zuul.ansible import paths
-from ansible.plugins.action import synchronize
 
 
 class ActionModule(synchronize.ActionModule):
