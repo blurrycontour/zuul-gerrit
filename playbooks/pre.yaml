@@ -1,0 +1,13 @@
+- hosts: all
+  tasks:
+    - name: Synchronize git repos to worker.
+      synchronize:
+        dest: /tmp/
+        src: .
+    - name: register
+      shell: ls -Rla /tmp/
+      register: result
+      ignore_errors: True
+
+    - debug:
+        var: result
