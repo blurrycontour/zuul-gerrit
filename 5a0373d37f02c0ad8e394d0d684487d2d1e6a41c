@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da36d5c6_f54a56c4",
+        "filename": "tests/unit/test_openstack.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-02-22T15:03:17Z",
+      "side": 1,
+      "message": "We should check that the keystone repo (and nova below) shows up in the jobdir for the job, not just the launcher git root.",
+      "revId": "5a0373d37f02c0ad8e394d0d684487d2d1e6a41c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
