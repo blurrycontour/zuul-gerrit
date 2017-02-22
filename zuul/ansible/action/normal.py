@@ -13,11 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
-# TODO(mordred) Figure out how to not need to do this to get the base class
 import ansible.plugins.action
 import imp
 normal = imp.load_module(
-    'ansible.plugins.action.normal',
+    'zuul.ansible.protected.action.normal',
     *imp.find_module('normal', ansible.plugins.action.__path__))
 
 
