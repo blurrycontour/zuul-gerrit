@@ -1,0 +1,20 @@
+- hosts: all
+  tasks:
+    - name: Create workspace directory
+      file:
+        path: /home/zuul/workspace
+        owner: zuul
+        group: zuul
+        state: directory
+
+    - debug:
+        var: "{{ zuul.launcher.git_root }}"
+
+    - name: Synchronize git repos to workspace directory.
+      synchronize:
+        dest: /home/zuul/workspace
+        src: "{{ zuul.launcher.git_root }}"
+
+    - name: Pause
+      pause:
+        minutes: 5
