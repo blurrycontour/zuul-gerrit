@@ -1,0 +1,6 @@
+- hosts: all
+  tasks:
+    - name: Synchronize git repos to worker.
+      synchronize:
+        dest: /tmp/opt/git
+        src: git/*
