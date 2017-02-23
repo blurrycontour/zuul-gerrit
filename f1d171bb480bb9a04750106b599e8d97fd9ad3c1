@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da36d5c6_c649ee61",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 6039
+      },
+      "writtenOn": "2017-02-23T20:07:01Z",
+      "side": 1,
+      "message": "For some unknown reason this always evaluates to False, but manually setting this to True in an untracked change works.",
+      "revId": "f1d171bb480bb9a04750106b599e8d97fd9ad3c1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
