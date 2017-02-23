@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da36d5c6_7b046b17",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-02-23T14:59:21Z",
+      "side": 1,
+      "message": "Can we use work_root, to match git_root (in general, directories here are named root).",
+      "revId": "b8d2783885d1595e53731f35def5f77a52c98c5f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
