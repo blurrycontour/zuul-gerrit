@@ -1,4 +1,6 @@
 - hosts: controller
   tasks:
-    - name: "Hello World"
-      shell: "echo 'Hello World'"
+    - name: run-tox
+      shell: /usr/local/bin/slave_scripts/run-tox.sh pep8
+      args:
+        chdir: /home/zuul/workspace/git/openstack-infra/zuul
