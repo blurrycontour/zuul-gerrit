@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da36d5c6_ecbfb1a7",
+        "filename": "zuul/ansible/action/synchronize.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-02-23T20:53:26Z",
+      "side": 1,
+      "message": "Can we check if this is already present first?",
+      "revId": "2b5dda13768b906574159bb97cc062c063ab3747",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
