@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "da36d5c6_dbe9e5e7",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-02-23T04:26:11Z",
+      "side": 1,
+      "message": "Agree. This I think looks better in the follow up patch when we make it subclass rather than cargo cult",
+      "parentUuid": "da36d5c6_3ee86ae2",
+      "revId": "ff0392da87ee0e68f95693542a38d375ce76ada0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da36d5c6_bea1baab",
         "filename": "zuul/ansible/callback/zuul_stream.py",
         "patchSetId": 5
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "da36d5c6_bbe0b1fb",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-02-23T04:26:11Z",
+      "side": 1,
+      "message": "Yah - they\u0027re great. I\u0027m going to do something about that in a followup.",
+      "parentUuid": "da36d5c6_bea1baab",
+      "revId": "ff0392da87ee0e68f95693542a38d375ce76ada0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da36d5c6_3ed22a01",
         "filename": "zuul/ansible/callback/zuul_stream.py",
         "patchSetId": 5
@@ -47,6 +83,24 @@
       "writtenOn": "2017-02-21T20:18:59Z",
       "side": 1,
       "message": "Is there anything that closes this file? Is this basically trying to do a \"touch\" on the file?",
+      "revId": "ff0392da87ee0e68f95693542a38d375ce76ada0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da36d5c6_9bdbed4e",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-02-23T04:26:11Z",
+      "side": 1,
+      "message": "Fixed in https://review.openstack.org/437243",
+      "parentUuid": "da36d5c6_3ed22a01",
       "revId": "ff0392da87ee0e68f95693542a38d375ce76ada0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
