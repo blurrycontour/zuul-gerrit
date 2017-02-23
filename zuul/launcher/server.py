@@ -238,6 +238,10 @@ class LaunchServer(object):
             self.merge_name = None
 
         self.connections = connections
+        # This merger and its git repos are used to maintain
+        # up-to-date copies of all the repos that are used by jobs, as
+        # well as to support the merger:cat functon to supply
+        # configuration information to Zuul when it starts.
         self.merger = self._getMerger(self.merge_root)
         self.update_queue = DeduplicateQueue()
 
@@ -356,7 +360,7 @@ class LaunchServer(object):
                 self.log.exception("Exception in update thread:")
 
     def _innerUpdateLoop(self):
-        # Inside of a loop that keeps the main repository up to date
+        # Inside of a loop that keeps the main repositories up to date
         task = self.update_queue.get()
         if task is None:
             # We are asked to stop
@@ -368,6 +372,7 @@ class LaunchServer(object):
         task.setComplete()
 
     def update(self, project, url):
+        # Update a repository in the main merger
         task = UpdateTask(project, url)
         task = self.update_queue.put(task)
         return task
@@ -518,8 +523,12 @@ class AnsibleJob(object):
             task.wait()
 
         self.log.debug("Job %s: git updates complete" % (self.job.unique,))
+        # Get a merger in order to clone the repos involved in this job.
         merger = self.launcher_server._getMerger(self.jobdir.git_root)
         merge_items = [i for i in args['items'] if i.get('refspec')]
+        for i in merge_items:
+            i['url'] = os.path.join(self.launcher_server.merge_root,
+                                    i['project'])
         if merge_items:
             commit = merger.mergeChanges(merge_items)  # noqa
         else:
