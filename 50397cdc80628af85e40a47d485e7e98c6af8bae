@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da36d5c6_b29d1468",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-02-23T21:20:23Z",
+      "side": 1,
+      "message": "does this need to be conf.get(\u0027repos\u0027, None)?",
+      "revId": "50397cdc80628af85e40a47d485e7e98c6af8bae",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
