@@ -259,7 +259,9 @@ class LaunchClient(object):
         dependent_items.reverse()
         # TODOv3(jeblair): This ansible vars data structure will
         # replace the environment variables below.
-        zuul_params = dict(uuid=uuid)
+        zuul_params = dict(uuid=uuid,
+                           project=item.change.project.name,
+                           branch=item.change.branch)
         # Legacy environment variables
         params = dict(ZUUL_UUID=uuid,
                       ZUUL_PROJECT=item.change.project.name)
