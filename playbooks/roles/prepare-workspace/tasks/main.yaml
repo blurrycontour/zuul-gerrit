@@ -1,5 +1,7 @@
-- name: Run zuul_stream
-  zuul_stream
+- name: Run zuul_stream.
+  zuul_console:
+    path: /tmp/console.html
+    port: 19885
 
 - name: Create workspace directory.
   file:
