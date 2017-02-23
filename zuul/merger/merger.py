@@ -64,13 +64,12 @@ class Repo(object):
                                                       self.local_path))
             git.Repo.clone_from(self.remote_url, self.local_path)
         repo = git.Repo(self.local_path)
-        if self.email:
-            repo.config_writer().set_value('user', 'email',
-                                           self.email)
-        if self.username:
-            repo.config_writer().set_value('user', 'name',
-                                           self.username)
-        repo.config_writer().write()
+        with repo.config_writer() as config_writer:
+            if self.email:
+                config_writer.set_value('user', 'email', self.email)
+            if self.username:
+                config_writer.set_value('user', 'name', self.username)
+                config_writer.write()
         self._initialized = True
 
     def isInitialized(self):
@@ -200,7 +199,7 @@ class Repo(object):
             tree = repo.commit(commit).tree
         for fn in files:
             if fn in tree:
-                ret[fn] = tree[fn].data_stream.read()
+                ret[fn] = tree[fn].data_stream.read().decode('utf8')
             else:
                 ret[fn] = None
         return ret

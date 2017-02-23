@@ -877,7 +877,7 @@ class FakeGearmanServer(gear.Server):
         for queue in [self.high_queue, self.normal_queue, self.low_queue]:
             for job in queue:
                 if not hasattr(job, 'waiting'):
-                    if job.name.startswith('executor:execute'):
+                    if job.name.startswith(b'executor:execute'):
                         job.waiting = self.hold_jobs_in_queue
                     else:
                         job.waiting = False
@@ -995,7 +995,7 @@ class FakeNodepool(object):
             path = self.REQUEST_ROOT + '/' + oid
             try:
                 data, stat = self.client.get(path)
-                data = json.loads(data)
+                data = json.loads(data.decode('utf8'))
                 data['_oid'] = oid
                 reqs.append(data)
             except kazoo.exceptions.NoNodeError:
@@ -1043,7 +1043,7 @@ class FakeNodepool(object):
                     image_id=None,
                     host_keys=["fake-key1", "fake-key2"],
                     executor='fake-nodepool')
-        data = json.dumps(data)
+        data = json.dumps(data).encode('utf8')
         path = self.client.create(path, data,
                                   makepath=True,
                                   sequence=True)
@@ -1072,7 +1072,7 @@ class FakeNodepool(object):
 
         request['state_time'] = time.time()
         path = self.REQUEST_ROOT + '/' + oid
-        data = json.dumps(request)
+        data = json.dumps(request).encode('utf8')
         self.log.debug("Fulfilling node request: %s %s" % (oid, data))
         self.client.set(path, data)
 
@@ -1690,6 +1690,7 @@ class ZuulTestCase(BaseTestCase):
         with repo.config_writer() as config_writer:
             config_writer.set_value('user', 'email', 'user@example.com')
             config_writer.set_value('user', 'name', 'User Name')
+            config_writer.release()
 
         repo.index.commit('initial commit')
         master = repo.create_head('master')
