@@ -1,5 +1,5 @@
 - name: Run zuul_stream
-  zuul_stream
+  zuul_stream:
 
 - name: Create workspace directory.
   file:
