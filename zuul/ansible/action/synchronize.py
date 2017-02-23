@@ -26,6 +26,8 @@ class ActionModule(synchronize.ActionModule):
         dest = self._task.args.get('dest', None)
         pull = self._task.args.get('pull', False)
 
+        self._task.args['rsync_opts'].append('--safe-links')
+
         if not pull and not paths._is_safe_path(source):
             return paths._fail_dict(source, prefix='Syncing files from')
         if pull and not paths._is_safe_path(dest):
