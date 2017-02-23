@@ -1,4 +1,9 @@
 - hosts: controller
   tasks:
-    - name: "Hello World"
-      shell: "echo 'Hello World'"
+#    - name: pause
+#      pause:
+#        minutes: 5
+    - name: run-tox
+      shell: ls
+      args:
+        chdir: /home/zuul/git/openstack-infra/zuul
