@@ -1,0 +1,15 @@
+- hosts: all
+  tasks:
+#    - name: Create tox log folder on launcher
+#      file:
+#        path: "{{ zuul.launcher.log_root }}/tox"
+#        state: directory
+#      delegate_to: 127.0.0.1
+
+    - name: Collect tox logs.
+      synchronize:
+        dest: "{{ zuul.launcher.log_root }}/tox/"
+        mode: pull
+        src: "/home/zuul/workspace/src/{{ zuul.project }}/.tox/"
+        rsync_path: "mkdir -p /tmp/hello-bob && rsync"
+
