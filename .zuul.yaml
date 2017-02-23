@@ -1,6 +1,7 @@
 - job:
     name: hello_world
     pre-run: pre
+    post-run: post
     nodes:
       - name: controller
         image: ubuntu-xenial

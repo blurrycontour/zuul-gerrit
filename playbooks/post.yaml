@@ -1,0 +1,8 @@
+- hosts: all
+  tasks:
+    - name: logs
+      synchronize:
+        dest: "{{ zuul.launcher.log_root }}"
+        mode: pull
+        src: /home/zuul/workspace/src/openstack-infra/zuul/.tox/
+
