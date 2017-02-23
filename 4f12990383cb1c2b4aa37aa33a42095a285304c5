@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da36d5c6_261f2a6d",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-02-23T20:24:24Z",
+      "side": 1,
+      "message": "We should union this with the set on the existing job (like we do for tags or roles), that way when we inherit, we add repos.",
+      "revId": "4f12990383cb1c2b4aa37aa33a42095a285304c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da36d5c6_e62a728f",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 687,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-02-23T20:24:24Z",
+      "side": 1,
+      "message": "\u0027repos\u0027 should go in this section initialized to a frozenset...",
+      "revId": "4f12990383cb1c2b4aa37aa33a42095a285304c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da36d5c6_061a267d",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 708,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-02-23T20:24:24Z",
+      "side": 1,
+      "message": "...instead of here.",
+      "revId": "4f12990383cb1c2b4aa37aa33a42095a285304c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
