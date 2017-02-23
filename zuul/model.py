@@ -2255,7 +2255,7 @@ class UnparsedAbideConfig(object):
                 raise Exception("Configuration item dictionaries must have "
                                 "a single key (when parsing %s)" %
                                 (conf,))
-            key, value = item.items()[0]
+            key, value = list(item.items())[0]
             if key == 'tenant':
                 self.tenants.append(value)
             else:
@@ -2313,7 +2313,7 @@ class UnparsedTenantConfig(object):
                 raise Exception("Configuration item dictionaries must have "
                                 "a single key (when parsing %s)" %
                                 (conf,))
-            key, value = item.items()[0]
+            key, value = list(item.items())[0]
             if key == 'project':
                 name = value['name']
                 self.projects.setdefault(name, []).append(value)
@@ -2620,7 +2620,7 @@ class Tenant(object):
             if hostname:
                 project = hostname_dict.get(hostname)
             else:
-                values = hostname_dict.values()
+                values = list(hostname_dict.values())
                 if len(values) == 1:
                     project = values[0]
                 else:

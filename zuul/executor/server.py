@@ -284,22 +284,37 @@ class ExecutorServer(object):
         library_path = os.path.dirname(os.path.abspath(
             zuul.ansible.library.__file__))
         for fn in os.listdir(library_path):
-            shutil.copy(os.path.join(library_path, fn), self.library_dir)
-
+            full_path = os.path.join(library_path, fn)
+            if os.path.isdir(full_path):
+                shutil.copytree(full_path, os.path.join(self.library_dir, fn))
+            else:
+                shutil.copy(os.path.join(library_path, fn), self.library_dir)
         action_path = os.path.dirname(os.path.abspath(
-            zuul.ansible.action.__file__))
+                                      zuul.ansible.action.__file__))
         for fn in os.listdir(action_path):
-            shutil.copy(os.path.join(action_path, fn), self.action_dir)
+            full_path = os.path.join(action_path, fn)
+            if os.path.isdir(full_path):
+                shutil.copytree(full_path, os.path.join(self.action_dir, fn))
+            else:
+                shutil.copy(full_path, self.action_dir)
 
         callback_path = os.path.dirname(os.path.abspath(
             zuul.ansible.callback.__file__))
         for fn in os.listdir(callback_path):
-            shutil.copy(os.path.join(callback_path, fn), self.callback_dir)
+            full_path = os.path.join(callback_path, fn)
+            if os.path.isdir(full_path):
+                shutil.copytree(full_path, os.path.join(self.callback_dir, fn))
+            else:
+                shutil.copy(os.path.join(callback_path, fn), self.callback_dir)
 
         lookup_path = os.path.dirname(os.path.abspath(
             zuul.ansible.lookup.__file__))
         for fn in os.listdir(lookup_path):
-            shutil.copy(os.path.join(lookup_path, fn), self.lookup_dir)
+            full_path = os.path.join(lookup_path, fn)
+            if os.path.isdir(full_path):
+                shutil.copytree(full_path, os.path.join(self.lookup_dir, fn))
+            else:
+                shutil.copy(os.path.join(lookup_path, fn), self.lookup_dir)
 
         self.job_workers = {}
 
@@ -315,7 +330,7 @@ class ExecutorServer(object):
             port = self.config.get('gearman', 'port')
         else:
             port = 4730
-        self.worker = gear.Worker('Zuul Executor Server')
+        self.worker = gear.TextWorker('Zuul Executor Server')
         self.worker.addServer(server, port)
         self.log.debug("Waiting for server")
         self.worker.waitForServer()
@@ -385,7 +400,7 @@ class ExecutorServer(object):
     def runCommand(self):
         while self._command_running:
             try:
-                command = self.command_socket.get()
+                command = self.command_socket.get().decode('utf8')
                 if command != '_stop':
                     self.command_map[command]()
             except Exception:
@@ -440,7 +455,7 @@ class ExecutorServer(object):
                         job.sendWorkFail()
                 except Exception:
                     self.log.exception("Exception while running job")
-                    job.sendWorkException(traceback.format_exc())
+                    job.sendWorkException(traceback.format_exc().encode('utf8'))
             except gear.InterruptedError:
                 pass
             except Exception:
@@ -582,7 +597,7 @@ class AnsibleJob(object):
                              source.canonical_hostname,
                              project['name']))
 
-            repo.remotes.origin.config_writer.set('url', url)
+            repo.remotes.origin.config_writer.set('url', url).release()
             repos.append(repo)
 
         merge_items = [i for i in args['items'] if i.get('refspec')]

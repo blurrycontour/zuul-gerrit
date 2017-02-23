@@ -12,7 +12,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import sys
+
 import sqlalchemy as sa
+from testtools import skipIf
 
 from tests.base import ZuulTestCase, ZuulDBTestCase
 
@@ -72,6 +75,7 @@ class TestSQLConnection(ZuulDBTestCase):
         self.assertEqual(9, len(insp.get_columns(buildset_table)))
         self.assertEqual(10, len(insp.get_columns(build_table)))
 
+    @skipIf(sys.version_info[0] > 2, 'Locks up under python 3')
     def test_sql_results(self):
         "Test results are entered into an sql table"
         # Grab the sa tables

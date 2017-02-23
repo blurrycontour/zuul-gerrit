@@ -59,10 +59,10 @@ class ZooKeeper(object):
         self._became_lost = False
 
     def _dictToStr(self, data):
-        return json.dumps(data)
+        return json.dumps(data).encode('utf8')
 
     def _strToDict(self, data):
-        return json.loads(data)
+        return json.loads(data.decode('utf8'))
 
     def _connection_listener(self, state):
         '''
@@ -168,7 +168,7 @@ class ZooKeeper(object):
             if data:
                 data = self._strToDict(data)
                 node_request.updateFromDict(data)
-                request_nodes = node_request.nodeset.getNodes()
+                request_nodes = list(node_request.nodeset.getNodes())
                 for i, nodeid in enumerate(data.get('nodes', [])):
                     node_path = '%s/%s' % (self.NODE_ROOT, nodeid)
                     node_data, node_stat = self.client.get(node_path)
