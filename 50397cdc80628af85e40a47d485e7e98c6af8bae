@@ -16,6 +16,24 @@
       "revId": "50397cdc80628af85e40a47d485e7e98c6af8bae",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da36d5c6_328124c4",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 6039
+      },
+      "writtenOn": "2017-02-23T21:26:34Z",
+      "side": 1,
+      "message": "No, the default default for the get() function is None -- meaning if no default is given and the value is not found, None is returned.",
+      "parentUuid": "da36d5c6_b29d1468",
+      "revId": "50397cdc80628af85e40a47d485e7e98c6af8bae",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
