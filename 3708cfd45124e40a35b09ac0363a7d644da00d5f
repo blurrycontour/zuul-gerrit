@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da36d5c6_290c693a",
+        "filename": "zuul/ansible/library/zuul_console.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-02-23T15:20:04Z",
+      "side": 1,
+      "message": "Should this also be LOG_STREAM_PATH?",
+      "revId": "3708cfd45124e40a35b09ac0363a7d644da00d5f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
