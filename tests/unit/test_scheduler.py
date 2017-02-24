@@ -4583,6 +4583,7 @@ class TestSchedulerTemplatedProject(ZuulTestCase):
 class TestSchedulerSuccessURL(ZuulTestCase):
     tenant_config_file = 'config/success-url/main.yaml'
 
+    @skip("Disabled for early v3 development")
     def test_success_url(self):
         "Ensure bad build params are ignored"
         self.sched.reconfigure(self.config)

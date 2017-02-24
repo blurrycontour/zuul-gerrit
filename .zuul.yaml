@@ -2,6 +2,8 @@
     name: python-linters
     pre-run: pre
     post-run: post
+    success-url: https://logs.openstack.org/{change.number}/{change.patchset}/{build.uuid}/
+    failure-url: https://logs.openstack.org/{change.number}/{change.patchset}/{build.uuid}/
     nodes:
       - name: worker
         image: ubuntu-xenial
