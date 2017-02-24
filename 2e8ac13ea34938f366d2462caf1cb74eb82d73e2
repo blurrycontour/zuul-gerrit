@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da36d5c6_38c3a258",
+        "filename": "playbooks/post.yaml",
+        "patchSetId": 15
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-02-24T20:22:31Z",
+      "side": 1,
+      "message": "I think we want to drop the uuid part from here...",
+      "revId": "2e8ac13ea34938f366d2462caf1cb74eb82d73e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da36d5c6_58a4d6b8",
+        "filename": "playbooks/post.yaml",
+        "patchSetId": 15
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-02-24T20:22:31Z",
+      "side": 1,
+      "message": "...and here...",
+      "revId": "2e8ac13ea34938f366d2462caf1cb74eb82d73e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da36d5c6_78a7dabc",
+        "filename": "playbooks/post.yaml",
+        "patchSetId": 15
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-02-24T20:22:31Z",
+      "side": 1,
+      "message": "...and add it here.",
+      "revId": "2e8ac13ea34938f366d2462caf1cb74eb82d73e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
