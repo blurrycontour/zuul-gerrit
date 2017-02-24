@@ -2163,20 +2163,21 @@ class TestScheduler(ZuulTestCase):
                         for job in change['jobs']:
                             status_jobs.append(job)
         self.assertEqual('project-merge', status_jobs[0]['name'])
-        self.assertEqual('https://server/job/project-merge/0/',
+        # HELP(mordred) where do I get the build uuids from?
+        self.assertEqual('finger://%s@zl.example.org' % status_jobs[0]['uuid'],
                          status_jobs[0]['url'])
-        self.assertEqual('https://server/job/project-merge/0/',
+        self.assertEqual('finger://%s@zl.example.org' % status_jobs[0]['uuid'],
                          status_jobs[0]['report_url'])
         self.assertEqual('project-test1', status_jobs[1]['name'])
-        self.assertEqual('https://server/job/project-test1/0/',
+        self.assertEqual('finger://%s@zl.example.org' % status_jobs[1]['uuid'],
                          status_jobs[1]['url'])
-        self.assertEqual('https://server/job/project-test1/0/',
+        self.assertEqual('finger://%s@zl.example.org' % status_jobs[1]['uuid'],
                          status_jobs[1]['report_url'])
 
         self.assertEqual('project-test2', status_jobs[2]['name'])
-        self.assertEqual('https://server/job/project-test2/0/',
+        self.assertEqual('finger://%s@zl.example.org' % status_jobs[2]['uuid'],
                          status_jobs[2]['url'])
-        self.assertEqual('https://server/job/project-test2/0/',
+        self.assertEqual('finger://%s@zl.example.org' % status_jobs[2]['uuid'],
                          status_jobs[2]['report_url'])
 
     @skip("Disabled for early v3 development")
@@ -3635,7 +3636,7 @@ For CI problems and help debugging, contact ci@example.org"""
                 self.assertEqual('project-merge', job['name'])
                 self.assertEqual('gate', job['pipeline'])
                 self.assertEqual(False, job['retry'])
-                self.assertEqual('https://server/job/project-merge/0/',
+                self.assertEqual('finger://%s@zl.example.org' % job['uuid'],
                                  job['url'])
                 self.assertEqual(7, len(job['worker']))
                 self.assertEqual(False, job['canceled'])
