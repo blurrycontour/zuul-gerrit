@@ -573,7 +573,10 @@ class AnsibleJob(object):
 
         data = {
             'manager': self.launcher_server.hostname,
-            'url': 'finger://server/job/{}/0/'.format(args['job']),
+            'url': 'finger://{unique}@{server}/job/{job}/0/'.format(
+                unique=self.job.unique,
+                server=self.launcher_server.hostname,
+                job=args['job']),
             'worker_name': 'My Worker',
         }
 

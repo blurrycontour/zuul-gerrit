@@ -4613,7 +4613,7 @@ class TestSchedulerSuccessURL(ZuulTestCase):
 
         # NOTE: This default URL is currently hard-coded in launcher/server.py
         self.assertIn(
-            '- docs-draft-test2 finger://server/job',
+            '- docs-draft-test2 finger://%s@zl.example.com/job' % uuid,
             body[3])
 
 
