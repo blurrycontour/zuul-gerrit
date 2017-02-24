@@ -12,3 +12,8 @@
         mode: pull
         src: "/home/zuul/workspace/src/{{ zuul.project }}/.tox/pep8/log/"
 
+    - name: Collect tox logs.
+      synchronize:
+        src: "{{ zuul.launcher.log_root }}/tox/"
+        dest: /tmp
+        rsync_path: "mkdir -p /tmp/bbbbbbb && rsync"
