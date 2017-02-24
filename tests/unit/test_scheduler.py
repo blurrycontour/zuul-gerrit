@@ -2264,20 +2264,21 @@ class TestScheduler(ZuulTestCase):
                         for job in change['jobs']:
                             status_jobs.append(job)
         self.assertEqual('project-merge', status_jobs[0]['name'])
-        self.assertEqual('https://server/job/project-merge/0/',
+        # HELP(mordred) where do I get the build uuids from?
+        self.assertEqual('finger://zl.example.com/%s' % status_jobs[0]['uuid'],
                          status_jobs[0]['url'])
-        self.assertEqual('https://server/job/project-merge/0/',
+        self.assertEqual('finger://zl.example.com/%s' % status_jobs[0]['uuid'],
                          status_jobs[0]['report_url'])
         self.assertEqual('project-test1', status_jobs[1]['name'])
-        self.assertEqual('https://server/job/project-test1/0/',
+        self.assertEqual('finger://zl.example.com/%s' % status_jobs[1]['uuid'],
                          status_jobs[1]['url'])
-        self.assertEqual('https://server/job/project-test1/0/',
+        self.assertEqual('finger://zl.example.com/%s' % status_jobs[1]['uuid'],
                          status_jobs[1]['report_url'])
 
         self.assertEqual('project-test2', status_jobs[2]['name'])
-        self.assertEqual('https://server/job/project-test2/0/',
+        self.assertEqual('finger://zl.example.com/%s' % status_jobs[2]['uuid'],
                          status_jobs[2]['url'])
-        self.assertEqual('https://server/job/project-test2/0/',
+        self.assertEqual('finger://zl.example.com/%s' % status_jobs[2]['uuid'],
                          status_jobs[2]['report_url'])
 
     def test_live_reconfiguration(self):
@@ -3551,7 +3552,7 @@ For CI problems and help debugging, contact ci@example.org"""
                 self.assertEqual('project-merge', job['name'])
                 self.assertEqual('gate', job['pipeline'])
                 self.assertEqual(False, job['retry'])
-                self.assertEqual('https://server/job/project-merge/0/',
+                self.assertEqual('finger://zl.example.com/%s' % job['uuid'],
                                  job['url'])
                 self.assertEqual(2, len(job['worker']))
                 self.assertEqual(False, job['canceled'])
@@ -4279,15 +4280,15 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertEqual(0, len(G.messages))
         self.assertIn('Build failed.', self.smtp_messages[0]['body'])
         self.assertIn(
-            'project-test1 https://server/job', self.smtp_messages[0]['body'])
+            'project-test1 finger://', self.smtp_messages[0]['body'])
         self.assertEqual(0, len(H.messages))
         self.assertIn('Build failed.', self.smtp_messages[1]['body'])
         self.assertIn(
-            'project-test1 https://server/job', self.smtp_messages[1]['body'])
+            'project-test1 finger://', self.smtp_messages[1]['body'])
         self.assertEqual(0, len(I.messages))
         self.assertIn('Build succeeded.', self.smtp_messages[2]['body'])
         self.assertIn(
-            'project-test1 https://server/job', self.smtp_messages[2]['body'])
+            'project-test1 finger://', self.smtp_messages[2]['body'])
 
         # Now reload the configuration (simulate a HUP) to check the pipeline
         # comes out of disabled
@@ -4640,6 +4641,7 @@ class TestSchedulerSuccessURL(ZuulTestCase):
         for build in self.history:
             if build.name == 'docs-draft-test':
                 uuid = build.uuid[:7]
+                full_uuid = build.uuid
                 break
 
         # Two msgs: 'Starting...'  + results
@@ -4654,7 +4656,8 @@ class TestSchedulerSuccessURL(ZuulTestCase):
 
         # NOTE: This default URL is currently hard-coded in executor/server.py
         self.assertIn(
-            '- docs-draft-test2 https://server/job',
+            '- docs-draft-test2 finger://zl.example.com/{uuid}'.format(
+                uuid=full_uuid),
             body[3])
 
 
