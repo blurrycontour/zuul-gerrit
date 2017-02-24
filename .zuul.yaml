@@ -2,6 +2,8 @@
     name: python-linters
     pre-run: pre
     post-run: post
+    success-url: https://logs.openstack.org/{build.parameters[LOG_PATH]}/
+    failure-url: https://logs.openstack.org/{build.parameters[LOG_PATH]}/
     nodes:
       - name: worker
         image: ubuntu-xenial
