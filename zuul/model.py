@@ -96,6 +96,13 @@ def normalizeCategory(name):
     return re.sub(' ', '-', name)
 
 
+class Attributes(object):
+    """A class to hold attributes for string formatting."""
+
+    def __init__(self, **kw):
+        setattr(self, '__dict__', kw)
+
+
 class Pipeline(object):
     """A configuration that ties triggers, reporters, managers and sources.
 
@@ -1433,12 +1440,24 @@ class QueueItem(object):
             if job.failure_url:
                 pattern = job.failure_url
         url = None
+        # Produce safe versions of objects which may be useful in
+        # result formatting, but don't allow users to crawl through
+        # the entire data structure where they might be able to access
+        # secrets, etc.
+        # TODOv3(jeblair): Changeish objects should be
+        # able to produce their own safe representations so that this
+        # can be driver-specific.
+        safe_change = Attributes(number=self.change.number,
+                                 patchset=self.change.patchset)
+        safe_pipeline = Attributes(name=self.pipeline.name)
+        safe_job = Attributes(name=job.name)
+        safe_build = Attributes(uuid=build.uuid)
         if pattern:
             try:
-                url = pattern.format(change=self.change,
-                                     pipeline=self.pipeline,
-                                     job=job,
-                                     build=build)
+                url = pattern.format(change=safe_change,
+                                     pipeline=safe_pipeline,
+                                     job=safe_job,
+                                     build=safe_build)
             except Exception:
                 pass  # FIXME: log this or something?
         if not url:
@@ -1583,16 +1602,6 @@ class Changeish(object):
 
     def __init__(self, project):
         self.project = project
-
-    def getBasePath(self):
-        base_path = ''
-        if hasattr(self, 'refspec'):
-            base_path = "%s/%s/%s" % (
-                self.number[-2:], self.number, self.patchset)
-        elif hasattr(self, 'ref'):
-            base_path = "%s/%s" % (self.newrev[:2], self.newrev)
-
-        return base_path
 
     def equals(self, other):
         raise NotImplementedError()
