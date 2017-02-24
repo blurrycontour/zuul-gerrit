@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da36d5c6_c33ffcb1",
+        "filename": ".zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-02-24T18:14:38Z",
+      "side": 1,
+      "message": "http://zuulv3-dev.openstack.org/logs/...",
+      "revId": "7dd826b8cf39b2142c23506dc65475a541e54cb4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
