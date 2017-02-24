@@ -15,7 +15,6 @@
 import gear
 import json
 import logging
-import os
 import six
 import time
 import threading
@@ -213,6 +212,9 @@ class LaunchClient(object):
     def updateBuildParams(self, job, item, params):
         """Allow the job to modify and add build parameters"""
 
+        # TODOv3(jhesketh): We need revisit what to do with swift.
+        return
+
         # NOTE(jhesketh): The params need to stay in a key=value data pair
         # as workers cannot necessarily handle lists.
 
@@ -295,16 +297,6 @@ class LaunchClient(object):
 
             params['ZUUL_REF'] = item.change.ref
             params['ZUUL_COMMIT'] = item.change.newrev
-
-        # The destination_path is a unique path for this build request
-        # and generally where the logs are expected to be placed
-        destination_path = os.path.join(item.change.getBasePath(),
-                                        pipeline.name, job.name, uuid[:7])
-        params['BASE_LOG_PATH'] = item.change.getBasePath()
-        params['LOG_PATH'] = destination_path
-
-        # Allow the job to update the params
-        self.updateBuildParams(job, item, params)
 
         # This is what we should be heading toward for parameters:
 
