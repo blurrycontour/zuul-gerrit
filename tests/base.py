@@ -690,6 +690,7 @@ class RecordingLaunchServer(zuul.launcher.server.LaunchServer):
         self.build_history = []
         self.fail_tests = {}
         self.job_builds = {}
+        self.hostname = 'zl.example.com'
 
     def failJob(self, name, change):
         """Instruct the launcher to report matching builds as failures.
