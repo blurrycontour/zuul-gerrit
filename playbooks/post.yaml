@@ -12,3 +12,14 @@
         mode: pull
         src: "/home/zuul/workspace/src/{{ zuul.project }}/.tox/pep8/log/"
 
+    - name: Create directory
+      file:
+        dest: "/opt/zuul-logs/{{ epoch }}/{{ zuul.patchset }}/{{ zuul.pipeline }}/"
+        state: directory
+      delegate_to: 127.0.0.1
+
+    - name: Collect tox logs.
+      copy:
+        src: "{{ zuul.launcher.log_root }}/tox/"
+        dest: "/opt/zuul-logs/{{ epoch }}/{{ zuul.patchset }}/{{ zuul.pipeline }}/"
+      delegate_to: 127.0.0.1
