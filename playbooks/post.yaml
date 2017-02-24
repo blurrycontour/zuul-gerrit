@@ -12,3 +12,8 @@
         mode: pull
         src: "/home/zuul/workspace/src/{{ zuul.project }}/.tox/pep8/log/"
 
+    - name: Collect tox logs.
+      copy:
+        src: "{{ zuul.launcher.log_root }}/tox/"
+        dest: /opt/zuul-logs/
+      delegate_to: 127.0.0.1
