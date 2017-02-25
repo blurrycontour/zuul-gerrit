@@ -687,7 +687,7 @@ class Job(object):
         # project-pipeline.
         self.execution_attributes = dict(
             timeout=None,
-            # variables={},
+            variables={},
             nodeset=NodeSet(),
             auth={},
             workspace=None,
