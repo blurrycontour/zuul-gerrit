@@ -116,6 +116,7 @@ class JobParser(object):
                '_source_context': model.SourceContext,
                'roles': to_list(role),
                'repos': to_list(str),
+               'vars': dict,
                }
 
         return vs.Schema(job)
@@ -206,6 +207,10 @@ class JobParser(object):
                     roles.append(r)
         job.roles = job.roles.union(set(roles))
 
+        variables = conf.get('vars', None):
+        if variables:
+            JobParser._deepUpdate(job.variables, variables)
+
         # If the definition for this job came from a project repo,
         # implicitly apply a branch matcher for the branch it was on.
         if (not job.source_context.trusted):
@@ -231,6 +236,17 @@ class JobParser(object):
             job.irrelevant_file_matcher = change_matcher.MatchAllFiles(
                 matchers)
         return job
+
+    @staticmethod
+    def _deepUpdate(a, b):
+        # Merge nested dictionaries if possible, otherwise, overwrite
+        # the value in 'a' with the value in 'b'.
+        for k, bv in b.items():
+            av = a.get(k)
+            if isinstance(av, dict) and isinstance(bv, dict):
+                JobParser._deepUpdate(av, bv)
+            else:
+                a[k] = bv
 
     @staticmethod
     def _makeZuulRole(tenant, job, role):

@@ -276,7 +276,6 @@ class LaunchClient(object):
         params['ZUUL_URL'] = item.current_build_set.zuul_url
         params['ZUUL_VOTING'] = job.voting and '1' or '0'
         if hasattr(item.change, 'refspec'):
-            zuul_params['branch'] = item.change.branch
             changes_str = '^'.join(
                 ['%s:%s:%s' % (i.change.project.name, i.change.branch,
                                i.change.refspec)
@@ -352,7 +351,8 @@ class LaunchClient(object):
                               public_ipv6=node.public_ipv6,
                               public_ipv4=node.public_ipv4))
         params['nodes'] = nodes
-        params['zuul'] = zuul_params
+        params['vars'] = copy.deepcopy(job.variables)
+        params['vars']['zuul'] = zuul_params
         projects = set()
         if job.repos:
             for repo in job.repos:
