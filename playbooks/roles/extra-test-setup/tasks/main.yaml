@@ -5,7 +5,7 @@
   register: p
 
 - name: Run tools/test-setup.sh.
-  shell: tools/test-setup.sh
+  command: tools/test-setup.sh
   args:
     chdir: "/home/zuul/workspace/src/{{ zuul.project }}"
   when:
