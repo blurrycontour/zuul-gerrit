@@ -1,0 +1,4 @@
+- hosts: ubuntu-xenial
+  roles:
+    - run-bindep
+    - run-tox
