@@ -1,0 +1,11 @@
+- hosts: all
+  tasks:
+    - name: Run bindep
+      include_role:
+        name: run-bindep
+
+    - name: Run a tox -e py27.
+      include_role:
+        name: run-tox
+      vars:
+        run_tox_eventlist: py27
