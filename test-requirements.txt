@@ -11,3 +11,5 @@ testrepository>=0.0.17
 testtools>=0.9.32
 sphinxcontrib-programoutput
 mock
+# NOTE(pabelanger): Switch to pypi!!
+git+https://github.com/pabelanger/ansible-lint#egg=ansible-lint
