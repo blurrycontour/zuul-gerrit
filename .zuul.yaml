@@ -5,7 +5,27 @@
     success-url: http://zuulv3-dev.openstack.org/logs/{build.uuid}/
     failure-url: http://zuulv3-dev.openstack.org/logs/{build.uuid}/
     nodes:
-      - name: worker
+      - name: ubuntu-xenial
+        image: ubuntu-xenial
+
+- job:
+    name: tox-coverage
+    pre-run: pre
+    post-run: post
+    success-url: http://zuulv3-dev.openstack.org/logs/{build.uuid}/
+    failure-url: http://zuulv3-dev.openstack.org/logs/{build.uuid}/
+    nodes:
+      - name: ubuntu-xenial
+        image: ubuntu-xenial
+
+- job:
+    name: tox-py27
+    pre-run: pre
+    post-run: post
+    success-url: http://zuulv3-dev.openstack.org/logs/{build.uuid}/
+    failure-url: http://zuulv3-dev.openstack.org/logs/{build.uuid}/
+    nodes:
+      - name: ubuntu-xenial
         image: ubuntu-xenial
 
 - project:
@@ -13,3 +33,5 @@
     check:
       jobs:
         - python-linters
+        - tox-coverage
+        - tox-py27
