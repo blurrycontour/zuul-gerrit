@@ -7,6 +7,8 @@
   zuul_console:
     path: /tmp/console.log
     port: 19885
+  tags:
+    - skip_ansible_lint
 
 - name: Display net-info.
   shell: |

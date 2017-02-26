@@ -11,3 +11,4 @@ testtools>=0.9.32
 sphinxcontrib-programoutput
 mock
 PyMySQL
+ansible-lint>=v3.4.12
