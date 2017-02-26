@@ -1,3 +1,7 @@
 ---
 # tasks/main.yaml
+run_tox_task_manager:
+  - default
+
+# task/default.yaml
 run_tox_eventlist:

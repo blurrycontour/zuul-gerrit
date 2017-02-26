@@ -4,8 +4,8 @@
       include_role:
         name: run-bindep
 
-    - name: Run a tox -e pep8.
+    - name: Run a tox -e py27.
       include_role:
         name: run-tox
       vars:
-        run_tox_eventlist: pep8
+        run_tox_eventlist: py27
