@@ -50,6 +50,24 @@
       "revId": "2e8ac13ea34938f366d2462caf1cb74eb82d73e2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da36d5c6_153213a7",
+        "filename": "playbooks/post.yaml",
+        "patchSetId": 15
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-02-26T16:49:08Z",
+      "side": 1,
+      "message": "Yes, I agree. However, I was fighting our security filters on the synchronize on Friday.  I\u0027ll continue to work on it.\n\nAlso, we still need to figure out why we can actually do this on zuul-launcher, since /opt/zuul-logs is outside the jobDir.",
+      "parentUuid": "da36d5c6_78a7dabc",
+      "revId": "2e8ac13ea34938f366d2462caf1cb74eb82d73e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
