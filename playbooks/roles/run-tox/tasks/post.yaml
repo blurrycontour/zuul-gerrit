@@ -1,0 +1,5 @@
+- name: Collect tox logs.
+  synchronize:
+    dest: "{{ zuul.launcher.log_root }}/tox"
+    mode: pull
+    src: "/home/zuul/workspace/src/{{ zuul.project }}/.tox/{{ run_tox_eventlist }}/log/"
