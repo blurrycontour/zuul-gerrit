@@ -1,0 +1,6 @@
+- hosts: ubuntu-xenial
+  vars:
+    run_tox_envlist: cover
+  roles:
+    - run-bindep
+    - run-tox
