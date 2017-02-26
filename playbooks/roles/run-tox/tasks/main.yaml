@@ -1,4 +1,5 @@
-- name: Run tox
-  shell: "/usr/local/jenkins/slave_scripts/run-tox.sh {{ run_tox_eventlist }}"
-  args:
-    chdir: "/home/zuul/workspace/src/{{ zuul.project }}"
+---
+- include: "{{ run_tox_task }}.yaml"
+  with_items: "{{ run_tox_task_manager }}"
+  loop_control:
+    loop_var: run_tox_task
