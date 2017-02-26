@@ -1,0 +1,11 @@
+- hosts: all
+  tasks:
+    - name: Collect tox logs.
+      synchronize:
+        dest: "{{ zuul.launcher.log_root }}/tox"
+        mode: pull
+        src: "/home/zuul/workspace/src/{{ zuul.project }}/.tox/{{ item }}/log/"
+      with_items:
+        - cover
+        - pep8
+        - py27
