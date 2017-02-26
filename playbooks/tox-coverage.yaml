@@ -1,0 +1,7 @@
+- hosts: all
+  tasks:
+    - name: Run a tox -e coverage.
+      include_role:
+        name: run-tox
+      vars:
+        run_tox_eventlist: coverage
