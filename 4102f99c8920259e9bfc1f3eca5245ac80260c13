@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da36d5c6_d465d81d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-02-27T04:39:16Z",
+      "side": 1,
+      "message": "I can\u0027t evaluate this change, because I don\u0027t understand why it is needed from the commit message or the changes.",
+      "revId": "4102f99c8920259e9bfc1f3eca5245ac80260c13",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
