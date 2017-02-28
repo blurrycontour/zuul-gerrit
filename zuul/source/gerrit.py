@@ -249,12 +249,12 @@ class GerritSource(BaseSource):
         max_ps = 0
         files = []
         for ps in data['patchSets']:
-            if ps['number'] == change.patchset:
+            if str(ps['number']) == change.patchset:
                 change.refspec = ps['ref']
                 for f in ps.get('files', []):
                     files.append(f['file'])
             if int(ps['number']) > int(max_ps):
-                max_ps = ps['number']
+                max_ps = str(ps['number'])
         if max_ps == change.patchset:
             change.is_current_patchset = True
         else:
