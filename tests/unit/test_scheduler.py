@@ -2752,11 +2752,9 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(B.data['status'], 'MERGED')
         self.assertEqual(B.reported, 2)
 
-    @skip("Disabled for early v3 development")
     def test_tags(self):
         "Test job tags"
-        self.config.set('zuul', 'layout_config',
-                        'tests/fixtures/layout-tags.yaml')
+        self.updateConfigLayout('layout-tags')
         self.sched.reconfigure(self.config)
 
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
