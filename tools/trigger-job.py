@@ -46,21 +46,28 @@ def main():
                         default='http://zuul.openstack.org/p', help='Zuul URL')
     parser.add_argument('--logpath', dest='logpath', required=True,
                         help='Path for log files.')
+    parser.add_argument('--offline', action='store_true', dest='offline',
+                        help='Whether or not to offline the node.')
     args = parser.parse_args()
 
-    data = {'ZUUL_PIPELINE': args.pipeline,
-            'ZUUL_PROJECT': args.project,
-            'ZUUL_UUID': str(uuid4().hex),
-            'ZUUL_REF': args.refname,
-            'ZUUL_REFNAME': args.refname,
-            'ZUUL_OLDREV': args.oldrev,
-            'ZUUL_NEWREV': args.newrev,
-            'ZUUL_SHORT_OLDREV': args.oldrev[:7],
-            'ZUUL_SHORT_NEWREV': args.newrev[:7],
-            'ZUUL_COMMIT': args.newrev,
-            'ZUUL_URL': args.url,
-            'LOG_PATH': args.logpath,
-            }
+    data = {}
+    data['ZUUL_PIPELINE'] = args.pipeline
+    data['ZUUL_PROJECT'] = args.project
+    data['ZUUL_UUID'] = str(uuid4().hex)
+    data['ZUUL_URL'] = args.url
+    data['LOG_PATH'] = args.logpath
+    data['TOX_TESTENV_PASSENV'] = "ZUUL_PIPELINE ZUUL_UUID ZUUL_VOTING " \
+                                  "ZUUL_URL ZUUL_PROJECT"
+    if args.pipeline != 'periodic':
+        data['ZUUL_REF'] = args.refname
+        data['ZUUL_REFNAME'] = args.refname
+        data['ZUUL_OLDREV'] = args.oldrev
+        data['ZUUL_NEWREV'] = args.newrev
+        data['ZUUL_SHORT_OLDREV'] = args.oldrev[:7]
+        data['ZUUL_SHORT_NEWREV'] = args.newrev[:7]
+        data['ZUUL_COMMIT'] = args.newrev
+    if args.offline:
+        data['OFFLINE_NODE_WHEN_COMPLETE'] = "1"
 
     c.addServer('127.0.0.1', 4730)
     c.waitForServer()
