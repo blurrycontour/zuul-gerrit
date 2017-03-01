@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba2be162_0049a531",
+        "filename": "tests/fixtures/config/ansible/git/org_project/playbooks/timeoutlocal.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-01T14:59:28Z",
+      "side": 1,
+      "message": "This will fail, because local actions are not supported on the launcher.\n\nWe can use pause, but need a way to stop user input.",
+      "revId": "86d1acd575caf9be4918eb514ea1f38a255e42fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_40ef1de8",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 606,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-01T14:59:28Z",
+      "side": 1,
+      "message": "Something we might want to change, is per timeout per pre / post and normal.  Right now, we just use a simple timeout for all three.",
+      "revId": "86d1acd575caf9be4918eb514ea1f38a255e42fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_00cc4588",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 689,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-01T14:59:28Z",
+      "side": 1,
+      "message": "Thoughts?",
+      "revId": "86d1acd575caf9be4918eb514ea1f38a255e42fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
