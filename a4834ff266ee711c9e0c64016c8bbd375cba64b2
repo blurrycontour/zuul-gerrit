@@ -16,6 +16,23 @@
       "revId": "a4834ff266ee711c9e0c64016c8bbd375cba64b2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_5663631a",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2855,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-01T15:39:04Z",
+      "side": 1,
+      "message": "I just double checked -- this test works without the merger reset.",
+      "revId": "a4834ff266ee711c9e0c64016c8bbd375cba64b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
