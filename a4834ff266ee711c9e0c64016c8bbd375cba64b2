@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba2be162_d66d9333",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2855,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-01T15:35:16Z",
+      "side": 1,
+      "message": "We should never have to explicitly modify the merger like this; it should always follow upstream when it\u0027s used.  If this is needed, we may have found an edge case we should fix.",
+      "revId": "a4834ff266ee711c9e0c64016c8bbd375cba64b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
