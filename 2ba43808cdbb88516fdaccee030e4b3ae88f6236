@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba2be162_d7474349",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-01T20:00:06Z",
+      "side": 1,
+      "message": "Can we set the wait value in the constructor so we don\u0027t have to check this every time?",
+      "revId": "2ba43808cdbb88516fdaccee030e4b3ae88f6236",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
