@@ -239,23 +239,23 @@ class GerritSource(BaseSource):
         change._data = data
 
         if change.patchset is None:
-            change.patchset = data['currentPatchSet']['number']
+            change.patchset = str(data['currentPatchSet']['number'])
 
         if 'project' not in data:
             raise exceptions.ChangeNotFound(change.number, change.patchset)
         change.project = self.sched.getProject(data['project'])
         change.branch = data['branch']
         change.url = data['url']
-        max_ps = 0
+        max_ps = '0'
         files = []
         for ps in data['patchSets']:
-            if ps['number'] == change.patchset:
+            if str(ps['number']) == change.patchset:
                 change.refspec = ps['ref']
                 for f in ps.get('files', []):
                     files.append(f['file'])
             if int(ps['number']) > int(max_ps):
-                max_ps = ps['number']
-        if max_ps == change.patchset:
+                max_ps = str(ps['number'])
+        if max_ps == str(change.patchset):
             change.is_current_patchset = True
         else:
             change.is_current_patchset = False
