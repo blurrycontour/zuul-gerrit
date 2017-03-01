@@ -11,8 +11,34 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+#
+# This file contains code from py-dag, https://github.com/thieman/py-dag
+# As required by the license, here is the proper attribution:
+#
+# The MIT License (MIT)
+# 
+# Copyright (c) 2014 Travis Thieman
+# 
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
 import abc
+import collections
 import copy
 import os
 import re
@@ -746,8 +772,14 @@ class Job(object):
     def __getattr__(self, name):
         v = self.__dict__.get(name)
         if v is None:
-            return copy.deepcopy(self.attributes[name])
+            try:
+                return copy.deepcopy(self.attributes[name])
+            except KeyError:
+                raise AttributeError
         return v
+
+    def __hash__(self):
+        return hash(self.name)
 
     def _get(self, name):
         return self.__dict__.get(name)
@@ -835,6 +867,179 @@ class Job(object):
             return False
 
         return True
+
+
+class JobGraphValidationError(Exception):
+    pass
+
+
+class JobGraph(object):
+    """ A JobGraph holds one or more Jobs in a Directed Acylic Graph to
+    represent Job dependences. """
+
+    def __init__(self):
+        self.graph = OrderedDict()
+
+    def __repr__(self):
+        return '<JobGraph %s>' % (self.graph)
+
+    def add_edge(self, ind, dep):
+        """ Add an edge (dependency) between two specified nodes. """
+
+        if ind not in self.graph or dep not in self.graph:
+            raise KeyError('one or more jobs do not exist in graph')
+
+        test_graph = copy.deepcopy(self.graph)
+        test_graph[ind].add(dep)
+        is_valid, message = self.validate(test_graph)
+
+        if is_valid:
+            self.graph[ind].add(dep)
+        else:
+            raise JobGraphValidationError()
+
+    def add_job(self, job):
+        """ Add a job node that does not exist to a graph. """
+
+        if job in self.graph:
+            raise KeyError('job %s already exists in graph' % job)
+
+        self.graph[job] = set()
+
+    def delete_edge(self, ind, dep):
+        """ Delete an edge between two jobs in a graph. """
+
+        if dep not in self.graph.get(ind, []):
+            raise KeyError('this edge does not exist')
+        self.graph[ind].remove(dep)
+
+    def delete_node(self, job):
+        """ Delete a job and all edges for the job from a graph. """
+
+        if job not in self.graph:
+            raise KeyError('job %s does not exists in graph' % job)
+
+        self.graph.pop(job)
+
+        for node, edges in graph.iteritems():
+            if job in edges:
+                edges.remove(job)
+
+    def downstream(self, job):
+        """ Return a list of all jobs the given job has edges towards. """
+
+        if job not in self.graph:
+            raise KeyError('job %s is not in graph' % job)
+
+        return list(self.graph[job])
+
+    def downstreams(self, job):
+        """ Return a list of all jobs downstream from a given job in the
+        dependency graph in a topological sorted order. """
+
+        jobs = [job]
+        jobs_seen = set()
+        i = 0
+        while i < len(jobs):
+            downstreams = self.downstream(jobs[i])
+            for downstream_job in downstreams:
+                if downstream_job not in jobs_seen:
+                    jobs_seen.add(downstream_job)
+                    jobs.append(downstream_job)
+            i += 1
+        return filter(lambda job: job in jobs_seen,
+                      self.topological_sort())
+
+    def independent(self):
+        """ Return a list of all jobss with no dependencies in the graph. """
+
+        dependent_jobs = set(job for dependents in self.graph.itervalues()
+                             for job in dependents)
+        return [job for job in self.graph.keys() if job not in dependent_jobs]
+
+    def leaves(self):
+        """ Return a list of all leaves that have no downstreams. """
+
+        return [key for key in self.graph if not self.graph[key]]
+
+    def predecessors(self, job):
+        """ Return a list of all predecessors of a given job in a graph. """
+
+        return [key for key in self.graph if job in self.graph[key]]
+
+    def size(self):
+        """ Return the size of the graph. """
+
+        return len(self.graph)
+
+    def topological_sort(self, graph=None):
+        """ Return a topologically sorted version of the graph. """
+
+        if graph is None:
+            graph = self.graph
+
+        degree = {}
+        for u in graph:
+            degree[u] = 0
+
+        for u in graph:
+            for v in graph[u]:
+                degree[v] += 1
+
+        queue = collections.deque()
+        for u in degree:
+            if degree[u] == 0:
+                queue.appendleft(u)
+
+        l = []
+        while queue:
+            u = queue.pop()
+            l.append(u)
+            for v in graph[u]:
+                degree[v] -= 1
+                if degree[v] == 0:
+                    queue.appendleft(v)
+
+        if len(l) == len(graph):
+            return l
+        else:
+            raise ValueError('graph is not acyclic')
+
+    def validate(self, graph=None):
+        """ Validate if the graph is valid. """
+
+        if graph is None:
+            graph = self.graph
+
+        if len(self.independent()) == 0:
+            return (False, 'no independent jobs detected')
+
+        try:
+            self.topological_sort(graph)
+        except ValueError:
+            return (False, 'failed topological sort')
+        return (True, 'valid')
+
+    @staticmethod
+    def from_dict(graph_dict):
+        """ Builds a fresh graph from a dict.
+
+        ex:
+        {node_name: [edges]}
+        """
+
+        graph = JobGraph()
+        for new_job in graph_dict.iterkeys():
+            graph.add_job(new_job)
+
+        for ind, dep in graph_dict.iteritems():
+            if not isinstance(dep, list):
+                raise TypeError('dict values must be lists')
+
+            for d in dep:
+                graph.add_edge(ind, d)
+
+        return graph
 
 
 class JobTree(object):
