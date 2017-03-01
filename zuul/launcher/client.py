@@ -309,6 +309,8 @@ class LaunchClient(object):
         params['BASE_LOG_PATH'] = item.change.getBasePath()
         params['LOG_PATH'] = destination_path
 
+	params['BUILD_TAGS'] = ' '.join(sorted(job.tags))
+
         # Allow the job to update the params
         self.updateBuildParams(job, item, params)
 

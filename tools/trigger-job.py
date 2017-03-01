@@ -60,6 +60,7 @@ def main():
             'ZUUL_COMMIT': args.newrev,
             'ZUUL_URL': args.url,
             'LOG_PATH': args.logpath,
+            'BUILD_TAGS' : args.tags
             }
 
     c.addServer('127.0.0.1', 4730)
