@@ -1,0 +1,4 @@
+- hosts: all
+  tasks:
+    - name: Pause forever, or until job -9 us.
+      shell: sleep 60

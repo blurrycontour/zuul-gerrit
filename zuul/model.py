@@ -686,7 +686,7 @@ class Job(object):
         # declared "final", these may not be overriden in a
         # project-pipeline.
         self.execution_attributes = dict(
-            timeout=None,
+            timeout=1800,
             variables={},
             nodeset=NodeSet(),
             auth={},

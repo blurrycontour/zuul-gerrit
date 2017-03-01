@@ -216,3 +216,10 @@ class TestAnsible(AnsibleZuulTestCase):
         bare_role_flag_path = os.path.join(self.test_root,
                                            build.uuid + '.bare-role.flag')
         self.assertTrue(os.path.exists(bare_role_flag_path))
+
+    def test_aborted_playbook(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        build = self.getJobFromHistory('timeoutlocal')
+        self.assertEqual(build.result, 'ABORTED')

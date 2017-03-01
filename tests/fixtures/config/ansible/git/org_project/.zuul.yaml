@@ -2,6 +2,11 @@
     parent: python27
     name: faillocal
 
+- job:
+    parent: python27
+    name: timeoutlocal
+    timeout: 5
+
 - project:
     name: org/project
 
@@ -9,3 +14,4 @@
       jobs:
         - python27
         - faillocal
+        - timeoutlocal

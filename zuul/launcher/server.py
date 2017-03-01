@@ -591,7 +591,7 @@ class AnsibleJob(object):
         self.job.sendWorkData(json.dumps(data))
         self.job.sendWorkStatus(0, 100)
 
-        result = self.runPlaybooks()
+        result = self.runPlaybooks(args)
 
         if result is None:
             self.job.sendWorkFail()
@@ -599,17 +599,19 @@ class AnsibleJob(object):
         result = dict(result=result)
         self.job.sendWorkComplete(json.dumps(result))
 
-    def runPlaybooks(self):
+    def runPlaybooks(self, args):
         result = None
 
         for playbook in self.jobdir.pre_playbooks:
-            pre_status, pre_code = self.runAnsiblePlaybook(playbook)
+            pre_status, pre_code = self.runAnsiblePlaybook(
+                playbook, args['timeout'])
             if pre_status != self.RESULT_NORMAL or pre_code != 0:
                 # These should really never fail, so return None and have
                 # zuul try again
                 return result
 
-        job_status, job_code = self.runAnsiblePlaybook(self.jobdir.playbook)
+        job_status, job_code = self.runAnsiblePlaybook(
+            self.jobdir.playbook, args['timeout'])
         if job_status == self.RESULT_TIMED_OUT:
             return 'TIMED_OUT'
         if job_status == self.RESULT_ABORTED:
@@ -627,7 +629,7 @@ class AnsibleJob(object):
 
         for playbook in self.jobdir.post_playbooks:
             post_status, post_code = self.runAnsiblePlaybook(
-                playbook, success)
+                playbook, args['timeout'], success)
             if post_status != self.RESULT_NORMAL or post_code != 0:
                 result = 'POST_FAILURE'
         return result
@@ -939,7 +941,7 @@ class AnsibleJob(object):
 
         return (self.RESULT_NORMAL, ret)
 
-    def runAnsiblePlaybook(self, playbook, success=None):
+    def runAnsiblePlaybook(self, playbook, timeout, success=None):
         env_copy = os.environ.copy()
         env_copy['LOGNAME'] = 'zuul'
 
@@ -954,9 +956,6 @@ class AnsibleJob(object):
             cmd.extend(['-e', 'success=%s' % str(bool(success))])
 
         cmd.extend(['-e@%s' % self.jobdir.vars, verbose])
-
-        # TODOv3: get this from the job
-        timeout = 60
 
         return self.runAnsible(
             cmd=cmd, timeout=timeout, trusted=playbook.trusted)
