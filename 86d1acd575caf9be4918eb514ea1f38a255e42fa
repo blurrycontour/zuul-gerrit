@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "ba2be162_d6959340",
+        "filename": "tests/fixtures/config/ansible/git/org_project/playbooks/timeoutlocal.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-01T15:31:52Z",
+      "side": 1,
+      "message": "If we put this in a config repo, we should be able to run it.",
+      "revId": "86d1acd575caf9be4918eb514ea1f38a255e42fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba2be162_40ef1de8",
         "filename": "zuul/launcher/server.py",
         "patchSetId": 1
@@ -36,6 +53,23 @@
     },
     {
       "key": {
+        "uuid": "ba2be162_f6929756",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 606,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-01T15:31:52Z",
+      "side": 1,
+      "message": "Agreed, it doesn\u0027t make much sense to use the same timeout for all three.  I think better options are:\n\n1) A cumulative timeout for the entire job (including pre, main, and post).\n2) Separate timeouts for all three sections (but the pre and post playbooks should still be cumulative for their timeouts).",
+      "revId": "86d1acd575caf9be4918eb514ea1f38a255e42fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba2be162_00cc4588",
         "filename": "zuul/model.py",
         "patchSetId": 1
@@ -47,6 +81,23 @@
       "writtenOn": "2017-03-01T14:59:28Z",
       "side": 1,
       "message": "Thoughts?",
+      "revId": "86d1acd575caf9be4918eb514ea1f38a255e42fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_b6b01ff6",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 689,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-01T15:31:52Z",
+      "side": 1,
+      "message": "I\u0027d be okay with no default timeout (and for us to support not having a timeout).",
       "revId": "86d1acd575caf9be4918eb514ea1f38a255e42fa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
