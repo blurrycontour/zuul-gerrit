@@ -567,6 +567,7 @@ class FakeBuild(object):
         self.pipeline = self.parameters['ZUUL_PIPELINE']
         self.project = self.parameters['ZUUL_PROJECT']
         self.name = self.parameters['job']
+        self.tags = self.parameters['BUILD_TAGS']
         self.wait_condition = threading.Condition()
         self.waiting = False
         self.aborted = False
