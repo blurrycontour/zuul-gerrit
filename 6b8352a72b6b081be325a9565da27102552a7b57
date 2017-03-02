@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba2be162_331f88b8",
+        "filename": "tests/fixtures/config/single-tenant/git/layout-tags/zuul.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-02T23:25:24Z",
+      "side": 1,
+      "message": "This was a Zuul v2 metajob (job whose name is a regular expression).  They are no more in Zuul v3.  Instead, we need a definition for each job that we invoke below.  This should be the definition for the \"merge\" job.  The other job definitions should essentially be empty.\n\nInvoking a job below in a pipeline without a job definition should cause an error, but instead, this test silently ran no jobs.  I have filed this story for that bug:\n\nhttps://storyboard.openstack.org/#!/story/2000893",
+      "revId": "6b8352a72b6b081be325a9565da27102552a7b57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_531cfcc0",
+        "filename": "tests/fixtures/config/single-tenant/git/layout-tags/zuul.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-02T23:25:24Z",
+      "side": 1,
+      "message": "After defining a merge job, change this to simply \u0027merge\u0027.",
+      "revId": "6b8352a72b6b081be325a9565da27102552a7b57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_737bc0f5",
+        "filename": "tests/fixtures/config/single-tenant/git/layout-tags/zuul.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-02T23:25:24Z",
+      "side": 1,
+      "message": "The rest of these jobs can also be shared between the two projects.  So: \"test1\" \"test2\" and \"integration\" on both project1 and project2.",
+      "revId": "6b8352a72b6b081be325a9565da27102552a7b57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_938034c2",
+        "filename": "tests/fixtures/config/single-tenant/git/layout-tags/zuul.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-02T23:25:24Z",
+      "side": 1,
+      "message": "This can also simply be \u0027merge\u0027.",
+      "revId": "6b8352a72b6b081be325a9565da27102552a7b57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_d30f0c86",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2768,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-02T23:25:24Z",
+      "side": 1,
+      "message": "It turns out that this test is running zero jobs.  We should add a check here that len(self.history) is the expected number.  I count eight?",
+      "revId": "6b8352a72b6b081be325a9565da27102552a7b57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_f32890e4",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2771,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-02T23:25:24Z",
+      "side": 1,
+      "message": "This is the red flag that caused me to to suspect no jobs were being run.  This variable should actually be under zuul.build_tags.  So: build.parameters[\u0027zuul\u0027].get(\u0027build_tags\u0027).",
+      "revId": "6b8352a72b6b081be325a9565da27102552a7b57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_13260415",
+        "filename": "zuul/launcher/client.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-02T23:25:24Z",
+      "side": 1,
+      "message": "Let\u0027s call the new variable \u0027tags\u0027 instead.  It\u0027s under the zuul namespace, so zuul.tags should be pretty clear.",
+      "revId": "6b8352a72b6b081be325a9565da27102552a7b57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
