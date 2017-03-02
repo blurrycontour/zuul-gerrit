@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba2be162_0810d5a7",
+        "filename": "zuul/lib/connections.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1420
+      },
+      "writtenOn": "2017-03-02T01:07:44Z",
+      "side": 1,
+      "message": "The base driver had this method added to it, this check seems redundant",
+      "revId": "b751f335d38629775ac452e94d10230b3865ccb8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
