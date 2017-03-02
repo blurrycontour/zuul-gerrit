@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "ba2be162_be5b3ff5",
+        "filename": "playbooks/post.yaml",
+        "patchSetId": 12
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-02T23:43:59Z",
+      "side": 1,
+      "message": "Agree. This needs a refactor.",
+      "parentUuid": "ba2be162_f0608603",
+      "revId": "d3e96046c18ea4b5b5003281b22695293e38d032",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba2be162_105efa43",
         "filename": "playbooks/post.yaml",
         "patchSetId": 12
@@ -30,6 +48,24 @@
       "writtenOn": "2017-03-02T23:03:22Z",
       "side": 1,
       "message": "This should say \"Publish logs\".  It\u0027s not tox specific.",
+      "revId": "d3e96046c18ea4b5b5003281b22695293e38d032",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_fe713777",
+        "filename": "playbooks/post.yaml",
+        "patchSetId": 12
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-02T23:43:59Z",
+      "side": 1,
+      "message": "agree",
+      "parentUuid": "ba2be162_105efa43",
       "revId": "d3e96046c18ea4b5b5003281b22695293e38d032",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "ba2be162_3e510fd9",
+        "filename": "playbooks/roles/run-tox/defaults/main.yaml",
+        "patchSetId": 12
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-02T23:43:59Z",
+      "side": 1,
+      "message": "personal preference, and easy way to see where the variables are used.",
+      "parentUuid": "ba2be162_5054f21f",
+      "revId": "d3e96046c18ea4b5b5003281b22695293e38d032",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba2be162_7033b614",
         "filename": "playbooks/roles/run-tox/defaults/main.yaml",
         "patchSetId": 12
@@ -64,6 +118,24 @@
       "writtenOn": "2017-03-02T23:03:22Z",
       "side": 1,
       "message": "I don\u0027t know what run_tox_task_manager means.  This could use a comment if it\u0027s necessary, but if there\u0027s a way to remove this, it might be nice since it\u0027s not exactly straightforward.",
+      "revId": "d3e96046c18ea4b5b5003281b22695293e38d032",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_3e8caf7e",
+        "filename": "playbooks/roles/run-tox/defaults/main.yaml",
+        "patchSetId": 12
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-02T23:43:59Z",
+      "side": 1,
+      "message": "This is a make shift way of doing tags in ansible I\u0027ve been using.  Basically, if you look at:\n\n  run-tox/tasks/main.yaml\n\nthis allows use to dynamically include tasks. For example:\n\n  playbooks/post.yaml\n\nwould set run_tox_task_manager, to only invoke the post.yaml.\n\nWhat I was trying to do here, is keep the log collection part of the role, rather then creating a create another role to collect logs.\n\nHowever, I can do that for now, since it is easier to see how it works.",
+      "parentUuid": "ba2be162_7033b614",
       "revId": "d3e96046c18ea4b5b5003281b22695293e38d032",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -132,6 +204,24 @@
       "writtenOn": "2017-03-02T23:03:22Z",
       "side": 1,
       "message": "Alternatively, this can eliminate the extra vars section:\n\n    - role: run-tox\n      env: cover\n\nI\u0027m not sure which looks better.",
+      "revId": "d3e96046c18ea4b5b5003281b22695293e38d032",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_deb1d348",
+        "filename": "playbooks/tox-cover.yaml",
+        "patchSetId": 12
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-02T23:43:59Z",
+      "side": 1,
+      "message": "Right, this is preference I think. I suspect we\u0027ll have to establish some style guide",
+      "parentUuid": "ba2be162_30577e27",
       "revId": "d3e96046c18ea4b5b5003281b22695293e38d032",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
