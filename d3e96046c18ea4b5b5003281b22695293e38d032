@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba2be162_f0608603",
+        "filename": "playbooks/post.yaml",
+        "patchSetId": 12
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-02T23:03:22Z",
+      "side": 1,
+      "message": "This is the base job post playbook, so it shouldn\u0027t mention tox.  This task should be in a tox-specific post playbook.  So maybe we need a \u0027tox-base\u0027 job which inherits base and adds this task to its post playbook.  then tox-* can inherit from tox-base.  Or, if we go with the PS10 approach, we could have a tox job with this as a post playbook and a variable for the env list.  Then tox-linters, etc, could override that variable.",
+      "revId": "d3e96046c18ea4b5b5003281b22695293e38d032",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_105efa43",
+        "filename": "playbooks/post.yaml",
+        "patchSetId": 12
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-02T23:03:22Z",
+      "side": 1,
+      "message": "This should say \"Publish logs\".  It\u0027s not tox specific.",
+      "revId": "d3e96046c18ea4b5b5003281b22695293e38d032",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_5054f21f",
+        "filename": "playbooks/roles/run-tox/defaults/main.yaml",
+        "patchSetId": 12
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-02T23:03:22Z",
+      "side": 1,
+      "message": "This comment seems unnecessary.",
+      "revId": "d3e96046c18ea4b5b5003281b22695293e38d032",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_7033b614",
+        "filename": "playbooks/roles/run-tox/defaults/main.yaml",
+        "patchSetId": 12
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-02T23:03:22Z",
+      "side": 1,
+      "message": "I don\u0027t know what run_tox_task_manager means.  This could use a comment if it\u0027s necessary, but if there\u0027s a way to remove this, it might be nice since it\u0027s not exactly straightforward.",
+      "revId": "d3e96046c18ea4b5b5003281b22695293e38d032",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_90382af1",
+        "filename": "playbooks/roles/run-tox/defaults/main.yaml",
+        "patchSetId": 12
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-02T23:03:22Z",
+      "side": 1,
+      "message": "This comment also seems unecessary.",
+      "revId": "d3e96046c18ea4b5b5003281b22695293e38d032",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_b039aef4",
+        "filename": "playbooks/roles/run-tox/defaults/main.yaml",
+        "patchSetId": 12
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-02T23:03:22Z",
+      "side": 1,
+      "message": "What\u0027s an eventlist?  Did you mean to say \"envlist\"?",
+      "revId": "d3e96046c18ea4b5b5003281b22695293e38d032",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_d0470275",
+        "filename": "playbooks/roles/run-tox/tasks/post.yaml",
+        "patchSetId": 12
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-02T23:03:22Z",
+      "side": 1,
+      "message": "If we have a generic tox post playbook, this is awkward.  We could use * for the envlist perhaps.  This is better in the PS10 approach.",
+      "revId": "d3e96046c18ea4b5b5003281b22695293e38d032",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_30577e27",
+        "filename": "playbooks/tox-cover.yaml",
+        "patchSetId": 12
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-02T23:03:22Z",
+      "side": 1,
+      "message": "Alternatively, this can eliminate the extra vars section:\n\n    - role: run-tox\n      env: cover\n\nI\u0027m not sure which looks better.",
+      "revId": "d3e96046c18ea4b5b5003281b22695293e38d032",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
