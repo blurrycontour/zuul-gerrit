@@ -34,6 +34,23 @@
       "revId": "96618ed7517c70b96c54c51d969040c0a29e3209",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_e4944f44",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 915,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-03-02T21:38:58Z",
+      "side": 1,
+      "message": "For potential followup, the code might be easier to grok/modify if the control flow was tied more directly to the watchdog existing and less the timeout. Something like:\n\n  watchdog \u003d None\n  if timeout:\n      watchdog \u003d Watchdog()\n      watchdog.start()\n  try:\n      ...\n  finally:\n      watchdog and watchdog.stop()\n  ...\n  if watchdog and watchdog.timed_out:\n     ...\n\nBut it so minimally different I don\u0027t know that its actually valuable, just noticed that we have tightly coupled timeout being a thing with watchdog being a thing rather than just checkingdirectly.",
+      "revId": "96618ed7517c70b96c54c51d969040c0a29e3209",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
