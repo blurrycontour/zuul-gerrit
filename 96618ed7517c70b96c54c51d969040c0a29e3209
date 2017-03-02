@@ -16,6 +16,24 @@
       "revId": "96618ed7517c70b96c54c51d969040c0a29e3209",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_3e2a087f",
+        "filename": "tests/fixtures/config/ansible/git/common-config/playbooks/timeout.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-02T15:09:06Z",
+      "side": 1,
+      "message": "we could, but a little scared of possible race conditions. In fact, if the test takes 60 seconds, then something is broken. Zuul will abort this in 10 seconds today.",
+      "parentUuid": "ba2be162_e9854059",
+      "revId": "96618ed7517c70b96c54c51d969040c0a29e3209",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
