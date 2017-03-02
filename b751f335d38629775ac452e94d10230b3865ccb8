@@ -16,6 +16,24 @@
       "revId": "b751f335d38629775ac452e94d10230b3865ccb8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_dd6112aa",
+        "filename": "zuul/lib/connections.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-03-02T06:08:26Z",
+      "side": 1,
+      "message": "Yeah, but it also has `registerScheduler` too, and yet the above function has this check. I\u0027m totally cargo coding here, so maybe the above function has it wrong too?",
+      "parentUuid": "ba2be162_0810d5a7",
+      "revId": "b751f335d38629775ac452e94d10230b3865ccb8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
