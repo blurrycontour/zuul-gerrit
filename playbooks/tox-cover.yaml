@@ -1,5 +1,3 @@
-- hosts: all
-  vars:
-    run_tox_envlist: cover
+- hosts: ubuntu-xenial
   roles:
-    - run-tox
+    - run-cover
