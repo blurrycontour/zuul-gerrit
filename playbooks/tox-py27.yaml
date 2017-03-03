@@ -2,4 +2,5 @@
   vars:
     run_tox_envlist: py27
   roles:
+    - revoke-sudo
     - run-tox
