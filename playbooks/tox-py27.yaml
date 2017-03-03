@@ -3,4 +3,5 @@
     run_tox_eventlist: py27
   roles:
     - run-bindep
+    - revoke-sudo
     - run-tox
