@@ -1,0 +1,12 @@
+- name: Remove sudo access for zuul user.
+  become: yes
+  file:
+    path: /etc/sudoers.d/zuul-sudo
+    state: absent
+
+- name: Prove become fails.
+  become: yes
+  become_user: zuul
+  become_method: sudo
+  become_flags: -n
+  shell: ! true
