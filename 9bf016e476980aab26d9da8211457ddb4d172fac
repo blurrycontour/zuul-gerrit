@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "ba2be162_fc32f8a5",
+        "filename": "playbooks/tox-post.yaml",
+        "patchSetId": 23
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-03T18:18:42Z",
+      "side": 1,
+      "message": "I agree, I think moving forward we could optimize this. But, I didn\u0027t want to get stuck doing that. I\u0027m happy to leave a comment indicating we should loop back here.\n\nFor the most part, each of our tox runs only create a single directory. So, while we are using with_items, it should only be 1 item we copy.",
+      "parentUuid": "ba2be162_3ca810db",
+      "revId": "9bf016e476980aab26d9da8211457ddb4d172fac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba2be162_2139cbf2",
         "filename": "playbooks/tox-pre.yaml",
         "patchSetId": 23
