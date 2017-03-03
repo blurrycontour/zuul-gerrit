@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba2be162_2139cbf2",
+        "filename": "playbooks/tox-pre.yaml",
+        "patchSetId": 23
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-03T18:10:17Z",
+      "side": 1,
+      "message": "We can likely remove this",
+      "revId": "9bf016e476980aab26d9da8211457ddb4d172fac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
