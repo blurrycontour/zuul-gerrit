@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba2be162_2aaef8e5",
+        "filename": "tests/fixtures/config/single-tenant/git/layout-tags/zuul.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-03T22:06:35Z",
+      "side": 1,
+      "message": "This tests adding tags at the point of job definition.  So every merge job should at least have a \u0027merge\u0027 tag.  Good.",
+      "revId": "6de7fa34f4ca842e8935ac8e29c3cf93c46fe0b8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_4ab96c2d",
+        "filename": "tests/fixtures/config/single-tenant/git/layout-tags/zuul.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-03T22:06:35Z",
+      "side": 1,
+      "message": "This tests adding a tag in a job tree.  So project1\u0027s merge job should also have an \u0027extratag\u0027.  Good.",
+      "revId": "6de7fa34f4ca842e8935ac8e29c3cf93c46fe0b8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_6ab47034",
+        "filename": "tests/fixtures/config/single-tenant/git/layout-tags/zuul.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-03T22:06:35Z",
+      "side": 1,
+      "message": "This seems duplicative with the project1 extratag.  Let\u0027s drop this so that we can verify that project2\u0027s merge job does not have an extratag.",
+      "revId": "6de7fa34f4ca842e8935ac8e29c3cf93c46fe0b8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_0ab3f450",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2766,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-03T22:06:35Z",
+      "side": 1,
+      "message": "I see why you added it to both -- since both of the jobs have the same name now.\n\nThere\u0027s a new method, self.getJobFromHistory which takes a project argument.  You can use that to get the \u0027merge\u0027 job from project1 or project2 specifically.\n\nOr if you want to drop project2 entirely, that would be fine, as long as all of these cases are covered:\n\n* Single tag only from job definition\n* Tag from job definition AND job tree\n* Single tag from job tree\n* No tags",
+      "revId": "6de7fa34f4ca842e8935ac8e29c3cf93c46fe0b8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
