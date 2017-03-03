@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "ba2be162_3ca810db",
+        "filename": "playbooks/tox-post.yaml",
+        "patchSetId": 23
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-03-03T18:14:31Z",
+      "side": 1,
+      "message": "This seems somewhat inefficient if there are a lot of files to find, is there not a way to pass in a whole list to synchronize at once? Or does the module do that behind the covers?",
+      "revId": "9bf016e476980aab26d9da8211457ddb4d172fac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba2be162_2139cbf2",
         "filename": "playbooks/tox-pre.yaml",
         "patchSetId": 23
