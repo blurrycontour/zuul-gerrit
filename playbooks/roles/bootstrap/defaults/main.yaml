@@ -1,0 +1,3 @@
+---
+# tasks/main.yaml
+bootstrap_workspace_root: /home/zuul/workspace
