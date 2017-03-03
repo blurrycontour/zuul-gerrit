@@ -1,3 +1,2 @@
 ---
-# tasks/main.yaml
-prepare_workspace_root: /home/zuul/workspace
+prepare_workspace_workspace_root: /home/zuul/workspace
