@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba2be162_5532e4a7",
+        "filename": ".zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-04T04:04:01Z",
+      "side": 1,
+      "message": "I\u0027m actually thinking it would be more readable if this was:\n\n  pre-run: base/pre.yaml\n  post-run: base/post.yaml\n\nWhere we actually included the file extension for the playbooks.",
+      "revId": "7b08c75a654989065630bf67abc000ab8cfc0152",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
