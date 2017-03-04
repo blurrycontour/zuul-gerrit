@@ -1,0 +1,6 @@
+- hosts: ubuntu-xenial
+  roles:
+    - run-bindep
+    - revoke-sudo
+    - run-tarball
+    - run-wheel
