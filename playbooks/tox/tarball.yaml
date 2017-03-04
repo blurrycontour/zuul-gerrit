@@ -1,0 +1,5 @@
+- hosts: ubuntu-xenial
+  roles:
+    - revoke-sudo
+    - run-tarball
+    - run-wheel
