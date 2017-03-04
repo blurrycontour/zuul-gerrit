@@ -1,0 +1,7 @@
+- hosts: all
+  tasks:
+    - name: Collect tarball artifacts.
+      synchronize:
+        dest: "{{ zuul.launcher.src_root }}/tarballs"
+        mode: pull
+        src: "{{ zuul_workspace_root }}/src/{{ zuul.project }}/dist/"
