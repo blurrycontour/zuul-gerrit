@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba2be162_8fb5f632",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 478,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-03-06T18:40:49Z",
+      "side": 1,
+      "message": "At some point in the future, there is an extra \u0027with\u0027 here that shold be removed, as it makes reading the sentence hard. #notaminusone",
+      "revId": "149b69c288f6fbf4b5e4a2d93fd568300b94d4ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
