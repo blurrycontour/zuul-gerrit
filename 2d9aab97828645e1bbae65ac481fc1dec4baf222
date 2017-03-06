@@ -16,6 +16,24 @@
       "revId": "2d9aab97828645e1bbae65ac481fc1dec4baf222",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_c35c491b",
+        "filename": "playbooks/roles/prepare-workspace/tasks/main.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-06T06:44:26Z",
+      "side": 1,
+      "message": "I think the configure_mirror script will need access to env vars which shell will allow.",
+      "parentUuid": "ba2be162_891e8461",
+      "revId": "2d9aab97828645e1bbae65ac481fc1dec4baf222",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
