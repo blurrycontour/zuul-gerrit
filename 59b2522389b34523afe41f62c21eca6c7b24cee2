@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba2be162_03d6614e",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1004,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-06T06:51:37Z",
+      "side": 1,
+      "message": "So since we\u0027re clarifying things, is \"launches Jobs\" confusing here when really it launches (or perhaps starts) builds?\n\nMaybe this could be:\n\n  Zuul creates a Build to represent each execution of each job. When Zuul launches builds for a Change, it creates ...",
+      "range": {
+        "startLine": 1002,
+        "startChar": 4,
+        "endLine": 1004,
+        "endChar": 27
+      },
+      "revId": "59b2522389b34523afe41f62c21eca6c7b24cee2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_43ccd9ba",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1005,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-06T06:51:37Z",
+      "side": 1,
+      "message": "Builds",
+      "range": {
+        "startLine": 1005,
+        "startChar": 52,
+        "endLine": 1005,
+        "endChar": 56
+      },
+      "revId": "59b2522389b34523afe41f62c21eca6c7b24cee2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_83c25183",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1006,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-06T06:51:37Z",
+      "side": 1,
+      "message": "... with a different configuration (that may have changed the Job) ...",
+      "range": {
+        "startLine": 1006,
+        "startChar": 21,
+        "endLine": 1006,
+        "endChar": 34
+      },
+      "revId": "59b2522389b34523afe41f62c21eca6c7b24cee2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_e3394da5",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1009,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-06T06:51:37Z",
+      "side": 1,
+      "message": "new builds to be launched.",
+      "range": {
+        "startLine": 1008,
+        "startChar": 24,
+        "endLine": 1009,
+        "endChar": 22
+      },
+      "revId": "59b2522389b34523afe41f62c21eca6c7b24cee2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
