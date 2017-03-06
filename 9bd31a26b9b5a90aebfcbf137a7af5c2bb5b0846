@@ -50,6 +50,24 @@
       "revId": "9bd31a26b9b5a90aebfcbf137a7af5c2bb5b0846",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a30ddce_f0ce56b3",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-06T22:57:05Z",
+      "side": 1,
+      "message": "Yeah, I had intended to come back and fix all these skips once sqlreporter had been forward ported. But commenting out the config now works well.",
+      "parentUuid": "ba2be162_37c0e27c",
+      "revId": "9bd31a26b9b5a90aebfcbf137a7af5c2bb5b0846",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
