@@ -16,6 +16,24 @@
       "revId": "7b08c75a654989065630bf67abc000ab8cfc0152",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_e365cd1d",
+        "filename": ".zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-06T07:19:39Z",
+      "side": 1,
+      "message": "I agree. I think that makes it clearer that you\u0027re referring to a playbook",
+      "parentUuid": "ba2be162_5532e4a7",
+      "revId": "7b08c75a654989065630bf67abc000ab8cfc0152",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
