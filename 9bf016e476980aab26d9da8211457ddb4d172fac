@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "9a30ddce_679c726a",
+        "filename": "playbooks/roles/run-tox/defaults/main.yaml",
+        "patchSetId": 23
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-06T21:32:55Z",
+      "side": 1,
+      "message": "What does the word \"eventlist\" mean here?  Did you mean to say \"envlist\", as in, list of environments?  I asked this in PS12 and did not get a response...",
+      "revId": "9bf016e476980aab26d9da8211457ddb4d172fac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba2be162_3ca810db",
         "filename": "playbooks/tox-post.yaml",
         "patchSetId": 23
