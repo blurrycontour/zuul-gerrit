@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9a30ddce_67c1d22e",
+        "filename": "playbooks/roles/run-tox/defaults/main.yaml",
+        "patchSetId": 23
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-06T21:35:47Z",
+      "side": 1,
+      "message": "Sorry, missed the comment. Yes, this is a typo and should be envlist, not eventlist.\n\nI can make the appropriate changes.",
+      "parentUuid": "9a30ddce_679c726a",
+      "revId": "9bf016e476980aab26d9da8211457ddb4d172fac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba2be162_3ca810db",
         "filename": "playbooks/tox-post.yaml",
         "patchSetId": 23
