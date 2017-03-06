@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "ba2be162_b24bfd5e",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1004,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-06T18:53:47Z",
+      "side": 1,
+      "message": "I think rewording in the manner you suggest is a good idea.",
+      "revId": "59b2522389b34523afe41f62c21eca6c7b24cee2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba2be162_43ccd9ba",
         "filename": "zuul/model.py",
         "patchSetId": 5
