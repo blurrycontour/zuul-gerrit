@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a30ddce_7baa4772",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-06T23:50:20Z",
+      "side": 1,
+      "message": "Why do we need extra waits?",
+      "range": {
+        "startLine": 254,
+        "startChar": 13,
+        "endLine": 254,
+        "endChar": 29
+      },
+      "revId": "f59f3cfa8af6fadc0d320b0925f12144df6cba3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
