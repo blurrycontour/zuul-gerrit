@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba2be162_d7330661",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-06T17:40:51Z",
+      "side": 1,
+      "message": "Removed in next PS.",
+      "revId": "f8d6ebe7a599f92417f426b3b0d3153a9c1b670b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
