@@ -1934,8 +1934,8 @@ class AnsibleZuulTestCase(ZuulTestCase):
 
 
 class ZuulDBTestCase(ZuulTestCase):
-    def setup_config(self, config_file='zuul-connections-same-gerrit.conf'):
-        super(ZuulDBTestCase, self).setup_config(config_file)
+    def setup_config(self):
+        super(ZuulDBTestCase, self).setup_config()
         for section_name in self.config.sections():
             con_match = re.match(r'^connection ([\'\"]?)(.*)(\1)$',
                                  section_name, re.I)
