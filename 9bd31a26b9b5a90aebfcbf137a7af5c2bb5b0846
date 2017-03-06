@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba2be162_17c3de8b",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-06T17:34:25Z",
+      "side": 1,
+      "message": "This is only used in tests, we should move it there.  I\u0027ll add a todo comment since I\u0027m updating this below.",
+      "revId": "9bd31a26b9b5a90aebfcbf137a7af5c2bb5b0846",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2be162_37c0e27c",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-06T17:34:25Z",
+      "side": 1,
+      "message": "We shouldn\u0027t add a skip.  I\u0027ll comment out the test fixture stanza that\u0027s causing us to skip this.",
+      "revId": "9bd31a26b9b5a90aebfcbf137a7af5c2bb5b0846",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
