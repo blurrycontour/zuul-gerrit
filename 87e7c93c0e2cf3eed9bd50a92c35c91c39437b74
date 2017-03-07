@@ -16,6 +16,24 @@
       "revId": "87e7c93c0e2cf3eed9bd50a92c35c91c39437b74",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a30ddce_e402ea3d",
+        "filename": "playbooks/roles/run-tox/tasks/main.yaml",
+        "patchSetId": 24
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-07T19:42:09Z",
+      "side": 1,
+      "message": "Ya, I\u0027ve fixed this in a follow up patch:\nI775fa00577856c3914266d23d32e9333b70e7db7\n\nI\u0027ve just created another role, and new playbook.  Long term, I think you are right, we\u0027d properly converge the 2 scripts.",
+      "parentUuid": "9a30ddce_44bc9605",
+      "revId": "87e7c93c0e2cf3eed9bd50a92c35c91c39437b74",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
