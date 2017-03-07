@@ -683,7 +683,7 @@ class Job(object):
             post_run=(),
             run=(),
             implied_run=(),
-            mutex=None,
+            semaphore=None,
             attempts=3,
             final=False,
             roles=frozenset(),
@@ -1218,7 +1218,7 @@ class QueueItem(object):
             return False
         return self.item_ahead.isHoldingFollowingChanges()
 
-    def _findJobsToRun(self, job_trees, mutex):
+    def _findJobsToRun(self, job_trees, semaphore):
         torun = []
         if self.item_ahead:
             # Only run jobs if any 'hold' jobs on the change ahead
@@ -1242,23 +1242,23 @@ class QueueItem(object):
                         # The nodes for this job are not ready, skip
                         # it for now.
                         continue
-                    if mutex.acquire(self, job):
-                        # If this job needs a mutex, either acquire it or make
-                        # sure that we have it before running the job.
+                    if semaphore.acquire(self, job):
+                        # If this job needs a semaphore, either acquire it or
+                        # make sure that we have it before running the job.
                         torun.append(job)
             # If there is no job, this is a null job tree, and we should
             # run all of its jobs.
             if result == 'SUCCESS' or not job:
-                torun.extend(self._findJobsToRun(tree.job_trees, mutex))
+                torun.extend(self._findJobsToRun(tree.job_trees, semaphore))
         return torun
 
-    def findJobsToRun(self, mutex):
+    def findJobsToRun(self, semaphore):
         if not self.live:
             return []
         tree = self.job_tree
         if not tree:
             return []
-        return self._findJobsToRun(tree.job_trees, mutex)
+        return self._findJobsToRun(tree.job_trees, semaphore)
 
     def _findJobsToRequest(self, job_trees):
         build_set = self.current_build_set
@@ -2041,6 +2041,7 @@ class UnparsedTenantConfig(object):
         self.project_templates = []
         self.projects = {}
         self.nodesets = []
+        self.semaphores = []
 
     def copy(self):
         r = UnparsedTenantConfig()
@@ -2059,6 +2060,7 @@ class UnparsedTenantConfig(object):
             for k, v in conf.projects.items():
                 self.projects.setdefault(k, []).extend(v)
             self.nodesets.extend(conf.nodesets)
+            self.semaphores.extend(conf.semaphores)
             return
 
         if not isinstance(conf, list):
@@ -2092,6 +2094,12 @@ class UnparsedTenantConfig(object):
                 self.pipelines.append(value)
             elif key == 'nodeset':
                 self.nodesets.append(value)
+            elif key == 'semaphore':
+                if source_context.trusted:
+                    self.semaphores.append(value)
+                else:
+                    raise Exception("Semaphores can only defined in "
+                                    "non-dynamic sources")
             else:
                 raise Exception("Configuration item `%s` not recognized "
                                 "(when parsing %s)" %
@@ -2114,6 +2122,7 @@ class Layout(object):
         # inherit from the reference definition.
         self.jobs = {'noop': [Job('noop')]}
         self.nodesets = {}
+        self.semaphores = {}
 
     def getJob(self, name):
         if name in self.jobs:
@@ -2146,6 +2155,11 @@ class Layout(object):
         if nodeset.name in self.nodesets:
             raise Exception("NodeSet %s already defined" % (nodeset.name,))
         self.nodesets[nodeset.name] = nodeset
+
+    def addSemaphore(self, semaphore):
+        if semaphore.name in self.semaphores:
+            raise Exception("Semaphore %s already defined" % (semaphore.name,))
+        self.semaphores[semaphore.name] = semaphore
 
     def addPipeline(self, pipeline):
         self.pipelines[pipeline.name] = pipeline
@@ -2197,6 +2211,12 @@ class Layout(object):
                 project_config.pipelines[item.pipeline.name].job_tree
             self._createJobTree(item.change, project_tree.job_trees, ret)
         return ret
+
+
+class Semaphore(object):
+    def __init__(self, name, max=1):
+        self.name = name
+        self.max = int(max)
 
 
 class Tenant(object):
