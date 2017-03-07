@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a30ddce_542b5feb",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 968,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-03-07T21:33:31Z",
+      "side": 1,
+      "message": "This sentence is a little bit hard to parse, I had to read it twice. Perhaps this:\n\n    When using semaphores the maximum value of each one can be specified in their respective config repositories.",
+      "revId": "9b0ae26cc716fc294f18816ef3b235874f12800c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
