@@ -201,8 +201,8 @@ class Cloner(object):
             if indicated_branch:
                 self.log.info("upstream repo is missing branch %s",
                               indicated_branch)
-            # FIXME should be origin HEAD branch which might not be 'master'
-            fallback_branch = 'master'
+            # Find origin HEAD branch, it might not be 'master'
+            fallback_branch = repo.createRepoObject().head.name
 
         if self.zuul_branch:
             fallback_zuul_ref = re.sub(self.zuul_branch, fallback_branch,
