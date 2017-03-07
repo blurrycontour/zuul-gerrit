@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a30ddce_943b17eb",
+        "filename": "tests/fixtures/zuul-sql-driver.conf",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-03-07T21:39:37Z",
+      "side": 1,
+      "message": "not a minus one, but I just want to point out that it is considered poor practice to use real tld\u0027s in unit tests. RFC2606 defines these:  .test, .example, .invalid, .localhost -- Since these are low-urgency changes, it would be nice to change these whenever we are touching tests.",
+      "revId": "66040728a792be6e53309f861de74661b055736e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a30ddce_b4401b58",
+        "filename": "zuul/driver/sql/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-03-07T21:39:37Z",
+      "side": 1,
+      "message": "Also not a minus one, but I wonder if we can we start doing py3k style imports in new code. I also wonder if there\u0027s a linter rule we can turn on for this. Anyway, this would be:\n\n    from zuul.driver.sql import sqlconnection\n    from zuul.driver.sql import sqlreporter",
+      "revId": "66040728a792be6e53309f861de74661b055736e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
