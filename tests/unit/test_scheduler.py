@@ -2188,58 +2188,64 @@ class TestScheduler(ZuulTestCase):
         self.sched.reconfigure(self.config)
         self.assertEqual(len(self.sched.layout.pipelines['gate'].queues), 1)
 
-    def test_mutex(self):
-        "Test job mutexes"
-        self.updateConfigLayout('layout-mutex')
+    def test_semaphore_one(self):
+        "Test semaphores with max=1 (mutex)"
+        self.updateConfigLayout('layout-semaphore')
         self.sched.reconfigure(self.config)
 
         self.executor_server.hold_jobs_in_build = True
+
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
-        self.assertFalse('test-mutex' in self.sched.mutex.mutexes)
+        self.assertFalse(('openstack', 'test-semaphore') in
+                         self.sched.semaphore.semaphores)
 
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
         self.assertEqual(len(self.builds), 3)
         self.assertEqual(self.builds[0].name, 'project-test1')
-        self.assertEqual(self.builds[1].name, 'mutex-one')
+        self.assertEqual(self.builds[1].name, 'semaphore-one-test1')
         self.assertEqual(self.builds[2].name, 'project-test1')
 
-        self.executor_server.release('mutex-one')
+        self.executor_server.release('semaphore-one-test1')
         self.waitUntilSettled()
 
         self.assertEqual(len(self.builds), 3)
         self.assertEqual(self.builds[0].name, 'project-test1')
         self.assertEqual(self.builds[1].name, 'project-test1')
-        self.assertEqual(self.builds[2].name, 'mutex-two')
-        self.assertTrue('test-mutex' in self.sched.mutex.mutexes)
+        self.assertEqual(self.builds[2].name, 'semaphore-one-test2')
+        self.assertTrue(('openstack', 'test-semaphore') in
+                        self.sched.semaphore.semaphores)
 
-        self.executor_server.release('mutex-two')
+        self.executor_server.release('semaphore-one-test2')
         self.waitUntilSettled()
 
         self.assertEqual(len(self.builds), 3)
         self.assertEqual(self.builds[0].name, 'project-test1')
         self.assertEqual(self.builds[1].name, 'project-test1')
-        self.assertEqual(self.builds[2].name, 'mutex-one')
-        self.assertTrue('test-mutex' in self.sched.mutex.mutexes)
+        self.assertEqual(self.builds[2].name, 'semaphore-one-test1')
+        self.assertTrue(('openstack', 'test-semaphore') in
+                        self.sched.semaphore.semaphores)
 
-        self.executor_server.release('mutex-one')
+        self.executor_server.release('semaphore-one-test1')
         self.waitUntilSettled()
 
         self.assertEqual(len(self.builds), 3)
         self.assertEqual(self.builds[0].name, 'project-test1')
         self.assertEqual(self.builds[1].name, 'project-test1')
-        self.assertEqual(self.builds[2].name, 'mutex-two')
-        self.assertTrue('test-mutex' in self.sched.mutex.mutexes)
+        self.assertEqual(self.builds[2].name, 'semaphore-one-test2')
+        self.assertTrue(('openstack', 'test-semaphore') in
+                        self.sched.semaphore.semaphores)
 
-        self.executor_server.release('mutex-two')
+        self.executor_server.release('semaphore-one-test2')
         self.waitUntilSettled()
 
         self.assertEqual(len(self.builds), 2)
         self.assertEqual(self.builds[0].name, 'project-test1')
         self.assertEqual(self.builds[1].name, 'project-test1')
-        self.assertFalse('test-mutex' in self.sched.mutex.mutexes)
+        self.assertFalse(('openstack', 'test-semaphore') in
+                         self.sched.semaphore.semaphores)
 
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
@@ -2249,11 +2255,93 @@ class TestScheduler(ZuulTestCase):
 
         self.assertEqual(A.reported, 1)
         self.assertEqual(B.reported, 1)
-        self.assertFalse('test-mutex' in self.sched.mutex.mutexes)
+        self.assertFalse(('openstack', 'test-semaphore') in
+                         self.sched.semaphore.semaphores)
 
-    def test_mutex_abandon(self):
-        "Test abandon with job mutexes"
-        self.updateConfigLayout('layout-mutex')
+    def test_semaphore_two(self):
+        "Test semaphores with max>1"
+        self.updateConfigLayout('layout-semaphore')
+        self.sched.reconfigure(self.config)
+
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
+        self.assertFalse(('openstack', 'test-semaphore-two') in
+                         self.sched.semaphore.semaphores)
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 4)
+        self.assertEqual(self.builds[0].name, 'project-test1')
+        self.assertEqual(self.builds[1].name, 'semaphore-two-test1')
+        self.assertEqual(self.builds[2].name, 'semaphore-two-test2')
+        self.assertEqual(self.builds[3].name, 'project-test1')
+        self.assertTrue(('openstack', 'test-semaphore-two') in
+                        self.sched.semaphore.semaphores)
+        self.assertEqual(len(self.sched.semaphore.semaphores.get(
+            ('openstack', 'test-semaphore-two'), [])), 2)
+
+        self.executor_server.release('semaphore-two-test1')
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 4)
+        self.assertEqual(self.builds[0].name, 'project-test1')
+        self.assertEqual(self.builds[1].name, 'semaphore-two-test2')
+        self.assertEqual(self.builds[2].name, 'project-test1')
+        self.assertEqual(self.builds[3].name, 'semaphore-two-test1')
+        self.assertTrue(('openstack', 'test-semaphore-two') in
+                        self.sched.semaphore.semaphores)
+        self.assertEqual(len(self.sched.semaphore.semaphores.get(
+            ('openstack', 'test-semaphore-two'), [])), 2)
+
+        self.executor_server.release('semaphore-two-test2')
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 4)
+        self.assertEqual(self.builds[0].name, 'project-test1')
+        self.assertEqual(self.builds[1].name, 'project-test1')
+        self.assertEqual(self.builds[2].name, 'semaphore-two-test1')
+        self.assertEqual(self.builds[3].name, 'semaphore-two-test2')
+        self.assertTrue(('openstack', 'test-semaphore-two') in
+                        self.sched.semaphore.semaphores)
+        self.assertEqual(len(self.sched.semaphore.semaphores.get(
+            ('openstack', 'test-semaphore-two'), [])), 2)
+
+        self.executor_server.release('semaphore-two-test1')
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 3)
+        self.assertEqual(self.builds[0].name, 'project-test1')
+        self.assertEqual(self.builds[1].name, 'project-test1')
+        self.assertEqual(self.builds[2].name, 'semaphore-two-test2')
+        self.assertTrue(('openstack', 'test-semaphore-two') in
+                        self.sched.semaphore.semaphores)
+        self.assertEqual(len(self.sched.semaphore.semaphores.get(
+            ('openstack', 'test-semaphore-two'), [])), 1)
+
+        self.executor_server.release('semaphore-two-test2')
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 2)
+        self.assertEqual(self.builds[0].name, 'project-test1')
+        self.assertEqual(self.builds[1].name, 'project-test1')
+        self.assertFalse(('openstack', 'test-semaphore-two') in
+                         self.sched.semaphore.semaphores)
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+
+        self.waitUntilSettled()
+        self.assertEqual(len(self.builds), 0)
+
+        self.assertEqual(A.reported, 1)
+        self.assertEqual(B.reported, 1)
+
+    def test_semaphore_abandon(self):
+        "Test abandon with job semaphores"
+        self.updateConfigLayout('layout-semaphore')
         self.sched.reconfigure(self.config)
 
         self.executor_server.hold_jobs_in_build = True
@@ -2262,12 +2350,14 @@ class TestScheduler(ZuulTestCase):
         check_pipeline = tenant.layout.pipelines['check']
 
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        self.assertFalse('test-mutex' in self.sched.mutex.mutexes)
+        self.assertFalse(('openstack', 'test-semaphore') in
+                         self.sched.semaphore.semaphores)
 
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
-        self.assertTrue('test-mutex' in self.sched.mutex.mutexes)
+        self.assertTrue(('openstack', 'test-semaphore') in
+                        self.sched.semaphore.semaphores)
 
         self.fake_gerrit.addEvent(A.getChangeAbandonedEvent())
         self.waitUntilSettled()
@@ -2276,29 +2366,32 @@ class TestScheduler(ZuulTestCase):
         items = check_pipeline.getAllItems()
         self.assertEqual(len(items), 0)
 
-        # The mutex should be released
-        self.assertFalse('test-mutex' in self.sched.mutex.mutexes)
+        # The semaphore should be released
+        self.assertFalse(('openstack', 'test-semaphore') in
+                         self.sched.semaphore.semaphores)
 
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
         self.waitUntilSettled()
 
-    def test_mutex_reconfigure(self):
-        "Test reconfigure with job mutexes"
-        self.updateConfigLayout('layout-mutex')
+    def test_semaphore_reconfigure(self):
+        "Test reconfigure with job semaphores"
+        self.updateConfigLayout('layout-semaphore')
         self.sched.reconfigure(self.config)
 
         self.executor_server.hold_jobs_in_build = True
 
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        self.assertFalse('test-mutex' in self.sched.mutex.mutexes)
+        self.assertFalse(('openstack', 'test-semaphore') in
+                         self.sched.semaphore.semaphores)
 
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
-        self.assertTrue('test-mutex' in self.sched.mutex.mutexes)
+        self.assertTrue(('openstack', 'test-semaphore') in
+                        self.sched.semaphore.semaphores)
 
-        self.updateConfigLayout('layout-mutex-reconfiguration')
+        self.updateConfigLayout('layout-semaphore-reconfiguration')
         self.sched.reconfigure(self.config)
         self.waitUntilSettled()
 
@@ -2308,8 +2401,9 @@ class TestScheduler(ZuulTestCase):
         # There should be no builds anymore
         self.assertEqual(len(self.builds), 0)
 
-        # The mutex should be released
-        self.assertFalse('test-mutex' in self.sched.mutex.mutexes)
+        # The semaphore should be released
+        self.assertFalse(('openstack', 'test-semaphore') in
+                         self.sched.semaphore.semaphores)
 
     def test_live_reconfiguration(self):
         "Test that live reconfiguration works"
