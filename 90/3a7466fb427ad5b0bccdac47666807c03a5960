@@ -1,0 +1,13 @@
+Verified+1: Zuul
+Code-Review+2: David Shrewsbury <shrewsbury.dave@gmail.com>
+Code-Review+2: Paul Belanger <pabelanger@redhat.com>
+Code-Review+1: Mike Perez <thingee@gmail.com>
+Code-Review+1: Clint 'SpamapS' Byrum <clint@fewbar.com>
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Workflow+1: Monty Taylor <mordred@inaugust.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Tue, 07 Mar 2017 22:23:55 +0000
+Reviewed-on: https://review.openstack.org/442638
+Project: openstack-infra/zuul
+Branch: refs/heads/feature/zuulv3
