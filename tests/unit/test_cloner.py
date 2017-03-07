@@ -20,6 +20,11 @@ import os
 import shutil
 import time
 
+try:
+    from unittest import mock
+except ImportError:
+    import mock
+
 import git
 
 import zuul.lib.cloner
@@ -749,4 +754,56 @@ class TestCloner(ZuulTestCase):
                               str(work[project].commit('HEAD')),
                               'Project %s commit for build %s should '
                               'be correct' % (project, 0))
+        shutil.rmtree(self.workspace_root)
+
+    @mock.patch('zuul.merger.merger.Repo.checkout')
+    def test_fallback_branch(self, mock_checkout):
+        projects = ["org/project1"]
+
+        cloner = zuul.lib.cloner.Cloner(
+            git_base_url=self.upstream_root,
+            projects=projects,
+            workspace=self.workspace_root,
+            branch='foo',
+            zuul_project=None,
+            zuul_branch=None,
+            zuul_ref='HEAD',
+            zuul_newrev=None,
+            zuul_url=self.git_root,
+        )
+        cloner.execute()
+        # We asked for non-existing branch 'foo', master will be cloned
+        expected = [mock.call('remotes/origin/master')]
+        self.assertEqual(mock_checkout.call_count, 1)
+        self.assertEqual(mock_checkout.call_args_list, expected)
+        shutil.rmtree(self.workspace_root)
+
+    @mock.patch('zuul.merger.merger.Repo.checkout')
+    def test_fallback_branch_nonmaster(self, mock_checkout):
+        self.init_repo('org/nonmaster')
+        projects = ['org/nonmaster']
+        # Remove the master branch, create a new default branch
+        repo = git.Repo(os.path.join(self.upstream_root, projects[0]))
+        new_master = repo.create_head('non-master')
+        repo.head.reference = new_master
+        zuul.merger.merger.reset_repo_to_head(repo)
+        repo.git.clean('-x', '-f', '-d')
+        repo.delete_head('master')
+
+        cloner = zuul.lib.cloner.Cloner(
+            git_base_url=self.upstream_root,
+            projects=projects,
+            workspace=self.workspace_root,
+            branch='foo',
+            zuul_project=None,
+            zuul_branch=None,
+            zuul_ref='HEAD',
+            zuul_newrev=None,
+            zuul_url=self.git_root,
+        )
+        cloner.execute()
+        # We asked for non-existing branch 'foo', non-master will be cloned
+        expected = [mock.call('remotes/origin/non-master')]
+        self.assertEqual(mock_checkout.call_count, 1)
+        self.assertEqual(mock_checkout.call_args_list, expected)
         shutil.rmtree(self.workspace_root)
