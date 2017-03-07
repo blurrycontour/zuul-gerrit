@@ -131,10 +131,10 @@ jobs:
       - '.*-requires'
   - name: project1-project2-integration
     queue-name: integration
-  - name: mutex-one
-    mutex: test-mutex
-  - name: mutex-two
-    mutex: test-mutex
+  - name: semaphore-one
+    semaphore: test-semaphore
+  - name: semaphore-two
+    semaphore: test-semaphore
   - name: project1-merge
     tags:
       - project1

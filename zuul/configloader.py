@@ -147,7 +147,7 @@ class JobParser(object):
                'success-url': str,
                'hold-following-changes': bool,
                'voting': bool,
-               'mutex': str,
+               'semaphore': str,
                'tags': to_list(str),
                'branches': to_list(str),
                'files': to_list(str),
@@ -172,7 +172,7 @@ class JobParser(object):
         'workspace',
         'voting',
         'hold-following-changes',
-        'mutex',
+        'semaphore',
         'attempts',
         'failure-message',
         'success-message',
@@ -618,6 +618,23 @@ class PipelineParser(object):
         return pipeline
 
 
+class SemaphoreParser(object):
+    @staticmethod
+    def getSchema():
+        semaphore = {vs.Required('name'): str,
+                     'max': int,
+                     '_source_context': model.SourceContext,
+                     }
+
+        return vs.Schema(semaphore)
+
+    @staticmethod
+    def fromYaml(conf):
+        SemaphoreParser.getSchema()(conf)
+        semaphore = model.Semaphore(conf['name'], conf.get('max', 1))
+        return semaphore
+
+
 class TenantParser(object):
     log = logging.getLogger("zuul.TenantParser")
 
@@ -808,6 +825,9 @@ class TenantParser(object):
 
         for config_job in data.jobs:
             layout.addJob(JobParser.fromYaml(tenant, layout, config_job))
+
+        for config_semaphore in data.semaphores:
+            layout.addSemaphore(SemaphoreParser.fromYaml(config_semaphore))
 
         for config_template in data.project_templates:
             layout.addProjectTemplate(ProjectTemplateParser.fromYaml(
