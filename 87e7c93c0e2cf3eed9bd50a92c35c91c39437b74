@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a30ddce_44bc9605",
+        "filename": "playbooks/roles/run-tox/tasks/main.yaml",
+        "patchSetId": 24
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2017-03-07T19:32:24Z",
+      "side": 1,
+      "message": "so one thing is that the coverage jobs don\u0027t run this script, but run \"run-cover.sh\", even though it then calls onto tox.  \n\nseems you could either parameterise the script to run, or make a whole separate task, but at the expense of some generality in the jobs",
+      "revId": "87e7c93c0e2cf3eed9bd50a92c35c91c39437b74",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
