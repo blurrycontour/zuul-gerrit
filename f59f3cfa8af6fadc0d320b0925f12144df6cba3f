@@ -22,6 +22,23 @@
       "revId": "f59f3cfa8af6fadc0d320b0925f12144df6cba3f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a30ddce_76009eab",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-07T00:21:27Z",
+      "side": 1,
+      "message": "Oh, I believe because the new ansible launcher is able to \"start\" a fake build more nondeterministically than the old fake jenkins (which would finish builds non-deterministically, but I think generally started them in the order submitted).  This change seemed to alter the timing (or test order) enough for this to be noticeable.  Sorry I didn\u0027t call that out in the commit message.",
+      "revId": "f59f3cfa8af6fadc0d320b0925f12144df6cba3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
