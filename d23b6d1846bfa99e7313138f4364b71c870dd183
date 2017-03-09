@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "9a30ddce_b34b6c86",
+        "filename": "zuul/source/gerrit.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 283,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-09T23:55:04Z",
+      "side": 1,
+      "message": "This is a git commit dependency.",
+      "revId": "d23b6d1846bfa99e7313138f4364b71c870dd183",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a30ddce_d7152d49",
         "filename": "zuul/source/gerrit.py",
         "patchSetId": 3
@@ -13,6 +30,23 @@
       "writtenOn": "2017-03-09T23:37:07Z",
       "side": 1,
       "message": "I\u0027m not sure about doing it in this section. If this section is a patch is based on another patch.\n\nI kind of think that this should only be for the case of a \"Depends-On:\" line.",
+      "revId": "d23b6d1846bfa99e7313138f4364b71c870dd183",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a30ddce_d350e034",
+        "filename": "zuul/source/gerrit.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-09T23:55:04Z",
+      "side": 1,
+      "message": "This section is \"Depends-On:\" commit message header.  But I agree with your point; we should probably not change the logic there.",
       "revId": "d23b6d1846bfa99e7313138f4364b71c870dd183",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
