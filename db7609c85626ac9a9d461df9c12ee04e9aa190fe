@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a30ddce_7c14669f",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1043,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-09T22:39:21Z",
+      "side": 1,
+      "message": "This should not be necessary.  The Gerrit connection should be setting this value.  I suspect this may have been added to make the tests happy.  I think the solution there is to enhance the fake gerrit used in tests to report the correct value.",
+      "revId": "db7609c85626ac9a9d461df9c12ee04e9aa190fe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
