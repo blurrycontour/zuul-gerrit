@@ -16,6 +16,24 @@
       "revId": "db7609c85626ac9a9d461df9c12ee04e9aa190fe",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a30ddce_f7d31102",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1043,
+      "author": {
+        "id": 14760
+      },
+      "writtenOn": "2017-03-09T23:04:52Z",
+      "side": 1,
+      "message": "I think just need to use the \u0027status\u0027 argument in the call to create change. Will test.",
+      "parentUuid": "9a30ddce_7c14669f",
+      "revId": "db7609c85626ac9a9d461df9c12ee04e9aa190fe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
