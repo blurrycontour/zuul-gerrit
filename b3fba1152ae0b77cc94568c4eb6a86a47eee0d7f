@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a30ddce_c6e84ee5",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 651,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-09T04:24:36Z",
+      "side": 1,
+      "message": "(nit) the semaphore",
+      "range": {
+        "startLine": 651,
+        "startChar": 28,
+        "endLine": 651,
+        "endChar": 32
+      },
+      "revId": "b3fba1152ae0b77cc94568c4eb6a86a47eee0d7f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
