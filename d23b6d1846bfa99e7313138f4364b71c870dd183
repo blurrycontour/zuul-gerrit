@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a30ddce_d7152d49",
+        "filename": "zuul/source/gerrit.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 14760
+      },
+      "writtenOn": "2017-03-09T23:37:07Z",
+      "side": 1,
+      "message": "I\u0027m not sure about doing it in this section. If this section is a patch is based on another patch.\n\nI kind of think that this should only be for the case of a \"Depends-On:\" line.",
+      "revId": "d23b6d1846bfa99e7313138f4364b71c870dd183",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
