@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a30ddce_1da34801",
+        "filename": "tests/fixtures/config/dependency-graph/git/common-config/zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-03-10T14:56:51Z",
+      "side": 0,
+      "message": "We should edit the generated patch and replace this comment.",
+      "revId": "73c3446aff7547802bfb8d612b71b0f5037d268e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a30ddce_bde23c2d",
+        "filename": "tests/fixtures/config/openstack/git/project-config/zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-03-10T14:56:51Z",
+      "side": 0,
+      "message": "same",
+      "revId": "73c3446aff7547802bfb8d612b71b0f5037d268e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a30ddce_fdd6744d",
+        "filename": "tests/fixtures/config/openstack/git/project-config/zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-03-10T14:56:51Z",
+      "side": 0,
+      "message": "same",
+      "revId": "73c3446aff7547802bfb8d612b71b0f5037d268e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a30ddce_1dc8a8a7",
+        "filename": "tests/fixtures/config/openstack/git/project-config/zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-03-10T14:56:51Z",
+      "side": 0,
+      "message": "same",
+      "revId": "73c3446aff7547802bfb8d612b71b0f5037d268e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a30ddce_fd3d948f",
+        "filename": "tests/fixtures/config/single-tenant/git/layout-footer-message/zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-03-10T14:56:51Z",
+      "side": 0,
+      "message": "same",
+      "revId": "73c3446aff7547802bfb8d612b71b0f5037d268e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a30ddce_fd64b4b9",
+        "filename": "tests/fixtures/config/single-tenant/git/layout-no-timer/zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-03-10T14:56:51Z",
+      "side": 0,
+      "message": "same",
+      "revId": "73c3446aff7547802bfb8d612b71b0f5037d268e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
