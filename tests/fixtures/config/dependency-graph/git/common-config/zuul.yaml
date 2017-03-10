@@ -2,8 +2,7 @@
     name: gate
     manager: dependent
     success-message: Build succeeded (gate).
-    source:
-      gerrit
+    source: gerrit
     trigger:
       gerrit:
         - event: comment-added
@@ -46,17 +45,6 @@
     name: org/project
     gate:
       jobs:
-        # Job dependencies, starting with A
-        #     A
-        #    / \
-        #   B   C
-        #  / \ / \
-        # D   F   E
-        #     |
-        #     G
-        # This is intentionally not listed in the natural order to
-        # ensure that we can reference dependencies before they are
-        # defined.
         - E:
             dependencies: C
         - A
@@ -65,7 +53,9 @@
         - C:
             dependencies: A
         - F:
-            dependencies: [B, C]
+            dependencies:
+              - B
+              - C
         - D:
             dependencies: B
         - G:
