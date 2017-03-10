@@ -2,6 +2,52 @@
   "comments": [
     {
       "key": {
+        "uuid": "9a30ddce_df09ba85",
+        "filename": "playbooks/roles/run-tox/defaults/main.yaml",
+        "patchSetId": 25
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-03-10T06:15:56Z",
+      "side": 1,
+      "message": "What\u0027s the meaning of this comment?",
+      "range": {
+        "startLine": 2,
+        "startChar": 2,
+        "endLine": 2,
+        "endChar": 19
+      },
+      "revId": "a9f010903791d8ebc187f0119c9ba1cec8d12a5c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a30ddce_df329a5d",
+        "filename": "playbooks/roles/run-tox/defaults/main.yaml",
+        "patchSetId": 25
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-03-10T06:15:56Z",
+      "side": 1,
+      "message": "Should there be a default? If the user adds a further variant forgetting to set this variable it wil silently run the wrong tox envs. It could be considered to define this like this:\n\n  run_tox_envlist: \"{{ run_tox_envlist_must_be_given }}\"\n\nThat would cause an execution error (assuming that \u0027run_tox_envlist_must_be_given\u0027 doesn\u0027t exist) in this case when running the playbook. That way there would be no silent wrong behavior.",
+      "range": {
+        "startLine": 3,
+        "startChar": 17,
+        "endLine": 3,
+        "endChar": 21
+      },
+      "revId": "a9f010903791d8ebc187f0119c9ba1cec8d12a5c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a30ddce_7f71ae43",
         "filename": "playbooks/tox-cover.yaml",
         "patchSetId": 25
