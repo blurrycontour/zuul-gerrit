@@ -113,6 +113,30 @@
     },
     {
       "key": {
+        "uuid": "9a30ddce_48725b12",
+        "filename": "playbooks/roles/run-tox/defaults/main.yaml",
+        "patchSetId": 25
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-10T16:59:39Z",
+      "side": 1,
+      "message": "actually, I am incorrect. The mandatory filter is the default, which causes ansible to raise an exception.\n\nHowever, as we build up roles, I think we\u0027ll have to set some sane default and / or validate the required variables are set properly.\n\nSomething like\n\n  - fail: msg\u003d\"Variable \u0027{{ item }}\u0027 is not defined\" \n    when: foo is None",
+      "parentUuid": "9a30ddce_281a8717",
+      "range": {
+        "startLine": 3,
+        "startChar": 17,
+        "endLine": 3,
+        "endChar": 21
+      },
+      "revId": "a9f010903791d8ebc187f0119c9ba1cec8d12a5c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a30ddce_7f71ae43",
         "filename": "playbooks/tox-cover.yaml",
         "patchSetId": 25
