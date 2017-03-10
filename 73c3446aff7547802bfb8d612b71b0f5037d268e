@@ -36,6 +36,23 @@
     },
     {
       "key": {
+        "uuid": "9a30ddce_9ffd6b70",
+        "filename": "tests/fixtures/config/openstack/git/project-config/zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-10T16:01:20Z",
+      "side": 0,
+      "message": "I think we can probably let these drop now.",
+      "revId": "73c3446aff7547802bfb8d612b71b0f5037d268e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a30ddce_fdd6744d",
         "filename": "tests/fixtures/config/openstack/git/project-config/zuul.yaml",
         "patchSetId": 1
