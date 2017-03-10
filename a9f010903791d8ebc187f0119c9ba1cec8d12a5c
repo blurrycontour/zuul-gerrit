@@ -49,6 +49,23 @@
     },
     {
       "key": {
+        "uuid": "9a30ddce_c8372b4b",
+        "filename": "playbooks/roles/run-tox/defaults/main.yaml",
+        "patchSetId": 25
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-10T16:58:29Z",
+      "side": 1,
+      "message": "I guess I still don\u0027t understand it.  It doesn\u0027t reference a file that exists.  I\u0027m fairly certain that if we leave this here, we will end up with hundreds of playbooks with this line copy/pasted into them, regardless of whether it is accurate.  My preference would be to remove this -- grep is a pretty good way of finding usage of variables.",
+      "revId": "a9f010903791d8ebc187f0119c9ba1cec8d12a5c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a30ddce_df329a5d",
         "filename": "playbooks/roles/run-tox/defaults/main.yaml",
         "patchSetId": 25
