@@ -2,8 +2,7 @@
     name: gate
     manager: dependent
     success-message: Build succeeded (gate).
-    source:
-      gerrit
+    source: gerrit
     trigger:
       gerrit:
         - event: comment-added
@@ -65,7 +64,9 @@
         - C:
             dependencies: A
         - F:
-            dependencies: [B, C]
+            dependencies:
+              - B
+              - C
         - D:
             dependencies: B
         - G:
