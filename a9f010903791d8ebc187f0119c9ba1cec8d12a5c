@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a30ddce_7f71ae43",
+        "filename": "playbooks/tox-cover.yaml",
+        "patchSetId": 25
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-03-10T06:06:30Z",
+      "side": 1,
+      "message": "Why not \u0027all\u0027 here? With \u0027all\u0027 it would be possible to alter the job in the project config to run on other nodes as well.",
+      "range": {
+        "startLine": 1,
+        "startChar": 9,
+        "endLine": 1,
+        "endChar": 22
+      },
+      "revId": "a9f010903791d8ebc187f0119c9ba1cec8d12a5c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a30ddce_3fa2d699",
+        "filename": "playbooks/tox-cover.yaml",
+        "patchSetId": 25
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-03-10T06:06:30Z",
+      "side": 1,
+      "message": "will \u0027run-binder\u0027 be executed in every box too-* playbook? If yes it possibly could be moved to the tox-pre playbook.",
+      "range": {
+        "startLine": 5,
+        "startChar": 6,
+        "endLine": 5,
+        "endChar": 16
+      },
+      "revId": "a9f010903791d8ebc187f0119c9ba1cec8d12a5c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
