@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9a30ddce_6829df89",
+        "filename": "playbooks/roles/run-tox/defaults/main.yaml",
+        "patchSetId": 25
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-10T16:52:34Z",
+      "side": 1,
+      "message": "Personal preference, it helps me know where the variables are used in the role.",
+      "parentUuid": "9a30ddce_df09ba85",
+      "range": {
+        "startLine": 2,
+        "startChar": 2,
+        "endLine": 2,
+        "endChar": 19
+      },
+      "revId": "a9f010903791d8ebc187f0119c9ba1cec8d12a5c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a30ddce_df329a5d",
         "filename": "playbooks/roles/run-tox/defaults/main.yaml",
         "patchSetId": 25
@@ -36,6 +60,30 @@
       "writtenOn": "2017-03-10T06:15:56Z",
       "side": 1,
       "message": "Should there be a default? If the user adds a further variant forgetting to set this variable it wil silently run the wrong tox envs. It could be considered to define this like this:\n\n  run_tox_envlist: \"{{ run_tox_envlist_must_be_given }}\"\n\nThat would cause an execution error (assuming that \u0027run_tox_envlist_must_be_given\u0027 doesn\u0027t exist) in this case when running the playbook. That way there would be no silent wrong behavior.",
+      "range": {
+        "startLine": 3,
+        "startChar": 17,
+        "endLine": 3,
+        "endChar": 21
+      },
+      "revId": "a9f010903791d8ebc187f0119c9ba1cec8d12a5c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a30ddce_281a8717",
+        "filename": "playbooks/roles/run-tox/defaults/main.yaml",
+        "patchSetId": 25
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-10T16:52:34Z",
+      "side": 1,
+      "message": "I don\u0027t know it should be the default, but I think we should have some sort of default.  Only because our current run-tox.sh scripts doesn\u0027t provide a sane option.\n\nHowever, what we could do is use the mandatory jinja2 filter, which causes ansible to raise an exception if missing.",
+      "parentUuid": "9a30ddce_df329a5d",
       "range": {
         "startLine": 3,
         "startChar": 17,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "9a30ddce_8550be33",
+        "filename": "playbooks/tox-cover.yaml",
+        "patchSetId": 25
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-10T16:52:34Z",
+      "side": 1,
+      "message": "Agree, I defaulted here for 2 reasons.  1, we only have ubuntu-xenial nodes. But more specifically, using all doesn\u0027t actually capture logs in zuul_stream, I think we have a bug in our callback plugin.",
+      "parentUuid": "9a30ddce_7f71ae43",
+      "range": {
+        "startLine": 1,
+        "startChar": 9,
+        "endLine": 1,
+        "endChar": 22
+      },
+      "revId": "a9f010903791d8ebc187f0119c9ba1cec8d12a5c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a30ddce_3fa2d699",
         "filename": "playbooks/tox-cover.yaml",
         "patchSetId": 25
@@ -82,6 +154,30 @@
       "writtenOn": "2017-03-10T06:06:30Z",
       "side": 1,
       "message": "will \u0027run-binder\u0027 be executed in every box too-* playbook? If yes it possibly could be moved to the tox-pre playbook.",
+      "range": {
+        "startLine": 5,
+        "startChar": 6,
+        "endLine": 5,
+        "endChar": 16
+      },
+      "revId": "a9f010903791d8ebc187f0119c9ba1cec8d12a5c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a30ddce_25063220",
+        "filename": "playbooks/tox-cover.yaml",
+        "patchSetId": 25
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-10T16:52:34Z",
+      "side": 1,
+      "message": "My concern about moving it into a pre playbook, there is no way to opt out of bindep.   And since all our projects have not embraced it yet, I see some issues.\n\nBut eventually, we want it it pre playbook.",
+      "parentUuid": "9a30ddce_3fa2d699",
       "range": {
         "startLine": 5,
         "startChar": 6,
