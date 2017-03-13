@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a25e98e_f0080d2b",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-13T21:21:25Z",
+      "side": 1,
+      "message": "All zuul yaml keys should use \u0027-\u0027 rather than \u0027_\u0027.\n\nHowever, I\u0027m not sure we want to put this here.  Since we know we need one for every repo, it seems safe to just assume they are in the correct location on disk, and let the admin handle key management outside of zuul.yaml files.",
+      "revId": "850a9f6bfb233c285af90ecf71752bb95c9b82d3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a25e98e_100e8934",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-13T21:21:25Z",
+      "side": 1,
+      "message": "We should find another way of getting the state dir to this code so we don\u0027t duplicate the config file search.",
+      "revId": "850a9f6bfb233c285af90ecf71752bb95c9b82d3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
