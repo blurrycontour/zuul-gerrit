@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "3a1ff146_793c0130",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-14T20:27:20Z",
+      "side": 1,
+      "message": "Nope.",
+      "revId": "6c724fb33a8b5db4a5eef341d307d99ba6f7b6de",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a22e58a_454e8ac2",
         "filename": "zuul/scheduler.py",
         "patchSetId": 9
@@ -42,6 +59,23 @@
         "endLine": 463,
         "endChar": 29
       },
+      "revId": "6c724fb33a8b5db4a5eef341d307d99ba6f7b6de",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a1ff146_593f4525",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 463,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-14T20:27:20Z",
+      "side": 1,
+      "message": "Zuul is *generally* a single-thread app, with lots of helper threads.  There are many cases where we rely on the single-threaded nature.  This is one of them -- we know this is only called from the scheduler main event loop.",
       "revId": "6c724fb33a8b5db4a5eef341d307d99ba6f7b6de",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
