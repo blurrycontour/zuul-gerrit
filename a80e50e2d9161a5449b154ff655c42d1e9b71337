@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a1ff146_9c4b6b59",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 455,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-14T20:44:20Z",
+      "side": 1,
+      "message": "Looking at the zuulv3 spec, it references:\n\n  /var/lib/zuul/keys/\u003csource name\u003e/\u003crepo name\u003e.pem\n  /var/lib/zuul/keys/\u003csource name\u003e/\u003crepo name\u003e.key (assumed)\n\nBut our code appears to be a little different.",
+      "revId": "a80e50e2d9161a5449b154ff655c42d1e9b71337",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
