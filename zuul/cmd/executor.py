@@ -68,6 +68,13 @@ class Executor(zuul.cmd.ZuulApp):
         s.connect(path)
         s.sendall('%s\n' % cmd)
 
+    def reconfigure_handler(self, signum, frame):
+        signal.signal(signal.SIGHUP, signal.SIG_IGN)
+        self.log.debug("Reconfiguration triggered")
+        self.read_config()
+        self.setup_logging('executor', 'log_config')
+        signal.signal(signal.SIGHUP, self.reconfigure_handler)
+
     def exit_handler(self):
         self.executor.stop()
         self.executor.join()
@@ -84,6 +91,7 @@ class Executor(zuul.cmd.ZuulApp):
                                        keep_jobdir=self.args.keep_jobdir)
         self.executor.start()
 
+        signal.signal(signal.SIGHUP, self.reconfigure_handler)
         signal.signal(signal.SIGUSR2, zuul.cmd.stack_dump_handler)
         if daemon:
             self.executor.join()
