@@ -521,8 +521,9 @@ class Secret(object):
 
     """
 
-    def __init__(self, name):
+    def __init__(self, name, source_context):
         self.name = name
+        self.source_context = source_context
         self.data = {}
 
     def __ne__(self, other):
@@ -532,6 +533,7 @@ class Secret(object):
         if not isinstance(other, Secret):
             return False
         return (self.name == other.name and
+                self.source_context == other.source_context and
                 self.data == other.data)
 
     def __repr__(self):
@@ -667,6 +669,28 @@ class ZuulRole(Role):
         return d
 
 
+class AuthContext(object):
+    """The authentication information for a job.
+
+    Authentication information (both the actual data and metadata such
+    as whether it should be inherited) for a job is grouped together
+    in this object.
+    """
+
+    def __init__(self, inherit=False):
+        self.inherit = inherit
+        self.secrets = []
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __eq__(self, other):
+        if not isinstance(other, AuthContext):
+            return False
+        return (self.inherit == other.inherit and
+                self.secrets == other.secrets)
+
+
 class Job(object):
 
     """A Job represents the defintion of actions to perform.
@@ -708,7 +732,7 @@ class Job(object):
             timeout=None,
             variables={},
             nodeset=NodeSet(),
-            auth={},
+            auth=None,
             workspace=None,
             pre_run=(),
             post_run=(),
@@ -798,7 +822,7 @@ class Job(object):
             raise Exception("Job unable to inherit from %s" % (other,))
 
         do_not_inherit = set()
-        if other.auth and not other.auth.get('inherit'):
+        if other.auth and not other.auth.inherit:
             do_not_inherit.add('auth')
 
         # copy all attributes
@@ -2241,7 +2265,7 @@ class Layout(object):
             # If the job does not allow auth inheritance, do not allow
             # the project-pipeline variant to update its execution
             # attributes.
-            if frozen_job.auth and not frozen_job.auth.get('inherit'):
+            if frozen_job.auth and not frozen_job.auth.inherit:
                 frozen_job.final = True
             frozen_job.applyVariant(job)
             frozen_tree = JobTree(frozen_job)
