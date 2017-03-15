@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a1ff146_fada7877",
+        "filename": "tests/fixtures/zuul-sql-driver.conf",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-15T16:28:50Z",
+      "side": 1,
+      "message": "this can be removed",
+      "revId": "312b06dbdfc9473423eba01b7fa0333ec7c0d70c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
