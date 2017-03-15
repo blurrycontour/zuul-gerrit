@@ -24,6 +24,8 @@ import voluptuous as vs
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives import hashes
 from zuul import model
 import zuul.manager.dependent
 import zuul.manager.independent
@@ -130,11 +132,31 @@ class EncryptedPKCS1(yaml.YAMLObject):
     yaml_loader = yaml.SafeLoader
 
     def __init__(self, data):
-        self.data = data
+        self.data = data.decode('base64')
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __eq__(self, other):
+        if not isinstance(other, EncryptedPKCS1):
+            return False
+        return (self.data == other.data)
 
     @classmethod
     def from_yaml(cls, loader, node):
         return cls(node.value)
+
+    def decrypt(self, private_key):
+        # https://cryptography.io/en/latest/hazmat/primitives/asymmetric/rsa/#decryption
+        plaintext = private_key.decrypt(
+            self.data,
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA1()),
+                algorithm=hashes.SHA1(),
+                label=None
+            )
+        )
+        return plaintext
 
 
 class NodeSetParser(object):
@@ -180,7 +202,7 @@ class SecretParser(object):
     def fromYaml(layout, conf):
         with configuration_exceptions('secret', conf):
             SecretParser.getSchema()(conf)
-        s = model.Secret(conf['name'])
+        s = model.Secret(conf['name'], conf['_source_context'])
         s.data = conf['data']
         return s
 
@@ -264,15 +286,15 @@ class JobParser(object):
             if 'inherit' in conf['auth']:
                 job.auth.inherit = conf['auth']['inherit']
 
-            for conf_secret in conf['auth'].get('secrets', []):
-                secret_name = conf_secret['name']
+            for secret_name in conf['auth'].get('secrets', []):
                 secret = layout.secrets[secret_name]
                 if secret.source_context != job.source_context:
                     raise Exception(
                         "Unable to use secret %s.  Secrets must be "
                         "defined in the same project in which they "
                         "are used" % secret_name)
-                job.auth.secrets.append(secret)
+                job.auth.secrets.append(secret.decrypt(
+                    job.source_context.project.private_key))
 
         if 'parent' in conf:
             parent = layout.getJob(conf['parent'])

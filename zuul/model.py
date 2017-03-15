@@ -521,8 +521,9 @@ class Secret(object):
 
     """
 
-    def __init__(self, name):
+    def __init__(self, name, source_context):
         self.name = name
+        self.source_context = source_context
         self.data = {}
 
     def __ne__(self, other):
@@ -532,10 +533,25 @@ class Secret(object):
         if not isinstance(other, Secret):
             return False
         return (self.name == other.name and
+                self.source_context == other.source_context and
                 self.data == other.data)
 
     def __repr__(self):
         return '<Secret %s>' % (self.name,)
+
+    def decrypt(self, private_key):
+        """Return a copy of this secret with any encrypted data decrypted.
+        Note that the original remains encrypted."""
+
+        r = copy.deepcopy(self)
+        rdata = {}
+        for k, v in r.data.items():
+            if hasattr(v, 'decrypt'):
+                rdata[k] = v.decrypt(private_key)
+            else:
+                rdata[k] = v
+        r.data = rdata
+        return r
 
 
 class SourceContext(object):
@@ -677,7 +693,7 @@ class AuthContext(object):
 
     def __init__(self, inherit=False):
         self.inherit = inherit
-        self.secrets = {}
+        self.secrets = []
 
 
 class Job(object):
