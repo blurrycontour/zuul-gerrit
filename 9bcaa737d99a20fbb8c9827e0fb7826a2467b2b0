@@ -48,6 +48,23 @@
     },
     {
       "key": {
+        "uuid": "3a1ff146_014e0096",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-15T21:16:59Z",
+      "side": 1,
+      "message": "We allow both kinds of data here, but later on, we\u0027re going to want to decrypt the encrypted bit.",
+      "revId": "9bcaa737d99a20fbb8c9827e0fb7826a2467b2b0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a1ff146_8178302d",
         "filename": "zuul/model.py",
         "patchSetId": 3
@@ -59,6 +76,23 @@
       "writtenOn": "2017-03-15T21:08:19Z",
       "side": 1,
       "message": "Since data is a dict won\u0027t this end up comparing if we point to the same pkcs object? rather than comparing contents? I think you can make a __eq__ method on the pkcs object to deal with this.",
+      "revId": "9bcaa737d99a20fbb8c9827e0fb7826a2467b2b0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a1ff146_e14ac482",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 535,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-15T21:16:59Z",
+      "side": 1,
+      "message": "Yep.",
       "revId": "9bcaa737d99a20fbb8c9827e0fb7826a2467b2b0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
