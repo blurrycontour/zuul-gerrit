@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a1ff146_10b67a8a",
+        "filename": "playbooks/tox-cover.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-15T00:00:54Z",
+      "side": 1,
+      "message": "Didn\u0027t we decide to keep this as \u0027all\u0027 to make other distros easier?",
+      "range": {
+        "startLine": 1,
+        "startChar": 8,
+        "endLine": 1,
+        "endChar": 22
+      },
+      "revId": "9bca37ebdb060278a958bc02a2e33cdcada70c6d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
