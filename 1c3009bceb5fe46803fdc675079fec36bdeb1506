@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a1ff146_f0671e23",
+        "filename": "playbooks/tox-docs.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-15T00:01:44Z",
+      "side": 1,
+      "message": "Use \u0027all\u0027 for consistency?",
+      "range": {
+        "startLine": 1,
+        "startChar": 9,
+        "endLine": 1,
+        "endChar": 22
+      },
+      "revId": "1c3009bceb5fe46803fdc675079fec36bdeb1506",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
