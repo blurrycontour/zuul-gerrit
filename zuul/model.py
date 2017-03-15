@@ -515,6 +515,32 @@ class NodeRequest(object):
         self.state_time = data['state_time']
 
 
+class Secret(object):
+    """A collection of private data.
+
+    In configuration, Secrets are collections of private data in
+    key-value pair format.  They are defined as top-level
+    configuration objects and then referenced by Jobs.
+
+    """
+
+    def __init__(self, name):
+        self.name = name
+        self.data = {}
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __eq__(self, other):
+        if not isinstance(other, Secret):
+            return False
+        return (self.name == other.name and
+                self.data == other.data)
+
+    def __repr__(self):
+        return '<Secret %s>' % (self.name,)
+
+
 class SourceContext(object):
     """A reference to the branch of a project in configuration.
 
@@ -2133,6 +2159,7 @@ class UnparsedTenantConfig(object):
         self.project_templates = []
         self.projects = {}
         self.nodesets = []
+        self.secrets = []
 
     def copy(self):
         r = UnparsedTenantConfig()
@@ -2141,6 +2168,7 @@ class UnparsedTenantConfig(object):
         r.project_templates = copy.deepcopy(self.project_templates)
         r.projects = copy.deepcopy(self.projects)
         r.nodesets = copy.deepcopy(self.nodesets)
+        r.secrets = copy.deepcopy(self.secrets)
         return r
 
     def extend(self, conf):
@@ -2151,6 +2179,7 @@ class UnparsedTenantConfig(object):
             for k, v in conf.projects.items():
                 self.projects.setdefault(k, []).extend(v)
             self.nodesets.extend(conf.nodesets)
+            self.secrets.extend(conf.secrets)
             return
 
         if not isinstance(conf, list):
@@ -2179,6 +2208,8 @@ class UnparsedTenantConfig(object):
                 self.pipelines.append(value)
             elif key == 'nodeset':
                 self.nodesets.append(value)
+            elif key == 'secret':
+                self.secrets.append(value)
             else:
                 raise Exception("Configuration item `%s` not recognized "
                                 "(when parsing %s)" %
@@ -2201,6 +2232,7 @@ class Layout(object):
         # inherit from the reference definition.
         self.jobs = {'noop': [Job('noop')]}
         self.nodesets = {}
+        self.secrets = {}
 
     def getJob(self, name):
         if name in self.jobs:
@@ -2233,6 +2265,11 @@ class Layout(object):
         if nodeset.name in self.nodesets:
             raise Exception("NodeSet %s already defined" % (nodeset.name,))
         self.nodesets[nodeset.name] = nodeset
+
+    def addSecret(self, secret):
+        if secret.name in self.secrets:
+            raise Exception("Secret %s already defined" % (secret.name,))
+        self.secrets[secret.name] = secret
 
     def addPipeline(self, pipeline):
         self.pipelines[pipeline.name] = pipeline
