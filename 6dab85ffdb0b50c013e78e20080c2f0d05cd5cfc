@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a1ff146_3b87abd8",
+        "filename": "tests/fixtures/config/ansible/git/common-config/zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-15T20:19:32Z",
+      "side": 1,
+      "message": "Could you explain why we are not using !encrypted/pkcs1 here?",
+      "revId": "6dab85ffdb0b50c013e78e20080c2f0d05cd5cfc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
