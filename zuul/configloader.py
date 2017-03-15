@@ -260,7 +260,19 @@ class JobParser(object):
         job = model.Job(conf['name'])
         job.source_context = conf.get('_source_context')
         if 'auth' in conf:
-            job.auth = conf.get('auth')
+            job.auth = model.AuthContext()
+            if 'inherit' in conf['auth']:
+                auth.inherit = conf['auth']['inherit']
+
+            for conf_secret in conf['auth'].get('secrets', []):
+                secret_name = conf_secret['name']
+                secret = layout.secrets[secret_name]
+                if secret.source_context != job.source_context:
+                    raise Exception(
+                        "Unable to use secret %s.  Secrets must be "
+                        "defined in the same project in which they "
+                        "are used" % secret_name)
+                auth.secrets.append(secret)
 
         if 'parent' in conf:
             parent = layout.getJob(conf['parent'])
