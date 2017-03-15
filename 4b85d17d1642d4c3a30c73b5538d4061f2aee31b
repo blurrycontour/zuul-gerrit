@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a1ff146_49ec9e8f",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 358,
+      "author": {
+        "id": 18462
+      },
+      "writtenOn": "2017-03-15T22:53:42Z",
+      "side": 1,
+      "message": "wouldnt it orint the log only if there is an exception?",
+      "range": {
+        "startLine": 357,
+        "startChar": 16,
+        "endLine": 358,
+        "endChar": 33
+      },
+      "revId": "4b85d17d1642d4c3a30c73b5538d4061f2aee31b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
