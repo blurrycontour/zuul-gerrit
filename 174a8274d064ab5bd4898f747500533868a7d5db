@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a1ff146_da721c7c",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 785,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-15T16:29:19Z",
+      "side": 1,
+      "message": "Gratutitous, but we can change it back.",
+      "revId": "174a8274d064ab5bd4898f747500533868a7d5db",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
