@@ -22,6 +22,30 @@
       "revId": "4b85d17d1642d4c3a30c73b5538d4061f2aee31b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a1ff146_6c97a890",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 358,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-03-15T23:12:57Z",
+      "side": 1,
+      "message": "No, what happens is it\u0027ll log the API limit only if there is NOT an exception. Hitting an exception will return the function early.",
+      "parentUuid": "3a1ff146_49ec9e8f",
+      "range": {
+        "startLine": 357,
+        "startChar": 16,
+        "endLine": 358,
+        "endChar": 33
+      },
+      "revId": "4b85d17d1642d4c3a30c73b5538d4061f2aee31b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
