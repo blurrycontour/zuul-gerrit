@@ -79,8 +79,8 @@ class Executor(zuul.cmd.ZuulApp):
 
         self.log = logging.getLogger("zuul.Executor")
 
-        LaunchServer = zuul.executor.server.LaunchServer
-        self.executor = LaunchServer(self.config, self.connections,
+        ExecutorServer = zuul.executor.server.ExecutorServer
+        self.executor = ExecutorServer(self.config, self.connections,
                                      keep_jobdir=self.args.keep_jobdir)
         self.executor.start()
 
