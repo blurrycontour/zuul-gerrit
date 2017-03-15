@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a1ff146_37bc2905",
+        "filename": "doc/source/statsd.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-15T16:05:36Z",
+      "side": 1,
+      "message": "Gratuitous, but okay.  :)",
+      "revId": "bf64b5d99bc91bef42d2b59ea0bc6077b44c9578",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a1ff146_5737e5af",
+        "filename": "doc/source/statsd.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-15T16:05:36Z",
+      "side": 1,
+      "message": "This is made more confusing as \"execute time\" sounds like \"execution time\".  However, this whole section needs updating, so I can\u0027t actually suggest what it should say now.",
+      "revId": "bf64b5d99bc91bef42d2b59ea0bc6077b44c9578",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a1ff146_773ce193",
+        "filename": "doc/source/statsd.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-15T16:05:36Z",
+      "side": 1,
+      "message": "Same.",
+      "revId": "bf64b5d99bc91bef42d2b59ea0bc6077b44c9578",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a1ff146_17bf2dfc",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 573,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-15T16:05:36Z",
+      "side": 1,
+      "message": "\u0027execute\u0027 should change to \u0027execution\u0027 to match the same part of speech as launch.  So we should say:  execution_server, execution_client, ExecutionServer, RecordingExecutionServer, etc.  Or we should say: executor_server, executor_client, ExecutorServer, RecordingExecutorServer.\n\nI think I prefer the latter, just so we don\u0027t have too many variants to grep for.  :)\n\nThe main thing is, we shouldn\u0027t say \"execute_server\" because that\u0027s an imperative verb phrase and it doesn\u0027t mean nice things.",
+      "revId": "bf64b5d99bc91bef42d2b59ea0bc6077b44c9578",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
