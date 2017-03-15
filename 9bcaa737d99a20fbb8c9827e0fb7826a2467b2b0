@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a1ff146_a1c9ac7a",
+        "filename": "tests/encrypt_secret.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-03-15T21:08:19Z",
+      "side": 1,
+      "message": "given the concerns with sha1 for security purposes we shouldn\u0027t use it here (as this example may end up being used all over due to cargo culting).",
+      "range": {
+        "startLine": 43,
+        "startChar": 46,
+        "endLine": 43,
+        "endChar": 50
+      },
+      "revId": "9bcaa737d99a20fbb8c9827e0fb7826a2467b2b0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a1ff146_a1560cd0",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-03-15T21:08:19Z",
+      "side": 1,
+      "message": "If we are allowing regular strings and \"tagged\" encrypted PKCS1 objects here why bother with a special type at all and just use str?",
+      "range": {
+        "startLine": 169,
+        "startChar": 16,
+        "endLine": 169,
+        "endChar": 48
+      },
+      "revId": "9bcaa737d99a20fbb8c9827e0fb7826a2467b2b0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a1ff146_8178302d",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 535,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-03-15T21:08:19Z",
+      "side": 1,
+      "message": "Since data is a dict won\u0027t this end up comparing if we point to the same pkcs object? rather than comparing contents? I think you can make a __eq__ method on the pkcs object to deal with this.",
+      "revId": "9bcaa737d99a20fbb8c9827e0fb7826a2467b2b0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
