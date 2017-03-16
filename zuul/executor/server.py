@@ -641,7 +641,9 @@ class AnsibleJob(object):
             ip = node.get('public_ipv4')
             if not ip:
                 ip = node.get('public_ipv6')
-            hosts.append((node['name'], dict(ansible_host=ip)))
+            hosts.append((node['name'], dict(
+                ansible_host=ip,
+                nodepool_provider=node.get('provider'))))
         return hosts
 
     def _blockPluginDirs(self, path):
@@ -805,9 +807,8 @@ class AnsibleJob(object):
         with open(self.jobdir.inventory, 'w') as inventory:
             for host_name, host_vars in self.getHostList(args):
                 inventory.write(host_name)
-                inventory.write(' ')
                 for k, v in host_vars.items():
-                    inventory.write('%s=%s' % (k, v))
+                    inventory.write(' %s=%s' % (k, v))
                 inventory.write('\n')
                 if 'ansible_host' in host_vars:
                     os.system("ssh-keyscan %s >> %s" % (

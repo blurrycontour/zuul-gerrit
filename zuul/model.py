@@ -375,6 +375,8 @@ class Node(object):
         self.private_ipv4 = None
         self.public_ipv6 = None
         self._keys = []
+        self.provider = None
+        self.region = None
 
     @property
     def state(self):
