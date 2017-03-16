@@ -725,7 +725,7 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
         l.append(change)
         self.fail_tests[name] = l
 
-    def release(self, regex=None):
+    def release(self, regex=None, match='name'):
         """Release a held build.
 
         :arg str regex: A regular expression which, if supplied, will
@@ -737,7 +737,7 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
         self.log.debug("Releasing build %s (%s)" % (regex,
                                                     len(self.running_builds)))
         for build in builds:
-            if not regex or re.match(regex, build.name):
+            if not regex or re.match(regex, getattr(build, match)):
                 self.log.debug("Releasing build %s" %
                                (build.parameters['ZUUL_UUID']))
                 build.release()
@@ -770,12 +770,15 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
 
 
 class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
-    def runPlaybooks(self, args):
+    def doMergeChanges(self, items):
+        # Get a merger in order to update the repos involved in this job.
+        commit = super(RecordingAnsibleJob, self).doMergeChanges(items)
+        if not commit:  # merge conflict
+            self.recordResult('MERGER_FAILURE')
+        return commit
+
+    def recordResult(self, result):
         build = self.executor_server.job_builds[self.job.unique]
-        build.jobdir = self.jobdir
-
-        result = super(RecordingAnsibleJob, self).runPlaybooks(args)
-
         self.executor_server.lock.acquire()
         self.executor_server.build_history.append(
             BuildHistory(name=build.name, result=result, changes=build.changes,
@@ -786,6 +789,13 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
         self.executor_server.running_builds.remove(build)
         del self.executor_server.job_builds[self.job.unique]
         self.executor_server.lock.release()
+
+    def runPlaybooks(self, args):
+        build = self.executor_server.job_builds[self.job.unique]
+        build.jobdir = self.jobdir
+
+        result = super(RecordingAnsibleJob, self).runPlaybooks(args)
+        self.recordResult(result)
         return result
 
     def runAnsible(self, cmd, timeout, trusted=False):
