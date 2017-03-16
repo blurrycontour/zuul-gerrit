@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "1a1ced50_b1b933ef",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1956,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-16T23:42:28Z",
+      "side": 1,
+      "message": "We don\u0027t want to do this here -- we need to load the standard config first so that \u0027project-merge\u0027 gets enqueued.",
+      "revId": "411ceefbd556245ea301aff4433ea12cbf335af5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a1ced50_d1622fad",
         "filename": "tests/unit/test_scheduler.py",
         "patchSetId": 1
@@ -19,6 +36,40 @@
     },
     {
       "key": {
+        "uuid": "1a1ced50_d1beafd3",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1964,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-16T23:42:28Z",
+      "side": 1,
+      "message": "This should be the project-merge job in the gearman queue.",
+      "revId": "411ceefbd556245ea301aff4433ea12cbf335af5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1ced50_f1b3ab08",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1972,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-16T23:42:28Z",
+      "side": 1,
+      "message": "The project-merge job should have been dequeued.",
+      "revId": "411ceefbd556245ea301aff4433ea12cbf335af5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a1ced50_f1572bc8",
         "filename": "tests/unit/test_scheduler.py",
         "patchSetId": 1
@@ -30,6 +81,23 @@
       "writtenOn": "2017-03-16T23:37:32Z",
       "side": 1,
       "message": "And we ought to still get gate-noop.",
+      "revId": "411ceefbd556245ea301aff4433ea12cbf335af5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1ced50_11b927ea",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1975,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-16T23:42:28Z",
+      "side": 1,
+      "message": "And project-merge should have not run.",
       "revId": "411ceefbd556245ea301aff4433ea12cbf335af5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
