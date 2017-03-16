@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a1ced50_c0733fb3",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 646,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-03-16T21:27:52Z",
+      "side": 1,
+      "message": "This will end up serializing AZ\u0027s for hosts without AZ\u0027s as \"None\". I assume we are fine with that? It would be weird if a cloud had an AZ called \"None\".",
+      "revId": "30ba93a9f6b166ba342cd2951a643eeb2b6c15ed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
