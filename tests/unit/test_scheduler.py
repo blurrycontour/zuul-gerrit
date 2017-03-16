@@ -1950,23 +1950,20 @@ class TestScheduler(ZuulTestCase):
         self.assertReportedStat('test-timing', '3|ms')
         self.assertReportedStat('test-gauge', '12|g')
 
-    @skip("Disabled for early v3 development")
     def test_stuck_job_cleanup(self):
         "Test that pending jobs are cleaned up if removed from layout"
-        # This job won't be registered at startup because it is not in
-        # the standard layout, but we need it to already be registerd
-        # for when we reconfigure, as that is when Zuul will attempt
-        # to run the new job.
-        self.worker.registerFunction('build:gate-noop')
+        self.updateConfigLayout('layout-only-gate-noop')
+        self.sched.reconfigure(self.config)
+
         self.gearman_server.hold_jobs_in_queue = True
+        self.executor_client.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         A.addApproval('code-review', 2)
         self.fake_gerrit.addEvent(A.addApproval('approved', 1))
         self.waitUntilSettled()
         self.assertEqual(len(self.gearman_server.getQueue()), 1)
 
-        self.updateConfigLayout(
-            'tests/fixtures/layout-no-jobs.yaml')
+        self.commitLayoutUpdate('layout-only-gate-noop', 'layout-no-jobs')
         self.sched.reconfigure(self.config)
         self.waitUntilSettled()
 
@@ -1975,9 +1972,7 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(len(self.gearman_server.getQueue()), 0)
         self.assertTrue(self.sched._areAllBuildsComplete())
 
-        self.assertEqual(len(self.history), 1)
-        self.assertEqual(self.history[0].name, 'gate-noop')
-        self.assertEqual(self.history[0].result, 'SUCCESS')
+        self.assertEqual(len(self.history), 0)
 
     def test_file_head(self):
         # This is a regression test for an observed bug.  A change
