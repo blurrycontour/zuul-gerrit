@@ -557,6 +557,9 @@ class AnsibleJob(object):
         merge_items = [i for i in args['items'] if i.get('refspec')]
         if merge_items:
             commit = merger.mergeChanges(merge_items)  # noqa
+            if not commit:  # merge conflict
+                result = dict(result='MERGER_FAILURE')
+                self.job.sendWorkComplete(json.dumps(result))
         else:
             commit = args['items'][-1]['newrev']  # noqa
 
