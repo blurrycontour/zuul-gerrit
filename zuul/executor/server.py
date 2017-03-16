@@ -552,11 +552,9 @@ class AnsibleJob(object):
                              project['name']))
             repo.remotes.origin.config_writer.set('url', project['url'])
 
-        # Get a merger in order to update the repos involved in this job.
-        merger = self.executor_server._getMerger(self.jobdir.src_root)
         merge_items = [i for i in args['items'] if i.get('refspec')]
         if merge_items:
-            commit = merger.mergeChanges(merge_items)  # noqa
+            commit = self.doMergeChanges(merge_items)
         else:
             commit = args['items'][-1]['newrev']  # noqa
 
@@ -595,6 +593,15 @@ class AnsibleJob(object):
             return
         result = dict(result=result)
         self.job.sendWorkComplete(json.dumps(result))
+
+    def doMergeChanges(self, items):
+        # Get a merger in order to update the repos involved in this job.
+        merger = self.executor_server._getMerger(self.jobdir.src_root)
+        commit = merger.mergeChanges(items)  # noqa
+        if not commit:  # merge conflict
+            result = dict(result='MERGER_FAILURE')
+            self.job.sendWorkComplete(json.dumps(result))
+        return commit
 
     def runPlaybooks(self, args):
         result = None
