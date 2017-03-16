@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a1ced50_d1622fad",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1959,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-16T23:37:32Z",
+      "side": 1,
+      "message": "We shouldn\u0027t need this, since what we really want to test is that a pending job in the gearman queue is canceled.  We shouldn\u0027t get far enough for the executor client to handle it.",
+      "revId": "411ceefbd556245ea301aff4433ea12cbf335af5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1ced50_f1572bc8",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1975,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-16T23:37:32Z",
+      "side": 1,
+      "message": "And we ought to still get gate-noop.",
+      "revId": "411ceefbd556245ea301aff4433ea12cbf335af5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
