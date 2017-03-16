@@ -924,18 +924,17 @@ class TestScheduler(ZuulTestCase):
         a = source.getChange(event, refresh=True)
         self.assertTrue(source.canMerge(a, mgr.getSubmitAllowNeeds()))
 
-    @skip("Disabled for early v3 development")
-    def test_build_configuration_conflict(self):
-        "Test that merge conflicts are handled"
+    def test_project_merge_conflict(self):
+        "Test that gate merge conflicts are handled properly"
 
-        self.gearman_server.hold_jobs_in_queue = True
-        A = self.fake_gerrit.addFakeChange('org/conflict-project',
-                                           'master', 'A')
-        A.addPatchset(['conflict'])
-        B = self.fake_gerrit.addFakeChange('org/conflict-project',
-                                           'master', 'B')
-        B.addPatchset(['conflict'])
-        C = self.fake_gerrit.addFakeChange('org/conflict-project',
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project',
+                                           'master', 'A',
+                                           files={'conflict': 'foo'})
+        B = self.fake_gerrit.addFakeChange('org/project',
+                                           'master', 'B',
+                                           files={'conflict': 'bar'})
+        C = self.fake_gerrit.addFakeChange('org/project',
                                            'master', 'C')
         A.addApproval('code-review', 2)
         B.addApproval('code-review', 2)
@@ -949,17 +948,15 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(B.reported, 1)
         self.assertEqual(C.reported, 1)
 
-        self.gearman_server.release('.*-merge')
+        self.executor_server.release('project-merge')
         self.waitUntilSettled()
-        self.gearman_server.release('.*-merge')
+        self.executor_server.release('project-merge')
         self.waitUntilSettled()
-        self.gearman_server.release('.*-merge')
+        self.executor_server.release('project-merge')
         self.waitUntilSettled()
 
-        self.assertEqual(len(self.history), 2)  # A and C merge jobs
-
-        self.gearman_server.hold_jobs_in_queue = False
-        self.gearman_server.release()
+        self.executor_server.hold_jobs_in_queue = False
+        self.executor_server.release()
         self.waitUntilSettled()
 
         self.assertEqual(A.data['status'], 'MERGED')
@@ -968,7 +965,77 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(A.reported, 2)
         self.assertEqual(B.reported, 2)
         self.assertEqual(C.reported, 2)
-        self.assertEqual(len(self.history), 6)
+
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+            dict(name='project-merge', result='SUCCESS', changes='1,1 3,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1 3,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1 3,1'),
+        ], ordered=False)
+
+    def test_delayed_merge_conflict(self):
+        "Test that delayed check merge conflicts are handled properly"
+
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project',
+                                           'master', 'A',
+                                           files={'conflict': 'foo'})
+        B = self.fake_gerrit.addFakeChange('org/project',
+                                           'master', 'B',
+                                           files={'conflict': 'bar'})
+        C = self.fake_gerrit.addFakeChange('org/project',
+                                           'master', 'C')
+        C.setDependsOn(B, 1)
+
+        # A enters the gate queue; B and C enter the check queue
+        A.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.waitUntilSettled()
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 1)
+        self.assertEqual(B.reported, 0)  # Check does not report start
+        self.assertEqual(C.reported, 0)  # Check does not report start
+
+        # A merges while B and C are queued in check
+        self.executor_server.release('1,1', match='changes')
+        self.waitUntilSettled()
+        self.executor_server.release('1,1', match='changes')
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(B.data['status'], 'NEW')
+        self.assertEqual(C.data['status'], 'NEW')
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(B.reported, 0)
+        self.assertEqual(C.reported, 0)
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+        ])
+
+        # B and C report merge conflicts
+        self.executor_server.hold_jobs_in_queue = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(B.data['status'], 'NEW')
+        self.assertEqual(C.data['status'], 'NEW')
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(B.reported, 1)
+        self.assertEqual(C.reported, 1)
+
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
 
     def test_post(self):
         "Test that post jobs run"
