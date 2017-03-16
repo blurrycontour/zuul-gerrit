@@ -924,18 +924,17 @@ class TestScheduler(ZuulTestCase):
         a = source.getChange(event, refresh=True)
         self.assertTrue(source.canMerge(a, mgr.getSubmitAllowNeeds()))
 
-    @skip("Disabled for early v3 development")
-    def test_build_configuration_conflict(self):
+    def test_merge_conflict(self):
         "Test that merge conflicts are handled"
 
-        self.gearman_server.hold_jobs_in_queue = True
-        A = self.fake_gerrit.addFakeChange('org/conflict-project',
-                                           'master', 'A')
-        A.addPatchset(['conflict'])
-        B = self.fake_gerrit.addFakeChange('org/conflict-project',
-                                           'master', 'B')
-        B.addPatchset(['conflict'])
-        C = self.fake_gerrit.addFakeChange('org/conflict-project',
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project',
+                                           'master', 'A',
+                                           files={'conflict': 'foo'})
+        B = self.fake_gerrit.addFakeChange('org/project',
+                                           'master', 'B',
+                                           files={'conflict': 'bar'})
+        C = self.fake_gerrit.addFakeChange('org/project',
                                            'master', 'C')
         A.addApproval('code-review', 2)
         B.addApproval('code-review', 2)
@@ -949,17 +948,15 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(B.reported, 1)
         self.assertEqual(C.reported, 1)
 
-        self.gearman_server.release('.*-merge')
+        self.executor_server.release('.*-merge')
         self.waitUntilSettled()
-        self.gearman_server.release('.*-merge')
+        self.executor_server.release('.*-merge')
         self.waitUntilSettled()
-        self.gearman_server.release('.*-merge')
+        self.executor_server.release('.*-merge')
         self.waitUntilSettled()
 
-        self.assertEqual(len(self.history), 2)  # A and C merge jobs
-
-        self.gearman_server.hold_jobs_in_queue = False
-        self.gearman_server.release()
+        self.executor_server.hold_jobs_in_queue = False
+        self.executor_server.release()
         self.waitUntilSettled()
 
         self.assertEqual(A.data['status'], 'MERGED')
@@ -968,7 +965,17 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(A.reported, 2)
         self.assertEqual(B.reported, 2)
         self.assertEqual(C.reported, 2)
-        self.assertEqual(len(self.history), 6)
+
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+            dict(name='project-merge', result='MERGER_FAILURE',
+                 changes='1,1 2,1'),
+            dict(name='project-merge', result='SUCCESS', changes='1,1 3,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1 3,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1 3,1'),
+        ])
 
     def test_post(self):
         "Test that post jobs run"
