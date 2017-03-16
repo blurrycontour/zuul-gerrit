@@ -265,6 +265,8 @@ class ChangeQueue(object):
         item = QueueItem(self, change)
         self.enqueueItem(item)
         item.enqueue_time = time.time()
+        if not item.current_build_set.ref:
+            item.current_build_set.setConfiguration()
         return item
 
     def enqueueItem(self, item):
