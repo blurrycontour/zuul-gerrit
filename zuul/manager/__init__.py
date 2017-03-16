@@ -13,7 +13,7 @@
 import logging
 
 from zuul import exceptions
-from zuul.model import NullChange
+from zuul.model import Change, NullChange
 
 
 class DynamicChangeQueueContextManager(object):
@@ -335,6 +335,8 @@ class PipelineManager(object):
             zuul_driver = self.sched.connections.drivers['zuul']
             tenant = self.pipeline.layout.tenant
             zuul_driver.onChangeEnqueued(tenant, item.change, self.pipeline)
+            if isinstance(item.change, Change):
+                self.scheduleMerge(item)
             return True
 
     def dequeueItem(self, item):
@@ -441,11 +443,15 @@ class PipelineManager(object):
         # the merger.
         number = None
         patchset = None
+        refspec = None
+        branch = None
         oldrev = None
         newrev = None
         if hasattr(item.change, 'number'):
             number = item.change.number
             patchset = item.change.patchset
+            refspec = item.change.refspec
+            branch = item.change.branch
         elif hasattr(item.change, 'newrev'):
             oldrev = item.change.oldrev
             newrev = item.change.newrev
@@ -457,8 +463,8 @@ class PipelineManager(object):
                         item.change.project),
                     connection_name=connection_name,
                     merge_mode=item.current_build_set.getMergeMode(project),
-                    refspec=item.change.refspec,
-                    branch=item.change.branch,
+                    refspec=refspec,
+                    branch=branch,
                     ref=item.current_build_set.ref,
                     number=number,
                     patchset=patchset,
@@ -519,13 +525,18 @@ class PipelineManager(object):
             return self._loadDynamicLayout(item)
         build_set.merge_state = build_set.PENDING
         self.log.debug("Preparing dynamic layout for: %s" % item.change)
+        self.scheduleMerge(item, ['zuul.yaml', '.zuul.yaml'])
+
+    def scheduleMerge(self, item, files=None):
+        self.log.debug("Scheduling merge for item %s (files: %s)" %
+                       (item, files))
         dependent_items = self.getDependentItems(item)
         dependent_items.reverse()
         all_items = dependent_items + [item]
         merger_items = map(self._makeMergerItem, all_items)
         self.sched.merger.mergeChanges(merger_items,
                                        item.current_build_set,
-                                       ['zuul.yaml', '.zuul.yaml'],
+                                       files,
                                        self.pipeline.precedence)
 
     def prepareLayout(self, item):
@@ -611,15 +622,7 @@ class PipelineManager(object):
             self.dequeueItem(item)
             changed = True
         if ((not item_ahead) and item.areAllJobsComplete() and item.live):
-            try:
-                self.reportItem(item)
-            except exceptions.MergeFailure:
-                failing_reasons.append("it did not merge")
-                for item_behind in item.items_behind:
-                    self.log.info("Resetting builds for change %s because the "
-                                  "item ahead, %s, failed to merge" %
-                                  (item_behind.change, item))
-                    self.cancelJobs(item_behind)
+            self.reportItem(item)
             self.dequeueItem(item)
             changed = True
         elif not failing_reasons and item.live:
@@ -628,6 +631,14 @@ class PipelineManager(object):
         if failing_reasons:
             self.log.debug("%s is a failing item because %s" %
                            (item, failing_reasons))
+            if item.didMergerFail():
+                for item_behind in item.items_behind:
+                    self.log.info("Resetting builds for change %s because "
+                                  "the item ahead, %s, failed to merge" %
+                                  (item_behind.change, item))
+                    self.cancelJobs(item_behind)
+                self.dequeueItem(item)
+                changed = True
         return (changed, nnfi)
 
     def processQueue(self):
@@ -722,8 +733,6 @@ class PipelineManager(object):
                 change_queue.decreaseWindowSize()
                 self.log.debug("%s window size decreased to %s" %
                                (change_queue, change_queue.window))
-                raise exceptions.MergeFailure(
-                    "Change %s failed to merge" % item.change)
             else:
                 change_queue.increaseWindowSize()
                 self.log.debug("%s window size increased to %s" %
