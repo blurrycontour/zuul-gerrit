@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a1ced50_7feda68a",
+        "filename": "zuul/connection/gerrit.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-17T17:30:45Z",
+      "side": 1,
+      "message": "This should probably be \"except Exception\" (so should all the other instances in this very old file, but since we\u0027re adding one, may as well do it right).  But we should raise here so that we maintain the error-propogation we had before.",
+      "revId": "98019b1cd36b2f950b6e7f04b2da755fd67aa006",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
