@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "1a1ced50_7f2be630",
+        "filename": "zuul/connection/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 14760
+      },
+      "writtenOn": "2017-03-17T17:16:29Z",
+      "side": 1,
+      "message": "I like my bike shed to be green ;)\n\n with open(self.keyfile, \u0027rb\u0027) as f:\n     pass",
+      "revId": "de26f969ef9960529b9c63c137d0ffa6af608461",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a1ced50_7f5da6e8",
         "filename": "zuul/connection/gerrit.py",
         "patchSetId": 1
