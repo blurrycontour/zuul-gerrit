@@ -37,12 +37,8 @@ class SQLReporter(BaseReporter):
             self.log.warn("SQL reporter (%s) is disabled " % self)
             return
 
-        if self.driver.sched.config.has_option('zuul', 'url_pattern'):
-            url_pattern = self.driver.sched.config.get('zuul', 'url_pattern')
-        else:
-            url_pattern = None
-
-        score = self.config.get('score', 0)
+        score = self.reporter_config['score']\
+            if 'score' in self.reporter_config else 0
 
         with self.connection.engine.begin() as conn:
             buildset_ins = self.connection.zuul_buildset_table.insert().values(
@@ -67,7 +63,7 @@ class SQLReporter(BaseReporter):
                     # information about the change.
                     continue
 
-                (result, url) = item.formatJobResult(job, url_pattern)
+                (result, url) = item.formatJobResult(job)
 
                 build_inserts.append({
                     'buildset_id': buildset_ins_result.inserted_primary_key,
