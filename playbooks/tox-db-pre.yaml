@@ -1,0 +1,31 @@
+- hosts: all
+  tasks:
+    - name: Update root password.
+      become: yes
+      mysql_user:
+        name: root
+        password: insecure_slave
+
+    - name: Remove anonymous user account from localhost.
+      become: yes
+      mysql_user:
+        name: ''
+        host: localhost
+        login_password: insecure_slave
+        state: absent
+
+    - name: Create openstack_citest user with all database priviledges.
+      become: yes
+      mysql_user:
+        name: openstack_citest
+        login_password: insecure_slave
+        password: openstack_citest
+        priv: '*.*:ALL,GRANT'
+        state: present
+
+    - name: Create openstack_citest database.
+      become: yes
+      mysql_db:
+        name: openstack_citest
+        login_password: insecure_slave
+        state: present

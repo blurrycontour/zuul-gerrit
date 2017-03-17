@@ -5,3 +5,4 @@ mysql-client [test]
 mysql-server [test]
 libjpeg-dev [test]
 zookeeperd [platform:dpkg]
+python-mysqldb
