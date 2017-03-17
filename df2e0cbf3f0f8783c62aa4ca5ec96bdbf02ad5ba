@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a1ced50_9ccfd5af",
+        "filename": "tox.ini",
+        "patchSetId": 8
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2017-03-17T14:39:45Z",
+      "side": 1,
+      "message": "minor nit, why not just do \"find playbooks\" ?",
+      "range": {
+        "startLine": 34,
+        "startChar": 11,
+        "endLine": 34,
+        "endChar": 23
+      },
+      "revId": "df2e0cbf3f0f8783c62aa4ca5ec96bdbf02ad5ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
