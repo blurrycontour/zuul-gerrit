@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a1ced50_a8ab6188",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2126,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-17T21:20:04Z",
+      "side": 1,
+      "message": "Why not let project repos define semaphores?  (After all, we let them define secrets.)",
+      "revId": "477d218c62179c66c1d743693f4ffa60a8833251",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1ced50_c8b09df7",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-17T21:20:04Z",
+      "side": 1,
+      "message": "Thanks for noticing this wasn\u0027t tenant-aware.  :)\n\nI wonder if we should have a SemaphoreHandler per-tenant, and then pass that in when we acquire and release a semaphore.  That would make this simpler.  We just need to make sure to copy it over to the new tenant object if we perform a full configuration reload.  That should be easy.",
+      "revId": "477d218c62179c66c1d743693f4ffa60a8833251",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
