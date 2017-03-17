@@ -1,0 +1,22 @@
+- hosts: all
+  tasks:
+    - name: Remove anonymous user account from localhost
+      become: yes
+      mysql_user:
+        name: ''
+        host: localhost
+        state: absent
+
+    - name: Create openstack_citest user with all database priviledges.
+      become: yes
+      mysql_user:
+        name: openstack_citest
+        password: openstack_citest
+        priv: '*.*:ALL'
+        state: present
+
+    - name: Create openstack_citest database.
+      become: yes
+      mysql_db:
+        name: openstack_citest
+        state: present
