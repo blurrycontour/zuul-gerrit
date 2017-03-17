@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a1ced50_df5f7570",
+        "filename": "tests/fixtures/config/dependency-graph/git/common-config/zuul.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-17T19:58:48Z",
+      "side": 1,
+      "message": "nit, seems odd that E is out of order :)",
+      "revId": "c787fe86ff525e2ab084f3968f2e569ff9e10047",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1ced50_5ffaa543",
+        "filename": "tests/fixtures/config/single-tenant/git/common-config/zuul.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-17T19:58:48Z",
+      "side": 1,
+      "message": "going to take a while for brain to start parsing this.  The original way was a little easier to read in the dependency order",
+      "range": {
+        "startLine": 123,
+        "startChar": 0,
+        "endLine": 129,
+        "endChar": 39
+      },
+      "revId": "c787fe86ff525e2ab084f3968f2e569ff9e10047",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
