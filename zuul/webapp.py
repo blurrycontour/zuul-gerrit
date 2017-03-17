@@ -22,7 +22,8 @@ import time
 from paste import httpserver
 import webob
 from webob import dec
-from cryptography.hazmat.primitives import serialization
+
+from zuul.lib import encryption
 
 """Zuul main web app.
 
@@ -105,11 +106,8 @@ class WebApp(threading.Thread):
         source = self.scheduler.connections.getSource(source_name)
         project = source.getProject(project_name)
 
-        # Serialize public key
-        pem_public_key = project.public_key.public_bytes(
-            encoding=serialization.Encoding.PEM,
-            format=serialization.PublicFormat.SubjectPublicKeyInfo
-        )
+        pem_public_key = encryption.serialize_rsa_public_key(
+            project.public_key)
 
         response = webob.Response(body=pem_public_key,
                                   content_type='text/plain')
