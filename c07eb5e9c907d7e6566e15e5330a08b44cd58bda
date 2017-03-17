@@ -51,6 +51,23 @@
       "revId": "c07eb5e9c907d7e6566e15e5330a08b44cd58bda",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1ced50_ae444974",
+        "filename": "playbooks/roles/prepare-workspace/defaults/main.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-17T22:56:49Z",
+      "side": 1,
+      "message": "I think that\u0027s reasonable.  The goal is to make things more comprehensible.  Like most strict rules, there may be some situations where it results in the opposite, and I think that\u0027s what we\u0027re seeing here.  \"prepare_workspace_workspace_root\" is very confusing, and in order to make it less confusing, we considered changing the name of the role -- however, that made that *role* more confusing.  That\u0027s why I think this merits re-examining the rule to see if it\u0027s a good fit here.\n\nI think the workspace root is going to be used by *a lot* of roles, and I think passing it around to each of them is going to make for a lot of boilerplate and will turn people off from wanting to write jobs.  That\u0027s why my preference is to just accept that this one should be global.\n\nOne of the things I\u0027m sure we both would like to avoid, however, is something like this leaking into non-zuul-specific playbook content.  For instance, if a devstack deployment script directly referenced zuul_workspace_root, that would be unfortunate, because while it may *want* a working directory, there\u0027s nothing zuul-specific about it, and that\u0027s definitely a case where I agree we should have a \"devstack_workspace_root: {{zuul_workspace_root}}\" variable definition.\n\nI\u0027m very sympathetic to that line of thinking, and if you and others feel strongly that we need to explicitly demarcate all of the role variables, maybe we could at least make it a bit cleaner here with a different name like \"prepare_workspace_root\".  It\u0027s also worth keeping in mind that we can write:\n  roles:\n    - role: prepare-workspace\n      root: {{zuul_workspace_root}\nif we wanted to shorten it further.",
+      "revId": "c07eb5e9c907d7e6566e15e5330a08b44cd58bda",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
