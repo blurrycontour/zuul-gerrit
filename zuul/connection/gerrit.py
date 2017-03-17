@@ -166,6 +166,12 @@ class GerritWatcher(threading.Thread):
 
     def _run(self):
         try:
+            # We attempt to open keyfile here as failure to read the file
+            # can result in thousands of stale connections to Gerrit DoSing
+            # the service.
+            if self.keyfile:
+                f = open(self.keyfile, 'rb')
+                f.close()
             client = paramiko.SSHClient()
             client.load_system_host_keys()
             client.set_missing_host_key_policy(paramiko.WarningPolicy())
@@ -353,6 +359,12 @@ class GerritConnection(BaseConnection):
         return alldata
 
     def _open(self):
+        # We attempt to open keyfile here as failure to read the file
+        # can result in thousands of stale connections to Gerrit DoSing
+        # the service.
+        if self.keyfile:
+            f = open(self.keyfile, 'rb')
+            f.close()
         client = paramiko.SSHClient()
         client.load_system_host_keys()
         client.set_missing_host_key_policy(paramiko.WarningPolicy())
