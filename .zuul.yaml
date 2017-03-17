@@ -16,6 +16,17 @@
     post-run: tox-post
 
 - job:
+    name: tox-db
+    parent: tox
+    pre-run: tox-db-pre
+    post-run: tox-db-post
+
+- job:
+    name: tox-db-py27
+    parent: tox-db
+    run: tox-py27
+
+- job:
     name: tox-cover
     parent: tox
     voting: false
