@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a1ced50_7f5da6e8",
+        "filename": "zuul/connection/gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 10058
+      },
+      "writtenOn": "2017-03-17T17:14:31Z",
+      "side": 1,
+      "message": "This should also assure that the permissions of the file are 600 otherwise, if the file is too permissive, paramiko can fail as well ending up in the same error.\n\nThen would be good to have a message stating if a opening file problem or too permissive file.",
+      "range": {
+        "startLine": 172,
+        "startChar": 0,
+        "endLine": 174,
+        "endChar": 25
+      },
+      "revId": "de26f969ef9960529b9c63c137d0ffa6af608461",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
