@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "1a1ced50_822686b8",
+        "filename": "tests/fixtures/config/dependency-graph/git/common-config/zuul.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-17T20:04:42Z",
+      "side": 1,
+      "message": "The comment directly above explains why.",
+      "revId": "c787fe86ff525e2ab084f3968f2e569ff9e10047",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a1ced50_5ffaa543",
         "filename": "tests/fixtures/config/single-tenant/git/common-config/zuul.yaml",
         "patchSetId": 3
