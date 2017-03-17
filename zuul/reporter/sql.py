@@ -37,11 +37,6 @@ class SQLReporter(BaseReporter):
             self.log.warn("SQL reporter (%s) is disabled " % self)
             return
 
-        if self.sched.config.has_option('zuul', 'url_pattern'):
-            url_pattern = self.sched.config.get('zuul', 'url_pattern')
-        else:
-            url_pattern = None
-
         score = self.reporter_config['score']\
             if 'score' in self.reporter_config else 0
 
@@ -68,7 +63,7 @@ class SQLReporter(BaseReporter):
                     # information about the change.
                     continue
 
-                (result, url) = item.formatJobResult(job, url_pattern)
+                (result, url) = item.formatJobResult(job)
 
                 build_inserts.append({
                     'buildset_id': buildset_ins_result.inserted_primary_key,
