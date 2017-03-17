@@ -28,6 +28,7 @@ class SQLReporter(BaseReporter):
     def __init__(self, driver, connection, config={}):
         super(SQLReporter, self).__init__(
             driver, connection, config)
+        #TODO(jeblair): document this is stored as NULL if unspecified
         self.result_score = config.get('score', None)
 
     def report(self, source, pipeline, item):
@@ -37,13 +38,6 @@ class SQLReporter(BaseReporter):
             self.log.warn("SQL reporter (%s) is disabled " % self)
             return
 
-        if self.driver.sched.config.has_option('zuul', 'url_pattern'):
-            url_pattern = self.driver.sched.config.get('zuul', 'url_pattern')
-        else:
-            url_pattern = None
-
-        score = self.config.get('score', 0)
-
         with self.connection.engine.begin() as conn:
             buildset_ins = self.connection.zuul_buildset_table.insert().values(
                 zuul_ref=item.current_build_set.ref,
@@ -52,7 +46,7 @@ class SQLReporter(BaseReporter):
                 change=item.change.number,
                 patchset=item.change.patchset,
                 ref=item.change.refspec,
-                score=score,
+                score=self.result_score,
                 message=self._formatItemReport(
                     pipeline, item, with_jobs=False),
             )
@@ -67,7 +61,7 @@ class SQLReporter(BaseReporter):
                     # information about the change.
                     continue
 
-                (result, url) = item.formatJobResult(job, url_pattern)
+                (result, url) = item.formatJobResult(job)
 
                 build_inserts.append({
                     'buildset_id': buildset_ins_result.inserted_primary_key,
