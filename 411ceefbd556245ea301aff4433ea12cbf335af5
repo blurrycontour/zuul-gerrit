@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "1a1ced50_629b45ca",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1956,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-03-17T23:10:13Z",
+      "side": 1,
+      "message": "Oops, sometimes I struggle to know what the original tests were doing. So I feel like that belongs in a comment. I\u0027ll try and add a few to make it more clear what we think this test does.",
+      "revId": "411ceefbd556245ea301aff4433ea12cbf335af5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a1ced50_d1622fad",
         "filename": "tests/unit/test_scheduler.py",
         "patchSetId": 1
@@ -30,6 +47,23 @@
       "writtenOn": "2017-03-16T23:37:32Z",
       "side": 1,
       "message": "We shouldn\u0027t need this, since what we really want to test is that a pending job in the gearman queue is canceled.  We shouldn\u0027t get far enough for the executor client to handle it.",
+      "revId": "411ceefbd556245ea301aff4433ea12cbf335af5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1ced50_82a041f6",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1959,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-03-17T23:10:13Z",
+      "side": 1,
+      "message": "This was flailing. the hold_jobs_in_queue wasn\u0027t holding anything. Will debug.",
       "revId": "411ceefbd556245ea301aff4433ea12cbf335af5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -98,6 +132,23 @@
       "writtenOn": "2017-03-16T23:42:28Z",
       "side": 1,
       "message": "And project-merge should have not run.",
+      "revId": "411ceefbd556245ea301aff4433ea12cbf335af5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1ced50_a2a53d05",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1975,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-03-17T23:10:13Z",
+      "side": 1,
+      "message": "Thanks! Will try and see where this isn\u0027t working.",
       "revId": "411ceefbd556245ea301aff4433ea12cbf335af5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
