@@ -33,6 +33,24 @@
       "revId": "c07eb5e9c907d7e6566e15e5330a08b44cd58bda",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1ced50_6e1251b6",
+        "filename": "playbooks/roles/prepare-workspace/defaults/main.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-17T22:41:18Z",
+      "side": 1,
+      "message": "Let me preface, as this is completely personal opinion and something I\u0027ve wanted to at-least get into some sort of design document for playbook / roles.\n\nI have a strong desire to implement / encore some sort of variable scoping for our roles.  Specifically, a role should only access local variables itself.  I know there is nothing stopping you to do this in ansible today (and more something specific to how puppet does variables) but I see it as a good way to implement some sort of interface for roles. It also should help protect us from spaghetti dependencies with roles.\n\nFor me, I\u0027ve been writing role variables with the following in mind, \u003crole name\u003e_\u003cvariable name\u003e. I the case here, prepare_workspace is the role, workspace_root the local variable.  This was part of my motivation at rename the role to bootstrap, so it didn\u0027t look weird.\n\nAdditionally, this patchset is a little bad because it doesn\u0027t completely follow what I just typed in the run-cover role, since it is accessing zuul_workspace_root directly.\n\nI can hopefully better demonstrate it with some existing code:\n\n  http://git.openstack.org/cgit/openstack/ansible-role-shade/tree/defaults/main.yaml\n  http://git.openstack.org/cgit/openstack/windmill/tree/playbooks/group_vars/nodepool-launcher.yaml\n\nPerhaps I am being a little paranoid, or making additional work, but I am concerned about how easier it is to group everything into a global vars.  Especially if every get to the point of separate repos for ansible roles.",
+      "parentUuid": "1a1ced50_d3404e59",
+      "revId": "c07eb5e9c907d7e6566e15e5330a08b44cd58bda",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
