@@ -22,6 +22,30 @@
       "revId": "df2e0cbf3f0f8783c62aa4ca5ec96bdbf02ad5ba",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1ced50_3c60a135",
+        "filename": "tox.ini",
+        "patchSetId": 8
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-17T14:45:16Z",
+      "side": 1,
+      "message": "No specific reason, ansible-lint doesn\u0027t like non yaml files, so I was just being cautious",
+      "parentUuid": "1a1ced50_9ccfd5af",
+      "range": {
+        "startLine": 34,
+        "startChar": 11,
+        "endLine": 34,
+        "endChar": 23
+      },
+      "revId": "df2e0cbf3f0f8783c62aa4ca5ec96bdbf02ad5ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
