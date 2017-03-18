@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1a1ced50_3647cbbc",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2126,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-03-18T07:03:25Z",
+      "side": 1,
+      "message": "I\u0027m not sure if that makes sense for semaphores as project repos are evaluated dynamically per patch right?\n\nI\u0027m thinking of the following use case. Two independent patches enter the check pipeline both modifying the semaphore (Patch A sets it to 2, Patch B to 3). What semaphore max should be effective during the run of these patches? So I think a semaphore config should exist exist exactly once at any time.\n\nIf you see a way to define this in a project repo but inhibit the dynamic evaluation I also would be fine with that.",
+      "parentUuid": "1a1ced50_a8ab6188",
+      "revId": "477d218c62179c66c1d743693f4ffa60a8833251",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a1ced50_c8b09df7",
         "filename": "zuul/scheduler.py",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2017-03-17T21:20:04Z",
       "side": 1,
       "message": "Thanks for noticing this wasn\u0027t tenant-aware.  :)\n\nI wonder if we should have a SemaphoreHandler per-tenant, and then pass that in when we acquire and release a semaphore.  That would make this simpler.  We just need to make sure to copy it over to the new tenant object if we perform a full configuration reload.  That should be easy.",
+      "revId": "477d218c62179c66c1d743693f4ffa60a8833251",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1ced50_5604477d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-03-18T07:03:25Z",
+      "side": 1,
+      "message": "Sounds reasonable. I\u0027ll try this out.",
+      "parentUuid": "1a1ced50_c8b09df7",
       "revId": "477d218c62179c66c1d743693f4ffa60a8833251",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
