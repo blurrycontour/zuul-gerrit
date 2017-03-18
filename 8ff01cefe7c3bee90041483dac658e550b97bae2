@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a1ced50_f65b7352",
+        "filename": "tests/encrypt_secret.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-03-18T07:21:51Z",
+      "side": 1,
+      "message": "Debuggin leftover?",
+      "range": {
+        "startLine": 48,
+        "startChar": 4,
+        "endLine": 48,
+        "endChar": 38
+      },
+      "revId": "8ff01cefe7c3bee90041483dac658e550b97bae2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
