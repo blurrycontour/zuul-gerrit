@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a1ced50_b7564bd0",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 659,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-19T20:46:10Z",
+      "side": 1,
+      "message": "My gut is telling me we should maybe default this to False, forcing admins to opt-in to using secrets for a pipeline.\n\nThat way, zuul operators need to be specific of which pipelines get to allow secrets.",
+      "revId": "cd5573cb70a6131755979e6f3a7f42e3b915f18f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
