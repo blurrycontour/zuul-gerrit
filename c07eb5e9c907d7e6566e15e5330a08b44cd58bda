@@ -68,6 +68,24 @@
       "revId": "c07eb5e9c907d7e6566e15e5330a08b44cd58bda",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1ced50_50bed4d4",
+        "filename": "playbooks/roles/prepare-workspace/defaults/main.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 7191
+      },
+      "writtenOn": "2017-03-20T22:45:10Z",
+      "side": 1,
+      "message": "I feel like i\u0027m agreeing with both of you.\n\nI always try and write role variables as \u003crole_name\u003e_\u003cvariable_name\u003e as I find it is at least keeps the variable namespace somewhat isolated. \n\nWhenever there are variables that apply to multiple roles i have a \u003cglobal_name\u003e_\u003cvariable_name\u003e that i then patch through to the role. Depending on how you re-use the role it can be done from the playback or just a big vars file, personally i prefer it in the playbook.\n\nI prefer this split because i think it makes the roles reusable. The question here is whether reusability is something we care about given how tied together all these roles are and that we want to provide users with only a global set of variables to care about.",
+      "parentUuid": "1a1ced50_ae444974",
+      "revId": "c07eb5e9c907d7e6566e15e5330a08b44cd58bda",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
