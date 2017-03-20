@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "1a1ced50_15ff0035",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2126,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-03-20T15:23:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a1ced50_b031df0d",
+      "revId": "477d218c62179c66c1d743693f4ffa60a8833251",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a1ced50_c8b09df7",
         "filename": "zuul/scheduler.py",
         "patchSetId": 4
@@ -84,6 +102,24 @@
       "side": 1,
       "message": "Sounds reasonable. I\u0027ll try this out.",
       "parentUuid": "1a1ced50_c8b09df7",
+      "revId": "477d218c62179c66c1d743693f4ffa60a8833251",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1ced50_75bd9467",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-03-20T15:23:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a1ced50_5604477d",
       "revId": "477d218c62179c66c1d743693f4ffa60a8833251",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
