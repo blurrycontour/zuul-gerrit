@@ -757,7 +757,7 @@ class Job(object):
             post_run=(),
             run=(),
             implied_run=(),
-            mutex=None,
+            semaphore=None,
             attempts=3,
             final=False,
             roles=frozenset(),
@@ -1366,7 +1366,7 @@ class QueueItem(object):
             return False
         return self.item_ahead.isHoldingFollowingChanges()
 
-    def findJobsToRun(self, mutex):
+    def findJobsToRun(self, semaphore_handler):
         torun = []
         if not self.live:
             return []
@@ -1405,9 +1405,9 @@ class QueueItem(object):
                     # The nodes for this job are not ready, skip
                     # it for now.
                     continue
-                if mutex.acquire(self, job):
-                    # If this job needs a mutex, either acquire it or make
-                    # sure that we have it before running the job.
+                if semaphore_handler.acquire(self, job):
+                    # If this job needs a semaphore, either acquire it or
+                    # make sure that we have it before running the job.
                     torun.append(job)
         return torun
 
@@ -2200,6 +2200,7 @@ class UnparsedTenantConfig(object):
         self.projects = {}
         self.nodesets = []
         self.secrets = []
+        self.semaphores = []
 
     def copy(self):
         r = UnparsedTenantConfig()
@@ -2209,6 +2210,7 @@ class UnparsedTenantConfig(object):
         r.projects = copy.deepcopy(self.projects)
         r.nodesets = copy.deepcopy(self.nodesets)
         r.secrets = copy.deepcopy(self.secrets)
+        r.semaphores = copy.deepcopy(self.semaphores)
         return r
 
     def extend(self, conf):
@@ -2220,6 +2222,7 @@ class UnparsedTenantConfig(object):
                 self.projects.setdefault(k, []).extend(v)
             self.nodesets.extend(conf.nodesets)
             self.secrets.extend(conf.secrets)
+            self.semaphores.extend(conf.semaphores)
             return
 
         if not isinstance(conf, list):
@@ -2250,6 +2253,8 @@ class UnparsedTenantConfig(object):
                 self.nodesets.append(value)
             elif key == 'secret':
                 self.secrets.append(value)
+            elif key == 'semaphore':
+                self.semaphores.append(value)
             else:
                 raise Exception("Configuration item `%s` not recognized "
                                 "(when parsing %s)" %
@@ -2273,6 +2278,7 @@ class Layout(object):
         self.jobs = {'noop': [Job('noop')]}
         self.nodesets = {}
         self.secrets = {}
+        self.semaphores = {}
 
     def getJob(self, name):
         if name in self.jobs:
@@ -2310,6 +2316,11 @@ class Layout(object):
         if secret.name in self.secrets:
             raise Exception("Secret %s already defined" % (secret.name,))
         self.secrets[secret.name] = secret
+
+    def addSemaphore(self, semaphore):
+        if semaphore.name in self.semaphores:
+            raise Exception("Semaphore %s already defined" % (semaphore.name,))
+        self.semaphores[semaphore.name] = semaphore
 
     def addPipeline(self, pipeline):
         self.pipelines[pipeline.name] = pipeline
@@ -2381,6 +2392,12 @@ class Layout(object):
         return ret
 
 
+class Semaphore(object):
+    def __init__(self, name, max=1):
+        self.name = name
+        self.max = int(max)
+
+
 class Tenant(object):
     def __init__(self, name):
         self.name = name
@@ -2400,6 +2417,8 @@ class Tenant(object):
         self.project_repos_config = None
         # A mapping of source -> {config_repos: {}, project_repos: {}}
         self.sources = {}
+
+        self.semaphore_handler = None
 
     def addConfigRepo(self, source, project):
         sd = self.sources.setdefault(source.name,

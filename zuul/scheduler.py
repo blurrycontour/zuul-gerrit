@@ -33,66 +33,87 @@ from zuul import exceptions
 from zuul import version as zuul_version
 
 
-class MutexHandler(object):
-    log = logging.getLogger("zuul.MutexHandler")
+class SemaphoreHandler(object):
+    log = logging.getLogger("zuul.SemaphoreHandler")
 
     def __init__(self):
-        self.mutexes = {}
+        self.semaphores = {}
 
     def acquire(self, item, job):
-        if not job.mutex:
+        if not job.semaphore:
             return True
-        mutex_name = job.mutex
-        m = self.mutexes.get(mutex_name)
+
+        semaphore_key = job.semaphore
+
+        m = self.semaphores.get(semaphore_key)
         if not m:
-            # The mutex is not held, acquire it
-            self._acquire(mutex_name, item, job.name)
+            # The semaphore is not held, acquire it
+            self._acquire(semaphore_key, item, job.name)
             return True
-        held_item, held_job_name = m
-        if held_item is item and held_job_name == job.name:
-            # This item already holds the mutex
+        if (item, job.name) in m:
+            # This item already holds the semaphore
             return True
-        held_build = held_item.current_build_set.getBuild(held_job_name)
-        if held_build and held_build.result:
-            # The build that held the mutex is complete, release it
-            # and let the new item have it.
-            self.log.error("Held mutex %s being released because "
-                           "the build that holds it is complete" %
-                           (mutex_name,))
-            self._release(mutex_name, item, job.name)
-            self._acquire(mutex_name, item, job.name)
+
+        # semaphore is there, check max
+        if len(m) < self._max_count(item, job.semaphore):
+            self._acquire(semaphore_key, item, job.name)
             return True
+
         return False
 
     def release(self, item, job):
-        if not job.mutex:
+        if not job.semaphore:
             return
-        mutex_name = job.mutex
-        m = self.mutexes.get(mutex_name)
+
+        semaphore_key = job.semaphore
+
+        m = self.semaphores.get(semaphore_key)
         if not m:
-            # The mutex is not held, nothing to do
-            self.log.error("Mutex can not be released for %s "
-                           "because the mutex is not held" %
-                           (item,))
+            # The semaphore is not held, nothing to do
+            self.log.error("Semaphore can not be released for %s "
+                           "because the semaphore is not held" %
+                           item)
             return
-        held_item, held_job_name = m
-        if held_item is item and held_job_name == job.name:
-            # This item holds the mutex
-            self._release(mutex_name, item, job.name)
+        if (item, job.name) in m:
+            # This item is a holder of the semaphore
+            self._release(semaphore_key, item, job.name)
             return
-        self.log.error("Mutex can not be released for %s "
-                       "which does not hold it" %
-                       (item,))
+        self.log.error("Semaphore can not be released for %s "
+                       "which does not hold it" % item)
 
-    def _acquire(self, mutex_name, item, job_name):
-        self.log.debug("Job %s of item %s acquiring mutex %s" %
-                       (job_name, item, mutex_name))
-        self.mutexes[mutex_name] = (item, job_name)
+    def _acquire(self, semaphore_key, item, job_name):
+        self.log.debug("Semaphore acquire {semaphore}: job {job}, item {item}"
+                       .format(semaphore=semaphore_key,
+                               job=job_name,
+                               item=item))
+        if semaphore_key not in self.semaphores:
+            self.semaphores[semaphore_key] = []
+        self.semaphores[semaphore_key].append((item, job_name))
 
-    def _release(self, mutex_name, item, job_name):
-        self.log.debug("Job %s of item %s releasing mutex %s" %
-                       (job_name, item, mutex_name))
-        del self.mutexes[mutex_name]
+    def _release(self, semaphore_key, item, job_name):
+        self.log.debug("Semaphore release {semaphore}: job {job}, item {item}"
+                       .format(semaphore=semaphore_key,
+                               job=job_name,
+                               item=item))
+        sem_item = (item, job_name)
+        if sem_item in self.semaphores[semaphore_key]:
+            self.semaphores[semaphore_key].remove(sem_item)
+
+        # cleanup if there is no user of the semaphore anymore
+        if len(self.semaphores[semaphore_key]) == 0:
+            del self.semaphores[semaphore_key]
+
+    @staticmethod
+    def _max_count(item, semaphore_name):
+        if not item.current_build_set.layout:
+            # This should not occur as the layout of the item must already be
+            # built when acquiring or releasing a semaphore for a job.
+            raise Exception("Item {} has no layout".format(item))
+
+        # find the right semaphore
+        default_semaphore = model.Semaphore(semaphore_name, 1)
+        semaphores = item.current_build_set.layout.semaphores
+        return semaphores.get(semaphore_name, default_semaphore).max
 
 
 class ManagementEvent(object):
@@ -269,7 +290,6 @@ class Scheduler(threading.Thread):
         self.connections = None
         self.statsd = extras.try_import('statsd.statsd')
         # TODO(jeblair): fix this
-        self.mutex = MutexHandler()
         # Despite triggers being part of the pipeline, there is one trigger set
         # per scheduler. The pipeline handles the trigger filters but since
         # the events are handled by the scheduler itself it needs to handle
@@ -594,19 +614,30 @@ class Scheduler(threading.Thread):
                 except Exception:
                     self.log.exception(
                         "Exception while canceling build %s "
-                        "for change %s" % (build, item.change))
+                        "for change %s" % (build, build.build_set.item.change))
                 finally:
-                    self.mutex.release(build.build_set.item, build.job)
+                    tenant.semaphore_handler.release(
+                        build.build_set.item, build.job)
 
     def _reconfigureTenant(self, tenant):
         # This is called from _doReconfigureEvent while holding the
         # layout lock
         old_tenant = self.abide.tenants.get(tenant.name)
+
         if old_tenant:
+            # Copy over semaphore handler so we don't loose the currently
+            # held semaphores.
+            tenant.semaphore_handler = old_tenant.semaphore_handler
+
             self._reenqueueTenant(old_tenant, tenant)
+        else:
+            # There is no old tenant, attach new semaphore handler
+            tenant.semaphore_handler = SemaphoreHandler()
+
         # TODOv3(jeblair): update for tenants
         # self.maintainConnectionCache()
         self.connections.reconfigureDrivers(tenant)
+
         # TODOv3(jeblair): remove postconfig calls?
         for pipeline in tenant.layout.pipelines.values():
             pipeline.source.postConfig()

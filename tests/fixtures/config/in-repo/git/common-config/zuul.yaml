@@ -42,3 +42,7 @@
     tenant-one-gate:
       jobs:
         - common-config-test
+
+- semaphore:
+    name: test-semaphore
+    max: 2
