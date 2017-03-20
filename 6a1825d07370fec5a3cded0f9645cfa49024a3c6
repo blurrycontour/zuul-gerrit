@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a1ced50_a4a3524e",
+        "filename": "tests/nodepool/test_nodepool_integration.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-20T20:49:09Z",
+      "side": 0,
+      "message": "Looks like we can drop ZooKeeperConnectionConfig() too",
+      "revId": "6a1825d07370fec5a3cded0f9645cfa49024a3c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
