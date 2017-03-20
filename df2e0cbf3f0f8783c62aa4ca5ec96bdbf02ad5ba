@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "1a1ced50_1cfa0543",
+        "filename": "test-requirements.txt",
+        "patchSetId": 8
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-20T14:29:46Z",
+      "side": 1,
+      "message": "this is not released to pypi yet, also need to drop the \u0027v\u0027",
+      "revId": "df2e0cbf3f0f8783c62aa4ca5ec96bdbf02ad5ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a1ced50_9ccfd5af",
         "filename": "tox.ini",
         "patchSetId": 8
