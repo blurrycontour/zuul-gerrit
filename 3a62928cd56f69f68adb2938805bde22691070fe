@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a1ced50_732d71fd",
+        "filename": "zuul/model.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 1450,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-03-21T17:44:24Z",
+      "side": 1,
+      "message": "A NullChange doesn\u0027t appear to have a \"number\" attribute. Some protection is needed around these ref calls.",
+      "revId": "3a62928cd56f69f68adb2938805bde22691070fe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
