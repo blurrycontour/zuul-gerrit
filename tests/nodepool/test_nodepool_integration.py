@@ -32,6 +32,7 @@ class TestNodepoolIntegration(BaseTestCase):
 
         self.zk = zuul.zk.ZooKeeper()
         self.zk.connect('localhost:2181')
+        self.hostname = 'nodepool-test-hostname'
 
         self.provisioned_requests = []
         # This class implements the scheduler methods zuul.nodepool
