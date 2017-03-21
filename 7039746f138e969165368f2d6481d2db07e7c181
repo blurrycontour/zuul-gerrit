@@ -16,6 +16,23 @@
       "revId": "7039746f138e969165368f2d6481d2db07e7c181",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1ced50_e60b5cd4",
+        "filename": "playbooks/roles/revoke-sudo/tasks/main.yaml",
+        "patchSetId": 18
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-21T20:08:58Z",
+      "side": 1,
+      "message": "Hmm, interesting. Right now, we don\u0027t really care, since we only expect the playbookto run onetime then we delete the node.  But, maybe it is something we should long term.",
+      "revId": "7039746f138e969165368f2d6481d2db07e7c181",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
