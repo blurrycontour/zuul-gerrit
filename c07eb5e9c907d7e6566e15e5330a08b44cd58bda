@@ -19,6 +19,41 @@
     },
     {
       "key": {
+        "uuid": "1a1ced50_9b714de3",
+        "filename": ".zuul.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-03-21T00:17:19Z",
+      "side": 1,
+      "message": "What drives the decision of what path to put in here? Is _this_ the decision point, that doesn\u0027t rely on anything else pre-existing?",
+      "parentUuid": "1a1ced50_f3254ac2",
+      "revId": "c07eb5e9c907d7e6566e15e5330a08b44cd58bda",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1ced50_9b486d89",
+        "filename": "playbooks/base-pre.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-03-21T00:17:19Z",
+      "side": 1,
+      "message": "It would seem more natural to scope this variable down at the role application. Even though this play is a single role, it is still a better practice to scope it down to the role itself rather than the entire play. Since it seems the attempt is to keep the variable only available in the role itself.",
+      "revId": "c07eb5e9c907d7e6566e15e5330a08b44cd58bda",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a1ced50_d3404e59",
         "filename": "playbooks/roles/prepare-workspace/defaults/main.yaml",
         "patchSetId": 8
@@ -100,6 +135,41 @@
       "writtenOn": "2017-03-20T23:45:03Z",
       "side": 1,
       "message": "My personal feeling is that we should follow the practices of the Ansible community. I\u0027ve not looked outside the walls of Ursula much, but it seems to me that a global zuul_workspace variable is fine for zuul\u0027s own roles, and then anything else should accept paths as role parameters.",
+      "revId": "c07eb5e9c907d7e6566e15e5330a08b44cd58bda",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1ced50_56beccd4",
+        "filename": "playbooks/roles/prepare-workspace/defaults/main.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-03-21T00:17:19Z",
+      "side": 1,
+      "message": "I don\u0027t have a strong opinion on whether or not to namespace the variables. I guess it depends on who the intended re-users of the roles. If they\u0027re only being used by zuul developers to test zuul itself, then we could easily define a global set of variables to use and depend on. If these roles are going to be usable outside of zuul, by maybe consumers of zuul, then it would be more appropriate to namespace, as we do not know how end users will combine these roles, and staking claim on global namespaces would be rude.\n\nAll that said, the awkwardness here is \"workspace_workspace\", which is what caught my eye immediately. I do agree renaming the role could help with this, such as \"workspace_bootstrap\" as the role name. However looking at the role itself, it\u0027s doing more than just ensuring that the workspace directory exists, it\u0027s also launching a daemon, so maybe the definition of \"workspace\" means the entire environment in which work happens, and then we have a \"workdir\" which is the directory within the workspace that is used to stage files and such. So, if we used \"workdir_root\" instead of \"workspace_root\", (or just simply \"workdir\" we could leave the role name as it is, and then this variable comes \"prepare_workspace_workdir_root\" (or \"prepare_workspace_workdir\", which avoids the awkward name repetition.\n\nAm I correct that \"workspace\" refers more to the greater environment, and less than the specific directory path?",
+      "parentUuid": "1a1ced50_9bba2d6d",
+      "revId": "c07eb5e9c907d7e6566e15e5330a08b44cd58bda",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1ced50_d678fc2d",
+        "filename": "playbooks/roles/run-bindep/tasks/main.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-03-21T00:17:19Z",
+      "side": 1,
+      "message": "As you\u0027ve pointed out, you tried to make prepare-workspace have a scoped variable, but now you\u0027re using the global variable here. It would make more sense if you stayed consistent and either scoped the global variable into role specific ones at the play level (and thus not depend on a site-specific global variable in a role) or give up that effort and simply rely on the global variable name throughout all these roles.\n\nSame comment goes to the other roles touched by this change.",
       "revId": "c07eb5e9c907d7e6566e15e5330a08b44cd58bda",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
