@@ -37,6 +37,23 @@
     },
     {
       "key": {
+        "uuid": "1a1ced50_27965b93",
+        "filename": ".zuul.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-21T16:08:12Z",
+      "side": 1,
+      "message": "maybe? with zuulv3, do we really need a workspace subdirectory or can we live using /home/zuul? I can add it back, but was trying to save some char length.",
+      "revId": "c07eb5e9c907d7e6566e15e5330a08b44cd58bda",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a1ced50_9b486d89",
         "filename": "playbooks/base-pre.yaml",
         "patchSetId": 8
@@ -159,6 +176,23 @@
     },
     {
       "key": {
+        "uuid": "1a1ced50_e77fe363",
+        "filename": "playbooks/roles/prepare-workspace/defaults/main.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-21T16:08:12Z",
+      "side": 1,
+      "message": "Right, workspace is really our base directory jobs are configured to use. In this case, it is /home/zuul.  We would make this prepare_workspace_rootdir/basedir/workdir moving forward.  The good news it looks like, the people do follow \u003crole name\u003e_\u003clocal var\u003e syntax.\n\nI also like the idea that jeblair mentioned about using role paramaters to be more specific in what variables we are passing.\n\nFor now, to keep things moving foward. zuul_workspace_root (global var) seems to be fine with everybody, so I\u0027ve uploaded PS9 to do that.\n\nI would like to establish some sort of style guide for zuul stdlib (even openstack-infra), maybe the next step forward is a spec / doc where we can document some of these items.",
+      "revId": "c07eb5e9c907d7e6566e15e5330a08b44cd58bda",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a1ced50_d678fc2d",
         "filename": "playbooks/roles/run-bindep/tasks/main.yaml",
         "patchSetId": 8
@@ -170,6 +204,23 @@
       "writtenOn": "2017-03-21T00:17:19Z",
       "side": 1,
       "message": "As you\u0027ve pointed out, you tried to make prepare-workspace have a scoped variable, but now you\u0027re using the global variable here. It would make more sense if you stayed consistent and either scoped the global variable into role specific ones at the play level (and thus not depend on a site-specific global variable in a role) or give up that effort and simply rely on the global variable name throughout all these roles.\n\nSame comment goes to the other roles touched by this change.",
+      "revId": "c07eb5e9c907d7e6566e15e5330a08b44cd58bda",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1ced50_07995fc4",
+        "filename": "playbooks/roles/run-bindep/tasks/main.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-21T16:08:12Z",
+      "side": 1,
+      "message": "Agreed, I never got around to updating this.  But now it is consider with above.",
       "revId": "c07eb5e9c907d7e6566e15e5330a08b44cd58bda",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
