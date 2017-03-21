@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a1ced50_f7230c56",
+        "filename": "playbooks/roles/extra-test-setup/tasks/main.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-03-21T18:03:00Z",
+      "side": 1,
+      "message": "This will cause a failure if the file tools/setup.sh does not exist. When the file path given to stat doesn\u0027t exist, the only return data is {\u0027exists\u0027: false}.\n\nYou\u0027d need to add another conditional here\n\nwhen:\n  - p.stat.exists\n  - p.stat.executable",
+      "revId": "83896d52b541063d9bc47d336478cad406ce9f90",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
