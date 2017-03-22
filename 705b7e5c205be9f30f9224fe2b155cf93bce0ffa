@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a1ced50_a23d9ec5",
+        "filename": "playbooks/roles/host-info/tasks/main.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-22T19:23:45Z",
+      "side": 1,
+      "message": "\"Building remotely\" is from jenkins; let\u0027s drop those words.  But printing the hostname is still cool.  However, we do that below.",
+      "revId": "705b7e5c205be9f30f9224fe2b155cf93bce0ffa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
