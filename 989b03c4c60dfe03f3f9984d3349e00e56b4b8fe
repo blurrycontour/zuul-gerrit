@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a1ced50_13a7afaa",
+        "filename": "playbooks/roles/extra-test-setup/tasks/main.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-22T16:05:09Z",
+      "side": 1,
+      "message": "The workspace can be a variable later on, but we haven\u0027t landed that change yet.",
+      "revId": "989b03c4c60dfe03f3f9984d3349e00e56b4b8fe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
