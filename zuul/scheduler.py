@@ -1970,7 +1970,7 @@ class IndependentPipelineManager(BasePipelineManager):
         # Return true if okay to proceed enqueing this change,
         # false if the change should not be enqueued.
         if not hasattr(change, 'needs_changes'):
-            self.log.debug("  Changeish does not support dependencies")
+            self.log.debug("  %s does not support dependencies" % type(change))
             return True
         if not change.needs_changes:
             self.log.debug("  No changes needed")
@@ -2091,7 +2091,7 @@ class DependentPipelineManager(BasePipelineManager):
         to_enqueue = []
         self.log.debug("Checking for changes needing %s:" % change)
         if not hasattr(change, 'needed_by_changes'):
-            self.log.debug("  Changeish does not support dependencies")
+            self.log.debug("  %s does not support dependencies" % type(change))
             return
         for other_change in change.needed_by_changes:
             with self.getChangeQueue(other_change) as other_change_queue:
@@ -2135,7 +2135,7 @@ class DependentPipelineManager(BasePipelineManager):
         # Return true if okay to proceed enqueing this change,
         # false if the change should not be enqueued.
         if not hasattr(change, 'needs_changes'):
-            self.log.debug("  Changeish does not support dependencies")
+            self.log.debug("  %s does not support dependencies" % type(change))
             return True
         if not change.needs_changes:
             self.log.debug("  No changes needed")

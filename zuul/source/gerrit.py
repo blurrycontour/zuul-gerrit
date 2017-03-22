@@ -155,7 +155,13 @@ class GerritSource(BaseSource):
             change.newrev = event.newrev
             change.url = self._getGitwebUrl(project, sha=event.newrev)
         else:
-            change = NullChange(project)
+            change = Ref(project)
+            refs = self.connection.getInfoRefs(project)
+            change.ref = 'refs/heads/master'
+            change.oldrev = refs[change.ref]
+            change.newrev = refs[change.ref]
+            change.url = self._getGitwebUrl(project, sha=change.newrev)
+
         return change
 
     def _getChange(self, number, patchset, refresh=False, history=None):

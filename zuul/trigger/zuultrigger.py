@@ -94,7 +94,7 @@ class ZuulTrigger(BaseTrigger):
     def _createParentChangeEnqueuedEvents(self, change, pipeline):
         self.log.debug("Checking for changes needing %s:" % change)
         if not hasattr(change, 'needed_by_changes'):
-            self.log.debug("  Changeish does not support dependencies")
+            self.log.debug("  %s does not support dependencies" % type(change))
             return
         for needs in change.needed_by_changes:
             self._createParentChangeEnqueuedEvent(needs, pipeline)
