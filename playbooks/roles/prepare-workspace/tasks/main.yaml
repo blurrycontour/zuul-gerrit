@@ -1,3 +1,5 @@
+# TODO(jeblair): if we don't need to pull this from the node anymore,
+# it can be made into a regular anonymous tmpfile.
 - name: Ensure console.log does not exist.
   file:
     path: /tmp/console.log
