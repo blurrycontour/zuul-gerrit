@@ -37,6 +37,23 @@
     },
     {
       "key": {
+        "uuid": "1a1ced50_fcb3bb4a",
+        "filename": "playbooks/roles/extra-test-setup/tasks/main.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-03-22T18:34:53Z",
+      "side": 1,
+      "message": "K, and agreed, it\u0027s a linter\u0027s job. :)",
+      "revId": "989b03c4c60dfe03f3f9984d3349e00e56b4b8fe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a1ced50_6eec7af3",
         "filename": "playbooks/roles/extra-test-setup/tasks/main.yaml",
         "patchSetId": 4
@@ -66,6 +83,23 @@
       "side": 1,
       "message": "Currently not every project has tools/test-setup.sh, so check to see it exists before the next task.\n\nIdeally, we move test-setup.sh in to playbooks then we don\u0027t need to do something like this. But, easy mode.",
       "parentUuid": "1a1ced50_6eec7af3",
+      "revId": "989b03c4c60dfe03f3f9984d3349e00e56b4b8fe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1ced50_1c85f758",
+        "filename": "playbooks/roles/extra-test-setup/tasks/main.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-03-22T18:34:53Z",
+      "side": 1,
+      "message": "So are we making a well defined interface? I kind of thought we were just doing tox. Where is the test-setup.sh interface defined, or is it just a convention OpenStack projects have followed (I am not involved with enough projects to know if this is the case)",
       "revId": "989b03c4c60dfe03f3f9984d3349e00e56b4b8fe",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -118,6 +152,23 @@
       "side": 1,
       "message": "Agree, jlk mentioned this too. A lot of our current setup will come from one time use workers, where we might not care about that.  However, I agree we should do it for best practices.",
       "parentUuid": "1a1ced50_8ebd36da",
+      "revId": "989b03c4c60dfe03f3f9984d3349e00e56b4b8fe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1ced50_3c88f370",
+        "filename": "playbooks/roles/extra-test-setup/tasks/main.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-03-22T18:34:53Z",
+      "side": 1,
+      "message": "Yeah, this is more \"do ansible the ansible way\" argument, not a \"this is important for this particular application.\" So it\u0027s just a future idea that we try and do that.",
       "revId": "989b03c4c60dfe03f3f9984d3349e00e56b4b8fe",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
