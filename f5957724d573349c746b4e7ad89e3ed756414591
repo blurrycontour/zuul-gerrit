@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a1ced50_30073c83",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 5246,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-22T17:20:56Z",
+      "side": 1,
+      "message": "While we don\u0027t want to dynamically change a semaphore\u0027s value for a speculative run, we do need to be able to change it if the configuration change lands.  I believe that should work, but I don\u0027t think that is explicitly tested.  It would probably be a good idea to do so, and perhaps altering this test to do that might be good.  We could change this to use the gate rather than check pipeline, and then after A merges, check the max value of the semaphore.",
+      "revId": "f5957724d573349c746b4e7ad89e3ed756414591",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1ced50_70fd346d",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1100,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-22T17:20:56Z",
+      "side": 1,
+      "message": "This seems like a reasonable compromise.",
+      "revId": "f5957724d573349c746b4e7ad89e3ed756414591",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1ced50_500af88a",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 635,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-22T17:20:56Z",
+      "side": 1,
+      "message": "If you did move SemaphoreHandler to model.py, you could just initialize the Tenant.semaphore_handler there.",
+      "revId": "f5957724d573349c746b4e7ad89e3ed756414591",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
