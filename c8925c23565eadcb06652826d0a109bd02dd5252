@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a1ced50_60663952",
+        "filename": "playbooks/roles/host-info/tasks/main.yaml",
+        "patchSetId": 24
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-22T23:04:53Z",
+      "side": 1,
+      "message": "This is bad! And will require changes to zuul",
+      "revId": "c8925c23565eadcb06652826d0a109bd02dd5252",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
