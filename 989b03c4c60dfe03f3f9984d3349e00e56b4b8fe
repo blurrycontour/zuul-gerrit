@@ -106,6 +106,24 @@
     },
     {
       "key": {
+        "uuid": "1a1ced50_fca73ba4",
+        "filename": "playbooks/roles/extra-test-setup/tasks/main.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-22T18:45:15Z",
+      "side": 1,
+      "message": "Not sure, I\u0027m just focused on easy mode for openstack projects. And because zuul is the only project right now on zuulv3-dev.o.o, I think we are crossing streams between that and stdlib.\n\nThere have been a lot of things in this stack, that I don\u0027t think are stdlib.  run-tox role as an example, is version openstack-infra.",
+      "parentUuid": "1a1ced50_1c85f758",
+      "revId": "989b03c4c60dfe03f3f9984d3349e00e56b4b8fe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a1ced50_13a7afaa",
         "filename": "playbooks/roles/extra-test-setup/tasks/main.yaml",
         "patchSetId": 4
