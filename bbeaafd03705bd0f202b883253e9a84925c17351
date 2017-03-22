@@ -22,6 +22,57 @@
       "revId": "bbeaafd03705bd0f202b883253e9a84925c17351",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1ced50_f4f05dff",
+        "filename": "tools/encrypt_secret.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 8124
+      },
+      "writtenOn": "2017-03-22T00:19:09Z",
+      "side": 1,
+      "message": "The following pattern seems more common:\n\n with tempfile.NamedTemporaryFile() as pubkey_file:\n   pubkey_file.write(...)\n   pubkey_file.flush()\n   ...",
+      "revId": "bbeaafd03705bd0f202b883253e9a84925c17351",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1ced50_34df556a",
+        "filename": "tools/encrypt_secret.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 8124
+      },
+      "writtenOn": "2017-03-22T00:19:09Z",
+      "side": 1,
+      "message": "it seems you should check that the command succeed",
+      "revId": "bbeaafd03705bd0f202b883253e9a84925c17351",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1ced50_d488c173",
+        "filename": "tools/encrypt_secret.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 8124
+      },
+      "writtenOn": "2017-03-22T00:19:09Z",
+      "side": 1,
+      "message": "useless braces",
+      "revId": "bbeaafd03705bd0f202b883253e9a84925c17351",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
