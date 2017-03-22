@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "1a1ced50_4ef17ecc",
+        "filename": "playbooks/roles/extra-test-setup/tasks/main.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-03-22T16:21:54Z",
+      "side": 1,
+      "message": "Just a question.. are we going to always want to have these ---\u0027s? Just wondering. They\u0027re basically pointless.",
+      "revId": "989b03c4c60dfe03f3f9984d3349e00e56b4b8fe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1ced50_6eec7af3",
+        "filename": "playbooks/roles/extra-test-setup/tasks/main.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-03-22T16:21:54Z",
+      "side": 1,
+      "message": "What\u0027s the point of this stat? If we remove the script, we should remove the role.",
+      "revId": "989b03c4c60dfe03f3f9984d3349e00e56b4b8fe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a1ced50_13a7afaa",
         "filename": "playbooks/roles/extra-test-setup/tasks/main.yaml",
         "patchSetId": 4
@@ -13,6 +47,23 @@
       "writtenOn": "2017-03-22T16:05:09Z",
       "side": 1,
       "message": "The workspace can be a variable later on, but we haven\u0027t landed that change yet.",
+      "revId": "989b03c4c60dfe03f3f9984d3349e00e56b4b8fe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1ced50_8ebd36da",
+        "filename": "playbooks/roles/extra-test-setup/tasks/main.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-03-22T16:21:54Z",
+      "side": 1,
+      "message": "future idea: this file should touch /run/zuul-test-setup-complete and then we can add a \u0027creates: /run/zuul-test-setup-complete\u0027. I know these playbooks are usually run on throwaway boxes, but it\u0027s a good habit to get into, and it helps speed things up for people iterating.",
       "revId": "989b03c4c60dfe03f3f9984d3349e00e56b4b8fe",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
