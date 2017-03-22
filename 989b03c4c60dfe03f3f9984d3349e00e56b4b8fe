@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1a1ced50_2e252208",
+        "filename": "playbooks/roles/extra-test-setup/tasks/main.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-22T16:26:24Z",
+      "side": 1,
+      "message": "Habit, I\u0027m hoping once we start linting our playbooks it will catch things like this.",
+      "parentUuid": "1a1ced50_4ef17ecc",
+      "revId": "989b03c4c60dfe03f3f9984d3349e00e56b4b8fe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a1ced50_6eec7af3",
         "filename": "playbooks/roles/extra-test-setup/tasks/main.yaml",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2017-03-22T16:21:54Z",
       "side": 1,
       "message": "What\u0027s the point of this stat? If we remove the script, we should remove the role.",
+      "revId": "989b03c4c60dfe03f3f9984d3349e00e56b4b8fe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1ced50_4ec41e3f",
+        "filename": "playbooks/roles/extra-test-setup/tasks/main.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-22T16:26:24Z",
+      "side": 1,
+      "message": "Currently not every project has tools/test-setup.sh, so check to see it exists before the next task.\n\nIdeally, we move test-setup.sh in to playbooks then we don\u0027t need to do something like this. But, easy mode.",
+      "parentUuid": "1a1ced50_6eec7af3",
       "revId": "989b03c4c60dfe03f3f9984d3349e00e56b4b8fe",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -64,6 +100,24 @@
       "writtenOn": "2017-03-22T16:21:54Z",
       "side": 1,
       "message": "future idea: this file should touch /run/zuul-test-setup-complete and then we can add a \u0027creates: /run/zuul-test-setup-complete\u0027. I know these playbooks are usually run on throwaway boxes, but it\u0027s a good habit to get into, and it helps speed things up for people iterating.",
+      "revId": "989b03c4c60dfe03f3f9984d3349e00e56b4b8fe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1ced50_0efce66e",
+        "filename": "playbooks/roles/extra-test-setup/tasks/main.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-03-22T16:26:24Z",
+      "side": 1,
+      "message": "Agree, jlk mentioned this too. A lot of our current setup will come from one time use workers, where we might not care about that.  However, I agree we should do it for best practices.",
+      "parentUuid": "1a1ced50_8ebd36da",
       "revId": "989b03c4c60dfe03f3f9984d3349e00e56b4b8fe",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
