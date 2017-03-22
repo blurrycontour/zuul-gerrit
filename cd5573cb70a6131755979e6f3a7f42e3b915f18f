@@ -16,6 +16,23 @@
       "revId": "cd5573cb70a6131755979e6f3a7f42e3b915f18f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1ced50_09fdc0b3",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 659,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-22T16:37:53Z",
+      "side": 1,
+      "message": "Yeah, and I think Clark suggested the same thing when we were discussing the spec.  I\u0027ll switch it.",
+      "revId": "cd5573cb70a6131755979e6f3a7f42e3b915f18f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
