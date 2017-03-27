@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ffe62b97_651bfc80",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1879,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-27T11:28:13Z",
+      "side": 1,
+      "message": "This assumes playbooks exists. I can\u0027t think of an example where it shouldn\u0027t (particularly because these are tests), but is there a case where a project wouldn\u0027t have playbooks but still use zuul?",
+      "range": {
+        "startLine": 1879,
+        "startChar": 62,
+        "endLine": 1879,
+        "endChar": 71
+      },
+      "revId": "678e2c34b3b97bc8742fdb44610b39247e7641e8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
