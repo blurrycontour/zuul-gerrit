@@ -14,6 +14,7 @@
 
 import abc
 import copy
+import logging
 import os
 import re
 import struct
@@ -1177,6 +1178,7 @@ class QueueItem(object):
     holds the current `BuildSet` as well as all previous `BuildSets` that were
     produced for this `QueueItem`.
     """
+    log = logging.getLogger("zuul.QueueItem")
 
     def __init__(self, queue, change):
         self.pipeline = queue.pipeline
@@ -1434,6 +1436,38 @@ class QueueItem(object):
             fakebuild.result = 'SKIPPED'
             self.addBuild(fakebuild)
 
+    def formatUrlPattern(self, url_pattern, job=None, build=None):
+        url = None
+        # Produce safe versions of objects which may be useful in
+        # result formatting, but don't allow users to crawl through
+        # the entire data structure where they might be able to access
+        # secrets, etc.
+        safe_change = self.change.getSafeAttributes()
+        safe_pipeline = self.pipeline.getSafeAttributes()
+        safe_job = job.getSafeAttributes()
+        safe_build = build.getSafeAttributes()
+        try:
+            url = pattern.format(change=safe_change,
+                                 pipeline=safe_pipeline,
+                                 job=safe_job,
+                                 build=safe_build)
+        except KeyError:
+            self.log.exception("Unknown key in url_pattern")
+            self.log.debug("url_pattern: %s" % url_pattern)
+        except AttributeError:
+            self.log.exception("Unknown attribute in url_pattern")
+            self.log.debug("url_pattern: %s" % url_pattern)
+            self.log.debug(
+                "change attributes: %s" % safe_change.__dict__.keys())
+            self.log.debug(
+                "pipeline attributes: %s" % safe_pipeline.__dict__.keys())
+            self.log.debug("build attributes: %s" % safe_build.__dict__.keys())
+            self.log.debug("job attributes: %s" % safe_job.__dict__.keys())
+        except Exception:
+            self.log.exception("Unknown error formatting url_pattern")
+
+        return url
+
     def formatJobResult(self, job):
         build = self.current_build_set.getBuild(job.name)
         result = build.result
@@ -1449,22 +1483,8 @@ class QueueItem(object):
             if job.failure_url:
                 pattern = job.failure_url
         url = None
-        # Produce safe versions of objects which may be useful in
-        # result formatting, but don't allow users to crawl through
-        # the entire data structure where they might be able to access
-        # secrets, etc.
-        safe_change = self.change.getSafeAttributes()
-        safe_pipeline = self.pipeline.getSafeAttributes()
-        safe_job = job.getSafeAttributes()
-        safe_build = build.getSafeAttributes()
         if pattern:
-            try:
-                url = pattern.format(change=safe_change,
-                                     pipeline=safe_pipeline,
-                                     job=safe_job,
-                                     build=safe_build)
-            except Exception:
-                pass  # FIXME: log this or something?
+            url = self.formatUrlPattern(pattern, job, build)
         if not url:
             url = build.url or job.name
         return (result, url)
