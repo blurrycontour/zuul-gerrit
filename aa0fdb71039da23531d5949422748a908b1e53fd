@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ffe62b97_a7b8c8e4",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1453,
+      "author": {
+        "id": 6039
+      },
+      "writtenOn": "2017-03-27T23:18:45Z",
+      "side": 1,
+      "message": "You will need to add a QueueItem logger like I had done in lines 17 and 1165 of https://review.openstack.org/#/c/449794/2/zuul/model.py",
+      "revId": "aa0fdb71039da23531d5949422748a908b1e53fd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
