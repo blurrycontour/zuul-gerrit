@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ffe62b97_1be1172b",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-27T20:48:54Z",
+      "side": 1,
+      "message": "This is unused...",
+      "revId": "625730b4814c0dc2294cb982e3a78ccf9b750c21",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_fbd3135f",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-27T20:48:54Z",
+      "side": 1,
+      "message": "This accesses the \u0027score\u0027 attribute regardless, so we need a .get() call like before.  But it looks like the initializer almost does what we want, so I\u0027ll drop this and use the attribute it sets instead.",
+      "revId": "625730b4814c0dc2294cb982e3a78ccf9b750c21",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
