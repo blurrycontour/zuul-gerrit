@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ffe62b97_d2d8347c",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1438,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-03-27T19:35:43Z",
+      "side": 1,
+      "message": "Apparently lines 1437 and 1438 are too long.",
+      "revId": "9b207864d4bd14251e1b53e864de37c0c7891da5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
