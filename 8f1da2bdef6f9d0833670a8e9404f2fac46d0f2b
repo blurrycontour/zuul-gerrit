@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ffe62b97_dc4250ab",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 572,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-28T21:43:57Z",
+      "side": 0,
+      "message": "Why is this being removed?  Is this copied over from I38b4fac4868a823b0de2f6c505744a927c577fad?  If so, please see my comment on that change on why it needs to stay.",
+      "revId": "8f1da2bdef6f9d0833670a8e9404f2fac46d0f2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_bc154c9e",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 613,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-28T21:43:57Z",
+      "side": 0,
+      "message": "Same comment as above.",
+      "revId": "8f1da2bdef6f9d0833670a8e9404f2fac46d0f2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_5c1080a8",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 724,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-28T21:43:57Z",
+      "side": 0,
+      "message": "Same comment as above.",
+      "revId": "8f1da2bdef6f9d0833670a8e9404f2fac46d0f2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}

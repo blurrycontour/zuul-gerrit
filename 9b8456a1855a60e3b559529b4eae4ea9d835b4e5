@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ffe62b97_3c401ca5",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 516,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-28T21:43:57Z",
+      "side": 1,
+      "message": "We shouldn\u0027t schedule a second merge here, it was already done in prepareItem.",
+      "revId": "9b8456a1855a60e3b559529b4eae4ea9d835b4e5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_1c3d582a",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 546,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-28T21:43:57Z",
+      "side": 1,
+      "message": "I think you want to request the config files here so we only perform one merge.",
+      "revId": "9b8456a1855a60e3b559529b4eae4ea9d835b4e5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_fc4514b5",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 556,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-28T21:43:57Z",
+      "side": 1,
+      "message": "You could keep this as part of prepareItem, right?  Why split it?",
+      "revId": "9b8456a1855a60e3b559529b4eae4ea9d835b4e5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_9c1a88c9",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 615,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-28T21:43:57Z",
+      "side": 1,
+      "message": "If you kept this as part of prepareItem, we can drop the extra jobs_ready variable and this gets a little simpler.",
+      "revId": "9b8456a1855a60e3b559529b4eae4ea9d835b4e5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_7c0b447c",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 645,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-28T21:43:57Z",
+      "side": 1,
+      "message": "This would report before it reaches the top of the queue which isn\u0027t right.  The previous location for this code is correct.",
+      "revId": "9b8456a1855a60e3b559529b4eae4ea9d835b4e5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
