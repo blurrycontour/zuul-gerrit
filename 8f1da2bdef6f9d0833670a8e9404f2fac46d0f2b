@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "ffe62b97_323de3c3",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 572,
+      "author": {
+        "id": 6039
+      },
+      "writtenOn": "2017-03-28T22:17:35Z",
+      "side": 0,
+      "message": "Oh, I had taken that comment to mean the confusion was on the part of the original author who added these try blocks. If we need to handle these exceptions I will revert this portion of the change.",
+      "revId": "8f1da2bdef6f9d0833670a8e9404f2fac46d0f2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ffe62b97_bc154c9e",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 11

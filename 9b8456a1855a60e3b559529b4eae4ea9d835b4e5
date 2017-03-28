@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "ffe62b97_721feb5a",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 516,
+      "author": {
+        "id": 6039
+      },
+      "writtenOn": "2017-03-28T22:17:35Z",
+      "side": 1,
+      "message": "We have only scheduled a merged if we got here from prepareItem, but not if we got here from reEnqueueItem. (And I\u0027m not sure what code paths lead to reEnqueueItem.)",
+      "revId": "9b8456a1855a60e3b559529b4eae4ea9d835b4e5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ffe62b97_1c3d582a",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 11
@@ -53,6 +70,23 @@
     },
     {
       "key": {
+        "uuid": "ffe62b97_5224e7ae",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 556,
+      "author": {
+        "id": 6039
+      },
+      "writtenOn": "2017-03-28T22:17:35Z",
+      "side": 1,
+      "message": "I was thinking that we could catch merge failures early (as soon as the change is queued), but delay freezing the job graph until the item is actionable (inside the pipeline\u0027s window). This would save us from re-calculating job graphs for queued changes.",
+      "revId": "9b8456a1855a60e3b559529b4eae4ea9d835b4e5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ffe62b97_9c1a88c9",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 11
@@ -64,6 +98,23 @@
       "writtenOn": "2017-03-28T21:43:57Z",
       "side": 1,
       "message": "If you kept this as part of prepareItem, we can drop the extra jobs_ready variable and this gets a little simpler.",
+      "revId": "9b8456a1855a60e3b559529b4eae4ea9d835b4e5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_123adfca",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 615,
+      "author": {
+        "id": 6039
+      },
+      "writtenOn": "2017-03-28T22:17:35Z",
+      "side": 1,
+      "message": "By splitting this up, we can run prepareItem before actionable is True, but I wanted to wait until the change is actionable before freezing the job graph. I haven\u0027t looked at that code, I\u0027m just assuming it\u0027s computationally heavy; this could very well be premature optimization.",
       "revId": "9b8456a1855a60e3b559529b4eae4ea9d835b4e5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
