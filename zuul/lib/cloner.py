@@ -24,6 +24,7 @@ import six
 from git import GitCommandError
 from zuul import exceptions
 from zuul.lib.clonemapper import CloneMapper
+from zuul.lib import yamlutil
 from zuul.merger.merger import Repo
 
 
@@ -63,7 +64,7 @@ class Cloner(object):
             raise Exception("Unable to read clone map file at %s." %
                             clone_map_file)
         clone_map_file = open(clone_map_file)
-        self.clone_map = yaml.safe_load(clone_map_file).get('clonemap')
+        self.clone_map = yaml.load(clone_map_file, Loader=yamlutil.SafeLoader).get('clonemap')
         self.log.info("Loaded map containing %s rules", len(self.clone_map))
         return self.clone_map
 

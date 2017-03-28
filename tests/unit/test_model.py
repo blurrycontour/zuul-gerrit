@@ -22,6 +22,7 @@ import yaml
 
 from zuul import model
 from zuul import configloader
+from zuul.lib import yamlutil
 
 from tests.base import BaseTestCase
 
@@ -33,7 +34,7 @@ class TestJob(BaseTestCase):
         self.project = model.Project('project', None)
         self.context = model.SourceContext(self.project, 'master',
                                            'test', True)
-        self.start_mark = yaml.Mark('name', 0, 0, 0, '', 0)
+        self.start_mark = yamlutil.Mark('name', 0, 0, 0, '', 0)
 
     @property
     def job(self):

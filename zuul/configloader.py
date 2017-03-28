@@ -22,6 +22,7 @@ import textwrap
 import voluptuous as vs
 
 from zuul import model
+from zuul.lib import yamlutil
 import zuul.manager.dependent
 import zuul.manager.independent
 from zuul import change_matcher
@@ -82,8 +83,7 @@ def configuration_exceptions(stanza, conf):
                      start_mark=str(start_mark))
         raise ConfigurationSyntaxError(m)
 
-
-class ZuulSafeLoader(yaml.SafeLoader):
+class ZuulSafeLoader(yamlutil.SafeLoader):
     zuul_node_types = frozenset(('job', 'nodeset', 'pipeline',
                                  'project', 'project-template'))
 
@@ -132,7 +132,7 @@ class NodeSetParser(object):
         nodeset = {vs.Required('name'): str,
                    vs.Required('nodes'): [node],
                    '_source_context': model.SourceContext,
-                   '_start_mark': yaml.Mark,
+                   '_start_mark': yamlutil.Mark,
                    }
 
         return vs.Schema(nodeset)
@@ -189,7 +189,7 @@ class JobParser(object):
                'post-run': to_list(str),
                'run': str,
                '_source_context': model.SourceContext,
-               '_start_mark': yaml.Mark,
+               '_start_mark': yamlutil.Mark,
                'roles': to_list(role),
                'repos': to_list(str),
                'vars': dict,
@@ -343,7 +343,7 @@ class ProjectTemplateParser(object):
                 'merge', 'merge-resolve',
                 'cherry-pick'),
             '_source_context': model.SourceContext,
-            '_start_mark': yaml.Mark,
+            '_start_mark': yamlutil.Mark,
         }
 
         for p in layout.pipelines.values():
@@ -407,7 +407,7 @@ class ProjectParser(object):
             'merge-mode': vs.Any('merge', 'merge-resolve',
                                  'cherry-pick'),
             '_source_context': model.SourceContext,
-            '_start_mark': yaml.Mark,
+            '_start_mark': yamlutil.Mark,
         }
 
         for p in layout.pipelines.values():
@@ -544,7 +544,7 @@ class PipelineParser(object):
                     'window-decrease-type': window_type,
                     'window-decrease-factor': window_factor,
                     '_source_context': model.SourceContext,
-                    '_start_mark': yaml.Mark,
+                    '_start_mark': yamlutil.Mark,
                     }
         pipeline['trigger'] = vs.Required(
             PipelineParser.getDriverSchema('trigger', connections))
@@ -867,7 +867,7 @@ class ConfigLoader(object):
         config_path = self.expandConfigPath(config_path)
         with open(config_path) as config_file:
             self.log.info("Loading configuration from %s" % (config_path,))
-            data = yaml.safe_load(config_file)
+            data = yaml.load(config_file, Loader=yamlutil.SafeLoader)
         config = model.UnparsedAbideConfig()
         config.extend(data)
         base = os.path.dirname(os.path.realpath(config_path))
