@@ -14,6 +14,8 @@
 # under the License.
 
 import logging
+from six.moves import urllib
+
 import voluptuous as v
 
 from zuul.connection import BaseConnection
@@ -30,8 +32,12 @@ class GitConnection(BaseConnection):
         if 'baseurl' not in self.connection_config:
             raise Exception('baseurl is required for git connections in '
                             '%s' % self.connection_name)
-
         self.baseurl = self.connection_config.get('baseurl')
+        self.canonical_hostname = self.connection_config.get(
+            'canonical_hostname')
+        if not self.canonical_hostname:
+            r = urllib.parse.urlparse(self.baseurl)
+            self.canonical_hostname = r.hostname
         self.projects = {}
 
     def getProject(self, name):
