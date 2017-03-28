@@ -42,6 +42,7 @@ import zmq
 
 import zuul.ansible.library
 from zuul.lib import commandsocket
+from zuul.lib import yamlutil
 
 ANSIBLE_WATCHDOG_GRACE = 5 * 60
 ANSIBLE_DEFAULT_TIMEOUT = 2 * 60 * 60
@@ -1278,7 +1279,8 @@ class NodeWorker(object):
             )
             zuul_vars = dict(zuul=variables)
             vars_yaml.write(
-                yaml.safe_dump(zuul_vars, default_flow_style=False))
+                yaml.dump(zuul_vars, default_flow_style=False,
+                          Dumper=yamlutil.Dumper))
 
         with open(jobdir.pre_playbook, 'w') as pre_playbook:
 
@@ -1307,7 +1309,8 @@ class NodeWorker(object):
 
             play = dict(hosts='node', name='Job setup', tasks=tasks)
             pre_playbook.write(
-                yaml.safe_dump([play], default_flow_style=False))
+                yaml.dump([play], default_flow_style=False,
+                          Dumper=yamlutil.Dumper))
 
         with open(jobdir.playbook, 'w') as playbook:
             tasks = []
@@ -1321,7 +1324,8 @@ class NodeWorker(object):
                                               sequence))
 
             play = dict(hosts='node', name='Job body', tasks=tasks)
-            playbook.write(yaml.safe_dump([play], default_flow_style=False))
+            playbook.write(yaml.dump([play], default_flow_style=False,
+                                     Dumper=yamlutil.Dumper))
 
         early_publishers, late_publishers = self._transformPublishers(jjb_job)
 
@@ -1362,7 +1366,8 @@ class NodeWorker(object):
 
             play = dict(hosts='node', name='Publishers',
                         tasks=tasks)
-            playbook.write(yaml.safe_dump([play], default_flow_style=False))
+            playbook.write(yaml.dump([play], default_flow_style=False,
+                                     dumper=yamlutil.Dumper))
 
         self._writeAnsibleConfig(jobdir, jobdir.config,
                                  library=self.library_dir)

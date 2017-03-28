@@ -22,6 +22,7 @@ import textwrap
 import voluptuous as vs
 
 from zuul import model
+from zuul.lib import yamlutil
 import zuul.manager.dependent
 import zuul.manager.independent
 from zuul import change_matcher
@@ -84,7 +85,7 @@ def configuration_exceptions(stanza, conf):
         raise ConfigurationSyntaxError(m)
 
 
-class ZuulSafeLoader(yaml.SafeLoader):
+class ZuulSafeLoader(yamlutil.SafeLoader):
     zuul_node_types = frozenset(('job', 'nodeset', 'secret', 'pipeline',
                                  'project', 'project-template'))
 
@@ -125,7 +126,7 @@ repo {repo} on branch {branch}.  The error was:
 
 class EncryptedPKCS1_OAEP(yaml.YAMLObject):
     yaml_tag = u'!encrypted/pkcs1-oaep'
-    yaml_loader = yaml.SafeLoader
+    yaml_loader = yamlutil.SafeLoader
 
     def __init__(self, ciphertext):
         self.ciphertext = ciphertext.decode('base64')
@@ -156,7 +157,7 @@ class NodeSetParser(object):
         nodeset = {vs.Required('name'): str,
                    vs.Required('nodes'): [node],
                    '_source_context': model.SourceContext,
-                   '_start_mark': yaml.Mark,
+                   '_start_mark': yamlutil.Mark,
                    }
 
         return vs.Schema(nodeset)
@@ -180,7 +181,7 @@ class SecretParser(object):
         secret = {vs.Required('name'): str,
                   vs.Required('data'): data,
                   '_source_context': model.SourceContext,
-                  '_start_mark': yaml.Mark,
+                  '_start_mark': yamlutil.Mark,
                   }
 
         return vs.Schema(secret)
@@ -235,7 +236,7 @@ class JobParser(object):
                'post-run': to_list(str),
                'run': str,
                '_source_context': model.SourceContext,
-               '_start_mark': yaml.Mark,
+               '_start_mark': yamlutil.Mark,
                'roles': to_list(role),
                'repos': to_list(str),
                'vars': dict,
@@ -415,7 +416,7 @@ class ProjectTemplateParser(object):
                 'merge', 'merge-resolve',
                 'cherry-pick'),
             '_source_context': model.SourceContext,
-            '_start_mark': yaml.Mark,
+            '_start_mark': yamlutil.Mark,
         }
 
         for p in layout.pipelines.values():
@@ -479,7 +480,7 @@ class ProjectParser(object):
             'merge-mode': vs.Any('merge', 'merge-resolve',
                                  'cherry-pick'),
             '_source_context': model.SourceContext,
-            '_start_mark': yaml.Mark,
+            '_start_mark': yamlutil.Mark,
         }
 
         for p in layout.pipelines.values():
@@ -618,7 +619,7 @@ class PipelineParser(object):
                     'window-decrease-type': window_type,
                     'window-decrease-factor': window_factor,
                     '_source_context': model.SourceContext,
-                    '_start_mark': yaml.Mark,
+                    '_start_mark': yamlutil.Mark,
                     }
         pipeline['trigger'] = vs.Required(
             PipelineParser.getDriverSchema('trigger', connections))
@@ -998,7 +999,7 @@ class ConfigLoader(object):
         config_path = self.expandConfigPath(config_path)
         with open(config_path) as config_file:
             self.log.info("Loading configuration from %s" % (config_path,))
-            data = yaml.safe_load(config_file)
+            data = yaml.load(config_file, Loader=yamlutil.SafeLoader)
         config = model.UnparsedAbideConfig()
         config.extend(data)
         base = os.path.dirname(os.path.realpath(config_path))

@@ -23,11 +23,12 @@ import os
 import signal
 import sys
 import traceback
-
 import yaml
+
 yappi = extras.try_import('yappi')
 
 import zuul.lib.connections
+from zuul.lib import yamlutil
 
 # Do not import modules that will pull in paramiko which must not be
 # imported until after the daemonization.
@@ -90,7 +91,8 @@ class ZuulApp(object):
 
             if os.path.splitext(fp)[1] in ('.yml', '.yaml'):
                 with open(fp, 'r') as f:
-                    logging.config.dictConfig(yaml.safe_load(f))
+                    logging.config.dictConfig(
+                        yaml.load(f, Loader=yamlutil.SafeLoader))
 
             else:
                 logging.config.fileConfig(fp)
