@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ffe62b97_48a7960c",
+        "filename": "zuul/webapp.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-03-28T23:22:21Z",
+      "side": 1,
+      "message": "Not related to this change, but it would help if there was indication that all of these URLs are tenant prefixed, and thus tenant scoped.",
+      "revId": "42be4e136d038c02363bc9faf19347787fe7d756",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
