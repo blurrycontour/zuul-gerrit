@@ -23,6 +23,7 @@ import yaml
 from zuul import model
 from zuul import configloader
 from zuul.lib import encryption
+from zuul.lib import yamlutil
 
 from tests.base import BaseTestCase, FIXTURE_DIR
 
@@ -51,7 +52,7 @@ class TestJob(BaseTestCase):
                 encryption.deserialize_rsa_keypair(f.read())
         self.context = model.SourceContext(self.project, 'master',
                                            'test', True)
-        self.start_mark = yaml.Mark('name', 0, 0, 0, '', 0)
+        self.start_mark = yamlutil.Mark('name', 0, 0, 0, '', 0)
 
     @property
     def job(self):
@@ -321,7 +322,7 @@ class TestJob(BaseTestCase):
         tenant = model.Tenant('tenant')
         layout = model.Layout()
 
-        conf = yaml.safe_load('''
+        conf = yaml.load('''
 - secret:
     name: pypi-credentials
     data:
@@ -336,7 +337,7 @@ class TestJob(BaseTestCase):
         aI+AKYsMYx3RBlfAmCeC1ve2BXPrqnOo7G8tnUvfdYPbK4Aakk0ds/AVqFHEZN+S6hRBmBjLaRFW
         Z3QSO1NjbBxWnaHKZYT7nkrJm8AMCgZU0ZArFLpaufKCeiK5ECSsDxic4FIsY1OkWT42qEUfL0Wd
         +150AKGNZpPJnnP3QYY4W/MWcKH/zdO400+zWN52WevbSqZy90tqKDJrBkMl1ydqbuw1E4ZHvIs=
-''')[0]['secret']
+''', Loader=yamlutil.SafeLoader)[0]['secret']
 
         conf['_source_context'] = self.context
         conf['_start_mark'] = self.start_mark
