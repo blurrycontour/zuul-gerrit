@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ffe62b97_8df6d062",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-03-28T23:12:34Z",
+      "side": 1,
+      "message": "I\u0027m asking upstream Ansible if there is any variable string we could use here so that Ansible will mask out the value if it ever goes through Ansible\u0027s logging methods. So far, what I\u0027m finding is all around various forms of \"password\". We will have to write docs to strongly suggest any use of secret data in Ansible tasks make use of the \"no_log\" task argument.",
+      "revId": "af15c509dda601d5b9d5833f2c526f5af75e3dcb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
