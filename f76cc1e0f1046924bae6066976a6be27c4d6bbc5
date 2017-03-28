@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ffe62b97_fa3f6222",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1467,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-28T16:38:05Z",
+      "side": 1,
+      "message": "That\u0027s a lot of debug logging -- can we dial it back to maybe just this last one?\n\nAlso, that will get the log entry into the server log, but eventually we should plumb this back into the report instead, so that the user sees it.  That will take some work and probably isn\u0027t super high-priority.",
+      "revId": "f76cc1e0f1046924bae6066976a6be27c4d6bbc5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
