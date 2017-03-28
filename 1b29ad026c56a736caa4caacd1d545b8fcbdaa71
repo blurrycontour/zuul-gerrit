@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ffe62b97_bf0c29a5",
+        "filename": "tests/base.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 780,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-28T17:25:00Z",
+      "side": 1,
+      "message": "We can call the superclass doMergeChanges and then record MERGER_FAILURE if commit is None.  That way we don\u0027t have to copy as much of the \"real\" code.",
+      "revId": "1b29ad026c56a736caa4caacd1d545b8fcbdaa71",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_ffd4f1ea",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 339,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-28T17:25:00Z",
+      "side": 1,
+      "message": "This will only cause the merge to happen when the change is enqueued.  However, the merge is part of the NNFI algorithm.  It needs to happen every time the queue sequence is changed.  Therefore, it needs to be called from within _processOneItem.",
+      "revId": "1b29ad026c56a736caa4caacd1d545b8fcbdaa71",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_df07ed81",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 527,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-28T17:25:00Z",
+      "side": 1,
+      "message": "We\u0027re trying to make sure this happens for every change, not just changes where the config is updated.  So by the time we get to this method, we should expect to have completed the merge already, rather than trying to schedule it from within here.",
+      "revId": "1b29ad026c56a736caa4caacd1d545b8fcbdaa71",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
