@@ -18,7 +18,7 @@ import random
 
 import fixtures
 import testtools
-import yaml
+from zuul.lib.yamlutil import yaml
 
 from zuul import model
 from zuul import configloader

@@ -14,7 +14,7 @@
 
 import os
 
-import yaml
+from zuul.lib.yamlutil import yaml
 
 FIXTURE_DIR = os.path.join(os.path.dirname(__file__),
                            'fixtures')

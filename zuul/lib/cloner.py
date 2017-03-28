@@ -17,7 +17,7 @@ import git
 import logging
 import os
 import re
-import yaml
+from zuul.lib.yamlutil import yaml
 
 import six
 

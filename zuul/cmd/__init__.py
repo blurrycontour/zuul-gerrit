@@ -24,7 +24,7 @@ import signal
 import sys
 import traceback
 
-import yaml
+from zuul.lib.yamlutil import yaml
 yappi = extras.try_import('yappi')
 
 import zuul.lib.connections

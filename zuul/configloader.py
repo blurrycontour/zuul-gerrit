@@ -15,7 +15,7 @@ import copy
 import os
 import logging
 import six
-import yaml
+from zuul.lib.yamlutil import yaml
 import pprint
 import textwrap
 

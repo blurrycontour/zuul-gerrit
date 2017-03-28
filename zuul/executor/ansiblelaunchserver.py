@@ -35,7 +35,7 @@ import uuid
 import Queue
 
 import gear
-import yaml
+from zuul.lib.yamlutil import yaml
 import jenkins_jobs.builder
 import jenkins_jobs.formatter
 import zmq
