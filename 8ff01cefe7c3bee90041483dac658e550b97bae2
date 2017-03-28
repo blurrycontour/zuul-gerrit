@@ -39,6 +39,40 @@
       "revId": "8ff01cefe7c3bee90041483dac658e550b97bae2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_12541f52",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-03-28T22:40:01Z",
+      "side": 1,
+      "message": "\"data\" is really generic, and since this is secret data consumers are trusting us with, we should \"flavor\" this attribute in a way that we can easily track where all its being used. Something distinctive to find, and something distinctive that when programming with it gives the developer some indication that it\u0027s sensitive and should be treated so.",
+      "revId": "8ff01cefe7c3bee90041483dac658e550b97bae2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_52d3c7d5",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 529,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-03-28T22:40:01Z",
+      "side": 1,
+      "message": "Same comment here, \"data\" is really generic, and since this is secret data consumers are trusting us with, we should \"flavor\" this attribute in a way that we can easily track where all its being used. Something distinctive to find, and something distinctive that when programming with it gives the developer some indication that it\u0027s sensitive and should be treated so.",
+      "revId": "8ff01cefe7c3bee90041483dac658e550b97bae2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
