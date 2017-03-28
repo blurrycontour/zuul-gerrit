@@ -36,6 +36,23 @@
     },
     {
       "key": {
+        "uuid": "ffe62b97_f2f09b93",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 572,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-28T22:35:40Z",
+      "side": 0,
+      "message": "Oh, yeah, sorry.  What I mean to say is that this use of the word \"merge\" is not the same use of the word \"merge\" in the rest of this change.\n\nHere, this is dealing with moving the git branch pointer to a new commit.  That is, actually merging the change into the upstream git repo.  In a \"gate\" pipeline, that happens when an item is reported, and if that process fails, then it invalidates all the items behind it and we have a gate reset.  So this (and more importantly, the one below it) handle that case.\n\nThe rest of this change is about the local speculative merge that happens before we start testing a change.  We end up using the word \"merge\" for both of them since it\u0027s the same git operation.",
+      "revId": "8f1da2bdef6f9d0833670a8e9404f2fac46d0f2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ffe62b97_bc154c9e",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 11

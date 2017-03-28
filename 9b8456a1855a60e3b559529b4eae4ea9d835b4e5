@@ -87,6 +87,23 @@
     },
     {
       "key": {
+        "uuid": "ffe62b97_12f89f78",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 556,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-28T22:35:40Z",
+      "side": 1,
+      "message": "Oh, interesting.  I think that can work.",
+      "revId": "9b8456a1855a60e3b559529b4eae4ea9d835b4e5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ffe62b97_9c1a88c9",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 11
@@ -115,6 +132,23 @@
       "writtenOn": "2017-03-28T22:17:35Z",
       "side": 1,
       "message": "By splitting this up, we can run prepareItem before actionable is True, but I wanted to wait until the change is actionable before freezing the job graph. I haven\u0027t looked at that code, I\u0027m just assuming it\u0027s computationally heavy; this could very well be premature optimization.",
+      "revId": "9b8456a1855a60e3b559529b4eae4ea9d835b4e5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_d2ed97b7",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 615,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-28T22:35:40Z",
+      "side": 1,
+      "message": "It\u0027s something, but it\u0027s not too heavy (by zuul standards).  If you were to do it, putting layout generation in here would probably make sense (it is heavier).\n\nI think the main argument against doing this, however, is that the status page won\u0027t be able to display what jobs are going to be run until this happens.  Maybe that\u0027s okay for an item outside of the window.  I\u0027m willing to try it and see.  :)",
       "revId": "9b8456a1855a60e3b559529b4eae4ea9d835b4e5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
