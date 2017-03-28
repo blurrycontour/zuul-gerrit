@@ -16,6 +16,74 @@
       "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_b2f1f36d",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 725,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-03-28T22:39:15Z",
+      "side": 1,
+      "message": "This can get stalled out on entropy problems pretty easily. Perhaps worth an INFO log of \"Generating key\" too?",
+      "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_92f6ef62",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 739,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-03-28T22:39:15Z",
+      "side": 1,
+      "message": "Oops, it was already generated, it\u0027s not being generated.",
+      "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_f2e1bb9c",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 460,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-03-28T22:39:15Z",
+      "side": 1,
+      "message": "I was surprised to see we don\u0027t pass defaults to ConfigParser, but I\u0027m sure there\u0027s a reason. Still this seems really deep and hard to discover. Haven\u0027t looked to see if other defaults are done in the same way, so I\u0027l leave this here just as a pondering.",
+      "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_d2deb7d8",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 466,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-03-28T22:39:15Z",
+      "side": 1,
+      "message": "I\u0027d like to see 0700 asserted here, both when it is created, and when it exists.",
+      "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
