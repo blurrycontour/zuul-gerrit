@@ -2986,14 +2986,11 @@ class TestScheduler(ZuulTestCase):
         self.executor_server.release('.*')
         self.waitUntilSettled()
 
-    @skip("Disabled for early v3 development")
     def test_timer_sshkey(self):
         "Test that a periodic job can setup SSH key authentication"
-        self.worker.hold_jobs_in_build = True
-        self.config.set('zuul', 'layout_config',
-                        'tests/fixtures/layout-timer.yaml')
+        self.executor_server.hold_jobs_in_build = True
+        self.updateConfigLayout('layout-timer')
         self.sched.reconfigure(self.config)
-        self.registerJobs()
 
         # The pipeline triggers every second, so we should have seen
         # several by now.
@@ -3002,7 +2999,7 @@ class TestScheduler(ZuulTestCase):
 
         self.assertEqual(len(self.builds), 2)
 
-        ssh_wrapper = os.path.join(self.git_root, ".ssh_wrapper_gerrit")
+        ssh_wrapper = os.path.join(self.merger_src_root, ".ssh_wrapper_gerrit")
         self.assertTrue(os.path.isfile(ssh_wrapper))
         with open(ssh_wrapper) as f:
             ssh_wrapper_content = f.read()
@@ -3011,7 +3008,7 @@ class TestScheduler(ZuulTestCase):
         # so we see its' environment variables
         self.assertEqual(os.environ['GIT_SSH'], ssh_wrapper)
 
-        self.worker.release('.*')
+        self.executor_server.release('.*')
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 2)
 
@@ -3022,12 +3019,10 @@ class TestScheduler(ZuulTestCase):
 
         # Stop queuing timer triggered jobs and let any that may have
         # queued through so that end of test assertions pass.
-        self.config.set('zuul', 'layout_config',
-                        'tests/fixtures/layout-no-timer.yaml')
+        self.commitLayoutUpdate('layout-timer', 'layout-no-timer')
         self.sched.reconfigure(self.config)
-        self.registerJobs()
         self.waitUntilSettled()
-        self.worker.release('.*')
+        self.executor_server.release('.*')
         self.waitUntilSettled()
 
     def test_client_enqueue_change(self):
