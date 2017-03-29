@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "ffe62b97_f21642a8",
+        "filename": "tests/encrypt_secret.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-29T12:28:20Z",
+      "side": 1,
+      "message": "(nit) I feel like this file should be in tools/\n\nWe may also one day want to test this tool.",
+      "revId": "8ff01cefe7c3bee90041483dac658e550b97bae2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ffe62b97_8d2010ae",
         "filename": "tests/encrypt_secret.py",
         "patchSetId": 6
@@ -13,6 +30,29 @@
       "writtenOn": "2017-03-28T23:15:22Z",
       "side": 1,
       "message": "It might be a nice gesture to users to move this to its own repo and have it pip installable. Someday. Just a thought.",
+      "revId": "8ff01cefe7c3bee90041483dac658e550b97bae2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_f27be2f1",
+        "filename": "tests/encrypt_secret.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-29T12:28:20Z",
+      "side": 1,
+      "message": "(nit) In the future we should allow this to be passed in so this becomes a more generic tool.",
+      "range": {
+        "startLine": 28,
+        "startChar": 4,
+        "endLine": 28,
+        "endChar": 20
+      },
       "revId": "8ff01cefe7c3bee90041483dac658e550b97bae2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
