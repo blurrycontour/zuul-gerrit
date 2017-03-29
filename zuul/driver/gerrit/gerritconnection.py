@@ -268,7 +268,7 @@ class GerritConnection(BaseConnection):
 
     def getProject(self, name):
         if name not in self.projects:
-            self.projects[name] = Project(name, self.connection_name)
+            self.projects[name] = Project(name, self.connection_name, self)
         return self.projects[name]
 
     def maintainCache(self, relevant):

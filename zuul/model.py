@@ -338,9 +338,12 @@ class Project(object):
     # This makes a Project instance a unique identifier for a given
     # project from a given source.
 
-    def __init__(self, name, connection_name, foreign=False):
+    def __init__(self, name, connection_name, source, foreign=False):
         self.name = name
+        # TODOv3 (jeblair): remove connection_name; it's replaced with
+        # source
         self.connection_name = connection_name
+        self.source = source
         # foreign projects are those referenced in dependencies
         # of layout projects, this should matter
         # when deciding whether to enqueue their changes
