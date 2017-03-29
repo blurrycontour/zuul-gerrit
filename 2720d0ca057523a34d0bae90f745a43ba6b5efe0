@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ffe62b97_82f681d6",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-29T13:04:11Z",
+      "side": 1,
+      "message": "(nit) Why are we defaulting to True here and False in the configloader?",
+      "range": {
+        "startLine": 124,
+        "startChar": 29,
+        "endLine": 124,
+        "endChar": 33
+      },
+      "revId": "2720d0ca057523a34d0bae90f745a43ba6b5efe0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
