@@ -22,15 +22,47 @@ import yaml
 
 from zuul import model
 from zuul import configloader
+from zuul.source import BaseSource
 
 from tests.base import BaseTestCase
 
 
-class TestJob(BaseTestCase):
+class DummySource(BaseSource):
+    name = 'dummy'
 
+    def getRefSha(self, project, ref):
+        pass
+
+    def isMerged(self, change, head=None):
+        pass
+
+    def canMerge(self, change, allow_needs):
+        pass
+
+    def postConfig(self):
+        pass
+
+    def getChange(self, event):
+        pass
+
+    def getProjectOpenChanges(self, project):
+        pass
+
+    def getGitUrl(self, project):
+        pass
+
+    def getProject(self, name):
+        pass
+
+    def getProjectBranches(self, project):
+        pass
+
+
+class TestJob(BaseTestCase):
     def setUp(self):
         super(TestJob, self).setUp()
-        self.project = model.Project('project', None)
+        self.source = DummySource(None, None, 'git.example.com')
+        self.project = model.Project('project', None, self.source)
         self.context = model.SourceContext(self.project, 'master',
                                            'test', True)
         self.start_mark = yaml.Mark('name', 0, 0, 0, '', 0)
@@ -143,7 +175,7 @@ class TestJob(BaseTestCase):
         pipeline = model.Pipeline('gate', layout)
         layout.addPipeline(pipeline)
         queue = model.ChangeQueue(pipeline)
-        project = model.Project('project', None)
+        project = model.Project('project', None, self.source)
 
         base = configloader.JobParser.fromYaml(tenant, layout, {
             '_source_context': self.context,
@@ -466,7 +498,7 @@ class TestJob(BaseTestCase):
         pipeline = model.Pipeline('gate', layout)
         layout.addPipeline(pipeline)
         queue = model.ChangeQueue(pipeline)
-        project = model.Project('project', None)
+        project = model.Project('project', None, self.source)
 
         base = configloader.JobParser.fromYaml(tenant, layout, {
             '_source_context': self.context,
@@ -512,7 +544,7 @@ class TestJob(BaseTestCase):
     def test_job_source_project(self):
         tenant = model.Tenant('tenant')
         layout = model.Layout()
-        base_project = model.Project('base_project', None)
+        base_project = model.Project('base_project', None, self.source)
         base_context = model.SourceContext(base_project, 'master',
                                            'test', True)
 
@@ -523,7 +555,7 @@ class TestJob(BaseTestCase):
         })
         layout.addJob(base)
 
-        other_project = model.Project('other_project', None)
+        other_project = model.Project('other_project', None, self.source)
         other_context = model.SourceContext(other_project, 'master',
                                             'test', True)
         base2 = configloader.JobParser.fromYaml(tenant, layout, {
