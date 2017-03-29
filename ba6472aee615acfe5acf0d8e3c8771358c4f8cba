@@ -2,6 +2,52 @@
   "comments": [
     {
       "key": {
+        "uuid": "ffe62b97_c7a6dec1",
+        "filename": "tests/base.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 1213,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-29T12:08:41Z",
+      "side": 1,
+      "message": "(nit) this is a little confusing. Does it mean the tests should create the keys, or that the zuul scheduler should. Consider renaming, perhaps to \"pregenerate_project_keys\" (and inverting logic)",
+      "range": {
+        "startLine": 1213,
+        "startChar": 15,
+        "endLine": 1213,
+        "endChar": 34
+      },
+      "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_47dace77",
+        "filename": "tests/base.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 1465,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-29T12:08:41Z",
+      "side": 1,
+      "message": "I think I\u0027m missing something here, but isn\u0027t the state root different for each unit test thus not actually saving time pre-generating the keys?",
+      "range": {
+        "startLine": 1465,
+        "startChar": 37,
+        "endLine": 1465,
+        "endChar": 47
+      },
+      "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ffe62b97_b761e5ab",
         "filename": "tests/unit/test_v3.py",
         "patchSetId": 18
@@ -13,6 +59,93 @@
       "writtenOn": "2017-03-28T22:04:46Z",
       "side": 1,
       "message": "As a casual observer, it\u0027s not very lear from this test that it actually validates the key generation path.",
+      "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_92b376e9",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-29T12:08:41Z",
+      "side": 1,
+      "message": "I\u0027m also not sure this is necessary. Simply loading the config should be enough to generate the keys. I\u0027m possibly missing some step of validation though.",
+      "parentUuid": "ffe62b97_b761e5ab",
+      "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_272d8aa7",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-29T12:08:41Z",
+      "side": 1,
+      "message": "(nit) default backend to what? this is ambiguous without context so perhaps import as?",
+      "range": {
+        "startLine": 24,
+        "startChar": 41,
+        "endLine": 24,
+        "endChar": 56
+      },
+      "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_e7c0c2e3",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 713,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-29T12:08:41Z",
+      "side": 1,
+      "message": "(nit) bit odd for the parser to be generating keys... consider a new class?\n\nIs it worth capturing exceptions that may occur here? For example the private key path isn\u0027t writable or generation fails for some reason?",
+      "range": {
+        "startLine": 713,
+        "startChar": 8,
+        "endLine": 713,
+        "endChar": 20
+      },
+      "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_1271a644",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 721,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-29T12:08:41Z",
+      "side": 1,
+      "message": "(nit) this is confusing where elsewhere key_dir is \"state_dir/keys\", but this is \"state_dir/keys/connection\"",
+      "range": {
+        "startLine": 721,
+        "startChar": 8,
+        "endLine": 721,
+        "endChar": 15
+      },
       "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -47,6 +180,52 @@
       "writtenOn": "2017-03-28T22:39:15Z",
       "side": 1,
       "message": "Oops, it was already generated, it\u0027s not being generated.",
+      "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_b23f9a85",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 755,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-29T12:08:41Z",
+      "side": 1,
+      "message": "Do we need to capture any malformed key exceptions?",
+      "range": {
+        "startLine": 755,
+        "startChar": 10,
+        "endLine": 755,
+        "endChar": 14
+      },
+      "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_326caa9a",
+        "filename": "zuul/model.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 2088,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-29T12:08:41Z",
+      "side": 1,
+      "message": "(-1) In configloader you\u0027re storing the public key as self.public_key. Unless I\u0027ve missed something we aren\u0027t writing the file out or storing the filename.",
+      "range": {
+        "startLine": 2088,
+        "startChar": 13,
+        "endLine": 2088,
+        "endChar": 28
+      },
       "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
