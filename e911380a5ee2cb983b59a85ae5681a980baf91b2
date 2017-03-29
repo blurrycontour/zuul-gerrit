@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ffe62b97_4df78f8c",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-29T12:35:03Z",
+      "side": 1,
+      "message": "We should create custom exception types and test that they are raised as expected (followup)",
+      "range": {
+        "startLine": 271,
+        "startChar": 26,
+        "endLine": 271,
+        "endChar": 35
+      },
+      "revId": "e911380a5ee2cb983b59a85ae5681a980baf91b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
