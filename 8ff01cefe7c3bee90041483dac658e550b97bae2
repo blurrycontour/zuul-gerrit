@@ -133,6 +133,24 @@
     },
     {
       "key": {
+        "uuid": "ffe62b97_8001ce6c",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-03-29T17:18:49Z",
+      "side": 1,
+      "message": "I agree with jlk here. I know it\u0027s in an object called EncryptedPKCS1 - but that\u0027s not necessarily evident from consuming places, and people like me can be dumb sometimes.",
+      "parentUuid": "ffe62b97_12541f52",
+      "revId": "8ff01cefe7c3bee90041483dac658e550b97bae2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ffe62b97_52d3c7d5",
         "filename": "zuul/model.py",
         "patchSetId": 6
@@ -161,6 +179,24 @@
       "writtenOn": "2017-03-28T23:15:22Z",
       "side": 1,
       "message": "I second naming this something more scary. :)",
+      "revId": "8ff01cefe7c3bee90041483dac658e550b97bae2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_60412aa9",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 529,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-03-29T17:18:49Z",
+      "side": 1,
+      "message": "Yah. Maybe \"secrets\"",
+      "parentUuid": "ffe62b97_ad1bd47e",
       "revId": "8ff01cefe7c3bee90041483dac658e550b97bae2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
