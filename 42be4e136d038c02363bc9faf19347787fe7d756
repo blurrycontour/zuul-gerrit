@@ -16,6 +16,52 @@
       "revId": "42be4e136d038c02363bc9faf19347787fe7d756",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_bf9ac25e",
+        "filename": "zuul/webapp.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-29T12:48:44Z",
+      "side": 1,
+      "message": "we need to raise a 404 if the path doesn\u0027t match this format",
+      "range": {
+        "startLine": 102,
+        "startChar": 46,
+        "endLine": 102,
+        "endChar": 50
+      },
+      "revId": "42be4e136d038c02363bc9faf19347787fe7d756",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_3fa6b2ac",
+        "filename": "zuul/webapp.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-29T12:48:44Z",
+      "side": 1,
+      "message": "we also need to raise 404\u0027s here if the source or project are wrong etc",
+      "range": {
+        "startLine": 106,
+        "startChar": 8,
+        "endLine": 106,
+        "endChar": 15
+      },
+      "revId": "42be4e136d038c02363bc9faf19347787fe7d756",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
