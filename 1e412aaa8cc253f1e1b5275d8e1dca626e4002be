@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "ffe62b97_26ce9762",
+        "filename": "tests/unit/test_encryption.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-29T19:05:57Z",
+      "side": 1,
+      "message": "No, the padding makes it different every time.  That\u0027s an important characteristic of oaep as it means that you can\u0027t see that someone else has the password \"password1\" by comparing the ciphertext (also this is important for robustness against known plaintext and chosen plaintext attacks, among others).",
+      "revId": "1e412aaa8cc253f1e1b5275d8e1dca626e4002be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ffe62b97_fb5ccf19",
         "filename": "tests/unit/test_encryption.py",
         "patchSetId": 5
@@ -36,6 +53,23 @@
       "writtenOn": "2017-03-29T17:24:57Z",
       "side": 1,
       "message": "I think we should maybe add openssl to bindep.txt with a [test] tag - just to be clear.",
+      "revId": "1e412aaa8cc253f1e1b5275d8e1dca626e4002be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_06c95357",
+        "filename": "tests/unit/test_encryption.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-29T19:05:57Z",
+      "side": 1,
+      "message": "Done.",
       "revId": "1e412aaa8cc253f1e1b5275d8e1dca626e4002be",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
