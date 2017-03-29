@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "ffe62b97_63825102",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-29T18:38:48Z",
+      "side": 1,
+      "message": "Probably not.  We can do that here.",
+      "revId": "d6a352972c47f3e028b8775d15e6ecfd69735ef9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ffe62b97_6d97e23b",
         "filename": "zuul/scheduler.py",
         "patchSetId": 19
@@ -30,6 +47,23 @@
       "writtenOn": "2017-03-29T17:55:21Z",
       "side": 1,
       "message": "I think this is (sadly) st.st_mode right?",
+      "revId": "d6a352972c47f3e028b8775d15e6ecfd69735ef9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_43850d06",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 465,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-29T18:38:48Z",
+      "side": 1,
+      "message": "Yep.  Also, there are more things wrong with this.",
       "revId": "d6a352972c47f3e028b8775d15e6ecfd69735ef9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
