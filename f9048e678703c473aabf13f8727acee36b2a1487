@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "ffe62b97_3027f1cc",
+        "filename": "zuul/lib/yamlutil.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-03-29T18:27:01Z",
+      "side": 1,
+      "message": "Oh, yeah will fix and add a license header.",
+      "revId": "f9048e678703c473aabf13f8727acee36b2a1487",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ffe62b97_40be3fb4",
         "filename": "zuul/lib/yamlutil.py",
         "patchSetId": 2
@@ -30,6 +47,23 @@
       "writtenOn": "2017-03-29T09:09:03Z",
       "side": 1,
       "message": "This line seems weird - where did _yaml come from? (I\u0027m asking to learn things)",
+      "revId": "f9048e678703c473aabf13f8727acee36b2a1487",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_1022adb9",
+        "filename": "zuul/lib/yamlutil.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-03-29T18:27:01Z",
+      "side": 1,
+      "message": "_yaml is the C extension.",
       "revId": "f9048e678703c473aabf13f8727acee36b2a1487",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
