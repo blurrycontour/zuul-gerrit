@@ -22,6 +22,23 @@
       "revId": "1e412aaa8cc253f1e1b5275d8e1dca626e4002be",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_fb5ccf19",
+        "filename": "tests/unit/test_encryption.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-03-29T17:24:57Z",
+      "side": 1,
+      "message": "I think we should maybe add openssl to bindep.txt with a [test] tag - just to be clear.",
+      "revId": "1e412aaa8cc253f1e1b5275d8e1dca626e4002be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
