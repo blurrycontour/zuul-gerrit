@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "ffe62b97_d01445eb",
+        "filename": "tests/encrypt_secret.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-29T18:12:56Z",
+      "side": 1,
+      "message": "In a later patch, a similar, but general purpose, script is added to tools/.  However, this one remains since this uses the static test fixture secret.",
+      "revId": "8ff01cefe7c3bee90041483dac658e550b97bae2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ffe62b97_8d2010ae",
         "filename": "tests/encrypt_secret.py",
         "patchSetId": 6
@@ -116,6 +133,23 @@
     },
     {
       "key": {
+        "uuid": "ffe62b97_b0d5411e",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-29T18:12:56Z",
+      "side": 1,
+      "message": "The follow up patches are happening!  So I\u0027ll leave this for now.",
+      "revId": "8ff01cefe7c3bee90041483dac658e550b97bae2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ffe62b97_12541f52",
         "filename": "zuul/configloader.py",
         "patchSetId": 6
@@ -145,6 +179,23 @@
       "side": 1,
       "message": "I agree with jlk here. I know it\u0027s in an object called EncryptedPKCS1 - but that\u0027s not necessarily evident from consuming places, and people like me can be dumb sometimes.",
       "parentUuid": "ffe62b97_12541f52",
+      "revId": "8ff01cefe7c3bee90041483dac658e550b97bae2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_90d8fd52",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-29T18:12:56Z",
+      "side": 1,
+      "message": "I agree with that, however, this object only stores the ciphertext (later it will grow a decrypt method which will return a decrypted copy of the data, but it still won\u0027t store it on this ojebct itself).\n\nHaving said that, logically, that\u0027s clearly just the flip side of the argument so I will rename this to make it clear that it is ciphertext.  :)",
       "revId": "8ff01cefe7c3bee90041483dac658e550b97bae2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -197,6 +248,23 @@
       "side": 1,
       "message": "Yah. Maybe \"secrets\"",
       "parentUuid": "ffe62b97_ad1bd47e",
+      "revId": "8ff01cefe7c3bee90041483dac658e550b97bae2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_f0198921",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 529,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-29T18:12:56Z",
+      "side": 1,
+      "message": "Yeah, this is the more important one.",
       "revId": "8ff01cefe7c3bee90041483dac658e550b97bae2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
