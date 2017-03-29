@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ffe62b97_20ffbb67",
+        "filename": "zuul/lib/yamlutil.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-03-29T09:09:03Z",
+      "side": 1,
+      "message": "You may need a # flake8: noqa here to squash the pep8 warnings.\n\nAlso - prolly a good idea to plop a copyright header in here since you need to respin for pep8 anyway.",
+      "revId": "f9048e678703c473aabf13f8727acee36b2a1487",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_40be3fb4",
+        "filename": "zuul/lib/yamlutil.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-03-29T09:09:03Z",
+      "side": 1,
+      "message": "This line seems weird - where did _yaml come from? (I\u0027m asking to learn things)",
+      "revId": "f9048e678703c473aabf13f8727acee36b2a1487",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
