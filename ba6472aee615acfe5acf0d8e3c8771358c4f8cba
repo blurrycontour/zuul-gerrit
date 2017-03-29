@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "ffe62b97_007a5eb8",
+        "filename": "tests/base.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 1213,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-29T17:20:38Z",
+      "side": 1,
+      "message": "There is no \"pre-generation\".  Zuul\u0027s standard behavior is to create keys for every project if they don\u0027t exist.  Setting this value in this test fixture to false, the default, will cause a static key that is stored in the test fixtures directory to be used for every project.\n\nIn other words: if you want zuul to create \"real\" keys for projects, set this to true.",
+      "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ffe62b97_47dace77",
         "filename": "tests/base.py",
         "patchSetId": 18
@@ -42,6 +59,57 @@
         "endLine": 1465,
         "endChar": 47
       },
+      "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_e04e5a95",
+        "filename": "tests/base.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 1465,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-29T17:20:38Z",
+      "side": 1,
+      "message": "Yes, which is why we\u0027re not pre-generating (there\u0027s that word again) a key.  We\u0027re copying an existing static key stored in the fixtures directory into each project.",
+      "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_60624a0c",
+        "filename": "tests/fixtures/private.pem",
+        "patchSetId": 18
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-29T17:20:38Z",
+      "side": 1,
+      "message": "This is the key we copy.",
+      "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_405d0645",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-29T17:20:38Z",
+      "side": 1,
+      "message": "Most tests copy the static key into place before running.  This flag causes zuul to actually execute the key generation code.  I will add some comments to the effect that this line is, ahem, key to the test.  It is subtle.",
       "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -77,6 +145,23 @@
       "side": 1,
       "message": "I\u0027m also not sure this is necessary. Simply loading the config should be enough to generate the keys. I\u0027m possibly missing some step of validation though.",
       "parentUuid": "ffe62b97_b761e5ab",
+      "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_2058c253",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-29T17:20:38Z",
+      "side": 1,
+      "message": "Exactly -- the fact that the configuration is loaded and this test runs means that zuul did not explode during the key generation stage.  All of this is here just to make sure we actually loaded the configuration (key generation is a side effect of that).  I\u0027ll add comments.",
       "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -123,6 +208,23 @@
     },
     {
       "key": {
+        "uuid": "ffe62b97_00537e3a",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-29T17:20:38Z",
+      "side": 1,
+      "message": "In the later change where all the crypto functions are centralized, they are all annotated with links to their source documentation.  I think perhaps that\u0027s what you\u0027re after here, so I\u0027ll leave this as-is for now with the expectation that later change addresses the comment.",
+      "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ffe62b97_e7c0c2e3",
         "filename": "zuul/configloader.py",
         "patchSetId": 18
@@ -140,6 +242,23 @@
         "endLine": 713,
         "endChar": 20
       },
+      "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_e033fa12",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 713,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-29T17:20:38Z",
+      "side": 1,
+      "message": "The actual crypto work is moved in a later change, but the decision to generate a key on configuration parsing is still here.  I\u0027m not sure where else we would do it.\n\nAs for exceptions, if we are unable to perform this, the current configuration loading exception handler will catch and log the error.  It is correct for the configuration to stop loading in that case.",
       "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -169,6 +288,23 @@
     },
     {
       "key": {
+        "uuid": "ffe62b97_c036b603",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 721,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-29T17:20:38Z",
+      "side": 1,
+      "message": "Are you saying it\u0027s confusing this local variable doesn\u0027t mean the same thing as a local variable in a different function?",
+      "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ffe62b97_b2f1f36d",
         "filename": "zuul/configloader.py",
         "patchSetId": 18
@@ -180,6 +316,23 @@
       "writtenOn": "2017-03-28T22:39:15Z",
       "side": 1,
       "message": "This can get stalled out on entropy problems pretty easily. Perhaps worth an INFO log of \"Generating key\" too?",
+      "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_a03972f2",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 725,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-29T17:20:38Z",
+      "side": 1,
+      "message": "It shouldn\u0027t stall on entropy per se (aiui, openssl seeds its PRNG from /dev/urandom).  However, it may be \"slow\" in that it may need to factor several candidate prime numbers.  I\u0027m a little worried that the double log messages will be too chatty, but we can add it and see.",
       "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -226,6 +379,23 @@
     },
     {
       "key": {
+        "uuid": "ffe62b97_803c2ee1",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 755,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-29T17:20:38Z",
+      "side": 1,
+      "message": "Nope.  Let them make this explode so we stop configuration.",
+      "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ffe62b97_326caa9a",
         "filename": "zuul/model.py",
         "patchSetId": 18
@@ -249,6 +419,23 @@
     },
     {
       "key": {
+        "uuid": "ffe62b97_80478e77",
+        "filename": "zuul/model.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 2088,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-29T17:20:38Z",
+      "side": 1,
+      "message": "Yep, this is no longer used, I\u0027ll remove it.",
+      "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ffe62b97_f2e1bb9c",
         "filename": "zuul/scheduler.py",
         "patchSetId": 18
@@ -266,6 +453,23 @@
     },
     {
       "key": {
+        "uuid": "ffe62b97_c0511638",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 460,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-29T17:20:38Z",
+      "side": 1,
+      "message": "I don\u0027t recall if there was a reason.  Unless I\u0027m mistaken, the \"connections\" part of the config file won\u0027t be able to use defaults anyway since the section name is dynamic.",
+      "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ffe62b97_d2deb7d8",
         "filename": "zuul/scheduler.py",
         "patchSetId": 18
@@ -277,6 +481,23 @@
       "writtenOn": "2017-03-28T22:39:15Z",
       "side": 1,
       "message": "I\u0027d like to see 0700 asserted here, both when it is created, and when it exists.",
+      "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_a044d274",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 466,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-29T17:20:38Z",
+      "side": 1,
+      "message": "Good idea.",
       "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
