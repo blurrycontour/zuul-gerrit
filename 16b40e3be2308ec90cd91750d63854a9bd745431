@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dfeb2761_e0499760",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 516,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-30T22:07:38Z",
+      "side": 1,
+      "message": "We shouldn\u0027t need to scheduleMerge here anymore since it\u0027s handled by prepareItem which is called before this.  In fact, we can probably drop most of the state machine logic from this now.",
+      "revId": "16b40e3be2308ec90cd91750d63854a9bd745431",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfeb2761_c0469350",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 532,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-30T22:07:38Z",
+      "side": 1,
+      "message": "The current code will schedule a merge and fetch the new layout even for Refs (which include post pipeline items as well as, now, periodic pipeline items).  This only performs speculative merging and layout collection for Change objects.  I think that\u0027s fine -- I can\u0027t think of a case where it would make a difference (in all cases, the layout configuration these items would run with should be the currently loaded configuration).\n\nHowever, when this is called from pepareItem, if the item is a Ref, the algorithm will get stuck.  prepareItem always expects a speculative merge to happen, but this only causes it to happen for Changes.  We can probably set the buildset state to COMPLETE here, and then return a boolean value to tell prepareItem that it can proceed (since normally it immediately returns false after calling this method).\n\n(BTW, once we get this working, I think it\u0027s worth a look at moving scheduleMerge from pepareItem to prepareJobs).",
+      "revId": "16b40e3be2308ec90cd91750d63854a9bd745431",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
