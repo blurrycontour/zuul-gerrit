@@ -36,6 +36,23 @@
     },
     {
       "key": {
+        "uuid": "dfeb2761_c3557d1f",
+        "filename": "tools/encrypt_secret.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2017-03-30T23:20:58Z",
+      "side": 1,
+      "message": "Completely agree, it should be possible to hack around this the \"hard\" way by adding two or three very short lines of code. Also, ties in with Clint\u0027s observations since there\u0027s little point in using six until you\u0027re ready to care about Py3k compliance.",
+      "revId": "c49e5e713f2c3ae2c86f27c57e5b657921b17968",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dfeb2761_c706b221",
         "filename": "tools/encrypt_secret.py",
         "patchSetId": 8
