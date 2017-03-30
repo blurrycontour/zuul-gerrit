@@ -2255,7 +2255,7 @@ class Layout(object):
 
     def createJobGraph(self, item):
         project_config = self.project_configs.get(
-            item.change.project.name, None)
+            item.change.project.canonical_name, None)
         ret = JobGraph()
         # NOTE(pabelanger): It is possible for a foreign project not to have a
         # configured pipeline, if so return an empty JobGraph.
