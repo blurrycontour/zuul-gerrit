@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "dfeb2761_5e9dc457",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 522,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-30T23:43:23Z",
+      "side": 1,
+      "message": "As you pointed out in IRC, this can be called during a re-enqueue.  We don\u0027t need to schedule a merge in that case, but we do need to return None if we\u0027re still waiting on one.  So we should at least keep this stanza, then return None otherwise.",
+      "revId": "16b40e3be2308ec90cd91750d63854a9bd745431",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dfeb2761_c0469350",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 13
