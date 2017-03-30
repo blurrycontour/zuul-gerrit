@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "dfeb2761_605907fd",
+        "filename": "tools/encrypt_secret.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-30T22:14:36Z",
+      "side": 1,
+      "message": "Ugh.  Let\u0027s fix that in a followup.  It\u0027s worth it to do the try/import dance for this.",
+      "revId": "c49e5e713f2c3ae2c86f27c57e5b657921b17968",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dfeb2761_c706b221",
         "filename": "tools/encrypt_secret.py",
         "patchSetId": 8
@@ -64,6 +81,23 @@
       "writtenOn": "2017-03-30T18:16:04Z",
       "side": 1,
       "message": "This is python3-unfriendly also.. bytes and strings no longer have arbitrary encode methods like this, so you have to use the codes module:\n\n    import codecs\n    codecs.encode(stdout, \u0027base64\u0027)",
+      "revId": "c49e5e713f2c3ae2c86f27c57e5b657921b17968",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfeb2761_405e03e7",
+        "filename": "tools/encrypt_secret.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-30T22:14:36Z",
+      "side": 1,
+      "message": "These are all good points which warrant a followup patch to correct since this is a standalone tool and should be more python3-ish than the rest of zuul.",
       "revId": "c49e5e713f2c3ae2c86f27c57e5b657921b17968",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
