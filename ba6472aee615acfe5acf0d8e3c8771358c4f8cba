@@ -42,6 +42,24 @@
     },
     {
       "key": {
+        "uuid": "ffe62b97_2b5f6973",
+        "filename": "tests/base.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 1213,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-30T10:00:26Z",
+      "side": 1,
+      "message": "Right, I overlooked the actual implementation. This could still be taken as asking the test to create the keys (even though it\u0027s just copying them in), but it\u0027s very much a nit.",
+      "parentUuid": "ffe62b97_007a5eb8",
+      "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ffe62b97_47dace77",
         "filename": "tests/base.py",
         "patchSetId": 18
@@ -76,6 +94,24 @@
       "writtenOn": "2017-03-29T17:20:38Z",
       "side": 1,
       "message": "Yes, which is why we\u0027re not pre-generating (there\u0027s that word again) a key.  We\u0027re copying an existing static key stored in the fixtures directory into each project.",
+      "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_4b33cd63",
+        "filename": "tests/base.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 1465,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-30T10:00:26Z",
+      "side": 1,
+      "message": "Right, that\u0027s obvious now. Sorry I missed that.",
+      "parentUuid": "ffe62b97_e04e5a95",
       "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -225,6 +261,24 @@
     },
     {
       "key": {
+        "uuid": "ffe62b97_6b3451fc",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-30T10:00:26Z",
+      "side": 1,
+      "message": "@Clint: sure, but you lose the context of cryptograph when hundreds of lines later you just use \u0027default_backend\u0027.\n\nHowever this is improved later on and when used in the zuul/lib/encryption.py there is enough context (and it\u0027s a smaller filer).",
+      "parentUuid": "ffe62b97_00537e3a",
+      "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ffe62b97_e7c0c2e3",
         "filename": "zuul/configloader.py",
         "patchSetId": 18
@@ -265,6 +319,24 @@
     },
     {
       "key": {
+        "uuid": "ffe62b97_360c703a",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 713,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-30T10:00:26Z",
+      "side": 1,
+      "message": "As I reviewed the later changes it made more sense to be here since the decrypted values are loaded at config parsing time.",
+      "parentUuid": "ffe62b97_e033fa12",
+      "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ffe62b97_1271a644",
         "filename": "zuul/configloader.py",
         "patchSetId": 18
@@ -299,6 +371,24 @@
       "writtenOn": "2017-03-29T17:20:38Z",
       "side": 1,
       "message": "Are you saying it\u0027s confusing this local variable doesn\u0027t mean the same thing as a local variable in a different function?",
+      "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffe62b97_769e78b9",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 721,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-03-30T10:00:26Z",
+      "side": 1,
+      "message": "Yes. Hence quite nit-picky. When reviewing and jumping between parts of the code it\u0027s a subtly worth noting (imo).\n\nI\u0027ve also considered if it\u0027s worth having a key_dir attribute on the scheduler or config model somewhere which would make it less local.",
+      "parentUuid": "ffe62b97_c036b603",
       "revId": "ba6472aee615acfe5acf0d8e3c8771358c4f8cba",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
