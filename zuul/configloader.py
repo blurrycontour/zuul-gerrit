@@ -393,14 +393,12 @@ class JobParser(object):
     def _makeZuulRole(tenant, job, role):
         name = role['zuul'].split('/')[-1]
 
-        # TODOv3(jeblair): this limits roles to the same
-        # source; we should remove that limitation.
-        source = job.source_context.project.connection_name
-        (trusted, project) = tenant.getRepo(source, role['zuul'])
+        (trusted, project) = tenant.getProject(role['zuul'])
         if project is None:
             return None
 
-        return model.ZuulRole(role.get('name', name), source,
+        return model.ZuulRole(role.get('name', name),
+                              project.connection_name,
                               project.name, trusted)
 
 
