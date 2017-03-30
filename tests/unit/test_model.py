@@ -171,6 +171,7 @@ class TestJob(BaseTestCase):
         layout.addPipeline(pipeline)
         queue = model.ChangeQueue(pipeline)
         project = model.Project('project', self.source)
+        tenant.addProjectRepo(project)
 
         base = configloader.JobParser.fromYaml(tenant, layout, {
             '_source_context': self.context,
@@ -437,6 +438,7 @@ class TestJob(BaseTestCase):
     def test_job_inheritance_job_tree(self):
         tenant = model.Tenant('tenant')
         layout = model.Layout()
+        tenant.addProjectRepo(self.project)
 
         pipeline = model.Pipeline('gate', layout)
         layout.addPipeline(pipeline)
@@ -517,6 +519,7 @@ class TestJob(BaseTestCase):
         layout.addPipeline(pipeline)
         queue = model.ChangeQueue(pipeline)
         project = model.Project('project', self.source)
+        tenant.addProjectRepo(project)
 
         base = configloader.JobParser.fromYaml(tenant, layout, {
             '_source_context': self.context,
