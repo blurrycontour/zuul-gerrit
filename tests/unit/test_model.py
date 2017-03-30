@@ -681,7 +681,7 @@ class TestTenant(BaseTestCase):
                         connection=connection1)
 
         source1_project1 = model.Project('project1', source1)
-        tenant.addConfigRepo(source1, source1_project1)
+        tenant.addConfigRepo(source1_project1)
         d = {'project1': source1_project1}
         self.assertEqual(d, tenant.projects)
         self.assertEqual((True, source1_project1),
@@ -690,7 +690,7 @@ class TestTenant(BaseTestCase):
                          tenant.getProject('git1.example.com/project1'))
 
         source1_project2 = model.Project('project2', source1)
-        tenant.addProjectRepo(source1, source1_project2)
+        tenant.addProjectRepo(source1_project2)
         d = {'project1': source1_project1,
              'project2': source1_project2}
         self.assertEqual(d, tenant.projects)
@@ -705,7 +705,7 @@ class TestTenant(BaseTestCase):
                         connection=connection2)
 
         source2_project1 = model.Project('project1', source2)
-        tenant.addProjectRepo(source2, source2_project1)
+        tenant.addProjectRepo(source2_project1)
         d = {'project1':
              {'git1.example.com': source1_project1,
               'git2.example.com': source2_project1},
@@ -723,7 +723,7 @@ class TestTenant(BaseTestCase):
                          tenant.getProject('git2.example.com/project1'))
 
         source2_project2 = model.Project('project2', source2)
-        tenant.addConfigRepo(source2, source2_project2)
+        tenant.addConfigRepo(source2_project2)
         d = {'project1':
              {'git1.example.com': source1_project1,
               'git2.example.com': source2_project1},
@@ -749,7 +749,7 @@ class TestTenant(BaseTestCase):
                          tenant.getProject('git2.example.com/project2'))
 
         source1_project2b = model.Project('subpath/project2', source1)
-        tenant.addConfigRepo(source1, source1_project2b)
+        tenant.addConfigRepo(source1_project2b)
         d = {'project1':
              {'git1.example.com': source1_project1,
               'git2.example.com': source2_project1},
@@ -769,7 +769,7 @@ class TestTenant(BaseTestCase):
             tenant.getProject('git1.example.com/subpath/project2'))
 
         source2_project2b = model.Project('subpath/project2', source2)
-        tenant.addConfigRepo(source2, source2_project2b)
+        tenant.addConfigRepo(source2_project2b)
         d = {'project1':
              {'git1.example.com': source1_project1,
               'git2.example.com': source2_project1},
