@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dfeb2761_c706b221",
+        "filename": "tools/encrypt_secret.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-03-30T18:16:04Z",
+      "side": 1,
+      "message": "It\u0027s a bit of a corner case, but there may be a time where we want to encrypt binary data with this scheme. If we want to do that, we should use \u0027rb\u0027 here...",
+      "revId": "c49e5e713f2c3ae2c86f27c57e5b657921b17968",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfeb2761_a703ae0f",
+        "filename": "tools/encrypt_secret.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-03-30T18:16:04Z",
+      "side": 1,
+      "message": "likewise this will be text only. The buffer attribute of sys.stdin is binary though.",
+      "revId": "c49e5e713f2c3ae2c86f27c57e5b657921b17968",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfeb2761_8afe6f03",
+        "filename": "tools/encrypt_secret.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-03-30T18:16:04Z",
+      "side": 1,
+      "message": "This is python3-unfriendly also.. bytes and strings no longer have arbitrary encode methods like this, so you have to use the codes module:\n\n    import codecs\n    codecs.encode(stdout, \u0027base64\u0027)",
+      "revId": "c49e5e713f2c3ae2c86f27c57e5b657921b17968",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
