@@ -1846,6 +1846,20 @@ class ZuulTestCase(BaseTestCase):
       gerrit:
         config-repos:
           - %s
+        project-repos:
+          - org/project3
+          - org/project4
+          - org/project5
+          - org/project6
+          - org/one-job-project
+          - org/nonvoting-project
+          - org/templated-project
+          - org/layered-project
+          - org/node-project
+          - org/conflict-project
+          - org/noop-project
+          - org/experimental-project
+          - org/no-jobs-project
         """ % path)
         f.close()
         self.config.set('zuul', 'tenant_config',
