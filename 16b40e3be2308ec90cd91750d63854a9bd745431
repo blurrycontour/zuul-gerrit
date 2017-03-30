@@ -33,6 +33,23 @@
       "revId": "16b40e3be2308ec90cd91750d63854a9bd745431",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfeb2761_e301a1b1",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 532,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-03-30T22:55:23Z",
+      "side": 1,
+      "message": "Strike the first paragraph of the above comment, it\u0027s wrong.",
+      "revId": "16b40e3be2308ec90cd91750d63854a9bd745431",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
