@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dfeb2761_0fa32d51",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 981,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-03T18:22:31Z",
+      "side": 1,
+      "message": "What this test wants to do is make sure that A merges before the executor performs the merges for the jobs in B and C.  We want to pause B and C mid-process while A reports and is merged upstream.  Holding the building job in the executor server, which is what this line does, will pause the build after the executor merges, during the ansible portion of the run.  So instead, we need to pause things right before the executor does anything with the build (since the merge happens right at the start).  To do that, we should hold them in the gearman queue.",
+      "revId": "0ce807bd3555afca806060aa5b9eef57e5a1dcfa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfeb2761_ef8929ca",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 1005,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-03T18:22:31Z",
+      "side": 1,
+      "message": "We don\u0027t have as many nice helper functions for releasing things in the gearman queue.  We can still release by job name, but that isn\u0027t specific enough here.  But if we\u0027re careful in the test, the order is deterministic, so we can start by releasing project-merge for A, which we know is at the head.",
+      "revId": "0ce807bd3555afca806060aa5b9eef57e5a1dcfa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfeb2761_cf8425b4",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 1007,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-03T18:22:31Z",
+      "side": 1,
+      "message": "Once project-merge completes for A, Zuul launches project-test1 and project-test2.  Because the gate pipeline has precedence set to high, those two jobs get added to the head of the queue, in front of the project-merge jobs for B and C.  So we can just release the first two jobs.",
+      "revId": "0ce807bd3555afca806060aa5b9eef57e5a1dcfa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfeb2761_af9321fa",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 1024,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-03T18:22:31Z",
+      "side": 1,
+      "message": "At this point, the only jobs left to run are the B and C project-merge jobs.  We expect them to fail, and therefore, Zuul will not enqueue the project-test jobs for those changes.  They are already in the right order, so we can just release the remaining gearman queue.",
+      "revId": "0ce807bd3555afca806060aa5b9eef57e5a1dcfa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfeb2761_8f8e1dce",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 1043,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-03T18:22:31Z",
+      "side": 1,
+      "message": "Because the test1 and test2 jobs depend on merge, they are never launched when merge fails.",
+      "revId": "0ce807bd3555afca806060aa5b9eef57e5a1dcfa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
