@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dfeb2761_6d187c74",
+        "filename": "tests/fixtures/config/single-tenant/git/layout-rate-limit/zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 6039
+      },
+      "writtenOn": "2017-04-03T21:41:48Z",
+      "side": 1,
+      "message": "Do we want to set `hold-following-changes: true` here like we do for many other project-merge jobs?",
+      "revId": "b01f1ca238af45150fc90eea495faf0ec7c4d32e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
