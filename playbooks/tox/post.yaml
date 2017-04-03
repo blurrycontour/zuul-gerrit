@@ -15,3 +15,11 @@
         mode: pull
         src: "{{ item.path }}/log/"
       with_items: "{{ result.files }}"
+
+    - name: Collect test-results
+      synchronize:
+        dest: "{{ zuul.executor.log_root }}"
+        mode: pull
+        src: "{{ zuul_workspace_root }}/src/{{ zuul.project }}/{{ item }}"
+      with_items:
+        - "*testrepository.subunit.gz"
