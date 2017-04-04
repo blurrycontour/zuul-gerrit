@@ -608,7 +608,6 @@ class PipelineParser(object):
 
         pipeline = {vs.Required('name'): str,
                     vs.Required('manager'): manager,
-                    'source': str,
                     'precedence': precedence,
                     'description': str,
                     'require': require,
