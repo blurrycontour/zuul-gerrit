@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dfeb2761_24014f06",
+        "filename": "tests/base.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 740,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-04T17:05:50Z",
+      "side": 1,
+      "message": "This part of the change isn\u0027t really needed anymore, but I guess we can keep it if you want.",
+      "revId": "e8c00539077906bbe9b7c647d7fa2efb3e2a90c8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfeb2761_6905f013",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 930,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-04T17:05:50Z",
+      "side": 1,
+      "message": "This changes from holding in queue to holding in build, but I think that should be okay.",
+      "revId": "e8c00539077906bbe9b7c647d7fa2efb3e2a90c8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfeb2761_49022c0d",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 958,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-04T17:05:50Z",
+      "side": 1,
+      "message": "-1: This should be \"_build\".",
+      "revId": "e8c00539077906bbe9b7c647d7fa2efb3e2a90c8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfeb2761_04064b1e",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 529,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-04T17:05:50Z",
+      "side": 1,
+      "message": "This should probably be debug level; it\u0027s not especially interesting for normal operation.",
+      "revId": "e8c00539077906bbe9b7c647d7fa2efb3e2a90c8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfeb2761_e406c71c",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 612,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-04T17:05:50Z",
+      "side": 1,
+      "message": "-1: This doesn\u0027t seem right -- why wouldn\u0027t it be up to date?  prepareItem should take care of ensuring that scheduleMerge is called.  We should be able to drop this entire conditional block.",
+      "revId": "e8c00539077906bbe9b7c647d7fa2efb3e2a90c8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfeb2761_c40bc321",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 632,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-04T17:05:50Z",
+      "side": 1,
+      "message": "-1: We\u0027re actually doing more work outside the active window now.  Previously, we would only call prepareLayout (which ran the merge job) when the item was in the active window.  Now we call prepareItem (which runs the merge job) above, outside the active window.\n\nI think if you kept to the current structure, and put prepareItem within the \"if actionable\" block that was here, it would be more efficient.",
+      "revId": "e8c00539077906bbe9b7c647d7fa2efb3e2a90c8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfeb2761_a4143f45",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 786,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-04T17:05:50Z",
+      "side": 1,
+      "message": "-1: This comment is now wrong -- we will start sending -1s on merge failures for changes with no jobs (which is unavoidable since if we can\u0027t merge a change we don\u0027t get a list of jobs).",
+      "revId": "e8c00539077906bbe9b7c647d7fa2efb3e2a90c8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
