@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dfeb2761_dd803ec2",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4184,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-04T15:26:57Z",
+      "side": 1,
+      "message": "The config in single-tenant/git/common-config is missing a check-pipeline entry for org/project2.  I haven\u0027t looked to see if we just lost that during the transition, but I assume so.",
+      "revId": "43cc25b6ad61f6209f3e92420f242bb870d2efc0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
