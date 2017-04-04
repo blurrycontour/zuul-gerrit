@@ -87,6 +87,23 @@
     },
     {
       "key": {
+        "uuid": "dfeb2761_df3eee89",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 612,
+      "author": {
+        "id": 6039
+      },
+      "writtenOn": "2017-04-04T17:41:28Z",
+      "side": 1,
+      "message": "This is needed for the test_delayed_merge_conflict case. Since we scheduled the first merge job when the item first entered the pipeline, and we have no other way of knowing if the change can still merge unless we schedule a second merge job, I think we need to schedule two merges per item. This is less than ideal, but I think it\u0027s needed in order to report merge conflicts before the item is actionable -- which is very useful when queue times are over an hour.",
+      "revId": "e8c00539077906bbe9b7c647d7fa2efb3e2a90c8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dfeb2761_c40bc321",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 18
@@ -98,6 +115,23 @@
       "writtenOn": "2017-04-04T17:05:50Z",
       "side": 1,
       "message": "-1: We\u0027re actually doing more work outside the active window now.  Previously, we would only call prepareLayout (which ran the merge job) when the item was in the active window.  Now we call prepareItem (which runs the merge job) above, outside the active window.\n\nI think if you kept to the current structure, and put prepareItem within the \"if actionable\" block that was here, it would be more efficient.",
+      "revId": "e8c00539077906bbe9b7c647d7fa2efb3e2a90c8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfeb2761_bf432a13",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 632,
+      "author": {
+        "id": 6039
+      },
+      "writtenOn": "2017-04-04T17:41:28Z",
+      "side": 1,
+      "message": "The primary reason I want to schedule a merge job outside active window is to report merge conflicts without waiting through potentially long queue times. This is also why I split prepareLayout into prepareItem and prepareJobs, I was hoping prepareItem could be a bit more lightweight to limit the work outside the active window, and delay prepareJobs until inside the active window.",
       "revId": "e8c00539077906bbe9b7c647d7fa2efb3e2a90c8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
