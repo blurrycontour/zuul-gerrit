@@ -2,7 +2,7 @@
     name: tenant-duplicate
     source:
       gerrit:
-        config-repos:
+        trusted-projects:
           - common-config
-        project-repos:
+        untrusted-projects:
           - org/project
