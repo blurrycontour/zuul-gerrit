@@ -22,6 +22,7 @@ import zuul.driver.github
 import zuul.driver.smtp
 import zuul.driver.timer
 import zuul.driver.sql
+import zuul.driver.bubblewrap
 from zuul.connection import BaseConnection
 from zuul.driver import SourceInterface
 
@@ -46,6 +47,7 @@ class ConnectionRegistry(object):
         self.registerDriver(zuul.driver.smtp.SMTPDriver())
         self.registerDriver(zuul.driver.timer.TimerDriver())
         self.registerDriver(zuul.driver.sql.SQLDriver())
+        self.registerDriver(zuul.driver.bubblewrap.BubblewrapDriver())
 
     def registerDriver(self, driver):
         if driver.name in self.drivers:
