@@ -247,6 +247,18 @@ class ExecutorServer(object):
         else:
             self.merge_name = None
 
+        if self.config.has_option('executor', 'insecure_prefix'):
+            self.insecure_prefix = self.config.get('executor',
+                                                  'insecure_prefix').split()
+        else:
+            self.insecure_prefix = []
+
+        if self.config.has_option('executor', 'insecure_suffix'):
+            self.insecure_suffix = self.config.get('executor',
+                                                  'insecure_suffix').split()
+        else:
+            self.insecure_suffix = []
+
         self.connections = connections
         # This merger and its git repos are used to maintain
         # up-to-date copies of all the repos that are used by jobs, as
@@ -471,6 +483,18 @@ class ExecutorServer(object):
         else:
             result['commit'] = ret
         job.sendWorkComplete(json.dumps(result))
+
+    def getInsecurePrefix(self, job_dir):
+        if job_dir:
+            return [ x.replace('%(job_dir)', job_dir) for x in
+                    self.insecure_prefix ]
+        return self.insecure_prefix
+
+    def getInsecureSuffix(self, job_dir):
+        if job_dir:
+            return [ x.replace('%(job_dir)', job_dir) for x in
+                    self.insecure_suffix ]
+        return self.insecure_suffix
 
 
 class AnsibleJob(object):
@@ -910,6 +934,9 @@ class AnsibleJob(object):
             env_copy['ANSIBLE_CONFIG'] = self.jobdir.trusted_config
         else:
             env_copy['ANSIBLE_CONFIG'] = self.jobdir.untrusted_config
+            cmd = self.executor_server.getInsecurePrefix(
+                self.jobdir.work_root) + cmd
+            cmd.extend(self.executor_server.getInsecureSuffix(self.jobdir.work_root))
 
         with self.proc_lock:
             if self.aborted:
