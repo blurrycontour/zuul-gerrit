@@ -247,6 +247,18 @@ class ExecutorServer(object):
         else:
             self.merge_name = None
 
+        if self.config.has_option('executor', 'insecure_prefix'):
+            self.insecure_prefix = self.config.get('executor',
+                                                  'insecure_prefix').split()
+        else:
+            self.insecure_prefix = []
+
+        if self.config.has_option('executor', 'insecure_suffix'):
+            self.insecure_suffix = self.config.get('executor',
+                                                  'insecure_suffix').split()
+        else:
+            self.insecure_suffix = []
+
         self.connections = connections
         # This merger and its git repos are used to maintain
         # up-to-date copies of all the repos that are used by jobs, as
@@ -256,13 +268,13 @@ class ExecutorServer(object):
         self.update_queue = DeduplicateQueue()
 
         if self.config.has_option('zuul', 'state_dir'):
-            state_dir = os.path.expanduser(
+            self.state_dir = os.path.expanduser(
                 self.config.get('zuul', 'state_dir'))
         else:
-            state_dir = '/var/lib/zuul'
-        path = os.path.join(state_dir, 'executor.socket')
+            self.state_dir = '/var/lib/zuul'
+        path = os.path.join(self.state_dir, 'executor.socket')
         self.command_socket = commandsocket.CommandSocket(path)
-        ansible_dir = os.path.join(state_dir, 'ansible')
+        ansible_dir = os.path.join(self.state_dir, 'ansible')
         self.library_dir = os.path.join(ansible_dir, 'library')
         if not os.path.exists(self.library_dir):
             os.makedirs(self.library_dir)
@@ -471,6 +483,18 @@ class ExecutorServer(object):
         else:
             result['commit'] = ret
         job.sendWorkComplete(json.dumps(result))
+
+    def getInsecurePrefix(self, job_dir):
+        prefix = self.insecure_prefix
+        prefix = [ x.replace('%(job_dir)', job_dir) for x in prefix ]
+        prefix = [ x.replace('%(state_dir)', self.state_dir) for x in prefix ]
+        return prefix
+
+    def getInsecureSuffix(self, job_dir):
+        suffix = self.insecure_suffix
+        suffix = [ x.replace('%(job_dir)', job_dir) for x in suffix ]
+        suffix = [ x.replace('%(state_dir)', self.state_dir) for x in suffix ]
+        return suffix
 
 
 class AnsibleJob(object):
@@ -910,6 +934,9 @@ class AnsibleJob(object):
             env_copy['ANSIBLE_CONFIG'] = self.jobdir.trusted_config
         else:
             env_copy['ANSIBLE_CONFIG'] = self.jobdir.untrusted_config
+            cmd = self.executor_server.getInsecurePrefix(
+                self.jobdir.root) + cmd
+            cmd.extend(self.executor_server.getInsecureSuffix(self.jobdir.root))
 
         with self.proc_lock:
             if self.aborted:

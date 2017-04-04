@@ -17,6 +17,7 @@
 import os
 import textwrap
 
+import fixtures
 import testtools
 
 import zuul.configloader
@@ -294,6 +295,13 @@ class TestAnsible(AnsibleZuulTestCase):
         with open(secrets_path) as f:
             self.assertEqual(f.read(), "test-username test-password")
 
+    def test_wrapped_playbook(self):
+        tools_path = os.path.join(os.getcwd(), 'tools')
+        newpath = '{}:{}'.format(tools_path, os.environ['PATH'])
+        self.useFixture(fixtures.EnvironmentVariable('PATH', newpath))
+        self.executor_server.insecure_prefix = ['bwrap-executor.sh',
+                                                '%(job_dir)', '%(state_dir)']
+        return self.test_playbook()
 
 class TestBrokenConfig(ZuulTestCase):
     # Test that we get an appropriate syntax error if we start with a
