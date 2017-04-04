@@ -2,8 +2,8 @@
     name: openstack
     source:
       gerrit:
-        config-repos:
+        trusted-projects:
           - project-config
-        project-repos:
+        untrusted-projects:
           - openstack/nova
           - openstack/keystone
