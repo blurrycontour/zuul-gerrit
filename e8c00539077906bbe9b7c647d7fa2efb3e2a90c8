@@ -104,6 +104,23 @@
     },
     {
       "key": {
+        "uuid": "dfeb2761_bf168a54",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 612,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-04T17:57:51Z",
+      "side": 1,
+      "message": "Oh, I thought the delayed merge case was testing that the executor could correctly throw a merge error when the state changed out from under it.  I believe that is what it is actually testing (I don\u0027t think that test ever has an item outside the active window).\n\nI\u0027d like to solve that race condition by having the executor merger create the exact same merge as this one.  But that can be done later.\n\nEither way (now or with the change I just described) the condition you describe is not much of a concern.  In a dependent pipeline, the entire future state of all repositories is known and fixed, so there can be no change between when an item crosses into the active window.  In an independent pipeline, the window does not have an effect (all queues are one change deep).  Therefore, in all cases, we should only need one merge check here.\n\nYou make a good argument that we may want to perform the merge earlier, however, in all cases we don\u0027t report a merge conflict until it hits the top of the queue anyway.  We would, however, be able to indicate that it has a merge conflict on the status page earlier.  Still, delayed merging is the current behavior, and we only have *more* work to do in Zuulv3, so I\u0027d rather keep it that way for now.",
+      "revId": "e8c00539077906bbe9b7c647d7fa2efb3e2a90c8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dfeb2761_c40bc321",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 18
@@ -132,6 +149,23 @@
       "writtenOn": "2017-04-04T17:41:28Z",
       "side": 1,
       "message": "The primary reason I want to schedule a merge job outside active window is to report merge conflicts without waiting through potentially long queue times. This is also why I split prepareLayout into prepareItem and prepareJobs, I was hoping prepareItem could be a bit more lightweight to limit the work outside the active window, and delay prepareJobs until inside the active window.",
+      "revId": "e8c00539077906bbe9b7c647d7fa2efb3e2a90c8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfeb2761_9f0f4636",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 632,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-04T17:57:51Z",
+      "side": 1,
+      "message": "I think I\u0027ve addressed the merge topic above.  The work division between prepareItem and prepareJobs you described is backward.  Performing a merge is *very* intensive.  It can take 30 seconds or longer for nova, for example (that is offloaded to a merge worker, of course, but we still have to take the hit of scheduling it and retrieving the results, and that will happen in a further iteration of the scheduler loop).  Calculating what jobs to run is a local data structure traversal which should take milliseconds at most.",
       "revId": "e8c00539077906bbe9b7c647d7fa2efb3e2a90c8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
