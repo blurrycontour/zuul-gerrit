@@ -568,8 +568,8 @@ class Scheduler(threading.Thread):
                     item.items_behind = []
                     item.pipeline = None
                     item.queue = None
-                    project_name = item.change.project.name
-                    item.change.project = new_pipeline.source.getProject(
+                    project_name = item.change.project.canonical_name
+                    item.change.project = tenant.getProject(
                         project_name)
                     if new_pipeline.manager.reEnqueueItem(item,
                                                           last_head):
@@ -608,7 +608,6 @@ class Scheduler(threading.Thread):
         self.connections.reconfigureDrivers(tenant)
         # TODOv3(jeblair): remove postconfig calls?
         for pipeline in tenant.layout.pipelines.values():
-            pipeline.source.postConfig()
             for trigger in pipeline.triggers:
                 trigger.postConfig(pipeline)
             for reporter in pipeline.actions:
@@ -668,7 +667,7 @@ class Scheduler(threading.Thread):
         tenant = self.abide.tenants.get(event.tenant_name)
         (trusted, project) = tenant.getProject(event.project_name)
         pipeline = tenant.layout.pipelines[event.forced_pipeline]
-        change = pipeline.source.getChange(event, project)
+        change = project.source.getChange(event, project)
         self.log.debug("Event %s for change %s was directly assigned "
                        "to pipeline %s" % (event, change, self))
         pipeline.manager.addChange(change, ignore_requirements=True)
@@ -757,31 +756,26 @@ class Scheduler(threading.Thread):
         event = self.trigger_event_queue.get()
         self.log.debug("Processing trigger event %s" % event)
         try:
+            source = self.connections.getSourceByHostname(
+                event.project_hostname)
+            project = source.getProject(source.project_name)
+            try:
+                change = source.getChange(event)
+            except exceptions.ChangeNotFound as e:
+                self.log.debug("Unable to get change %s from "
+                               "source %s",
+                               e.change, source)
+                return
             for tenant in self.abide.tenants.values():
-                reconfigured_tenant = False
+                if (event.type == 'change-merged' and
+                    hasattr(change, 'files') and
+                    change.updatesConfig()):
+                    # The change that just landed updates the config.
+                    # Clear out cached data for this project and
+                    # perform a reconfiguration.
+                    change.project.unparsed_config = None
+                    self.reconfigureTenant(tenant)
                 for pipeline in tenant.layout.pipelines.values():
-                    # Get the change even if the project is unknown to
-                    # us for the use of updating the cache if there is
-                    # another change depending on this foreign one.
-                    try:
-                        change = pipeline.source.getChange(event)
-                    except exceptions.ChangeNotFound as e:
-                        self.log.debug("Unable to get change %s from "
-                                       "source %s (most likely looking "
-                                       "for a change from another "
-                                       "connection trigger)",
-                                       e.change, pipeline.source)
-                        continue
-                    if (event.type == 'change-merged' and
-                        hasattr(change, 'files') and
-                        not reconfigured_tenant and
-                        change.updatesConfig()):
-                        # The change that just landed updates the config.
-                        # Clear out cached data for this project and
-                        # perform a reconfiguration.
-                        change.project.unparsed_config = None
-                        self.reconfigureTenant(tenant)
-                        reconfigured_tenant = True
                     if event.type == 'patchset-created':
                         pipeline.manager.removeOldVersionsOfChange(change)
                     elif event.type == 'change-abandoned':
