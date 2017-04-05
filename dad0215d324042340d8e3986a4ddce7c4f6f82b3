@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bff0334d_81276665",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2396,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-04-05T21:01:08Z",
+      "side": 1,
+      "message": "FYI, this should be:\n\n   :arg Project project:\n\nData type comes before parameter name.",
+      "range": {
+        "startLine": 2396,
+        "startChar": 13,
+        "endLine": 2396,
+        "endChar": 28
+      },
+      "revId": "dad0215d324042340d8e3986a4ddce7c4f6f82b3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bff0334d_011b561b",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2418,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-04-05T21:01:08Z",
+      "side": 1,
+      "message": "Same as above",
+      "range": {
+        "startLine": 2418,
+        "startChar": 13,
+        "endLine": 2418,
+        "endChar": 21
+      },
+      "revId": "dad0215d324042340d8e3986a4ddce7c4f6f82b3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
