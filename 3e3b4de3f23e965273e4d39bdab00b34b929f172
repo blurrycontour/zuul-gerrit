@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bff0334d_15b83428",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 343,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-04-05T18:48:07Z",
+      "side": 1,
+      "message": "nit: inconsistent spacing",
+      "range": {
+        "startLine": 343,
+        "startChar": 40,
+        "endLine": 343,
+        "endChar": 43
+      },
+      "revId": "3e3b4de3f23e965273e4d39bdab00b34b929f172",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
