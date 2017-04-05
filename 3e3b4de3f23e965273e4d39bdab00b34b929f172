@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "bff0334d_476cce35",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 334,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-04-05T21:45:48Z",
+      "side": 1,
+      "message": "Same nit as below, inconsistent spacing.",
+      "revId": "3e3b4de3f23e965273e4d39bdab00b34b929f172",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bff0334d_15b83428",
         "filename": "zuul/executor/client.py",
         "patchSetId": 5
