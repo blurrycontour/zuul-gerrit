@@ -16,6 +16,23 @@
       "revId": "ca5f9f12f75626fe6ec7f55de28aa5a80ebd5df1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bff0334d_8d0f69e0",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 920,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-06T21:35:00Z",
+      "side": 1,
+      "message": "I believe the goal here is to get something to copy/paste as a command.  I don\u0027t think dumping env_copy will help with that.  Also, other than this, it\u0027s mostly not very interesting (an admin can inspect the env pretty easily).",
+      "revId": "ca5f9f12f75626fe6ec7f55de28aa5a80ebd5df1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
