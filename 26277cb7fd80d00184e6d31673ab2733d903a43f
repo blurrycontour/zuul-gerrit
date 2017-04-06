@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bff0334d_6eb54a31",
+        "filename": "zuul/ansible/lookup/csvfile.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-04-06T15:52:24Z",
+      "side": 1,
+      "message": "s/run/read_csv/  ?",
+      "range": {
+        "startLine": 26,
+        "startChar": 41,
+        "endLine": 26,
+        "endChar": 44
+      },
+      "revId": "26277cb7fd80d00184e6d31673ab2733d903a43f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
