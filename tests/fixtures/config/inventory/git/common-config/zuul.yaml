@@ -31,6 +31,14 @@
           - compute1
           - compute2
 
+- nodeset:
+    name: nodeset2
+    nodes:
+      - name: default
+        label: default-label
+      - name: fakeuser
+        label: fakeuser-label
+
 - job:
     name: base
     parent: null
@@ -44,3 +52,7 @@
 - job:
     name: group-inventory
     nodes: nodeset1
+
+- job:
+    name: hostvars-inventory
+    nodes: nodeset2
