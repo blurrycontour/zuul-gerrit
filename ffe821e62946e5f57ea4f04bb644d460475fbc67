@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bff0334d_db688f88",
+        "filename": "zuul/ansible/lookup/first_found.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-06T18:40:27Z",
+      "side": 1,
+      "message": "It would be nice if this part were in another function in the original module.",
+      "revId": "ffe821e62946e5f57ea4f04bb644d460475fbc67",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
