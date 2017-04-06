@@ -17,6 +17,7 @@ import imp
 import os
 
 import ansible.plugins.action
+import ansible.plugins.lookup
 
 
 def _is_safe_path(path):
@@ -51,3 +52,11 @@ def _import_ansible_action_plugin(name):
     return imp.load_module(
         'zuul.ansible.protected.action.' + name,
         *imp.find_module(name, ansible.plugins.action.__path__))
+
+
+def _import_ansible_lookup_plugin(name):
+    # See _import_ansible_action_plugin
+
+    return imp.load_module(
+        'zuul.ansible.protected.lookup.' + name,
+        *imp.find_module(name, ansible.plugins.lookup.__path__))
