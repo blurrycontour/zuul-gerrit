@@ -1051,14 +1051,18 @@ class ConfigLoader(object):
 
     def _loadDynamicProjectData(self, config, source, project, files,
                                 config_repo):
+        if config_repo:
+            fn = 'zuul.yaml'
+            data = files.getFile(project.name, 'master', fn)
+            if data:
+                config.extend(data)
+            else:
+                config.extend(project.unparsed_config)
+            return
+
         for branch in source.getProjectBranches(project):
-            data = None
-            if config_repo:
-                fn = 'zuul.yaml'
-                data = files.getFile(project.name, branch, fn)
-            if not data:
-                fn = '.zuul.yaml'
-                data = files.getFile(project.name, branch, fn)
+            fn = '.zuul.yaml'
+            data = files.getFile(project.name, branch, fn)
             if data:
                 source_context = model.SourceContext(project, branch,
                                                      fn, config_repo)
@@ -1100,6 +1104,12 @@ class ConfigLoader(object):
         # exactly one value at any time. So we do not support dynamic semaphore
         # configuration changes.
         layout.semaphores = tenant.layout.semaphores
+
+        for config_nodeset in config.nodesets:
+            layout.addNodeSet(NodeSetParser.fromYaml(layout, config_nodeset))
+
+        for config_secret in config.secrets:
+            layout.addSecret(SecretParser.fromYaml(layout, config_secret))
 
         for config_job in config.jobs:
             layout.addJob(JobParser.fromYaml(tenant, layout, config_job))
