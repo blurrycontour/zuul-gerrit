@@ -671,6 +671,45 @@ class TestAnsible(AnsibleZuulTestCase):
             self.assertIn(fail.format("timeout", build_timeout.uuid), msg)
             self.assertIn(fail.format("failpost", build_failpost.uuid), msg)
 
+    def _add_job(self, job):
+        conf = textwrap.dedent(
+            """
+            - job:
+                name: %s
+
+            - project:
+                name: org/plugin-project
+                check:
+                  jobs:
+                    - %s
+            """ % (job, job))
+
+        file_dict = {'.zuul.yaml': conf}
+        A = self.fake_gerrit.addFakeChange('org/plugin-project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+    def test_plugins(self):
+        count = 0
+        plugin_tests = [
+            ('passwd', 'FAILURE'),
+            ('cartesian', 'SUCCESS'),
+            ('consul_kv', 'FAILURE'),
+            ('credstash', 'FAILURE'),
+            ('csvfile_good', 'SUCCESS'),
+            ('csvfile_bad', 'FAILURE'),
+        ]
+        for job, result in plugin_tests:
+            count += 1
+            self._add_job(job)
+            self.assertEqual(count, len(self.history))
+            build = self.history[-1]
+            self.assertEqual(build.result, result)
+
+        # TODOv3(jeblair): parse the ansible output and verify we're
+        # getting the exception we expect.
+
 
 class TestPrePlaybooks(AnsibleZuulTestCase):
     # A temporary class to hold new tests while others are disabled
