@@ -16,6 +16,23 @@
       "revId": "b01f1ca238af45150fc90eea495faf0ec7c4d32e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bff0334d_9817ada4",
+        "filename": "tests/fixtures/config/single-tenant/git/layout-rate-limit/zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-06T18:16:53Z",
+      "side": 1,
+      "message": "The old version of this test did not.",
+      "revId": "b01f1ca238af45150fc90eea495faf0ec7c4d32e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
