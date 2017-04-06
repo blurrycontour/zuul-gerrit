@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bff0334d_989214f6",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 920,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-04-06T15:20:19Z",
+      "side": 1,
+      "message": "Ran into this yesterday, maybe we should just dump the contents of env_copy to log?",
+      "revId": "ca5f9f12f75626fe6ec7f55de28aa5a80ebd5df1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
