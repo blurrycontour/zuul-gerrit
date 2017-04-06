@@ -1898,7 +1898,7 @@ class ZuulTestCase(BaseTestCase):
         f = tempfile.NamedTemporaryFile(dir=root, delete=False)
         f.write("""
 - tenant:
-    name: openstack
+    name: tenant-one
     source:
       gerrit:
         config-repos:

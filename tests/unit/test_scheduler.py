@@ -2247,7 +2247,7 @@ class TestScheduler(ZuulTestCase):
 
         self.executor_server.hold_jobs_in_build = True
 
-        tenant = self.sched.abide.tenants.get('openstack')
+        tenant = self.sched.abide.tenants.get('tenant-one')
         check_pipeline = tenant.layout.pipelines['check']
 
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
@@ -3273,7 +3273,7 @@ class TestScheduler(ZuulTestCase):
         self.executor_server.release('project-.*')
         self.waitUntilSettled()
 
-        tenant = self.sched.abide.tenants.get('openstack')
+        tenant = self.sched.abide.tenants.get('tenant-one')
         queue = tenant.layout.pipelines['gate'].queues[0]
         # A failed so window is reduced by 1 to 1.
         self.assertEqual(queue.window, 1)
@@ -3365,7 +3365,7 @@ class TestScheduler(ZuulTestCase):
         self.executor_server.release('project-.*')
         self.waitUntilSettled()
 
-        tenant = self.sched.abide.tenants.get('openstack')
+        tenant = self.sched.abide.tenants.get('tenant-one')
         queue = tenant.layout.pipelines['gate'].queues[0]
         # A failed so window is reduced by 1 to 1.
         self.assertEqual(queue.window, 1)
@@ -4134,7 +4134,7 @@ For CI problems and help debugging, contact ci@example.org"""
 
         # Make sure none of the items share a change queue, and all
         # are live.
-        tenant = self.sched.abide.tenants.get('openstack')
+        tenant = self.sched.abide.tenants.get('tenant-one')
         check_pipeline = tenant.layout.pipelines['check']
         self.assertEqual(len(check_pipeline.queues), 3)
         self.assertEqual(len(check_pipeline.getAllItems()), 3)
@@ -4270,7 +4270,7 @@ For CI problems and help debugging, contact ci@example.org"""
         self.updateConfigLayout('layout-disabled-at')
         self.sched.reconfigure(self.config)
 
-        tenant = self.sched.abide.tenants.get('openstack')
+        tenant = self.sched.abide.tenants.get('tenant-one')
         self.assertEqual(3, tenant.layout.pipelines['check'].disable_at)
         self.assertEqual(
             0, tenant.layout.pipelines['check']._consecutive_failures)
@@ -4368,7 +4368,7 @@ For CI problems and help debugging, contact ci@example.org"""
         # comes out of disabled
         self.sched.reconfigure(self.config)
 
-        tenant = self.sched.abide.tenants.get('openstack')
+        tenant = self.sched.abide.tenants.get('tenant-one')
 
         self.assertEqual(3, tenant.layout.pipelines['check'].disable_at)
         self.assertEqual(
