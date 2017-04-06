@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bff0334d_3e6ac9b2",
+        "filename": "playbooks/roles/host-info/tasks/main.yaml",
+        "patchSetId": 27
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-06T19:01:40Z",
+      "side": 1,
+      "message": "I like this task for the stdlib.",
+      "revId": "e848d46ef5ed5cac1c6ba427adff5e770a05850d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bff0334d_1e65c5e1",
+        "filename": "playbooks/roles/host-info/tasks/main.yaml",
+        "patchSetId": 27
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-06T19:01:40Z",
+      "side": 1,
+      "message": "I think this task is both too detailed and too openstack-specific for the stdlib.  Can we break it up into a different role so that we move it into project-config later?",
+      "revId": "e848d46ef5ed5cac1c6ba427adff5e770a05850d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
