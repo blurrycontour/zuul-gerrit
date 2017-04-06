@@ -6,4 +6,5 @@
           - common-config
         project-repos:
           - org/project
+          - org/lookup-project
           - bare-role

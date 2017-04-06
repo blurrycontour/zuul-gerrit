@@ -1,0 +1,6 @@
+- hosts: all
+  vars:
+    value: "{{ lookup('csvfile', 'a file=test.csv') }}"
+    #value: "{{ lookup('csvfile', 'a file=src/org/lookup_project/test.csv') }}"
+  tasks:
+    - debug: msg="value is {{ value }}"
