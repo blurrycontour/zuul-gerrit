@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bff0334d_3a31b80c",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1462,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-06T17:55:59Z",
+      "side": 1,
+      "message": "How about this:\n\ntry:\n  format...\nexcept KeyError as e:\n  self.log.error(\"Error while formatting url for job %s: unknown key %s in pattern %s\" % (job, e.message, url_pattern))\nexcept AttributeError as e:\n  self.log.error(\"Error while formatting url for job %s: unknown attribute %s in pattern %s\" % (job, e.message, url_pattern))\nexcept Exception:\n  self.log.exception(\"Error while formatting url for job %s with pattern %s:\" % (job, url_pattern))\n\nThat gives us nice short error messages for the expected exceptions, and a full traceback for the unexpected ones.  The short ones are a stepping stone to being able to report them back to the user later.",
+      "revId": "848dd86ef0dad321fc32c4826ada1fe39ff71548",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
