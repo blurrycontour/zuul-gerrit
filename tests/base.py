@@ -1131,7 +1131,7 @@ class MySQLSchemaFixture(fixtures.Fixture):
 
 class BaseTestCase(testtools.TestCase):
     log = logging.getLogger("zuul.test")
-    wait_timeout = 20
+    wait_timeout = 30
 
     def attachLogs(self, *args):
         def reader():
