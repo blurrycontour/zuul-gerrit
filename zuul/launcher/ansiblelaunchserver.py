@@ -131,6 +131,10 @@ class JobDir(object):
 
     def __exit__(self, etype, value, tb):
         if not self.keep:
+            # Make sure all directories have 0755 permissions.
+            for root, dirs, files in os.walk(self.root):
+                for d in dirs:
+                    os.chmod(os.path.join(root, d), 0755)
             shutil.rmtree(self.root)
 
 
