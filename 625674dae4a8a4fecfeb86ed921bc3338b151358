@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bff0334d_863720e4",
+        "filename": "zuul/launcher/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-04-07T17:50:50Z",
+      "side": 1,
+      "message": "More complete comment would be \"Ensure directories are writeable so that files can be removed from them\".",
+      "revId": "625674dae4a8a4fecfeb86ed921bc3338b151358",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
