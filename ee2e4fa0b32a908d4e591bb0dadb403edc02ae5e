@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bff0334d_499c640e",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2507,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-04-10T13:20:40Z",
+      "side": 1,
+      "message": "Any reason not to keep it as a set?",
+      "range": {
+        "startLine": 2507,
+        "startChar": 28,
+        "endLine": 2507,
+        "endChar": 30
+      },
+      "revId": "ee2e4fa0b32a908d4e591bb0dadb403edc02ae5e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bff0334d_299da009",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2512,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-04-10T13:20:40Z",
+      "side": 1,
+      "message": "ditto",
+      "range": {
+        "startLine": 2512,
+        "startChar": 29,
+        "endLine": 2512,
+        "endChar": 31
+      },
+      "revId": "ee2e4fa0b32a908d4e591bb0dadb403edc02ae5e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
