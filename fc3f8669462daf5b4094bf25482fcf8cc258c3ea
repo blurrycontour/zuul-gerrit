@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bff0334d_090c1c39",
+        "filename": "zuul/model.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 358,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-04-10T13:15:57Z",
+      "side": 1,
+      "message": "Could consider using path.join, but we can come back to that.  We could sanitise the hostname or just let it function with \u0027//\u0027 etc.",
+      "range": {
+        "startLine": 358,
+        "startChar": 37,
+        "endLine": 358,
+        "endChar": 55
+      },
+      "revId": "fc3f8669462daf5b4094bf25482fcf8cc258c3ea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bff0334d_4996a441",
+        "filename": "zuul/model.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 2527,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-04-10T13:15:57Z",
+      "side": 1,
+      "message": "Storing two different structures here seems over complicated. Why not just always store it as an unambiguous mapping and then have the logic in getProject to figure out the fqhn or return the first item if there is only 1 entry?",
+      "revId": "fc3f8669462daf5b4094bf25482fcf8cc258c3ea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
