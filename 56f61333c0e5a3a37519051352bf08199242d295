@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bff0334d_11d89678",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 387,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-04-11T13:54:05Z",
+      "side": 1,
+      "message": "FYI, this isn\u0027t strictly necessary since updateFromDict() should set this attribute for us automatically. I *think* the existence of these other attributes might be from before it did that?",
+      "revId": "56f61333c0e5a3a37519051352bf08199242d295",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
