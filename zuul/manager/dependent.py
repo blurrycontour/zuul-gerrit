@@ -71,7 +71,7 @@ class DependentPipelineManager(PipelineManager):
             self.log.debug("Added project %s to queue: %s" %
                            (project, change_queue))
 
-    def getChangeQueue(self, change, existing=None):
+    def getChangeQueue(self, change, existing=None, dynamic=True):
         if existing:
             return StaticChangeQueueContextManager(existing)
         return StaticChangeQueueContextManager(

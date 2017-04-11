@@ -25,10 +25,19 @@ class IndependentPipelineManager(PipelineManager):
     def _postConfig(self, layout):
         super(IndependentPipelineManager, self)._postConfig(layout)
 
-    def getChangeQueue(self, change, existing=None):
+    def getChangeQueue(self, change, existing=None, dynamic=True):
         # creates a new change queue for every change
         if existing:
             return DynamicChangeQueueContextManager(existing)
+
+        if not dynamic:
+            # Don't create a dynamic change queue if the project is not
+            # configured for the pipeline.
+            matching = [x for x in self.pipeline.layout.project_configs
+                        if x == change.project.name]
+            if not matching:
+                return DynamicChangeQueueContextManager(None)
+
         change_queue = model.ChangeQueue(self.pipeline)
         change_queue.addProject(change.project)
         self.pipeline.addQueue(change_queue)

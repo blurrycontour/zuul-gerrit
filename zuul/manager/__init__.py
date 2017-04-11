@@ -192,6 +192,9 @@ class PipelineManager(object):
     def getFailingDependentItems(self, item):
         return None
 
+    def getChangeQueue(self, change, existing=None, dynamic=True):
+        return None
+
     def getDependentItems(self, item):
         orig_item = item
         items = []
@@ -301,7 +304,8 @@ class PipelineManager(object):
                                    "requirement %s" % (change, f))
                     return False
 
-        with self.getChangeQueue(change, change_queue) as change_queue:
+        with self.getChangeQueue(change, change_queue,
+                                 dynamic=False)as change_queue:
             if not change_queue:
                 self.log.debug("Unable to find change queue for "
                                "change %s in project %s" %
