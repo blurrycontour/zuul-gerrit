@@ -385,9 +385,6 @@ class Node(object):
         self._state = 'unknown'
         self.state_time = time.time()
         self.interface_ip = None
-        self.public_ipv4 = None
-        self.private_ipv4 = None
-        self.public_ipv6 = None
         self._keys = []
         self.az = None
         self.provider = None
