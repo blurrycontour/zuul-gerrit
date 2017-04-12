@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bff0334d_417abbb9",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-04-12T04:08:39Z",
+      "side": 1,
+      "message": "I\u0027m not sure if we need this extra parameter. (Further comment on line 241)",
+      "range": {
+        "startLine": 195,
+        "startChar": 52,
+        "endLine": 195,
+        "endChar": 59
+      },
+      "revId": "878000e3e2e0025fc5a90e7734f8986353ca233b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bff0334d_442f6987",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-04-12T04:08:39Z",
+      "side": 1,
+      "message": "This is the only other place (besides ln308) that calls getChangeQueue. Dropping a change from the queue because the project doesn\u0027t exist anymore sounds like a reasonable behaviour so we can probably drop the dynamic param and always check if it exists unless I\u0027m missing something?",
+      "revId": "878000e3e2e0025fc5a90e7734f8986353ca233b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bff0334d_41de3bda",
+        "filename": "zuul/manager/independent.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-04-12T04:08:39Z",
+      "side": 1,
+      "message": "(nit) This could perhaps be a method on Layout",
+      "revId": "878000e3e2e0025fc5a90e7734f8986353ca233b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
