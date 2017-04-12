@@ -42,6 +42,24 @@
     },
     {
       "key": {
+        "uuid": "bff0334d_7901e769",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-04-12T11:04:58Z",
+      "side": 1,
+      "message": "Not sure if I\u0027m mixing up something on v3, but on v2 I also did a change like that (Ifa5d3b4f46adf90d39f2b5a551c1bf2bbb3137d8) where the new parameter was necessary for not breaking deps to unmanaged projects (for which a dynamic queue was created).",
+      "parentUuid": "bff0334d_442f6987",
+      "revId": "878000e3e2e0025fc5a90e7734f8986353ca233b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bff0334d_41de3bda",
         "filename": "zuul/manager/independent.py",
         "patchSetId": 1
