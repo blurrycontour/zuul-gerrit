@@ -1,0 +1,9 @@
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Code-Review+2: Paul Belanger <pabelanger@redhat.com>
+Workflow+1: Paul Belanger <pabelanger@redhat.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Wed, 12 Apr 2017 20:13:02 +0000
+Reviewed-on: https://review.openstack.org/456282
+Project: openstack-infra/zuul
+Branch: refs/heads/master
