@@ -24,6 +24,7 @@ pid_file_module = extras.try_imports(['daemon.pidlockfile', 'daemon.pidfile'])
 
 import logging
 import os
+import pwd
 import socket
 import sys
 import signal
@@ -35,6 +36,10 @@ import zuul.executor.server
 # imported until after the daemonization.
 # https://github.com/paramiko/paramiko/issues/59
 # Similar situation with gear and statsd.
+
+
+# TODO(Shrews): Get this from the config file
+USER = 'zuul'
 
 
 class Executor(zuul.cmd.ZuulApp):
@@ -72,11 +77,41 @@ class Executor(zuul.cmd.ZuulApp):
         self.executor.stop()
         self.executor.join()
 
+    def start_log_streamer(self):
+        pipe_read, pipe_write = os.pipe()
+        child_pid = os.fork()
+        if child_pid == 0:
+            os.close(pipe_write)
+            import zuul.lib.log_streamer
+            zuul.lib.log_streamer.LogStreamer(USER, self.config)
+
+            # Keep running until the parent dies:
+            pipe_read = os.fdopen(pipe_read)
+            pipe_read.read()
+            os._exit(0)
+        else:
+            os.close(pipe_read)
+            self.log_streamer_pid = child_pid
+
+    def change_privs(self):
+        '''
+        Drop our privileges to the zuul user.
+        '''
+        if os.getuid() != 0:
+            return
+        pw = pwd.getpwnam(USER)
+        os.setgroups([])
+        os.setgid(pw.pw_gid)
+        os.setuid(pw.pw_uid)
+        os.umask(0o022)
+
     def main(self, daemon=True):
         # See comment at top of file about zuul imports
 
-        self.setup_logging('executor', 'log_config')
+        self.start_log_streamer()
+        self.change_privs()
 
+        self.setup_logging('executor', 'log_config')
         self.log = logging.getLogger("zuul.Executor")
 
         jobroot_dir = None
