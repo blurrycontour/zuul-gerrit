@@ -80,7 +80,14 @@ class JobDirPlaybook(object):
 
 
 class JobDir(object):
-    def __init__(self, root=None, keep=False):
+    def __init__(self, root=None, keep=False, prefix=None):
+        '''
+        :param str root: Root directory for the individual job directories.
+        :param bool keep: If True, do not delete the job directory.
+        :param str prefix: A prefix string for the job directory name.
+            If supplied, this should be the unique job identifier. Using this
+            will help the log streaming daemon find job logs.
+        '''
         # root
         #   ansible
         #     trusted.cfg
@@ -89,7 +96,11 @@ class JobDir(object):
         #     src
         #     logs
         self.keep = keep
-        self.root = tempfile.mkdtemp(dir=root)
+        if prefix:
+            prefix = prefix + "_"
+            self.root = tempfile.mkdtemp(prefix=prefix, dir=root)
+        else:
+            self.root = tempfile.mkdtemp(dir=root)
         # Work
         self.work_root = os.path.join(self.root, 'work')
         os.makedirs(self.work_root)
@@ -524,7 +535,8 @@ class AnsibleJob(object):
     def execute(self):
         try:
             self.jobdir = JobDir(root=self.executor_server.jobdir_root,
-                                 keep=self.executor_server.keep_jobdir)
+                                 keep=self.executor_server.keep_jobdir,
+                                 prefix=self.job.unique)
             self._execute()
         except Exception:
             self.log.exception("Exception while executing job")
