@@ -1642,11 +1642,15 @@ class ZuulTestCase(BaseTestCase):
         commit = repo.index.commit('Creating a fake commit')
         return commit.hexsha
 
-    def orderedRelease(self):
+    def orderedRelease(self, count=None):
         # Run one build at a time to ensure non-race order:
+        i = 0
         while len(self.builds):
             self.release(self.builds[0])
             self.waitUntilSettled()
+            i += 1
+            if count is not None and i >= count:
+                break
 
     def release(self, job):
         if isinstance(job, FakeBuild):
@@ -1725,9 +1729,10 @@ class ZuulTestCase(BaseTestCase):
             else:
                 self.log.debug("%s is unassigned" % server_job)
                 return False
-        for (uuid, job_worker) in self.executor_server.job_workers.items():
-            if uuid not in seen_builds:
-                self.log.debug("%s is not finalized" % uuid)
+        for (build_uuid, job_worker) in \
+            self.executor_server.job_workers.items():
+            if build_uuid not in seen_builds:
+                self.log.debug("%s is not finalized" % build_uuid)
                 return False
         return True
 
