@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "7ffa3b31_21c04150",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2507,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-18T22:01:33Z",
+      "side": 1,
+      "message": "We need to iterate over these in the original order when performing reconfiguration.  I missed that when I wrote the temporary comment this patch removes.",
+      "revId": "ee2e4fa0b32a908d4e591bb0dadb403edc02ae5e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bff0334d_299da009",
         "filename": "zuul/model.py",
         "patchSetId": 6
