@@ -38,6 +38,11 @@ class TimerDriver(Driver, TriggerInterface):
 
     def reconfigure(self, tenant):
         self._removeJobs(tenant)
+        if self.apsched:
+            # Stop the apsched thread so that we don't leak threads
+            # when there are no jobs to run in the cron scheduler.
+            self.apsched.shutdown()
+            self.apsched = None
         self._addJobs(tenant)
 
     def _removeJobs(self, tenant):
@@ -69,6 +74,9 @@ class TimerDriver(Driver, TriggerInterface):
                     trigger = CronTrigger(day=dom, day_of_week=dow, hour=hour,
                                           minute=minute, second=second)
 
+                    if not self.apsched:
+                        self.apsched = BackgroundScheduler()
+                        self.apsched.start()
                     job = self.apsched.add_job(
                         self._onTrigger, trigger=trigger,
                         args=(tenant, pipeline.name, timespec,))
@@ -87,7 +95,9 @@ class TimerDriver(Driver, TriggerInterface):
             self.sched.addEvent(event)
 
     def stop(self):
-        self.apsched.shutdown()
+        if self.apsched:
+            self.apsched.shutdown()
+            self.apsched = None
 
     def getTrigger(self, connection_name, config=None):
         return timertrigger.TimerTrigger(self, config)
