@@ -769,6 +769,11 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
                 build.release()
         super(RecordingExecutorServer, self).stopJob(job)
 
+    def stop(self):
+        for build in self.running_builds:
+            build.release()
+        super(RecordingExecutorServer, self).stop()
+
 
 class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
     def doMergeChanges(self, items):
@@ -1398,14 +1403,13 @@ class ZuulTestCase(BaseTestCase):
         self.webapp.start()
         self.rpc.start()
         self.executor_client.gearman.waitForServer()
+        # Cleanups are run in reverse order
+        self.addCleanup(self.assertCleanShutdown)
         self.addCleanup(self.shutdown)
+        self.addCleanup(self.assertFinalState)
 
         self.sched.reconfigure(self.config)
         self.sched.resume()
-
-    def tearDown(self):
-        super(ZuulTestCase, self).tearDown()
-        self.assertFinalState()
 
     def configure_connections(self):
         # Set up gerrit related fakes
@@ -1545,6 +1549,9 @@ class ZuulTestCase(BaseTestCase):
                     self.assertEqual(test_key, f.read())
 
     def assertFinalState(self):
+        self.log.debug("Assert final state")
+        # Make sure no jobs are running
+        self.assertEqual({}, self.executor_server.job_workers)
         # Make sure that git.Repo objects have been garbage collected.
         repos = []
         gc.collect()
@@ -1584,6 +1591,9 @@ class ZuulTestCase(BaseTestCase):
         if len(threads) > 1:
             self.log.error("More than one thread is running: %s" % threads)
         self.printHistory()
+
+    def assertCleanShutdown(self):
+        pass
 
     def init_repo(self, project):
         parts = project.split('/')
