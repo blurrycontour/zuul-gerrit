@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "7ffa3b31_810395b8",
+        "filename": "zuul/model.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 358,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-18T21:59:28Z",
+      "side": 1,
+      "message": "path.join is system-dependent; the better thing here is actual string concatenation.\n\nI agree that sanity checking that someone didn\u0027t put \"/\" on the end of the hostname is a good idea, but unlikely so not strictly necessary for now.",
+      "revId": "fc3f8669462daf5b4094bf25482fcf8cc258c3ea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bff0334d_4996a441",
         "filename": "zuul/model.py",
         "patchSetId": 8
@@ -36,6 +53,23 @@
       "writtenOn": "2017-04-10T13:15:57Z",
       "side": 1,
       "message": "Storing two different structures here seems over complicated. Why not just always store it as an unambiguous mapping and then have the logic in getProject to figure out the fqhn or return the first item if there is only 1 entry?",
+      "revId": "fc3f8669462daf5b4094bf25482fcf8cc258c3ea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ffa3b31_61fe49af",
+        "filename": "zuul/model.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 2527,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-18T21:59:28Z",
+      "side": 1,
+      "message": "Ok.",
       "revId": "fc3f8669462daf5b4094bf25482fcf8cc258c3ea",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
