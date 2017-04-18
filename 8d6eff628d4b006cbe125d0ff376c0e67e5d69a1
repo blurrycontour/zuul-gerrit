@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7ffa3b31_ae768ea3",
+        "filename": "setup.cfg",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-04-18T13:43:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7ffa3b31_5ced9d89",
+      "revId": "8d6eff628d4b006cbe125d0ff376c0e67e5d69a1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7ffa3b31_3c04114a",
         "filename": "zuul/cmd/fingerd.py",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2017-04-17T21:40:07Z",
       "side": 1,
       "message": "We should double check that the job_dir is under the jobdir_root, to avoid \u0027..\u0027 escapes.\n\nThe right term to use for a running instance of a job is \u0027build\u0027, so this should be \"Build ID %s not found\".\n\nSometimes we\u0027re loose about that in the code, but try not to be in the logs or user interface.  It might help to call the variables \"build_uuid\" instead of \"job_id\" if you wanted to be consistent.",
+      "revId": "8d6eff628d4b006cbe125d0ff376c0e67e5d69a1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ffa3b31_8e50720c",
+        "filename": "zuul/cmd/fingerd.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-04-18T13:43:14Z",
+      "side": 1,
+      "message": "I modified the next next PS to validate that the incoming data is only hex characters.",
+      "parentUuid": "7ffa3b31_3c04114a",
       "revId": "8d6eff628d4b006cbe125d0ff376c0e67e5d69a1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "7ffa3b31_2e415e3a",
+        "filename": "zuul/cmd/fingerd.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-04-18T13:43:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7ffa3b31_1cff1535",
+      "revId": "8d6eff628d4b006cbe125d0ff376c0e67e5d69a1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7ffa3b31_fcfd893a",
         "filename": "zuul/cmd/fingerd.py",
         "patchSetId": 2
@@ -64,6 +118,24 @@
       "writtenOn": "2017-04-17T21:40:07Z",
       "side": 1,
       "message": "\u0027for build %s\u0027",
+      "revId": "8d6eff628d4b006cbe125d0ff376c0e67e5d69a1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ffa3b31_0e3c62bd",
+        "filename": "zuul/cmd/fingerd.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-04-18T13:43:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7ffa3b31_fcfd893a",
       "revId": "8d6eff628d4b006cbe125d0ff376c0e67e5d69a1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
