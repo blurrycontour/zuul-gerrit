@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7ffa3b31_7cfb6b46",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 4435,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-19T23:59:59Z",
+      "side": 1,
+      "message": "Oh, the tenant name in simple_layout is \"tenant-one\" now.",
+      "revId": "248244345399ffebd640f5a9e64ad05f1573d164",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
