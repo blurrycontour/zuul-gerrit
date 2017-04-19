@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "7ffa3b31_c41067ab",
+        "filename": "tests/fixtures/layouts/tags.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-04-19T21:25:00Z",
+      "side": 1,
+      "message": "I think this job is unused and can be removed?",
+      "revId": "65d97c79427a7aff7868e70c263b18016c44cfdc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7ffa3b31_4472174b",
         "filename": "tests/unit/test_scheduler.py",
         "patchSetId": 2
@@ -13,6 +30,24 @@
       "writtenOn": "2017-04-19T21:22:17Z",
       "side": 1,
       "message": "So... why did this change from 8 to 2?",
+      "revId": "65d97c79427a7aff7868e70c263b18016c44cfdc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ffa3b31_04808fbf",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2937,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-04-19T21:25:00Z",
+      "side": 1,
+      "message": "Because in the new layout file org/project1 and org/project2 have one job each so 2 * new patchset \u003d\u003d 2 jobs run.",
+      "parentUuid": "7ffa3b31_4472174b",
       "revId": "65d97c79427a7aff7868e70c263b18016c44cfdc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
