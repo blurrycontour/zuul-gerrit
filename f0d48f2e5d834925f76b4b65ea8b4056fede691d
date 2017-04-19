@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7ffa3b31_44d577e4",
+        "filename": "tests/fixtures/config/single-tenant/git/layout-tags/zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-04-19T21:22:17Z",
+      "side": 0,
+      "message": "Seems jobs test1 and test2 are dropped, and the references to them in the project blocks were dropped. I take it these are auto-generated now?",
+      "revId": "f0d48f2e5d834925f76b4b65ea8b4056fede691d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
