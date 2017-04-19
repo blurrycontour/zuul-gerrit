@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7ffa3b31_7c000bac",
+        "filename": "zuul/model.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 358,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-04-19T23:31:48Z",
+      "side": 1,
+      "message": "I know this merged already but a quick search doesn\u0027t show this new variable used anywhere?",
+      "revId": "c2a54fdf64e51689ed3e83b12f815bd539d17f6d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ffa3b31_1c35878f",
+        "filename": "zuul/model.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 2540,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-04-19T23:31:48Z",
+      "side": 1,
+      "message": "Doesn\u0027t this imply that a canonical_hostname can only host a single project? Did you mean to use the unused project.canonical_name instead?",
+      "revId": "c2a54fdf64e51689ed3e83b12f815bd539d17f6d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
