@@ -19,6 +19,57 @@
     },
     {
       "key": {
+        "uuid": "7ffa3b31_3cba83c0",
+        "filename": "zuul/model.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 358,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-19T23:43:28Z",
+      "side": 1,
+      "message": "If not in this change, it is used in a later change.",
+      "revId": "c2a54fdf64e51689ed3e83b12f815bd539d17f6d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ffa3b31_1cbfc7b0",
+        "filename": "zuul/model.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 2537,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-19T23:43:28Z",
+      "side": 1,
+      "message": "First lookup ^",
+      "revId": "c2a54fdf64e51689ed3e83b12f815bd539d17f6d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ffa3b31_fcaf7b7a",
+        "filename": "zuul/model.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 2538,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-19T23:43:28Z",
+      "side": 1,
+      "message": "Second lookup ^",
+      "revId": "c2a54fdf64e51689ed3e83b12f815bd539d17f6d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7ffa3b31_1c35878f",
         "filename": "zuul/model.py",
         "patchSetId": 12
@@ -30,6 +81,23 @@
       "writtenOn": "2017-04-19T23:31:48Z",
       "side": 1,
       "message": "Doesn\u0027t this imply that a canonical_hostname can only host a single project? Did you mean to use the unused project.canonical_name instead?",
+      "revId": "c2a54fdf64e51689ed3e83b12f815bd539d17f6d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ffa3b31_dcb4bfd3",
+        "filename": "zuul/model.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 2540,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-19T23:43:28Z",
+      "side": 1,
+      "message": "The lookup path is project_name -\u003e hostname -\u003e project.  First we use the project name to get a dictionary of hostname-\u003eproject mappings.  Then we use the hostname to find the actual project.  In this method, where we add a project, if that final entry already exists, we have a collision.\n\nThe lookup is \"backwards\" from the way we think about it because the hostname is optional.  So this way we can return the project without specifying a hostname by seeing if the hostname-\u003eproject mapping has only one element.",
       "revId": "c2a54fdf64e51689ed3e83b12f815bd539d17f6d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
