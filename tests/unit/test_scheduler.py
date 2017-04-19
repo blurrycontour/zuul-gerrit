@@ -1248,9 +1248,9 @@ class TestScheduler(ZuulTestCase):
         # aborted jobs.
 
         self.executor_server.hold_jobs_in_build = True
-        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
-        B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
-        C = self.fake_gerrit.addFakeChange('org/project1', 'master', 'C')
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
         A.addApproval('code-review', 2)
         B.addApproval('code-review', 2)
         C.addApproval('code-review', 2)
@@ -1502,17 +1502,17 @@ class TestScheduler(ZuulTestCase):
         # https://bugs.executepad.net/zuul/+bug/1078946
         # This test assumes the repo is already cloned; make sure it is
         tenant = self.sched.abide.tenants.get('tenant-one')
-        trusted, project = tenant.getProject('org/project1')
+        trusted, project = tenant.getProject('org/project')
         url = self.fake_gerrit.getGitUrl(project)
-        self.merge_server.merger.addProject('org/project1', url)
-        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        self.merge_server.merger.addProject('org/project', url)
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         A.addPatchset(large=True)
-        path = os.path.join(self.upstream_root, "org/project1")
+        path = os.path.join(self.upstream_root, "org/project")
         repack_repo(path)
-        path = os.path.join(self.merger_src_root, "org/project1")
+        path = os.path.join(self.merger_src_root, "org/project")
         if os.path.exists(path):
             repack_repo(path)
-        path = os.path.join(self.executor_src_root, "org/project1")
+        path = os.path.join(self.executor_src_root, "org/project")
         if os.path.exists(path):
             repack_repo(path)
 
