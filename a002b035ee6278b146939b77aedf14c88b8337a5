@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7ffa3b31_e3d8007c",
+        "filename": "tests/base.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1406,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-04-19T17:26:20Z",
+      "side": 1,
+      "message": "Hooray for addCleanup!",
+      "revId": "a002b035ee6278b146939b77aedf14c88b8337a5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
