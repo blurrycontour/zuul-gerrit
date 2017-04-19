@@ -16,6 +16,23 @@
       "revId": "f0d48f2e5d834925f76b4b65ea8b4056fede691d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ffa3b31_9f8aacbc",
+        "filename": "tests/fixtures/config/single-tenant/git/layout-tags/zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-19T22:18:05Z",
+      "side": 0,
+      "message": "Oh I simplified the test too since we weren\u0027t getting anything out of these other jobs; they just ended up in the test due to copypasta.",
+      "revId": "f0d48f2e5d834925f76b4b65ea8b4056fede691d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
