@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7ffa3b31_4857d327",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-04-19T17:25:45Z",
+      "side": 1,
+      "message": "Unrelated whitespace edit?",
+      "revId": "eabbd08a7c0a430ae5c542af695dd5853907528f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
