@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7ffa3b31_f449aeb6",
+        "filename": "tests/fixtures/config/semaphore/git/common-config/zuul.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-04-20T21:19:56Z",
+      "side": 1,
+      "message": "I\u0027m really glad this comment is here. I was like where is test-semaphore at?",
+      "revId": "9ea0d0b937d952636a60b148eebb776bdc21a38d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
