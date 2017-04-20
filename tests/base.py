@@ -2054,7 +2054,39 @@ class ZuulTestCase(BaseTestCase):
             commit_data)
         return before
 
+    def commitConfigUpdate(self, project_name, source_name):
+        """Commit an update to zuul.yaml
+
+        This overwrites the zuul.yaml in the specificed project with
+        the contents specified.  It will also ensure playbooks exist
+        for each job specified in the configuration.
+
+        :arg str project_name: The name of the project containing
+            zuul.yaml (e.g., common-config)
+
+        :arg str source_name: The path to the file (underneath the
+            test fixture directory) whose contents should be used to
+            replace zuul.yaml.
+        """
+
+        source_path = os.path.join(FIXTURE_DIR, source_name)
+        files = {}
+        with open(source_path, 'r') as f:
+            data = f.read()
+            layout = yaml.safe_load(data)
+            commit_data['zuul.yaml'] = f.read()
+        untrusted_projects = []
+        for item in layout:
+            if 'job' in item:
+                jobname = item['job']['name']
+                files['playbooks/%s.yaml' % jobname] = ''
+        before = self.addCommitToRepo(
+            project_name, 'Pulling content from %s' % source_name,
+            files)
+        return before
+
     def addEvent(self, connection, event):
+
         """Inject a Fake (Gerrit) event.
 
         This method accepts a JSON-encoded event and simulates Zuul
