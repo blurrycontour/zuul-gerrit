@@ -2069,9 +2069,16 @@ class ZuulTestCase(BaseTestCase):
         """
 
         source_path = os.path.join(FIXTURE_DIR, source_name)
-        commit_data = {}
-        with open(source_path, 'r') as nt:
-            commit_data['zuul.yaml'] = nt.read()
+        files = {}
+        with open(source_path, 'r') as f:
+            data = f.read()
+            layout = yaml.safe_load(data)
+            files['zuul.yaml'] = data
+        untrusted_projects = []
+        for item in layout:
+            if 'job' in item:
+                jobname = item['job']['name']
+                files['playbooks/%s.yaml' % jobname] = ''
         before = self.addCommitToRepo(
             project_name, 'Pulling content from %s' % source_name,
             commit_data)
