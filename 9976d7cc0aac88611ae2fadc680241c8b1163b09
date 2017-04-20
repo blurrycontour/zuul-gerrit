@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7ffa3b31_0971a30c",
+        "filename": "zuul/cmd/log_streamer.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-20T20:33:06Z",
+      "side": 1,
+      "message": "It would be nice if this happened once, after binding the port.",
+      "revId": "9976d7cc0aac88611ae2fadc680241c8b1163b09",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ffa3b31_e9631741",
+        "filename": "zuul/cmd/log_streamer.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-20T20:33:06Z",
+      "side": 1,
+      "message": "The case of the log file being deleted because the job ended will be very common and should probably be handled without logging an exception.  If I\u0027m reading correctly, it will currently raise an exception after follow_log returns and stream_log calls chunk_log again.",
+      "revId": "9976d7cc0aac88611ae2fadc680241c8b1163b09",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ffa3b31_c9685b1e",
+        "filename": "zuul/cmd/log_streamer.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-20T20:33:06Z",
+      "side": 1,
+      "message": "Everything below here, along with the RequestHandler class, should be moved into its own class in a file in /zuul/ (outside of cmd).  That should implement the actual functionality, and the file here in cmd should only implement what\u0027s needed to run that from the CLI.\n\nThen the test framework will start an instance of that new class for testing.  Generally, the CLI programs in cmd are not tested by the unit tests, so it\u0027s good to keep their surface small.",
+      "revId": "9976d7cc0aac88611ae2fadc680241c8b1163b09",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
