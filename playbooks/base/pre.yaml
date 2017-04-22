@@ -1,3 +1,8 @@
 - hosts: all
-  roles:
-    - prepare-workspace
+  tasks:
+    - name: Prepare zuul worker.
+      include_role:
+        name: stdlib.prepare-workspace
+      vars:
+        _prepare_workspace_file_path: "{{ zuul_workspace_root }}"
+        _prepare_workspace_synchronize_src: "{{ zuul.executor.src_root }}"
