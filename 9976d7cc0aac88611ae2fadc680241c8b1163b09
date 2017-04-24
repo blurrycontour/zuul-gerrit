@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5ff73747_a3b6d5d8",
+        "filename": "zuul/cmd/log_streamer.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-04-24T20:11:35Z",
+      "side": 1,
+      "message": "Handled this by creating a custom socketserver class that overrides server_bind() and changes privileges there.",
+      "parentUuid": "7ffa3b31_0971a30c",
+      "revId": "9976d7cc0aac88611ae2fadc680241c8b1163b09",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7ffa3b31_e9631741",
         "filename": "zuul/cmd/log_streamer.py",
         "patchSetId": 9
@@ -30,6 +48,24 @@
       "writtenOn": "2017-04-20T20:33:06Z",
       "side": 1,
       "message": "The case of the log file being deleted because the job ended will be very common and should probably be handled without logging an exception.  If I\u0027m reading correctly, it will currently raise an exception after follow_log returns and stream_log calls chunk_log again.",
+      "revId": "9976d7cc0aac88611ae2fadc680241c8b1163b09",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ff73747_23a9a57a",
+        "filename": "zuul/cmd/log_streamer.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-04-24T20:11:35Z",
+      "side": 1,
+      "message": "For the life of me, I cannot remember why I changed this from the zuul_console.py code.",
+      "parentUuid": "7ffa3b31_e9631741",
       "revId": "9976d7cc0aac88611ae2fadc680241c8b1163b09",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
