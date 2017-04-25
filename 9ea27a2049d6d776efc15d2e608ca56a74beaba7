@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ff73747_4d683c20",
+        "filename": "zuul/lib/log_streamer.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-25T16:22:13Z",
+      "side": 1,
+      "message": "Maybe call this LogStreamer, as this seems like the main thing that this file should export?\n\nThis is the class that we will manually instatiate in the test framework.",
+      "revId": "9ea27a2049d6d776efc15d2e608ca56a74beaba7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ff73747_2d773005",
+        "filename": "zuul/lib/log_streamer.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-25T16:22:13Z",
+      "side": 1,
+      "message": "Can you add jobdir_root here too?",
+      "revId": "9ea27a2049d6d776efc15d2e608ca56a74beaba7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ff73747_0d723412",
+        "filename": "zuul/lib/log_streamer.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-25T16:22:13Z",
+      "side": 1,
+      "message": "This class should be in zuul/cmd/executor.  It has all of the non-testable setup and signal handling.",
+      "revId": "9ea27a2049d6d776efc15d2e608ca56a74beaba7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
