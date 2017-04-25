@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "5ff73747_afdd6a15",
+        "filename": "doc/source/triggers.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-25T22:22:17Z",
+      "side": 1,
+      "message": "This is a really interesting place we\u0027re in.  After previously flattening the \"pull_request\" event plus actions into \"pr-*\" in zuul, there\u0027s another manipulation here where we are expanding the \"push\" event (which does not have actions) into multiple zuul events based on the ref.\n\nThis is very similar to the \u0027ref-updated\u0027 event in gerrit, which also happens if someone pushes to a branch or creates a tag.  We use regular expressions on the ref in the pipeline configuration to distinguish between the two.  We could do the same here.  I\u0027m sympathetic to the idea of making these two synthetic events in Zuul, but I do think we should do the same thing for both Gerrit and GitHub (it\u0027s fine if these drivers are different, obviously, but I don\u0027t think they should be unecessarily different).  I think using a single event here (\"push\" I guess?) is the default choice, and splitting this into two events (push/tag) is something we should discuss more broadly and decide if we want to do that sort of manipulation in Gerrit as well.",
+      "revId": "61608d8fdd28ab021ef4dfddd6330e741f76f9c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5ff73747_1b939ba5",
         "filename": "tests/base.py",
         "patchSetId": 9
@@ -13,6 +30,23 @@
       "writtenOn": "2017-04-25T12:08:03Z",
       "side": 1,
       "message": "This looks like it should maybe be \u0027tag\u0027 ?",
+      "revId": "61608d8fdd28ab021ef4dfddd6330e741f76f9c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ff73747_8fe06ece",
+        "filename": "tests/base.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 672,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-25T22:22:17Z",
+      "side": 1,
+      "message": "Actually \u0027push\u0027 is correct: https://developer.github.com/v3/activity/events/types/#pushevent\nIt looks like this expands a single GitHub event into separate zuul events based on the ref.",
       "revId": "61608d8fdd28ab021ef4dfddd6330e741f76f9c6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
