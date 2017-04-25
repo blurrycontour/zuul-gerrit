@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ff73747_ad3b40e9",
+        "filename": "zuul/driver/timer/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-25T16:27:43Z",
+      "side": 1,
+      "message": "The scheduler is global, but this method only reconfigures for a single tenant.",
+      "revId": "77d2d5cd0e1145eb755a6767950bcb0efcf576ca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
