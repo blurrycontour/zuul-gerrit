@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ff73747_923e65d8",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-25T16:06:02Z",
+      "side": 1,
+      "message": "Maybe we should use mkdir here, so that if it already exists, it throws an exception and we aren\u0027t tricked into reusing an existing directory.  Also, we should set the perms to 700 like mkdtemp does.",
+      "revId": "b37c7404b2e7708820cea56b6c5258db25db86a8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
