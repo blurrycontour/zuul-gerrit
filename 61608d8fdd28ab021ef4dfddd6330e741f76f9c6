@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ff73747_1b939ba5",
+        "filename": "tests/base.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 672,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-04-25T12:08:03Z",
+      "side": 1,
+      "message": "This looks like it should maybe be \u0027tag\u0027 ?",
+      "revId": "61608d8fdd28ab021ef4dfddd6330e741f76f9c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
