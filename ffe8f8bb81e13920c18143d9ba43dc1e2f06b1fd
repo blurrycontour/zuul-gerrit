@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ff73747_eff3729d",
+        "filename": "tests/nodepool/test_nodepool_integration.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-04-25T22:23:43Z",
+      "side": 1,
+      "message": "Shouldn\u0027t we add the cleanup for disconnect after the connect occurs below?",
+      "revId": "ffe8f8bb81e13920c18143d9ba43dc1e2f06b1fd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
