@@ -38,6 +38,7 @@ import subprocess
 import sys
 import tempfile
 import threading
+import traceback
 import time
 import uuid
 
@@ -1654,10 +1655,15 @@ class ZuulTestCase(BaseTestCase):
         self.gearman_server.shutdown()
         self.fake_nodepool.stop()
         self.zk.disconnect()
+        self.printHistory()
         threads = threading.enumerate()
         if len(threads) > 1:
-            self.log.error("More than one thread is running: %s" % threads)
-        self.printHistory()
+            log_str = ""
+            for thread_id, stack_frame in sys._current_frames().items():
+                log_str += "Thread: %s\n" % thread_id
+                log_str += "".join(traceback.format_stack(stack_frame))
+            self.log.debug(log_str)
+            raise Exception("More than one thread is running: %s" % threads)
 
     def assertCleanShutdown(self):
         pass
