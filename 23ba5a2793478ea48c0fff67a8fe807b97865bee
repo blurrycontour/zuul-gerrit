@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ff73747_ef1c926b",
+        "filename": "doc/source/triggers.rst",
+        "patchSetId": 17
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-25T22:03:43Z",
+      "side": 1,
+      "message": "The gerrit driver doesn\u0027t translate its events, it just passes through \"patchset-created\", \"change-merged\", etc.  Partly that\u0027s to make it easy to cross-reference with Gerrit documentation so we don\u0027t have to copy that here (though maybe that would be a better idea and friendlier to Zuul users).  Partly to be future-proof.\n\nI see that GitHub has a weird two-level event system, where there are some events such as PushEvent (added to zuul in a later change) which are very straightforward, but then PullRequestEvent which has an action such as \"opened\" and \"closed\".  So conceptually, we want to flatten that space for use in zuul, which is what is happening here and in later changes.  That\u0027s why we have \"pr-open\" instead of \"opened\" -- so that if there\u0027s an OpenEvent later on, we don\u0027t collide.\n\nI certainly don\u0027t want to ask people to type \"pull-request-\" all the time, so using \"pr-\" seems like a good way to namespace these.\n\nI wonder if we should try to normalize the part after \"pr-\" to the github action names to minimize the delta between zuul and the github event stream.  So use \"pr-opened\" instead of \"pr-open\".  That makes it easier to map between the two systems.\n\nShould we used \"synchronized\" instead of \"change\"?  Is that what happens when someone updates the underlying branch?",
+      "revId": "23ba5a2793478ea48c0fff67a8fe807b97865bee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ff73747_cf179645",
+        "filename": "doc/source/triggers.rst",
+        "patchSetId": 17
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-25T22:03:43Z",
+      "side": 1,
+      "message": "Since the events they need to enable in github aren\u0027t the flattened events we have in zuul, this probably needs more detail.  We may need to \"unflatten\" the events in our documentation (eg \"pr-open, pr-close -- enable the pull_request event for these\").  Or we could recommend that people enable events for everything that Zuul supports (eg \"Be sure to enable the pull_request and push events in GitHub\").",
+      "revId": "23ba5a2793478ea48c0fff67a8fe807b97865bee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
