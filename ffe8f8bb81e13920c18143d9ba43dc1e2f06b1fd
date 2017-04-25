@@ -16,6 +16,24 @@
       "revId": "ffe8f8bb81e13920c18143d9ba43dc1e2f06b1fd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ff73747_af144aa1",
+        "filename": "tests/nodepool/test_nodepool_integration.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-04-25T22:26:37Z",
+      "side": 1,
+      "message": "No typically you\u0027d try to have cleanups in place before the item they clean. That way if something half breaks it has a chance at cleaning up after itself. When things break the test is gonna fail anyways so having disconnect fail if it can\u0027t recover is fine.",
+      "parentUuid": "5ff73747_eff3729d",
+      "revId": "ffe8f8bb81e13920c18143d9ba43dc1e2f06b1fd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
