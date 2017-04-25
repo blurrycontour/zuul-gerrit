@@ -486,19 +486,6 @@ class Scheduler(threading.Thread):
         finally:
             self.layout_lock.release()
 
-    def _reenqueueGetProject(self, tenant, project):
-        # Attempt to get the same project as the one passed in.  If
-        # the project is now found on a different connection, return
-        # the new version of the project.  If it is no longer
-        # available (due to a connection being removed), return None.
-        project_name = project.canonical_name
-        (trusted, new_project) = tenant.getProject(project_name)
-        if new_project:
-            return new_project
-        source = self.connections.getSourceByHostname(
-            project.canonical_hostname)
-        return source.getProject(project.name)
-
     def _reenqueueTenant(self, old_tenant, tenant):
         for name, new_pipeline in tenant.layout.pipelines.items():
             old_pipeline = old_tenant.layout.pipelines.get(name)
@@ -518,8 +505,10 @@ class Scheduler(threading.Thread):
                     item.items_behind = []
                     item.pipeline = None
                     item.queue = None
-                    item.change.project = self._reenqueueGetProject(
-                        tenant, item.change.project)
+                    # Attempt to get the same project, even if it's
+                    # now found via a different connection.
+                    item.change.project = tenant.getProject(
+                        project.canonical_name)
                     if (item.change.project and
                         new_pipeline.manager.reEnqueueItem(item,
                                                            last_head)):
@@ -714,16 +703,19 @@ class Scheduler(threading.Thread):
         event = self.trigger_event_queue.get()
         self.log.debug("Processing trigger event %s" % event)
         try:
-            source = self.connections.getSourceByHostname(
-                event.project_hostname)
-            try:
-                change = source.getChange(event)
-            except exceptions.ChangeNotFound as e:
-                self.log.debug("Unable to get change %s from "
-                               "source %s",
-                               e.change, source)
-                return
+            full_project_name = ('/'.join([event.project_hostname,
+                                           event.project_name]))
             for tenant in self.abide.tenants.values():
+                (trusted, project) = tenant.getProject(full_project_name)
+                if project is None:
+                    continue
+                try:
+                    change = project.source.getChange(event)
+                except exceptions.ChangeNotFound as e:
+                    self.log.debug("Unable to get change %s from "
+                                   "source %s",
+                                   e.change, project.source)
+                    continue
                 if (event.type == 'change-merged' and
                     hasattr(change, 'files') and
                     change.updatesConfig()):
