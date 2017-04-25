@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ff73747_8f63ceb1",
+        "filename": "doc/source/reporters.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-25T22:10:39Z",
+      "side": 1,
+      "message": "I think we should drop the last sentence; see below.",
+      "revId": "328a819c581dc372c7a43da6a430385c21be9c74",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ff73747_af60caa6",
+        "filename": "tests/fixtures/layouts/basic-github.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-25T22:10:39Z",
+      "side": 1,
+      "message": "This isn\u0027t used, right?  (This is the \"string parameter with no special meaning\" in the docs?)  Why don\u0027t we change this to \"github: {}\" which is what we typically do for reporters with no arguments.\n\n(I spent a few minutes trying to figure out where this would show up.)",
+      "revId": "328a819c581dc372c7a43da6a430385c21be9c74",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
