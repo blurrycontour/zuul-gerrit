@@ -52,7 +52,7 @@ class Watchdog(object):
 
     def _run(self):
         while self._running and time.time() < self.end:
-            time.sleep(10)
+            time.sleep(1)
         if self._running:
             self.timed_out = True
             self.function(*self.args)
@@ -65,6 +65,8 @@ class Watchdog(object):
 
     def stop(self):
         self._running = False
+        # Wait for watchdog to stop
+        self.thread.join()
 
 # TODOv3(mordred): put git repos in a hierarchy that includes source
 # hostname, eg: git.openstack.org/openstack/nova.  Also, configure

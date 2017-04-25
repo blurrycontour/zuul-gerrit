@@ -64,7 +64,7 @@
 - job:
     parent: python27
     name: timeout
-    timeout: 1
+    timeout: 3
 
 - job:
     parent: python27
