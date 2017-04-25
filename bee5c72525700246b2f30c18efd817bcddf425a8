@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ff73747_6ccc10bc",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-25T21:35:11Z",
+      "side": 1,
+      "message": "My first thought on seeing this was to wonder whether this belongs here -- so far this class just defines the required API for a connection.  But further thought leads me to think that this is probably the way that most connections should register a handler, so having a handy helper function to do it right is a good idea, and this is probably the best place (though we could certainly put it in the webapp itself).",
+      "revId": "bee5c72525700246b2f30c18efd817bcddf425a8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
