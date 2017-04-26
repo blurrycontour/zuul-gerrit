@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5ff73747_8793a0a3",
+        "filename": "doc/source/triggers.rst",
+        "patchSetId": 17
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-04-26T13:37:08Z",
+      "side": 1,
+      "message": "Oh god. Naming.\n\nWhy not just do a direct mapping to like \"pull_request.opened\" or \"pull_request-opened\" - you know, mechanical {event}.{action} - even if that produces a slightly longer event name? It\u0027s more typing, but it\u0027s not _that_ much typing, and it doesn\u0027t get typed _that_ much, right? That way we can say here \"pull request events from github have an additional \u0027action\u0027 field, which gets translated onto the zuul event name as pull_request.{action}. If you want any of the zuul pull_request.* events, be sure to select the pull_request webhook\" - or even more generally \"some gh events also have an action - if youwant zuul events for {event}.* be sure to enable the corresponding webhook for {event}\"\n\nJust thinking out loud...",
+      "parentUuid": "5ff73747_ef1c926b",
+      "revId": "23ba5a2793478ea48c0fff67a8fe807b97865bee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5ff73747_cf179645",
         "filename": "doc/source/triggers.rst",
         "patchSetId": 17
