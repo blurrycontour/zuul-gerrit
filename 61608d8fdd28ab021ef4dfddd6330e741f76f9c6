@@ -54,6 +54,23 @@
     },
     {
       "key": {
+        "uuid": "5ff73747_2d1ffdb7",
+        "filename": "doc/source/triggers.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-26T20:20:52Z",
+      "side": 1,
+      "message": "Let\u0027s avoid the push/tag expansion for now, and just implement this as close as reasonably possible to a mechanical passthrough of the event.  That is consistent with the current way zuul works.  Later, let\u0027s look into synthetic events for both drivers as an enhancement.",
+      "revId": "61608d8fdd28ab021ef4dfddd6330e741f76f9c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5ff73747_1b939ba5",
         "filename": "tests/base.py",
         "patchSetId": 9
