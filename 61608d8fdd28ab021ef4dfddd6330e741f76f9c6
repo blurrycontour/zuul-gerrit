@@ -37,6 +37,23 @@
     },
     {
       "key": {
+        "uuid": "5ff73747_8474b169",
+        "filename": "doc/source/triggers.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-26T18:15:40Z",
+      "side": 1,
+      "message": "I think expanding this event to push and tag is potentially useful -- they map to frequently useful events that otherwise require significant technical knowledge to distinguish.  However, I think that we should avoid dealing with gerrit \u0027merge\u0027 in this way as it would serve to mask an important distinction between the ref-updated and change-merged events which both have legitimate reasons for people to want to use them.",
+      "revId": "61608d8fdd28ab021ef4dfddd6330e741f76f9c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5ff73747_1b939ba5",
         "filename": "tests/base.py",
         "patchSetId": 9
