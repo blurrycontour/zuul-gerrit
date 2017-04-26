@@ -288,21 +288,33 @@ class ExecutorServer(object):
         library_path = os.path.dirname(os.path.abspath(
             zuul.ansible.library.__file__))
         for fn in os.listdir(library_path):
+            if os.path.isdir(fn):
+                self.log.warning('Ignoring directory: {}'.format(fn))
+                continue
             shutil.copy(os.path.join(library_path, fn), self.library_dir)
 
         action_path = os.path.dirname(os.path.abspath(
             zuul.ansible.action.__file__))
         for fn in os.listdir(action_path):
+            if os.path.isdir(fn):
+                self.log.warning('Ignoring directory: {}'.format(fn))
+                continue
             shutil.copy(os.path.join(action_path, fn), self.action_dir)
 
         callback_path = os.path.dirname(os.path.abspath(
             zuul.ansible.callback.__file__))
         for fn in os.listdir(callback_path):
+            if os.path.isdir(fn):
+                self.log.warning('Ignoring directory: {}'.format(fn))
+                continue
             shutil.copy(os.path.join(callback_path, fn), self.callback_dir)
 
         lookup_path = os.path.dirname(os.path.abspath(
             zuul.ansible.lookup.__file__))
         for fn in os.listdir(lookup_path):
+            if os.path.isdir(fn):
+                self.log.warning('Ignoring directory: {}'.format(fn))
+                continue
             shutil.copy(os.path.join(lookup_path, fn), self.lookup_dir)
 
         self.job_workers = {}
