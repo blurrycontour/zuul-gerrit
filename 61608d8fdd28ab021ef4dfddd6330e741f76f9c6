@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5ff73747_6750945e",
+        "filename": "doc/source/triggers.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-04-26T13:50:41Z",
+      "side": 1,
+      "message": "Wow, yeah, I\u0027m super torn on this.\n\nOn the one hand, I really like the _zuul_ interface being really clear about push v. tag, since the number of folks who know that git tags are a special git ref is not super high. On the other hand I like the direct mapping of zuul events to the source system.\n\nI think, without having thought about it deeply yet, I may be more on the side of \"make a set of zuul terms with clear definitions\" and use them in both gerrit and github where they make sense. We have three in this space potentially: ref-updated/push, merge, tag. (the gerrit merge event being less useful at the moment which is why we use ref-updated. All three of those really expand to basic git terms that humans understand, and if we made synthetic events in both drivers for them, it would likely be nice. (would save new users using gerrit from needing to learn that \"ref updated\" is the concept they\u0027re looking for if they want to run actions when stuff lands - most folks who use gerrit but do not directly program its event interface likely have never thought of \"ref updated\" as a concept) On the other hand - keeping direct event mapping for things like pull-request and change I think is important, because calling gerrit changes \"PRs\" annoys gerrit people and calling PRs \"changes\" confuses GH people - those are concepts unique to each system.\n\nI definitely agree we should chat more broadly about this - there are definitely some ramifications  to user experience in either direction.",
+      "parentUuid": "5ff73747_afdd6a15",
+      "revId": "61608d8fdd28ab021ef4dfddd6330e741f76f9c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5ff73747_1b939ba5",
         "filename": "tests/base.py",
         "patchSetId": 9
