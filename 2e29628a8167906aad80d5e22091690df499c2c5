@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ff73747_846dd133",
+        "filename": "tools/bwrap-executor.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-26T18:24:58Z",
+      "side": 1,
+      "message": "In IRC we found that we should be able to safely drop /proc from this.",
+      "revId": "2e29628a8167906aad80d5e22091690df499c2c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ff73747_64688520",
+        "filename": "tools/bwrap-executor.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-26T18:24:58Z",
+      "side": 1,
+      "message": "We shouldn\u0027t need the state_dir, and in fact, that\u0027s kind of dangerous as the executor control socket is located there, among potentially other thigs.  We may need state_dir/ansible, however, as that is where our custom modules are installed.",
+      "revId": "2e29628a8167906aad80d5e22091690df499c2c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
