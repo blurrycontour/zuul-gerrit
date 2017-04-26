@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5ff73747_66208db1",
+        "filename": "zuul/lib/log_streamer.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-04-26T17:47:53Z",
+      "side": 1,
+      "message": "Hmm, no, I don\u0027t think this is the thing we want to call since we\u0027d still have to call server_forever() on it. I\u0027ll propose a different solution in the next PS.",
+      "parentUuid": "5ff73747_4d683c20",
+      "revId": "9ea27a2049d6d776efc15d2e608ca56a74beaba7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5ff73747_2d773005",
         "filename": "zuul/lib/log_streamer.py",
         "patchSetId": 12
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "5ff73747_262a858f",
+        "filename": "zuul/lib/log_streamer.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-04-26T17:47:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ff73747_2d773005",
+      "revId": "9ea27a2049d6d776efc15d2e608ca56a74beaba7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5ff73747_0d723412",
         "filename": "zuul/lib/log_streamer.py",
         "patchSetId": 12
@@ -47,6 +83,24 @@
       "writtenOn": "2017-04-25T16:22:13Z",
       "side": 1,
       "message": "This class should be in zuul/cmd/executor.  It has all of the non-testable setup and signal handling.",
+      "revId": "9ea27a2049d6d776efc15d2e608ca56a74beaba7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ff73747_a617b551",
+        "filename": "zuul/lib/log_streamer.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-04-26T17:47:53Z",
+      "side": 1,
+      "message": "I moved the non-testable stuff up.",
+      "parentUuid": "5ff73747_0d723412",
       "revId": "9ea27a2049d6d776efc15d2e608ca56a74beaba7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
