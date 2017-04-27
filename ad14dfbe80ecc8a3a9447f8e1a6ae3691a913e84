@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ff73747_14e8aedf",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-27T16:36:42Z",
+      "side": 1,
+      "message": "We can copy this from above.  It\u0027s not great:\n\nDirectory that Zuul should clone local git repositories to.\n``git_dir\u003d/var/lib/zuul/git``",
+      "revId": "ad14dfbe80ecc8a3a9447f8e1a6ae3691a913e84",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ff73747_f4e4220f",
+        "filename": "doc/source/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-27T16:36:42Z",
+      "side": 1,
+      "message": "SSH private key file to be used when logging into worker nodes.\n``private_key_file\u003d~/.ssh/id_rsa``",
+      "revId": "ad14dfbe80ecc8a3a9447f8e1a6ae3691a913e84",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
