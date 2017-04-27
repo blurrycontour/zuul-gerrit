@@ -113,15 +113,17 @@ class MergeClient(object):
                     files=files)
         self.submitJob('merger:merge', data, build_set, precedence)
 
-    def updateRepo(self, project, url, build_set,
+    def updateRepo(self, hostname, project_name, url, build_set,
                    precedence=zuul.model.PRECEDENCE_NORMAL):
-        data = dict(project=project,
+        data = dict(project=project_name,
+                    canonical_hostname=hostname,
                     url=url)
         self.submitJob('merger:update', data, build_set, precedence)
 
-    def getFiles(self, project, url, branch, files,
+    def getFiles(self, hostname, project_name, url, branch, files,
                  precedence=zuul.model.PRECEDENCE_HIGH):
-        data = dict(project=project,
+        data = dict(project=project_name,
+                    canonical_hostname=hostname,
                     url=url,
                     branch=branch,
                     files=files)
