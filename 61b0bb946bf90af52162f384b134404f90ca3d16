@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ff73747_a45d3b16",
+        "filename": "doc/source/reporters.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-27T23:18:32Z",
+      "side": 1,
+      "message": "``status\u003dtrue``\n\nHowever, I\u0027d normally expect this to be: \"status: pending\".  So that for each result type (start, success, failure, merge-failure) you con specify which status (if any) to send.  I will grant that\u0027s normally straightforward, and \"start: github: status: success\" doesn\u0027t make much sense.  However \"failure: github: status: success\" actually does have a use case to build, essentially a non-voting pipeline.  Probably not a great idea, but feasible.\n\nAt any rate, actually specifying the status rather than making it hard-coded in zuul is a bit more in-line with the other reporters.",
+      "revId": "61b0bb946bf90af52162f384b134404f90ca3d16",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ff73747_849c7fc0",
+        "filename": "doc/source/reporters.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-04-27T23:18:32Z",
+      "side": 1,
+      "message": "Other reporters don\u0027t have the option to disable the message in the report.  This not only adds the option, but actually sets it to false by default, making this the only reporter where you have to make this explicit.  I\u0027m wondering if that\u0027s because people generally expect CI systems in github to restrict themselves to status reports, rather than comments?  (So if you do both, does it appear that you are repeating yourself?)\n\nIf that\u0027s the case, I wonder if we should put the message in the description field, rather than add it as a comment.\n\nI\u0027m fuzzy enough on how the choices here affect the output on github that it\u0027s probably worth a chat in IRC about it.",
+      "revId": "61b0bb946bf90af52162f384b134404f90ca3d16",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
