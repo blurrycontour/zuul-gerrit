@@ -157,14 +157,13 @@ class JobDir(object):
 
 
 class UpdateTask(object):
-    def __init__(self, hostname, project_name, url):
-        self.hostname = hostname
+    def __init__(self, connection_name, project_name):
+        self.connection_name = connection_name
         self.project_name = project_name
-        self.url = url
         self.event = threading.Event()
 
     def __eq__(self, other):
-        if (other.hostname == self.hostname and
+        if (other.connection_name == self.connection_name and
             other.project_name == self.project_name):
             return True
         return False
@@ -405,16 +404,16 @@ class ExecutorServer(object):
         if task is None:
             # We are asked to stop
             return
-        self.log.info("Updating repo %s from %s" % (
-            task.project_name, task.url))
-        self.merger.updateRepo(task.hostname, task.project_name, task.url)
-        self.log.debug("Finished updating repo %s/%s from %s" %
-                       (task.hostname, task.project_name, task.url))
+        self.log.info("Updating repo %s/%s" % (
+            task.connection_name, task.project_name))
+        self.merger.updateRepo(task.connection_name, task.project_name)
+        self.log.debug("Finished updating repo %s/%s" %
+                       (task.connection_name, task.project_name))
         task.setComplete()
 
-    def update(self, hostname, project_name, url):
+    def update(self, connection_name, project_name):
         # Update a repository in the main merger
-        task = UpdateTask(hostname, project_name, url)
+        task = UpdateTask(connection_name, project_name)
         task = self.update_queue.put(task)
         return task
 
@@ -473,11 +472,9 @@ class ExecutorServer(object):
 
     def cat(self, job):
         args = json.loads(job.arguments)
-        task = self.update(args['canonical_hostname'],
-                           args['project'], args['url'])
+        task = self.update(args['connection'], args['project'])
         task.wait()
-        files = self.merger.getFiles(args['canonical_hostname'],
-                                     args['project'], args['url'],
+        files = self.merger.getFiles(args['connection'], args['project'],
                                      args['branch'], args['files'])
         result = dict(updated=True,
                       files=files,
@@ -564,22 +561,29 @@ class AnsibleJob(object):
             self.log.debug("Job %s: updating project %s" %
                            (self.job.unique, project))
             tasks.append(self.executor_server.update(
-                project['canonical_hostname'],
-                project['name'], project['url']))
+                project['connection'], project['name']))
         for task in tasks:
             task.wait()
 
         self.log.debug("Job %s: git updates complete" % (self.job.unique,))
+        repos = []
         for project in args['projects']:
-            self.log.debug("Cloning %s" % (project['name'],))
+            self.log.debug("Cloning %s/%s" % (project['connection'],
+                                              project['name'],))
+            source = self.executor_server.connections.getSource(
+                project['connection'])
+            project_object = source.getProject(project['name'])
+            url = source.getGitUrl(project_object)
             repo = git.Repo.clone_from(
                 os.path.join(self.executor_server.merge_root,
-                             project['canonical_hostname'],
+                             source.canonical_hostname,
                              project['name']),
                 os.path.join(self.jobdir.src_root,
-                             project['canonical_hostname'],
+                             source.canonical_hostname,
                              project['name']))
-            repo.remotes.origin.config_writer.set('url', project['url'])
+
+            repo.remotes.origin.config_writer.set('url', url)
+            repos.append(repo)
 
         merge_items = [i for i in args['items'] if i.get('refspec')]
         if merge_items:
@@ -590,6 +594,11 @@ class AnsibleJob(object):
                 return
         else:
             commit = args['items'][-1]['newrev']  # noqa
+
+        # Delete the origin remote from each repo we set up since
+        # it will not be valid within the jobs.
+        for repo in repos:
+            repo.delete_remote(repo.remotes.origin)
 
         # is the playbook in a repo that we have already prepared?
         self.preparePlaybookRepos(args)
@@ -756,14 +765,12 @@ class AnsibleJob(object):
         source = self.executor_server.connections.getSource(
             playbook['connection'])
         project = source.getProject(playbook['project'])
-        # TODO(jeblair): construct the url in the merger itself
-        url = source.getGitUrl(project)
         if not playbook['trusted']:
             # This is a project repo, so it is safe to use the already
             # checked out version (from speculative merging) of the
             # playbook
             for i in args['items']:
-                if (i['connection_name'] == playbook['connection'] and
+                if (i['connection'] == playbook['connection'] and
                     i['project'] == playbook['project']):
                     # We already have this repo prepared
                     path = os.path.join(self.jobdir.src_root,
@@ -780,8 +787,8 @@ class AnsibleJob(object):
         # tip into a dedicated space.
 
         merger = self.executor_server._getMerger(jobdir_playbook.root)
-        merger.checkoutBranch(project.canonical_hostname,
-                              project.name, url, playbook['branch'])
+        merger.checkoutBranch(playbook['connection'], project.name,
+                              playbook['branch'])
 
         path = os.path.join(jobdir_playbook.root,
                             project.canonical_hostname,
@@ -825,8 +832,6 @@ class AnsibleJob(object):
         source = self.executor_server.connections.getSource(
             role['connection'])
         project = source.getProject(role['project'])
-        # TODO(jeblair): construct the url in the merger itself
-        url = source.getGitUrl(project)
         role_repo = None
         if not role['trusted']:
             # This is a project repo, so it is safe to use the already
@@ -834,7 +839,7 @@ class AnsibleJob(object):
             # role
 
             for i in args['items']:
-                if (i['connection_name'] == role['connection'] and
+                if (i['connection'] == role['connection'] and
                     i['project'] == role['project']):
                     # We already have this repo prepared;
                     # copy it into location.
@@ -853,8 +858,8 @@ class AnsibleJob(object):
 
         if not role_repo:
             merger = self.executor_server._getMerger(root)
-            merger.checkoutBranch(project.canonical_hostname,
-                                  project.name, url, 'master')
+            merger.checkoutBranch(role['connection'], project.name,
+                                  'master')
             role_repo = os.path.join(root, project.canonical_hostname,
                                      project.name)
 

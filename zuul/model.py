@@ -1103,22 +1103,22 @@ class RepoFiles(object):
     """
 
     def __init__(self):
-        self.hostnames = {}
+        self.connections = {}
 
     def __repr__(self):
-        return '<RepoFiles %s>' % self.hostnames
+        return '<RepoFiles %s>' % self.connections
 
     def setFiles(self, items):
         self.hostnames = {}
         for item in items:
-            hostname = self.hostnames.setdefault(
-                item['canonical_hostname'], {})
-            project = hostname.setdefault(item['project'], {})
+            connection = self.connections.setdefault(
+                item['connection'], {})
+            project = connection.setdefault(item['project'], {})
             branch = project.setdefault(item['branch'], {})
             branch.update(item['files'])
 
-    def getFile(self, hostname, project_name, branch, fn):
-        host = self.hostnames.get(hostname, {})
+    def getFile(self, connection_name, project_name, branch, fn):
+        host = self.connections.get(connection_name, {})
         return host.get(project_name, {}).get(branch, {}).get(fn)
 
 
@@ -1719,9 +1719,7 @@ class QueueItem(object):
         project = self.change.project
 
         return dict(project=project.name,
-                    canonical_hostname=project.canonical_hostname,
-                    url=source.getGitUrl(project),
-                    connection_name=connection_name,
+                    connection=connection_name,
                     merge_mode=self.current_build_set.getMergeMode(),
                     refspec=refspec,
                     branch=branch,
