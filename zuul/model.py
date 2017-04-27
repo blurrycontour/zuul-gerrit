@@ -1103,20 +1103,23 @@ class RepoFiles(object):
     """
 
     def __init__(self):
-        self.projects = {}
+        self.hostnames = {}
 
     def __repr__(self):
-        return '<RepoFiles %s>' % self.projects
+        return '<RepoFiles %s>' % self.hostnames
 
     def setFiles(self, items):
-        self.projects = {}
+        self.hostnames = {}
         for item in items:
-            project = self.projects.setdefault(item['project'], {})
+            hostname = self.hostnames.setdefault(
+                item['canonical_hostname'], {})
+            project = hostname.setdefault(item['project'], {})
             branch = project.setdefault(item['branch'], {})
             branch.update(item['files'])
 
-    def getFile(self, project, branch, fn):
-        return self.projects.get(project, {}).get(branch, {}).get(fn)
+    def getFile(self, hostname, project_name, branch, fn):
+        host = self.hostnames.get(hostname, {})
+        return host.get(project_name, {}).get(branch, {}).get(fn)
 
 
 class BuildSet(object):
@@ -1713,10 +1716,11 @@ class QueueItem(object):
             branch = None
         source = self.change.project.source
         connection_name = source.connection.connection_name
-        project = self.change.project.name
+        project = self.change.project
 
-        return dict(project=project,
-                    url=source.getGitUrl(self.change.project),
+        return dict(project=project.name,
+                    canonical_hostname=project.canonical_hostname,
+                    url=source.getGitUrl(project),
                     connection_name=connection_name,
                     merge_mode=self.current_build_set.getMergeMode(),
                     refspec=refspec,

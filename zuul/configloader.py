@@ -891,7 +891,8 @@ class TenantParser(object):
             # Get main config files.  These files are permitted the
             # full range of configuration.
             url = project.source.getGitUrl(project)
-            job = merger.getFiles(project.name, url, 'master',
+            job = merger.getFiles(project.canonical_hostname,
+                                  project.name, url, 'master',
                                   files=['zuul.yaml', '.zuul.yaml'])
             job.source_context = model.SourceContext(project, 'master',
                                                      '', True)
@@ -918,7 +919,8 @@ class TenantParser(object):
             for branch in project.source.getProjectBranches(project):
                 project.unparsed_branch_config[branch] = \
                     model.UnparsedTenantConfig()
-                job = merger.getFiles(project.name, url, branch,
+                job = merger.getFiles(project.canonical_hostname,
+                                      project.name, url, branch,
                                       files=['.zuul.yaml'])
                 job.source_context = model.SourceContext(
                     project, branch, '', False)
@@ -1068,7 +1070,8 @@ class ConfigLoader(object):
 
         for branch in branches:
             incdata = None
-            data = files.getFile(project.name, branch, fn)
+            data = files.getFile(project.canonical_hostname, project.name,
+                                 branch, fn)
             if data:
                 source_context = model.SourceContext(project, branch,
                                                      fn, trusted)

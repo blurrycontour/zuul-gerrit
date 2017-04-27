@@ -285,6 +285,7 @@ class ExecutorClient(object):
                 connection = project.source.connection
                 params['projects'].append(
                     dict(name=project.name,
+                         canonical_hostname=project.canonical_hostname,
                          connection_name=connection.connection_name,
                          url=project.source.getGitUrl(project)))
                 projects.add(project)
@@ -294,6 +295,7 @@ class ExecutorClient(object):
                 connection = item.change.project.source.connection
                 params['projects'].append(
                     dict(name=project.name,
+                         canonical_hostname=project.canonical_hostname,
                          connection_name=connection.connection_name,
                          url=project.source.getGitUrl(project)))
                 projects.add(project)

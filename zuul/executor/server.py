@@ -71,11 +71,6 @@ class Watchdog(object):
     def stop(self):
         self._running = False
 
-# TODOv3(mordred): put git repos in a hierarchy that includes source
-# hostname, eg: git.openstack.org/openstack/nova.  Also, configure
-# sources to have an alias, so that the review.openstack.org source
-# repos end up in git.openstack.org.
-
 
 class JobDirPlaybook(object):
     def __init__(self, root):
@@ -162,13 +157,15 @@ class JobDir(object):
 
 
 class UpdateTask(object):
-    def __init__(self, project, url):
-        self.project = project
+    def __init__(self, hostname, project_name, url):
+        self.hostname = hostname
+        self.project_name = project_name
         self.url = url
         self.event = threading.Event()
 
     def __eq__(self, other):
-        if other.project == self.project:
+        if (other.hostname == self.hostname and
+            other.project_name == self.project_name):
             return True
         return False
 
@@ -408,15 +405,16 @@ class ExecutorServer(object):
         if task is None:
             # We are asked to stop
             return
-        self.log.info("Updating repo %s from %s" % (task.project, task.url))
-        self.merger.updateRepo(task.project, task.url)
-        self.log.debug("Finished updating repo %s from %s" %
-                       (task.project, task.url))
+        self.log.info("Updating repo %s from %s" % (
+            task.project_name, task.url))
+        self.merger.updateRepo(task.hostname, task.project_name, task.url)
+        self.log.debug("Finished updating repo %s/%s from %s" %
+                       (task.hostname, task.project_name, task.url))
         task.setComplete()
 
-    def update(self, project, url):
+    def update(self, hostname, project_name, url):
         # Update a repository in the main merger
-        task = UpdateTask(project, url)
+        task = UpdateTask(hostname, project_name, url)
         task = self.update_queue.put(task)
         return task
 
@@ -475,9 +473,11 @@ class ExecutorServer(object):
 
     def cat(self, job):
         args = json.loads(job.arguments)
-        task = self.update(args['project'], args['url'])
+        task = self.update(args['canonical_hostname'],
+                           args['project'], args['url'])
         task.wait()
-        files = self.merger.getFiles(args['project'], args['url'],
+        files = self.merger.getFiles(args['canonical_hostname'],
+                                     args['project'], args['url'],
                                      args['branch'], args['files'])
         result = dict(updated=True,
                       files=files,
@@ -562,8 +562,9 @@ class AnsibleJob(object):
         tasks = []
         for project in args['projects']:
             self.log.debug("Job %s: updating project %s" %
-                           (self.job.unique, project['name']))
+                           (self.job.unique, project))
             tasks.append(self.executor_server.update(
+                project['canonical_hostname'],
                 project['name'], project['url']))
         for task in tasks:
             task.wait()
@@ -573,8 +574,10 @@ class AnsibleJob(object):
             self.log.debug("Cloning %s" % (project['name'],))
             repo = git.Repo.clone_from(
                 os.path.join(self.executor_server.merge_root,
+                             project['canonical_hostname'],
                              project['name']),
                 os.path.join(self.jobdir.src_root,
+                             project['canonical_hostname'],
                              project['name']))
             repo.remotes.origin.config_writer.set('url', project['url'])
 
@@ -764,6 +767,7 @@ class AnsibleJob(object):
                     i['project'] == playbook['project']):
                     # We already have this repo prepared
                     path = os.path.join(self.jobdir.src_root,
+                                        project.canonical_hostname,
                                         project.name,
                                         playbook['path'])
                     jobdir_playbook.path = self.findPlaybook(
@@ -776,9 +780,11 @@ class AnsibleJob(object):
         # tip into a dedicated space.
 
         merger = self.executor_server._getMerger(jobdir_playbook.root)
-        merger.checkoutBranch(project.name, url, playbook['branch'])
+        merger.checkoutBranch(project.canonical_hostname,
+                              project.name, url, playbook['branch'])
 
         path = os.path.join(jobdir_playbook.root,
+                            project.canonical_hostname,
                             project.name,
                             playbook['path'])
         jobdir_playbook.path = self.findPlaybook(
@@ -834,6 +840,7 @@ class AnsibleJob(object):
                     # copy it into location.
 
                     path = os.path.join(self.jobdir.src_root,
+                                        project.canonical_hostname,
                                         project.name)
                     link = os.path.join(root, role['name'])
                     os.symlink(path, link)
@@ -846,13 +853,15 @@ class AnsibleJob(object):
 
         if not role_repo:
             merger = self.executor_server._getMerger(root)
-            merger.checkoutBranch(project.name, url, 'master')
-            role_repo = os.path.join(root, project.name)
+            merger.checkoutBranch(project.canonical_hostname,
+                                  project.name, url, 'master')
+            role_repo = os.path.join(root, project.canonical_hostname,
+                                     project.name)
 
         role_path = self.findRole(role_repo, trusted=role['trusted'])
         if role_path is None:
             # In the case of a bare role, add the containing directory
-            role_path = root
+            role_path = os.path.join(root, project.canonical_hostname)
         self.jobdir.roles_path.append(role_path)
 
     def prepareAnsibleFiles(self, args):
