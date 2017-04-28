@@ -255,6 +255,7 @@ class ExecutorClient(object):
         params['timeout'] = job.timeout
         params['items'] = merger_items
         params['projects'] = []
+        params['repo_state'] = item.current_build_set.repo_state
 
         if job.name != 'noop':
             params['playbooks'] = [x.toDict() for x in job.run]

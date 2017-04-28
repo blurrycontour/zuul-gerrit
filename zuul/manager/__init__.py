@@ -679,6 +679,7 @@ class PipelineManager(object):
         if event.merged:
             build_set.commit = event.commit
             build_set.files.setFiles(event.files)
+            build_set.repo_state = event.repo_state
         elif event.updated:
             build_set.commit = item.change.newrev
         if not build_set.commit:

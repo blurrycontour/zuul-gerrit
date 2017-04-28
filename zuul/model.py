@@ -1163,6 +1163,7 @@ class BuildSet(object):
         self.nodesets = {}  # job -> nodeset
         self.node_requests = {}  # job -> reqs
         self.files = RepoFiles()
+        self.repo_state = {}
         self.layout = None
         self.tries = {}
 
