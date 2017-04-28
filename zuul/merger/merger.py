@@ -125,6 +125,10 @@ class Repo(object):
         ref = repo.refs[refname]
         return ref.commit
 
+    def getRefs(self):
+        repo = self.createRepoObject()
+        return repo.refs
+
     def checkout(self, ref):
         repo = self.createRepoObject()
         self.log.debug("Checking out %s" % ref)
@@ -286,6 +290,18 @@ class Merger(object):
             raise Exception("Project %s/%s does not have branch %s" %
                             (connection_name, project_name, branch))
 
+    def _saveRepoState(self, connection_name, project_name, repo,
+                       repo_state):
+        projects = repo_state.setdefault(connection_name, {})
+        project = projects.setdefault(project_name, {})
+        if project:
+            # We already have a state for this project.
+            return
+        for ref in repo.getRefs():
+            if ref.path.startswith('refs/zuul'):
+                continue
+            project[ref.path] = ref.object.hexsha
+
     def _mergeChange(self, item, ref):
         repo = self.getRepo(item['connection'], item['project'])
         try:
@@ -315,27 +331,13 @@ class Merger(object):
 
         return commit
 
-    def _mergeItem(self, item, recent):
+    def _mergeItem(self, item, recent, repo_state):
         self.log.debug("Processing refspec %s for project %s/%s / %s ref %s" %
                        (item['refspec'], item['connection'],
                         item['project'], item['branch'], item['ref']))
         repo = self.getRepo(item['connection'], item['project'])
         key = (item['connection'], item['project'], item['branch'])
 
-        # See if we have a commit for this change already in this repo
-        zuul_ref = item['branch'] + '/' + item['ref']
-        with repo.createRepoObject().git.custom_environment(
-            GIT_SSH_COMMAND=self._get_ssh_cmd(item['connection'])):
-            commit = repo.getCommitFromRef(zuul_ref)
-            if commit:
-                self.log.debug(
-                    "Found commit %s for ref %s" % (commit, zuul_ref))
-                # Store this as the most recent commit for this
-                # project-branch
-                recent[key] = commit
-                return commit
-
-        self.log.debug("Unable to find commit for ref %s" % (zuul_ref,))
         # We need to merge the change
         # Get the most recent commit for this project-branch
         base = recent.get(key)
@@ -349,6 +351,10 @@ class Merger(object):
                 self.log.exception("Unable to reset repo %s" % repo)
                 return None
             base = repo.getBranchHead(item['branch'])
+            # Save the repo state so that later mergers can repeat
+            # this process.
+            self._saveRepoState(item['connection'], item['project'], repo,
+                                repo_state)
         else:
             self.log.debug("Found base commit %s for %s" % (base, key,))
         # Merge the change
@@ -373,10 +379,14 @@ class Merger(object):
                     return None
             return commit
 
-    def mergeChanges(self, items, files=None):
+    def mergeChanges(self, items, files=None, repo_state=None):
+        # connection+project+branch -> commit
         recent = {}
         commit = None
         read_files = []
+        # connection -> project -> ref -> commit
+        if repo_state is None:
+            repo_state = {}
         for item in items:
             if item.get("number") and item.get("patchset"):
                 self.log.debug("Merging for change %s,%s." %
@@ -384,7 +394,7 @@ class Merger(object):
             elif item.get("newrev") and item.get("oldrev"):
                 self.log.debug("Merging for rev %s with oldrev %s." %
                                (item["newrev"], item["oldrev"]))
-            commit = self._mergeItem(item, recent)
+            commit = self._mergeItem(item, recent, repo_state)
             if not commit:
                 return None
             if files:
@@ -395,9 +405,7 @@ class Merger(object):
                     project=item['project'],
                     branch=item['branch'],
                     files=repo_files))
-        if files:
-            return commit.hexsha, read_files
-        return commit.hexsha
+        return commit.hexsha, read_files, repo_state
 
     def getFiles(self, connection_name, project_name, branch, files):
         repo = self.getRepo(connection_name, project_name)
