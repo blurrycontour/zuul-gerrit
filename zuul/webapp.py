@@ -39,7 +39,7 @@ The supported urls are:
    queue / pipeline structure of the system
  - /status.json (backwards compatibility): same as /status
  - /status/change/X,Y: return status just for gerrit change X,Y
- - /keys/SOURCE/PROJECT.pub: return the public key for PROJECT
+ - /keys/PROJECT.pub: return the public key for PROJECT
 
 When returning status for a single gerrit change you will get an
 array of changes, they will not include the queue structure.
@@ -73,8 +73,8 @@ class WebApp(threading.Thread):
                                        start_loop=False)
 
     def _init_default_routes(self):
-        self.register_path('/{tenant_name}/keys/{source_name}/'
-                           '{project_name:.+}.pub', self.get_key)
+        self.register_path('/{tenant_name}/keys/{project_name:.+}.pub',
+                           self.get_key)
 
         self.mapper.redirect('/{tenant_name}/status',
                              '/{tenant_name}/status.json')
@@ -94,13 +94,13 @@ class WebApp(threading.Thread):
     def stop(self):
         self.server.server_close()
 
-    def get_key(self, request, tenant_name, source_name, project_name):
-        source = self.scheduler.connections.getSource(source_name)
+    def get_key(self, request, tenant_name, project_name):
+        tenant = self.scheduler.abide.tenants.get(tenant_name)
 
-        if not source:
+        if not tenant:
             raise webob.exc.HTTPNotFound()
 
-        project = source.getProject(project_name)
+        trusted, project = tenant.getProject(project_name)
 
         if not project:
             raise webob.exc.HTTPNotFound()

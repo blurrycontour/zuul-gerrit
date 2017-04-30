@@ -93,8 +93,7 @@ class TestWebapp(ZuulTestCase):
             public_pem = f.read()
 
         req = urllib.request.Request(
-            "http://localhost:%s/tenant-one/keys/gerrit/org/project.pub" %
-            self.port)
+            "http://localhost:%s/tenant-one/keys/org/project.pub" % self.port)
         f = urllib.request.urlopen(req)
         self.assertEqual(f.read(), public_pem)
 
