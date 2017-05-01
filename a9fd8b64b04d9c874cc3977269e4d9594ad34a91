@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "5ff73747_9708f291",
+        "filename": "playbooks/roles/stdlib.prepare-workspace/README.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-05-01T22:20:01Z",
+      "side": 1,
+      "message": "Break out the paint!\n\nAgree, for now I have just used stdlib because everything in within a single repo.  Ideally, we\u0027ll switch stdlib with the future repo name.",
+      "parentUuid": "5ff73747_57a94a8d",
+      "range": {
+        "startLine": 2,
+        "startChar": 7,
+        "endLine": 2,
+        "endChar": 14
+      },
+      "revId": "a9fd8b64b04d9c874cc3977269e4d9594ad34a91",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5ff73747_b7976e45",
         "filename": "playbooks/roles/stdlib.prepare-workspace/defaults/main.yaml",
         "patchSetId": 3
@@ -36,6 +60,24 @@
       "writtenOn": "2017-05-01T22:14:00Z",
       "side": 1,
       "message": "any reason to not have this set by the user you just sshed in as?",
+      "revId": "a9fd8b64b04d9c874cc3977269e4d9594ad34a91",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ff73747_37e8feb0",
+        "filename": "playbooks/roles/stdlib.prepare-workspace/defaults/main.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-05-01T22:20:01Z",
+      "side": 1,
+      "message": "I think we could in the playbook, however I have been burned by ansible in the past.  I cannot remember the version of ansible, maybe 2.0.0.1, but when the new version of ansible came out, it no longer worked as expected.\n\nBasically, I\u0027d like to minimize how much we depend on magic variables from ansible if possible. And define a sane default.  In this cause, we have zuul users on our openstack-infra images, but I am assuming this is also the default user we\u0027ll expect installs to use.",
+      "parentUuid": "5ff73747_b7976e45",
       "revId": "a9fd8b64b04d9c874cc3977269e4d9594ad34a91",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
