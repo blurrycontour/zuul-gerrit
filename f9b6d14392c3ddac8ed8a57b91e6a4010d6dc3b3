@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ff73747_6b0d84e6",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 839,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-01T18:08:11Z",
+      "side": 1,
+      "message": "Read-only seems excessive.  At some point, Zuul or operators are going to have to deal with rotation, and being able to write to the file would be useful.  How about we just set the mode to 600 when we open the file?",
+      "revId": "f9b6d14392c3ddac8ed8a57b91e6a4010d6dc3b3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
