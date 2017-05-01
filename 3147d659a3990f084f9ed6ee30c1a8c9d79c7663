@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ff73747_d7be7bac",
+        "filename": "tests/fixtures/layout-live-reconfiguration-failed-job.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-01T21:24:16Z",
+      "side": 0,
+      "message": "Note there\u0027s no entry for testfile here.  Though there is in the standard configuration.  So in the Zuul v2 world, that means that project-testfile still exists, but it no longer has a files requirement...",
+      "revId": "3147d659a3990f084f9ed6ee30c1a8c9d79c7663",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}

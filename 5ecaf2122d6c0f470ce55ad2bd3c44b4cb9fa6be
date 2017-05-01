@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ff73747_f7c3b736",
+        "filename": "tests/fixtures/layouts/live-reconfiguration-failed-job.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-01T21:24:16Z",
+      "side": 1,
+      "message": "...so over here, we should keep the job entry but just drop the files subentry.",
+      "revId": "5ecaf2122d6c0f470ce55ad2bd3c44b4cb9fa6be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
