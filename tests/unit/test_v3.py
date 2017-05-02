@@ -346,6 +346,8 @@ class TestAnsible(AnsibleZuulTestCase):
         self.assertEqual(build.result, 'SUCCESS')
         build = self.getJobFromHistory('python27')
         self.assertEqual(build.result, 'SUCCESS')
+        build = self.getJobFromHistory('hello-world')
+        self.assertEqual(build.result, 'SUCCESS')
         flag_path = os.path.join(self.test_root, build.uuid + '.flag')
         self.assertTrue(os.path.exists(flag_path))
         copied_path = os.path.join(self.test_root, build.uuid +
