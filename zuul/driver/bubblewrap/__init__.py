@@ -22,6 +22,8 @@ import pwd
 import subprocess
 import sys
 
+from six.moves import shlex_quote
+
 import zuul
 from zuul.driver import (Driver, WrapperInterface)
 
@@ -94,7 +96,7 @@ class BubblewrapDriver(Driver, WrapperInterface):
         else:
             zuul_python_dir = os.path.dirname(sys.executable)
             # We want the dir directly above bin to get the whole venv
-            zuul_dir = os.path.normpath(os.path.join(zuul_python_dir, '..'))
+            zuul_dir = os.path.normpath(os.path.join(zuul_python_dir, '../../..'))
 
         bwrap_command = list(self.bwrap_command)
         if not zuul_dir.startswith('/usr'):
@@ -124,6 +126,9 @@ class BubblewrapDriver(Driver, WrapperInterface):
         kwargs['gid_fd'] = group_r
         kwargs['user_home'] = passwd.pw_dir
         command = [x.format(**kwargs) for x in bwrap_command]
+
+        self.log.debug("Bubblewrap command: %s",
+                       " ".join(shlex_quote(c) for c in command))
 
         wrapped_popen = WrappedPopen(command, passwd_r, group_r)
 
