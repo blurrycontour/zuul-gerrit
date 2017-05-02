@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ff73747_b933d8f5",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 7191
+      },
+      "writtenOn": "2017-05-02T07:45:26Z",
+      "side": 1,
+      "message": "project should already be a string.",
+      "revId": "fbf820e6b5283c460e6f0e33d008ddb34c034355",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ff73747_992edc89",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 7191
+      },
+      "writtenOn": "2017-05-02T07:45:26Z",
+      "side": 1,
+      "message": "project is already a string.",
+      "revId": "fbf820e6b5283c460e6f0e33d008ddb34c034355",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ff73747_59529414",
+        "filename": "zuul/driver/github/githubreporter.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 7191
+      },
+      "writtenOn": "2017-05-02T07:45:26Z",
+      "side": 1,
+      "message": "project is passed through here as a string.",
+      "range": {
+        "startLine": 106,
+        "startChar": 21,
+        "endLine": 106,
+        "endChar": 31
+      },
+      "revId": "fbf820e6b5283c460e6f0e33d008ddb34c034355",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
