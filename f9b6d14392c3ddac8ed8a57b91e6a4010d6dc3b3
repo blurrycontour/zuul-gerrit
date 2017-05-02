@@ -16,6 +16,23 @@
       "revId": "f9b6d14392c3ddac8ed8a57b91e6a4010d6dc3b3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ff73747_4b2504ab",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 839,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-05-02T18:11:02Z",
+      "side": 1,
+      "message": "I agree, read-only is a bit much.",
+      "revId": "f9b6d14392c3ddac8ed8a57b91e6a4010d6dc3b3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
