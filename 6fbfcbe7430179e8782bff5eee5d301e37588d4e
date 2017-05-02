@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ff73747_7fcf5929",
+        "filename": "zuul/driver/bubblewrap/__init__.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-05-02T22:08:03Z",
+      "side": 1,
+      "message": "So, I am not sure if we want to include the home directory by default.  That would mean we\u0027d have to expose our complete .ssh folder on executors today.  I could be possible we have SSH keys for other trusted servers there.\n\nHowever, we still need to bind mount of ssh_private_key file for zuul user.  Since it is a config settings in zuul.conf, it many also not exists in home .ssh directory.",
+      "revId": "6fbfcbe7430179e8782bff5eee5d301e37588d4e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
