@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ff73747_5667034e",
+        "filename": "tests/base.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 920,
+      "author": {
+        "id": 7191
+      },
+      "writtenOn": "2017-05-02T07:34:14Z",
+      "side": 1,
+      "message": "project is expected to be a string.",
+      "revId": "ecb811a836e58c81ac3120f0f974fd07d84348d4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ff73747_16d29bd1",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 526,
+      "author": {
+        "id": 7191
+      },
+      "writtenOn": "2017-05-02T07:34:14Z",
+      "side": 1,
+      "message": "project is accessed as an object.",
+      "revId": "ecb811a836e58c81ac3120f0f974fd07d84348d4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
