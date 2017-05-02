@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5ff73747_a9bc986c",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-05-02T15:31:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ff73747_b933d8f5",
+      "revId": "fbf820e6b5283c460e6f0e33d008ddb34c034355",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5ff73747_992edc89",
         "filename": "zuul/driver/github/githubconnection.py",
         "patchSetId": 9
@@ -30,6 +48,24 @@
       "writtenOn": "2017-05-02T07:45:26Z",
       "side": 1,
       "message": "project is already a string.",
+      "revId": "fbf820e6b5283c460e6f0e33d008ddb34c034355",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ff73747_89c1dce7",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-05-02T15:31:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ff73747_992edc89",
       "revId": "fbf820e6b5283c460e6f0e33d008ddb34c034355",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
