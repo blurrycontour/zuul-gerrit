@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ff73747_9600eb03",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 7191
+      },
+      "writtenOn": "2017-05-02T07:42:54Z",
+      "side": 1,
+      "message": "project is expecting an object.",
+      "revId": "3ddc0a9f9ea1a51be7599f9bd2e36feb20d3b785",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ff73747_d60af323",
+        "filename": "zuul/driver/github/githubreporter.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 7191
+      },
+      "writtenOn": "2017-05-02T07:42:54Z",
+      "side": 1,
+      "message": "project is a string.",
+      "range": {
+        "startLine": 70,
+        "startChar": 0,
+        "endLine": 70,
+        "endChar": 12
+      },
+      "revId": "3ddc0a9f9ea1a51be7599f9bd2e36feb20d3b785",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
