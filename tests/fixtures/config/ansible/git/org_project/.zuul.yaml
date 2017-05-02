@@ -2,6 +2,9 @@
     parent: python27
     name: faillocal
 
+- job:
+    name: hello-world
+
 - project:
     name: org/project
     check:
@@ -10,3 +13,4 @@
         - faillocal
         - check-vars
         - timeout
+        - hello-world
