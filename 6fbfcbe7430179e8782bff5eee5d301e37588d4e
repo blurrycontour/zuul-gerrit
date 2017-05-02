@@ -16,6 +16,24 @@
       "revId": "6fbfcbe7430179e8782bff5eee5d301e37588d4e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ff73747_da68bb88",
+        "filename": "zuul/driver/bubblewrap/__init__.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-05-02T23:01:00Z",
+      "side": 1,
+      "message": "clarkb brought up an interested suggestion. Maybe we use ssh-agent to handle our SSH keys within bubblewrap.  I\u0027m going to do some testing around SSH_AUTH_SOCK and see if that will work.\n\nA quick test would look like the following:\n\n  --bind $SSH_AUTH_SOCK $SSH_AUTH_SOCK \\\n  --setenv SSH_AUTH_SOCK $SSH_AUTH_SOCK \\\n\nWhich _should_ remove the need to mount home and our SSH keys in bubblewrap",
+      "parentUuid": "5ff73747_7fcf5929",
+      "revId": "6fbfcbe7430179e8782bff5eee5d301e37588d4e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
