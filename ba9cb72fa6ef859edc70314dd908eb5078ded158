@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ff73747_f63defc3",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 7191
+      },
+      "writtenOn": "2017-05-02T07:12:06Z",
+      "side": 1,
+      "message": "iter_branches doesn\u0027t exist in the 1.0 series, it\u0027s available as branches().",
+      "revId": "ba9cb72fa6ef859edc70314dd908eb5078ded158",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
