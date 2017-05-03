@@ -33,6 +33,23 @@
       "revId": "8762bb6ae91c73d5631e04ce1411cdbdf596e311",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ff73747_630444c7",
+        "filename": "zuul/driver/github/githubreporter.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-05-03T17:38:28Z",
+      "side": 1,
+      "message": "Fixed locally, will be in next push.",
+      "revId": "8762bb6ae91c73d5631e04ce1411cdbdf596e311",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
