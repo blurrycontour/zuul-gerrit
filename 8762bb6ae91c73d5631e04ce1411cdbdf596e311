@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ff73747_0d73864f",
+        "filename": "zuul/driver/github/githubreporter.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 7191
+      },
+      "writtenOn": "2017-05-03T04:43:51Z",
+      "side": 1,
+      "message": "When you do a split here we remove the owner name from the project string.",
+      "revId": "8762bb6ae91c73d5631e04ce1411cdbdf596e311",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ff73747_ed8dfa2a",
+        "filename": "zuul/driver/github/githubreporter.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 7191
+      },
+      "writtenOn": "2017-05-03T04:43:51Z",
+      "side": 1,
+      "message": "so here we are only passing the repo name, which will then fail in commentPull.\n\nI can\u0027t see why the split() happens at all in this function.",
+      "revId": "8762bb6ae91c73d5631e04ce1411cdbdf596e311",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
