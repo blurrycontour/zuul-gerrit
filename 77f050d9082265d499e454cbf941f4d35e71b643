@@ -16,6 +16,23 @@
       "revId": "77f050d9082265d499e454cbf941f4d35e71b643",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ff73747_dece4f82",
+        "filename": "zuul/driver/gerrit/gerritreporter.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-05-03T18:14:30Z",
+      "side": 1,
+      "message": "What Jim suggests sounds right. THat would limit every report to just the connection the change came through, which does not accomplish your feature idea of a generic reporter that all changes could go through, but it would solve the immediate problem.",
+      "revId": "77f050d9082265d499e454cbf941f4d35e71b643",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
