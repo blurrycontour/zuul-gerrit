@@ -33,6 +33,24 @@
       "revId": "50658a3762b483c72ea559051bc9860fc91f7cda",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ff73747_e49d100b",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 7191
+      },
+      "writtenOn": "2017-05-03T09:33:23Z",
+      "side": 0,
+      "message": "it was removed because there\u0027s no unregister in routes. I thought it was practically a fairly rare situation that you would actually want to remove a path from a webapp - but I guess that\u0027s a probably situation.",
+      "parentUuid": "5ff73747_e92ce0ad",
+      "revId": "50658a3762b483c72ea559051bc9860fc91f7cda",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
