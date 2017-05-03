@@ -16,6 +16,23 @@
       "revId": "43e0db8dc5548633353ac81d7f29c2d71c34cef2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ff73747_58bc97ba",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-05-03T17:16:04Z",
+      "side": 1,
+      "message": "Fixed locally. Will be in the next push (avoiding rebase until more feedback)",
+      "revId": "43e0db8dc5548633353ac81d7f29c2d71c34cef2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
