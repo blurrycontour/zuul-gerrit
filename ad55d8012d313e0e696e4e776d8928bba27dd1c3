@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ff73747_b875dbfc",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-05-03T17:22:00Z",
+      "side": 0,
+      "message": "Fixed in local tree. Will be in next push.",
+      "revId": "ad55d8012d313e0e696e4e776d8928bba27dd1c3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
