@@ -15,7 +15,7 @@
 import logging
 import voluptuous as v
 
-
+from zuul.driver.gerrit.gerritsource import GerritSource
 from zuul.reporter import BaseReporter
 
 
@@ -27,6 +27,8 @@ class GerritReporter(BaseReporter):
 
     def report(self, source, pipeline, item):
         """Send a message to gerrit."""
+        if not isinstance(source, GerritSource):
+            return
         message = self._formatItemReport(pipeline, item)
 
         self.log.debug("Report change %s, params %s, message: %s" %
