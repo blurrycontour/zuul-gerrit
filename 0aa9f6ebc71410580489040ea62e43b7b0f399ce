@@ -16,6 +16,24 @@
       "revId": "0aa9f6ebc71410580489040ea62e43b7b0f399ce",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f044301_9627bcb7",
+        "filename": "zuul/driver/bubblewrap/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-05-03T22:45:41Z",
+      "side": 1,
+      "message": "The issue for my testing, was zuul was not inside bwrap.\n\n  $ cat .tox/py27/lib/python2.7/site-packages/zuul.egg-link \n  /home/pabelanger/git/openstack-infra/zuul\n\nIn this case, I think we\u0027d need to update tox.ini?",
+      "parentUuid": "3f044301_30459018",
+      "revId": "0aa9f6ebc71410580489040ea62e43b7b0f399ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
