@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ff73747_8d5f9671",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 7191
+      },
+      "writtenOn": "2017-05-03T05:10:10Z",
+      "side": 1,
+      "message": "to_json() is not a thing. based on the test i think it should be as_dict().",
+      "revId": "43e0db8dc5548633353ac81d7f29c2d71c34cef2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
