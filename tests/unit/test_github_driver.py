@@ -281,7 +281,36 @@ class TestGithubDriver(ZuulTestCase):
                      (A.number, A.head_sha))
         self.assertEqual('check', check_status['context'])
         self.assertEqual('success', check_status['state'])
-        self.assertEqual('', check_status['url'])
+        log_url = ('http://logs.example.com/org/project/1/%s' % A.head_sha)
+        self.assertEqual(log_url, check_status['url'])
+
+        # pipeline does not report start status, we should only have 2
+        self.executor_server.hold_jobs_in_build = True
+        self.fake_github.emitEvent(
+            A.getCommentAddedEvent('reporting check'))
+        self.waitUntilSettled()
+        self.assertEqual(2, len(A.statuses[A.head_sha]))
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+        # pipeline reports success/failure status
+        self.assertEqual(3, len(A.statuses[A.head_sha]))
+        report_status = A.statuses[A.head_sha][0]
+        self.assertEqual('reporting', report_status['context'])
+        self.assertEqual('success', report_status['state'])
+
+    @simple_layout('layouts/reporting-github.yaml', driver='github')
+    def test_report_pull_comment(self):
+        # pipeline reports comment on success
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_github.openFakePullRequest('org/project', 'master', 'A')
+        self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(0, len(A.comments))
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
         self.assertEqual(1, len(A.comments))
         self.assertThat(A.comments[0],
                         MatchesRegex('.*Build succeeded.*', re.DOTALL))
