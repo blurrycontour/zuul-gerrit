@@ -1,5 +1,24 @@
+- job:
+    name: tox-docs
+
+- job:
+    name: tox-cover
+
+- job:
+    name: tox-linters
+
+- job:
+    name: tox-py27
+
+- job:
+    name: tox-tarball
+
 - project:
     name: openstack-infra/zuul
     check:
       jobs:
-        - noop
+        - tox-docs
+        - tox-cover
+        - tox-linters
+        - tox-py27
+        - tox-tarball
