@@ -272,7 +272,12 @@ class TestInRepoConfig(ZuulTestCase):
             """
             - job:
                 name: project-test2
-                foo: error
+
+            - project:
+                name: org/project1
+                tenant-one-gate:
+                  jobs:
+                    - project-test2
             """)
 
         file_dict = {'zuul.yaml': in_repo_conf}
@@ -306,6 +311,26 @@ class TestInRepoConfig(ZuulTestCase):
         self.assertEqual(A.reported, 2,
                          "A should report start and failure")
         self.assertIn('syntax error', A.messages[1],
+                      "A should have a syntax error reported")
+
+    def test_untrusted_shadow_error(self):
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: common-config-test
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        A.addApproval('code-review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('approved', 1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'NEW')
+        self.assertEqual(A.reported, 2,
+                         "A should report start and failure")
+        self.assertIn('not permitted to shadow', A.messages[1],
                       "A should have a syntax error reported")
 
 
