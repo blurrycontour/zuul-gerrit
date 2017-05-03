@@ -280,6 +280,11 @@ class JobParser(object):
         # them (e.g., "job.run = ..." rather than
         # "job.run.append(...)").
 
+        if conf['name'] in layout.jobs:
+            reference = layout.jobs[conf['name']]
+        else:
+            reference = None
+
         job = model.Job(conf['name'])
         job.source_context = conf.get('_source_context')
         if 'auth' in conf:
@@ -372,9 +377,14 @@ class JobParser(object):
                 allowed.append(project.name)
             job.allowed_projects = frozenset(allowed)
 
-        # If the definition for this job came from a project repo,
-        # implicitly apply a branch matcher for the branch it was on.
-        if (not job.source_context.trusted):
+        # If the current job definition is not in the same branch as the
+        # reference definition of this job, and this is a project repo,
+        # add an implicit branch matcher for this branch (assuming there
+        # are no explicit branch matchers).
+        if (reference and
+            reference.source_context.branch != job.source_context.branch and
+            'branches' not in conf and
+            (not job.source_context.trusted)):
             branches = [job.source_context.branch]
         elif 'branches' in conf:
             branches = as_list(conf['branches'])
