@@ -12,11 +12,11 @@
 
 - job:
     name: project-bitrot-stable-old
-    success-url: http://logs.example.com/{job.name}/{build.number}
+    success-url: http://logs.example.com/{job.name}/{build.uuid}
 
 - job:
     name: project-bitrot-stable-older
-    success-url: http://logs.example.com/{job.name}/{build.number}
+    success-url: http://logs.example.com/{job.name}/{build.uuid}
 
 - project:
     name: org/project
