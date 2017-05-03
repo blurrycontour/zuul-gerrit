@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f044301_30459018",
+        "filename": "zuul/driver/bubblewrap/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-05-03T21:27:52Z",
+      "side": 1,
+      "message": "I don\u0027t understand why this would be ../../.. -- The python is $VENV/bin/python and I want $VENV??",
+      "revId": "0aa9f6ebc71410580489040ea62e43b7b0f399ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
