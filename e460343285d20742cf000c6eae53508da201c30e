@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ff73747_27e89a14",
+        "filename": "zuul/webapp.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 7191
+      },
+      "writtenOn": "2017-05-03T09:34:45Z",
+      "side": 1,
+      "message": "as a general, pre-existing problem, i don\u0027t like having a variable or static routes as the first element. It\u0027d be cleaner to prefix it all with /tenant/ or something.",
+      "revId": "e460343285d20742cf000c6eae53508da201c30e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
