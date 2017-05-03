@@ -15,7 +15,6 @@
 import logging
 import voluptuous as v
 
-
 from zuul.reporter import BaseReporter
 
 
@@ -27,6 +26,9 @@ class GerritReporter(BaseReporter):
 
     def report(self, pipeline, item):
         """Send a message to gerrit."""
+        if item.change.project.source.connection != self.connection:
+            return
+
         message = self._formatItemReport(pipeline, item)
 
         self.log.debug("Report change %s, params %s, message: %s" %
