@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ff73747_7ec18480",
+        "filename": "zuul/driver/gerrit/gerritreporter.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-03T14:02:29Z",
+      "side": 1,
+      "message": "How about:\n\nif item.change.source.connection !\u003d self.connection:\n  return\n\nThat should make this resilient to multiple gerrits.\n\n(item.change.source is the same as source here.  I just noticed that and think we should drop the source argument.  I suggested item.change.source.connection to make it clear what we\u0027re testing.)",
+      "revId": "77f050d9082265d499e454cbf941f4d35e71b643",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
