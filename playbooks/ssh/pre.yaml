@@ -1,0 +1,11 @@
+- hosts: all
+  roles:
+    - run-bindep
+  tasks:
+    # delegate_to: localhost
+    - name: Create .ssh directory.
+      shell: mkdir -p /tmp/jobdir/work/.ssh
+
+    # delegate_to: localhost
+    - name: Enable ssh-agent.
+      shell: ssh-agent -s > /tmp/jobdir/work/.ssh/agent.sh

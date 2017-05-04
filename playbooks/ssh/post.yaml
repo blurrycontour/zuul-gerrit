@@ -1,0 +1,5 @@
+- hosts: all
+  tasks:
+    # delegate_to: localhost
+    - name: Disable ssh-agent.
+      shell: source /tmp/jobdir/work/.ssh/agent.sh; ssh-agent -k
