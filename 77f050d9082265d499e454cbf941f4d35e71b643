@@ -33,6 +33,23 @@
       "revId": "77f050d9082265d499e454cbf941f4d35e71b643",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f044301_51fffe66",
+        "filename": "zuul/driver/gerrit/gerritreporter.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-04T00:08:56Z",
+      "side": 1,
+      "message": "Jesse, since we would only put checks like this in reporters where they are required (like Gerrit, Github, etc), \"globally applicable\" reporters like sql, smtp, irc, fedmsg, etc can still report everything.\n\nThe only thing this doesn\u0027t get us is \"only report gerrit patches to sql, not github\" but that\u0027s not a use case I anticipate at the moment.",
+      "revId": "77f050d9082265d499e454cbf941f4d35e71b643",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
