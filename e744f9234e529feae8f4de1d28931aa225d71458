@@ -33,6 +33,23 @@
       "revId": "e744f9234e529feae8f4de1d28931aa225d71458",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f044301_f57db66e",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-04T18:57:26Z",
+      "side": 1,
+      "message": "Whoops, I\u0027m wrong, this is correct.  :)",
+      "revId": "e744f9234e529feae8f4de1d28931aa225d71458",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
