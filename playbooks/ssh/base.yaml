@@ -1,0 +1,29 @@
+- hosts: all
+  tasks:
+    # delegate_to: localhost
+    - name: Generate SSH keys.
+      shell: ssh-keygen -b 2048 -t rsa -f /tmp/jobdir/work/.ssh/id_rsa -q -N ""
+
+    # delegate_to: localhost
+    - name: Publish SSH public keys to remote nodes.
+      shell: echo hello
+
+    # delegate_to: localhost
+    - name: Add SSH keys to ssh-agent.
+      shell: source /tmp/jobdir/work/.ssh/agent.sh; ssh-add /tmp/jobdir/work/.ssh/id_rsa
+      args:
+        executable: /bin/bash
+
+    # delegate_to: localhost
+    - name: Remove SSH keys.
+      shell: rm -rf /tmp/jobdir/work/.ssh/id_rsa*
+
+    # delegate_to: localhost
+    - name: Display current ssh keys.
+      shell: source /tmp/jobdir/work/.ssh/agent.sh; ssh-add -l
+      args:
+        executable: /bin/bash
+
+    # delegate_to: localhost
+    - name: Create .ssh/config file.
+      shell: touch /tmp/jobdir/work/.ssh/config
