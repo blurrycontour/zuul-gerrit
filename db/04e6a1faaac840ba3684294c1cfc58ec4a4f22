@@ -1,0 +1,10 @@
+Verified+1: Zuul
+Code-Review+2: Paul Belanger <pabelanger@redhat.com>
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Workflow+1: Monty Taylor <mordred@inaugust.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Thu, 04 May 2017 17:42:09 +0000
+Reviewed-on: https://review.openstack.org/462300
+Project: openstack-infra/zuul
+Branch: refs/heads/feature/zuulv3
