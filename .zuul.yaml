@@ -44,12 +44,15 @@
     run: tox/tarball
     post-run: tox/tarball-post
 
+- job:
+    name: ssh-base
+    parent: base
+    pre-run: ssh/pre
+    run: ssh/base
+    post-run: ssh/post
+
 - project:
     name: openstack-infra/zuul
     check:
       jobs:
-        - tox-docs
-        - tox-cover
-        - tox-linters
-        - tox-py27
-        - tox-tarball
+        - ssh-base
