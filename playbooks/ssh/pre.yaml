@@ -1,0 +1,4 @@
+- hosts: all
+  tasks:
+    - name: Enable ssh-agent.
+      shell: ssh-agent -s /tmp/agent.sh
