@@ -1749,6 +1749,21 @@ class BaseTestCase(testtools.TestCase):
                     pass
 
 
+class SshKeyResource(object):
+    def __init__(self):
+        self.key_path = tempfile.mkdtemp()
+        self.private_key_file = os.path.join(self.key_path, 'id_rsa')
+        subprocess.check_call(['ssh-keygen', '-t', 'rsa', '-b', '1024',
+                               '-N', '', '-q', '-f', self.private_key_file])
+
+    def __del__(self):
+        if self.key_path:
+            shutil.rmtree(self.key_path)
+
+
+_base_ssh_key = None
+
+
 class ZuulTestCase(BaseTestCase):
     """A test case with a functioning Zuul.
 
@@ -1813,6 +1828,10 @@ class ZuulTestCase(BaseTestCase):
 
     def setUp(self):
         super(ZuulTestCase, self).setUp()
+        global _base_ssh_key
+        if _base_ssh_key is None:
+            _base_ssh_key = SshKeyResource()
+        self.private_key_file = _base_ssh_key.private_key_file
 
         self.setupZK()
 
@@ -1843,6 +1862,7 @@ class ZuulTestCase(BaseTestCase):
         self.config.set('merger', 'git_dir', self.merger_src_root)
         self.config.set('executor', 'git_dir', self.executor_src_root)
         self.config.set('zuul', 'state_dir', self.state_root)
+        self.config.set('executor', 'private_key_file', self.private_key_file)
 
         self.statsd = FakeStatsd()
         # note, use 127.0.0.1 rather than localhost to avoid getting ipv6
