@@ -17,6 +17,7 @@ import json
 import logging
 import os
 import shutil
+import select
 import signal
 import socket
 import subprocess
@@ -77,6 +78,76 @@ class JobDirPlaybook(object):
         self.root = root
         self.trusted = None
         self.path = None
+
+
+class SshAgent(object):
+    log = logging.getLogger("zuul.ExecutorServer")
+
+    def __init__(self):
+        self.env = {}
+        self.ssh_agent = None
+
+    def start(self):
+        if self.ssh_agent:
+            return
+        self.ssh_agent = subprocess.Popen(['ssh-agent', '-D'],
+                                          stdout=subprocess.PIPE)
+        # Running with -D, our indication that the agent is ready is that it has
+        # printed the auth sock location. It should be the first thing printed.
+        (ready, writable, errs) = select.select([self.ssh_agent.stdout],
+                                                [], [self.ssh_agent.stdout], 5)
+        if errs:
+            raise RuntimeError('ssh-agent failed to spawn')
+        line = self.ssh_agent.stdout.readline().decode('utf8')
+        if '=' in line:
+            (name, value) = line.strip().split(';')[0].split('=', 1)
+            self.env[name] = value
+        if 'SSH_AUTH_SOCK' not in self.env:
+            raise RuntimeError('ssh-agent did not print auth sock')
+        self.log.info('Started SSH Agent, {}'.format(self.env))
+
+    def stop(self):
+        if self.ssh_agent:
+            try:
+                self.ssh_agent.terminate()
+            except Exception:
+                self.log.exception("Failed sending SIGTERM to agent")
+                try:
+                    self.ssh_agent.kill()
+                except Exception:
+                    self.log.exception("Failed sending SIGKILL to agent")
+            self.log.info('Stopped SSH Agent, {}'.format(self.env))
+            self.ssh_agent = None
+            self.env = {}
+
+    def add(self, key_path):
+        env = os.environ.copy()
+        env.update(self.env)
+        subprocess.check_output(['ssh-add', key_path], env=env)
+        self.log.info('Added SSH Key {}'.format(key_path))
+
+    def remove(self, key_path):
+        env = os.environ.copy()
+        env.update(self.env)
+        subprocess.check_output(['ssh-add', '-d', key_path], env=env)
+        self.log.info('Removed SSH Key {}'.format(key_path))
+
+    def list(self):
+        if self.ssh_agent is None:
+            return None
+        env = os.environ.copy()
+        env.update(self.env)
+        result = []
+        for line in subprocess.Popen(['ssh-add', '-L'], env=env,
+                                     stdout=subprocess.PIPE).stdout:
+            line = line.decode('utf8')
+            if line.strip() == 'The agent has no identities.':
+                break
+            result.append(line.strip())
+        return result
+
+    def __del__(self):
+        self.stop()
 
 
 class JobDir(object):
@@ -520,8 +591,10 @@ class AnsibleJob(object):
                 'executor', 'private_key_file')
         else:
             self.private_key_file = '~/.ssh/id_rsa'
+        self.ssh_agent = SshAgent()
 
     def run(self):
+        self.ssh_agent.start()
         self.running = True
         self.thread = threading.Thread(target=self.execute)
         self.thread.start()
@@ -529,6 +602,7 @@ class AnsibleJob(object):
     def stop(self):
         self.aborted = True
         self.abortRunningProc()
+        self.ssh_agent.stop()
         self.thread.join()
 
     def execute(self):
@@ -549,6 +623,11 @@ class AnsibleJob(object):
                 self.executor_server.finishJob(self.job.unique)
             except Exception:
                 self.log.exception("Error finalizing job thread:")
+            if self.ssh_agent:
+                try:
+                    self.ssh_agent.stop()
+                except Exception:
+                    self.log.exception("Error stopping SSH agent:")
 
     def _execute(self):
         self.log.debug("Job %s: beginning" % (self.job.unique,))
@@ -1032,6 +1111,7 @@ class AnsibleJob(object):
 
     def runAnsible(self, cmd, timeout, trusted=False):
         env_copy = os.environ.copy()
+        env_copy.update(self.ssh_agent.env)
         env_copy['LOGNAME'] = 'zuul'
 
         if trusted:
