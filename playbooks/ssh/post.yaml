@@ -1,0 +1,6 @@
+- hosts: all
+  tasks:
+    - name: Disable ssh-agent.
+      shell: source /tmp/agent.sh; ssh-agent -k
+      args:
+        executable: /bin/bash
