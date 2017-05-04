@@ -183,10 +183,16 @@ class ExecutorClient(object):
         dependent_items.reverse()
         # TODOv3(jeblair): This ansible vars data structure will
         # replace the environment variables below.
+        project = dict(
+            name=item.change.project.name,
+            connection_name=item.change.project.connection_name,
+            canonical_hostname=item.change.project.canonical_hostname,
+            canonical_name=item.change.project.canonical_name)
+
         zuul_params = dict(uuid=uuid,
                            pipeline=pipeline.name,
                            job=job.name,
-                           project=item.change.project.name,
+                           project=project,
                            tags=' '.join(sorted(job.tags)))
 
         if hasattr(item.change, 'branch'):
