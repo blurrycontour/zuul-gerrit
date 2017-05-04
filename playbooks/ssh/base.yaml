@@ -1,0 +1,6 @@
+- hosts: all
+  tasks:
+    - name: Display current ssh keys.
+      shell: source /tmp/agent.sh; ssh-add -l
+      args:
+        executable: /bin/bash
