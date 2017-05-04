@@ -16,6 +16,23 @@
       "revId": "5ff74c0b493660f2064c7dbfeb75e3dbe5468706",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f044301_34dd6414",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 976,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-05-04T17:38:49Z",
+      "side": 1,
+      "message": "We discussed in IRC a bit, but I don\u0027t think this is necessary. SSH_AUTH_SOCK will be on bwrap\u0027s env, and thus, on ansible-playbook\u0027s env. So there\u0027s no need for a ~/.ssh/config.",
+      "revId": "5ff74c0b493660f2064c7dbfeb75e3dbe5468706",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
