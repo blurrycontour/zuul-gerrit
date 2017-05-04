@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f044301_ae592eff",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 976,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-05-04T13:44:12Z",
+      "side": 1,
+      "message": "So, since we copy the \u0027zuul\u0027 user environment, we actually get some interesting variables.\n\nIn the case of using bwrap, HOME\u003d/home/zuul.  What do you think about making it HOME\u003dself.jobdir.work_root for bwrap driver.\n\nThis would then mean, a trusted job could update the contents of ~/.ssh/config inside self.jobdir.work_root, allow us to setup the SSH_AUTH_SOCK:\n\n  Host node\n    # pseudo ansible code\n    IdentityAgent {{ zuul.executor.work_root/ssh/ssh-auth-sock }}\n\nThen, when ansible-playbook ran inside brwap, ssh _should_ read the ~/.ssh/config file and how our ssh-agent work.\n\nInitial testing locally confirms this works.",
+      "revId": "5ff74c0b493660f2064c7dbfeb75e3dbe5468706",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
