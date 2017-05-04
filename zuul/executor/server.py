@@ -17,6 +17,7 @@ import json
 import logging
 import os
 import shutil
+import select
 import signal
 import socket
 import subprocess
@@ -77,6 +78,90 @@ class JobDirPlaybook(object):
         self.root = root
         self.trusted = None
         self.path = None
+
+
+class SshAgent(object):
+    log = logging.getLogger("zuul.ExecutorServer")
+
+    def __init__(self):
+        self.env = {}
+        self.ssh_agent = None
+        self.sock_dir = None
+
+    def start(self):
+        if self.ssh_agent:
+            return
+        self.sock_dir = tempfile.mkdtemp()
+        sock_path = os.path.join(self.sock_dir, 'ssh-agent.sock')
+        self.ssh_agent = subprocess.Popen(['ssh-agent', '-D', '-a', sock_path],
+                                          stdout=subprocess.PIPE)
+        # Running with -D, our indication that the agent is ready is that it
+        # has printed the auth sock location. We don't need to read, just wait
+        # for any activity, since it is the only thing printed to stdout.
+        self.log.debug('SSH Agent waiting output {}'.format(sock_path))
+        (ready, writable, errs) = select.select([self.ssh_agent.stdout],
+                                                [], [self.ssh_agent.stdout], 5)
+        if errs:
+            self.log.debug('SSH Agent got errors {}'.format(sock_path))
+            raise RuntimeError('ssh-agent failed to spawn')
+        self.env['SSH_AUTH_SOCK'] = sock_path
+        self.log.info('Started SSH Agent, {}'.format(self.env))
+
+    def stop(self):
+        if self.ssh_agent:
+            try:
+                self.ssh_agent.terminate()
+                self.ssh_agent.wait()
+            except Exception:
+                self.log.exception("Failed sending SIGTERM to agent")
+                try:
+                    self.ssh_agent.kill()
+                except Exception:
+                    self.log.exception("Failed sending SIGKILL to agent")
+            self.log.info('Stopped SSH Agent, {}'.format(self.env))
+            self.ssh_agent = None
+            try:
+                os.rmdir(self.sock_dir)
+            except OSError:
+                self.log.exception('Socket dir is either full or disappeared')
+            self.sock_dir = None
+            self.env = {}
+
+    def add(self, key_path):
+        env = os.environ.copy()
+        env.update(self.env)
+        key_path = os.path.expanduser(key_path)
+        self.log.debug('Adding SSH Key {}'.format(key_path))
+        try:
+            output = subprocess.check_output(['ssh-add', key_path], env=env,
+                                             stderr=subprocess.PIPE)
+        except subprocess.CalledProcessError:
+            self.log.error('ssh-add failed: {}'.format(output))
+            raise
+        self.log.info('Added SSH Key {}'.format(key_path))
+
+    def remove(self, key_path):
+        env = os.environ.copy()
+        env.update(self.env)
+        key_path = os.path.expanduser(key_path)
+        self.log.debug('Removing SSH Key {}'.format(key_path))
+        subprocess.check_output(['ssh-add', '-d', key_path], env=env,
+                                stderr=subprocess.PIPE)
+        self.log.info('Removed SSH Key {}'.format(key_path))
+
+    def list(self):
+        if self.ssh_agent is None:
+            return None
+        env = os.environ.copy()
+        env.update(self.env)
+        result = []
+        for line in subprocess.Popen(['ssh-add', '-L'], env=env,
+                                     stdout=subprocess.PIPE).stdout:
+            line = line.decode('utf8')
+            if line.strip() == 'The agent has no identities.':
+                break
+            result.append(line.strip())
+        return result
 
 
 class JobDir(object):
@@ -168,7 +253,7 @@ class UpdateTask(object):
         self.event = threading.Event()
 
     def __eq__(self, other):
-        if (other.connection_name == self.connection_name and
+        if (other and other.connection_name == self.connection_name and
             other.project_name == self.project_name):
             return True
         return False
@@ -520,8 +605,11 @@ class AnsibleJob(object):
                 'executor', 'private_key_file')
         else:
             self.private_key_file = '~/.ssh/id_rsa'
+        self.ssh_agent = SshAgent()
 
     def run(self):
+        self.ssh_agent.start()
+        self.ssh_agent.add(self.private_key_file)
         self.running = True
         self.thread = threading.Thread(target=self.execute)
         self.thread.start()
@@ -529,6 +617,7 @@ class AnsibleJob(object):
     def stop(self):
         self.aborted = True
         self.abortRunningProc()
+        self.ssh_agent.stop()
         self.thread.join()
 
     def execute(self):
@@ -549,6 +638,11 @@ class AnsibleJob(object):
                 self.executor_server.finishJob(self.job.unique)
             except Exception:
                 self.log.exception("Error finalizing job thread:")
+            if self.ssh_agent:
+                try:
+                    self.ssh_agent.stop()
+                except Exception:
+                    self.log.exception("Error stopping SSH agent:")
 
     def _execute(self):
         self.log.debug("Job %s: beginning" % (self.job.unique,))
@@ -1032,6 +1126,7 @@ class AnsibleJob(object):
 
     def runAnsible(self, cmd, timeout, trusted=False):
         env_copy = os.environ.copy()
+        env_copy.update(self.ssh_agent.env)
         env_copy['LOGNAME'] = 'zuul'
 
         if trusted:
