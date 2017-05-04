@@ -1,0 +1,14 @@
+- hosts: all
+  tasks:
+    - name: Generate SSH keys
+      shell: ssh-keygen -b 2048 -t rsa -f ~/.ssh/id_rsa -q -N ""
+
+    - name: Add SSH keys to ssh-agent.
+      shell: source /tmp/agent.ssh; ssh-add ~/.ssh/id_rsa
+      args:
+        executable: /bin/bash
+
+    - name: Display current ssh keys.
+      shell: source /tmp/agent.sh; ssh-add -l
+      args:
+        executable: /bin/bash
