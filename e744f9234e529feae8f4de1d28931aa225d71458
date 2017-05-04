@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f044301_5560eace",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-04T18:56:16Z",
+      "side": 1,
+      "message": "I\u0027d prefer to omit connection name as something that shouldn\u0027t leak into playbooks.  We can revisit that if there\u0027s a compelling use-case for it.",
+      "revId": "e744f9234e529feae8f4de1d28931aa225d71458",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f044301_359b1eca",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-04T18:56:16Z",
+      "side": 1,
+      "message": "This isn\u0027t the right place to make this change.  You want to be in server.py where we set up the variables for ansible.",
+      "revId": "e744f9234e529feae8f4de1d28931aa225d71458",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
