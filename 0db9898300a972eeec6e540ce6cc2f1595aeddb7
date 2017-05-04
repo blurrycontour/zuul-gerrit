@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f044301_07bc79da",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-05-04T19:36:32Z",
+      "side": 1,
+      "message": "Maybe we could build a top of paramiko.agent ? It already has some support for working with ssh-agent and could mean less code for us to carry.\n\nFor example, it has a function to get_keys() today.",
+      "revId": "0db9898300a972eeec6e540ce6cc2f1595aeddb7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
