@@ -1,0 +1,6 @@
+- hosts: all
+  roles:
+    - run-bindep
+  tasks:
+    - name: Enable ssh-agent.
+      shell: ssh-agent -s > /tmp/agent.sh
