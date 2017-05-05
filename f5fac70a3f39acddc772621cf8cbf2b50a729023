@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "3f044301_9bb8c476",
+        "filename": "doc/source/reporters.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-05T20:08:06Z",
+      "side": 1,
+      "message": "0: I wasn\u0027t going to mention this, but since there\u0027s a thing below that needs changing, this could probably be better Englished as \"...that the reporter should set as the commit status...\"",
+      "revId": "f5fac70a3f39acddc772621cf8cbf2b50a729023",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f044301_7bbbb871",
+        "filename": "doc/source/reporters.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-05T20:08:06Z",
+      "side": 1,
+      "message": "-1: The \"(or without)\" phrasing is substantially confusing -- the choice is not whether the comment includes the pipeline status, but rather whether the comment is left at all, right?  Assuming that\u0027s the case, I think it\u0027s more correct if we just omit that phrase.",
+      "revId": "f5fac70a3f39acddc772621cf8cbf2b50a729023",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5ff73747_ad5812fa",
         "filename": "zuul/driver/github/githubconnection.py",
         "patchSetId": 11
