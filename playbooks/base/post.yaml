@@ -11,3 +11,4 @@
         dest: "/opt/zuul-logs/{{ zuul.uuid}}"
         src: "{{ zuul.executor.log_root }}/"
       delegate_to: 127.0.0.1
+    - remove-build-sshkey
