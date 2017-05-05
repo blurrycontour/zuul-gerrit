@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f044301_7e44c61b",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-05T20:30:17Z",
+      "side": 1,
+      "message": "I think this is another case where we\u0027re manipulating too much and ending up with something that is a little farther away from what you would expect either from Zuul or Github.  Instead of using the \u0027label / -label\u0027 syntax, it\u0027s probably more straightforward to just pass the actions through unchanged here, so then the trigger config looks like:\n\n  trigger:\n    github:\n      - event: pull_request\n        action: labeled\n        label:\n          - something-added\n      - event: pull_request\n        action: unlabeled\n        label:\n          - something-removed\n\nSimilarly, the reporter could be:\n\n  success:\n    github:\n      label:\n        - tests pass\n      unlabel:\n        - pending",
+      "revId": "845f2741b10ef395021cce46005ab88742da69d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
