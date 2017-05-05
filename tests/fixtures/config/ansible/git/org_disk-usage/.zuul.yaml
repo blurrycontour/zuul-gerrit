@@ -1,0 +1,7 @@
+- project:
+    name: org/disk-usage
+    check:
+      jobs:
+        - disk-usage-fail
+        - disk-usage-success
+

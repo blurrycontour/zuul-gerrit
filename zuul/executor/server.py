@@ -41,13 +41,40 @@ COMMANDS = ['stop', 'pause', 'unpause', 'graceful', 'verbose',
             'unverbose']
 
 
-class Watchdog(object):
+class DiskspaceWatchdog(object):
+    def __init__(self, jobdir, limit, function, args):
+        self.jobdir = jobdir
+        self.max_bytes = limit * 1024 * 1024
+        self.function = function
+        self.full = False
+        self.args = args
+
+        self.thread = threading.Thread(target=self._run,
+                                       name='executor-watchdog-disk')
+        self.thread.daemon = True
+
+    def _run(self):
+        while self._running:
+            time.sleep(1)
+            if self.jobdir.getDiskUsage() >= self.max_bytes:
+                self.full = True
+                self.function(*self.args)
+
+    def start(self):
+        self._running = True
+        self.thread.start()
+
+    def stop(self):
+        self._running = False
+
+
+class TimeoutWatchdog(object):
     def __init__(self, timeout, function, args):
         self.timeout = timeout
         self.function = function
         self.args = args
         self.thread = threading.Thread(target=self._run,
-                                       name='executor-watchdog')
+                                       name='executor-watchdog-timeout')
         self.thread.daemon = True
         self.timed_out = None
 
@@ -163,6 +190,13 @@ class JobDir(object):
         self.roles.append(root)
         return root
 
+    def getDiskUsage(self):
+        bs = 0
+        for p, _, fs in os.walk(self.work_root):
+            for f in fs:
+                bs += os.lstat(os.path.join(p, f)).st_size
+        return bs
+
     def cleanup(self):
         if not self.keep:
             shutil.rmtree(self.root)
@@ -267,6 +301,12 @@ class ExecutorServer(object):
             self.merge_root = self.config.get('executor', 'git_dir')
         else:
             self.merge_root = '/var/lib/zuul/executor-git'
+
+        if self.config.has_option('executor', 'max_mb_per_job'):
+            self.max_mb_per_job = int(self.config.get('executor',
+                                                      'max_mb_per_job'))
+        else:
+            self.max_mb_per_job = None
 
         if self.config.has_option('merger', 'git_user_email'):
             self.merge_email = self.config.get('merger', 'git_user_email')
@@ -515,6 +555,7 @@ class AnsibleJob(object):
     RESULT_TIMED_OUT = 2
     RESULT_UNREACHABLE = 3
     RESULT_ABORTED = 4
+    RESULT_OUT_OF_DISK = 5
 
     def __init__(self, executor_server, job):
         self.executor_server = executor_server
@@ -674,6 +715,9 @@ class AnsibleJob(object):
             return 'TIMED_OUT'
         if job_status == self.RESULT_ABORTED:
             return 'ABORTED'
+        if job_status == self.RESULT_OUT_OF_DISK:
+            return 'OUT_OF_DISK'
+
         if job_status != self.RESULT_NORMAL:
             # The result of the job is indeterminate.  Zuul will
             # run it again.
@@ -1023,7 +1067,7 @@ class AnsibleJob(object):
                 "-o UserKnownHostsFile=%s" % self.jobdir.known_hosts
             config.write('ssh_args = %s\n' % ssh_args)
 
-    def _ansibleTimeout(self, msg):
+    def _ansibleAbort(self, msg):
         self.log.warning(msg)
         self.abortRunningProc()
 
@@ -1065,10 +1109,18 @@ class AnsibleJob(object):
                 env=env_copy,
             )
 
+        max_disk = self.executor_server.max_mb_per_job
+        if max_disk:
+            disk_watchdog = DiskspaceWatchdog(
+                self.jobdir,
+                max_disk,
+                self._ansibleAbort, ("Ansible workspace full",))
+            disk_watchdog.start()
+
         ret = None
         if timeout:
-            watchdog = Watchdog(timeout, self._ansibleTimeout,
-                                ("Ansible timeout exceeded",))
+            watchdog = TimeoutWatchdog(timeout, self._ansibleAbort,
+                                       ("Ansible timeout exceeded",))
             watchdog.start()
         try:
             for line in iter(self.proc.stdout.readline, b''):
@@ -1078,6 +1130,9 @@ class AnsibleJob(object):
         finally:
             if timeout:
                 watchdog.stop()
+            if max_disk:
+                disk_watchdog.stop()
+
         self.log.debug("Ansible exit code: %s" % (ret,))
 
         with self.proc_lock:
@@ -1085,6 +1140,8 @@ class AnsibleJob(object):
 
         if timeout and watchdog.timed_out:
             return (self.RESULT_TIMED_OUT, None)
+        if max_disk and disk_watchdog.full:
+            return (self.RESULT_OUT_OF_DISK, None)
         if ret == 3:
             # AnsibleHostUnreachable: We had a network issue connecting to
             # our zuul-worker.

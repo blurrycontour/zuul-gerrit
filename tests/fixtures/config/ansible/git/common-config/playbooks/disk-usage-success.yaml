@@ -1,0 +1,38 @@
+- hosts: all
+  tasks:
+    - name:
+      debug:
+        var: zuul
+
+    - name: Create out dir
+      file:
+        path: "{{zuul.executor.log_root}}/disk-usage/"
+        state: directory
+
+    - name: Write 10k (1)
+      shell:
+        cmd: "dd if=/dev/zero of={{zuul.executor.log_root}}/disk-usage/disk-usage.1 bs=10k count=1"
+
+    - name: Sleep
+      pause:
+        seconds: 1
+
+    - name: Write 10k (2)
+      shell:
+        cmd: "dd if=/dev/zero of={{zuul.executor.log_root}}/disk-usage/disk-usage.2 bs=10k count=1"
+
+    - name: Sleep
+      pause:
+        seconds: 1
+
+    - name: Write 10k (3)
+      shell:
+        cmd: "dd if=/dev/zero of={{zuul.executor.log_root}}/disk-usage/disk-usage.3 bs=10k count=1"
+
+    - name: Sleep
+      pause:
+        seconds: 1
+
+    - name: Write 10k (4)
+      shell:
+        cmd: "dd if=/dev/zero of={{zuul.executor.log_root}}/disk-usage/disk-usage.4 bs=10k count=1"
