@@ -288,3 +288,63 @@ class TestGithubRequirements(ZuulTestCase):
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 1)
         self.assertEqual(self.history[0].name, 'project7-olderthan')
+
+    @simple_layout('layouts/requirements-github.yaml', driver='github')
+    def test_trigger_require_review_user_state(self):
+        "Test trigger requirement: review state from user"
+
+        A = self.fake_github.openFakePullRequest('org/project8', 'master', 'A')
+        # Add derp and herp to writers
+        A.writers.append('derp')
+        # A comment event that we will keep submitting to trigger
+        comment = A.getCommentAddedEvent('test me')
+        self.fake_github.emitEvent(comment)
+        self.waitUntilSettled()
+        # No positive review from derp so should not be enqueued
+        self.assertEqual(len(self.history), 0)
+
+        # A negative from derp should not cause it to be enqueued
+        A.addReview('derp', 'CHANGES_REQUESTED')
+        self.fake_github.emitEvent(comment)
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 0)
+
+        # A positive from nobody should not cause it to be enqueued
+        A.addReview('nobody', 'APPROVED')
+        self.fake_github.emitEvent(comment)
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 0)
+
+        # A positive from derp should cause it to be enqueued
+        A.addReview('derp', 'APPROVED')
+        self.fake_github.emitEvent(comment)
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 1)
+        self.assertEqual(self.history[0].name,
+                         'project8-triggerreviewuserstate')
+
+    @simple_layout('layouts/requirements-github.yaml', driver='github')
+    def test_trigger_reject(self):
+        "Test trigger requirement: reject negative review"
+
+        A = self.fake_github.openFakePullRequest('org/project9', 'master', 'A')
+        # Add derp and herp to writers
+        A.writers.append('derp')
+        # A comment event that we will keep submitting to trigger
+        comment = A.getCommentAddedEvent('test me')
+        self.fake_github.emitEvent(comment)
+        self.waitUntilSettled()
+        # No negative review from derp so should be enqueued
+        self.assertEqual(len(self.history), 1)
+
+        # A negative from herp should still cause it to be enqueued
+        A.addReview('herp', 'CHANGES_REQUESTED')
+        self.fake_github.emitEvent(comment)
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 2)
+
+        # A negative from derp should not cause it to be enqueued
+        A.addReview('derp', 'CHANGES_REQUESTED')
+        self.fake_github.emitEvent(comment)
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 2)

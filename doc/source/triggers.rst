@@ -178,6 +178,22 @@ following options.
   expression and multiple refs may be listed. Github always sends full ref
   name, eg. ``refs/tags/bar`` and this string is matched against the regexp.
 
+Github driver triggers support change pre-conditions to trigger. The change in
+question will need to meet any defined condition to trigger the pipeline. These
+are like pipeline requirements, but specific to the github driver based
+trigger.
+
+  *require-review*
+  This may be used for any event.  It requires that a certain kind of review be
+  present for the current patchset of the change (the review could be added by
+  the event in question).  It follows the same syntax as the review pipeline
+  requirement For each specified criteria there must exist a matching review.
+
+  *reject-review*
+  This takes a list of reviews in the same format as
+  *require-review* but will fail to enter the pipeline if there is
+  a matching review.
+
 GitHub Configuration
 ~~~~~~~~~~~~~~~~~~~~
 

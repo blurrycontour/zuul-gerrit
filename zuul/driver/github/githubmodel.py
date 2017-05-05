@@ -60,9 +60,12 @@ class GithubTriggerEvent(TriggerEvent):
 
 
 class GithubCommonFilter(object):
-    def __init__(self, required_reviews=[], required_statuses=[]):
+    def __init__(self, required_reviews=[], reject_reviews=[],
+                 required_statuses=[]):
         self._required_reviews = copy.deepcopy(required_reviews)
         self.required_reviews = self._tidy_reviews(required_reviews)
+        self._reject_reviews = copy.deepcopy(reject_reviews)
+        self.reject_reviews = self._tidy_reviews(reject_reviews)
         self.required_statuses = required_statuses
 
     def _tidy_reviews(self, reviews):
@@ -113,7 +116,8 @@ class GithubCommonFilter(object):
             # No reviews means no matching
             return False
 
-        return self.matchesRequiredReviews(change)
+        return (self.matchesRequiredReviews(change) and
+                self.matchesNoRejectReviews(change))
 
     def matchesRequiredReviews(self, change):
         for rreview in self.required_reviews:
@@ -125,6 +129,16 @@ class GithubCommonFilter(object):
                     break
             if not matches_review:
                 return False
+        return True
+
+    def matchesNoRejectReviews(self, change):
+        # Make sure no reviews match a reject criteria
+        for rreview in self.reject_reviews:
+            for review in change.reviews:
+                if self._match_review_required_review(rreview, review):
+                    # A reject review has been matched, reject immediately
+                    return False
+        # If we are here, no rejects have been matched. Good to go.
         return True
 
     def matchesRequiredStatuses(self, change):
@@ -142,11 +156,13 @@ class GithubEventFilter(EventFilter, GithubCommonFilter):
     def __init__(self, trigger, types=[], branches=[], refs=[],
                  comments=[], actions=[], labels=[], unlabels=[],
                  states=[], statuses=[], required_statuses=[],
-                 ignore_deletes=True):
+                 required_reviews=[], reject_reviews=[], ignore_deletes=True):
 
         EventFilter.__init__(self, trigger)
 
-        GithubCommonFilter.__init__(self, required_statuses=required_statuses)
+        GithubCommonFilter.__init__(self, required_statuses=required_statuses,
+                                    required_reviews=required_reviews,
+                                    reject_reviews=reject_reviews)
 
         self._types = types
         self._branches = branches

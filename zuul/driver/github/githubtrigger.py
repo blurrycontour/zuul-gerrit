@@ -16,6 +16,7 @@ import logging
 import voluptuous as v
 from zuul.trigger import BaseTrigger
 from zuul.driver.github.githubmodel import GithubEventFilter
+from zuul.driver.github.githubsource import review
 
 
 class GithubTrigger(BaseTrigger):
@@ -43,7 +44,9 @@ class GithubTrigger(BaseTrigger):
                 unlabels=toList(trigger.get('unlabel')),
                 states=toList(trigger.get('state')),
                 statuses=toList(trigger.get('status')),
-                required_statuses=toList(trigger.get('require-status'))
+                required_statuses=toList(trigger.get('require-status')),
+                required_reviews=toList(trigger.get('require-review')),
+                reject_reviews=toList(trigger.get('reject-review')),
             )
             efilters.append(f)
 
@@ -70,6 +73,8 @@ def getSchema():
         'unlabel': toList(str),
         'state': toList(str),
         'require-status': toList(str),
+        'require-review': toList(review),
+        'reject-review': toList(review),
         'status': toList(str)
     }
 
