@@ -68,6 +68,14 @@
 
 - job:
     parent: python27
+    name: disk-usage-fail
+
+- job:
+    parent: python27
+    name: disk-usage-success
+
+- job:
+    parent: python27
     name: check-vars
     nodes:
       - name: ubuntu-xenial

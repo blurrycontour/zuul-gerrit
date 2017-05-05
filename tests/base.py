@@ -1667,7 +1667,7 @@ class ZuulTestCase(BaseTestCase):
         # we whitelist watchdog threads as they have relatively long delays
         # before noticing they should exit, but they should exit on their own.
         threads = [t for t in threading.enumerate()
-                   if t.name != 'executor-watchdog']
+                   if not t.name.startswith('executor-watchdog')]
         if len(threads) > 1:
             log_str = ""
             for thread_id, stack_frame in sys._current_frames().items():
