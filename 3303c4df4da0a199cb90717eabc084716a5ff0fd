@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f044301_1eca626c",
+        "filename": "zuul/driver/github/githubsource.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-05T20:41:27Z",
+      "side": 1,
+      "message": "We should check how often this gets called -- I think it may get called _a lot_ (like, every pass through the NNFI algorithm).  In that case, we should really hit that API call when we query the PR initially and store the result.  If we get an event that would cause that to change, then we can just update the value on the existing change singleton (this is why connections cache changes, so they can do out-of-band updates).\n\nThen this method would just operate on the data on the change object.",
+      "revId": "3303c4df4da0a199cb90717eabc084716a5ff0fd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
