@@ -18,6 +18,11 @@ git_dir=/var/lib/zuul/git
 ;git_user_name=zuul
 zuul_url=http://zuul.example.com/p
 
+[executor]
+pidfile=/var/run/zuul-executor/zuul-executor.pid
+git_dir=/var/lib/zuul/executor-git
+;max_mb_per_job = 1024
+
 [webapp]
 listen_address=0.0.0.0
 port=8001

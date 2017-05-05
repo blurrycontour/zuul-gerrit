@@ -370,6 +370,20 @@ class TestAnsible(AnsibleZuulTestCase):
             self.assertEqual(f.read(), "test-username test-password")
 
 
+class TestExecutorDiskUsage(AnsibleZuulTestCase):
+    config_file = 'zuul-executor-max-disk.conf'
+    tenant_config_file = 'config/ansible/main.yaml'
+
+    def test_job_disk_usage(self):
+        A = self.fake_gerrit.addFakeChange('org/disk-usage', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        build = self.getJobFromHistory('disk-usage-fail')
+        self.assertEqual(build.result, 'OUT_OF_DISK')
+        build = self.getJobFromHistory('disk-usage-success')
+        self.assertEqual(build.result, 'SUCCESS')
+
+
 class TestBrokenConfig(ZuulTestCase):
     # Test that we get an appropriate syntax error if we start with a
     # broken config.
