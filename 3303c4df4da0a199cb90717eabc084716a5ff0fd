@@ -16,6 +16,24 @@
       "revId": "3303c4df4da0a199cb90717eabc084716a5ff0fd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f044301_4057dc03",
+        "filename": "zuul/driver/github/githubsource.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-05-07T18:06:25Z",
+      "side": 1,
+      "message": "In a commit later than that, we introduce a caching layer, as Github supports etags, which can tell us if the cached response we have is still valid. It\u0027ll be a quick API call and it will not count against API rate limits. \n\nWe could cache it completely internally, however since the value could change out from under Zuul\u0027s nose, it might be better to use Github\u0027s own caching mechanism.\n\nI thought I had removed this TODO and added the API call, but looks like I didn\u0027t do that. I\u0027ll add one in here.",
+      "parentUuid": "3f044301_1eca626c",
+      "revId": "3303c4df4da0a199cb90717eabc084716a5ff0fd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
