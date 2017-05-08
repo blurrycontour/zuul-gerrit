@@ -32,7 +32,11 @@ import threading
 import time
 import traceback
 import uuid
-import Queue
+
+try:
+    import Queue
+except ImportError:
+    import queue as Queue
 
 import gear
 import jenkins_jobs.builder

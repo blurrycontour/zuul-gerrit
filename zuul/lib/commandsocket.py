@@ -18,7 +18,11 @@ import logging
 import os
 import socket
 import threading
-import Queue
+
+try:
+    import Queue
+except ImportError:
+    import queue as Queue
 
 
 class CommandSocket(object):
