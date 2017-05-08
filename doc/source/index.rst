@@ -15,6 +15,7 @@ Contents:
 
    quick-start
    gating
+   configuration
    connections
    triggers
    reporters
