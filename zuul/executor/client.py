@@ -193,6 +193,7 @@ class ExecutorClient(object):
             canonical_name=item.change.project.canonical_name)
 
         zuul_params = dict(uuid=uuid,
+                           ref=item.current_build_set.ref,
                            pipeline=pipeline.name,
                            job=job.name,
                            project=project,
@@ -204,6 +205,7 @@ class ExecutorClient(object):
             zuul_params['change'] = item.change.number
         if hasattr(item.change, 'patchset'):
             zuul_params['patchset'] = item.change.patchset
+
         # Legacy environment variables
         params = dict(ZUUL_UUID=uuid,
                       ZUUL_PROJECT=item.change.project.name)
