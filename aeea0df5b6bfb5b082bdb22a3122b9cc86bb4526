@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f044301_9649838c",
+        "filename": "etc/console.html",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 7191
+      },
+      "writtenOn": "2017-05-09T23:26:12Z",
+      "side": 1,
+      "message": "nit: Don\u0027t need the function here. ws.onmessage \u003d onMessage;",
+      "range": {
+        "startLine": 29,
+        "startChar": 19,
+        "endLine": 29,
+        "endChar": 28
+      },
+      "revId": "aeea0df5b6bfb5b082bdb22a3122b9cc86bb4526",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f044301_1655731d",
+        "filename": "etc/console.html",
+        "patchSetId": 3
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 7191
+      },
+      "writtenOn": "2017-05-09T23:26:12Z",
+      "side": 1,
+      "message": "for all the useless crap that is in javascript, how awesome that there\u0027s still not a standard query string parser :P",
+      "range": {
+        "startLine": 68,
+        "startChar": 16,
+        "endLine": 68,
+        "endChar": 22
+      },
+      "revId": "aeea0df5b6bfb5b082bdb22a3122b9cc86bb4526",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f044301_d634abfd",
+        "filename": "zuul/streamer.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 7191
+      },
+      "writtenOn": "2017-05-09T23:26:12Z",
+      "side": 1,
+      "message": "googling for asyncio and gearman there are at least a couple of libraries that could do this more natively. The cross over here into importing and calling regular zuul code make me a little squeamish.",
+      "revId": "aeea0df5b6bfb5b082bdb22a3122b9cc86bb4526",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f044301_f61a077b",
+        "filename": "zuul/streamer.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 7191
+      },
+      "writtenOn": "2017-05-09T23:26:12Z",
+      "side": 1,
+      "message": "it doesn\u0027t appear like logfile is used. can we ignore this param until we need it? \n\nMy rationale is that i\u0027m very rarely going to decide i want to stream nothing but dmesg or something. More likely i will want to somehow multiplex the files over this stream so that i can filter things out on the client side.\n\nEspecially seeing that every time i connect to the server its going to send me the entire contents of the file again.",
+      "range": {
+        "startLine": 65,
+        "startChar": 29,
+        "endLine": 65,
+        "endChar": 36
+      },
+      "revId": "aeea0df5b6bfb5b082bdb22a3122b9cc86bb4526",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
