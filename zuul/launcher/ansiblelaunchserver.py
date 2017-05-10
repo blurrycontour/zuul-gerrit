@@ -29,7 +29,17 @@ import Queue
 
 import gear
 import yaml
-import jenkins_jobs.builder
+
+try:
+    from jenkins_jobs.builder import Builder as jenkins_jobs_builder
+    jjb_2 = False
+except ImportError:
+    from jenkins_jobs.builder import JenkinsManager as jenkins_jobs_builder
+    from jenkins_jobs.parser import YamlParser
+    from jenkins_jobs.config import JJBConfig
+    from jenkins_jobs.registry import ModuleRegistry
+    jjb_2 = True
+
 import jenkins_jobs.formatter
 import zmq
 
@@ -302,8 +312,13 @@ class LaunchServer(object):
         self.log.debug("Loading jobs")
         builder = JJB()
         path = self.config.get('launcher', 'jenkins_jobs')
-        builder.load_files([path])
-        builder.parser.expandYaml()
+        if jjb_2:
+            registry = ModuleRegistry(JJBConfig())
+            builder.parser.load_files([path])
+            builder.parser.expandYaml(registry, None)
+        else:
+            builder.load_files([path])
+            builder.parser.expandYaml()
         unseen = set(self.jobs.keys())
         for job in builder.parser.jobs:
             builder.expandMacros(job)
@@ -1541,9 +1556,11 @@ class NodeWorker(object):
         return ret == 0
 
 
-class JJB(jenkins_jobs.builder.Builder):
+class JJB(jenkins_jobs_builder):
     def __init__(self):
         self.global_config = None
+        if jjb_2:
+            self.parser = YamlParser(JJBConfig())
         self._plugins_list = []
 
     def expandComponent(self, component_type, component, template_data):
