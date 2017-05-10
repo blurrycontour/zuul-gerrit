@@ -34,6 +34,23 @@
       "revId": "3303c4df4da0a199cb90717eabc084716a5ff0fd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f044301_1267aabf",
+        "filename": "zuul/driver/github/githubsource.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-10T18:55:23Z",
+      "side": 1,
+      "message": "I don\u0027t think we want even a quick API call here -- this is called in the main scheduler loop, which blocks the entire app.  And we\u0027re not smart about it at all -- we\u0027re going to call it over and over and over again (possibly way more than necessary).  Any network traffic at this rate will be disastrous.\n\nIt is okay for this to change out from under zuul -- the algorithm expects that.  Generally, actions which will change the outcome of this call will emit events which will cause us to update this Change object.  After that event is processed, the NNFI scheduler algorithm will run again, and call this method, and get the new result from the cached data on this object.  The result is that Zuul will only have out of date data for a very short time.  That\u0027s okay -- the worst thing that can happen is that Zuul will try to merge a change which it no longer can, and it will reset the queue after that fails.  That\u0027s nearly the same thing that would happen if we did the API call here -- we would just reset the queue a second or so earlier.\n\nIn short, this method should not do any significant work, and should only return a result based on the supplied data (including the cached data on the Change object).  The github driver should update that data out-of-band on any webhook events it receives.",
+      "revId": "3303c4df4da0a199cb90717eabc084716a5ff0fd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
