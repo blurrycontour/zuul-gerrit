@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f044301_923a9ac9",
+        "filename": "doc/source/reporters.rst",
+        "patchSetId": 14
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-10T18:43:21Z",
+      "side": 1,
+      "message": "unlabel",
+      "revId": "c36ac7a56a9dbf995974df31fcda5e24340c3ea2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f044301_72338ef7",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-10T18:43:21Z",
+      "side": 1,
+      "message": "Should we pass through the action names unchanged, so it\u0027s \"labeled\" and \"unlabeled\"?",
+      "revId": "c36ac7a56a9dbf995974df31fcda5e24340c3ea2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
