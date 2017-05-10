@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f044301_92729a7a",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-10T18:56:04Z",
+      "side": 1,
+      "message": "See comments in PS 10",
+      "revId": "b80c3f96843583a14ede00c554dca94c4d5e1ac6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
