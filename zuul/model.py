@@ -1235,7 +1235,9 @@ class BuildSet(object):
         del self.node_requests[job_name]
 
     def getTries(self, job_name):
-        return self.tries.get(job_name)
+        if job_name in self.tries:
+            return self.tries[job_name]
+        return 0
 
     def getMergeMode(self):
         if self.layout:
