@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f044301_12ba1c09",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 7191
+      },
+      "writtenOn": "2017-05-10T04:45:53Z",
+      "side": 1,
+      "message": "looking through the ssh-agent man page there\u0027s a few things I think we can use. \n\nIf you use -D (no-daemon) and save the return like: \n\nself.agent \u003d subprocess.Popen([\u0027ssh-agent\u0027, \u0027-D\u0027])\n\nyou can self.agent.kill() later.\n\nAlso not sure if this is better, but you can do -a to specify the bind address rather than discover it afterwards so like,\n\n-a $JOBDIR/ssh-agent\n\nagain and save that rather than query the output.",
+      "revId": "5a6f0c7a2285a288775b43a6a167ca21da7619db",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
