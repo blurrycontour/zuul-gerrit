@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f044301_25fb7079",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-11T16:00:03Z",
+      "side": 1,
+      "message": "Instead of mapping this to the pull_request event, maybe we should pass through pull_request_review event -- especially since it has it\u0027s own action field?",
+      "revId": "054f7675f9eefe68b54609f80ba97fafc2a74095",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
