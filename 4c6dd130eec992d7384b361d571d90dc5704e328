@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "3f044301_d77b5f25",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1693,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-05-11T16:36:07Z",
+      "side": 1,
+      "message": "Oh this one is leftover churn. We shouldn\u0027t need to release if we\u0027re also using the context manager.",
+      "revId": "4c6dd130eec992d7384b361d571d90dc5704e328",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f044301_c453b238",
         "filename": "zuul/merger/merger.py",
         "patchSetId": 1
@@ -30,6 +47,23 @@
       "writtenOn": "2017-05-11T14:14:24Z",
       "side": 1,
       "message": "Context manager with no release.",
+      "revId": "4c6dd130eec992d7384b361d571d90dc5704e328",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f044301_f77e5b17",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-05-11T16:36:07Z",
+      "side": 1,
+      "message": "Yeah this one is the way we should be using the context manager.",
       "revId": "4c6dd130eec992d7384b361d571d90dc5704e328",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
