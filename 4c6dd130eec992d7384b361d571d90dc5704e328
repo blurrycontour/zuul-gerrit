@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f044301_a432e60e",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1693,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-11T14:14:24Z",
+      "side": 1,
+      "message": "I\u0027m not quite sure I understand the change; can you explain more in the commit message?\n\nSpecifically: you\u0027re adding a release method to a context manager here, but below, there is a context manager without a release.",
+      "revId": "4c6dd130eec992d7384b361d571d90dc5704e328",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f044301_c453b238",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-11T14:14:24Z",
+      "side": 1,
+      "message": "Context manager with no release.",
+      "revId": "4c6dd130eec992d7384b361d571d90dc5704e328",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
