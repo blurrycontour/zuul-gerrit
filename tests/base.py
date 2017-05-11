@@ -1690,6 +1690,7 @@ class ZuulTestCase(BaseTestCase):
         with repo.config_writer() as config_writer:
             config_writer.set_value('user', 'email', 'user@example.com')
             config_writer.set_value('user', 'name', 'User Name')
+            config_writer.release()
 
         repo.index.commit('initial commit')
         master = repo.create_head('master')
