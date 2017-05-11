@@ -32,6 +32,7 @@ import yaml
 import jenkins_jobs.builder
 import jenkins_jobs.formatter
 import zmq
+from six import string_types
 
 import zuul.ansible.library
 from zuul.lib import commandsocket
@@ -47,7 +48,7 @@ COMMANDS = ['reconfigure', 'stop', 'pause', 'unpause', 'release', 'graceful',
 
 
 def boolify(x):
-    if isinstance(x, str):
+    if isinstance(x, string_types):
         return bool(int(x))
     return bool(x)
 
