@@ -69,6 +69,9 @@ class Server(object):
 
         self.socket = s
 
+        # Write pid file
+        open("%s.pid" % self.path, "w").write("%d" % os.getpid())
+
     def accept(self):
         conn, addr = self.socket.accept()
         return conn
