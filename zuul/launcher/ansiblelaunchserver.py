@@ -1208,9 +1208,9 @@ class NodeWorker(object):
         filetask = dict(path=remote_path,
                         state='absent')
         task = dict(file=filetask)
-        tasks.append(task)
+        block = dict(block=tasks, always=[task])
 
-        return tasks
+        return block
 
     def _transformPublishers(self, jjb_job):
         early_publishers = []
@@ -1314,7 +1314,7 @@ class NodeWorker(object):
             for builder in jjb_job.get('builders', []):
                 if 'shell' in builder:
                     sequence += 1
-                    tasks.extend(
+                    tasks.append(
                         self._makeBuilderTask(jobdir, builder, parameters,
                                               sequence))
 
