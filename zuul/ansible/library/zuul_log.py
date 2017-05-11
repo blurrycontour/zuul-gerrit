@@ -20,8 +20,11 @@ import datetime
 
 
 class Console(object):
+    def __init__(self, path):
+        self.path = path
+
     def __enter__(self):
-        self.logfile = open('/tmp/console.html', 'a', 0)
+        self.logfile = open(self.path, 'a', 0)
         return self
 
     def __exit__(self, etype, value, tb):
@@ -33,10 +36,10 @@ class Console(object):
         self.logfile.write(outln)
 
 
-def log(msg):
+def log(msg, path):
     if not isinstance(msg, list):
         msg = [msg]
-    with Console() as console:
+    with Console(path) as console:
         for line in msg:
             console.addLine("[Zuul] %s\n" % line)
 
@@ -45,11 +48,12 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             msg=dict(required=True, type='raw'),
+            path=dict(default='/tmp/console.html'),
         )
     )
 
     p = module.params
-    log(p['msg'])
+    log(p['msg'], p['path'])
     module.exit_json(changed=True)
 
 from ansible.module_utils.basic import *  # noqa

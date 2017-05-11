@@ -125,8 +125,11 @@ PASSWD_ARG_RE = re.compile(r'^[-]{0,2}pass[-]?(word|wd)?')
 
 
 class Console(object):
+    def __init__(self, path):
+        self.path = path
+
     def __enter__(self):
-        self.logfile = open('/tmp/console.html', 'a', 0)
+        self.logfile = open(self.path, 'a', 0)
         return self
 
     def __exit__(self, etype, value, tb):
@@ -142,9 +145,9 @@ class Console(object):
         self.logfile.write(outln)
 
 
-def follow(fd):
+def follow(fd, console_path):
     newline_warning = False
-    with Console() as console:
+    with Console(console_path) as console:
         while True:
             line = fd.readline()
             if not line:
@@ -159,7 +162,7 @@ def follow(fd):
 
 # Taken from ansible/module_utils/basic.py ... forking the method for now
 # so that we can dive in and figure out how to make appropriate hook points
-def zuul_run_command(self, args, check_rc=False, close_fds=True, executable=None, data=None, binary_data=False, path_prefix=None, cwd=None, use_unsafe_shell=False, prompt_regex=None, environ_update=None):
+def zuul_run_command(self, args, check_rc=False, close_fds=True, executable=None, data=None, binary_data=False, path_prefix=None, cwd=None, use_unsafe_shell=False, prompt_regex=None, environ_update=None, console_path=None):
     '''
     Execute a command, returns rc, stdout, and stderr.
 
@@ -308,7 +311,7 @@ def zuul_run_command(self, args, check_rc=False, close_fds=True, executable=None
             self.log('Executing: ' + running)
         # ZUUL: Replaced the excution loop with the zuul_runner run function
         cmd = subprocess.Popen(args, **kwargs)
-        t = threading.Thread(target=follow, args=(cmd.stdout,))
+        t = threading.Thread(target=follow, args=(cmd.stdout, console_path,))
         t.daemon = True
         t.start()
         ret = cmd.wait()
@@ -317,7 +320,7 @@ def zuul_run_command(self, args, check_rc=False, close_fds=True, executable=None
         # likely stuck in readline() because it spawed a child that is
         # holding stdout or stderr open.
         t.join(10)
-        with Console() as console:
+        with Console(console_path) as console:
             if t.isAlive():
                 console.addLine("[Zuul] standard output/error still open "
                                 "after child exited")
@@ -392,6 +395,7 @@ def main():
           removes = dict(type='path'),
           warn = dict(type='bool', default=True),
           environ = dict(type='dict', default=None),
+          console_path = dict(type='path', default="/tmp/console.html"),
         )
     )
 
@@ -403,6 +407,7 @@ def main():
     removes  = module.params['removes']
     warn = module.params['warn']
     environ = module.params['environ']
+    console_path = module.params['console_path']
 
     if args.strip() == '':
         module.fail_json(rc=256, msg="no command given")
@@ -443,7 +448,7 @@ def main():
         args = shlex.split(args)
     startd = datetime.datetime.now()
 
-    rc, out, err = zuul_run_command(module, args, executable=executable, use_unsafe_shell=shell, environ_update=environ)
+    rc, out, err = zuul_run_command(module, args, executable=executable, use_unsafe_shell=shell, environ_update=environ, console_path=console_path)
 
     endd = datetime.datetime.now()
     delta = endd - startd
