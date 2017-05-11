@@ -47,7 +47,7 @@ COMMANDS = ['reconfigure', 'stop', 'pause', 'unpause', 'release', 'graceful',
 
 
 def boolify(x):
-    if isinstance(x, str):
+    if isinstance(x, basestring):
         return bool(int(x))
     return bool(x)
 
