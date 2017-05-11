@@ -995,7 +995,7 @@ class NodeWorker(object):
                 tasks.append(task)
 
                 # Fetch the console log from the remote host.
-                src = '/tmp/console.html'
+                src = '%s/.console.html' % parameters['WORKSPACE']
                 rsync_opts = []
             else:
                 src = parameters['WORKSPACE']
@@ -1202,7 +1202,9 @@ class NodeWorker(object):
         task = dict(command=remote_path)
         task['name'] = 'command generated from JJB'
         task['environment'] = "{{ zuul.environment }}"
-        task['args'] = dict(chdir=parameters['WORKSPACE'])
+        task['args'] = dict(chdir=parameters['WORKSPACE'],
+                            console_path="%s/.console.html" %
+                                parameters['WORKSPACE'])
         tasks.append(task)
 
         filetask = dict(path=remote_path,
@@ -1246,6 +1248,7 @@ class NodeWorker(object):
 
         parameters = args.copy()
         parameters['WORKSPACE'] = os.path.join(self.workspace_root, job_name)
+        console_path = '%s/.console.html' % parameters['WORKSPACE']
 
         with open(jobdir.inventory, 'w') as inventory:
             for host_name, host_vars in self.getHostList():
@@ -1285,11 +1288,10 @@ class NodeWorker(object):
             tasks = []
             tasks.append(dict(shell=shellargs, delegate_to='127.0.0.1'))
 
-            task = dict(file=dict(path='/tmp/console.html', state='absent'))
+            task = dict(file=dict(path=console_path, state='absent'))
             tasks.append(task)
 
-            task = dict(zuul_console=dict(path='/tmp/console.html',
-                                          port=19885))
+            task = dict(zuul_console=dict(path=console_path, port=19885))
             tasks.append(task)
 
             task = dict(file=dict(path=parameters['WORKSPACE'],
@@ -1300,7 +1302,7 @@ class NodeWorker(object):
                 "Launched by %s" % self.manager_name,
                 "Building remotely on %s in workspace %s" % (
                     self.name, parameters['WORKSPACE'])]
-            task = dict(zuul_log=dict(msg=msg))
+            task = dict(zuul_log=dict(msg=msg, path=console_path))
             tasks.append(task)
 
             play = dict(hosts='node', name='Job setup', tasks=tasks)
@@ -1345,13 +1347,16 @@ class NodeWorker(object):
             # of the publishers succeed.
             tasks = []
 
-            task = dict(zuul_log=dict(msg="Job complete, result: SUCCESS"),
+            task = dict(zuul_log=dict(msg="Job complete, result: SUCCESS",
+                                      path=console_path),
                         when='success|bool')
             blocks[0].insert(0, task)
-            task = dict(zuul_log=dict(msg="Job complete, result: FAILURE"),
+            task = dict(zuul_log=dict(msg="Job complete, result: FAILURE",
+                                      path=console_path),
                         when='not success|bool and not timedout|bool')
             blocks[0].insert(0, task)
-            task = dict(zuul_log=dict(msg="Job timed out, result: FAILURE"),
+            task = dict(zuul_log=dict(msg="Job timed out, result: FAILURE",
+                                      path=console_path),
                         when='not success|bool and timedout|bool')
             blocks[0].insert(0, task)
 
