@@ -1363,6 +1363,21 @@ class NodeWorker(object):
             tasks.append(dict(block=blocks[0],
                               always=blocks[1]))
 
+            task = dict(stat=dict(path="%s.pid" % console_path),
+                        register="console_pid_file")
+            tasks.append(task)
+            task = dict(command="cat %s.pid" % console_path,
+                        register="console_pid",
+                        when='console_pid_file.stat.exists')
+            tasks.append(task)
+            task = dict(command="kill {{console_pid.stdout}}",
+                        when='console_pid_file.stat.exists')
+            tasks.append(task)
+            task = dict(file=dict(path="%s.pid" % console_path,
+                                  state='absent'),
+                        when='console_pid_file.stat.exists')
+            tasks.append(task)
+
             play = dict(hosts='node', name='Publishers',
                         tasks=tasks)
             playbook.write(yaml.safe_dump([play], default_flow_style=False))
