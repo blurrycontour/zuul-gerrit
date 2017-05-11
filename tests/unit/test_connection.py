@@ -12,7 +12,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import sys
+
 import sqlalchemy as sa
+from testtools import skipIf
 
 from tests.base import ZuulTestCase, ZuulDBTestCase
 
@@ -61,6 +64,7 @@ class TestSQLConnection(ZuulDBTestCase):
     config_file = 'zuul-sql-driver.conf'
     tenant_config_file = 'config/sql-driver/main.yaml'
 
+    @skipIf(sys.version_info[0] > 2, 'Locks up under python 3')
     def test_sql_tables_created(self, metadata_table=None):
         "Test the tables for storing results are created properly"
         buildset_table = 'zuul_buildset'
@@ -72,6 +76,7 @@ class TestSQLConnection(ZuulDBTestCase):
         self.assertEqual(9, len(insp.get_columns(buildset_table)))
         self.assertEqual(10, len(insp.get_columns(build_table)))
 
+    @skipIf(sys.version_info[0] > 2, 'Locks up under python 3')
     def test_sql_results(self):
         "Test results are entered into an sql table"
         # Grab the sa tables
@@ -207,6 +212,7 @@ class TestConnectionsBadSQL(ZuulDBTestCase):
     config_file = 'zuul-sql-driver-bad.conf'
     tenant_config_file = 'config/sql-driver/main.yaml'
 
+    @skipIf(sys.version_info[0] > 2, 'Locks up under python 3')
     def test_unable_to_connect(self):
         "Test the SQL reporter fails gracefully when unable to connect"
         self.config.set('zuul', 'layout_config',
@@ -224,6 +230,7 @@ class TestMultipleGerrits(ZuulTestCase):
     config_file = 'zuul-connections-multiple-gerrits.conf'
     tenant_config_file = 'config/zuul-connections-multiple-gerrits/main.yaml'
 
+    @skipIf(sys.version_info[0] > 2, 'Locks up under python 3')
     def test_multiple_project_separate_gerrits(self):
         self.executor_server.hold_jobs_in_build = True
 
