@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f044301_ff3e37b6",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-11T14:20:40Z",
+      "side": 1,
+      "message": "Why change str() to \u0027{}\u0027.format() ?  \n\nIt looks like\n\n  hashlib.sha1(str(random.random()).encode(\u0027ascii\u0027))\n\nworks in 2 and 3.\n\nThis is kind of a style thing which I normally wouldn\u0027t weigh in on, but maybe it\u0027s worth examining py2-\u003e3 idioms a little bit so we don\u0027t make it harder than necessary.  I\u0027d personally prefer str(x) to \u0027{}\u0027.format(x) because it seems to express what\u0027s going on so much more simply.",
+      "revId": "a945dcf6150c0d9c2bfbcd9e0f1b3e345660adab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
