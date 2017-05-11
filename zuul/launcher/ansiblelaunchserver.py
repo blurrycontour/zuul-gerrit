@@ -1208,9 +1208,7 @@ class NodeWorker(object):
         filetask = dict(path=remote_path,
                         state='absent')
         task = dict(file=filetask)
-        tasks.append(task)
-
-        return tasks
+        return [dict(block=tasks, always=[task])]
 
     def _transformPublishers(self, jjb_job):
         early_publishers = []
