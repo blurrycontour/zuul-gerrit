@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f044301_44a1e245",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-11T14:10:03Z",
+      "side": 1,
+      "message": "pep8 may be upset about this.",
+      "revId": "45697d72aa6aecc264281e559470fa7495193b78",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f044301_248a56be",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 456,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-11T14:10:03Z",
+      "side": 1,
+      "message": "and this",
+      "revId": "45697d72aa6aecc264281e559470fa7495193b78",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
