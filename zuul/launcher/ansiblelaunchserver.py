@@ -975,7 +975,7 @@ class NodeWorker(object):
                       '--prune-empty-dirs']
         return rsync_opts
 
-    def _makeSCPTask(self, jobdir, publisher, parameters):
+    def _makeSCPTask(self, jobdir, publisher, parameters, console_path):
         tasks = []
         for scpfile in publisher['scp']['files']:
             scproot = tempfile.mkdtemp(dir=jobdir.staging_root)
@@ -995,8 +995,10 @@ class NodeWorker(object):
                 tasks.append(task)
 
                 # Fetch the console log from the remote host.
-                src = '/tmp/console.html'
-                rsync_opts = []
+                syncargs = dict(src=console_path,
+                                dest=os.path.join(scproot, 'console.html'),
+                                copy_links='yes',
+                                mode='pull')
             else:
                 src = parameters['WORKSPACE']
                 if not src.endswith('/'):
@@ -1004,12 +1006,12 @@ class NodeWorker(object):
                 rsync_opts = self._getRsyncOptions(scpfile['source'],
                                                    parameters)
 
-            syncargs = dict(src=src,
-                            dest=scproot,
-                            copy_links='yes',
-                            mode='pull')
-            if rsync_opts:
-                syncargs['rsync_opts'] = rsync_opts
+                syncargs = dict(src=src,
+                                dest=scproot,
+                                copy_links='yes',
+                                mode='pull',
+                                rsync_opts=rsync_opts)
+
             task = dict(name='copy files from node',
                         synchronize=syncargs)
             if not scpfile.get('copy-after-failure'):
@@ -1182,7 +1184,8 @@ class NodeWorker(object):
 
         return tasks
 
-    def _makeBuilderTask(self, jobdir, builder, parameters, sequence):
+    def _makeBuilderTask(self, jobdir, builder, parameters, sequence,
+                         console_path):
         tasks = []
         script_fn = '%02d-%s.sh' % (sequence, str(uuid.uuid4().hex))
         script_path = os.path.join(jobdir.script_root, script_fn)
@@ -1202,7 +1205,8 @@ class NodeWorker(object):
         task = dict(command=remote_path)
         task['name'] = 'command generated from JJB'
         task['environment'] = "{{ zuul.environment }}"
-        task['args'] = dict(chdir=parameters['WORKSPACE'])
+        task['args'] = dict(chdir=parameters['WORKSPACE'],
+                            console_path=console_path)
         tasks.append(task)
 
         filetask = dict(path=remote_path,
@@ -1246,6 +1250,7 @@ class NodeWorker(object):
 
         parameters = args.copy()
         parameters['WORKSPACE'] = os.path.join(self.workspace_root, job_name)
+        console_path = os.path.join(parameters['WORKSPACE'], '.console.html')
 
         with open(jobdir.inventory, 'w') as inventory:
             for host_name, host_vars in self.getHostList():
@@ -1285,11 +1290,10 @@ class NodeWorker(object):
             tasks = []
             tasks.append(dict(shell=shellargs, delegate_to='127.0.0.1'))
 
-            task = dict(file=dict(path='/tmp/console.html', state='absent'))
+            task = dict(file=dict(path=console_path, state='absent'))
             tasks.append(task)
 
-            task = dict(zuul_console=dict(path='/tmp/console.html',
-                                          port=19885))
+            task = dict(zuul_console=dict(path=console_path, port=19885))
             tasks.append(task)
 
             task = dict(file=dict(path=parameters['WORKSPACE'],
@@ -1300,7 +1304,7 @@ class NodeWorker(object):
                 "Launched by %s" % self.manager_name,
                 "Building remotely on %s in workspace %s" % (
                     self.name, parameters['WORKSPACE'])]
-            task = dict(zuul_log=dict(msg=msg))
+            task = dict(zuul_log=dict(msg=msg, path=console_path))
             tasks.append(task)
 
             play = dict(hosts='node', name='Job setup', tasks=tasks)
@@ -1316,7 +1320,7 @@ class NodeWorker(object):
                     sequence += 1
                     tasks.extend(
                         self._makeBuilderTask(jobdir, builder, parameters,
-                                              sequence))
+                                              sequence, console_path))
 
             play = dict(hosts='node', name='Job body', tasks=tasks)
             playbook.write(yaml.safe_dump([play], default_flow_style=False))
@@ -1330,7 +1334,8 @@ class NodeWorker(object):
                 for publisher in publishers:
                     if 'scp' in publisher:
                         block.extend(self._makeSCPTask(jobdir, publisher,
-                                                       parameters))
+                                                       parameters,
+                                                       console_path))
                     if 'ftp' in publisher:
                         block.extend(self._makeFTPTask(jobdir, publisher,
                                                        parameters))
@@ -1345,13 +1350,16 @@ class NodeWorker(object):
             # of the publishers succeed.
             tasks = []
 
-            task = dict(zuul_log=dict(msg="Job complete, result: SUCCESS"),
+            task = dict(zuul_log=dict(msg="Job complete, result: SUCCESS",
+                                      path=console_path),
                         when='success|bool')
             blocks[0].insert(0, task)
-            task = dict(zuul_log=dict(msg="Job complete, result: FAILURE"),
+            task = dict(zuul_log=dict(msg="Job complete, result: FAILURE",
+                                      path=console_path),
                         when='not success|bool and not timedout|bool')
             blocks[0].insert(0, task)
-            task = dict(zuul_log=dict(msg="Job timed out, result: FAILURE"),
+            task = dict(zuul_log=dict(msg="Job timed out, result: FAILURE",
+                                      path=console_path),
                         when='not success|bool and timedout|bool')
             blocks[0].insert(0, task)
 
