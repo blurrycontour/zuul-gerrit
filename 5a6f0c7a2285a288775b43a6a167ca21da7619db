@@ -16,6 +16,23 @@
       "revId": "5a6f0c7a2285a288775b43a6a167ca21da7619db",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f044301_6653bb18",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-05-11T21:35:05Z",
+      "side": 1,
+      "message": "I like it. Especially since we can just put the socket in the job dir and get it inside the bubblewrap for free.",
+      "revId": "5a6f0c7a2285a288775b43a6a167ca21da7619db",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
