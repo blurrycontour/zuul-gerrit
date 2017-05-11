@@ -16,6 +16,23 @@
       "revId": "a945dcf6150c0d9c2bfbcd9e0f1b3e345660adab",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f044301_37af237e",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-05-11T16:37:36Z",
+      "side": 1,
+      "message": "Agreed on the preference. I did this one in a rush and don\u0027t remember why I felt that I had to do it this way.",
+      "revId": "a945dcf6150c0d9c2bfbcd9e0f1b3e345660adab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
