@@ -161,10 +161,38 @@ class FakeIssueSearchResult(object):
         self.issue = issue
 
 
+class FakeResponse(object):
+    def __init__(self, data):
+        self.status_code = 200
+        self.data = data
+
+    def json(self):
+        return self.data
+
+
+class FakeGithubSession(object):
+
+    def build_url(self, *args):
+        fakebase = 'https://example.com/api/v3/'
+        fakepath = '/'.join(args)
+        return fakebase + fakepath
+
+    def get(self, url, headers=None):
+        # TODO(tobiash): get project from url and inject contexts
+        contexts = []
+        data = {
+            'required_status_checks': {
+                'contexts': contexts
+            }
+        }
+        return FakeResponse(data)
+
+
 class FakeGithub(object):
     def __init__(self, pull_requests):
         self._pull_requests = pull_requests
         self._repos = {}
+        self.session = FakeGithubSession()
 
     def user(self, login):
         return FakeUser(login)
