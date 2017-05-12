@@ -38,7 +38,7 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
     def report(self, item):
         """Send the compiled report message."""
 
-    def getSubmitAllowNeeds(self):
+    def getSubmitAllowNeeds(self, tenant_name, pipeline_name):
         """Get a list of code review labels that are allowed to be
         "needed" in the submit records for a change, with respect
         to this queue.  In other words, the list of review labels
