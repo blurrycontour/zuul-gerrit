@@ -33,6 +33,23 @@
       "revId": "5a6f0c7a2285a288775b43a6a167ca21da7619db",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f013ff3_aab48f36",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-05-12T18:18:40Z",
+      "side": 1,
+      "message": "So after playing with this idea, it fell apart a bit in the details. One good reason to use daemon mode is that ssh-agent takes care to create the socket before forking and exiting. So when we use .communicate() below, we know that the socket is ready and it\u0027s safe to return from start(). If we don\u0027t have that, we have to poll the socket file\u0027s existence, or poll the stdout for the printed details, which signals that the socket is ready. Using daemon mode then actually seems simpler.",
+      "revId": "5a6f0c7a2285a288775b43a6a167ca21da7619db",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
