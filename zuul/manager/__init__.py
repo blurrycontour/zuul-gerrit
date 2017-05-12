@@ -115,7 +115,9 @@ class PipelineManager(object):
         # this queue itself is likely to set before submitting.
         allow_needs = set()
         for action_reporter in self.pipeline.success_actions:
-            allow_needs.update(action_reporter.getSubmitAllowNeeds())
+            allow_needs.update(action_reporter.getSubmitAllowNeeds(
+                self.pipeline.layout.tenant.name, self.pipeline.name))
+
         return allow_needs
 
     def eventMatches(self, event, change):
