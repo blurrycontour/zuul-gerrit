@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f013ff3_6408fb27",
+        "filename": "tests/fixtures/config/ansible/git/common-config/playbooks/disk-usage-fail.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-05-12T23:16:29Z",
+      "side": 1,
+      "message": "We can use the pause module here. Can specify how long to pause. Doesn\u0027t show as \"changed\".",
+      "revId": "ab3af0d043753286b54548975699944cf21e9fec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
