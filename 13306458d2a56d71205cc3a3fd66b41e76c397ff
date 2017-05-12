@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f013ff3_043817d1",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1273,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-05-12T23:20:29Z",
+      "side": 0,
+      "message": "Is this an unintended removal?",
+      "revId": "13306458d2a56d71205cc3a3fd66b41e76c397ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
