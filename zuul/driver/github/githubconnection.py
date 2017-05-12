@@ -894,17 +894,34 @@ class GithubConnection(BaseConnection):
         return pr
 
     def canMerge(self, change, allow_needs):
-        # This API call may get a false (null) while GitHub is calculating
-        # if it can merge.  The github3.py library will just return that as
-        # false. This could lead to false negatives.
-        # Additionally, this only checks if the PR code could merge
-        # cleanly to the target branch. It does not evaluate any branch
-        # protection merge requirements (such as reviews and status states)
-        # At some point in the future this may be available through the API
-        # or we can fetch the branch protection settings and evaluate within
-        # Zuul whether or not those protections have been met
-        # For now, just send back a True value.
-        return True
+        github = self.getGithubClient(change.project.name)
+        owner, proj = change.project.name.split('/')
+        pull = github.pull_request(owner, proj, change.number)
+
+        if not pull.mergeable:
+            return False
+
+        # this is super cacheable, we may care about more than status in the
+        # future, for now this is all that is integration enabled.
+        url = github.session.build_url('repos', change.project.name,
+                                       'branches', change.branch,
+                                       'protection', 'required_status_checks')
+
+        headers = {'Accept': 'application/vnd.github.loki-preview+json'}
+        resp = github.session.get(url, headers=headers)
+
+        if resp.status_code == 404:
+            # i think this means there are no branch protections for this
+            return True
+
+        required_contexts = set(resp.json()['contexts'])
+        statuses = [c.statuses() for c in pull.commits(1)]
+        statuses = statuses[0] if statuses else []  # only got 0 or 1 commit
+
+        log_rate_limit(self.log, github)
+
+        successful = set([s.context for s in statuses if s.state == 'success'])
+        return successful == required_contexts
 
     def getPullBySha(self, sha, project):
         pulls = []
