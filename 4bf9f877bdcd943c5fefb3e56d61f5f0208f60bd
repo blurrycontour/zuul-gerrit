@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f013ff3_703556f7",
+        "filename": "playbooks/roles/prepare-workspace/tasks/main.yaml",
+        "patchSetId": 12
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-05-12T23:04:06Z",
+      "side": 1,
+      "message": "A comment on why this is being skipped would be helpful for future devs looking at it.",
+      "revId": "4bf9f877bdcd943c5fefb3e56d61f5f0208f60bd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
