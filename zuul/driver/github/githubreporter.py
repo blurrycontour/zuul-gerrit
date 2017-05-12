@@ -38,22 +38,22 @@ class GithubReporter(BaseReporter):
         if not isinstance(self._unlabels, list):
             self._unlabels = [self._unlabels]
 
-    def report(self, source, pipeline, item):
+    def report(self, source, item):
         """Comment on PR and set commit status."""
         if self._create_comment:
-            self.addPullComment(pipeline, item)
+            self.addPullComment(item)
         if (self._commit_status is not None and
             hasattr(item.change, 'patchset') and
             item.change.patchset is not None):
-            self.setPullStatus(pipeline, item)
+            self.setPullStatus(item)
         if (self._merge and
             hasattr(item.change, 'number')):
             self.mergePull(item)
         if self._labels or self._unlabels:
             self.setLabels(item)
 
-    def addPullComment(self, pipeline, item):
-        message = self._formatItemReport(pipeline, item)
+    def addPullComment(self, item):
+        message = self._formatItemReport(item)
         project = item.change.project.name
         pr_number = item.change.number
         self.log.debug(
@@ -61,10 +61,10 @@ class GithubReporter(BaseReporter):
             (item.change, self.config, message))
         self.connection.commentPull(project, pr_number, message)
 
-    def setPullStatus(self, pipeline, item):
+    def setPullStatus(self, item):
         project = item.change.project.name
         sha = item.change.patchset
-        context = pipeline.name
+        context = item.pipeline.name
         state = self._commit_status
         url = ''
         if self.connection.sched.config.has_option('zuul', 'status_url'):
@@ -73,8 +73,8 @@ class GithubReporter(BaseReporter):
                                  item.change.number,
                                  item.change.patchset)
         description = ''
-        if pipeline.description:
-            description = pipeline.description
+        if item.pipeline.description:
+            description = item.pipeline.description
 
         self.log.debug(
             'Reporting change %s, params %s, status:\n'
