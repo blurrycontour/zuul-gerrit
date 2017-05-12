@@ -880,16 +880,30 @@ class GithubConnection(BaseConnection):
         return pr
 
     def canMerge(self, change, allow_needs):
-        # This API call may get a false (null) while GitHub is calculating
-        # if it can merge.  The github3.py library will just return that as
-        # false. This could lead to false negatives.
-        # Additionally, this only checks if the PR code could merge
-        # cleanly to the target branch. It does not evaluate any branch
-        # protection merge requirements (such as reviews and status states)
-        # At some point in the future this may be available through the API
-        # or we can fetch the branch protection settings and evaluate within
-        # Zuul whether or not those protections have been met
-        # For now, just send back a True value.
+        github = self.getGithubClient(change.project.name)
+        owner, proj = change.project.name.split('/')
+        pull = github.pull_request(owner, proj, change.number)
+
+        if not pull.mergeable:
+            return False
+
+        protection = self._getBranchProtection(
+            change.project.name, change.branch)
+
+        if not self._hasRequiredStatusChecks(allow_needs, protection, pull):
+            return False
+
+        required_reviews = protection.get(
+            'required_pull_request_reviews')
+        if required_reviews:
+            # TODO: process reviews
+            if required_reviews.get('require_code_owner_reviews'):
+                # we need to process the reviews using code owners
+                return True
+            else:
+                # we need to process the review using access rights
+                return True
+
         return True
 
     def getPullBySha(self, sha, project):
@@ -962,6 +976,37 @@ class GithubConnection(BaseConnection):
                         reviews[user] = review
 
         return reviews.values()
+
+    def _getBranchProtection(self, project_name: str, branch: str):
+        github = self.getGithubClient(project_name)
+        url = github.session.build_url('repos', project_name,
+                                       'branches', branch,
+                                       'protection')
+
+        headers = {'Accept': 'application/vnd.github.loki-preview+json'}
+        resp = github.session.get(url, headers=headers)
+
+        if resp.status_code == 404:
+            # i think this means there are no branch protections for this
+            return None
+
+        return resp.json()
+
+    def _hasRequiredStatusChecks(self, allow_needs, protection, pull):
+        required_status_checks = protection.get('required_status_checks')
+        if required_status_checks:
+            required_contexts = required_status_checks.get('contexts')
+            if required_contexts:
+                # strip allow_needs as we will set this in the gate our selves
+                r = set([x for x in required_contexts if x not in allow_needs])
+
+                statuses = [c.statuses() for c in pull.commits(1)]
+                statuses = statuses[
+                    0] if statuses else []  # only got 0 or 1 commit
+                successful = set(
+                    [s.context for s in statuses
+                     if s.state == 'success' and s.context not in allow_needs])
+                return successful == r
 
     def _getPullReviews(self, owner, project, number):
         # make a list out of the reviews so that we complete our
