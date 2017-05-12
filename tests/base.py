@@ -1199,6 +1199,15 @@ class FakeGithubConnection(githubconnection.GithubConnection):
 
         return prs
 
+    # TODO(tobiash): This method should be removed here and
+    # replaced by improving the FakeGithub
+    def _getBranchProtection(self, project_name: str, branch: str):
+        return {
+            'required_status_checks': {
+                'contexts': [
+                ]
+            }
+        }
 
 class BuildHistory(object):
     def __init__(self, **kw):

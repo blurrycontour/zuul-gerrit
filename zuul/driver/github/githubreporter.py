@@ -184,6 +184,21 @@ class GithubReporter(BaseReporter):
 
         return message
 
+    def getSubmitAllowNeeds(self, tenant_name, pipeline_name):
+        """Get a list of code review labels that are allowed to be
+        "needed" in the submit records for a change, with respect
+        to this queue.  In other words, the list of review labels
+        this reporter itself is likely to set before submitting.
+        """
+
+        # check if we report a status, if not we can return an empty list
+        status = self.config.get('status')
+        if not status:
+            return []
+
+        # we return a status so return the status we report to github
+        return ["%s/%s" % (tenant_name, pipeline_name)]
+
 
 def getSchema():
     github_reporter = v.Schema({
