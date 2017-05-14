@@ -622,6 +622,10 @@ class NodeWorker(object):
         self.library_dir = library_dir
         self.pre_post_library_dir = pre_post_library_dir
         self.options = options
+        if self.config.has_option('launcher', 'results_dir'):
+            self.results_dir = config.get('launcher', 'results_dir')
+        else:
+            self.results_dir = None
 
     def isAlive(self):
         # Meant to be called from the manager
@@ -975,7 +979,8 @@ class NodeWorker(object):
                       '--prune-empty-dirs']
         return rsync_opts
 
-    def _makeSCPTask(self, jobdir, publisher, parameters, console_path):
+    def _makeSCPTask(self, jobdir, publisher, parameters, console_path,
+                     job_name):
         tasks = []
         for scpfile in publisher['scp']['files']:
             scproot = tempfile.mkdtemp(dir=jobdir.staging_root)
@@ -1022,6 +1027,37 @@ class NodeWorker(object):
             # message if it fails.
             # https://github.com/ansible/ansible/issues/18281
             tasks.append(task)
+
+            if self.results_dir and scpfile.get('copy-console'):
+                result_dir = os.path.join(self.results_dir, job_name)
+                job_dir = os.path.join(result_dir, "%s-%s,%s-%s-%s" % (
+                    parameters.get("ZUUL_PROJECT"),
+                    parameters.get("ZUUL_CHANGE", "0"),
+                    parameters.get("ZUUL_PATCHSET", "0"),
+                    parameters.get("ZUUL_PIPELINE"),
+                    parameters.get("ZUUL_UUID"),
+                ))
+                result_path = os.path.join(job_dir, "console.html")
+                task = dict(name="create results directory",
+                            file=dict(path=job_dir,
+                                      state="directory"),
+                            delegate_to='127.0.0.1')
+                tasks.append(task)
+                task = dict(name="copy result console.html",
+                            copy=dict(src=os.path.join(scproot,
+                                                       'console.html'),
+                                      dest=result_path,
+                                      remote_src=True),
+                            delegate_to='127.0.0.1')
+                tasks.append(task)
+                task = dict(name="symlink lastSuccessful",
+                            file=dict(path=os.path.join(result_dir,
+                                                        "lastSuccessful"),
+                                      src=result_path,
+                                      state="link"),
+                            when='success|bool',
+                            delegate_to='127.0.0.1')
+                tasks.append(task)
 
             task = self._makeSCPTaskLocalAction(
                 site, scpfile, scproot, parameters)
@@ -1335,7 +1371,7 @@ class NodeWorker(object):
                     if 'scp' in publisher:
                         block.extend(self._makeSCPTask(jobdir, publisher,
                                                        parameters,
-                                                       console_path))
+                                                       console_path, job_name))
                     if 'ftp' in publisher:
                         block.extend(self._makeFTPTask(jobdir, publisher,
                                                        parameters))
