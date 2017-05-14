@@ -622,6 +622,10 @@ class NodeWorker(object):
         self.library_dir = library_dir
         self.pre_post_library_dir = pre_post_library_dir
         self.options = options
+        if self.config.has_option('launcher', 'results_dir'):
+            self.results_dir = config.get('launcher', 'results_dir')
+        else:
+            self.results_dir = None
 
     def isAlive(self):
         # Meant to be called from the manager
@@ -1377,6 +1381,43 @@ class NodeWorker(object):
                                   state='absent'),
                         when='console_pid_file.stat.exists')
             tasks.append(task)
+
+            if self.results_dir:
+                result_dir = "%s/%s-%s" % (
+                    self.results_dir,
+                    job_name,
+                    parameters.get("ZUUL_PIPELINE"),
+                )
+                job_dir = "%s/%s-%s,%s-%s" % (
+                    result_dir,
+                    parameters.get("ZUUL_PROJECT"),
+                    parameters.get("ZUUL_CHANGE", "0"),
+                    parameters.get("ZUUL_PATCHSET", "0"),
+                    parameters.get("ZUUL_UUID"),
+                )
+                task = dict(file=dict(path="%s-SUCCESS" % job_dir,
+                                      state="directory"),
+                            when='success|bool')
+                tasks.append(task)
+                task = dict(copy=dict(src=console_path,
+                                      dest="%s-SUCCESS/console.html" % job_dir,
+                                      remote_src=True),
+                            when='success|bool')
+                tasks.append(task)
+                task = dict(file=dict(path="%s/lastSuccessful" % result_dir,
+                                      src="%s-SUCCESS/console.html" % job_dir,
+                                      state="link"),
+                            when='success|bool')
+                tasks.append(task)
+                task = dict(file=dict(path="%s-FAILURE" % job_dir,
+                                      state="directory"),
+                            when='not success|bool')
+                tasks.append(task)
+                task = dict(copy=dict(src=console_path,
+                                      dest="%s-FAILURE/console.html" % job_dir,
+                                      remote_src=True),
+                            when='not success|bool')
+                tasks.append(task)
 
             play = dict(hosts='node', name='Publishers',
                         tasks=tasks)
