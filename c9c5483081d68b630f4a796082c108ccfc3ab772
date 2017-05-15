@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f013ff3_285186d9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-05-15T18:23:06Z",
+      "side": 1,
+      "message": "No such thing as SIGHUP1",
+      "revId": "c9c5483081d68b630f4a796082c108ccfc3ab772",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
