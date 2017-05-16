@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f013ff3_5c3fd424",
+        "filename": "doc/source/quick-start.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-05-16T16:19:19Z",
+      "side": 1,
+      "message": "Might be worth mentioning the bindep.txt file and the bindep tool. In fact, it seems the bindep.txt in the master branch is missing a bunch of things- so it might be worth backporting the non-zookeeper bits from feature/zuulv3 into master\u0027s bindep.txt just for completeness.",
+      "revId": "78dd08c271f6d87e0c47df995a70d944ef3f5614",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
