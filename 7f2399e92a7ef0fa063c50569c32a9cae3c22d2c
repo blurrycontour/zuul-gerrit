@@ -16,6 +16,23 @@
       "revId": "7f2399e92a7ef0fa063c50569c32a9cae3c22d2c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f013ff3_68d6452a",
+        "filename": "doc/source/triggers.rst",
+        "patchSetId": 14
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-05-16T22:02:03Z",
+      "side": 1,
+      "message": "You are correct! I\u0027ll fix that up",
+      "revId": "7f2399e92a7ef0fa063c50569c32a9cae3c22d2c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
