@@ -1066,6 +1066,32 @@ class NodeWorker(object):
 
         return task
 
+    def _makeEmailTask(self, jobdir, publisher, parameters, job_name):
+        url = "unknown"
+        if self.config.has_option("zuul", "url_pattern"):
+            class _Build:
+                def __init__(self, parameters):
+                    self.parameters = parameters
+            try:
+                url = self.config.get("zuul", "url_pattern").format(
+                    build=_Build(parameters))
+            except:
+                self.log.exception("Exception formatting url_pattern")
+        mailargs = dict(
+            to=",".join(publisher["email"].get("recipients", "root").split()),
+            subject="Build failed in zuul-launcher: %s #%s" % (
+                job_name,
+                parameters.get("ZUUL_UUID")),
+            body="Logs url: %s" % url,
+            headers="X-Zuul-Job=%s" % job_name,
+        )
+        mailargs["from"] = "zuul"
+        task = dict(name='Send email',
+                    mail=mailargs,
+                    when='not success|bool',
+                    delegate_to='127.0.0.1')
+        return [task]
+
     def _makeFTPTask(self, jobdir, publisher, parameters):
         tasks = []
         ftp = publisher['ftp']
@@ -1337,6 +1363,9 @@ class NodeWorker(object):
                     if 'afs' in publisher:
                         block.extend(self._makeAFSTask(jobdir, publisher,
                                                        parameters))
+                    if 'email' in publisher:
+                        block.extend(self._makeEmailTask(jobdir, publisher,
+                                                         parameters, job_name))
                 blocks.append(block)
 
             # The 'always' section contains the log publishing tasks,
