@@ -3398,6 +3398,17 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertFalse(self.smtp_messages[1]['body'].startswith(failure_msg))
         self.assertTrue(self.smtp_messages[1]['body'].endswith(footer_msg))
 
+    def test_unmanaged_project_start_message(self):
+        "Test start reporting is not done for unmanaged projects."
+        self.updateConfigLayout('layout-unmanaged-project')
+        self.sched.reconfigure(self.config)
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(0, len(A.messages))
+
     @skip("Disabled for early v3 development")
     def test_merge_failure_reporters(self):
         """Check that the config is set up correctly"""
