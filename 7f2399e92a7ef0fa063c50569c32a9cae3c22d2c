@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f013ff3_883751b1",
+        "filename": "doc/source/triggers.rst",
+        "patchSetId": 14
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-05-16T21:59:56Z",
+      "side": 1,
+      "message": "I think you mean ``pull_request_review`` events?",
+      "revId": "7f2399e92a7ef0fa063c50569c32a9cae3c22d2c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
