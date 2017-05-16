@@ -13,6 +13,12 @@ You can get zuul from pypi via::
 
     pip install zuul
 
+Additional dependencies include:
+
+    - GCC
+    - Python development library (e.g. python-devel, python-dev)
+
+
 Zuul Components
 ---------------
 
@@ -61,10 +67,10 @@ Jenkins:
 Zuul Setup
 ----------
 
-At minimum we need to provide **zuul.conf** and **layout.yaml** and placed
-in /etc/zuul/ directory. You will also need a zuul user and ssh key for the
-zuul user in Gerrit. The following example uses the builtin gearmand service
-in zuul.
+At minimum we need to provide **zuul.conf** and **layout.yaml** and placed in
+``/etc/zuul/`` directory. You will also need a ``zuul`` user and ssh key for
+the zuul user in Gerrit. The following example uses the builtin ``gearmand``
+service in zuul.
 
 **zuul.conf**::
 
@@ -111,25 +117,26 @@ The following sets up a basic timer triggered job using zuul.
 Starting Zuul
 -------------
 
-You can run zuul-server with the **-d** option to make it not daemonize. It's
-a good idea at first to confirm there's no issues with your configuration.
+You can run ``zuul-server`` with the **-d** option to make it not daemonize.
+It's a good idea at first to confirm there are no issues with your
+configuration.
 
 Simply run::
 
     zuul-server
 
-Once run you should have 2 zuul-server processes::
+Once run you should have 2 ``zuul-server`` processes::
 
     zuul     12102     1  0 Jan21 ?        00:15:45 /home/zuul/zuulvenv/bin/python /home/zuul/zuulvenv/bin/zuul-server -d
     zuul     12107 12102  0 Jan21 ?        00:00:01 /home/zuul/zuulvenv/bin/python /home/zuul/zuulvenv/bin/zuul-server -d
 
 Note: In this example zuul was installed in a virtualenv.
 
-The 2nd zuul-server process is gearmand running if you are using the builtin
-gearmand server, otherwise there will only be 1 process.
+The 2nd ``zuul-server`` process is ``gearmand`` running if you are using the
+builtin gearmand server, otherwise there will only be 1 process.
 
-Zuul won't actually process your Job queue however unless you also have a
-zuul-merger process running.
+Zuul won't actually process your job queue however unless you also have a
+``zuul-merger`` process running.
 
 Simply run::
 
