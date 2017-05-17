@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff0f0b1f_26a2fb9b",
+        "filename": "tests/fixtures/config/ansible/git/org_lookup-project/playbooks/csvfile_good.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-05-17T17:49:34Z",
+      "side": 1,
+      "message": "Was this comment meant to be left in?",
+      "revId": "7f31ee27c91785f0949a4329662a1a6c1dff7afc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
