@@ -46,13 +46,27 @@ class SQLReporter(BaseReporter):
             if 'score' in self.reporter_config else 0
 
         with self.connection.engine.begin() as conn:
+            if hasattr(item.change, 'number'):
+                change = item.change.number
+            else:
+                change = ''
+            if hasattr(item.change, 'patchset'):
+                patchset = item.change.patchset
+            else:
+                patchset = ''
+            if hasattr(item.change, 'refspec'):
+                refspec = item.change.refspec
+            elif hasattr(item.change, 'newrev'):
+                refspec = item.change.newrev
+            else:
+                refspec = ''
             buildset_ins = self.connection.zuul_buildset_table.insert().values(
                 zuul_ref=item.current_build_set.ref,
                 pipeline=item.pipeline.name,
                 project=item.change.project.name,
-                change=item.change.number,
-                patchset=item.change.patchset,
-                ref=item.change.refspec,
+                change=change,
+                patchset=patchset,
+                ref=refspec,
                 score=score,
                 message=self._formatItemReport(
                     pipeline, item, with_jobs=False),
