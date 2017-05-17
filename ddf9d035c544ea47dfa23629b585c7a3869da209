@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff0f0b1f_4bd5fab8",
+        "filename": "doc/source/project-config.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 578,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-05-17T17:42:15Z",
+      "side": 1,
+      "message": "Maybe it\u0027s too late for this term, but \"inherit\" sounds more like \"should I get this from a parent\", rather than \"this is something that can be passed down\". I don\u0027t know if there is a better word, but it just struck me as odd when reading.",
+      "revId": "ddf9d035c544ea47dfa23629b585c7a3869da209",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
