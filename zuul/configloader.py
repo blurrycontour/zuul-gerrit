@@ -710,14 +710,14 @@ class PipelineParser(object):
         if 'require' in conf or 'reject' in conf:
             require = conf.get('require', {})
             reject = conf.get('reject', {})
-            f = model.ChangeishFilter(
+            f = model.RefFilter(
                 open=require.get('open'),
                 current_patchset=require.get('current-patchset'),
                 statuses=as_list(require.get('status')),
                 required_approvals=as_list(require.get('approval')),
                 reject_approvals=as_list(reject.get('approval'))
             )
-            manager.changeish_filters.append(f)
+            manager.ref_filters.append(f)
 
         for trigger_name, trigger_config in conf.get('trigger').items():
             trigger = connections.getTrigger(trigger_name, trigger_config)
