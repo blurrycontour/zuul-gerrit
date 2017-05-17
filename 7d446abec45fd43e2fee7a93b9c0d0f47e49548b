@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff0f0b1f_90a581b8",
+        "filename": "doc/source/project-config.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-05-17T17:20:01Z",
+      "side": 1,
+      "message": "One question that comes up when I explain this, and maybe it\u0027s covered in gating, but at what point does the reporter report on success? Lets say 4 changes get queued up, and change 1 passes, and change 1+2 passes. As those finish, while 1+2+3 and 1+2+3+4 are still going, will Zuul report on changes 1 and 2 (where some forms of \"report\" \u003d\u003d merging them)? Or does zuul wait for the entire queue run (1,2,3,4) to finish out before providing the reports?",
+      "revId": "7d446abec45fd43e2fee7a93b9c0d0f47e49548b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff0f0b1f_50afe993",
+        "filename": "doc/source/project-config.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-05-17T17:20:01Z",
+      "side": 1,
+      "message": "Where is this textual description used? Are there formatting concerns?",
+      "revId": "7d446abec45fd43e2fee7a93b9c0d0f47e49548b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff0f0b1f_10917153",
+        "filename": "doc/source/project-config.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-05-17T17:20:01Z",
+      "side": 1,
+      "message": "Probably want to remove the \"Gerrit\" bit here and make it more generic.",
+      "revId": "7d446abec45fd43e2fee7a93b9c0d0f47e49548b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff0f0b1f_70e66deb",
+        "filename": "doc/source/project-config.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-05-17T17:20:01Z",
+      "side": 1,
+      "message": "Given that reject is a negative match, can\u0027t the docs rely on the options available to require? Or are only a sub-set available?",
+      "revId": "7d446abec45fd43e2fee7a93b9c0d0f47e49548b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff0f0b1f_ebbe0efe",
+        "filename": "doc/source/project-config.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 549,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-05-17T17:20:01Z",
+      "side": 1,
+      "message": "Can the \"reference branch\" to be read first be manipulated? For the crazy projects that do not use \"master\", but instead use some other name (I\u0027m looking at you Ansible...)",
+      "revId": "7d446abec45fd43e2fee7a93b9c0d0f47e49548b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
