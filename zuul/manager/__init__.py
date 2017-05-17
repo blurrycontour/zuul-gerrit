@@ -47,7 +47,7 @@ class PipelineManager(object):
         self.sched = sched
         self.pipeline = pipeline
         self.event_filters = []
-        self.changeish_filters = []
+        self.ref_filters = []
 
     def __str__(self):
         return "<%s %s>" % (self.__class__.__name__, self.pipeline.name)
@@ -55,7 +55,7 @@ class PipelineManager(object):
     def _postConfig(self, layout):
         self.log.info("Configured Pipeline Manager %s" % self.pipeline.name)
         self.log.info("  Requirements:")
-        for f in self.changeish_filters:
+        for f in self.ref_filters:
             self.log.info("    %s" % f)
         self.log.info("  Events:")
         for e in self.event_filters:
@@ -295,7 +295,7 @@ class PipelineManager(object):
             return False
 
         if not ignore_requirements:
-            for f in self.changeish_filters:
+            for f in self.ref_filters:
                 if not f.matches(change):
                     self.log.debug("Change %s does not match pipeline "
                                    "requirement %s" % (change, f))
