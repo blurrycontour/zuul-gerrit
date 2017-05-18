@@ -19,10 +19,6 @@ import time
 
 from tests.base import ZuulTestCase, simple_layout, random_sha1
 
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s %(name)-32s '
-                    '%(levelname)-8s %(message)s')
-
 
 class TestGithubDriver(ZuulTestCase):
     config_file = 'zuul-github-driver.conf'
