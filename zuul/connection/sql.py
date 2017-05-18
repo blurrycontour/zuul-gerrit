@@ -42,6 +42,8 @@ class SQLConnection(BaseConnection):
             self.engine = sa.create_engine(self.dburi)
             self._migrate()
             self._setup_tables()
+            self.zuul_buildset_table, self.zuul_build_table \
+                = self._setup_tables()
             self.tables_established = True
         except sa.exc.NoSuchModuleError:
             self.log.exception(
@@ -67,10 +69,11 @@ class SQLConnection(BaseConnection):
 
             alembic.command.upgrade(config, 'head')
 
-    def _setup_tables(self):
+    @staticmethod
+    def _setup_tables():
         metadata = sa.MetaData()
 
-        self.zuul_buildset_table = sa.Table(
+        zuul_buildset_table = sa.Table(
             BUILDSET_TABLE, metadata,
             sa.Column('id', sa.Integer, primary_key=True),
             sa.Column('zuul_ref', sa.String(255)),
@@ -83,7 +86,7 @@ class SQLConnection(BaseConnection):
             sa.Column('message', sa.TEXT()),
         )
 
-        self.zuul_build_table = sa.Table(
+        zuul_build_table = sa.Table(
             BUILD_TABLE, metadata,
             sa.Column('id', sa.Integer, primary_key=True),
             sa.Column('buildset_id', sa.Integer,
@@ -97,6 +100,8 @@ class SQLConnection(BaseConnection):
             sa.Column('log_url', sa.String(255)),
             sa.Column('node_name', sa.String(255)),
         )
+
+        return zuul_buildset_table, zuul_build_table
 
 
 def getSchema():
