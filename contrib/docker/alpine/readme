@@ -1,0 +1,5 @@
+Building the container:
+
+Go to root of zuul workspace and execute:
+
+docker build -f contrib/docker/alpine/Dockerfile .
