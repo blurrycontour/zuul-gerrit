@@ -5,6 +5,7 @@
 .idea
 .test
 .testrepository
+.stestr
 .tox
 .venv
 AUTHORS
