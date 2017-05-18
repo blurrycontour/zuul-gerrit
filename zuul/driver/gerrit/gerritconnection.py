@@ -26,8 +26,9 @@ import pprint
 import voluptuous as v
 
 from zuul.connection import BaseConnection
-from zuul.model import TriggerEvent, Change, Ref
+from zuul.model import TriggerEvent, Ref
 from zuul import exceptions
+from zuul.driver.gerrit.gerritmodel import GerritChange
 
 
 # Walk the change dependency tree to find a cycle
@@ -316,7 +317,7 @@ class GerritConnection(BaseConnection):
         if change and not refresh:
             return change
         if not change:
-            change = Change(None)
+            change = GerritChange(None)
             change.number = number
             change.patchset = patchset
         key = '%s,%s' % (change.number, change.patchset)
