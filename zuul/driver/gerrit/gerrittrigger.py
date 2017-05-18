@@ -16,6 +16,7 @@ import logging
 import voluptuous as v
 from zuul.model import EventFilter
 from zuul.trigger import BaseTrigger
+from zuul.driver.gerrit.gerritfilters import GerritEventFilter
 
 
 class GerritTrigger(BaseTrigger):
@@ -47,7 +48,7 @@ class GerritTrigger(BaseTrigger):
             if not usernames:
                 usernames = toList(trigger.get('username_filter'))
             ignore_deletes = trigger.get('ignore-deletes', True)
-            f = EventFilter(
+            f = GerritEventFilter(
                 trigger=self,
                 types=toList(trigger['event']),
                 branches=toList(trigger.get('branch')),

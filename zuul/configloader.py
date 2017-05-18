@@ -740,24 +740,21 @@ class PipelineParser(object):
         pipeline.setManager(manager)
         layout.pipelines[conf['name']] = pipeline
 
-        if 'require' in conf or 'reject' in conf:
-            require = conf.get('require', {})
-            reject = conf.get('reject', {})
-            f = model.ChangeishFilter(
-                open=require.get('open'),
-                current_patchset=require.get('current-patchset'),
-                statuses=as_list(require.get('status')),
-                required_approvals=as_list(require.get('approval')),
-                reject_approvals=as_list(reject.get('approval'))
-            )
-            manager.changeish_filters.append(f)
+        for source_name, require_config in conf.get('require', {}).items():
+            source = connections.getSource(source_name)
+            manager.changeish.filters.extend(
+                source.getRequireFilters(require_config))
+
+        for source_name, reject_config in conf.get('reject', {}).items():
+            source = connections.getSource(source_name)
+            manager.changeish.filters.extend(
+                source.getRejectFilters(require_config))
 
         for trigger_name, trigger_config in conf.get('trigger').items():
             trigger = connections.getTrigger(trigger_name, trigger_config)
             pipeline.triggers.append(trigger)
-
-            manager.event_filters += trigger.getEventFilters(
-                conf['trigger'][trigger_name])
+            manager.event_filters.extend(
+                trigger.getEventFilters(conf['trigger'][trigger_name]))
 
         return pipeline
 

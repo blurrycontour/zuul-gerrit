@@ -15,6 +15,7 @@
 import logging
 from zuul.source import BaseSource
 from zuul.model import Project
+from zuul.driver.gerrit.gerritfilters import GerritRefFilter
 
 
 class GerritSource(BaseSource):
@@ -59,3 +60,18 @@ class GerritSource(BaseSource):
 
     def _getGitwebUrl(self, project, sha=None):
         return self.connection._getGitwebUrl(project, sha)
+
+    def getRequireFilters(self, config):
+        f = GerritRefFilter(
+            open=config.get('open'),
+            current_patchset=config.get('current-patchset'),
+            statuses=as_list(config.get('status')),
+            required_approvals=as_list(config.get('approval')),
+        )
+        return [f]
+
+    def getRejectFilters(self, config):
+        f = GerritRefFilter(
+            reject_approvals=as_list(config.get('approval')),
+        )
+        return [f]
