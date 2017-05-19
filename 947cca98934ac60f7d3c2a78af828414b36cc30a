@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff0f0b1f_a69b5dc7",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-05-19T19:04:58Z",
+      "side": 1,
+      "message": "\\o/ for a useful info log that should be relatively uncommon :)",
+      "revId": "947cca98934ac60f7d3c2a78af828414b36cc30a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
