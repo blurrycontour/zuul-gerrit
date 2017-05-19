@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "ff0f0b1f_7a0e008e",
+        "filename": "Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-05-19T17:17:36Z",
+      "side": 1,
+      "message": "So you mean something like this?\n\n if [ -f constrains.txt ]; then CONSTRAINTS\u003d\"-c constraints.txt\"; fi\n pip ... $CONSTRAINTS ...",
+      "parentUuid": "ff0f0b1f_45991e6c",
+      "revId": "c12078290905466a5b86b60b597e4985cfdc2bcd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff0f0b1f_259cea5b",
         "filename": "Dockerfile",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2017-05-19T15:52:40Z",
       "side": 1,
       "message": "Just curious, is there a well thought out reason for using -e here?",
+      "revId": "c12078290905466a5b86b60b597e4985cfdc2bcd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff0f0b1f_ba62583d",
+        "filename": "Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-05-19T17:17:36Z",
+      "side": 1,
+      "message": "To be honest, I have no clue why the heck I did that. I think this origins from my first steps with zuul (and python stuff) two years ago and I never questioned this line again.",
+      "parentUuid": "ff0f0b1f_259cea5b",
       "revId": "c12078290905466a5b86b60b597e4985cfdc2bcd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "ff0f0b1f_9af31474",
+        "filename": "Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-05-19T17:17:36Z",
+      "side": 1,
+      "message": "Good hint, thanks. Will have to read a bit about wheels.",
+      "parentUuid": "ff0f0b1f_05a326a0",
+      "revId": "c12078290905466a5b86b60b597e4985cfdc2bcd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff0f0b1f_e59dd257",
         "filename": "Dockerfile",
         "patchSetId": 2
@@ -64,6 +118,24 @@
       "writtenOn": "2017-05-19T15:52:40Z",
       "side": 1,
       "message": "This is a bit contradictory. -S means \"use a system UID in the range defined in /etc/login.defs\" and -u 1000 overrides that. That said, you are an \"application\" and not \"the system\" so you should not be using -S, as those are intended to be reserved for the OS.",
+      "revId": "c12078290905466a5b86b60b597e4985cfdc2bcd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff0f0b1f_ba95b8e6",
+        "filename": "Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-05-19T17:17:36Z",
+      "side": 1,
+      "message": "Copy\u0026paste issue, thanks",
+      "parentUuid": "ff0f0b1f_e59dd257",
       "revId": "c12078290905466a5b86b60b597e4985cfdc2bcd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
