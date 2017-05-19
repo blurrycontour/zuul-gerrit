@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff0f0b1f_10cc9f33",
+        "filename": "zuul/driver/github/githubmodel.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-05-19T00:52:32Z",
+      "side": 1,
+      "message": "I forget what \u0027state\u0027 means here, and I wonder if, since we\u0027re separating the two, we should pick a better term that more aligned with Github terms.\n\n*time passes*\n\nOh right, state is the review state, approved, comment, or request_changes. I\u0027m still not super happy with \"state\" here, and I\u0027ll give it some thought and conversation, but probably okay to keep it in for now.",
+      "revId": "511b204618236f83efde7fbc735cc1d1a08ca448",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
