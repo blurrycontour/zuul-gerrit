@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff0f0b1f_45991e6c",
+        "filename": "Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-05-19T15:52:40Z",
+      "side": 1,
+      "message": "Enhancement for later: Would really like to see upper-constraints support here. Building w/o them can be really frustrating as pypi moves under your feet.",
+      "revId": "c12078290905466a5b86b60b597e4985cfdc2bcd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff0f0b1f_259cea5b",
+        "filename": "Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-05-19T15:52:40Z",
+      "side": 1,
+      "message": "Just curious, is there a well thought out reason for using -e here?",
+      "revId": "c12078290905466a5b86b60b597e4985cfdc2bcd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff0f0b1f_05a326a0",
+        "filename": "Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-05-19T15:52:40Z",
+      "side": 1,
+      "message": "Since you\u0027re obviously not trying to make wheels work, you can pass --install-option\u003d\"--install-scripts\u003d/usr/bin\" and all the executables will be automatically installed in /usr/bin rather than in the venv. I mention wheels because using --install-* options disables wheels.",
+      "revId": "c12078290905466a5b86b60b597e4985cfdc2bcd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff0f0b1f_e59dd257",
+        "filename": "Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-05-19T15:52:40Z",
+      "side": 1,
+      "message": "This is a bit contradictory. -S means \"use a system UID in the range defined in /etc/login.defs\" and -u 1000 overrides that. That said, you are an \"application\" and not \"the system\" so you should not be using -S, as those are intended to be reserved for the OS.",
+      "revId": "c12078290905466a5b86b60b597e4985cfdc2bcd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff0f0b1f_c5ac0e8e",
+        "filename": "Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-05-19T15:52:40Z",
+      "side": 1,
+      "message": "Oh busybox. Why would I have a /home/zuul if I made a system user? :-P",
+      "revId": "c12078290905466a5b86b60b597e4985cfdc2bcd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
