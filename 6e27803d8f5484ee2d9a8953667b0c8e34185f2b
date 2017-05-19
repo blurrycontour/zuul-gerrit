@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff0f0b1f_bc02500a",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1520,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-19T20:43:07Z",
+      "side": 1,
+      "message": "I agree the keyword arguments make it look like these are optional, but in pracice, this is called in only one place and these are always supplied.  And I don\u0027t think this makes sense except in the context of a job+build.  So maybe we should just drop the initializers?",
+      "revId": "6e27803d8f5484ee2d9a8953667b0c8e34185f2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
