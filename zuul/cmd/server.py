@@ -88,7 +88,7 @@ class Server(zuul.cmd.ZuulApp):
         logging.basicConfig(level=logging.DEBUG)
         self.sched = zuul.scheduler.Scheduler(self.config,
                                               testonly=True)
-        self.configure_connections()
+        self.configure_connections(enable_sql=True)
         self.sched.registerConnections(self.connections, load=False)
         layout = self.sched.testConfig(self.config.get('zuul',
                                                        'layout_config'),
@@ -189,7 +189,7 @@ class Server(zuul.cmd.ZuulApp):
             listen_address=listen_address)
         rpc = zuul.rpclistener.RPCListener(self.config, self.sched)
 
-        self.configure_connections()
+        self.configure_connections(enable_sql=True)
         self.sched.setLauncher(gearman)
         self.sched.setMerger(merger)
 

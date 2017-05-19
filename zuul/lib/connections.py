@@ -20,7 +20,7 @@ import zuul.connection.smtp
 import zuul.connection.sql
 
 
-def configure_connections(config):
+def configure_connections(config, enable_sql=False):
     log = logging.getLogger("configure_connections")
     # Register connections from the config
 
@@ -50,6 +50,8 @@ def configure_connections(config):
             connections[con_name] = \
                 zuul.connection.smtp.SMTPConnection(con_name, con_config)
         elif con_driver == 'sql':
+            if not enable_sql:
+                continue
             connections[con_name] = \
                 zuul.connection.sql.SQLConnection(con_name, con_config)
         else:
