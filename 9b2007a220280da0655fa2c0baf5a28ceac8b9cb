@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff0f0b1f_eb77e039",
+        "filename": "zuul/ansible/library/command.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 338,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-05-19T18:49:34Z",
+      "side": 1,
+      "message": "Shouldn\u0027t stderr handled similar?",
+      "range": {
+        "startLine": 338,
+        "startChar": 8,
+        "endLine": 338,
+        "endChar": 19
+      },
+      "revId": "9b2007a220280da0655fa2c0baf5a28ceac8b9cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
