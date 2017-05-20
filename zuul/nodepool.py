@@ -13,14 +13,39 @@
 import logging
 
 from zuul import model
+import re
 
 
 class Nodepool(object):
     log = logging.getLogger('zuul.nodepool')
+    node_section_re = re.compile('node "(.*?)"')
 
     def __init__(self, scheduler):
         self.requests = {}
         self.sched = scheduler
+        self.static_nodes = {}
+
+        config = self.sched.config
+        def get_config_default(section, option, default):
+            if config.has_option(section, option):
+                return config.get(section, option)
+            return default
+        for section in config.sections():
+            m = self.node_section_re.match(section)
+            if m:
+                nodename = m.group(1)
+                d = {}
+                d['name'] = nodename
+                d['host'] = config.get(section, 'host')
+                d['host_key'] = config.get(section, 'host_key')
+                d['description'] = get_config_default(section,
+                                                      'description', '')
+                if config.has_option(section, 'labels'):
+                    d['labels'] = config.get(section, 'labels').split(',')
+                else:
+                    d['labels'] = []
+                self.static_nodes[nodename] = d
+
 
     def requestNodes(self, build_set, job):
         # Create a copy of the nodeset to represent the actual nodes
@@ -29,9 +54,21 @@ class Nodepool(object):
         req = model.NodeRequest(self.sched.hostname, build_set, job, nodeset)
         self.requests[req.uid] = req
 
-        self.sched.zk.submitNodeRequest(req, self._updateNodeRequest)
-        # Logged after submission so that we have the request id
-        self.log.info("Submited node request %s" % (req,))
+        # Check if static node defined
+        static = [n for n in req.nodeset.getNodes() if n.image in self.static_nodes]
+        if static:
+            static_node = self.static_nodes[static[0].image]
+            req._state = model.STATE_FULFILLED
+            static[0].id = "STATICID"
+            static[0].interface_ip = static_node["host"]
+            static[0].host_keys = [static_node["host_key"]]
+            req.nodes = [static[0]]
+            self.log.info("Using static node %s %s" % (static_node, req.nodes))
+            self._updateNodeRequest(req, False)
+        else:
+            self.sched.zk.submitNodeRequest(req, self._updateNodeRequest)
+            # Logged after submission so that we have the request id
+            self.log.info("Submited node request %s" % (req,))
 
         return req
 
