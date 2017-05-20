@@ -13,6 +13,7 @@
 # under the License.
 
 
+from six.moves import configparser as ConfigParser
 import time
 
 import zuul.zk
@@ -44,6 +45,7 @@ class TestNodepool(BaseTestCase):
         self.provisioned_requests = []
         # This class implements the scheduler methods zuul.nodepool
         # needs, so we pass 'self' as the scheduler.
+        self.config = ConfigParser.ConfigParser()
         self.nodepool = zuul.nodepool.Nodepool(self)
 
         self.fake_nodepool = FakeNodepool(
