@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff0f0b1f_bb892ccb",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-20T14:21:52Z",
+      "side": 1,
+      "message": "nit: This is much shorter as: getattr(item.change, \u0027number\u0027, \u0027\u0027)",
+      "revId": "ebb54ef32294ebba6e6bddaabf1efb16ba8a0655",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
