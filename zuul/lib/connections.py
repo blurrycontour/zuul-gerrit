@@ -78,7 +78,7 @@ class ConnectionRegistry(object):
         for driver in self.drivers.values():
             driver.stop()
 
-    def configure(self, config):
+    def configure(self, config, enable_sql=False):
         # Register connections from the config
         connections = {}
 
@@ -98,6 +98,9 @@ class ConnectionRegistry(object):
             if con_driver not in self.drivers:
                 raise Exception("Unknown driver, %s, for connection %s"
                                 % (con_config['driver'], con_name))
+
+            if con_driver == 'sql' and not enable_sql:
+                continue
 
             driver = self.drivers[con_driver]
             connection = driver.getConnection(con_name, con_config)

@@ -173,7 +173,7 @@ class Scheduler(zuul.cmd.ZuulApp):
             listen_address=listen_address)
         rpc = zuul.rpclistener.RPCListener(self.config, self.sched)
 
-        self.configure_connections()
+        self.configure_connections(enable_sql=True)
         self.sched.setExecutor(gearman)
         self.sched.setMerger(merger)
         self.sched.setNodepool(nodepool)
