@@ -953,6 +953,11 @@ class AnsibleJob(object):
                 hostname=self.executor_server.hostname,
                 src_root=self.jobdir.src_root,
                 log_root=self.jobdir.log_root)
+            # Add legacy ZUUL_ environment variables
+            zuul_vars['zuul']['env'] = {}
+            for k, v in args.items():
+                if k.startswith("ZUUL_"):
+                    zuul_vars['zuul']['env'][k] = v
             vars_yaml.write(
                 yaml.safe_dump(zuul_vars, default_flow_style=False))
         self.writeAnsibleConfig(self.jobdir.untrusted_config)
