@@ -1869,7 +1869,7 @@ class ZuulTestCase(BaseTestCase):
 
         # Register connections from the config using fakes
         self.connections = zuul.lib.connections.ConnectionRegistry()
-        self.connections.configure(self.config)
+        self.connections.configure(self.config, enable_sql=True)
 
     def setup_config(self):
         # This creates the per-test configuration object.  It can be
