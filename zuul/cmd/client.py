@@ -17,14 +17,18 @@
 import argparse
 import babel.dates
 import datetime
+import json
 import logging
 import prettytable
 import sys
+import urllib.parse
+import urllib.request
 import time
 
 
 import zuul.rpcclient
 import zuul.cmd
+import zuul.web
 from zuul.lib.config import get_default
 
 
@@ -38,6 +42,8 @@ class Client(zuul.cmd.ZuulApp):
                             help='specify the config file')
         parser.add_argument('-v', dest='verbose', action='store_true',
                             help='verbose output')
+        parser.add_argument('--web', default='127.0.0.1',
+                            help='the zuul-web host')
         parser.add_argument('--version', dest='version', action='version',
                             version=self._get_version(),
                             help='show zuul version')
@@ -107,6 +113,19 @@ class Client(zuul.cmd.ZuulApp):
         # TODO: add filters such as queue, project, changeid etc
         show_running_jobs.set_defaults(func=self.show_running_jobs)
 
+        show_jobs = show_subparsers.add_parser('jobs', help='show the jobs')
+        for filter_name in zuul.web.JobsController.filters:
+            show_jobs.add_argument('--%s' % filter_name, action='append',
+                                   help="filter by %s" % filter_name)
+        show_jobs.set_defaults(func=self.show_jobs)
+
+        show_builds = show_subparsers.add_parser('builds',
+                                                 help='show the builds')
+        for filter_name in zuul.web.JobsController.filters:
+            show_builds.add_argument('--%s' % filter_name, action='append',
+                                     help="filter by %s" % filter_name)
+        show_builds.set_defaults(func=self.show_builds)
+
         self.args = parser.parse_args()
         if self.args.func == self.enqueue_ref:
             if self.args.oldrev == self.args.newrev:
@@ -127,6 +146,8 @@ class Client(zuul.cmd.ZuulApp):
         self.ssl_key = get_default(self.config, 'gearman', 'ssl_key')
         self.ssl_cert = get_default(self.config, 'gearman', 'ssl_cert')
         self.ssl_ca = get_default(self.config, 'gearman', 'ssl_ca')
+        self.weburl = "http://%s:%s" % (
+            self.args.web, get_default(self.config, 'web', 'port', 9000))
 
         if self.args.func():
             sys.exit(0)
@@ -198,6 +219,39 @@ class Client(zuul.cmd.ZuulApp):
                 table.add_row(values)
         print(table)
         return True
+
+    def print_job_controller(self, path, fields):
+        params = []
+        for filter_name in zuul.web.JobsController.filters:
+            if getattr(self.args, filter_name):
+                for param in getattr(self.args, filter_name):
+                    params.append((filter_name, param))
+        url = "%s%s%s" % (self.weburl, path, urllib.parse.urlencode(params))
+        self.log.info("Fetching %s" % url)
+        try:
+            with urllib.request.urlopen(url) as f:
+                jobs = json.loads(f.read().decode('utf-8'))
+        except:
+            self.log.exception("Couldn't fetch %s" % url)
+            sys.exit(1)
+        table = prettytable.PrettyTable(field_names=fields)
+        for job in jobs:
+            values = []
+            for field in fields:
+                values.append(job[field])
+            table.add_row(values)
+        print(table)
+        return True
+
+    def show_jobs(self):
+        return self.print_job_controller(
+            "/jobs?", ["name", "status", "count", "lastDuration",
+                       "lastSuccess", "lastFailure"])
+
+    def show_builds(self):
+        return self.print_job_controller(
+            "/builds?", ["job_name", "project", "change", "pipeline",
+                         "duration", "result", "score", "log_url", "end_time"])
 
     def _epoch_to_relative_time(self, epoch):
         if epoch:
