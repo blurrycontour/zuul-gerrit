@@ -663,6 +663,9 @@ class Scheduler(threading.Thread):
         self.log.debug("Adding complete event for build: %s result: %s" % (
             build, result))
         build.end_time = time.time()
+        # Ensure start_time is set when onBuildStarted wasn't called
+        if build.start_time is None:
+            build.start_time = build.end_time
         # Note, as soon as the result is set, other threads may act
         # upon this, even though the event hasn't been fully
         # processed.  Ensure that any other data from the event (eg,
