@@ -64,6 +64,7 @@ class Repo(object):
                                                       self.local_path))
             git.Repo.clone_from(self.remote_url, self.local_path)
         repo = git.Repo(self.local_path)
+        self.log.debug("Created git repo object 0x%x %s" % (id(repo), repr(repo)))
         with repo.config_writer() as config_writer:
             if self.email:
                 config_writer.set_value('user', 'email', self.email)
@@ -78,6 +79,7 @@ class Repo(object):
     def createRepoObject(self):
         self._ensure_cloned()
         repo = git.Repo(self.local_path)
+        self.log.debug("Created git repo object 0x%x %s" % (id(repo), repr(repo)))
         return repo
 
     def reset(self):

@@ -134,6 +134,8 @@ class GerritChangeReference(git.Reference):
 
 
 class FakeGerritChange(object):
+    log = logging.getLogger("zuul.test.FakeGerritChange")
+
     categories = {'approved': ('Approved', -1, 1),
                   'code-review': ('Code-Review', -2, 2),
                   'verified': ('Verified', -2, 2)}
@@ -181,6 +183,7 @@ class FakeGerritChange(object):
     def addFakeChangeToRepo(self, msg, files, large):
         path = os.path.join(self.upstream_root, self.project)
         repo = git.Repo(path)
+        self.log.debug("Created git repo object 0x%x %s" % (id(repo), repr(repo)))
         ref = GerritChangeReference.create(
             repo, '1/%s/%s' % (self.number, self.latest_patchset),
             'refs/tags/init')
@@ -311,6 +314,7 @@ class FakeGerritChange(object):
     def getRefUpdatedEvent(self):
         path = os.path.join(self.upstream_root, self.project)
         repo = git.Repo(path)
+        self.log.debug("Created git repo object 0x%x %s" % (id(repo), repr(repo)))
         oldrev = repo.heads[self.branch].commit.hexsha
 
         event = {
@@ -439,6 +443,7 @@ class FakeGerritChange(object):
 
         path = os.path.join(self.upstream_root, self.project)
         repo = git.Repo(path)
+        self.log.debug("Created git repo object 0x%x %s" % (id(repo), repr(repo)))
         repo.heads[self.branch].commit = \
             repo.commit(self.patchsets[-1]['revision'])
 
@@ -545,6 +550,7 @@ class GithubChangeReference(git.Reference):
 
 
 class FakeGithubPullRequest(object):
+    log = logging.getLogger("zuul.test.FakeGithubPullRequest")
 
     def __init__(self, github, number, project, branch,
                  subject, upstream_root, files=[], number_of_commits=1):
@@ -714,7 +720,9 @@ class FakeGithubPullRequest(object):
 
     def _getRepo(self):
         repo_path = os.path.join(self.upstream_root, self.project)
-        return git.Repo(repo_path)
+        repo = git.Repo(repo_path)
+        self.log.debug("Created git repo object 0x%x %s" % (id(repo), repr(repo)))
+        return repo
 
     def _createPRRef(self):
         repo = self._getRepo()
@@ -934,6 +942,8 @@ class BuildHistory(object):
 
 
 class FakeURLOpener(object):
+    log = logging.getLogger("zuul.test.FakeURLOpener")
+
     def __init__(self, upstream_root, url):
         self.upstream_root = upstream_root
         self.url = url
@@ -948,6 +958,7 @@ class FakeURLOpener(object):
                 'shallow no-progress include-tag multi_ack_detailed no-done\n')
         path = os.path.join(self.upstream_root, project)
         repo = git.Repo(path)
+        self.log.debug("Created git repo object 0x%x %s" % (id(repo), repr(repo)))
         for ref in repo.refs:
             r = ref.object.hexsha + ' ' + ref.path + '\n'
             ret += '%04x%s' % (len(r) + 4, r)
@@ -1096,6 +1107,7 @@ class FakeBuild(object):
             except NoSuchPathError as e:
                 self.log.debug('%s' % e)
                 return False
+            self.log.debug("Created git repo object 0x%x %s" % (id(repo), repr(repo)))
             ref = self.parameters['ZUUL_REF']
             repo_messages = [c.message.strip() for c in repo.iter_commits(ref)]
             commit_message = '%s-1' % change.subject
@@ -2037,7 +2049,7 @@ class ZuulTestCase(BaseTestCase):
         gc.collect()
         for obj in gc.get_objects():
             if isinstance(obj, git.Repo):
-                self.log.debug("Leaked git repo object: %s" % repr(obj))
+                self.log.debug("Leaked git repo object: %s %s" % (id(obj), repr(obj)))
                 repos.append(obj)
         self.assertEqual(len(repos), 0)
         self.assertEmptyQueues()
@@ -2090,6 +2102,7 @@ class ZuulTestCase(BaseTestCase):
             os.makedirs(path)
         path = os.path.join(self.upstream_root, project)
         repo = git.Repo.init(path)
+        self.log.debug("Created git repo object 0x%x %s" % (id(repo), repr(repo)))
 
         with repo.config_writer() as config_writer:
             config_writer.set_value('user', 'email', 'user@example.com')
@@ -2107,6 +2120,7 @@ class ZuulTestCase(BaseTestCase):
     def create_branch(self, project, branch):
         path = os.path.join(self.upstream_root, project)
         repo = git.Repo.init(path)
+        self.log.debug("Created git repo object 0x%x %s" % (id(repo), repr(repo)))
         fn = os.path.join(path, 'README')
 
         branch_head = repo.create_head(branch)
@@ -2124,6 +2138,7 @@ class ZuulTestCase(BaseTestCase):
     def create_commit(self, project):
         path = os.path.join(self.upstream_root, project)
         repo = git.Repo(path)
+        self.log.debug("Created git repo object 0x%x %s" % (id(repo), repr(repo)))
         repo.head.reference = repo.heads['master']
         file_name = os.path.join(path, 'README')
         with open(file_name, 'a') as f:
@@ -2443,6 +2458,7 @@ class ZuulTestCase(BaseTestCase):
                         branch='master', tag=None):
         path = os.path.join(self.upstream_root, project)
         repo = git.Repo(path)
+        self.log.debug("Created git repo object 0x%x %s" % (id(repo), repr(repo)))
         repo.head.reference = branch
         zuul.merger.merger.reset_repo_to_head(repo)
         for fn, content in files.items():

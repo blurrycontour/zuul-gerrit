@@ -602,7 +602,7 @@ class AnsibleJob(object):
                 os.path.join(self.jobdir.src_root,
                              source.canonical_hostname,
                              project['name']))
-
+            self.log.debug("Created git repo object 0x%x %s" % (id(repo), repr(repo)))
             repo.remotes.origin.config_writer.set('url', url)
             repos.append(repo)
 
