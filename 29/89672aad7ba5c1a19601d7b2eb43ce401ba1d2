@@ -1,0 +1,12 @@
+Code-Review+2: Clark Boylan <cboylan@sapwetik.org>
+Code-Review+1: Jesse Keating <omgjlk@us.ibm.com>
+Code-Review+1: Jamie Lennox <jamielennox@gmail.com>
+Verified+1: Zuul
+Code-Review+2: Clint 'SpamapS' Byrum <clint@fewbar.com>
+Workflow+1: Clint 'SpamapS' Byrum <clint@fewbar.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Mon, 22 May 2017 22:42:02 +0000
+Reviewed-on: https://review.openstack.org/461849
+Project: openstack-infra/zuul
+Branch: refs/heads/feature/zuulv3
