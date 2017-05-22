@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff0f0b1f_72e26aa2",
+        "filename": "tests/base.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2053,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-05-22T22:21:30Z",
+      "side": 1,
+      "message": "You may also want to log https://docs.python.org/3/library/gc.html#gc.get_referrers and cross check against https://docs.python.org/3/library/gc.html#gc.garbage",
+      "revId": "74caf3bab0a7d708deb9d41016ee00c743247af4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
