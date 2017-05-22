@@ -17,3 +17,4 @@ babel>=1.0
 six>=1.6.0
 sqlalchemy
 alembic
+cryptography

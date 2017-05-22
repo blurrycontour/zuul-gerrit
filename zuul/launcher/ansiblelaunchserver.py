@@ -35,6 +35,7 @@ import zmq
 
 import zuul.ansible.library
 from zuul.lib import commandsocket
+from zuul.lib import jenkins
 
 ANSIBLE_WATCHDOG_GRACE = 5 * 60
 ANSIBLE_DEFAULT_TIMEOUT = 2 * 60 * 60
@@ -176,6 +177,12 @@ class LaunchServer(object):
         else:
             self.accept_nodes = True
         self.config_accept_nodes = self.accept_nodes
+
+        if self.config.has_option('launcher', 'jenkins_secrets'):
+            self.secrets = jenkins.decrypt(self.config.get('launcher',
+                                                           'jenkins_secrets'))
+        else:
+            self.secrets = {}
 
         if self.config.has_option('zuul', 'state_dir'):
             state_dir = os.path.expanduser(
@@ -491,7 +498,7 @@ class LaunchServer(object):
                             self.hostname, self.zmq_send_queue,
                             self.termination_queue, self.keep_jobdir,
                             self.library_dir, self.pre_post_library_dir,
-                            self.options)
+                            self.options, self.secrets)
         self.node_workers[worker.name] = worker
 
         worker.thread = threading.Thread(target=worker.run)
@@ -572,13 +579,14 @@ class NodeWorker(object):
     def __init__(self, config, jobs, builds, sites, name, host,
                  description, labels, manager_name, zmq_send_queue,
                  termination_queue, keep_jobdir, library_dir,
-                 pre_post_library_dir, options):
+                 pre_post_library_dir, options, secrets):
         self.log = logging.getLogger("zuul.NodeWorker.%s" % (name,))
         self.log.debug("Creating node worker %s" % (name,))
         self.config = config
         self.jobs = jobs
         self.builds = builds
         self.sites = sites
+        self.secrets = secrets
         self.name = name
         self.host = host
         self.description = description
@@ -1185,7 +1193,7 @@ class NodeWorker(object):
         return tasks
 
     def _makeBuilderTask(self, jobdir, builder, parameters, sequence,
-                         console_path):
+                         env, console_path):
         tasks = []
         script_fn = '%02d-%s.sh' % (sequence, str(uuid.uuid4().hex))
         script_path = os.path.join(jobdir.script_root, script_fn)
@@ -1204,7 +1212,7 @@ class NodeWorker(object):
 
         task = dict(command=remote_path)
         task['name'] = 'command generated from JJB'
-        task['environment'] = "{{ zuul.environment }}"
+        task['environment'] = env
         task['args'] = dict(chdir=parameters['WORKSPACE'],
                             console_path=console_path)
         tasks.append(task)
@@ -1213,6 +1221,50 @@ class NodeWorker(object):
                         state='absent')
         task = dict(file=filetask)
         tasks.append(task)
+
+        return tasks
+
+    def _makeSecretTask(self, jobdir, wrapper, parameters, env, post_tasks):
+        tasks = []
+        secrets_path = os.path.join(jobdir.root, "secrets")
+        if not os.path.isdir(secrets_path):
+            os.mkdir(secrets_path, 0o700)
+
+        for binding in wrapper["credentials-binding"]:
+            if 'text' in binding:
+                secret = self.secrets[binding['text']['credential-id']]
+                env[binding['text']['variable']] = secret['secret']
+                self.used_secrets.append(secret['secret'])
+            elif 'file' in binding:
+                # Write secret locally
+                secret = self.secrets[binding['file']['credential-id']]
+                secret_path = os.path.join(secrets_path,
+                                           secret['fileName'])
+                with open(secret_path, 'wb') as secret_file:
+                    secret_file.write(secret["content"])
+
+                # Copy secret to slave
+                if secret['fileName'][0] != '.':
+                    secret['fileName'] = ".%s" % secret['fileName']
+                remote_path = os.path.join(parameters['WORKSPACE'],
+                                           secret['fileName'])
+                copy = dict(src=secret_path,
+                            dest=remote_path)
+                task = dict(copy=copy)
+                tasks.append(task)
+
+                # Ensure secret is removed
+                filetask = dict(path=remote_path,
+                                state='absent')
+                task = dict(file=filetask)
+                post_tasks.append(task)
+                filetask = dict(path=secret_path,
+                                state='absent')
+                task = dict(file=filetask,
+                            delegate_to='127.0.0.1')
+                post_tasks.append(task)
+
+                env[binding['file']['variable']] = remote_path
 
         return tasks
 
@@ -1313,15 +1365,31 @@ class NodeWorker(object):
 
         with open(jobdir.playbook, 'w') as playbook:
             tasks = []
+            post_tasks = []
 
+            env = {}
+            self.used_secrets = []
+            for wrapper in jjb_job.get('wrappers', []):
+                if 'credentials-binding' in wrapper:
+                    tasks.extend(
+                        self._makeSecretTask(jobdir, wrapper, parameters,
+                                             env, post_tasks))
+            env.update(parameters)
             sequence = 0
             for builder in jjb_job.get('builders', []):
                 if 'shell' in builder:
                     sequence += 1
                     tasks.extend(
                         self._makeBuilderTask(jobdir, builder, parameters,
-                                              sequence, console_path))
+                                              sequence, env, console_path))
 
+            if post_tasks:
+                tasks.extend(post_tasks)
+                # Also ensure post_tasks are executed if block failed
+                post_tasks.append(dict(fail=dict(msg='FAILURE')))
+                for task in tasks:
+                    if "always" in task:
+                        task["rescue"] = post_tasks
             play = dict(hosts='node', name='Job body', tasks=tasks)
             playbook.write(yaml.safe_dump([play], default_flow_style=False))
 
@@ -1515,6 +1583,15 @@ class NodeWorker(object):
             verbose = '-vvv'
         else:
             verbose = '-v'
+
+        # Remove secrets from playbook
+        if self.used_secrets:
+            with open(jobdir.playbook, 'r') as playbook:
+                playbook_content = playbook.read()
+            with open(jobdir.playbook, 'w') as playbook:
+                for secret in self.used_secrets:
+                    playbook_content = playbook_content.replace(secret, 'XXXX')
+                playbook.write(playbook_content)
 
         cmd = ['ansible-playbook', jobdir.post_playbook,
                '-e', 'success=%s' % success,
