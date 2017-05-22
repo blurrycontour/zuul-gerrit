@@ -7,6 +7,9 @@ echo "Destination: $DEST_DIR"
 echo "Fetching jquery.min.js..."
 curl -L --silent http://code.jquery.com/jquery.min.js > $DEST_DIR/jquery.min.js
 
+echo "Fetching angular.min.js..."
+curl -L --silent https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js > $DEST_DIR/angular.min.js
+
 echo "Fetching jquery-visibility.min.js..."
 curl -L --silent https://raw.githubusercontent.com/mathiasbynens/jquery-visibility/master/jquery-visibility.js > $DEST_DIR/jquery-visibility.js
 
