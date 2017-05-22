@@ -23,6 +23,8 @@ import uvloop
 import aiohttp
 from aiohttp import web
 
+from sqlalchemy.sql import select
+
 import zuul.rpcclient
 
 
@@ -138,22 +140,128 @@ class LogStreamingHandler(object):
         return ws
 
 
+class JobsController(object):
+    def __init__(self, sql_connections):
+        self.sql_connections = sql_connections
+
+    def jobInfo(self, job_name):
+        """Return all the job executions information"""
+        job = {'name': job_name, 'runs': []}
+        for connection in self.sql_connections.values():
+            with connection.engine.begin() as conn:
+                build = connection.zuul_build_table
+                buildset = connection.zuul_buildset_table
+                stm = select([
+                    build.c.id,
+                    buildset.c.pipeline,
+                    buildset.c.project,
+                    buildset.c.change,
+                    buildset.c.patchset,
+                    buildset.c.ref,
+                    buildset.c.score,
+                    build.c.start_time,
+                    build.c.end_time,
+                    build.c.log_url,
+                    build.c.node_name]).\
+                    where(build.c.job_name == job_name).\
+                    where(build.c.buildset_id == buildset.c.id)
+
+                for row in conn.execute(stm):
+                    run = dict(row)
+                    # Convert date to iso format
+                    run['start_time'] = row.start_time.strftime(
+                        '%Y-%m-%dT%H:%M:%S')
+                    run['end_time'] = row.end_time.strftime(
+                        '%Y-%m-%dT%H:%M:%S')
+                    # Compute run duration
+                    run['duration'] = (row.end_time -
+                                       row.start_time).total_seconds()
+                    job['runs'].append(run)
+        return job
+
+    def jobLists(self):
+        # Return list of job similar to jenkins dashboard
+        jobs = {}
+        for connection in self.sql_connections.values():
+            with connection.engine.begin() as conn:
+                for row in conn.execute(connection.zuul_build_table.select()):
+                    name, end, res = row.job_name, row.end_time, row.result
+                    # Add new job to the list
+                    if name not in jobs:
+                        jobs[name] = {
+                            'lastSuccess': end if res == 'SUCCESS' else None,
+                            'lastFailure': end if res == 'FAILURE' else None,
+                            'lastRun': end,
+                            'lastStatus': res,
+                            'lastDuration': end - row.start_time,
+                            'count': 0
+                        }
+                    # Update job build information if relevant
+                    elif res == 'SUCCESS' and (
+                            not jobs[name]['lastSuccess'] or
+                            jobs[name]['lastSuccess'] < end):
+                        jobs[name]['lastSuccess'] = end
+                    elif res == 'FAILURE' and (
+                            not jobs[name]['lastFailure'] or
+                            jobs[name]['lastFailure'] < end):
+                        jobs[name]['lastFailure'] = end
+                    if jobs[name]['lastRun'] < end:
+                        jobs[name]['lastRun'] = end
+                        jobs[name]['lastStatus'] = res
+                    jobs[name]['count'] += 1
+
+        jobs_list = []
+        for job_name in sorted(jobs.keys()):
+            job = jobs[job_name]
+            jobs_list.append({
+                'name': job_name,
+                'status': job['lastStatus'],
+                'count': job['count'],
+                'lastSuccess': job['lastSuccess'].strftime(
+                    '%Y-%m-%dT%H:%M:%S') if job['lastSuccess'] else None,
+                'lastFailure': job['lastFailure'].strftime(
+                    '%Y-%m-%dT%H:%M:%S') if job['lastFailure'] else None,
+                'lastDuration': job['lastDuration'].total_seconds()})
+        return jobs_list
+
+    async def processRequest(self, request):
+        try:
+            if request.match_info["name"]:
+                data = self.jobInfo(request.match_info["name"])
+            else:
+                data = self.jobLists()
+            resp = web.json_response(data)
+        except Exception as e:
+            self.log.exception("Jobs exception:")
+            resp = web.json_response({'error_description': 'Internal error'},
+                                     status=500)
+        return resp
+
+
 class ZuulWeb(object):
 
     log = logging.getLogger("zuul.web.ZuulWeb")
 
     def __init__(self, gear_server='127.0.0.1', gear_port=4730,
-                 listen_address='127.0.0.1', listen_port=9000):
+                 listen_address='127.0.0.1', listen_port=9000,
+                 sql_connections={}):
         self.gear_server = gear_server
         self.gear_port = gear_port
         self.listen_address = listen_address
         self.listen_port = listen_port
+        if sql_connections:
+            self.jobs_controller = JobsController(sql_connections)
+        else:
+            self.jobs_controller = None
 
     async def _handleWebsocket(self, request):
         handler = LogStreamingHandler(self.event_loop,
                                       self.gear_server,
                                       self.gear_port)
         return await handler.processRequest(request)
+
+    async def _handleJobs(self, request):
+        return await self.jobs_controller.processRequest(request)
 
     def run(self, loop=None):
         '''
@@ -169,6 +277,8 @@ class ZuulWeb(object):
         routes = [
             ('GET', '/console-stream', self._handleWebsocket)
         ]
+        if self.jobs_controller:
+            routes.append(('GET', '/jobs/{name:.*}', self._handleJobs))
 
         self.log.debug("ZuulWeb starting")
         asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())

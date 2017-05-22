@@ -26,6 +26,8 @@ import threading
 import zuul.cmd
 import zuul.web
 
+from zuul.driver.sql import sqlconnection
+
 # as of python-daemon 1.6 it doesn't bundle pidlockfile anymore
 # instead it depends on lockfile-0.9.1 which uses pidfile.
 pid_file_module = extras.try_imports(['daemon.pidlockfile', 'daemon.pidfile'])
@@ -61,6 +63,11 @@ class WebServer(zuul.cmd.ZuulApp):
         if self.config.has_option('web', 'port'):
             params['listen_port'] = self.config.get('web', 'port')
 
+        params['sql_connections'] = {}
+        for conn_name, connection in self.connections.connections.items():
+            if isinstance(connection, sqlconnection.SQLConnection):
+                params['sql_connections'][conn_name] = connection
+
         try:
             self.web = zuul.web.ZuulWeb(**params)
         except Exception as e:
@@ -91,6 +98,8 @@ class WebServer(zuul.cmd.ZuulApp):
     def main(self):
         self.setup_logging('web', 'log_config')
         self.log = logging.getLogger("zuul.WebServer")
+
+        self.configure_connections()
 
         try:
             self._main()
