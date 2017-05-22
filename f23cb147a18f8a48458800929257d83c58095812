@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff0f0b1f_ec0b417a",
+        "filename": "contrib/docker/alpine/Dockerfile",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-05-22T21:08:05Z",
+      "side": 1,
+      "message": "Why is pytz being installed on it\u0027s own? Is it not properly listed as a requirement of zuul?",
+      "revId": "f23cb147a18f8a48458800929257d83c58095812",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff0f0b1f_2cc93925",
+        "filename": "contrib/docker/alpine/Dockerfile",
+        "patchSetId": 3
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-05-22T21:08:05Z",
+      "side": 1,
+      "message": "There\u0027s no real need to activate here, just call the full path to python3 in the virtualenv, and that will ensure the environment is set up right for the setup.py call.",
+      "revId": "f23cb147a18f8a48458800929257d83c58095812",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
