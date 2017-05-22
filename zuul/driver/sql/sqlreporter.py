@@ -14,6 +14,7 @@
 
 import datetime
 import logging
+import time
 import voluptuous as v
 
 from zuul.reporter import BaseReporter
@@ -63,6 +64,11 @@ class SQLReporter(BaseReporter):
                     # stats about builds. It doesn't understand how to store
                     # information about the change.
                     continue
+                # Ensure start_time/end_time are float
+                if not build.start_time:
+                    build.start_time = time.time()
+                if not build.end_time:
+                    build.end_time = time.time()
 
                 (result, url) = item.formatJobResult(job)
 
