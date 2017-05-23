@@ -287,18 +287,21 @@ class ExecutorClient(object):
         params['vars']['zuul'] = zuul_params
         projects = set()
 
-        def make_project_dict(project):
+        def make_project_dict(project, override_branch=None):
             project_config = item.current_build_set.layout.project_configs.get(
                 project.canonical_name, None)
             connection = project.source.connection
             return dict(connection=connection.connection_name,
                         name=project.name,
+                        override_branch=override_branch,
                         default_branch=project_config.default_branch))
 
         if job.repos:
-            for repo in job.repos:
-                (trusted, project) = tenant.getProject(repo)
-                params['projects'].append(make_project_dict(project))
+            for job_project in job.repos:
+                project = job_project.project
+                params['projects'].append(
+                    make_project_dict(project,
+                                      job_project.override_branch))
                 projects.add(project)
         for item in all_items:
             if item.change.project not in projects:
