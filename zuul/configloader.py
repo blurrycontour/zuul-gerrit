@@ -227,6 +227,9 @@ class JobParser(object):
 
         role = vs.Any(zuul_role, galaxy_role)
 
+        repo = {vs.Required('name'): str,
+                'override-branch': str}
+
         job = {vs.Required('name'): str,
                'parent': str,
                'queue-name': str,
@@ -251,7 +254,7 @@ class JobParser(object):
                '_source_context': model.SourceContext,
                '_start_mark': yaml.Mark,
                'roles': to_list(role),
-               'repos': to_list(str),
+               'repos': to_list(vs.Any(repo, str)),
                'vars': dict,
                'dependencies': to_list(str),
                'allowed-projects': to_list(str),
@@ -364,9 +367,20 @@ class JobParser(object):
             job.nodeset = ns
 
         if 'repos' in conf:
-            # Accumulate repos in a set so that job inheritance
-            # is additive.
-            job.repos = job.repos.union(set(conf.get('repos', [])))
+            new_repos = {}
+            repos = as_list(conf.get('repos', []))
+            for repo in repos:
+                if isinstance(repo, dict):
+                    repo_name = repo['name']
+                    repo_override_branch = repo.get('override-branch')
+                else:
+                    repo_name = repo
+                    repo_override_branch = None
+                (trusted, project) = tenant.getProject(repo_name)
+                if project is None:
+                    raise Exception("Unknown project %s" % (repo_name,))
+                new_repos[repo_name] = job_project
+            job.updateRepos(new_repos)
 
         tags = conf.get('tags')
         if tags:
