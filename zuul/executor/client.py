@@ -296,8 +296,8 @@ class ExecutorClient(object):
                         override_branch=override_branch,
                         default_branch=project_config.default_branch))
 
-        if job.repos:
-            for job_project in job.repos:
+        if job.projects:
+            for job_project in job.projects:
                 project = job_project.project
                 params['projects'].append(
                     make_project_dict(project,

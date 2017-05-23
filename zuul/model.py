@@ -771,7 +771,7 @@ class Job(object):
             attempts=3,
             final=False,
             roles=frozenset(),
-            repos={},
+            required_projects={},
             allowed_projects=None,
         )
 
@@ -837,10 +837,10 @@ class Job(object):
         Job._deepUpdate(v, other_vars)
         self.variables = v
 
-    def updateRepos(self, other_repos):
-        repos = self.repos
-        Job._deepUpdate(repos, other_repos)
-        self.repos = repos
+    def updateProjects(self, other_projects):
+        required_projects = self.required_projects
+        Job._deepUpdate(required_projects, other_projects)
+        self.required_projects = required_projects
 
     @staticmethod
     def _deepUpdate(a, b):
@@ -894,7 +894,7 @@ class Job(object):
                                         repr(self), k, other._get(k),
                                         repr(other)))
                 if k not in set(['pre_run', 'post_run', 'roles', 'variables',
-                                 'repos']):
+                                 'required_projects']):
                     setattr(self, k, copy.deepcopy(other._get(k)))
 
         # Don't set final above so that we don't trip an error halfway
@@ -910,8 +910,8 @@ class Job(object):
             self.roles = self.roles.union(other.roles)
         if other._get('variables') is not None:
             self.updateVariables(other.variables)
-        if other._get('repos') is not None:
-            self.updateRepos(other.repos)
+        if other._get('required_projects') is not None:
+            self.updateProjects(other.required_projects)
 
         for k in self.context_attributes:
             if (other._get(k) is not None and
@@ -939,7 +939,7 @@ class Job(object):
         return True
 
 
-class JobRepo(object):
+class JobProject(object):
     """ A reference to a project from a job. """
 
     def __init__(self, project, override_branch=None):
