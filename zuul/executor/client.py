@@ -296,8 +296,8 @@ class ExecutorClient(object):
                         override_branch=override_branch,
                         default_branch=project_config.default_branch)
 
-        if job.repos:
-            for job_project in job.repos.values():
+        if job.required_projects:
+            for job_project in job.required_projects.values():
                 (trusted, project) = tenant.getProject(job_project.project_name)
                 if project is None:
                     raise Exception("Unknown project %s" % (project_name,))
