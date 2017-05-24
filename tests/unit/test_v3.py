@@ -352,8 +352,13 @@ class TestAnsible(AnsibleZuulTestCase):
         self.assertIn('all', inventory)
         self.assertIn('hosts', inventory['all'])
         self.assertNotIn('children', inventory['all'])
+        self.assertIn('vars', inventory['all'])
         for node_name in all_nodes:
             self.assertIn(node_name, inventory['all']['hosts'])
+        self.assertIn('zuul_workspace_root', inventory['all']['vars'])
+        self.assertIn('zuul', inventory['all']['vars'])
+        self.assertIn('executor', inventory['all']['vars']['zuul'])
+        self.assertIn('src_root', inventory['all']['vars']['zuul']['executor'])
 
         build = self.getJobFromHistory('group-inventory')
         self.assertEqual(build.result, 'SUCCESS')
@@ -363,12 +368,17 @@ class TestAnsible(AnsibleZuulTestCase):
         self.assertIn('all', inventory)
         self.assertIn('hosts', inventory['all'])
         self.assertIn('children', inventory['all'])
+        self.assertIn('vars', inventory['all'])
         for group_name in ('ceph-osd', 'ceph-monitor'):
             self.assertIn(group_name, inventory['all']['hosts'])
         for node_name in all_nodes:
             self.assertIn(node_name, inventory['all']['hosts'])
             self.assertIn(node_name,
                           inventory['all']['children']['ceph-monitor'])
+        self.assertIn('zuul_workspace_root', inventory['all']['vars'])
+        self.assertIn('zuul', inventory['all']['vars'])
+        self.assertIn('executor', inventory['all']['vars']['zuul'])
+        self.assertIn('src_root', inventory['all']['vars']['zuul']['executor'])
 
         build = self.getJobFromHistory('python27')
         self.assertEqual(build.result, 'SUCCESS')
