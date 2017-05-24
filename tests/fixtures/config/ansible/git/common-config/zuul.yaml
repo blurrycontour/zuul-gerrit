@@ -72,3 +72,27 @@
     nodes:
       - name: ubuntu-xenial
         image: ubuntu-xenial
+
+- nodeset:
+    name: nodeset1
+    nodes:
+      - name: controller
+        image: controller-image
+      - name: compute1
+        image: compute-image
+      - name: compute2
+        image: compute-image
+    groups:
+      - name: ceph-osd
+        nodes:
+          - controller
+      - name: ceph-monitor
+        nodes:
+          - controller
+          - compute1
+          - compute2
+
+- job:
+    parent: python27
+    name: group-inventory
+    nodes: nodeset1
