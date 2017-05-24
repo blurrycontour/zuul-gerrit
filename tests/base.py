@@ -2286,6 +2286,14 @@ class ZuulTestCase(BaseTestCase):
         jobs = filter(lambda x: x.result == result, jobs)
         return len(list(jobs))
 
+    def getBuildByName(self, name):
+        for build in self.builds:
+            self.log.debug("Build name: %s build.job.name: %s name: %s" %
+                           (build.job.name, build.name, name))
+            if build.job.name == name:
+                return build
+        raise Exception("Unable to find build %s" % name)
+
     def getJobFromHistory(self, name, project=None):
         for job in self.history:
             if (job.name == name and
