@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "ff0f0b1f_8858df30",
+        "filename": "contrib/docker/alpine/Dockerfile",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-05-24T22:05:51Z",
+      "side": 1,
+      "message": "It just struck me that we should actually try to get alpine support into bindep.",
+      "revId": "f23cb147a18f8a48458800929257d83c58095812",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff0f0b1f_ec0b417a",
         "filename": "contrib/docker/alpine/Dockerfile",
         "patchSetId": 3
@@ -31,6 +48,23 @@
       "side": 1,
       "message": "It at least was missing from the requirements once I crafted the dockerfile. Will check if this is still necessary and probably remove that. If it turns out to be necessary I will propose a patch to add this to the requirements.",
       "parentUuid": "ff0f0b1f_ec0b417a",
+      "revId": "f23cb147a18f8a48458800929257d83c58095812",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff0f0b1f_68434b43",
+        "filename": "contrib/docker/alpine/Dockerfile",
+        "patchSetId": 3
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-05-24T22:05:51Z",
+      "side": 1,
+      "message": "Any reason we wouldn\u0027t just install this with the deps in the beginning?",
       "revId": "f23cb147a18f8a48458800929257d83c58095812",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
