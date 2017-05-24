@@ -261,6 +261,10 @@ class ExecutorClient(object):
         params['timeout'] = job.timeout
         params['items'] = merger_items
         params['projects'] = []
+        if hasattr(item.change, 'branch'):
+            params['branch'] = item.change.branch
+        else:
+            params['branch'] = None
         params['override_branch'] = job.override_branch
         params['repo_state'] = item.current_build_set.repo_state
 
@@ -294,6 +298,7 @@ class ExecutorClient(object):
             connection = project.source.connection
             return dict(connection=connection.connection_name,
                         name=project.name,
+                        canonical_name=project.canonical_name,
                         override_branch=override_branch,
                         default_branch=project_config.default_branch)
 
