@@ -18,6 +18,7 @@ import os
 import textwrap
 
 import testtools
+import yaml
 
 import zuul.configloader
 from zuul.lib import encryption
@@ -342,8 +343,31 @@ class TestAnsible(AnsibleZuulTestCase):
         self.assertEqual(build.result, 'TIMED_OUT')
         build = self.getJobFromHistory('faillocal')
         self.assertEqual(build.result, 'FAILURE')
+
         build = self.getJobFromHistory('check-vars')
         self.assertEqual(build.result, 'SUCCESS')
+        inventory_path = os.path.join(self.test_root, 'inventory.yaml')
+        inventory = yaml.safe_load(open(inventory_path, 'r'))
+        all_nodes = ('ubuntu-xenial',)
+        self.assertIn('all', inventory)
+        self.assertIn('hosts', inventory['all'])
+        for node_name in all_nodes:
+            self.assertIn(node_name, inventory['all']['hosts'])
+
+        build = self.getJobFromHistory('group-inventory')
+        self.assertEqual(build.result, 'SUCCESS')
+        inventory_path = os.path.join(self.test_root, 'inventory.yaml')
+        inventory = yaml.safe_load(open(inventory_path, 'r'))
+        all_nodes = ('controller', 'compute1', 'compute2')
+        self.assertIn('all', inventory)
+        self.assertIn('hosts', inventory['all'])
+        for group_name in ('ceph-osd', 'ceph-monitor'):
+            self.assertIn(group_name, inventory)
+        for node_name in all_nodes:
+            self.assertIn(node_name, inventory['all']['hosts'])
+            self.assertIn(node_name,
+                          inventory['ceph-monitor']['hosts'])
+
         build = self.getJobFromHistory('python27')
         self.assertEqual(build.result, 'SUCCESS')
         flag_path = os.path.join(self.test_root, build.uuid + '.flag')

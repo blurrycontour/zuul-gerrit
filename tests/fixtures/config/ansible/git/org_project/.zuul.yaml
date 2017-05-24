@@ -9,4 +9,5 @@
         - python27
         - faillocal
         - check-vars
+        - group-inventory
         - timeout
