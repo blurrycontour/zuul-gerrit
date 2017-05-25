@@ -14,7 +14,7 @@
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from zuul.ansible import paths
+from . import paths
 win_copy = paths._import_ansible_action_plugin("win_copy")
 
 
