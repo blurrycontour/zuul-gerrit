@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff0f0b1f_c07e92ae",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-25T16:22:45Z",
+      "side": 1,
+      "message": "ouch.\n\nI\u0027m guessing what is meant there is that having a cold cache will make the github driver make exessive api calls on restart.  I think I agree that we can live with that for now.\n\nI think the only thing that \"sucks\" about zuul restarting is that we don\u0027t save the queues automatically -- something that we can and should fix.  Of course, the config parsing is going to be a huge part of restarting in v3.  That may \"suck\" too.",
+      "revId": "63426db5f7df2be50c2fa4dd708398fa2ab2eb21",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
