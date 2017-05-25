@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "ff0f0b1f_155ba354",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 445,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-05-25T22:15:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff0f0b1f_5586bbdd",
+      "revId": "cad5d76e554c3667f2f2761c3ac3d787aa93c439",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff0f0b1f_356b4720",
         "filename": "zuul/model.py",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2017-05-25T22:06:05Z",
       "side": 1,
       "message": "We should do group.nodes[:] just to make sure we end up with a new copy of that list.",
+      "revId": "cad5d76e554c3667f2f2761c3ac3d787aa93c439",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff0f0b1f_355ea745",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 477,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-05-25T22:15:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff0f0b1f_356b4720",
       "revId": "cad5d76e554c3667f2f2761c3ac3d787aa93c439",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
