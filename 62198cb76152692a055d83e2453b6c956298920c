@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff0f0b1f_20030e76",
+        "filename": "zuul/driver/github/githubreporter.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-25T16:15:08Z",
+      "side": 1,
+      "message": "This probably wants to be info or warning.",
+      "revId": "62198cb76152692a055d83e2453b6c956298920c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
