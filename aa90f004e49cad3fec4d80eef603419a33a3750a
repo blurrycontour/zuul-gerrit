@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff0f0b1f_a01cbec1",
+        "filename": "zuul/driver/github/githubreporter.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-25T16:17:36Z",
+      "side": 1,
+      "message": "Given what you say in the commit message, let\u0027s just go ahead and log this at error level with:\n\n  self.log.exception()\n\nAlso, the (i, item.change) tuple appears to be reversed.",
+      "revId": "aa90f004e49cad3fec4d80eef603419a33a3750a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff0f0b1f_80777a09",
+        "filename": "zuul/driver/github/githubreporter.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-25T16:17:36Z",
+      "side": 1,
+      "message": "If you haven\u0027t changed this to info or warning in the previous patch, now would be a good time.",
+      "revId": "aa90f004e49cad3fec4d80eef603419a33a3750a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
