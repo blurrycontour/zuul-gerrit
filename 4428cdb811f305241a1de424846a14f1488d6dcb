@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff0f0b1f_b593d700",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 369,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-25T22:11:39Z",
+      "side": 1,
+      "message": "This test is failing because the inventory_path is not correct (the actual file is deeper in the jobdir).  These other checks are for files which are written by job-ansible outside of the jobdir.\n\nThis test is already quite long, and what we\u0027re checking doesn\u0027t actually require running ansible.  How about moving this test to a different class (an instance of ZuulTestCase rather than AnsibleZuulTestCase) so that we don\u0027t actually run ansible.\n\nThen stick a hold_jobs_in_build \u003d True at the start of the test, and you should be able to examine the inventory file while the build is paused (then release the build to let it finish).  To correct the path -- once you hold a build, the FakeBuild object in self.builds[0] has a .jobdir attribute so you can work out the path.",
+      "revId": "4428cdb811f305241a1de424846a14f1488d6dcb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
