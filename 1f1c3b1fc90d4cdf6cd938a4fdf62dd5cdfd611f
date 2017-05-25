@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff0f0b1f_2b5e4645",
+        "filename": "tests/fixtures/config/inventory/git/common-config/zuul.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-25T23:45:36Z",
+      "side": 1,
+      "message": "Job name doesn\u0027t match others",
+      "revId": "1f1c3b1fc90d4cdf6cd938a4fdf62dd5cdfd611f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff0f0b1f_4b497a89",
+        "filename": "tests/fixtures/config/inventory/git/org_project/.zuul.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-25T23:45:36Z",
+      "side": 1,
+      "message": "Job name doesn\u0027t match others",
+      "revId": "1f1c3b1fc90d4cdf6cd938a4fdf62dd5cdfd611f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff0f0b1f_6b443e75",
+        "filename": "tests/unit/test_inventory.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-25T23:45:36Z",
+      "side": 1,
+      "message": "Job name doesn\u0027t match others.",
+      "revId": "1f1c3b1fc90d4cdf6cd938a4fdf62dd5cdfd611f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
