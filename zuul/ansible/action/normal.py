@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
-from zuul.ansible import paths
+from . import paths
 normal = paths._import_ansible_action_plugin('normal')
 
 
