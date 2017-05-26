@@ -16,6 +16,23 @@
       "revId": "3f93039a1dfef55e48e9128eae8b9363f17cd95c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff0f0b1f_dd31b8a4",
+        "filename": "tests/unit/test_ssh_agent.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-05-26T16:37:58Z",
+      "side": 1,
+      "message": "Oh whoops! Good thought. Revision incoming.",
+      "revId": "3f93039a1dfef55e48e9128eae8b9363f17cd95c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
