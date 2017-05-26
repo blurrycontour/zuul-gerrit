@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff0f0b1f_871762ee",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-05-26T22:32:54Z",
+      "side": 1,
+      "message": "Random premature optimization: I wonder if we could still get the efficiency by sending something like a batch rsync serialized through gearman. It may, however, be just as costly to apply an rsync batch as it would be to do merges again. :-P",
+      "revId": "1960d687c9209c4ce8e239e4b7920d97b6bff424",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
