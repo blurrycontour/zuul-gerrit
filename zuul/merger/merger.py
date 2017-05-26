@@ -182,8 +182,7 @@ class Repo(object):
 
     def checkoutLocalBranch(self, branch):
         repo = self.createRepoObject()
-        ref = repo.heads[branch].commit
-        self.checkout(ref)
+        repo.heads[branch].checkout()
 
     def cherryPick(self, ref):
         repo = self.createRepoObject()
