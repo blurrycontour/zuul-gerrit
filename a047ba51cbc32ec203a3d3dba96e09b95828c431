@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff0f0b1f_eb97153a",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-05-26T16:00:52Z",
+      "side": 1,
+      "message": "result is a dict, right? Is there some reason we\u0027re not del\u0027ing these?",
+      "revId": "a047ba51cbc32ec203a3d3dba96e09b95828c431",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
