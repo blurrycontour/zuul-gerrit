@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff0f0b1f_44e148d0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-05-26T21:40:24Z",
+      "side": 1,
+      "message": "Fantastic commit message.",
+      "revId": "63e1d5796fd066f220945a2f23be0577a6d68dfb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
