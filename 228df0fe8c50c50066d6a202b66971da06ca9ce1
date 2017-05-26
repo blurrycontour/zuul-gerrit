@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff0f0b1f_0855ba1d",
+        "filename": "zuul/driver/gerrit/gerritreporter.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-05-26T09:31:51Z",
+      "side": 1,
+      "message": "This causes the test test_multiple_gerrit_connections to fail. Reason for this is that this test triggers on one connection and tries to report on a different connection to the same gerrit.\n\nI don\u0027t know if this is a use case that should be supported but as the test exists it looks like a valid use case to me.\n\nIn order to skip voting to a wrong gerrit but still supporting the above use case you could compare the canonical hostnames instead:\n\n  if item.change.project.source.connection.canonical_hostname !\u003d self.connection.canonical_hostname:",
+      "range": {
+        "startLine": 29,
+        "startChar": 8,
+        "endLine": 29,
+        "endChar": 68
+      },
+      "revId": "228df0fe8c50c50066d6a202b66971da06ca9ce1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
