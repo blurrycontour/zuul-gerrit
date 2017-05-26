@@ -71,6 +71,24 @@
     },
     {
       "key": {
+        "uuid": "ff0f0b1f_9c3d892e",
+        "filename": "contrib/docker/alpine/Dockerfile",
+        "patchSetId": 3
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-05-26T13:27:09Z",
+      "side": 1,
+      "message": "The reason was just to document the reasoning, but sure, this should be moved to the deps above.",
+      "parentUuid": "ff0f0b1f_68434b43",
+      "revId": "f23cb147a18f8a48458800929257d83c58095812",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff0f0b1f_2cc93925",
         "filename": "contrib/docker/alpine/Dockerfile",
         "patchSetId": 3
