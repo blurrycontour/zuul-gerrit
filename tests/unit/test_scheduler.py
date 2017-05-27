@@ -3626,14 +3626,10 @@ For CI problems and help debugging, contact ci@example.org"""
             )
         )
 
-    @skip("Disabled for early v3 development")
+    @simple_layout('layouts/merge-failure.yaml')
     def test_merge_failure_reports(self):
         """Check that when a change fails to merge the correct message is sent
         to the correct reporter"""
-        self.updateConfigLayout(
-            'tests/fixtures/layout-merge-failure.yaml')
-        self.sched.reconfigure(self.config)
-        self.registerJobs()
 
         # Check a test failure isn't reported to SMTP
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
@@ -3648,11 +3644,11 @@ For CI problems and help debugging, contact ci@example.org"""
         # Check a merge failure is reported to SMTP
         # B should be merged, but C will conflict with B
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
-        B.addPatchset(['conflict'])
+        B.addPatchset({'conflict': 'A'})
         C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
-        C.addPatchset(['conflict'])
-        B.addApproval('Code-Review', 2)
-        C.addApproval('Code-Review', 2)
+        C.addPatchset({'conflict': 'C'})
+        B.addApproval('Code-review', 2)
+        C.addApproval('Code-review', 2)
         self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
         self.fake_gerrit.addEvent(C.addApproval('Approved', 1))
         self.waitUntilSettled()
@@ -3662,17 +3658,16 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertEqual('The merge failed! For more information...',
                          self.smtp_messages[0]['body'])
 
-    @skip("Disabled for early v3 development")
     def test_default_merge_failure_reports(self):
         """Check that the default merge failure reports are correct."""
 
         # A should report success, B should report merge failure.
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addPatchset(['conflict'])
+        A.addPatchset({'conflict': 'A'})
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
-        B.addPatchset(['conflict'])
-        A.addApproval('Code-Review', 2)
-        B.addApproval('Code-Review', 2)
+        B.addPatchset({'conflict': 'C'})
+        A.addApproval('Code-review', 2)
+        B.addApproval('Code-review', 2)
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
         self.waitUntilSettled()
