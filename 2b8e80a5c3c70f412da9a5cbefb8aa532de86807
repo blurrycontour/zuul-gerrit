@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df140735_ff549756",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-05-27T19:12:24Z",
+      "side": 1,
+      "message": "It would be cool if this could also log (and maybe even adding the complete event to the extra metadata) some kind of change identifier (change id in gerrit, something similar for GitHub).\n\nThat could make it possible to trace the lifecycle of the change from receiving the event to the end.",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 34
+      },
+      "revId": "2b8e80a5c3c70f412da9a5cbefb8aa532de86807",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
