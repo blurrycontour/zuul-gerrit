@@ -905,15 +905,20 @@ class AnsibleJob(object):
             # results in the wrong thing being in interface_ip
             # TODO(jeblair): Move this notice to the docs.
             ip = node.get('interface_ip')
+            port = node.get('ssh_port', 22)
             host_vars = dict(
                 ansible_host=ip,
+                ansible_port=port,
                 nodepool_az=node.get('az'),
                 nodepool_provider=node.get('provider'),
                 nodepool_region=node.get('region'))
 
             host_keys = []
             for key in node.get('host_keys'):
-                host_keys.append("%s %s" % (ip, key))
+                if port != 22:
+                    host_keys.append("[%s]:%s %s" % (ip, port, key))
+                else:
+                    host_keys.append("%s %s" % (ip, key))
 
             hosts.append(dict(
                 name=node['name'],
