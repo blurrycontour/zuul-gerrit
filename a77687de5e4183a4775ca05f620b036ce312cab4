@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df140735_755bed2d",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 821,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-05-29T18:19:50Z",
+      "side": 1,
+      "message": "shouldn\u0027t this be 0o0700?",
+      "range": {
+        "startLine": 821,
+        "startChar": 33,
+        "endLine": 821,
+        "endChar": 38
+      },
+      "revId": "a77687de5e4183a4775ca05f620b036ce312cab4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df140735_5540e935",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 839,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-05-29T18:19:50Z",
+      "side": 1,
+      "message": "0o0600?",
+      "range": {
+        "startLine": 839,
+        "startChar": 43,
+        "endLine": 839,
+        "endChar": 48
+      },
+      "revId": "a77687de5e4183a4775ca05f620b036ce312cab4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
