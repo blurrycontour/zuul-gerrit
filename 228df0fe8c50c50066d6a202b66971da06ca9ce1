@@ -22,6 +22,30 @@
       "revId": "228df0fe8c50c50066d6a202b66971da06ca9ce1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df140735_1abf3efc",
+        "filename": "zuul/driver/gerrit/gerritreporter.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-05-29T17:23:07Z",
+      "side": 1,
+      "message": "I have this now working in real life with multiple gerrits with this:\n\n  # If the source is no GerritSource we cannot report anything here.\n  if not isinstance(item.change.project.source, GerritSource):\n      return\n\n  # For supporting several Gerrit connections we also must filter by\n  # the canonical hostname.\n  if item.change.project.source.connection.canonical_hostname !\u003d \\\n          self.connection.canonical_hostname:\n      return",
+      "parentUuid": "ff0f0b1f_0855ba1d",
+      "range": {
+        "startLine": 29,
+        "startChar": 8,
+        "endLine": 29,
+        "endChar": 68
+      },
+      "revId": "228df0fe8c50c50066d6a202b66971da06ca9ce1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
