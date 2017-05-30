@@ -53,6 +53,8 @@
     name: python27
     pre-run: pre
     post-run: post
+    success-url: https://success.example.com/zuul-logs/{build.uuid}/
+    failure-url: https://failure.example.com/zuul-logs/{build.uuid}/
     vars:
       flagpath: '{{zuul._test.test_root}}/{{zuul.uuid}}.flag'
     roles:
@@ -72,3 +74,8 @@
     nodes:
       - name: ubuntu-xenial
         image: ubuntu-xenial
+
+- job:
+    parent: python27
+    name: failpost
+    post-run: post-broken
