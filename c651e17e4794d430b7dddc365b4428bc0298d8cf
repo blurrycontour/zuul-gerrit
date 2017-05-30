@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df140735_16a6dbc2",
+        "filename": "zuul/lib/log_streamer.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-30T21:35:49Z",
+      "side": 1,
+      "message": "The file that much of this was copied from was originally copyright IBM under the GPL; we have the okay from them to relicense it under the ASL, so including the header below is okay, however, we should add the original IBM copyright line here as well.",
+      "revId": "c651e17e4794d430b7dddc365b4428bc0298d8cf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
