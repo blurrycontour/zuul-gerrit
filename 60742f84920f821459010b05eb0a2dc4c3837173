@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df140735_116825f3",
+        "filename": "doc/source/reporters.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-30T22:31:10Z",
+      "side": 1,
+      "message": "string",
+      "revId": "60742f84920f821459010b05eb0a2dc4c3837173",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df140735_3163291d",
+        "filename": "zuul/driver/github/githubreporter.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-30T22:31:10Z",
+      "side": 1,
+      "message": "To keep users from second guessing themselves, Zuul config dictionary keys should always use \u0027-\u0027 rather than \u0027_\u0027 (unless we\u0027re passing through something verbatim to an underlying system).",
+      "revId": "60742f84920f821459010b05eb0a2dc4c3837173",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
