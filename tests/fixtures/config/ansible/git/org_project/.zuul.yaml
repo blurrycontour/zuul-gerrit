@@ -10,3 +10,4 @@
         - faillocal
         - check-vars
         - timeout
+        - failpost
