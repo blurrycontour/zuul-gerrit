@@ -16,6 +16,40 @@
       "revId": "34c7daaaa4c10ff1d7549e02382bc07755925834",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df140735_81b2a2e5",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-30T23:11:12Z",
+      "side": 1,
+      "message": "We shouldn\u0027t, since this aims to record only the initial state.  However, due to a defect below, that initial state may not be what the merger uses in all cases.\n\nI suspect if we fix that defect, this shouldn\u0027t ever be called for the same project more than once and we could actually raise an exception here.",
+      "revId": "34c7daaaa4c10ff1d7549e02382bc07755925834",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df140735_61b54ecd",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 342,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-30T23:11:12Z",
+      "side": 1,
+      "message": "If a merge operation touches multiple branches of the same project, recent will only be updated one at a time as those changes are merged.  That means that we could end up resetting a project multiple times for the purpose of getting multiple branch heads.  The second might end up with a slightly different repository state than the first.  So we should update recent with all of the branch tip values when we reset a project and store the repo state.",
+      "revId": "34c7daaaa4c10ff1d7549e02382bc07755925834",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
