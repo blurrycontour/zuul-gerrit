@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df140735_8f4ad252",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 6039
+      },
+      "writtenOn": "2017-05-30T17:57:18Z",
+      "side": 1,
+      "message": "Do we need to check for a stale state here?",
+      "revId": "34c7daaaa4c10ff1d7549e02382bc07755925834",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
