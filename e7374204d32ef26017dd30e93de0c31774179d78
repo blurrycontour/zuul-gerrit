@@ -16,6 +16,24 @@
       "revId": "e7374204d32ef26017dd30e93de0c31774179d78",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df140735_d84abb53",
+        "filename": "zuul/cmd/executor.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-05-31T13:29:45Z",
+      "side": 1,
+      "message": "well- finger is a protocol with a well-known port. Since this is running on the executor,it _shouldn\u0027t_ be a problem, right? (honest question)\n\nI agree with ip address - a \"listen\" directive could certainly be nice.",
+      "parentUuid": "df140735_75097a93",
+      "revId": "e7374204d32ef26017dd30e93de0c31774179d78",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
