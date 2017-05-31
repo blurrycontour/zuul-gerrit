@@ -110,7 +110,7 @@ layout.yaml to be useful.
 
 **jobroot_dir**
   Path to directory that Zuul should store temporary job files.
-  ``jobroot_dir=/tmp``
+  ``jobroot_dir=/tmp/zuul-jobs``
 
 **report_times**
   Boolean value (``true`` or ``false``) that determines if Zuul should

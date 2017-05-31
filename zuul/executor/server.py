@@ -83,7 +83,8 @@ class JobDir(object):
     def __init__(self, root, keep, build_uuid):
         '''
         :param str root: Root directory for the individual job directories.
-            Can be None to use the default system temp root directory.
+            Can be None to use the a directory in the default system temp
+            root directory. (By default '/tmp/zuul-jobs' on linux systems)
         :param bool keep: If True, do not delete the job directory.
         :param str build_uuid: The unique build UUID. If supplied, this will
             be used as the temp job directory name. Using this will help the
@@ -100,7 +101,9 @@ class JobDir(object):
         if root:
             tmpdir = root
         else:
-            tmpdir = tempfile.gettempdir()
+            tmpdir = os.path.join(tempfile.gettempdir(), 'zuul-jobs')
+            if not os.path.exists(tmpdir):
+                os.makedirs(tmpdir)
         self.root = os.path.join(tmpdir, build_uuid)
         os.mkdir(self.root, 0o700)
         # Work
