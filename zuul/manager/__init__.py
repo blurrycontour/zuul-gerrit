@@ -124,6 +124,11 @@ class PipelineManager(object):
             else:
                 return False
         for ef in self.event_filters:
+            if (ef.trigger.connection.connection_name !=
+                change.project.connection_name):
+                self.log.debug("Filter %s skipped for change %s due "
+                               "to mismatched connections" % (ef, change))
+                continue
             if ef.matches(event, change):
                 self.log.debug("Event %s for change %s matched %s "
                                "in pipeline %s" % (event, change, ef, self))
@@ -285,6 +290,9 @@ class PipelineManager(object):
 
         if not ignore_requirements:
             for f in self.changeish_filters:
+                if f.connection_name != change.project.connection_name:
+                    self.log.debug("Filter %s skipped for change %s due "
+                                   "to mismatched connections" % (f, change))
                 if not f.matches(change):
                     self.log.debug("Change %s does not match pipeline "
                                    "requirement %s" % (change, f))
