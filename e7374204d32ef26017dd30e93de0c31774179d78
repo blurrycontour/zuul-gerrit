@@ -34,6 +34,24 @@
       "revId": "e7374204d32ef26017dd30e93de0c31774179d78",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df140735_38177754",
+        "filename": "zuul/cmd/executor.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-05-31T13:51:56Z",
+      "side": 1,
+      "message": "We can do that. I was actually considering making the port configurable just for testing purposes (to come later).",
+      "parentUuid": "df140735_d84abb53",
+      "revId": "e7374204d32ef26017dd30e93de0c31774179d78",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
