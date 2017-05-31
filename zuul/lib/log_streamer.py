@@ -48,23 +48,26 @@ class RequestHandler(ss.BaseRequestHandler):
     '''
 
     def handle(self):
-        build_uuid = self.request.recv(1024)
+        build_uuid = self.request.recv(1024).decode("utf-8")
         build_uuid = build_uuid.rstrip()
 
         # validate build ID
         if not re.match("[0-9A-Fa-f]+$", build_uuid):
-            self.request.sendall('Build ID %s is not valid' % build_uuid)
+            msg = 'Build ID %s is not valid' % build_uuid
+            self.request.sendall(msg.encode("utf-8"))
             return
 
         job_dir = os.path.join(self.server.jobdir_root, build_uuid)
         if not os.path.exists(job_dir):
-            self.request.sendall('Build ID %s not found' % build_uuid)
+            msg = 'Build ID %s not found' % build_uuid
+            self.request.sendall(msg.encode("utf-8"))
             return
 
         # check if log file exists
         log_file = os.path.join(job_dir, 'ansible', 'ansible_log.txt')
         if not os.path.exists(log_file):
-            self.request.sendall('Log not found for build ID %s' % build_uuid)
+            msg = 'Log not found for build ID %s' % build_uuid
+            self.request.sendall(msg.encode("utf-8"))
             return
 
         self.stream_log(log_file)
