@@ -108,9 +108,9 @@ layout.yaml to be useful.
   commands.
   ``state_dir=/var/lib/zuul``
 
-**jobroot_dir**
+**jobdir_root**
   Path to directory that Zuul should store temporary job files.
-  ``jobroot_dir=/tmp/zuul-jobs``
+  ``jobdir_root=/tmp/zuul-jobs``
 
 **report_times**
   Boolean value (``true`` or ``false``) that determines if Zuul should
