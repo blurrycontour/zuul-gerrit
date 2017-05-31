@@ -16,6 +16,24 @@
       "revId": "c651e17e4794d430b7dddc365b4428bc0298d8cf",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df140735_af4a1fa9",
+        "filename": "zuul/lib/log_streamer.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-05-31T12:19:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df140735_16a6dbc2",
+      "revId": "c651e17e4794d430b7dddc365b4428bc0298d8cf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
