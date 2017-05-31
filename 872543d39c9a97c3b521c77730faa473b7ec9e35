@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df140735_acb8e0c7",
+        "filename": "zuul/lib/connections.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-05-31T17:51:08Z",
+      "side": 1,
+      "message": "Register nullwrap?",
+      "revId": "872543d39c9a97c3b521c77730faa473b7ec9e35",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
