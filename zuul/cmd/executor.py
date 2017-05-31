@@ -83,6 +83,10 @@ class Executor(zuul.cmd.ZuulApp):
         if self.config.has_option('zuul', 'jobroot_dir'):
             jobroot_dir = os.path.expanduser(
                 self.config.get('zuul', 'jobroot_dir'))
+            if not os.path.isdir(jobroot_dir):
+                print("Invalid jobroot_dir: {jobroot_dir}".format(
+                    jobroot_dir=jobroot_dir))
+                sys.exit(1)
 
         ExecutorServer = zuul.executor.server.ExecutorServer
         self.executor = ExecutorServer(self.config, self.connections,
