@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df140735_b999206f",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 506,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-06-01T17:26:06Z",
+      "side": 1,
+      "message": "This seem to create:\n\n  DEBUG:zuul.AnsibleJob:[build: b1246d6cb9f24ddea35e3dba202af93f] Job b1246d6cb9f24ddea35e3dba202af93f: beginning\n\nfor example. Curious why build / job uuid are the same. Is it possible for them to be different?",
+      "revId": "da182dec516b9611294793508f2940dff27f5f4f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
