@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df140735_432fb3a0",
+        "filename": "zuul/driver/gerrit/gerritreporter.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-01T16:32:11Z",
+      "side": 1,
+      "message": "I think this could just use change.project.connection_name and self.connection.connection_name, given previous advice from James. But this works too.",
+      "revId": "b09f421fd023412500f0eb50adbfa6ea80060268",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
