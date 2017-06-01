@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df140735_c3b86377",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 1131,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-06-01T16:29:42Z",
+      "side": 1,
+      "message": "I\u0027d be okay with we ran bwrap for trusted jobs too, atleast the option to do so.",
+      "revId": "5870ccae62a3a7d38604b4a2f5b87d84aeafaee0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
