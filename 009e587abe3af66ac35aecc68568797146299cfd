@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df140735_536e322f",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-06-02T22:59:29Z",
+      "side": 1,
+      "message": "Another way to do this is to have one worker, but register/unregister this queue when queue length is \u003e 0. This is kind of a cool way to do it though. :)",
+      "revId": "009e587abe3af66ac35aecc68568797146299cfd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
