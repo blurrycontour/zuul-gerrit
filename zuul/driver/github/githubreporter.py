@@ -71,7 +71,10 @@ class GithubReporter(BaseReporter):
         context = '%s/%s' % (pipeline.layout.tenant.name, pipeline.name)
         state = self._commit_status
         url = ''
-        if self.connection.sched.config.has_option('zuul', 'status_url'):
+        pipeline_url = self.config.get('status-url', '')
+        if pipeline_url:
+            url = item.formatUrlPattern(pipeline_url)
+        elif self.connection.sched.config.has_option('zuul', 'status_url'):
             base = self.connection.sched.config.get('zuul', 'status_url')
             url = '%s/#%s,%s' % (base,
                                  item.change.number,
@@ -157,6 +160,7 @@ class GithubReporter(BaseReporter):
 def getSchema():
     github_reporter = v.Schema({
         'status': v.Any('pending', 'success', 'failure'),
+        'status-url': scalar_or_list(str),
         'comment': bool,
         'merge': bool,
         'label': scalar_or_list(str),
