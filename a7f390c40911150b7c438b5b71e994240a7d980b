@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df140735_52ece38d",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1527,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-06-04T03:00:02Z",
+      "side": 1,
+      "message": "Perhaps we should use an empty Attributes() instance if there is no job?",
+      "range": {
+        "startLine": 1527,
+        "startChar": 55,
+        "endLine": 1527,
+        "endChar": 57
+      },
+      "revId": "a7f390c40911150b7c438b5b71e994240a7d980b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
