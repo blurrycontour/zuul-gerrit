@@ -2188,6 +2188,9 @@ class Layout(object):
             self._createJobGraph(item, project_job_list, ret)
         return ret
 
+    def hasProject(self, project):
+        return project.canonical_name in self.project_configs
+
 
 class Semaphore(object):
     def __init__(self, name, max=1):
