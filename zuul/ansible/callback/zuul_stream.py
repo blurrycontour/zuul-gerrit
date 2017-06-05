@@ -138,32 +138,35 @@ class CallbackModule(default.CallbackModule):
         self._log.info(msg)
 
     def v2_playbook_on_task_start(self, task, is_conditional):
-        self._task = task
+        try:
+            self._task = task
 
-        if self._play.strategy != 'free':
-            task_name = self._print_task_banner(task)
-        if task.action == 'command':
-            log_id = uuid.uuid4().hex
-            task.args['zuul_log_id'] = log_id
-            play_vars = self._play._variable_manager._hostvars
+            if self._play.strategy != 'free':
+                task_name = self._print_task_banner(task)
+            if task.action == 'command':
+                log_id = uuid.uuid4().hex
+                task.args['zuul_log_id'] = log_id
+                play_vars = self._play._variable_manager._hostvars
 
-            hosts = self._play.hosts
-            if 'all' in hosts:
-                # NOTE(jamielennox): play.hosts is purely the list of hosts
-                # that was provided not interpretted by inventory. We don't
-                # have inventory access here but we can assume that 'all' is
-                # everything in hostvars.
-                hosts = play_vars.keys()
+                hosts = self._play.hosts
+                if 'all' in hosts:
+                    # NOTE(jamielennox): play.hosts is purely the list of hosts
+                    # that was provided not interpretted by inventory. We don't
+                    # have inventory access here but we can assume that 'all' is
+                    # everything in hostvars.
+                    hosts = play_vars.keys()
 
-            for host in hosts:
-                ip = play_vars[host].get(
-                    'ansible_host', play_vars[host].get(
-                        'ansible_inventory_host'))
-                self._host_dict[host] = ip
-                self._streamer = multiprocessing.Process(
-                    target=self._read_log, args=(host, ip, log_id, task_name))
-                self._streamer.daemon = True
-                self._streamer.start()
+                for host in hosts:
+                    ip = play_vars[host].get(
+                        'ansible_host', play_vars[host].get(
+                            'ansible_inventory_host'))
+                    self._host_dict[host] = ip
+                    self._streamer = multiprocessing.Process(
+                        target=self._read_log, args=(host, ip, log_id, task_name))
+                    self._streamer.daemon = True
+                    self._streamer.start()
+        except Exception as e:
+            self._display.display(str(e))
 
     def v2_runner_on_failed(self, result, ignore_errors=False):
         if self._streamer:
