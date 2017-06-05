@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df140735_0dd62629",
+        "filename": "tests/fixtures/config/push-reqs/git/common-config/zuul.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-06-05T20:11:34Z",
+      "side": 1,
+      "message": "This isn\u0027t RFC2606 compliant. example.com/net/org or anything tld\u0027d with .test, .invalid, .example, .localhost is preferred.",
+      "revId": "b2bf97c9af4f2cb310365cfc570c2eb37258509a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df140735_edd89253",
+        "filename": "tests/fixtures/config/push-reqs/git/common-config/zuul.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-06-05T20:11:34Z",
+      "side": 1,
+      "message": "It\u0027s also a bit confusing that this matches up with the email address.",
+      "revId": "b2bf97c9af4f2cb310365cfc570c2eb37258509a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
