@@ -97,7 +97,8 @@ class RequestHandler(ss.BaseRequestHandler):
         # check if log file exists
         log_file = os.path.join(job_dir, 'work', 'logs', 'job-output.txt')
         if not os.path.exists(log_file):
-            msg = 'Log not found for build ID %s' % build_uuid
+            #msg = 'Log not found for build ID %s' % build_uuid
+            msg = 'Log not found for build ID %s' % log_file
             self.request.sendall(msg.encode("utf-8"))
             return
 
