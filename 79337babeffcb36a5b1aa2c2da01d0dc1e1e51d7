@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df140735_c53ee2bf",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3493,
+      "author": {
+        "id": 19930
+      },
+      "writtenOn": "2017-06-05T02:14:53Z",
+      "side": 1,
+      "message": "Btw, can you replace this one by assertTrue?",
+      "revId": "79337babeffcb36a5b1aa2c2da01d0dc1e1e51d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df140735_a539aed7",
+        "filename": "tests/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3506,
+      "author": {
+        "id": 19930
+      },
+      "writtenOn": "2017-06-05T02:14:53Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "79337babeffcb36a5b1aa2c2da01d0dc1e1e51d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
