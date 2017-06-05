@@ -1,0 +1,18 @@
+- hosts: all
+  tasks:
+    - debug: var=waitpath
+
+     # Do not proceed until test creates the flag file
+    - wait_for:
+        state: present
+        path: "{{waitpath}}"
+
+    # Remove the flag file to allow test to proceed
+    - file:
+        state: absent
+        path: "{{waitpath}}"
+
+     # Do not proceed until test creates the flag file (again)
+    - wait_for:
+        state: present
+        path: "{{waitpath}}"
