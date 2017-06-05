@@ -1,0 +1,7 @@
+- hosts: all
+  tasks:
+    - debug: var=waitpath
+    - name: welcome
+      shell: echo 'Hello, World'
+    #- wait_for:
+    #    path: "{{waitpath}}"
