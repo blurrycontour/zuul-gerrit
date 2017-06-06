@@ -345,7 +345,7 @@ class TestInRepoConfig(ZuulTestCase):
         self.assertEqual(A.data['status'], 'NEW')
         self.assertEqual(A.reported, 1,
                          "A should report failure")
-        self.assertIn('Pipelines may not be defined', A.messages[1],
+        self.assertIn('Pipelines may not be defined', A.messages[0],
                       "A should have a syntax error reported")
 
     def test_untrusted_project_error(self):
@@ -365,7 +365,7 @@ class TestInRepoConfig(ZuulTestCase):
         self.assertEqual(A.data['status'], 'NEW')
         self.assertEqual(A.reported, 1,
                          "A should report failure")
-        self.assertIn('the only project definition permitted', A.messages[1],
+        self.assertIn('the only project definition permitted', A.messages[0],
                       "A should have a syntax error reported")
 
 
