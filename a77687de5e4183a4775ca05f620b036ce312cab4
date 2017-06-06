@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "df140735_7b98921a",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 821,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-06T23:19:38Z",
+      "side": 1,
+      "message": "0o700 \u003d\u003d 0o0700 so this is fine.",
+      "revId": "a77687de5e4183a4775ca05f620b036ce312cab4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df140735_5540e935",
         "filename": "zuul/configloader.py",
         "patchSetId": 2
@@ -42,6 +59,23 @@
         "endLine": 839,
         "endChar": 48
       },
+      "revId": "a77687de5e4183a4775ca05f620b036ce312cab4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df140735_5b9dce08",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 839,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-06T23:19:38Z",
+      "side": 1,
+      "message": "This number is fine too.",
       "revId": "a77687de5e4183a4775ca05f620b036ce312cab4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
