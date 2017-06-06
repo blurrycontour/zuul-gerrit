@@ -16,6 +16,24 @@
       "revId": "6e27803d8f5484ee2d9a8953667b0c8e34185f2b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df140735_a1e8627b",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1520,
+      "author": {
+        "id": 7191
+      },
+      "writtenOn": "2017-06-06T00:47:59Z",
+      "side": 1,
+      "message": "So maybe i should merge this with the follow up patch that does make use of this method without job and build? As it looks optional here i thought it made sense standalone.",
+      "parentUuid": "ff0f0b1f_bc02500a",
+      "revId": "6e27803d8f5484ee2d9a8953667b0c8e34185f2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
