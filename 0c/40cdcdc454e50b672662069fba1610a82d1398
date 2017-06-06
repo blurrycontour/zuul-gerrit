@@ -1,0 +1,12 @@
+Verified+1: Zuul
+Code-Review+1: Jesse Keating <omgjlk@us.ibm.com>
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Code-Review+1: K Jonathan Harker <code@gentlydownthe.net>
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Tue, 06 Jun 2017 22:42:05 +0000
+Reviewed-on: https://review.openstack.org/449794
+Project: openstack-infra/zuul
+Branch: refs/heads/feature/zuulv3
