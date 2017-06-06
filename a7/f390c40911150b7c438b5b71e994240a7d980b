@@ -1,0 +1,12 @@
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Verified+1: Zuul
+Code-Review+2: Joshua Hesketh <joshua.hesketh@rackspace.com>
+Code-Review+1: Clint 'SpamapS' Byrum <clint@fewbar.com>
+Code-Review+1: Jamie Lennox <jamielennox@gmail.com>
+Workflow+1: Monty Taylor <mordred@inaugust.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Tue, 06 Jun 2017 18:07:13 +0000
+Reviewed-on: https://review.openstack.org/470415
+Project: openstack-infra/zuul
+Branch: refs/heads/feature/zuulv3
