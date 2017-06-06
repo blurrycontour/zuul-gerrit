@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df140735_2220af49",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-06T21:12:20Z",
+      "side": 1,
+      "message": "Actually, we should probably use this instead:\n\n  if event.type \u003d\u003d \u0027ref-updated\u0027 and (not event.ref.startswith(\u0027refs\u0027))\n\nThough that should happen a little lower after we\u0027ve set event.ref.\n\nThat will handle both the case of a change being merged as well as a direct push to a branch.  (A change-merged event will be followed by a ref-updated event, so we don\u0027t need to do both).\n\nI know that\u0027s not what is there now, but I don\u0027t think I thought it through all the way when I added it initially.",
+      "revId": "918109a5f185ba8fa497064dc0dfdbf4300b4fbb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
