@@ -16,6 +16,23 @@
       "revId": "da182dec516b9611294793508f2940dff27f5f4f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df140735_8f7ea0e1",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-06-06T07:11:06Z",
+      "side": 1,
+      "message": "Redundant line, since both branches result in self.logger being set.",
+      "revId": "da182dec516b9611294793508f2940dff27f5f4f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
