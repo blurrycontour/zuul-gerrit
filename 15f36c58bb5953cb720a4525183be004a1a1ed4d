@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df140735_ce4d9fc5",
+        "filename": "zuul/lib/log_streamer.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-06-06T20:47:18Z",
+      "side": 1,
+      "message": "double decode",
+      "revId": "15f36c58bb5953cb720a4525183be004a1a1ed4d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
