@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df140735_dc645d4c",
+        "filename": "zuul/driver/github/githubreporter.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 7191
+      },
+      "writtenOn": "2017-06-06T01:44:55Z",
+      "side": 1,
+      "message": "why wouldn\u0027t we formatUrlPattern the url from zuul status? The idea then is that we can get rid of this hardcoded change pattern url and use the template.",
+      "revId": "2c4dde8ad7f47d4ad0031d98f8decc35291790b3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df140735_fc1a81c3",
+        "filename": "zuul/driver/github/githubreporter.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 7191
+      },
+      "writtenOn": "2017-06-06T01:44:55Z",
+      "side": 1,
+      "message": "i don\u0027t think this can be a list. it has to be a single string.",
+      "range": {
+        "startLine": 163,
+        "startChar": 22,
+        "endLine": 163,
+        "endChar": 36
+      },
+      "revId": "2c4dde8ad7f47d4ad0031d98f8decc35291790b3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
