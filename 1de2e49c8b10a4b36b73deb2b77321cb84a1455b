@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df140735_c28d73d4",
+        "filename": "tests/unit/test_cloner.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 724,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-06-06T21:36:11Z",
+      "side": 1,
+      "message": "Slight nit, this appears to be leftover test debugging that probably shouldn\u0027t stick around?",
+      "revId": "1de2e49c8b10a4b36b73deb2b77321cb84a1455b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
