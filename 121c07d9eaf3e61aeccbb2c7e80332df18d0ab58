@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df140735_7793e75d",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 392,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-06-07T16:49:48Z",
+      "side": 1,
+      "message": "default mode here is 0777. Maybe 0755 is enough?",
+      "revId": "121c07d9eaf3e61aeccbb2c7e80332df18d0ab58",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
