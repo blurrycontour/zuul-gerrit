@@ -16,6 +16,23 @@
       "revId": "121c07d9eaf3e61aeccbb2c7e80332df18d0ab58",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df140735_7723e7bf",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 392,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-07T17:00:16Z",
+      "side": 1,
+      "message": "Well, that\u0027s what was here before, so i tmust be okay... but I can change it.",
+      "revId": "121c07d9eaf3e61aeccbb2c7e80332df18d0ab58",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
