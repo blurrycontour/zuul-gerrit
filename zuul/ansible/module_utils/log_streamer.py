@@ -15,6 +15,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import datetime
 import os
 import os.path
 import pwd
@@ -29,6 +30,10 @@ try:
 except ImportError:
     import socketserver as ss  # python 3
 
+NODE_LOG_STREAM_PATH = '/tmp'
+NODE_LOG_STREAM_FILE = 'console-{uuid}.log'
+NODE_LOG_STREAM_PORT = 19885
+
 
 class Log(object):
 
@@ -39,7 +44,7 @@ class Log(object):
         self.size = self.stat.st_size
 
 
-class RequestHandler(ss.BaseRequestHandler):
+class BaseRequestHandler(ss.BaseRequestHandler):
     '''
     Class to handle a single log streaming request.
 
@@ -78,27 +83,15 @@ class RequestHandler(ss.BaseRequestHandler):
             except UnicodeDecodeError:
                 pass
 
+    def validate_uuid(self, requested_uuid):
+        return re.match("[0-9A-Fa-f]+$", requested_uuid)
+
     def handle(self):
-        build_uuid = self.get_command()
-        build_uuid = build_uuid.rstrip()
+        requested_uuid = self.get_command()
+        requested_uuid = requested_uuid.rstrip()
 
-        # validate build ID
-        if not re.match("[0-9A-Fa-f]+$", build_uuid):
-            msg = 'Build ID %s is not valid' % build_uuid
-            self.request.sendall(msg.encode("utf-8"))
-            return
-
-        job_dir = os.path.join(self.server.jobdir_root, build_uuid)
-        if not os.path.exists(job_dir):
-            msg = 'Build ID %s not found' % build_uuid
-            self.request.sendall(msg.encode("utf-8"))
-            return
-
-        # check if log file exists
-        log_file = os.path.join(job_dir, 'ansible', 'job-output.txt')
-        if not os.path.exists(log_file):
-            msg = 'Log not found for build ID %s' % build_uuid
-            self.request.sendall(msg.encode("utf-8"))
+        log_file = self.make_log_file(requested_uuid)
+        if not log_file:
             return
 
         self.stream_log(log_file)
@@ -170,10 +163,55 @@ class RequestHandler(ss.BaseRequestHandler):
             log.size = st.st_size
 
 
-class CustomForkingTCPServer(ss.ForkingTCPServer):
+class FingerRequestHandler(BaseRequestHandler):
+
+    def make_log_file(self, requested_uuid):
+        # validate ID
+        if not self.validate_uuid(requested_uuid):
+            msg = 'Build ID %s is not valid' % requested_uuid
+            self.request.sendall(msg.encode("utf-8"))
+            return
+
+        job_dir = os.path.join(self.server.jobdir_root, requested_uuid)
+        if not os.path.exists(job_dir):
+            msg = 'Build ID %s not found' % requested_uuid
+            self.request.sendall(msg.encode("utf-8"))
+            return
+
+        # check if log file exists
+        log_file = os.path.join(job_dir, 'ansible', 'job-output.txt')
+        if not os.path.exists(log_file):
+            msg = 'Log not found for Build ID %s' % requested_uuid
+            self.request.sendall(msg.encode("utf-8"))
+            return
+
+        return log_file
+
+
+class NodeRequestHandler(BaseRequestHandler):
+
+    def make_log_file(self, requested_uuid):
+
+        # validate ID
+        if not self.validate_uuid(requested_uuid):
+            msg = 'Log ID %s is not valid' % requested_uuid
+            self.request.sendall(msg.encode("utf-8"))
+            return
+
+        log_file = self.server.file_template.format(uuid=requested_uuid)
+
+        return log_file
+
+
+class V6ForkingTCPServer(ss.ForkingTCPServer):
+    address_family = socket.AF_INET6
+
+
+class CustomForkingTCPServer(V6ForkingTCPServer):
     '''
     Custom version that allows us to drop privileges after port binding.
     '''
+
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
         self.jobdir_root = kwargs.pop('jobdir_root')
@@ -220,7 +258,7 @@ class LogStreamer(object):
 
     def __init__(self, user, host, port, jobdir_root):
         self.server = CustomForkingTCPServer((host, port),
-                                             RequestHandler,
+                                             FingerRequestHandler,
                                              user=user,
                                              jobdir_root=jobdir_root)
 
@@ -234,3 +272,11 @@ class LogStreamer(object):
         if self.thd.isAlive():
             self.server.shutdown()
             self.server.server_close()
+
+
+def get_node_log_streamer(
+        host='::', port=NODE_LOG_STREAM_PORT, path=NODE_LOG_STREAM_PATH):
+    '''Factory function for making an on-node log streamer.'''
+    server = V6ForkingTCPServer((host, port), NodeRequestHandler)
+    server.file_template = os.path.join(path, NODE_LOG_STREAM_FILE)
+    return server

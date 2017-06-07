@@ -428,6 +428,7 @@ class ExecutorServer(object):
         self.action_dir = os.path.join(plugin_dir, 'action')
         self.callback_dir = os.path.join(plugin_dir, 'callback')
         self.lookup_dir = os.path.join(plugin_dir, 'lookup')
+        self.module_utils_dir = os.path.join(plugin_dir, 'module_utils')
 
         _copy_ansible_files(zuul.ansible, plugin_dir)
 
@@ -1187,6 +1188,8 @@ class AnsibleJob(object):
             config.write('library = %s\n'
                          % self.executor_server.library_dir)
             config.write('command_warnings = False\n')
+            config.write('module_utils = %s\n'
+                         % self.executor_server.module_utils_dir)
             config.write('callback_plugins = %s\n'
                          % self.executor_server.callback_dir)
             config.write('stdout_callback = zuul_stream\n')

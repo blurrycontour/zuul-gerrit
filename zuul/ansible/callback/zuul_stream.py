@@ -25,7 +25,7 @@ import uuid
 
 from ansible.plugins.callback import default
 
-LOG_STREAM_PORT = 19885
+from zuul.ansible.module_utils import log_streamer
 
 
 def linesplit(socket):
@@ -109,7 +109,7 @@ class CallbackModule(default.CallbackModule):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         while True:
             try:
-                s.connect((ip, LOG_STREAM_PORT))
+                s.connect((ip, log_streamer.NODE_LOG_STREAM_PORT))
             except Exception:
                 self._log.debug("[%s] Waiting on logger" % host)
                 time.sleep(0.1)

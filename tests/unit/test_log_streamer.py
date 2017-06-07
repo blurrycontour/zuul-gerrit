@@ -18,7 +18,7 @@ import logging
 import socket
 import tempfile
 
-import zuul.lib.log_streamer
+from zuul.ansible.module_utils import log_streamer
 import tests.base
 
 
@@ -33,7 +33,7 @@ class TestLogStreamer(tests.base.BaseTestCase):
     def startStreamer(self, port, root=None):
         if not root:
             root = tempfile.gettempdir()
-        return zuul.lib.log_streamer.LogStreamer(None, self.host, port, root)
+        return log_streamer.LogStreamer(None, self.host, port, root)
 
     def test_start_stop(self):
         port = 7900
