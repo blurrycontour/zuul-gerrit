@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df140735_83cab94c",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 392,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-07T18:36:14Z",
+      "side": 1,
+      "message": "Instead of this makedirs...",
+      "revId": "2b37701acfc40cac824db61c1ce038cbdc063595",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df140735_63c7a547",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 396,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-07T18:36:14Z",
+      "side": 1,
+      "message": "Put this here:\n\n  os.makedirs(plugin_dir, mode\u003d0o755)\n\n(but we can still omit the os.path.exists for plugin_dir)",
+      "revId": "2b37701acfc40cac824db61c1ce038cbdc063595",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
