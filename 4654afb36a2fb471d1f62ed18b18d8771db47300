@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df140735_a493905c",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 391,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-07T14:17:10Z",
+      "side": 1,
+      "message": "This is probably what we should rmtree.",
+      "revId": "4654afb36a2fb471d1f62ed18b18d8771db47300",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df140735_84908c50",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 397,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-07T14:17:10Z",
+      "side": 1,
+      "message": "And we\u0027ll be able to drop this.",
+      "revId": "4654afb36a2fb471d1f62ed18b18d8771db47300",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
