@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "df140735_c1b431f5",
+        "filename": "zuul/ansible/library/zuul_console.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-07T15:55:59Z",
+      "side": 1,
+      "message": "Need to pass conn as argument to get_command and use that instead of self.socket.",
+      "revId": "6a073fe97346cf54a8f70902df9dcffb8aabcecb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df140735_3e9d4c66",
         "filename": "zuul/ansible/library/zuul_console.py",
         "patchSetId": 2
