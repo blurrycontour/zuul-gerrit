@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df140735_3e9d4c66",
+        "filename": "zuul/ansible/library/zuul_console.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-07T15:33:34Z",
+      "side": 1,
+      "message": "Should probaby add some protection to make sure this is just a uuid, and not an attempt to read a random file (ie \"/../etc/passwd\").",
+      "revId": "6a073fe97346cf54a8f70902df9dcffb8aabcecb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
