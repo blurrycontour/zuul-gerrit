@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df140735_7182f302",
+        "filename": "tests/unit/test_inventory.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-06-07T00:47:11Z",
+      "side": 1,
+      "message": "from zuul.lib import yamlutil as yaml will get you a C-accelerated yaml :)",
+      "revId": "0d926125cc60da9fe281721afca27c3c99203026",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df140735_5187ef10",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-06-07T00:47:11Z",
+      "side": 1,
+      "message": "s/and/any/",
+      "revId": "0d926125cc60da9fe281721afca27c3c99203026",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
