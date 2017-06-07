@@ -29,6 +29,10 @@ try:
 except ImportError:
     import socketserver as ss  # python 3
 
+NODE_LOG_STREAM_PATH = '/tmp'
+NODE_LOG_STREAM_FILE = 'console-{uuid}.log'
+NODE_LOG_STREAM_PORT = 19885
+
 
 class Log(object):
 
@@ -79,25 +83,22 @@ class RequestHandler(ss.BaseRequestHandler):
                 pass
 
     def handle(self):
-        build_uuid = self.get_command()
-        build_uuid = build_uuid.rstrip()
+        requested_uuid = self.get_command()
+        requested_uuid = requested_uuid.rstrip()
 
-        # validate build ID
-        if not re.match("[0-9A-Fa-f]+$", build_uuid):
-            msg = 'Build ID %s is not valid' % build_uuid
-            self.request.sendall(msg.encode("utf-8"))
-            return
-
-        job_dir = os.path.join(self.server.jobdir_root, build_uuid)
-        if not os.path.exists(job_dir):
-            msg = 'Build ID %s not found' % build_uuid
+        # validate ID
+        if not re.match("[0-9A-Fa-f]+$", requested_uuid):
+            msg = '{log_type} ID {uuid} is not valid'.format(
+                log_type=self.server.log_type, uuid=requested_uuid)
             self.request.sendall(msg.encode("utf-8"))
             return
 
         # check if log file exists
-        log_file = os.path.join(job_dir, 'ansible', 'job-output.txt')
-        if not os.path.exists(log_file):
-            msg = 'Log not found for build ID %s' % build_uuid
+        log_file = self.server.file_template.format(uuid=requested_uuid)
+        if self.server.check_logfile and not os.path.exists(log_file):
+            msg = 'Log not found for {log_type} ID {uuid}: {log_file}'.format(
+                log_type=self.server.log_type, uuid=requested_uuid,
+                log_file=log_file)
             self.request.sendall(msg.encode("utf-8"))
             return
 
@@ -170,13 +171,22 @@ class RequestHandler(ss.BaseRequestHandler):
             log.size = st.st_size
 
 
-class CustomForkingTCPServer(ss.ForkingTCPServer):
+class V6ForkingTCPServer(ss.ForkingTCPServer):
+    address_family = socket.AF_INET6
+    check_logfile = False
+
+
+class CustomForkingTCPServer(V6ForkingTCPServer):
     '''
     Custom version that allows us to drop privileges after port binding.
     '''
+
+    check_logfile = True
+
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
-        self.jobdir_root = kwargs.pop('jobdir_root')
+        self.file_template = kwargs.pop('file_template')
+        self.log_type = 'Build'
         # For some reason, setting custom attributes does not work if we
         # call the base class __init__ first. Wha??
         ss.ForkingTCPServer.__init__(self, *args, **kwargs)
@@ -219,10 +229,12 @@ class LogStreamer(object):
     '''
 
     def __init__(self, user, host, port, jobdir_root):
-        self.server = CustomForkingTCPServer((host, port),
-                                             RequestHandler,
-                                             user=user,
-                                             jobdir_root=jobdir_root)
+        file_template = "{jobdir_root}/{{uuid}}/ansible/job_output.txt"
+        self.server = CustomForkingTCPServer(
+            (host, port),
+            RequestHandler,
+            user=user,
+            file_template=file_template.format(jobdir_root=jobdir_root))
 
         # We start the actual serving within a thread so we can return to
         # the owner.
@@ -234,3 +246,12 @@ class LogStreamer(object):
         if self.thd.isAlive():
             self.server.shutdown()
             self.server.server_close()
+
+
+def get_node_log_streamer(
+        host='::', port=NODE_LOG_STREAM_PORT, path=NODE_LOG_STREAM_PATH):
+    '''Factory function for making an on-node log streamer.'''
+    server = V6ForkingTCPServer((host, port), RequestHandler)
+    server.file_template = os.path.join(path, NODE_LOG_STREAM_FILE)
+    server.log_type = 'Log'
+    return server
