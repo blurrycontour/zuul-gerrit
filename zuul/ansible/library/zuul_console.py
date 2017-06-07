@@ -22,7 +22,7 @@ import socket
 import threading
 import time
 
-LOG_STREAM_FILE = '/tmp/console.log'
+LOG_STREAM_FILE = '/tmp/console-{log_uuid}.log'
 LOG_STREAM_PORT = 19885
 
 
@@ -63,6 +63,10 @@ class Console(object):
 
 
 class Server(object):
+
+    MAX_REQUEST_LEN = 1024
+    REQUEST_TIMEOUT = 10
+
     def __init__(self, path, port):
         self.path = path
 
@@ -85,9 +89,9 @@ class Server(object):
             t.daemon = True
             t.start()
 
-    def chunkConsole(self, conn):
+    def chunkConsole(self, conn, log_uuid):
         try:
-            console = Console(self.path)
+            console = Console(self.path.format(log_uuid=log_uuid))
         except Exception:
             return
         while True:
@@ -132,7 +136,38 @@ class Server(object):
                 return True
             console.size = st.st_size
 
+    def get_command(self):
+        poll = select.poll()
+        bitmask = (select.POLLIN | select.POLLERR |
+                   select.POLLHUP | select.POLLNVAL)
+        poll.register(self.socket, bitmask)
+        buffer = b''
+        ret = None
+        start = time.time()
+        while True:
+            elapsed = time.time() - start
+            timeout = max(self.REQUEST_TIMEOUT - elapsed, 0)
+            if not timeout:
+                raise Exception("Timeout while waiting for input")
+            for fd, event in poll.poll(timeout):
+                if event & select.POLLIN:
+                    buffer += self.socket.recv(self.MAX_REQUEST_LEN)
+                else:
+                    raise Exception("Received error event")
+            if len(buffer) >= self.MAX_REQUEST_LEN:
+                raise Exception("Request too long")
+            try:
+                ret = buffer.decode('utf-8')
+                x = ret.find('\n')
+                if x > 0:
+                    return ret[:x]
+            except UnicodeDecodeError:
+                pass
+
     def handleOneConnection(self, conn):
+        log_uuid = self.get_command()
+        log_uuid = log_uuid.rstrip()
+
         # FIXME: this won't notice disconnects until it tries to send
         console = None
         try:
@@ -143,12 +178,12 @@ class Server(object):
                     except:
                         pass
                 while True:
-                    console = self.chunkConsole(conn)
+                    console = self.chunkConsole(conn, log_uuid)
                     if console:
                         break
                     time.sleep(0.5)
                 while True:
-                    if self.followConsole(console, conn):
+                    if self.followConsole(console, conn, log_uuid):
                         break
                     else:
                         return
