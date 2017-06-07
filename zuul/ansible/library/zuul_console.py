@@ -17,13 +17,6 @@
 
 import os
 import sys
-import select
-import socket
-import threading
-import time
-
-LOG_STREAM_FILE = '/tmp/console-{log_uuid}.log'
-LOG_STREAM_PORT = 19885
 
 
 def daemonize():
@@ -54,174 +47,34 @@ def daemonize():
     return False
 
 
-class Console(object):
-    def __init__(self, path):
-        self.path = path
-        self.file = open(path)
-        self.stat = os.stat(path)
-        self.size = self.stat.st_size
-
-
-class Server(object):
-
-    MAX_REQUEST_LEN = 1024
-    REQUEST_TIMEOUT = 10
-
-    def __init__(self, path, port):
-        self.path = path
-
-        s = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
-        s.setsockopt(socket.SOL_SOCKET,
-                     socket.SO_REUSEADDR, 1)
-        s.bind(('::', port))
-        s.listen(1)
-
-        self.socket = s
-
-    def accept(self):
-        conn, addr = self.socket.accept()
-        return conn
-
-    def run(self):
-        while True:
-            conn = self.accept()
-            t = threading.Thread(target=self.handleOneConnection, args=(conn,))
-            t.daemon = True
-            t.start()
-
-    def chunkConsole(self, conn, log_uuid):
-        try:
-            console = Console(self.path.format(log_uuid=log_uuid))
-        except Exception:
-            return
-        while True:
-            chunk = console.file.read(4096)
-            if not chunk:
-                break
-            conn.send(chunk)
-        return console
-
-    def followConsole(self, console, conn):
-        while True:
-            # As long as we have unread data, keep reading/sending
-            while True:
-                chunk = console.file.read(4096)
-                if chunk:
-                    conn.send(chunk)
-                else:
-                    break
-
-            # At this point, we are waiting for more data to be written
-            time.sleep(0.5)
-
-            # Check to see if the remote end has sent any data, if so,
-            # discard
-            r, w, e = select.select([conn], [], [conn], 0)
-            if conn in e:
-                return False
-            if conn in r:
-                ret = conn.recv(1024)
-                # Discard anything read, if input is eof, it has
-                # disconnected.
-                if not ret:
-                    return False
-
-            # See if the file has been truncated
-            try:
-                st = os.stat(console.path)
-                if (st.st_ino != console.stat.st_ino or
-                    st.st_size < console.size):
-                    return True
-            except Exception:
-                return True
-            console.size = st.st_size
-
-    def get_command(self, conn):
-        poll = select.poll()
-        bitmask = (select.POLLIN | select.POLLERR |
-                   select.POLLHUP | select.POLLNVAL)
-        poll.register(conn, bitmask)
-        buffer = b''
-        ret = None
-        start = time.time()
-        while True:
-            elapsed = time.time() - start
-            timeout = max(self.REQUEST_TIMEOUT - elapsed, 0)
-            if not timeout:
-                raise Exception("Timeout while waiting for input")
-            for fd, event in poll.poll(timeout):
-                if event & select.POLLIN:
-                    buffer += conn.recv(self.MAX_REQUEST_LEN)
-                else:
-                    raise Exception("Received error event")
-            if len(buffer) >= self.MAX_REQUEST_LEN:
-                raise Exception("Request too long")
-            try:
-                ret = buffer.decode('utf-8')
-                x = ret.find('\n')
-                if x > 0:
-                    return ret[:x]
-            except UnicodeDecodeError:
-                pass
-
-    def handleOneConnection(self, conn):
-        log_uuid = self.get_command(conn)
-        # use path split to make use the input isn't trying to be clever
-        # and construct some path like /tmp/console-/../../something
-        log_uuid = os.path.split(log_uuid.rstrip())[-1]
-
-        # FIXME: this won't notice disconnects until it tries to send
-        console = None
-        try:
-            while True:
-                if console is not None:
-                    try:
-                        console.file.close()
-                    except:
-                        pass
-                while True:
-                    console = self.chunkConsole(conn, log_uuid)
-                    if console:
-                        break
-                    time.sleep(0.5)
-                while True:
-                    if self.followConsole(console, conn):
-                        break
-                    else:
-                        return
-        finally:
-            try:
-                conn.close()
-            except Exception:
-                pass
-
-
 def test():
-    s = Server(LOG_STREAM_FILE, LOG_STREAM_PORT)
-    s.run()
+    s = log_streamer.get_node_log_streamer()
+    s.serve_forever()
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            path=dict(default=LOG_STREAM_FILE),
-            port=dict(default=LOG_STREAM_PORT, type='int'),
+            path=dict(default=None, type='str'),
+            port=dict(default=None, type='int'),
         )
     )
 
     p = module.params
-    path = p['path']
-    port = p['port']
+    kwargs = {}
+    for key in ('path', 'port'):
+        if key in p:
+            kwargs[key] = p[key]
 
     if daemonize():
         module.exit_json()
 
-    s = Server(path, port)
-    s.run()
+    s = log_streamer.get_node_log_streamer()
+    s.serve_forever()
 
 from ansible.module_utils.basic import *  # noqa
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils import log_streamer
 
 if __name__ == '__main__':
     main()
-# test()

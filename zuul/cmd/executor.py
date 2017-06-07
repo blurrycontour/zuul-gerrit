@@ -82,11 +82,11 @@ class Executor(zuul.cmd.ZuulApp):
         child_pid = os.fork()
         if child_pid == 0:
             os.close(pipe_write)
-            import zuul.lib.log_streamer
+            from zuul.ansible.module_utils import log_streamer
 
             self.log.info("Starting log streamer")
-            streamer = zuul.lib.log_streamer.LogStreamer(
-                self.user, '0.0.0.0', self.finger_port, self.jobroot_dir)
+            streamer = log_streamer.LogStreamer(
+                self.user, '::', self.finger_port, self.jobroot_dir)
 
             # Keep running until the parent dies:
             pipe_read = os.fdopen(pipe_read)

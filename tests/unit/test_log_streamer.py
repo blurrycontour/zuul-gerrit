@@ -18,7 +18,7 @@ import logging
 import socket
 import tempfile
 
-import zuul.lib.log_streamer
+from zuul.ansible.module_utils import log_streamer
 import tests.base
 
 
@@ -28,26 +28,26 @@ class TestLogStreamer(tests.base.BaseTestCase):
 
     def setUp(self):
         super(TestLogStreamer, self).setUp()
-        self.host = '0.0.0.0'
+        self.host = '::'
 
     def startStreamer(self, port, root=None):
         if not root:
             root = tempfile.gettempdir()
-        return zuul.lib.log_streamer.LogStreamer(None, self.host, port, root)
+        return log_streamer.LogStreamer(None, self.host, port, root)
 
     def test_start_stop(self):
         port = 7900
         streamer = self.startStreamer(port)
         self.addCleanup(streamer.stop)
 
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
         self.addCleanup(s.close)
         self.assertEqual(0, s.connect_ex((self.host, port)))
         s.close()
 
         streamer.stop()
 
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
         self.addCleanup(s.close)
         self.assertNotEqual(0, s.connect_ex((self.host, port)))
         s.close()
