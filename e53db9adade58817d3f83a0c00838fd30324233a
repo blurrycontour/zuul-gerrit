@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df140735_8f3c25c0",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 617,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-07T14:31:58Z",
+      "side": 1,
+      "message": "I think we can drop these -- name is implied, and worker_hostname is redundant with manager.",
+      "revId": "e53db9adade58817d3f83a0c00838fd30324233a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
