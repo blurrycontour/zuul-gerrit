@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf091321_6977913c",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-08T17:18:05Z",
+      "side": 1,
+      "message": "What is this used for?",
+      "revId": "b115358259390422a7aa816b93c7af4a39329d57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf091321_4974cd35",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-08T17:18:05Z",
+      "side": 1,
+      "message": "Would it make sense to display the log_id too, since there will be multiple of these going, and the host isn\u0027t really a unique identifier?",
+      "revId": "b115358259390422a7aa816b93c7af4a39329d57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
