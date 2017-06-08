@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf091321_9e82164f",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-06-08T18:06:22Z",
+      "side": 1,
+      "message": "The leading underscore.. it BURNS us",
+      "revId": "50db522998994c1baf82195016aaecd3128268cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
