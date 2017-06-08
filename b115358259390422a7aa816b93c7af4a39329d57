@@ -69,6 +69,23 @@
       "revId": "b115358259390422a7aa816b93c7af4a39329d57",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf091321_deed2e26",
+        "filename": "zuul/ansible/library/command.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-06-08T18:06:37Z",
+      "side": 1,
+      "message": "ew, /tmp hard coded. \u003cgrumble but ignore\u003e",
+      "revId": "b115358259390422a7aa816b93c7af4a39329d57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
