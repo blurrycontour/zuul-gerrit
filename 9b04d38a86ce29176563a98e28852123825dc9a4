@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf091321_8821c3b7",
+        "filename": "tests/fixtures/config/tenant-parser/git/common-config/zuul.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-06-08T16:18:15Z",
+      "side": 1,
+      "message": "Did you forget to git add something? I don\u0027t find any reference to tenant-parser anywhere in tests.",
+      "revId": "9b04d38a86ce29176563a98e28852123825dc9a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf091321_682e6fa6",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1227,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-06-08T16:18:15Z",
+      "side": 1,
+      "message": "I find this list comprehension to be a little bit hard to read... and I wonder if it\u0027s really a win over a more deliberate loop. That said, it\u0027s correct, so this is just me expressing my personal feelings.",
+      "revId": "9b04d38a86ce29176563a98e28852123825dc9a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
