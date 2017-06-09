@@ -14,10 +14,10 @@
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 
 import datetime
-import multiprocessing
 import logging
 import os
 import socket
+import threading
 import time
 import uuid
 
@@ -161,7 +161,7 @@ class CallbackModule(default.CallbackModule):
                     'ansible_host', play_vars[host].get(
                         'ansible_inventory_host'))
                 self._host_dict[host] = ip
-                self._streamer = multiprocessing.Process(
+                self._streamer = threading.Thread(
                     target=self._read_log, args=(host, ip, log_id, task_name))
                 self._streamer.daemon = True
                 self._streamer.start()
@@ -174,7 +174,6 @@ class CallbackModule(default.CallbackModule):
                     now=datetime.datetime.now())
                 self._log.info(msg)
                 self._display.display("WARNING: Streamer could not join")
-                self._streamer.terminate()
 
     def v2_runner_on_failed(self, result, ignore_errors=False):
         self._stop_streamer()
