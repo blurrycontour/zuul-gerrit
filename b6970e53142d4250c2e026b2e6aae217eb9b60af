@@ -16,6 +16,23 @@
       "revId": "b6970e53142d4250c2e026b2e6aae217eb9b60af",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f231b9d_a0d27333",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-06-09T22:15:33Z",
+      "side": 1,
+      "message": "I said this 2 patches later, but I\u0027m dubious about this helping much. Without a timeout-then-kill, you\u0027re likely to just bounce off with your weak SIGTERM if it really is stuck. THe only way to really fix this is AFAIK is to make _read_log non-blocking and add a semaphore that tells you when to exit early.",
+      "revId": "b6970e53142d4250c2e026b2e6aae217eb9b60af",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
