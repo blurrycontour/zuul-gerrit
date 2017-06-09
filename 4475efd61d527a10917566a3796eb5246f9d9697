@@ -16,6 +16,23 @@
       "revId": "4475efd61d527a10917566a3796eb5246f9d9697",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f231b9d_e09d0b67",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-09T22:18:52Z",
+      "side": 0,
+      "message": "Yeah.  Now, whether we exit depends on how aggressive ansible-playbook is about terminating.  We should test this out and make sure we don\u0027t end up with hung ansible-playbook processes if we ever don\u0027t receive the end-of-stream marker.",
+      "revId": "4475efd61d527a10917566a3796eb5246f9d9697",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
