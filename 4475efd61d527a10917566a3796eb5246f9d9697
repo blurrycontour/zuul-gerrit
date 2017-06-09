@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f231b9d_a05f13e4",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-06-09T22:11:51Z",
+      "side": 0,
+      "message": "We just added this 2 patches ago. I have my doubts about that terminate working anyway, since the main blocking thing would be send() which would be in a syscall, but it seems funny to add it and then remove it 2 patches later.",
+      "revId": "4475efd61d527a10917566a3796eb5246f9d9697",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
