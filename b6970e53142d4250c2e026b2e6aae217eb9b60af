@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f231b9d_e01aab15",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-09T22:15:27Z",
+      "side": 1,
+      "message": "Sorry to bikeshed, but [Zuul] is generally the way we\u0027ve established that \"this is zuul interjecting meta-information into the log stream\".  Might be good to stick with that for user-friendliness.",
+      "revId": "b6970e53142d4250c2e026b2e6aae217eb9b60af",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
