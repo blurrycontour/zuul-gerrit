@@ -166,9 +166,15 @@ class CallbackModule(default.CallbackModule):
                 self._streamer.daemon = True
                 self._streamer.start()
 
-    def v2_runner_on_failed(self, result, ignore_errors=False):
+    def _stop_streamer(self):
         if self._streamer:
-            self._streamer.join()
+            self._streamer.join(5)
+            if self._streamer.is_alive():
+                self._display.vvv("Streamer could not join")
+                self._streamer.terminate()
+
+    def v2_runner_on_failed(self, result, ignore_errors=False):
+        self._stop_streamer()
         if result._task.action in ('command', 'shell'):
             zuul_filter_result(result._result)
         self._handle_exception(result._result)
@@ -194,8 +200,7 @@ class CallbackModule(default.CallbackModule):
         if result._task.action in ('include', 'include_role'):
             return
 
-        if self._streamer:
-            self._streamer.join()
+        self._stop_streamer()
 
         if result._result.get('changed', False):
             status = 'changed'
