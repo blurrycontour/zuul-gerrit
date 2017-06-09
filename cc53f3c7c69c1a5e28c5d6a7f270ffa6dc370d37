@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f231b9d_3d04507b",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-09T21:39:15Z",
+      "side": 1,
+      "message": "5 is okay for starters if we want to see how things go, but you could start as high as 30 with no argument from me.",
+      "revId": "cc53f3c7c69c1a5e28c5d6a7f270ffa6dc370d37",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f231b9d_1df9947f",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-09T21:39:15Z",
+      "side": 1,
+      "message": "I think this might be a good thing to log at normal verbosity.  Something like \"[Zuul] Log stream did not terminate\" perhaps?",
+      "revId": "cc53f3c7c69c1a5e28c5d6a7f270ffa6dc370d37",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
