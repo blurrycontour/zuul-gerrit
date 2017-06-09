@@ -15,10 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
+import glob
 import os
 import sys
 import select
 import socket
+import subprocess
 import threading
 import time
 
@@ -196,6 +198,18 @@ class Server(object):
                 pass
 
 
+def get_process(port):
+    # the ss command returns output that looks like:
+    # State      Recv-Q Send-Q Local Address:Port Peer Address:Port
+    # LISTEN     0      5      :::19885 :::* users:(("python",pid=3440,fd=3))
+    for line in subprocess.check_output(
+            ["ss", "-lptn", "sport", "=", ":" + str(port)]).split('\n'):
+        for part in line.split(','):
+            if part.startswith('pid='):
+                _, pid = part.split('=')
+                return pid
+
+
 def test():
     s = Server(LOG_STREAM_FILE, LOG_STREAM_PORT)
     s.run()
@@ -206,18 +220,27 @@ def main():
         argument_spec=dict(
             path=dict(default=LOG_STREAM_FILE),
             port=dict(default=LOG_STREAM_PORT, type='int'),
+            state=dict(default='present', choices=['absent', 'present']),
         )
     )
 
     p = module.params
     path = p['path']
     port = p['port']
+    state = p['state']
 
-    if daemonize():
-        module.exit_json()
+    if state == 'present':
+        if daemonize():
+            module.exit_json()
 
-    s = Server(path, port)
-    s.run()
+        s = Server(path, port)
+        s.run()
+    else:
+        pid = get_process(port)
+        subprocess.check_output(['kill', pid])
+        for fn in glob.glob(LOG_STREAM_FILE.format(log_uuid='*')):
+            os.unlink(fn)
+
 
 from ansible.module_utils.basic import *  # noqa
 from ansible.module_utils.basic import AnsibleModule
