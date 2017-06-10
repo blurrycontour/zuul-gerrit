@@ -116,6 +116,7 @@ class CallbackModule(default.CallbackModule):
         self._log("[%s] Starting to log %s for task %s"
                % (host, log_id, task_name), job=False)
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        hosts = self._get_play_hosts()
         while True:
             try:
                 s.connect((ip, LOG_STREAM_PORT))
@@ -132,7 +133,10 @@ class CallbackModule(default.CallbackModule):
                 else:
                     ts, ln = line.strip().split(' | ', 1)
 
-                    self._log("%s | %s " % (host, ln), ts=ts)
+                    if len(hosts) > 1:
+                        self._log("%s | %s " % (host, ln), ts=ts)
+                    else:
+                        self._log(ln, ts=ts)
 
     def v2_playbook_on_start(self, playbook):
         self._playbook_name = os.path.splitext(playbook._file_name)[0]
@@ -158,14 +162,7 @@ class CallbackModule(default.CallbackModule):
             task.args['zuul_log_id'] = log_id
             play_vars = self._play._variable_manager._hostvars
 
-            hosts = self._play.hosts
-            if 'all' in hosts:
-                # NOTE(jamielennox): play.hosts is purely the list of hosts
-                # that was provided not interpretted by inventory. We don't
-                # have inventory access here but we can assume that 'all' is
-                # everything in hostvars.
-                hosts = play_vars.keys()
-
+            hosts = self._get_play_hosts()
             for host in hosts:
                 ip = play_vars[host].get(
                     'ansible_host', play_vars[host].get(
@@ -264,10 +261,24 @@ class CallbackModule(default.CallbackModule):
         self._log(msg)
         return task
 
+    def _get_play_hosts(self):
+        hosts = self._play.hosts
+        if 'all' in hosts:
+            # NOTE(jamielennox): play.hosts is purely the list of hosts
+            # that was provided not interpretted by inventory. We don't
+            # have inventory access here but we can assume that 'all' is
+            # everything in hostvars.
+            hosts = play_vars.keys()
+        return hosts
+
     def _log_message(self, result, msg, status="ok"):
-        hostname = self._get_hostname(result)
-        self._log("{host} | {status}: {msg}".format(
-            host=hostname, status=status, msg=msg))
+        hosts = self._get_play_hosts()
+        if len(hosts) > 1:
+            hostname = self._get_hostname(result)
+            self._log("{host} | {status}: {msg}".format(
+                host=hostname, status=status, msg=msg))
+        else:
+            self._log("{status}: {msg}".format(status=status, msg=msg))
 
     def _get_hostname(self, result):
         delegated_vars = result._result.get('_ansible_delegated_vars', None)
