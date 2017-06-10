@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f231b9d_36f7cdf8",
+        "filename": "zuul/ansible/library/zuul_console.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-06-10T00:33:37Z",
+      "side": 1,
+      "message": "Here is a rough sketch of what this looks like with not really good enough error handling when done in python:\n\n  import os\n  inode \u003d None\n  with open(\u0027/proc/net/tcp\u0027) as f:\n      # discard header line\n      f.readline()\n      for line in f:\n          # sl  local_address rem_address   st tx_queue:rx_queue tr:tm-\u003ewhen\n          # retrnsmt   uid  timeout inode\n          fields \u003d line.split()\n          # Format is localaddr:localport in hex\n          port \u003d int(fields[1].split(\u0027:\u0027)[1], base\u003d16)\n          if port \u003d\u003d 19885:\n              inode \u003d fields[9]\n              break\n\n  if not inode:\n      quit()\n\n  my_euid \u003d os.geteuid()\n  for d in os.listdir(\u0027/proc\u0027):\n      try:\n          int(d)\n      except:\n          continue\n      d_abs_path \u003d os.path.join(\u0027/proc\u0027, d)\n      if os.stat(d_abs_path).st_uid !\u003d my_euid:\n          continue\n      fd_dir \u003d os.path.join(d_abs_path, \u0027fd\u0027)\n      if os.path.exists(fd_dir):\n          if os.stat(fd_dir).st_uid !\u003d my_euid:\n              continue\n          for fd in os.listdir(fd_dir):\n              fd_path \u003d os.path.join(fd_dir, fd)\n              if os.path.islink(fd_path):\n                  target \u003d os.readlink(fd_path)\n                  if \u0027[\u0027+inode+\u0027]\u0027 in target:\n                      print(d)\n                      break\n\nI need to weekend myself now but feel free to combine this with the psutils code which should do much better error handling on the /proc listings.",
+      "revId": "e028b8ffad98c5b4c1419d118a7da3fad84df120",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
