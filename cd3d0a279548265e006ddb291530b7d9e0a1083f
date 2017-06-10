@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f231b9d_a4e160d3",
+        "filename": "zuul/ansible/library/zuul_console.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-10T14:55:04Z",
+      "side": 1,
+      "message": "We should ignore this; proc has lots of non-numeric file names.",
+      "revId": "cd3d0a279548265e006ddb291530b7d9e0a1083f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f231b9d_84e664e8",
+        "filename": "zuul/ansible/library/zuul_console.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-10T14:55:04Z",
+      "side": 1,
+      "message": "\"as e\"",
+      "revId": "cd3d0a279548265e006ddb291530b7d9e0a1083f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
