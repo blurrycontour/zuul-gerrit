@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f231b9d_e49ab86c",
+        "filename": "zuul/ansible/library/zuul_console.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-10T14:41:04Z",
+      "side": 1,
+      "message": "I\u0027d probably just put a general exception handler for this whole loop...",
+      "revId": "41584e2a11f0d67c7d7e05b202f34fc4087a7134",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f231b9d_c489fc26",
+        "filename": "zuul/ansible/library/zuul_console.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-10T14:41:04Z",
+      "side": 1,
+      "message": "...and this whole loop.  That way if there are ever any problems reading a file, we keep trying others.",
+      "revId": "41584e2a11f0d67c7d7e05b202f34fc4087a7134",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
