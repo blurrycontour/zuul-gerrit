@@ -1083,7 +1083,6 @@ class Build(object):
     def __init__(self, job, uuid):
         self.job = job
         self.uuid = uuid
-        self.url = None
         self.result = None
         self.build_set = None
         self.execute_time = time.time()
@@ -1091,6 +1090,7 @@ class Build(object):
         self.end_time = None
         self.estimated_time = None
         self.pipeline = None
+        self.started = False
         self.canceled = False
         self.retry = False
         self.parameters = {}
@@ -1104,6 +1104,12 @@ class Build(object):
 
     def getSafeAttributes(self):
         return Attributes(uuid=self.uuid)
+
+    def formatBuildUrl(self):
+        if not self.worker.hostname:
+            return "finger://{uuid}@{hostname}".format(
+                uuid=self.uuid, hostname=self.worker.hostname)
+        return None
 
 
 class Worker(object):
@@ -1678,7 +1684,7 @@ class QueueItem(object):
             worker = None
             if build:
                 result = build.result
-                build_url = build.url
+                build_url = build.formatBuildUrl()
                 (unused, report_url) = self.formatJobResult(job)
                 if build.start_time:
                     if build.end_time:
@@ -1712,6 +1718,7 @@ class QueueItem(object):
                 'end_time': build.end_time if build else None,
                 'estimated_time': build.estimated_time if build else None,
                 'pipeline': build.pipeline.name if build else None,
+                'started': build.started if build else False,
                 'canceled': build.canceled if build else None,
                 'retry': build.retry if build else None,
                 'node_labels': build.node_labels if build else [],
