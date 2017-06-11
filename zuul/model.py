@@ -1109,8 +1109,14 @@ class Build(object):
         # Produce finger URL consistent with IETF Draft
         # https://tools.ietf.org/html/draft-ietf-uri-url-finger-03
         if self.worker.hostname:
-            return "finger://{hostname}/{uuid}".format(
-                uuid=self.uuid, hostname=self.worker.hostname)
+            if self.worker.log_port:
+                return "finger://{hostname}:{port}/{uuid}".format(
+                    uuid=self.uuid,
+                    port=self.worker.log_port,
+                    hostname=self.worker.hostname)
+            else:
+                return "finger://{hostname}/{uuid}".format(
+                    uuid=self.uuid, hostname=self.worker.hostname)
         return None
 
 
@@ -1119,11 +1125,13 @@ class Worker(object):
     def __init__(self):
         self.name = "Unknown"
         self.hostname = None
+        self.log_port = None
 
     def updateFromData(self, data):
         """Update worker information if contained in the WORK_DATA response."""
         self.name = data.get('worker_name', self.name)
         self.hostname = data.get('worker_hostname', self.hostname)
+        self.log_port = data.get('worker_log_port', self.log_port)
 
     def __repr__(self):
         return '<Worker %s>' % self.name
