@@ -384,7 +384,7 @@ class ExecutorClient(object):
             return False
 
         # TODOv3(jeblair): make a nicer way of recording build start.
-        if build.url is not None:
+        if build.started:
             self.log.debug("Build %s has already started" % build)
             self.cancelRunningBuild(build)
             self.log.debug("Canceled running build %s" % build)
@@ -400,7 +400,7 @@ class ExecutorClient(object):
         time.sleep(1)
 
         self.log.debug("Still unable to find build %s to cancel" % build)
-        if build.url:
+        if build.started:
             self.log.debug("Build %s has just started" % build)
             self.log.debug("Canceled running build %s" % build)
             self.cancelRunningBuild(build)
@@ -436,13 +436,13 @@ class ExecutorClient(object):
         self.log.debug("Build %s update %s" % (job, data))
         build = self.builds.get(job.unique)
         if build:
-            started = (build.url is not None)
-            # Allow URL to be updated
             build.url = data.get('url', build.url)
+            build.started = (build.url is not None)
             # Update information about worker
             build.worker.updateFromData(data)
+            # Update information about executor
 
-            if not started:
+            if not build.started:
                 self.log.info("Build %s started" % job)
                 build.__gearman_manager = data.get('manager')
                 self.sched.onBuildStarted(build)
