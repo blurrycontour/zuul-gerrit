@@ -39,9 +39,6 @@ import zuul.executor.server
 # Similar situation with gear and statsd.
 
 
-DEFAULT_FINGER_PORT = 79
-
-
 class Executor(zuul.cmd.ZuulApp):
 
     def parse_arguments(self):
@@ -135,7 +132,7 @@ class Executor(zuul.cmd.ZuulApp):
         if self.config.has_option('executor', 'finger_port'):
             self.finger_port = int(self.config.get('executor', 'finger_port'))
         else:
-            self.finger_port = DEFAULT_FINGER_PORT
+            self.finger_port = zuul.log.executor.DEFAULT_FINGER_PORT
 
         self.start_log_streamer()
         self.change_privs()
@@ -143,7 +140,8 @@ class Executor(zuul.cmd.ZuulApp):
         ExecutorServer = zuul.executor.server.ExecutorServer
         self.executor = ExecutorServer(self.config, self.connections,
                                        jobdir_root=self.jobroot_dir,
-                                       keep_jobdir=self.args.keep_jobdir)
+                                       keep_jobdir=self.args.keep_jobdir,
+                                       log_streaming_port=self.finger_port)
         self.executor.start()
 
         signal.signal(signal.SIGUSR2, zuul.cmd.stack_dump_handler)
