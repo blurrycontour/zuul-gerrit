@@ -35,6 +35,7 @@ from zuul.lib import commandsocket
 
 COMMANDS = ['stop', 'pause', 'unpause', 'graceful', 'verbose',
             'unverbose']
+DEFAULT_FINGER_PORT = 79
 
 
 class Watchdog(object):
@@ -354,13 +355,14 @@ class ExecutorServer(object):
     log = logging.getLogger("zuul.ExecutorServer")
 
     def __init__(self, config, connections={}, jobdir_root=None,
-                 keep_jobdir=False):
+                 keep_jobdir=False, log_streaming_port=DEFAULT_FINGER_PORT):
         self.config = config
         self.keep_jobdir = keep_jobdir
         self.jobdir_root = jobdir_root
         # TODOv3(mordred): make the executor name more unique --
         # perhaps hostname+pid.
         self.hostname = socket.gethostname()
+        self.log_streaming_port = log_streaming_port
         self.zuul_url = config.get('merger', 'zuul_url')
         self.merger_lock = threading.Lock()
         self.command_map = dict(
@@ -802,6 +804,8 @@ class AnsibleJob(object):
             'worker_name': 'My Worker',
             'worker_hostname': self.executor_server.hostname,
         }
+        if self.executor_server.log_streaming_port != DEFAULT_FINGER_PORT:
+            data['worker_log_port'] = self.executor_server.log_streaming_port
 
         self.job.sendWorkData(json.dumps(data))
         self.job.sendWorkStatus(0, 100)
