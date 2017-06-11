@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f231b9d_d9e0c199",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1112,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-06-11T15:48:10Z",
+      "side": 1,
+      "message": "I believe you want:\n\n  finger://host[:port][/\u003crequest\u003e]\n\nper the draft above.",
+      "revId": "ea25b192cce92699d0020f1902b46b0e3ffe6ce0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
