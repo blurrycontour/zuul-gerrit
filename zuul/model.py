@@ -1091,6 +1091,7 @@ class Build(object):
         self.end_time = None
         self.estimated_time = None
         self.pipeline = None
+        self.started = False
         self.canceled = False
         self.retry = False
         self.parameters = {}
@@ -1712,6 +1713,7 @@ class QueueItem(object):
                 'end_time': build.end_time if build else None,
                 'estimated_time': build.estimated_time if build else None,
                 'pipeline': build.pipeline.name if build else None,
+                'started': build.started if build else False,
                 'canceled': build.canceled if build else None,
                 'retry': build.retry if build else None,
                 'node_labels': build.node_labels if build else [],

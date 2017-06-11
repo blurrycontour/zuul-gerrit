@@ -2348,7 +2348,7 @@ class ZuulTestCase(BaseTestCase):
                 return False
             if server_job.waiting:
                 continue
-            if build.url is None:
+            if not build.started:
                 self.log.debug("%s has not reported start" % build)
                 return False
             # using internal ServerJob which offers no Text interface
