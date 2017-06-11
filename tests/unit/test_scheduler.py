@@ -4655,7 +4655,7 @@ class TestSchedulerSuccessURL(ZuulTestCase):
             'docs-draft-test/%s/publish-docs/' % uuid,
             body[2])
 
-        # NOTE: This default URL is currently hard-coded in executor/server.py
+        # NOTE: This default URL is currently hard-coded in zuul/model.py
         self.assertIn(
             '- docs-draft-test2 finger://zl.example.com/{uuid}'.format(
                 uuid=uuid_test2),

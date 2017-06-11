@@ -799,11 +799,8 @@ class AnsibleJob(object):
         self.prepareAnsibleFiles(args)
 
         data = {
-            'manager': self.executor_server.hostname,
-            'url': 'finger://{server}/{unique}'.format(
-                unique=self.job.unique,
-                server=self.executor_server.hostname),
             'worker_name': 'My Worker',
+            'worker_hostname': self.executor_server.hostname,
         }
 
         self.job.sendWorkData(json.dumps(data))
