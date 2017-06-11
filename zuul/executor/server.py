@@ -1234,6 +1234,8 @@ class AnsibleJob(object):
                 self.log.exception("Exception while killing ansible process:")
 
     def runAnsible(self, cmd, timeout, trusted=False):
+        # TODO(pabelanger): Create clean environment before we pass to
+        # bubblewrap.  It is possible to leak zuul-executor host information.
         env_copy = os.environ.copy()
         env_copy.update(self.ssh_agent.env)
         env_copy['LOGNAME'] = 'zuul'
@@ -1258,6 +1260,9 @@ class AnsibleJob(object):
                 ssh_auth_sock=env_copy.get('SSH_AUTH_SOCK'))
 
         env_copy['ANSIBLE_CONFIG'] = config_file
+        # NOTE(pabelanger): Default HOME variable to jobdir.work_root, as it is
+        # possible we don't bind mount current zuul user home directory.
+        env_copy['HOME'] = self.jobdir.work_root
 
         with self.proc_lock:
             if self.aborted:
