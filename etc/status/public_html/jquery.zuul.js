@@ -129,7 +129,7 @@
             job_status: function(job) {
                 var result = job.result ? job.result.toLowerCase() : null;
                 if (result === null) {
-                    result = job.url ? 'in progress' : 'queued';
+                    result = job.started ? 'in progress' : 'queued';
                 }
 
                 if (result === 'in progress') {
@@ -241,7 +241,7 @@
                 $.each(change.jobs, function (i, job) {
                     var result = job.result ? job.result.toLowerCase() : null;
                     if (result === null) {
-                        result = job.url ? 'in progress' : 'queued';
+                        result = job.started ? 'in progress' : 'queued';
                     }
 
                     if (result !== 'queued') {
