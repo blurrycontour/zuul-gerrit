@@ -2267,7 +2267,6 @@ class TestScheduler(ZuulTestCase):
         # TODO(mordred) pull uuids from self.builds
         self.assertEqual('finger://zl.example.com/%s' % status_jobs[0]['uuid'],
                          status_jobs[0]['url'])
-        # TOOD(mordred) configure a success-url on the base job
         self.assertEqual('finger://zl.example.com/%s' % status_jobs[0]['uuid'],
                          status_jobs[0]['report_url'])
         self.assertEqual('project-test1', status_jobs[1]['name'])
@@ -2275,12 +2274,13 @@ class TestScheduler(ZuulTestCase):
                          status_jobs[1]['url'])
         self.assertEqual('finger://zl.example.com/%s' % status_jobs[1]['uuid'],
                          status_jobs[1]['report_url'])
-
         self.assertEqual('project-test2', status_jobs[2]['name'])
         self.assertEqual('finger://zl.example.com/%s' % status_jobs[2]['uuid'],
                          status_jobs[2]['url'])
-        self.assertEqual('finger://zl.example.com/%s' % status_jobs[2]['uuid'],
-                         status_jobs[2]['report_url'])
+        self.assertEqual(
+            'http://logs.example.com/{n}/{p}/gate/project-test2'.format(
+                n=A.number, p=A.latest_patchset),
+            status_jobs[2]['report_url'])
 
     def test_live_reconfiguration(self):
         "Test that live reconfiguration works"
