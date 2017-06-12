@@ -581,8 +581,14 @@ class GithubConnection(BaseConnection):
     def getPullFileNames(self, project, number):
         github = self.getGithubClient(project)
         owner, proj = project.name.split('/')
-        filenames = [f.filename for f in
-                     github.pull_request(owner, proj, number).files()]
+        for retry in range(5):
+            pull = github.pull_request(owner, proj, number)
+            if pull is not None:
+                break
+            self.log.warning("Pull request #%s of %s/%s returned None!" % (
+                             number, owner, proj))
+            time.sleep(1)
+        filenames = [f.filename for f in pull.files()]
         log_rate_limit(self.log, github)
         return filenames
 
