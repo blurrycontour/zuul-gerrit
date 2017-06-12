@@ -33,6 +33,24 @@
       "revId": "3ab22ae210daf64c9d5cbdbdc0f75aa616cd0e1c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f231b9d_1ec15581",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1265,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-06-12T21:25:20Z",
+      "side": 1,
+      "message": "Where did we end up about running trusted playbook also in bubblewrap?  If we did that, it would be straightforward to setup both playbooks the same.",
+      "parentUuid": "7f231b9d_9447871e",
+      "revId": "3ab22ae210daf64c9d5cbdbdc0f75aa616cd0e1c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
