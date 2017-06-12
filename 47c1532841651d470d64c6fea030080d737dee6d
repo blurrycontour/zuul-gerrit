@@ -16,6 +16,24 @@
       "revId": "47c1532841651d470d64c6fea030080d737dee6d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f231b9d_14cc9733",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-06-12T21:07:53Z",
+      "side": 0,
+      "message": "Yes - \"the Log Stream did not terminate\" is communicating the same thing.",
+      "parentUuid": "7f231b9d_0846be7d",
+      "revId": "47c1532841651d470d64c6fea030080d737dee6d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }

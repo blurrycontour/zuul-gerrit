@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7f231b9d_b4da83e6",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-06-12T21:07:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7f231b9d_28517a37",
+      "revId": "aaf34812beb175fa8b34129408f729b895c32e45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7f231b9d_353203f3",
         "filename": "zuul/ansible/callback/zuul_stream.py",
         "patchSetId": 2
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "7f231b9d_94d787c0",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-06-12T21:07:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7f231b9d_353203f3",
+      "revId": "aaf34812beb175fa8b34129408f729b895c32e45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7f231b9d_e84a627e",
         "filename": "zuul/ansible/callback/zuul_stream.py",
         "patchSetId": 2
@@ -47,6 +83,24 @@
       "writtenOn": "2017-06-12T18:57:04Z",
       "side": 1,
       "message": "The timestamp is lost on this message, since you\u0027re setting executor\u003dTrue. That bypasses the part of the _log() function that would attach a timestamp.",
+      "revId": "aaf34812beb175fa8b34129408f729b895c32e45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f231b9d_d4d5ffba",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-06-12T21:07:53Z",
+      "side": 1,
+      "message": "Yah - missed sending this to the job too.",
+      "parentUuid": "7f231b9d_e84a627e",
       "revId": "aaf34812beb175fa8b34129408f729b895c32e45",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
