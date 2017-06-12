@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f231b9d_7907461e",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-12T20:37:25Z",
+      "side": 1,
+      "message": "This could cause problems with this line\n\ntimestamp |   | table | column | column |\n\n\nI think the problem is the strip before the split.  So if instead we did:\n\nts, ln \u003d line.split(\u0027 | \u0027, 1)\nln \u003d ln.strip()\n\nThat might fix the problem?",
+      "revId": "e6665e4902c5fe8bfb08f931c8775a92e4d26eac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
