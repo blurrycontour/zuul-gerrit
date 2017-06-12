@@ -66,6 +66,7 @@
 
 - job:
     name: project-test2
+    success-url: http://logs.example.com/{change.number}/{change.patchset}/{pipeline.name}/{job.name}
 
 - job:
     name: project1-project2-integration
