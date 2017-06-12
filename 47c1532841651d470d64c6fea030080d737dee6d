@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f231b9d_0846be7d",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-12T18:57:04Z",
+      "side": 0,
+      "message": "This WARNING seems to have completely been lost.",
+      "revId": "47c1532841651d470d64c6fea030080d737dee6d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}

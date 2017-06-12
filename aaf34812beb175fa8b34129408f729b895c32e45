@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "7f231b9d_28517a37",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-12T18:57:04Z",
+      "side": 1,
+      "message": "The old line used _display.display, but with the new function, because you don\u0027t seem to be passing executor\u003dTrue, and you are passing job\u003dFalse, you\u0027re getting a noop.",
+      "revId": "aaf34812beb175fa8b34129408f729b895c32e45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7f231b9d_353203f3",
         "filename": "zuul/ansible/callback/zuul_stream.py",
         "patchSetId": 2
@@ -13,6 +30,23 @@
       "writtenOn": "2017-06-12T12:37:36Z",
       "side": 1,
       "message": "It seems like it needs \"executor\u003dTrue\", otherwise this is noop.",
+      "revId": "aaf34812beb175fa8b34129408f729b895c32e45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f231b9d_e84a627e",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-12T18:57:04Z",
+      "side": 1,
+      "message": "The timestamp is lost on this message, since you\u0027re setting executor\u003dTrue. That bypasses the part of the _log() function that would attach a timestamp.",
       "revId": "aaf34812beb175fa8b34129408f729b895c32e45",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
