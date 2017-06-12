@@ -88,7 +88,7 @@ class GithubWebhookListener():
         except AttributeError:
             message = "Unhandled X-Github-Event: {0}".format(event)
             self.log.debug(message)
-            raise webob.exc.HTTPBadRequest(message)
+            method = None
 
         try:
             json_body = request.json_body
@@ -112,9 +112,11 @@ class GithubWebhookListener():
             self.connection.installation_map[project_name] = installation_id
 
         try:
-            event = method(json_body)
+            if method:
+                event = method(json_body)
         except:
             self.log.exception('Exception when handling event:')
+        finally:
             event = None
 
         if event:
