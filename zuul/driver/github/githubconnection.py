@@ -88,7 +88,7 @@ class GithubWebhookListener():
         except AttributeError:
             message = "Unhandled X-Github-Event: {0}".format(event)
             self.log.debug(message)
-            raise webob.exc.HTTPBadRequest(message)
+            method = None
 
         try:
             json_body = request.json_body
@@ -111,11 +111,12 @@ class GithubWebhookListener():
 
             self.connection.installation_map[project_name] = installation_id
 
-        try:
-            event = method(json_body)
-        except:
-            self.log.exception('Exception when handling event:')
-            event = None
+        event = None
+        if method:
+            try:
+                event = method(json_body)
+            except:
+                self.log.exception('Exception when handling event:')
 
         if event:
             if event.change_number:
@@ -212,6 +213,9 @@ class GithubWebhookListener():
         event.type = 'pull_request_review'
         event.action = body.get('action')
         return event
+
+    def _event_ping(self, body):
+        return
 
     def _event_status(self, body):
         action = body.get('action')
