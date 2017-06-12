@@ -1,0 +1,11 @@
+Code-Review+2: Paul Belanger <pabelanger@redhat.com>
+Code-Review+2: Clint 'SpamapS' Byrum <clint@fewbar.com>
+Verified+1: Zuul
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Mon, 12 Jun 2017 16:43:29 +0000
+Reviewed-on: https://review.openstack.org/472483
+Project: openstack-infra/zuul
+Branch: refs/heads/feature/zuulv3
