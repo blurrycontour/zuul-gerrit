@@ -207,6 +207,9 @@ class GithubWebhookListener():
         event.action = body.get('action')
         return event
 
+    def _event_ping(self, body):
+        return
+
     def _event_status(self, body):
         action = body.get('action')
         if action == 'pending':
