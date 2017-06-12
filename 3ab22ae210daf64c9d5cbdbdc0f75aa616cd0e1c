@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f231b9d_b44a8324",
+        "filename": "zuul/driver/bubblewrap/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-12T20:46:42Z",
+      "side": 1,
+      "message": "+1: This was the old behavior (and still current behavior for trusted playbooks); we inadvertantly changed it with bubblewrap.",
+      "revId": "3ab22ae210daf64c9d5cbdbdc0f75aa616cd0e1c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f231b9d_9447871e",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1265,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-12T20:46:42Z",
+      "side": 1,
+      "message": "-1: The environment variables should be the same between trusted and untrusted playbooks (otherwise it is hard to depend on them).  I think it makes sense to leave \u0027HOME\u0027 alone, even if it\u0027s not writeable.\n\nAs a special case, we could set HOME to work_root for both kinds of playbooks, but let\u0027s do that in a new change since that could be tricky and we\u0027ll want to think carefully about it.",
+      "revId": "3ab22ae210daf64c9d5cbdbdc0f75aa616cd0e1c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
