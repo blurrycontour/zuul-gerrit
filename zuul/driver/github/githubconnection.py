@@ -88,7 +88,8 @@ class GithubWebhookListener():
         except AttributeError:
             message = "Unhandled X-Github-Event: {0}".format(event)
             self.log.debug(message)
-            raise webob.exc.HTTPBadRequest(message)
+            # Returns empty 200 on unhandled events
+            raise webob.exc.HTTPOk()
 
         try:
             json_body = request.json_body
@@ -212,6 +213,9 @@ class GithubWebhookListener():
         event.type = 'pull_request_review'
         event.action = body.get('action')
         return event
+
+    def _event_ping(self, body):
+        return
 
     def _event_status(self, body):
         action = body.get('action')
