@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f231b9d_353203f3",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-06-12T12:37:36Z",
+      "side": 1,
+      "message": "It seems like it needs \"executor\u003dTrue\", otherwise this is noop.",
+      "revId": "aaf34812beb175fa8b34129408f729b895c32e45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
