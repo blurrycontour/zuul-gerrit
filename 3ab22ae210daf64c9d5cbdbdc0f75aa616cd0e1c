@@ -51,6 +51,23 @@
       "revId": "3ab22ae210daf64c9d5cbdbdc0f75aa616cd0e1c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f231b9d_fe0219b4",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1265,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-12T21:28:15Z",
+      "side": 1,
+      "message": "We have not decided to do it yet.  I don\u0027t think anyone has presented a comprehensive argument or proposal for it.",
+      "revId": "3ab22ae210daf64c9d5cbdbdc0f75aa616cd0e1c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
