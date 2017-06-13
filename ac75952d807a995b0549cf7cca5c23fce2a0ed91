@@ -51,6 +51,24 @@
       "revId": "ac75952d807a995b0549cf7cca5c23fce2a0ed91",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f231b9d_12e5c4a8",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-06-13T01:01:45Z",
+      "side": 1,
+      "message": "I\u0027ll look into that.",
+      "parentUuid": "7f231b9d_3eaf71e4",
+      "revId": "ac75952d807a995b0549cf7cca5c23fce2a0ed91",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
