@@ -905,7 +905,7 @@ class AnsibleJob(object):
                 ansible_user=self.executor_server.default_username,
                 nodepool_az=node.get('az'),
                 nodepool_provider=node.get('provider'),
-                nodepool_region=node.get('region'))
+                nodepool_region_name=node.get('region_name'))
 
             host_keys = []
             for key in node.get('host_keys'):

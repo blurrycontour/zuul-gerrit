@@ -283,7 +283,7 @@ class ExecutorClient(object):
                               az=node.az,
                               host_keys=node.host_keys,
                               provider=node.provider,
-                              region=node.region,
+                              region_name=node.region_name,
                               interface_ip=node.interface_ip,
                               public_ipv6=node.public_ipv6,
                               public_ipv4=node.public_ipv4))

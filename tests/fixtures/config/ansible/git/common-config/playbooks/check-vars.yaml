@@ -4,7 +4,7 @@
       assert:
         that:
           - nodepool_az == 'test-az'
-          - nodepool_region == 'test-region'
+          - nodepool_region_name == 'test-region'
           - nodepool_provider == 'test-provider'
 
     - name: Assert zuul-executor variables are valid.

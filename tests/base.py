@@ -1522,7 +1522,7 @@ class FakeNodepool(object):
         path = '/nodepool/nodes/'
         data = dict(type=node_type,
                     provider='test-provider',
-                    region='test-region',
+                    region_name='test-region',
                     az='test-az',
                     interface_ip='127.0.0.1',
                     public_ipv4='127.0.0.1',

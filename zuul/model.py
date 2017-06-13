@@ -369,7 +369,7 @@ class Node(object):
         self._keys = []
         self.az = None
         self.provider = None
-        self.region = None
+        self.region_name = None
 
     @property
     def state(self):
