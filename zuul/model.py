@@ -1083,7 +1083,6 @@ class Build(object):
     def __init__(self, job, uuid):
         self.job = job
         self.uuid = uuid
-        self.url = None
         self.result = None
         self.build_set = None
         self.execute_time = time.time()
@@ -1104,6 +1103,15 @@ class Build(object):
 
     def getSafeAttributes(self):
         return Attributes(uuid=self.uuid)
+
+    @property
+    def url(self):
+        # Produce finger URL consistent with IETF Draft
+        # https://tools.ietf.org/html/draft-ietf-uri-url-finger-03
+        if self.worker.hostname:
+            return "finger://{hostname}/{uuid}".format(
+                uuid=self.uuid, hostname=self.worker.hostname)
+        return None
 
 
 class Worker(object):
