@@ -1106,7 +1106,8 @@ class TenantParser(object):
             job = merger.getFiles(
                 project.source.connection.connection_name,
                 project.name, 'master',
-                files=['zuul.yaml', '.zuul.yaml'])
+                files=['zuul.yaml', '.zuul.yaml'],
+                dirs=['zuul.d', '.zuul.d'])
             job.source_context = model.SourceContext(project, 'master',
                                                      '', True)
             jobs.append(job)
@@ -1134,7 +1135,8 @@ class TenantParser(object):
                 job = merger.getFiles(
                     project.source.connection.connection_name,
                     project.name, branch,
-                    files=['zuul.yaml', '.zuul.yaml'])
+                    files=['zuul.yaml', '.zuul.yaml'],
+                    dirs=['zuul.d', '.zuul.d'])
                 job.source_context = model.SourceContext(
                     project, branch, '', False)
                 jobs.append(job)
@@ -1156,6 +1158,35 @@ class TenantParser(object):
                             (job.source_context,))
                         continue
                     loaded = True
+                    job.source_context.path = fn
+                    TenantParser.log.info(
+                        "Loading configuration from %s" %
+                        (job.source_context,))
+                    project = job.source_context.project
+                    branch = job.source_context.branch
+                    if job.source_context.trusted:
+                        incdata = TenantParser._parseConfigProjectLayout(
+                            job.files[fn], job.source_context)
+                        config_projects_config.extend(incdata)
+                    else:
+                        incdata = TenantParser._parseUntrustedProjectLayout(
+                            job.files[fn], job.source_context)
+                        untrusted_projects_config.extend(incdata)
+                    project.unparsed_config.extend(incdata)
+                    if branch in project.unparsed_branch_config:
+                        project.unparsed_branch_config[branch].extend(incdata)
+            loaded = False
+            files = sorted(job.files.keys())
+            for dn in ['zuul.d', '.zuul.d']:
+                for fn in files:
+                    if not fn.startswith("%s/" % dn):
+                        continue
+                    if loaded and loaded != dn:
+                        TenantParser.log.warning(
+                            "Multiple configuration directories in %s" %
+                            (job.source_context,))
+                        continue
+                    loaded = dn
                     job.source_context.path = fn
                     TenantParser.log.info(
                         "Loading configuration from %s" %
@@ -1328,28 +1359,48 @@ class ConfigLoader(object):
             branches = project.source.getProjectBranches(project)
 
         for branch in branches:
-            incdata = None
-            for fn in ['zuul.yaml', '.zuul.yaml']:
+            # Look for zuul.d/.zuul.d files
+            fns1 = []
+            fns2 = []
+            files_list = files.connections.get(
+                project.source.connection.connection_name, {}).get(
+                    project.name, {}).get(branch, {}).keys()
+            for fn in files_list:
+                if fn.Startswith("zuul.d/"):
+                    fns1.append(fn)
+                if fn.startswith(".zuul.d/"):
+                    fns2.append(fn)
+
+            # Sort directory listing and order by priority
+            fns = ['zuul.yaml', '.zuul.yaml'] + sorted(fns1) + sorted(fns2)
+
+            loaded = None
+            for fn in fns:
+                incdata = None
                 data = files.getFile(project.source.connection.connection_name,
                                      project.name, branch, fn)
+                # Prevent mixing zuul.yaml/zuul.d with .zuul.yaml/.zuul.d
+                if loaded and loaded != fn[0]:
+                    TenantParser.log.warning(
+                        "Multiple configuration in %s" % job.source_context)
+                    continue
+                loaded = fn[0]
                 if data:
-                    break
-            if data:
-                source_context = model.SourceContext(project, branch,
-                                                     fn, trusted)
-                if trusted:
-                    incdata = TenantParser._parseConfigProjectLayout(
-                        data, source_context)
+                    source_context = model.SourceContext(project, branch,
+                                                         fn, trusted)
+                    if trusted:
+                        incdata = TenantParser._parseConfigProjectLayout(
+                            data, source_context)
+                    else:
+                        incdata = TenantParser._parseUntrustedProjectLayout(
+                            data, source_context)
                 else:
-                    incdata = TenantParser._parseUntrustedProjectLayout(
-                        data, source_context)
-            else:
-                if trusted:
-                    incdata = project.unparsed_config
-                else:
-                    incdata = project.unparsed_branch_config.get(branch)
-            if incdata:
-                config.extend(incdata)
+                    if trusted:
+                        incdata = project.unparsed_config
+                    else:
+                        incdata = project.unparsed_branch_config.get(branch)
+                if incdata:
+                    config.extend(incdata)
 
     def createDynamicLayout(self, tenant, files,
                             include_config_projects=False):
