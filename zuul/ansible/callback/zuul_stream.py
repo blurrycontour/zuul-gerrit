@@ -273,9 +273,13 @@ class CallbackModule(default.CallbackModule):
         return hosts
 
     def _log_message(self, result, msg, status="ok"):
-        hostname = self._get_hostname(result)
-        self._log("{host} | {status}: {msg}".format(
-            host=hostname, status=status, msg=msg))
+        hosts = self._get_play_hosts()
+        if len(hosts) > 1:
+            hostname = self._get_hostname(result)
+            self._log("{host} | {status}: {msg}".format(
+                host=hostname, status=status, msg=msg))
+        else:
+            self._log("{status}: {msg}".format(status=status, msg=msg))
 
     def _get_hostname(self, result):
         delegated_vars = result._result.get('_ansible_delegated_vars', None)
