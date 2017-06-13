@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f231b9d_b1926e9d",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 499,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-06-13T19:30:04Z",
+      "side": 1,
+      "message": "FYI, tuples are hashable as long as all of the elements are. You can just say:\n\n    key \u003d (project.name, number, patchset)\n\nThe only time we\u0027d need to serialize it as the actual bytes would be if we were putting this in memcached or something, but even then the client libs usually do this for us.\n\nI see that this is mostly cargo culted from the gerrit driver. However, might be good to follow up and fix that. Or not. #nitpicks",
+      "revId": "61040e7ccba2898459c9cef79779391dbd1f6803",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f231b9d_918d327d",
+        "filename": "zuul/driver/github/githubsource.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-06-13T19:30:04Z",
+      "side": 1,
+      "message": "It\u0027s worth noting that I can\u0027t find anywhere that refresh\u003dTrue is passed to this.",
+      "revId": "61040e7ccba2898459c9cef79779391dbd1f6803",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
