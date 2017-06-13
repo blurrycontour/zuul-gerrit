@@ -186,3 +186,22 @@ class TestTenantGroups3(TenantParserTestCase):
                         project2_config.pipelines['check'].job_list.jobs)
         self.assertTrue('project2-job' in
                         project2_config.pipelines['check'].job_list.jobs)
+
+
+class TestSplitConfig(ZuulTestCase):
+    tenant_config_file = 'config/split-config/main.yaml'
+
+    def setup_config(self):
+        super(TestSplitConfig, self).setup_config()
+
+    def test_split_config(self):
+        tenant = self.sched.abide.tenants.get('tenant-one')
+        self.assertIn('project-test1', tenant.layout.jobs)
+        project_config = tenant.layout.project_configs.get(
+            'review.example.com/org/project')
+        self.assertIn('project-test1',
+                      project_config.pipelines['check'].job_list.jobs)
+        project1_config = tenant.layout.project_configs.get(
+            'review.example.com/org/project1')
+        self.assertIn('project1-project2-integration',
+                      project1_config.pipelines['check'].job_list.jobs)
