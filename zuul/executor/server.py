@@ -647,7 +647,8 @@ class ExecutorServer(object):
         task.wait()
         with self.merger_lock:
             files = self.merger.getFiles(args['connection'], args['project'],
-                                         args['branch'], args['files'])
+                                         args['branch'], args['files'],
+                                         args.get('dirs', []))
         result = dict(updated=True,
                       files=files,
                       zuul_url=self.zuul_url)
