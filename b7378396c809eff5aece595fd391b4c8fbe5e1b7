@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f231b9d_5857c403",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 908,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-06-13T16:04:12Z",
+      "side": 1,
+      "message": "Should these three lines exist top-level at all? Or should they go into the zuul variables dict instead?",
+      "range": {
+        "startLine": 906,
+        "startChar": 0,
+        "endLine": 908,
+        "endChar": 61
+      },
+      "revId": "b7378396c809eff5aece595fd391b4c8fbe5e1b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
