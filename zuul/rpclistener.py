@@ -38,8 +38,11 @@ class RPCListener(object):
             port = self.config.get('gearman', 'port')
         else:
             port = 4730
+        ssl_key = self.config.get('gearman', 'ssl_key')
+        ssl_cert = self.config.get('gearman', 'ssl_cert')
+        ssl_ca = self.config.get('gearman', 'ssl_ca')
         self.worker = gear.TextWorker('Zuul RPC Listener')
-        self.worker.addServer(server, port)
+        self.worker.addServer(server, port, ssl_key, ssl_cert, ssl_ca)
         self.worker.waitForServer()
         self.register()
         self.thread = threading.Thread(target=self.run)
