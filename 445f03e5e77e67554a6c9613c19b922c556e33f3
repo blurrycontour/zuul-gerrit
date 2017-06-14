@@ -16,6 +16,24 @@
       "revId": "445f03e5e77e67554a6c9613c19b922c556e33f3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f231b9d_fa5773c9",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-06-14T23:16:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7f231b9d_17c568f1",
+      "revId": "445f03e5e77e67554a6c9613c19b922c556e33f3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
