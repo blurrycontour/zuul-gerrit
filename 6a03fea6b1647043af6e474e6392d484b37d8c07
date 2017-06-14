@@ -16,6 +16,24 @@
       "revId": "6a03fea6b1647043af6e474e6392d484b37d8c07",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f231b9d_1aa8ef8a",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1155,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-06-14T23:26:56Z",
+      "side": 1,
+      "message": "Oops, this was left-over test debugging!",
+      "parentUuid": "7f231b9d_1bba3f09",
+      "revId": "6a03fea6b1647043af6e474e6392d484b37d8c07",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
