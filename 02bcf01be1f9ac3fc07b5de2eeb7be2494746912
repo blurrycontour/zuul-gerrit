@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f231b9d_095e7d11",
+        "filename": "tests/fixtures/gearman/README.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-14T13:58:45Z",
+      "side": 1,
+      "message": "Let\u0027s use \"-nodes\" so we don\u0027t have passwords on the CA cert used in the test fixture.  Also, you can simplify this by combining key generation with csr generation.  Also, we should generate certs that are valid for more than 1 month (ie, 10 years is a good start).\n\nHere are commands that do all of that, and use 2048 bit keys (which are standard now).\n\nopenssl req -new -newkey rsa:2048 -nodes -keyout root-ca.key -x509 -days 3650 -out root-ca.pem -subj \"/C\u003dUS/ST\u003dTexas/L\u003dAustin/O\u003dOpenStack Foundation/CN\u003dgearman-ca\"\n\nCLIENT\u003d\u0027client\u0027\nopenssl req -new -newkey rsa:2048 -nodes -keyout $CLIENT.key -out $CLIENT.csr -subj \"/C\u003dUS/ST\u003dTexas/L\u003dAustin/O\u003dOpenStack Foundation/CN\u003dgearman-$CLIENT\"\nopenssl x509 -req -days 3650 -in $CLIENT.csr -out $CLIENT.pem -CA root-ca.pem -CAkey root-ca.key -CAcreateserial\n\nCLIENT\u003d\u0027server\u0027\nopenssl req -new -newkey rsa:2048 -nodes -keyout $CLIENT.key -out $CLIENT.csr -subj \"/C\u003dUS/ST\u003dTexas/L\u003dAustin/O\u003dOpenStack Foundation/CN\u003dnodepool-$CLIENT\"\nopenssl x509 -req -days 3650 -in $CLIENT.csr -out $CLIENT.pem -CA root-ca.pem -CAkey root-ca.key -CAcreateserial",
+      "revId": "02bcf01be1f9ac3fc07b5de2eeb7be2494746912",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
