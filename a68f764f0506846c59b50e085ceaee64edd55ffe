@@ -22,6 +22,30 @@
       "revId": "a68f764f0506846c59b50e085ceaee64edd55ffe",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f231b9d_93208cb2",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-06-14T04:26:15Z",
+      "side": 1,
+      "message": "Because I wasn\u0027t sure of the code path :-) Though it might be worthy to check the payload decoding in case github does negative test of the hook, e.g. send bad data and expect an error back...\n\nIf it\u0027s ok to return here, I\u0027m fine with it too.",
+      "parentUuid": "7f231b9d_9351ac65",
+      "range": {
+        "startLine": 91,
+        "startChar": 20,
+        "endLine": 91,
+        "endChar": 21
+      },
+      "revId": "a68f764f0506846c59b50e085ceaee64edd55ffe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
