@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f231b9d_9351ac65",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 7191
+      },
+      "writtenOn": "2017-06-14T04:13:12Z",
+      "side": 1,
+      "message": "why not just bail out here? return None or raise HTTPOk? \n\nI\u0027m not sure there\u0027s any point sending it through the json decoder and intsallation_id checks just to fall through at the end.",
+      "range": {
+        "startLine": 91,
+        "startChar": 20,
+        "endLine": 91,
+        "endChar": 21
+      },
+      "revId": "a68f764f0506846c59b50e085ceaee64edd55ffe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
