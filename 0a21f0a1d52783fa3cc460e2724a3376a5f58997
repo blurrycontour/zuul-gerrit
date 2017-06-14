@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f231b9d_db6607c2",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2713,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-14T16:37:38Z",
+      "side": 1,
+      "message": "This docstring reads weird.",
+      "revId": "0a21f0a1d52783fa3cc460e2724a3376a5f58997",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f231b9d_bb57cbca",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 462,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-14T16:37:38Z",
+      "side": 1,
+      "message": "These will be much more concise with python 3, where we can make use of a fallback value.",
+      "revId": "0a21f0a1d52783fa3cc460e2724a3376a5f58997",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
