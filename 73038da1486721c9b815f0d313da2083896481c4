@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f231b9d_1beebfb3",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-14T16:43:35Z",
+      "side": 1,
+      "message": "Since this isn\u0027t doing anything, and now we return 200 on unhandled events, do we need this function here?",
+      "revId": "73038da1486721c9b815f0d313da2083896481c4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
