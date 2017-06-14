@@ -22,6 +22,30 @@
       "revId": "7d454c1665a06840ee62da193938c676f6f22d08",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f231b9d_8465e0e3",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1114,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-06-14T08:47:04Z",
+      "side": 1,
+      "message": "What do you mean? Redundant regarding to what?",
+      "parentUuid": "7f231b9d_f817a250",
+      "range": {
+        "startLine": 1114,
+        "startChar": 42,
+        "endLine": 1114,
+        "endChar": 43
+      },
+      "revId": "7d454c1665a06840ee62da193938c676f6f22d08",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
