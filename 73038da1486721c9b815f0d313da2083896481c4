@@ -16,6 +16,24 @@
       "revId": "73038da1486721c9b815f0d313da2083896481c4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f231b9d_5ad547e4",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-06-14T23:34:22Z",
+      "side": 1,
+      "message": "It seems like the ping would be a good opportunity to exercise the payload decoding and return Ok only when the _dispatch_event succeed.",
+      "parentUuid": "7f231b9d_1beebfb3",
+      "revId": "73038da1486721c9b815f0d313da2083896481c4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
