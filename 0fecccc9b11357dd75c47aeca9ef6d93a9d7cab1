@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f231b9d_3411695e",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-15T15:41:59Z",
+      "side": 1,
+      "message": "This is a change -- it makes the port configurable.  Using the gearman client section for this (\u0027gearman\u0027) is okay I guess -- it should never be different.  But it seems a little weird.  It might be worth considering adding a separate port option for the server.",
+      "revId": "0fecccc9b11357dd75c47aeca9ef6d93a9d7cab1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f231b9d_14166d56",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-15T15:41:59Z",
+      "side": 1,
+      "message": "These should definitely be read from gearman_server.",
+      "revId": "0fecccc9b11357dd75c47aeca9ef6d93a9d7cab1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f231b9d_f40e5139",
+        "filename": "zuul/lib/config.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-15T15:41:59Z",
+      "side": 1,
+      "message": "This should probably be \"if expand_user and value\"  for safety.",
+      "revId": "0fecccc9b11357dd75c47aeca9ef6d93a9d7cab1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
