@@ -1,0 +1,30 @@
+- pipeline:
+    name: check
+    manager: independent
+    trigger:
+      github:
+        - event: pull_request
+          action: changed
+    start:
+      github: {}
+    success:
+      github: {}
+    failure:
+      github: {}
+
+- job:
+    name: project1-test
+- job:
+    name: project2-test
+
+- project:
+    name: org/project1
+    check:
+      jobs:
+        - project1-test
+
+- project:
+    name: org/project2
+    check:
+      jobs:
+        - project2-test

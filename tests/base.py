@@ -574,6 +574,7 @@ class FakeGithubPullRequest(object):
         self.statuses = {}
         self.reviews = []
         self.writers = []
+        self.commit_messages = []
         self.updated_at = None
         self.head_sha = None
         self.is_merged = False
@@ -583,14 +584,14 @@ class FakeGithubPullRequest(object):
         self._addCommitToRepo(files=files)
         self._updateTimeStamp()
 
-    def addCommit(self, files=[]):
+    def addCommit(self, files=[], msg=''):
         """Adds a commit on top of the actual PR head."""
-        self._addCommitToRepo(files=files)
+        self._addCommitToRepo(files=files, msg=msg)
         self._updateTimeStamp()
 
-    def forcePush(self, files=[]):
+    def forcePush(self, files=[], msg=''):
         """Clears actual commits and add a commit on top of the base."""
-        self._addCommitToRepo(files=files, reset=True)
+        self._addCommitToRepo(files=files, reset=True, msg=msg)
         self._updateTimeStamp()
 
     def getPullRequestOpenedEvent(self):
@@ -735,7 +736,7 @@ class FakeGithubPullRequest(object):
         GithubChangeReference.create(
             repo, self._getPRReference(), 'refs/tags/init')
 
-    def _addCommitToRepo(self, files=[], reset=False):
+    def _addCommitToRepo(self, files=[], reset=False, msg=None):
         repo = self._getRepo()
         ref = repo.references[self._getPRReference()]
         if reset:
@@ -752,7 +753,8 @@ class FakeGithubPullRequest(object):
         else:
             fn = '%s-%s' % (self.branch.replace('/', '_'), self.number)
             self.files = [fn]
-        msg = self.subject + '-' + str(self.number_of_commits)
+        if msg is None:
+            msg = self.subject + '-' + str(self.number_of_commits)
         fn = os.path.join(repo.working_dir, fn)
         f = open(fn, 'w')
         with open(fn, 'w') as f:
@@ -764,6 +766,8 @@ class FakeGithubPullRequest(object):
         # Create an empty set of statuses for the given sha,
         # each sha on a PR may have a status set on it
         self.statuses[self.head_sha] = []
+        # Add the commit message to the list of commit messages on the PR.
+        self.commit_messages.append(msg)
         repo.head.reference = 'master'
         zuul.merger.merger.reset_repo_to_head(repo)
         repo.git.clean('-x', '-f', '-d')
@@ -936,7 +940,8 @@ class FakeGithubConnection(githubconnection.GithubConnection):
                     'full_name': pr.project
                 }
             },
-            'files': pr.files
+            'files': pr.files,
+            'commit_messages': pr.commit_messages
         }
         return data
 
