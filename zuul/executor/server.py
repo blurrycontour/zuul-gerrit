@@ -25,6 +25,7 @@ import threading
 import time
 import traceback
 from zuul.lib.yamlutil import yaml
+from zuul.lib.config import get_default
 
 import gear
 from six.moves import shlex_quote
@@ -373,32 +374,14 @@ class ExecutorServer(object):
             unverbose=self.verboseOff,
         )
 
-        if self.config.has_option('executor', 'git_dir'):
-            self.merge_root = self.config.get('executor', 'git_dir')
-        else:
-            self.merge_root = '/var/lib/zuul/executor-git'
-
-        if self.config.has_option('executor', 'default_username'):
-            self.default_username = self.config.get('executor',
-                                                    'default_username')
-        else:
-            self.default_username = 'zuul'
-
-        if self.config.has_option('merger', 'git_user_email'):
-            self.merge_email = self.config.get('merger', 'git_user_email')
-        else:
-            self.merge_email = None
-
-        if self.config.has_option('merger', 'git_user_name'):
-            self.merge_name = self.config.get('merger', 'git_user_name')
-        else:
-            self.merge_name = None
-
-        if self.config.has_option('executor', 'trusted_wrapper'):
-            trusted_wrapper_name = self.config.get(
-                'executor', 'trusted_wrapper').strip()
-        else:
-            trusted_wrapper_name = 'bubblewrap'
+        self.merge_root = get_default(self.config, 'executor', 'git_dir',
+                                      '/var/lib/zuul/executor-git')
+        self.default_username = get_default(self.config, 'executor',
+                                            'default_username', 'zuul')
+        self.merge_email = get_default(self.config, 'merger', 'git_user_email')
+        self.merge_name = get_default(self.config, 'merger', 'git_user_name')
+        trusted_wrapper_name = get_default(self.config, 'executor',
+                                           'trusted_wrapper', 'bubblewrap')
         self.trusted_wrapper = connections.drivers[trusted_wrapper_name]
 
         if trusted_wrapper_name == 'bubblewrap':
@@ -407,21 +390,15 @@ class ExecutorServer(object):
                 'rw': [self.config.get('zuul', 'state_dir')],
             }
             for btype in ('ro', 'rw'):
-                if self.config.has_option('executor',
-                                          'trusted_bubble_%s_dirs' % btype):
-                    trusted_map[btype].extend(
-                        self.config.get('executor',
-                                        'trusted_bubble_%s_dirs' % btype
-                                        ).split(':'))
+                trusted_map[btype].extend(get_default(
+                    self.config, 'executor', 'trusted_bubble_%s_dirs' % btype,
+                    "").split(':'))
         else:
             trusted_map = {}
         self.trusted_map = trusted_map
 
-        if self.config.has_option('executor', 'untrusted_wrapper'):
-            untrusted_wrapper_name = self.config.get(
-                'executor', 'untrusted_wrapper').strip()
-        else:
-            untrusted_wrapper_name = 'bubblewrap'
+        untrusted_wrapper_name = get_default(self.config, 'executor',
+                                             'untrusted_wrapper', 'bubblewrap')
         self.untrusted_wrapper = connections.drivers[untrusted_wrapper_name]
 
         self.connections = connections
@@ -432,11 +409,8 @@ class ExecutorServer(object):
         self.merger = self._getMerger(self.merge_root)
         self.update_queue = DeduplicateQueue()
 
-        if self.config.has_option('zuul', 'state_dir'):
-            state_dir = os.path.expanduser(
-                self.config.get('zuul', 'state_dir'))
-        else:
-            state_dir = '/var/lib/zuul'
+        state_dir = get_default(self.config, 'zuul', 'state_dir',
+                                '/var/lib/zuul', expand_user=True)
         path = os.path.join(state_dir, 'executor.socket')
         self.command_socket = commandsocket.CommandSocket(path)
         ansible_dir = os.path.join(state_dir, 'ansible')
@@ -478,22 +452,10 @@ class ExecutorServer(object):
         self._running = True
         self._command_running = True
         server = self.config.get('gearman', 'server')
-        if self.config.has_option('gearman', 'port'):
-            port = self.config.get('gearman', 'port')
-        else:
-            port = 4730
-        if self.config.has_option('gearman', 'ssl_key'):
-            ssl_key = self.config.get('gearman', 'ssl_key')
-        else:
-            ssl_key = None
-        if self.config.has_option('gearman', 'ssl_cert'):
-            ssl_cert = self.config.get('gearman', 'ssl_cert')
-        else:
-            ssl_cert = None
-        if self.config.has_option('gearman', 'ssl_ca'):
-            ssl_ca = self.config.get('gearman', 'ssl_ca')
-        else:
-            ssl_ca = None
+        port = get_default(self.config, 'gearman', 'port', 4730)
+        ssl_key = get_default(self.config, 'gearman', 'ssl_key')
+        ssl_cert = get_default(self.config, 'gearman', 'ssl_cert')
+        ssl_ca = get_default(self.config, 'gearman', 'ssl_ca')
         self.merger_worker = ExecutorMergeWorker(self, 'Zuul Executor Merger')
         self.merger_worker.addServer(server, port, ssl_key, ssl_cert, ssl_ca)
         self.executor_worker = gear.TextWorker('Zuul Executor Server')
@@ -736,12 +698,9 @@ class AnsibleJob(object):
         self.thread = None
         self.ssh_agent = None
 
-        if self.executor_server.config.has_option(
-            'executor', 'private_key_file'):
-            self.private_key_file = self.executor_server.config.get(
-                'executor', 'private_key_file')
-        else:
-            self.private_key_file = '~/.ssh/id_rsa'
+        self.private_key_file = get_default(self.executor_server.config,
+                                            'executor', 'private_key_file',
+                                            '~/.ssh/id_rsa')
         self.ssh_agent = SshAgent()
 
     def run(self):
