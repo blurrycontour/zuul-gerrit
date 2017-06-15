@@ -18,6 +18,7 @@ import logging
 import hmac
 import hashlib
 import time
+import re
 
 import cachecontrol
 from cachecontrol.cache import DictCache
@@ -72,7 +73,10 @@ class GithubWebhookListener():
 
         self._validate_signature(request)
 
-        self.__dispatch_event(request)
+        try:
+            self.__dispatch_event(request)
+        except:
+            self.log.exception("Exception handling Github event:")
 
     def __dispatch_event(self, request):
         try:
@@ -327,6 +331,11 @@ class GithubConnection(BaseConnection):
     driver_name = 'github'
     log = logging.getLogger("connection.github")
     payload_path = 'payload'
+    # The regex is based on the connection host. We do not yet support
+    # cross-connection dependency gathering
+    depends_on_re = re.compile(
+        r"^Depends-On: https://%s/.+/.+/pull/[0-9]+$" % self.git_host,
+        re.MULTILINE | re.IGNORECASE)
 
     def __init__(self, driver, connection_name, connection_config):
         super(GithubConnection, self).__init__(
@@ -476,8 +485,6 @@ class GithubConnection(BaseConnection):
         if event.change_number:
             change = self._getChange(project, event.change_number,
                                      event.patch_number, refresh=refresh)
-            change.refspec = event.refspec
-            change.branch = event.branch
             change.url = event.change_url
             change.updated_at = self._ghTimestampToDate(event.updated_at)
             change.source_event = event
@@ -495,8 +502,9 @@ class GithubConnection(BaseConnection):
             change = Ref(project)
         return change
 
-    def _getChange(self, project, number, patchset, refresh=False):
-        key = '%s/%s/%s' % (project.name, number, patchset)
+    def _getChange(self, project, number, patchset=None, refresh=False,
+                   history=None):
+        key = (project.name, number, patchset)
         change = self._change_cache.get(key)
         if change and not refresh:
             return change
@@ -505,25 +513,89 @@ class GithubConnection(BaseConnection):
             change.project = project
             change.number = number
             change.patchset = patchset
-        self._change_cache[key] = change
         try:
-            self._updateChange(change)
+            self._updateChange(change, history)
         except Exception:
             if key in self._change_cache:
                 del self._change_cache[key]
             raise
+        # Ensure key has a populated patchset value
+        key = (project.name, number, change.patchset)
+        self._change_cache[key] = change
         return change
 
-    def _updateChange(self, change):
+    def _getDependsOnFromCommits(self, change):
+        prs = []
+        seen = set()
+
+        # loop through every commit message of the change
+        for message in change.commit_messages:
+            for match in self.depends_on_re.findall(message):
+                if match in seen:
+                    self.log.debug("Ignoring duplicate Depends-On: %s" %
+                                   (match,))
+                    continue
+                seen.add(match)
+                # Get the github url
+                url = match.rsplit()[-1]
+                # break it into the parts we need
+                _, org, proj, _, num = url.rsplit('/', 4)
+                prs.append((org, proj, num))
+
+        return prs
+
+    def _updateChange(self, change, history=None):
+
+        # If this change is already in the history, we have a cyclic
+        # dependency loop and we do not need to update again, since it
+        # was done in a previous frame.
+        if history and (change.project.name, change.number) in history:
+            return change
+
         self.log.info("Updating %s" % (change,))
         change.pr = self.getPull(change.project.name, change.number)
+        if not change.patchset:
+            change.patchset = change.pr.get('head').get('sha')
+        change.refspec = "refs/pull/%s/head" % change.number
+        change.branch = change.pr.get('base').get('ref')
         change.files = change.pr.get('files')
         change.title = change.pr.get('title')
         change.open = change.pr.get('state') == 'open'
+        change.is_merged = change.pr.get('merged')
         change.status = self._get_statuses(change.project,
                                            change.patchset)
         change.reviews = self.getPullReviews(change.project,
                                              change.number)
+        change.commit_messages = change.pr.get('commit_messages')
+
+        if history is None:
+            history = []
+        else:
+            history = history[:]
+        history.append((change.project.name, change.number))
+
+        needs_changes = []
+
+        # Get all the PRs this may depend on
+        for pr in self._getDependsOnFromCommits(change):
+            proj = "/".join((pr[0], pr[1]))
+            pull = int(pr[2])
+            self.log.debug("Updating %s: Getting commit-dependent "
+                           "pull request %s/%s" %
+                           (change, proj, pull))
+            project = self.source.getProject(proj)
+            dep = self._getChange(project, pull, history=history)
+            if (not dep.is_merged) and dep not in needs_changes:
+                needs_changes.append(dep)
+
+        change.needs_changes = needs_changes
+
+        # TODO(jlk) Implement needed_by_changes
+        # We need to search presumably all of github for any commit
+        # that has in the message Depends-On: <this change> and then
+        # find the pull requests that have that commit in them
+        # However the github search API only indexes commits on master
+        # branch, so we'd never find the commits on other branches.
 
         return change
 
@@ -574,6 +646,7 @@ class GithubConnection(BaseConnection):
             time.sleep(1)
         pr = probj.as_dict()
         pr['files'] = [f.filename for f in probj.files()]
+        pr['commit_messages'] = [c.message for c in probj.commits()]
         log_rate_limit(self.log, github)
         return pr
 
