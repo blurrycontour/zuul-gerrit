@@ -26,6 +26,7 @@ zuul_url=http://zuul.example.com/p
 
 [executor]
 default_username=zuul
+trusted_bubble_rw_dirs=/opt/zuul-logs
 
 [webapp]
 listen_address=0.0.0.0

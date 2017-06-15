@@ -84,7 +84,6 @@ class BubblewrapDriver(Driver, WrapperInterface):
         '--ro-bind', '/bin', '/bin',
         '--ro-bind', '/sbin', '/sbin',
         '--ro-bind', '/etc/resolv.conf', '/etc/resolv.conf',
-        '--ro-bind', '{ansible_dir}', '{ansible_dir}',
         '--ro-bind', '{ssh_auth_sock}', '{ssh_auth_sock}',
         '--dir', '{work_dir}',
         '--bind', '{work_dir}', '{work_dir}',
@@ -118,6 +117,18 @@ class BubblewrapDriver(Driver, WrapperInterface):
         bwrap_command = list(self.bwrap_command)
         if not zuul_dir.startswith('/usr'):
             bwrap_command.extend(['--ro-bind', zuul_dir, zuul_dir])
+
+        if kwargs.get('ansible_dir'):
+            bwrap_command.extend(['--ro-bind', kwargs['ansible_dir'],
+                                  kwargs['ansible_dir']])
+
+        for btype in ('ro', 'rw'):
+            if btype == 'ro':
+                bind_arg = '--ro-bind'
+            else:
+                bind_arg = '--bind'
+            for bind in kwargs.get('bind_map', {}).get(btype, []):
+                bwrap_command.extend([bind_arg, bind, bind])
 
         # Need users and groups
         uid = os.getuid()
