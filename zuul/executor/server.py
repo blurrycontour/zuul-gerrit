@@ -394,6 +394,29 @@ class ExecutorServer(object):
         else:
             self.merge_name = None
 
+        if self.config.has_option('executor', 'trusted_wrapper'):
+            trusted_wrapper_name = self.config.get(
+                'executor', 'trusted_wrapper').strip()
+        else:
+            trusted_wrapper_name = 'bubblewrap'
+        self.trusted_wrapper = connections.drivers[trusted_wrapper_name]
+
+        if trusted_wrapper_name == 'bubblewrap':
+            trusted_map = {
+                'ro': [],
+                'rw': [self.config.get('zuul', 'state_dir')],
+            }
+            for btype in ('ro', 'rw'):
+                if self.config.has_option('executor',
+                                          'trusted_bubble_%s_dirs' % btype):
+                    trusted_map[btype].extend(
+                        self.config.get('executor',
+                                        'trusted_bubble_%s_dirs' % btype
+                                        ).split(':'))
+        else:
+            trusted_map = {}
+        self.trusted_map = trusted_map
+
         if self.config.has_option('executor', 'untrusted_wrapper'):
             untrusted_wrapper_name = self.config.get(
                 'executor', 'untrusted_wrapper').strip()
@@ -1267,7 +1290,11 @@ class AnsibleJob(object):
 
         if trusted:
             config_file = self.jobdir.trusted_config
-            popen = subprocess.Popen
+            driver = self.executor_server.trusted_wrapper
+            popen = driver.getPopen(
+                work_dir=self.jobdir.root,
+                ssh_auth_sock=env_copy.get('SSH_AUTH_SOCK'),
+                bind_map=self.executor_server.trusted_map)
         else:
             config_file = self.jobdir.untrusted_config
             driver = self.executor_server.untrusted_wrapper

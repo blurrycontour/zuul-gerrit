@@ -2023,6 +2023,8 @@ class ZuulTestCase(BaseTestCase):
                         project = reponame.replace('_', '/')
                         self.copyDirToRepo(project,
                                            os.path.join(git_path, reponame))
+        # Make test_root persist between ansible run
+        self.config.set('executor', 'trusted_bubble_rw_dirs', self.test_root)
         self.setupAllProjectKeys()
 
     def setupSimpleLayout(self):
