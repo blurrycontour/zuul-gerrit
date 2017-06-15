@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7f231b9d_4720b5ac",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-06-15T16:20:50Z",
+      "side": 1,
+      "message": "While we\u0027re looking at it - is there a value in having client and server have different sections? gearman_server.listen_address and gearman.server should always match, as should port. The only thing that would be different would be ssl_key, ssl_cert and ssl_ca. But those are ultimately about identifying a process, so we could even just have an ssl section which has key, cert and ca?\n\nOr - we can totally keep it as it is and have a gearman_server and a gearman section ... but if we do, maybe make gearman section gearman_client?\n\nJust thinking out loud.",
+      "parentUuid": "7f231b9d_3411695e",
+      "revId": "0fecccc9b11357dd75c47aeca9ef6d93a9d7cab1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7f231b9d_14166d56",
         "filename": "zuul/cmd/scheduler.py",
         "patchSetId": 2
