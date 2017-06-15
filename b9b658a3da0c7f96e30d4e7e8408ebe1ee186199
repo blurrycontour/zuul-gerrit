@@ -22,6 +22,30 @@
       "revId": "b9b658a3da0c7f96e30d4e7e8408ebe1ee186199",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f231b9d_5b69b0f6",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 805,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-06-15T18:14:01Z",
+      "side": 1,
+      "message": "Yup - agree.",
+      "parentUuid": "7f231b9d_e87b2978",
+      "range": {
+        "startLine": 805,
+        "startChar": 28,
+        "endLine": 805,
+        "endChar": 43
+      },
+      "revId": "b9b658a3da0c7f96e30d4e7e8408ebe1ee186199",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
