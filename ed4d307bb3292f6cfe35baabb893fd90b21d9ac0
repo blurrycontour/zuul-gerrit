@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f231b9d_7538edec",
+        "filename": "tests/base.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2028,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-06-16T03:02:03Z",
+      "side": 1,
+      "message": "So, I\u0027m not sure we should do this. It feels like we\u0027re starting to add job configuration in zuul.conf.  \n\nI think a better option would be to have the job use ssh over 127.0.0.1 if they needed to access the host file system. It likely needs to be setup before hand, since we\u0027d be inside bwrap.",
+      "range": {
+        "startLine": 2027,
+        "startChar": 2,
+        "endLine": 2028,
+        "endChar": 77
+      },
+      "revId": "ed4d307bb3292f6cfe35baabb893fd90b21d9ac0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
