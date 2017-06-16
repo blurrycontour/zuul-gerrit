@@ -66,6 +66,23 @@
     },
     {
       "key": {
+        "uuid": "7f231b9d_ff7f2863",
+        "filename": "tests/base.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2028,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-16T16:00:36Z",
+      "side": 1,
+      "message": "We discussed this and agreed it\u0027s a good idea.  However, there are some use cases where this may still be desirable.  So let\u0027s proceed with this patch, and avoid recommending it (and avoid using the facility ourselves in production).",
+      "revId": "ed4d307bb3292f6cfe35baabb893fd90b21d9ac0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7f231b9d_b86aee16",
         "filename": "zuul/executor/server.py",
         "patchSetId": 3
@@ -77,6 +94,23 @@
       "writtenOn": "2017-06-16T13:48:33Z",
       "side": 1,
       "message": "Since there is already a driver interface, perhaps the driver should grow two things:\n\n* a \"setTrustedMap\" method so that the executor can read the trusted_dirs config options and then pass it to the driver\n* a option to getPopen - trusted\u003dFalse\n\nThis way the driver can manage the logic of what to do with the information and how to apply the information, but the executor can still be the one reading the executor config.\n\nI\u0027d suggest that the setTrustedMap option take:\n- state_dir (rw for both trusted and untrusted)\n- trusted_ro_dirs\n- trusted_rw_dirs\n- untrusted_ro_dirs\n- untrusted_rw_dirs\n\nAnd we should say that trusted dirs are additive on top of untrusted dirs. \n\nIn doing that, the config values should be \"trusted_ro_dirs\" and \"trusted_rw_dirs\" (and maybe even untrusted_ro_dirs and untrusted_rw_dirs)\n\nthat would make the attribute on the executor \"self.wrapper\" rather than self.trusted_wrapper and self.untrusted_wrapper.\n\nFor that matter - maybe we just collapse the config definitions from trusted_wrapper and untrusted_wrapper to execution_wrapper",
+      "revId": "ed4d307bb3292f6cfe35baabb893fd90b21d9ac0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f231b9d_df9a2cb7",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-16T16:00:36Z",
+      "side": 1,
+      "message": "I agree with Monty\u0027s suggestions here.",
       "revId": "ed4d307bb3292f6cfe35baabb893fd90b21d9ac0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
