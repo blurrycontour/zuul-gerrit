@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "7f231b9d_98fcd23e",
+        "filename": "etc/zuul.conf-sample",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-06-16T13:48:33Z",
+      "side": 1,
+      "message": "How about just \"trusted_rw_dirs\" (see later note) And maybe even a trusted_ro_dirs just for completeness.",
+      "revId": "ed4d307bb3292f6cfe35baabb893fd90b21d9ac0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7f231b9d_7538edec",
         "filename": "tests/base.py",
         "patchSetId": 3
@@ -43,6 +60,23 @@
         "endLine": 2028,
         "endChar": 77
       },
+      "revId": "ed4d307bb3292f6cfe35baabb893fd90b21d9ac0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f231b9d_b86aee16",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-06-16T13:48:33Z",
+      "side": 1,
+      "message": "Since there is already a driver interface, perhaps the driver should grow two things:\n\n* a \"setTrustedMap\" method so that the executor can read the trusted_dirs config options and then pass it to the driver\n* a option to getPopen - trusted\u003dFalse\n\nThis way the driver can manage the logic of what to do with the information and how to apply the information, but the executor can still be the one reading the executor config.\n\nI\u0027d suggest that the setTrustedMap option take:\n- state_dir (rw for both trusted and untrusted)\n- trusted_ro_dirs\n- trusted_rw_dirs\n- untrusted_ro_dirs\n- untrusted_rw_dirs\n\nAnd we should say that trusted dirs are additive on top of untrusted dirs. \n\nIn doing that, the config values should be \"trusted_ro_dirs\" and \"trusted_rw_dirs\" (and maybe even untrusted_ro_dirs and untrusted_rw_dirs)\n\nthat would make the attribute on the executor \"self.wrapper\" rather than self.trusted_wrapper and self.untrusted_wrapper.\n\nFor that matter - maybe we just collapse the config definitions from trusted_wrapper and untrusted_wrapper to execution_wrapper",
       "revId": "ed4d307bb3292f6cfe35baabb893fd90b21d9ac0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
