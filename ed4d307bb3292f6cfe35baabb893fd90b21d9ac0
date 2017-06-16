@@ -22,6 +22,30 @@
       "revId": "ed4d307bb3292f6cfe35baabb893fd90b21d9ac0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f231b9d_d867f8b6",
+        "filename": "tests/base.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2028,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-06-16T03:28:49Z",
+      "side": 1,
+      "message": "This is to make .flag path checks succeed in unit test playbooks. Otherwise the directory disappear with the bwrap mount namespace.",
+      "parentUuid": "7f231b9d_7538edec",
+      "range": {
+        "startLine": 2027,
+        "startChar": 2,
+        "endLine": 2028,
+        "endChar": 77
+      },
+      "revId": "ed4d307bb3292f6cfe35baabb893fd90b21d9ac0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
