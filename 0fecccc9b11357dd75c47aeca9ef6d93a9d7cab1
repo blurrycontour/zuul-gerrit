@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "7f231b9d_5f9bd264",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-06-16T01:14:26Z",
+      "side": 1,
+      "message": "Alternatively, we could have a get_gearman_client_config and get_gearman_server_config that returns all the parameters at once. In the meantime I restored the legacy behavior until this is settle.",
+      "parentUuid": "7f231b9d_4720b5ac",
+      "revId": "0fecccc9b11357dd75c47aeca9ef6d93a9d7cab1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7f231b9d_14166d56",
         "filename": "zuul/cmd/scheduler.py",
         "patchSetId": 2
@@ -54,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "7f231b9d_9f904a4c",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-06-16T01:14:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7f231b9d_14166d56",
+      "revId": "0fecccc9b11357dd75c47aeca9ef6d93a9d7cab1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7f231b9d_f40e5139",
         "filename": "zuul/lib/config.py",
         "patchSetId": 2
@@ -65,6 +101,24 @@
       "writtenOn": "2017-06-15T15:41:59Z",
       "side": 1,
       "message": "This should probably be \"if expand_user and value\"  for safety.",
+      "revId": "0fecccc9b11357dd75c47aeca9ef6d93a9d7cab1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f231b9d_3fa496a5",
+        "filename": "zuul/lib/config.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-06-16T01:14:26Z",
+      "side": 1,
+      "message": "Yes, good idea!",
+      "parentUuid": "7f231b9d_f40e5139",
       "revId": "0fecccc9b11357dd75c47aeca9ef6d93a9d7cab1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
