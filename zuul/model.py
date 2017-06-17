@@ -14,17 +14,12 @@
 
 import abc
 import copy
+from collections import OrderedDict
 import logging
 import os
 import struct
 import time
 from uuid import uuid4
-import extras
-
-import six
-
-OrderedDict = extras.try_imports(['collections.OrderedDict',
-                                  'ordereddict.OrderedDict'])
 
 
 MERGER_MERGE = 1          # "git merge"
@@ -669,8 +664,7 @@ class PlaybookContext(object):
             path=self.path)
 
 
-@six.add_metaclass(abc.ABCMeta)
-class Role(object):
+class Role(object, metaclass=abc.ABCMeta):
     """A reference to an ansible role."""
 
     def __init__(self, target_name):
