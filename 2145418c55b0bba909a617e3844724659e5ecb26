@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7f231b9d_9f435fb0",
+        "filename": "tests/unit/test_log_streamer.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-06-19T19:46:09Z",
+      "side": 1,
+      "message": "Done in followup: https://review.openstack.org/475505",
+      "parentUuid": "7f231b9d_7630b39f",
+      "revId": "2145418c55b0bba909a617e3844724659e5ecb26",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7f231b9d_563377ab",
         "filename": "tests/unit/test_log_streamer.py",
         "patchSetId": 17
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "7f231b9d_5f1707a5",
+        "filename": "tests/unit/test_log_streamer.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-06-19T19:46:09Z",
+      "side": 1,
+      "message": "Done in followup: https://review.openstack.org/475505",
+      "parentUuid": "7f231b9d_563377ab",
+      "revId": "2145418c55b0bba909a617e3844724659e5ecb26",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7f231b9d_3626bb69",
         "filename": "tests/unit/test_log_streamer.py",
         "patchSetId": 17
@@ -47,6 +83,24 @@
       "writtenOn": "2017-06-19T16:25:02Z",
       "side": 1,
       "message": "\u0027\u0027.join(logfile.readline())  is the same as  logfile.read()",
+      "revId": "2145418c55b0bba909a617e3844724659e5ecb26",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f231b9d_ff25b30b",
+        "filename": "tests/unit/test_log_streamer.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-06-19T19:46:09Z",
+      "side": 1,
+      "message": "Done in followup: https://review.openstack.org/475505",
+      "parentUuid": "7f231b9d_3626bb69",
       "revId": "2145418c55b0bba909a617e3844724659e5ecb26",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
