@@ -683,6 +683,10 @@ class GithubConnection(BaseConnection):
 
         # Create a repo object
         repository = github.repository(owner, project)
+
+        if not repository:
+            return 'none'
+
         # Build up a URL
         url = repository._build_url('collaborators', login, 'permission',
                                     base_url=repository._api)
