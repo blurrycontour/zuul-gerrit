@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f231b9d_40fe0d6b",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-06-19T15:36:09Z",
+      "side": 1,
+      "message": "Not sure this permanent comment really adds anything post-porting, but doesn\u0027t hurt either.",
+      "revId": "fb35e2630bb2d231c4e3bc59d936b4b0aaf7cba9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
