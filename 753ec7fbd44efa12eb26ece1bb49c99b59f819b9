@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f231b9d_696e9fc9",
+        "filename": "tests/unit/test_log_streamer.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-06-19T11:50:25Z",
+      "side": 1,
+      "message": "This open() is a leftover from previous patch sets that had several sync points in the python27.yaml. This shouldn\u0027t happen until *after* the streamer has started, otherwise we race with the job finishing.",
+      "revId": "753ec7fbd44efa12eb26ece1bb49c99b59f819b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
