@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f231b9d_dd47aa1c",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-06-19T15:00:28Z",
+      "side": 1,
+      "message": "Since _exc_info is set using sys.exc_info(), I wonder if we want to use ALL of the elements within the tuple that is returned rather than just the value element? So, something like:\n\n    e, v, t \u003d self._exc_info\n    raise e(v).with_traceback(t)\n\nBased on reading from: http://python3porting.com/differences.html#raise",
+      "revId": "d3915cadff20ef06295596da9f5ee92016dd9385",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
