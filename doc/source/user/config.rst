@@ -111,7 +111,7 @@ success, the pipeline reports back to Gerrit with a *Verified* vote of
         my_gerrit
           verified: -1
 
-See TODO for more annotated examples of common pipeline configurations.
+.. TODO: See TODO for more annotated examples of common pipeline configurations.
 
 The attributes available on a pipeline are as follows (all are
 optional unless otherwise specified):
@@ -190,7 +190,7 @@ optional unless otherwise specified):
 
   Triggers are loaded from their connection name. The driver type of
   the connection will dictate which options are available.
-  See :doc:`triggers`.
+  See xref:`triggers`.
 
 **require**
   If this section is present, it established pre-requisites for any
@@ -199,7 +199,7 @@ optional unless otherwise specified):
   the conditions specified here must be met or the item will not be
   enqueued.
 
-.. TODO this section is in flux in v3 _pipeline-require-approval:
+.. _pipeline-require-approval:
 
   **approval**
   This requires that a certain kind of approval be present for the
@@ -509,7 +509,7 @@ unless otherwise specified:
   variants used in constructing the frozen job, with no duplication.
   Default: none.
 
-** branches **
+**branches**
   A regular expression (or list of regular expressions) which describe
   on what branches a job should run (or in the case of variants: to
   alter the behavior of a job for a certain branch).
@@ -667,12 +667,13 @@ the project is not the name under which the role should be installed
 (and therefore referenced from Ansible), the `name` attribute may be
 used to specify an alternate.
 
+  .. note:: galaxy roles are not yet implemented
+
   **galaxy**
   The name of the role in Ansible Galaxy.  If this attribute is
   supplied, Zuul will search Ansible Galaxy for a role by this name
   and install it.  Mutually exclusive with ``zuul``; either ``galaxy``
   or ``zuul`` must be supplied.
-  TODO: not yet implemented
 
   **zuul**
   The name of a Zuul project which supplies the role.  Mutually
@@ -855,9 +856,9 @@ A list of node definitions, each of which has the following format:
   The name of the node.  This will appear in the Ansible inventory for
   the job.
 
-  **image** (required)
-  The Nodepool image type for the node.  Zuul will request a node with
-  this flavor.  TODO: change to flavor
+  **label** (required)
+  The Nodepool label for the node.  Zuul will request a node with
+  this label.
 
 .. _semaphore:
 

@@ -26,13 +26,8 @@ specified by the pipeline's *Reporter*.
 TODO: flow diagram
 
 The following sections describe how to configure Zuul.
-:ref:`admin-config` covers areas of interest primarily to system
-administrators.  :ref:`project-config` covers the portion of Zuul
+ref:`admin-config` covers areas of interest primarily to system
+administrators.  ref:`project-config` covers the portion of Zuul
 configuration of interest to most users -- that which is included
 directly in the git repositories operated on by Zuul.
 
-.. toctree::
-   :maxdepth: 2
-
-   admin-config
-   project-config

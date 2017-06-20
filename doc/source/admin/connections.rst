@@ -6,8 +6,8 @@ Connections
 ===========
 
 zuul coordinates talking to multiple different systems via the concept
-of connections. A connection is listed in the :ref:`zuulconf` file and is
-then referred to from the :ref:`layoutyaml`. This makes it possible to
+of connections. A connection is listed in the xref:`zuulconf` file and is
+then referred to from the xref:`layoutyaml`. This makes it possible to
 receive events from gerrit via one connection and post results from another
 connection that may report back as a different user.
 

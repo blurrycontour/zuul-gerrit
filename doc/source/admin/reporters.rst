@@ -25,7 +25,7 @@ with a value. For example, ``verified: 1`` becomes ``gerrit review
 --verified 1`` and ``submit: true`` becomes ``gerrit review
 --submit``.
 
-A :ref:`connection` that uses the gerrit driver must be supplied to the
+A xref:`connection` that uses the gerrit driver must be supplied to the
 trigger.
 
 GitHub
@@ -36,7 +36,7 @@ comment containing the build results, a commit status on start, success and
 failure, an issue label addition/removal on the PR, and a merge of the PR
 itself. Status name, description, and context is taken from the pipeline.
 
-A :ref:`connection` that uses the github driver must be supplied to the
+A xref:`connection` that uses the github driver must be supplied to the
 reporter. It has the following options:
 
   **status**
@@ -75,14 +75,14 @@ SMTP
 
 A simple email reporter is also available.
 
-A :ref:`connection` that uses the smtp driver must be supplied to the
+A xref:`connection` that uses the smtp driver must be supplied to the
 reporter.
 
 SMTP Configuration
 ~~~~~~~~~~~~~~~~~~
 
 zuul.conf contains the SMTP server and default to/from as described
-in :ref:`zuulconf`.
+in xref:`zuulconf`.
 
 Each pipeline can overwrite the ``subject`` or the ``to`` or ``from`` address by
 providing alternatives as arguments to the reporter. For example, ::
@@ -108,7 +108,7 @@ SQL
 
 This reporter is used to store results in a database.
 
-A :ref:`connection` that uses the sql driver must be supplied to the
+A xref:`connection` that uses the sql driver must be supplied to the
 reporter.
 
 SQL Configuration

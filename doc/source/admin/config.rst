@@ -22,3 +22,11 @@ TODO:
 * github
   * trigger config
   * reporter config
+
+.. toctree::
+   :maxdepth: 2
+
+   connections
+   reporters
+   triggers
+   statsd
