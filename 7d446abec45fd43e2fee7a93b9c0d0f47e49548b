@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "5f201791_a8dc9618",
+        "filename": "doc/source/project-config.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-20T20:32:30Z",
+      "side": 1,
+      "message": "Each change is reported once when it completes jobs while at the top of the queue.  I\u0027m not sure if that\u0027s documented anywhere, or where it should be.  You make a good point -- we should find a place for it.",
+      "revId": "7d446abec45fd43e2fee7a93b9c0d0f47e49548b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff0f0b1f_50afe993",
         "filename": "doc/source/project-config.rst",
         "patchSetId": 1
@@ -30,6 +47,23 @@
       "writtenOn": "2017-05-17T17:20:01Z",
       "side": 1,
       "message": "Where is this textual description used? Are there formatting concerns?",
+      "revId": "7d446abec45fd43e2fee7a93b9c0d0f47e49548b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_88e1dad3",
+        "filename": "doc/source/project-config.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-20T20:32:30Z",
+      "side": 1,
+      "message": "Fixed.",
       "revId": "7d446abec45fd43e2fee7a93b9c0d0f47e49548b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -70,6 +104,23 @@
     },
     {
       "key": {
+        "uuid": "5f201791_68e67eeb",
+        "filename": "doc/source/project-config.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-20T20:32:30Z",
+      "side": 1,
+      "message": "Yes, only a subset is available, and we do indeed link back to the approval docs.",
+      "revId": "7d446abec45fd43e2fee7a93b9c0d0f47e49548b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff0f0b1f_ebbe0efe",
         "filename": "doc/source/project-config.rst",
         "patchSetId": 1
@@ -81,6 +132,23 @@
       "writtenOn": "2017-05-17T17:20:01Z",
       "side": 1,
       "message": "Can the \"reference branch\" to be read first be manipulated? For the crazy projects that do not use \"master\", but instead use some other name (I\u0027m looking at you Ansible...)",
+      "revId": "7d446abec45fd43e2fee7a93b9c0d0f47e49548b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_48ebc2af",
+        "filename": "doc/source/project-config.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 549,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-20T20:32:30Z",
+      "side": 1,
+      "message": "Not yet, but we should.",
       "revId": "7d446abec45fd43e2fee7a93b9c0d0f47e49548b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
