@@ -1,0 +1,10 @@
+Code-Review+2: David Shrewsbury <shrewsbury.dave@gmail.com>
+Verified+1: Zuul
+Code-Review+2: Clint 'SpamapS' Byrum <clint@fewbar.com>
+Workflow+1: Clint 'SpamapS' Byrum <clint@fewbar.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Tue, 20 Jun 2017 16:33:21 +0000
+Reviewed-on: https://review.openstack.org/475135
+Project: openstack-infra/zuul
+Branch: refs/heads/feature/zuulv3
