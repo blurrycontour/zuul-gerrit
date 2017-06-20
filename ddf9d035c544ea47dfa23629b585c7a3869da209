@@ -16,6 +16,23 @@
       "revId": "ddf9d035c544ea47dfa23629b585c7a3869da209",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_08cdca5c",
+        "filename": "doc/source/project-config.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 578,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-20T20:32:32Z",
+      "side": 1,
+      "message": "Good point; I\u0027d be happy to change it (before we release 3.0) if we can find a better word.\n\nMaybe \"inheritable\"?",
+      "revId": "ddf9d035c544ea47dfa23629b585c7a3869da209",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
