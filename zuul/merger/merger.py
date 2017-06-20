@@ -72,7 +72,7 @@ class Repo(object):
         if not repo_is_cloned:
             self.log.debug("Cloning from %s to %s" % (self.remote_url,
                                                       self.local_path))
-            if self.cache_path:
+            if self.cache_path and os.path.isdir('%s/.git' % self.cache_path):
                 git.Repo.clone_from(self.cache_path, self.local_path,
                                     env=self.env)
                 rewrite_url = True
