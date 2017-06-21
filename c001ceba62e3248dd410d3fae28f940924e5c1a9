@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f201791_a06ca108",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-21T08:48:33Z",
+      "side": 1,
+      "message": "Will the except on the next line catch this raise? If not, the webapp will seemingly crash and stop processing, which was the point of putting in the bare except in the first place, to allow the traceback to get logged but allow the webapp to keep going.",
+      "revId": "c001ceba62e3248dd410d3fae28f940924e5c1a9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
