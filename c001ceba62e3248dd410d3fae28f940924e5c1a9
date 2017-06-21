@@ -16,6 +16,24 @@
       "revId": "c001ceba62e3248dd410d3fae28f940924e5c1a9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_7b74fc99",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-06-21T08:56:12Z",
+      "side": 1,
+      "message": "The expect on the next line won\u0027t catch this raise, it\u0027s because we want the webob.exc to be passed to the caller so that the response is 404.",
+      "parentUuid": "5f201791_a06ca108",
+      "revId": "c001ceba62e3248dd410d3fae28f940924e5c1a9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
