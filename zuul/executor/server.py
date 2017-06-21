@@ -318,6 +318,13 @@ def make_inventory_dict(nodes, groups, all_vars):
     hosts = {}
     for node in nodes:
         hosts[node['name']] = node['host_vars']
+    # For Ansible 2.3.1 and before, the implicit localhost does not properly
+    # do the right things with ansible_python_interpreter, but an explicit
+    # definition should make it properly apply.
+    hosts['localhost'] = dict(
+        ansible_host='127.0.0.1',
+        ansible_connection='local',
+    )
 
     inventory = {
         'all': {
