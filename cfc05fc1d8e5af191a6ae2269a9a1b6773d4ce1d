@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f201791_5090cd4e",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 861,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-22T15:24:36Z",
+      "side": 1,
+      "message": "Oh, this fixes the objection I had to the change this depends on. Good stuff.",
+      "revId": "cfc05fc1d8e5af191a6ae2269a9a1b6773d4ce1d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
