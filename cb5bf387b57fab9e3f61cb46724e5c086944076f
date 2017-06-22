@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f201791_8edd2116",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 543,
+      "author": {
+        "id": 1420
+      },
+      "writtenOn": "2017-06-22T16:56:26Z",
+      "side": 1,
+      "message": "So wrt concerns at https://review.openstack.org/#/c/476286/1,  this works since you\u0027re parsing the parsed user-provided URL, which (at least in my GHE case) is the same relative schema as public github.  In the case of 476286, some API responses that contain URL pointers to PRs give a URLs that are different enough to break things (eg, https://github.ibm.com/api/v3/repos/$proj/$repo/pulls/$num)",
+      "range": {
+        "startLine": 543,
+        "startChar": 23,
+        "endLine": 543,
+        "endChar": 24
+      },
+      "revId": "cb5bf387b57fab9e3f61cb46724e5c086944076f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
