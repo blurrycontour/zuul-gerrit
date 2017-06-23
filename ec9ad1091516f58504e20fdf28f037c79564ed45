@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "5f201791_29638344",
+        "filename": "doc/source/project-config.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 687,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-06-23T17:37:48Z",
+      "side": 1,
+      "message": "seems to be renamed to required-projects now",
+      "revId": "ec9ad1091516f58504e20fdf28f037c79564ed45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f201791_9aed648d",
         "filename": "doc/source/project-config.rst",
         "patchSetId": 4
