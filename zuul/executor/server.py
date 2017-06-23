@@ -411,9 +411,9 @@ class ExecutorServer(object):
         self.merger = self._getMerger(self.merge_root)
         self.update_queue = DeduplicateQueue()
 
-        if self.config.has_option('zuul', 'state_dir'):
+        if self.config.has_option('executor', 'state_dir'):
             state_dir = os.path.expanduser(
-                self.config.get('zuul', 'state_dir'))
+                self.config.get('executor', 'state_dir'))
         else:
             state_dir = '/var/lib/zuul'
         path = os.path.join(state_dir, 'executor.socket')

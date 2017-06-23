@@ -79,8 +79,9 @@ def main():
     server.read_config()
     server.configure_connections(source_only=True)
 
-    if server.config.has_option('zuul', 'state_dir'):
-        state_dir = os.path.expanduser(server.config.get('zuul', 'state_dir'))
+    if server.config.has_option('merger', 'state_dir'):
+        state_dir = os.path.expanduser(server.config.get(
+            'merger', 'state_dir'))
     else:
         state_dir = '/var/lib/zuul'
     test_fn = os.path.join(state_dir, 'test')
