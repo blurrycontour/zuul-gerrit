@@ -161,8 +161,8 @@ class Scheduler(zuul.cmd.ZuulApp):
         nodepool = zuul.nodepool.Nodepool(self.sched)
 
         zookeeper = zuul.zk.ZooKeeper()
-        if self.config.has_option('zuul', 'zookeeper_hosts'):
-            zookeeper_hosts = self.config.get('zuul', 'zookeeper_hosts')
+        if self.config.has_option('zookeeper', 'hosts'):
+            zookeeper_hosts = self.config.get('zookeeper', 'hosts')
         else:
             zookeeper_hosts = '127.0.0.1:2181'
 
