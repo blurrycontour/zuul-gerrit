@@ -334,9 +334,9 @@ class GithubConnection(BaseConnection):
         self._change_cache = {}
         self.projects = {}
         self.git_ssh_key = self.connection_config.get('sshkey')
-        self.git_host = self.connection_config.get('git_host', 'github.com')
+        self.server = self.connection_config.get('server', 'github.com')
         self.canonical_hostname = self.connection_config.get(
-            'canonical_hostname', self.git_host)
+            'canonical_hostname', self.server)
         self.source = driver.getSource(self)
 
         self._github = None
@@ -363,8 +363,8 @@ class GithubConnection(BaseConnection):
         self.unregisterHttpHandler(self.payload_path)
 
     def _createGithubClient(self):
-        if self.git_host != 'github.com':
-            url = 'https://%s/' % self.git_host
+        if self.server != 'github.com':
+            url = 'https://%s/' % self.server
             github = github3.GitHubEnterprise(url)
         else:
             github = github3.GitHub()
@@ -529,18 +529,18 @@ class GithubConnection(BaseConnection):
 
     def getGitUrl(self, project):
         if self.git_ssh_key:
-            return 'ssh://git@%s/%s.git' % (self.git_host, project)
+            return 'ssh://git@%s/%s.git' % (self.server, project)
 
         if self.app_id:
             installation_key = self._get_installation_key(project)
             return 'https://x-access-token:%s@%s/%s' % (installation_key,
-                                                        self.git_host,
+                                                        self.server,
                                                         project)
 
-        return 'https://%s/%s' % (self.git_host, project)
+        return 'https://%s/%s' % (self.server, project)
 
     def getGitwebUrl(self, project, sha=None):
-        url = 'https://%s/%s' % (self.git_host, project)
+        url = 'https://%s/%s' % (self.server, project)
         if sha is not None:
             url += '/commit/%s' % sha
         return url
@@ -672,7 +672,7 @@ class GithubConnection(BaseConnection):
         return GithubUser(self.getGithubClient(), login)
 
     def getUserUri(self, login):
-        return 'https://%s/%s' % (self.git_host, login)
+        return 'https://%s/%s' % (self.server, login)
 
     def getRepoPermission(self, project, login):
         github = self.getGithubClient(project)
