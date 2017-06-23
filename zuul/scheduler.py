@@ -370,16 +370,16 @@ class Scheduler(threading.Thread):
         self.log.debug("Waiting for exit")
 
     def _get_queue_pickle_file(self):
-        if self.config.has_option('zuul', 'state_dir'):
-            state_dir = os.path.expanduser(self.config.get('zuul',
+        if self.config.has_option('scheduler', 'state_dir'):
+            state_dir = os.path.expanduser(self.config.get('scheduler',
                                                            'state_dir'))
         else:
             state_dir = '/var/lib/zuul'
         return os.path.join(state_dir, 'queue.pickle')
 
     def _get_time_database_dir(self):
-        if self.config.has_option('zuul', 'state_dir'):
-            state_dir = os.path.expanduser(self.config.get('zuul',
+        if self.config.has_option('scheduler', 'state_dir'):
+            state_dir = os.path.expanduser(self.config.get('scheduler',
                                                            'state_dir'))
         else:
             state_dir = '/var/lib/zuul'
@@ -389,8 +389,8 @@ class Scheduler(threading.Thread):
         return d
 
     def _get_project_key_dir(self):
-        if self.config.has_option('zuul', 'state_dir'):
-            state_dir = os.path.expanduser(self.config.get('zuul',
+        if self.config.has_option('scheduler', 'state_dir'):
+            state_dir = os.path.expanduser(self.config.get('scheduler',
                                                            'state_dir'))
         else:
             state_dir = '/var/lib/zuul'
