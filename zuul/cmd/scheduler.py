@@ -168,8 +168,8 @@ class Scheduler(zuul.cmd.ZuulApp):
 
         zookeeper.connect(zookeeper_hosts)
 
-        if self.config.has_option('zuul', 'status_expiry'):
-            cache_expiry = self.config.getint('zuul', 'status_expiry')
+        if self.config.has_option('webapp', 'status_expiry'):
+            cache_expiry = self.config.getint('webapp', 'status_expiry')
         else:
             cache_expiry = 1
 
