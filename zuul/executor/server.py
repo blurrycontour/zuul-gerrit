@@ -400,7 +400,7 @@ class ExecutorServer(object):
         self.merger = self._getMerger(self.merge_root)
         self.update_queue = DeduplicateQueue()
 
-        state_dir = get_default(self.config, 'zuul', 'state_dir',
+        state_dir = get_default(self.config, 'executor', 'state_dir',
                                 '/var/lib/zuul', expand_user=True)
         path = os.path.join(state_dir, 'executor.socket')
         self.command_socket = commandsocket.CommandSocket(path)
