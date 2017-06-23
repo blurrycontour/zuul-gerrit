@@ -1864,9 +1864,10 @@ class ZuulTestCase(BaseTestCase):
             shutil.copy('{}.pub'.format(src_private_key_file),
                         '{}.pub'.format(self.private_key_file))
             os.chmod(self.private_key_file, 0o0600)
-        self.config.set('zuul', 'tenant_config',
-                        os.path.join(FIXTURE_DIR,
-                                     self.config.get('zuul', 'tenant_config')))
+        self.config.set('scheduler', 'tenant_config',
+                        os.path.join(
+                            FIXTURE_DIR,
+                            self.config.get('scheduler', 'tenant_config')))
         self.config.set('merger', 'git_dir', self.merger_src_root)
         self.config.set('executor', 'git_dir', self.executor_src_root)
         self.config.set('zuul', 'state_dir', self.state_root)
@@ -2013,7 +2014,7 @@ class ZuulTestCase(BaseTestCase):
 
         if not self.setupSimpleLayout():
             if hasattr(self, 'tenant_config_file'):
-                self.config.set('zuul', 'tenant_config',
+                self.config.set('scheduler', 'tenant_config',
                                 self.tenant_config_file)
                 git_path = os.path.join(
                     os.path.dirname(
@@ -2069,7 +2070,7 @@ class ZuulTestCase(BaseTestCase):
                                 'untrusted-projects': untrusted_projects}}}}]
         f.write(yaml.dump(config).encode('utf8'))
         f.close()
-        self.config.set('zuul', 'tenant_config',
+        self.config.set('scheduler', 'tenant_config',
                         os.path.join(FIXTURE_DIR, f.name))
 
         self.init_repo('common-config')
@@ -2082,7 +2083,7 @@ class ZuulTestCase(BaseTestCase):
         if self.create_project_keys:
             return
 
-        path = self.config.get('zuul', 'tenant_config')
+        path = self.config.get('scheduler', 'tenant_config')
         with open(os.path.join(FIXTURE_DIR, path)) as f:
             tenant_config = yaml.safe_load(f.read())
         for tenant in tenant_config:
@@ -2589,7 +2590,7 @@ class ZuulTestCase(BaseTestCase):
           - org/project1
           - org/project2\n""" % path)
         f.close()
-        self.config.set('zuul', 'tenant_config',
+        self.config.set('scheduler', 'tenant_config',
                         os.path.join(FIXTURE_DIR, f.name))
         self.setupAllProjectKeys()
 
