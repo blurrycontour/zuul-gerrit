@@ -13,11 +13,16 @@
 # under the License.
 
 import argparse
+import base64
 import os
 import subprocess
 import sys
 import tempfile
-import urllib
+
+try:
+    import urllib.request
+except ImportError:
+    import urllib
 
 DESCRIPTION = """Encrypt a secret for Zuul.
 
@@ -70,18 +75,18 @@ def main():
                               pubkey_file.name],
                              stdin=subprocess.PIPE,
                              stdout=subprocess.PIPE)
-        (stdout, stderr) = p.communicate(plaintext)
+        (stdout, stderr) = p.communicate(plaintext.encode("utf-8"))
         if p.returncode != 0:
             raise Exception("Return code %s from openssl" % p.returncode)
-        ciphertext = stdout.encode('base64')
+        ciphertext = base64.b64encode(stdout)
     finally:
         os.unlink(pubkey_file.name)
 
     if args.outfile:
-        with open(args.outfile, "w") as f:
+        with open(args.outfile, "wb") as f:
             f.write(ciphertext)
     else:
-        print(ciphertext)
+        print(ciphertext.decode("utf-8"))
 
 
 if __name__ == '__main__':
