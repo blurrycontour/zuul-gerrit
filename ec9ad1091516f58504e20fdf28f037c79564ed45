@@ -2,6 +2,52 @@
   "comments": [
     {
       "key": {
+        "uuid": "5f201791_341aae6e",
+        "filename": "doc/source/project-config.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-06-24T18:42:44Z",
+      "side": 1,
+      "message": "Is there any semantic difference between zuul.yaml and .zuul.yaml in this case?",
+      "range": {
+        "startLine": 39,
+        "startChar": 32,
+        "endLine": 40,
+        "endChar": 56
+      },
+      "revId": "ec9ad1091516f58504e20fdf28f037c79564ed45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_b41fde59",
+        "filename": "doc/source/project-config.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-06-24T18:42:44Z",
+      "side": 1,
+      "message": "With gerrit \u003e\u003d2.13 this would need to be case sensitive.",
+      "range": {
+        "startLine": 109,
+        "startChar": 10,
+        "endLine": 109,
+        "endChar": 18
+      },
+      "revId": "ec9ad1091516f58504e20fdf28f037c79564ed45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f201791_29638344",
         "filename": "doc/source/project-config.rst",
         "patchSetId": 4
@@ -19,6 +65,23 @@
     },
     {
       "key": {
+        "uuid": "5f201791_145e9211",
+        "filename": "doc/source/project-config.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 810,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-06-24T18:42:44Z",
+      "side": 1,
+      "message": "How do secrets relate to speculative changes of the job?",
+      "revId": "ec9ad1091516f58504e20fdf28f037c79564ed45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f201791_9aed648d",
         "filename": "doc/source/project-config.rst",
         "patchSetId": 4
@@ -30,6 +93,29 @@
       "writtenOn": "2017-06-22T14:55:01Z",
       "side": 1,
       "message": "This needs to change to \"label\" actually.",
+      "revId": "ec9ad1091516f58504e20fdf28f037c79564ed45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_b46d9ecd",
+        "filename": "doc/source/project-config.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 874,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-06-24T18:42:44Z",
+      "side": 1,
+      "message": "Semaphores are not restricted to config projects (see https://review.openstack.org/#/c/442563/4/zuul/model.py@2126)",
+      "range": {
+        "startLine": 873,
+        "startChar": 0,
+        "endLine": 874,
+        "endChar": 35
+      },
       "revId": "ec9ad1091516f58504e20fdf28f037c79564ed45",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
