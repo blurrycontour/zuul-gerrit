@@ -295,6 +295,9 @@ class JobParser(object):
 
         role = vs.Any(zuul_role, galaxy_role)
 
+        run_shell = {vs.Required('shell'): str}
+        run_playbook = {vs.Required('playbook'): str}
+
         job_project = {vs.Required('name'): str,
                        'override-branch': str}
 
@@ -317,7 +320,7 @@ class JobParser(object):
                'attempts': int,
                'pre-run': to_list(str),
                'post-run': to_list(str),
-               'run': str,
+               'run': vs.Any(str, run_shell, run_playbook),
                '_source_context': model.SourceContext,
                '_start_mark': yaml.Mark,
                'roles': to_list(role),
@@ -411,8 +414,16 @@ class JobParser(object):
                                              full_post_run_name)
             job.post_run = (post_run,) + job.post_run
         if 'run' in conf:
-            run_name = os.path.join('playbooks', conf['run'])
-            run = model.PlaybookContext(job.source_context, run_name)
+            if isinstance(conf['run'], dict) and 'playbook' in conf['run']:
+                conf['run'] = conf['run']['playbook']
+            if isinstance(conf['run'], str):
+                run_name = os.path.join('playbooks', conf['run'])
+                run = model.PlaybookContext(job.source_context, run_name)
+            else:
+                # Generate a simple shell playbook
+                run_name = os.path.join('playbooks', job.name)
+                run = model.PlaybookContext(job.source_context, run_name,
+                                            generate=conf['run'])
             job.run = (run,)
         else:
             if not project_pipeline:

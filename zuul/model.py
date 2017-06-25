@@ -636,13 +636,15 @@ class PlaybookContext(object):
     playbooks so that we can keep track of which repos and security
     contexts are needed in order to run them."""
 
-    def __init__(self, source_context, path):
+    def __init__(self, source_context, path, generate=None):
         self.source_context = source_context
         self.path = path
+        self.generate = None
 
     def __repr__(self):
-        return '<PlaybookContext %s %s>' % (self.source_context,
-                                            self.path)
+        return '<PlaybookContext %s %s %s>' % (self.source_context,
+                                               self.path,
+                                               self.generate)
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -651,7 +653,8 @@ class PlaybookContext(object):
         if not isinstance(other, PlaybookContext):
             return False
         return (self.source_context == other.source_context and
-                self.path == other.path)
+                self.path == other.path,
+                self.generate == other.generate)
 
     def toDict(self):
         # Render to a dict to use in passing json to the executor
@@ -660,7 +663,8 @@ class PlaybookContext(object):
             project=self.source_context.project.name,
             branch=self.source_context.branch,
             trusted=self.source_context.trusted,
-            path=self.path)
+            path=self.path,
+            generate=self.generate)
 
 
 class Role(object, metaclass=abc.ABCMeta):

@@ -955,6 +955,28 @@ class AnsibleJob(object):
                     "Ansible plugin dir %s found adjacent to playbook %s in"
                     " non-trusted repo." % (entry, path))
 
+    def generatePlaybook(self, path, generate):
+        os.makedirs(os.path.dirname(path))
+        fn = path + '.yaml'
+        content = self._generatePlaybookFromShell(generate['shell'])
+
+        with open(path, 'w') as playbook_yaml:
+            playbook_yaml.write(
+                yaml.safe_dump([content], default_flow_style=False))
+        return fn
+
+    def _generatePlaybookFromShell(self, path, shell):
+
+        # ansible's initial working directory is the home directory of the user
+        return dict(
+            hosts="all",
+            gather_facts=True,
+            gather_subset=["!all"],
+            tasks=[dict(
+                shell=shell,
+                args=dict(
+                  chdir="src/{{ zuul.project.canonical_name }}"))])
+
     def findPlaybook(self, path, required=False, trusted=False):
         for ext in ['.yaml', '.yml']:
             fn = path + ext
@@ -1010,6 +1032,15 @@ class AnsibleJob(object):
         source = self.executor_server.connections.getSource(
             playbook['connection'])
         project = source.getProject(playbook['project'])
+        if playbook['generate']:
+            # We're generating a simple playbook for the user, so we don't
+            # consume the playbook content from the git repo at all
+            path = os.path.join(jobdir_playbook.root,
+                                'generated',
+                                playbook['path'])
+            jobdir_playbook.path = self.generatePlaybook(
+                path, playbook['generate'])
+            return
         if not playbook['trusted']:
             # This is a project repo, so it is safe to use the already
             # checked out version (from speculative merging) of the
