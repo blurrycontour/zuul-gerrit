@@ -48,6 +48,23 @@
     },
     {
       "key": {
+        "uuid": "5f201791_33307be8",
+        "filename": "doc/source/project-config.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 564,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-06-26T05:07:23Z",
+      "side": 1,
+      "message": "It might be noted that files list is overridden completely during inheritance (unlike vars which are additive).\n\nIs that desired behaviour?",
+      "revId": "ec9ad1091516f58504e20fdf28f037c79564ed45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f201791_29638344",
         "filename": "doc/source/project-config.rst",
         "patchSetId": 4
@@ -59,6 +76,23 @@
       "writtenOn": "2017-06-23T17:37:48Z",
       "side": 1,
       "message": "seems to be renamed to required-projects now",
+      "revId": "ec9ad1091516f58504e20fdf28f037c79564ed45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_531ad76e",
+        "filename": "doc/source/project-config.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 694,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-06-26T05:07:23Z",
+      "side": 1,
+      "message": "It might be noted that vars are additive during inheritance.",
       "revId": "ec9ad1091516f58504e20fdf28f037c79564ed45",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
