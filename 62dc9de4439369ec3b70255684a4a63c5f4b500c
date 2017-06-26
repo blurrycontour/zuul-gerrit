@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f201791_5eaf657c",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-26T18:55:58Z",
+      "side": 1,
+      "message": "Should we remove the lower method here?",
+      "revId": "62dc9de4439369ec3b70255684a4a63c5f4b500c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
