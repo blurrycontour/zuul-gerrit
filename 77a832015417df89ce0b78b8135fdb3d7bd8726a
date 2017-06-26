@@ -1,0 +1,395 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f201791_6605f310",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-26T22:04:18Z",
+      "side": 1,
+      "message": "Reading this, and the config entries below, and the Executor section below, it is not clear that the executor performs \"merger\" tasks, and thus reads these bits of the config file. From the reading, it sounds like these config entries are only necessary if opting to run a stand-alone merger process.",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_4606771e",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-26T22:04:18Z",
+      "side": 1,
+      "message": "This should probably be updated to indicate recent decision to run both trusted and untrusted playbooks inside of bubblewrap.",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_eb254cc3",
+        "filename": "doc/source/admin/drivers/github.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-26T22:04:18Z",
+      "side": 1,
+      "message": "GitHub",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_cb2290b9",
+        "filename": "doc/source/admin/drivers/github.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-26T22:04:18Z",
+      "side": 1,
+      "message": "GitHub",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_ab2bd492",
+        "filename": "doc/source/admin/drivers/github.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-26T22:04:18Z",
+      "side": 1,
+      "message": "s/Github/GitHub",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_8b281897",
+        "filename": "doc/source/admin/drivers/github.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-26T22:04:18Z",
+      "side": 1,
+      "message": "I can take on this TODO once the re-arrangement happens, as to avoid repeated rebase issues.",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_6b1b7c80",
+        "filename": "doc/source/admin/drivers/github.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-26T22:04:18Z",
+      "side": 1,
+      "message": "GitHub",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_4b20c0ac",
+        "filename": "doc/source/admin/drivers/github.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-26T22:04:18Z",
+      "side": 1,
+      "message": "Missing entry for canonical_hostname. Although I wonder if we should drop git_host in favor of canonical_hostname? I\u0027m not sure that having \"git_host\" as a unique config item for github makes much sense.",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_2b11045e",
+        "filename": "doc/source/admin/drivers/github.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-26T22:04:18Z",
+      "side": 1,
+      "message": "GitHub",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_0b164856",
+        "filename": "doc/source/admin/drivers/github.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-26T22:04:18Z",
+      "side": 1,
+      "message": "GitHub",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_eb0e6c39",
+        "filename": "doc/source/admin/drivers/github.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-26T22:04:18Z",
+      "side": 1,
+      "message": "This should be dropped, as we handle reviews via a specific event.",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_cb0bb027",
+        "filename": "doc/source/admin/drivers/github.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-26T22:04:18Z",
+      "side": 1,
+      "message": "This should be dropped, it ref updates (pushes) are handled via a specific event.",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_ab04f418",
+        "filename": "doc/source/admin/drivers/github.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-26T22:04:18Z",
+      "side": 1,
+      "message": "This should say \"for ``pull-request`` ``status`` actions.\"",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_8b013809",
+        "filename": "doc/source/admin/drivers/github.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-26T22:04:18Z",
+      "side": 1,
+      "message": "GitHub",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_662e1393",
+        "filename": "doc/source/admin/installation.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-26T22:04:18Z",
+      "side": 1,
+      "message": "Feels odd to have a standalone section for Gearman, but bury the zookeeper section inside the nodepool section.",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_461f975a",
+        "filename": "doc/source/admin/installation.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-26T22:04:18Z",
+      "side": 1,
+      "message": "metadata",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_0614ff42",
+        "filename": "doc/source/admin/quick-start.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-26T22:04:18Z",
+      "side": 1,
+      "message": "\"both of these functions\" is vague. It doesn\u0027t seem that there were more than one functions described earlier in the paragraph.",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_e610e350",
+        "filename": "doc/source/admin/quick-start.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-26T22:04:18Z",
+      "side": 1,
+      "message": "From the example repo, or from \"the conifgured repo\"? The example repo isn\u0027t real, thus it would cause errors if used literally, right?",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_c619677a",
+        "filename": "doc/source/admin/tenants.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-26T22:04:18Z",
+      "side": 1,
+      "message": "Not sure why this has a yaml dash. Also, shouldn\u0027t it match up with a driver type?",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_a6166b48",
+        "filename": "doc/source/user/concepts.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-26T22:04:18Z",
+      "side": 1,
+      "message": "\"a newly proposed change to a project to be tested.\" You\u0027re mixing plurals in this paragraph.",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_86292f8b",
+        "filename": "doc/source/user/concepts.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-26T22:04:18Z",
+      "side": 1,
+      "message": "GitHub",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_86000f03",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-26T22:04:18Z",
+      "side": 1,
+      "message": "I feel like these should be moved to the driver documentation, since they are very driver specific. Also it should be mentioned that the requirements and rejects are defined in per-driver sections.",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_260b7b24",
+        "filename": "doc/source/user/jobs.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-26T22:04:18Z",
+      "side": 1,
+      "message": "TODO: Document where they source winds up on the remote node if using the base job.",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
