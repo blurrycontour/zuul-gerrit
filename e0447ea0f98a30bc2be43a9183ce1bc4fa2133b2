@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5f201791_2357f25a",
+        "filename": "tools/encrypt_secret.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-06-26T18:17:35Z",
+      "side": 1,
+      "message": "ups, that was during debugging, should probably stay as is",
+      "parentUuid": "5f201791_0349962f",
+      "revId": "e0447ea0f98a30bc2be43a9183ce1bc4fa2133b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f201791_e351fada",
         "filename": "tools/encrypt_secret.py",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2017-06-26T17:57:05Z",
       "side": 1,
       "message": "This intentionally only uses standard python packages since we want it to be easily run by any user (not just a zuul administrator).  If we want to make it py2 and py3 compatible, we should avoid using six, and instead just do the try/except import here ourselves.",
+      "revId": "e0447ea0f98a30bc2be43a9183ce1bc4fa2133b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_c3495eb7",
+        "filename": "tools/encrypt_secret.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-06-26T18:17:35Z",
+      "side": 1,
+      "message": "ok, will change that",
+      "parentUuid": "5f201791_e351fada",
       "revId": "e0447ea0f98a30bc2be43a9183ce1bc4fa2133b2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
