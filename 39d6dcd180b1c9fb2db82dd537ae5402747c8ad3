@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f201791_156f8bfc",
+        "filename": "tools/encrypt_secret.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-06-26T20:37:30Z",
+      "side": 1,
+      "message": "IMO, let\u0027s ditch the conditional import. We\u0027re not testing this code at all, but it will just be unused branching if we ever do test this code since we only test with python3 now.",
+      "revId": "39d6dcd180b1c9fb2db82dd537ae5402747c8ad3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_f5776fd3",
+        "filename": "tools/encrypt_secret.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-06-26T20:37:30Z",
+      "side": 1,
+      "message": "Can we just open this \u0027rb\u0027?",
+      "revId": "39d6dcd180b1c9fb2db82dd537ae5402747c8ad3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_d57473d1",
+        "filename": "tools/encrypt_secret.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-06-26T20:37:30Z",
+      "side": 1,
+      "message": "And use sys.stdin.buffer to get bytes instead of str?",
+      "revId": "39d6dcd180b1c9fb2db82dd537ae5402747c8ad3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_b57d77b3",
+        "filename": "tools/encrypt_secret.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-06-26T20:37:30Z",
+      "side": 1,
+      "message": "Then you wouldn\u0027t need to encode this.",
+      "revId": "39d6dcd180b1c9fb2db82dd537ae5402747c8ad3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_957a7bb7",
+        "filename": "tools/encrypt_secret.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-06-26T20:37:30Z",
+      "side": 1,
+      "message": "and this should really be sys.stdout.buffer.wrtie(ciphertext)",
+      "revId": "39d6dcd180b1c9fb2db82dd537ae5402747c8ad3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
