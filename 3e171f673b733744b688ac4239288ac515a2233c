@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f201791_684ee26f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-06-26T20:41:58Z",
+      "side": 1,
+      "message": "Wouldn\u0027t it be better to use readthru pattern here and populate the cache so the next clone of this repo isn\u0027t a remote clone?",
+      "revId": "3e171f673b733744b688ac4239288ac515a2233c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
