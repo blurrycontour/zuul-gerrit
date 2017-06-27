@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5f201791_e02fa23c",
+        "filename": "tools/encrypt_secret.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-06-27T05:03:09Z",
+      "side": 1,
+      "message": "That depends if we want to support python2 for this script (as it is user tooling, not the service itself). Judging from jeblair\u0027s comment in PS1 we probably want to support python2 for this script.",
+      "parentUuid": "5f201791_156f8bfc",
+      "revId": "39d6dcd180b1c9fb2db82dd537ae5402747c8ad3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f201791_f5776fd3",
         "filename": "tools/encrypt_secret.py",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2017-06-26T20:37:30Z",
       "side": 1,
       "message": "Can we just open this \u0027rb\u0027?",
+      "revId": "39d6dcd180b1c9fb2db82dd537ae5402747c8ad3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_c034a695",
+        "filename": "tools/encrypt_secret.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-06-27T05:03:09Z",
+      "side": 1,
+      "message": "will do",
+      "parentUuid": "5f201791_f5776fd3",
       "revId": "39d6dcd180b1c9fb2db82dd537ae5402747c8ad3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
