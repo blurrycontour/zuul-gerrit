@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f201791_fbf2996f",
+        "filename": "zuul/web.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-06-27T18:20:16Z",
+      "side": 1,
+      "message": "Maybe we should have an else that returns an invalid-protocol error.",
+      "revId": "947f83c22411d3fb4943965861fcc6daa492eb5f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
