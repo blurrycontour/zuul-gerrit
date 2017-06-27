@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f201791_dc713878",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-27T00:03:50Z",
+      "side": 1,
+      "message": "Should this say Gerrit here? I think GitHub driver uses it too, and others could.",
+      "revId": "64f170843795e3dc34930c4273e286e30a33e4a5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_bc6afc7d",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-27T00:03:50Z",
+      "side": 1,
+      "message": "\"zuul-server\" ?",
+      "revId": "64f170843795e3dc34930c4273e286e30a33e4a5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
