@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f201791_272eabfa",
+        "filename": "tests/unit/test_log_streamer.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-27T23:42:03Z",
+      "side": 1,
+      "message": "This can still be shorter as:\n        file_contents \u003d logfile.read()",
+      "revId": "f8c73c3a199617cccd75dea7b3fb27aa11810c01",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
