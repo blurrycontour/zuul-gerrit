@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "5f201791_fb1cd978",
+        "filename": "zuul/web.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-06-27T18:40:02Z",
+      "side": 1,
+      "message": "You may want to try except around this json.loads(), log json parse errors, then continue to the next message to be as greedy as possible.",
+      "revId": "947f83c22411d3fb4943965861fcc6daa492eb5f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_be3f6f85",
+        "filename": "zuul/web.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-06-27T18:40:02Z",
+      "side": 1,
+      "message": "This will potentially drop messages. Perhaps you should yield rather than return and keep processing messages? Or just accumulate and return once?",
+      "revId": "947f83c22411d3fb4943965861fcc6daa492eb5f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f201791_fbf2996f",
         "filename": "zuul/web.py",
         "patchSetId": 21
@@ -13,6 +47,41 @@
       "writtenOn": "2017-06-27T18:20:16Z",
       "side": 1,
       "message": "Maybe we should have an else that returns an invalid-protocol error.",
+      "revId": "947f83c22411d3fb4943965861fcc6daa492eb5f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_bb12e160",
+        "filename": "zuul/web.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-06-27T18:40:02Z",
+      "side": 1,
+      "message": "+1 or possibly also handle binary as if it were ascii? Though that is probably too python2.",
+      "parentUuid": "5f201791_fbf2996f",
+      "revId": "947f83c22411d3fb4943965861fcc6daa492eb5f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f201791_fe0727c9",
+        "filename": "zuul/web.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-06-27T18:40:02Z",
+      "side": 1,
+      "message": "Does this class need to implement sendMessage as it is being passed via self to the ConsoleClientProtocl which calls sendMessage on the streamer on line 37.",
       "revId": "947f83c22411d3fb4943965861fcc6daa492eb5f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
