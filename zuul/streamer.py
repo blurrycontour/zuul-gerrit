@@ -16,6 +16,8 @@
 
 
 import asyncio
+import aiohttp
+from aiohttp import web
 import functools
 import json
 import logging
@@ -59,6 +61,12 @@ class ZuulStreamerProtocol(websocket.WebSocketServerProtocol):
     gear_server = None
     gear_port = None
 
+    def connection_made(self, transport):
+        print("Connection")
+        print(transport.get_extra_info('peername'))
+        super(ZuulStreamerProtocol, self).connection_made(transport)
+        print("after")
+
     def onConnect(self, request):
         print("Client connecting: {}".format(request.peer))
 
@@ -76,6 +84,7 @@ class ZuulStreamerProtocol(websocket.WebSocketServerProtocol):
         return rpc.get_job_log_stream_address(request['uuid'])
 
     async def onMessage(self, payload, isBinary):
+        print("onMessage")
         if isBinary:
             return self.sendClose(
                 1003, 'zuul log streaming is a text protocol')
@@ -131,19 +140,103 @@ class ZuulStreamerProtocol(websocket.WebSocketServerProtocol):
 
         return self.sendClose(1000, "No more data")
 
+async def handle_message(ws, request):
+    for key in ('uuid', 'logfile'):
+        if key not in request:
+            await ws.close(
+                4000, "'{key}' missing from request payload".format(key=key))
+
+    ws.send_str("Test test")
+    await ws.close()
+    return
+
+    loop = asyncio.get_event_loop()
+
+    # Schedule the blocking gearman work in an Executor
+    gear_task = loop.run_in_executor(None, self._getPortLocation, request)
+
+    try:
+        port_location = await asyncio.wait_for(gear_task, 30)
+    except asyncio.TimeoutError:
+        return self.sendClose(4010, "Gearman timeout")
+
+    if not port_location:
+        return self.sendClose(4011, "Error with Gearman")
+
+    server = port_location['server']
+    port = port_location['port']
+
+    client_completed = asyncio.Future()
+    client_factory = functools.partial(
+        ConsoleClientProtocol, self, future=client_completed)
+
+    try:
+        factory_coroutine = await loop.create_connection(
+            client_factory, host=server, port=port)
+
+        loop.run_until_complete(factory_coroutine)
+        loop.run_until_complete(client_completed)
+    except Exception as e:
+        print("Exception: %s" % e)
+        return self.sendClose(4020, "Console streaming error")
+
+    return self.sendClose(1000, "No more data")
+
+async def websocket_handler(request):
+    try:
+        print("in handler")
+        ws = web.WebSocketResponse()
+        print("after ws")
+        await ws.prepare(request)
+        print("after await")
+        async for msg in ws:
+            print(msg.type)
+            if msg.type == aiohttp.WSMsgType.TEXT:
+                print("txt")
+                request = json.loads(msg.data)
+                print("Got message: %s" % request)
+                await handle_message(ws, request)
+            elif msg.type == aiohttp.WSMsgType.ERROR:
+                print('ws connection closed with exception %s' %
+                      ws.exception())
+
+            print("srrsly")
+            #request = json.loads(payload.decode('utf8'))
+    except Exception as e:
+        print(str(e))
+        await ws.close()
+    return ws
 
 class ZuulStreamer(object):
 
     log = logging.getLogger("zuul.streamer.ZuulStreamer")
 
     def __init__(self, gear_server='127.0.0.1', gear_port=4730,
-                 listen_address='127.0.0.1', listen_port=9000, loop=None):
+                 listen_address='127.0.0.1', listen_port=9000):
         self.gear_server = gear_server
         self.gear_port = gear_port
         self.listen_address = listen_address
         self.listen_port = listen_port
 
-    def run(self, loop=None):
+        #ZuulStreamerProtocol.gear_server = self.gear_server
+        #ZuulStreamerProtocol.gear_port = self.gear_port
+
+        #self.factory = websocket.WebSocketServerFactory(
+        #    u"ws://{listen_address}:{listen_port}".format(
+        #        listen_address=self.listen_address,
+        #        listen_port=self.listen_port))
+        #self.factory.protocol = ZuulStreamerProtocol
+
+        #self.term = asyncio.Future()
+
+        # create the server
+        #coro = self.event_loop.create_server(self.factory,
+        #                                     self.listen_address,
+        #                                     self.listen_port)
+        #self.server = self.event_loop.run_until_complete(coro)
+
+
+    def run(self, loop):
         '''
         Run the websocket streamer.
 
@@ -156,8 +249,6 @@ class ZuulStreamer(object):
         '''
         self.log.debug("ZuulStreamer starting")
 
-        ZuulStreamerProtocol.gear_server = self.gear_server
-        ZuulStreamerProtocol.gear_port = self.gear_port
 
         # The event loop must be set here before calling any autobahn methods
         # since that library will use it via calls to get_event_loop().
@@ -166,31 +257,25 @@ class ZuulStreamer(object):
 
         self.event_loop = asyncio.get_event_loop()
 
-        self.factory = websocket.WebSocketServerFactory(
-            u"ws://{listen_address}:{listen_port}".format(
-                listen_address=self.listen_address,
-                listen_port=self.listen_port))
-        self.factory.protocol = ZuulStreamerProtocol
-
-        self.term = asyncio.Future()
-
-        # create the server
-        coro = self.event_loop.create_server(self.factory,
-                                             self.listen_address,
-                                             self.listen_port)
-        self.server = self.event_loop.run_until_complete(coro)
+        app = web.Application()
+        app.router.add_get('/', websocket_handler)
+        web.run_app(
+            app, host=self.listen_address,
+            port=int(self.listen_port), loop=loop,
+            handle_signals=False)
 
         # start the server
-        self.event_loop.run_until_complete(self.term)
+        #self.event_loop.run_until_complete(self.term)
 
         # cleanup
         self.server.close()
-        self.event_loop.stop()
-        self.event_loop.close()
+        #self.event_loop.stop()
+        #self.event_loop.close()
         self.log.debug("ZuulStreamer stopped")
 
     def stop(self):
-        self.event_loop.call_soon_threadsafe(self.term.set_result, True)
+        #self.event_loop.call_soon_threadsafe(self.term.set_result, True)
+        pass
 
 
 if __name__ == "__main__":

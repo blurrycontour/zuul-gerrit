@@ -75,11 +75,11 @@ class WebStreamer(zuul.cmd.ZuulApp):
             self.log.exception("Error creating ZuulStreamer:")
             sys.exit(1)
 
-        signal.signal(signal.SIGUSR1, self.exit_handler)
-        signal.signal(signal.SIGTERM, self.exit_handler)
+        loop = asyncio.get_event_loop()
+        loop.add_signal_handler(signal.SIGUSR1, self.exit_handler)
+        loop.add_signal_handler(signal.SIGTERM, self.exit_handler)
 
         self.log.info('Zuul Web Streamer starting')
-        loop = asyncio.get_event_loop()
         self.thread = threading.Thread(target=self.streamer.run,
                                        args=(loop,),
                                        name='streamer')
