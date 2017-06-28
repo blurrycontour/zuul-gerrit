@@ -16,7 +16,6 @@
 import json
 import re
 import select
-import threading
 import time
 import paramiko
 import logging
@@ -29,9 +28,10 @@ from zuul.connection import BaseConnection
 from zuul.model import Ref
 from zuul import exceptions
 from zuul.driver.gerrit.gerritmodel import GerritChange, GerritTriggerEvent
+from zuul.lib import thread
 
 
-class GerritEventConnector(threading.Thread):
+class GerritEventConnector(thread.Thread):
     """Move events from Gerrit to the scheduler."""
 
     log = logging.getLogger("zuul.GerritEventConnector")
@@ -39,7 +39,6 @@ class GerritEventConnector(threading.Thread):
 
     def __init__(self, connection):
         super(GerritEventConnector, self).__init__()
-        self.daemon = True
         self.connection = connection
         self._stopped = False
 
@@ -139,7 +138,7 @@ class GerritEventConnector(threading.Thread):
         self.connection.logEvent(event)
         self.connection.sched.addEvent(event)
 
-    def run(self):
+    def exec(self):
         while True:
             if self._stopped:
                 return
@@ -151,13 +150,13 @@ class GerritEventConnector(threading.Thread):
                 self.connection.eventDone()
 
 
-class GerritWatcher(threading.Thread):
+class GerritWatcher(thread.Thread):
     log = logging.getLogger("gerrit.GerritWatcher")
     poll_timeout = 500
 
     def __init__(self, gerrit_connection, username, hostname, port=29418,
                  keyfile=None, keepalive=60):
-        threading.Thread.__init__(self)
+        super(GerritWatcher, self).__init__()
         self.username = username
         self.keyfile = keyfile
         self.hostname = hostname
@@ -225,7 +224,7 @@ class GerritWatcher(threading.Thread):
             self.log.exception("Exception on ssh event stream:")
             time.sleep(5)
 
-    def run(self):
+    def exec(self):
         while not self._stopped:
             self._run()
 

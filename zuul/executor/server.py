@@ -33,6 +33,7 @@ import gear
 import zuul.merger.merger
 import zuul.ansible
 from zuul.lib import commandsocket
+from zuul.lib import thread
 
 COMMANDS = ['stop', 'pause', 'unpause', 'graceful', 'verbose',
             'unverbose']
@@ -43,9 +44,8 @@ class Watchdog(object):
         self.timeout = timeout
         self.function = function
         self.args = args
-        self.thread = threading.Thread(target=self._run,
-                                       name='executor-watchdog')
-        self.thread.daemon = True
+        self.thread = thread.Thread(target=self._run,
+                                    name='executor-watchdog')
         self.timed_out = None
 
     def _run(self):
@@ -453,19 +453,19 @@ class ExecutorServer(object):
 
         self.log.debug("Starting command processor")
         self.command_socket.start()
-        self.command_thread = threading.Thread(target=self.runCommand)
-        self.command_thread.daemon = True
+        self.command_thread = thread.Thread(target=self.runCommand,
+                                            log=self.log)
         self.command_thread.start()
 
         self.log.debug("Starting worker")
-        self.update_thread = threading.Thread(target=self._updateLoop)
-        self.update_thread.daemon = True
+        self.update_thread = thread.Thread(target=self._updateLoop,
+                                           log=self.log)
         self.update_thread.start()
-        self.merger_thread = threading.Thread(target=self.run_merger)
-        self.merger_thread.daemon = True
+        self.merger_thread = thread.Thread(target=self.run_merger,
+                                           log=self.log)
         self.merger_thread.start()
-        self.executor_thread = threading.Thread(target=self.run_executor)
-        self.executor_thread.daemon = True
+        self.executor_thread = thread.Thread(target=self.run_executor,
+                                             log=self.log)
         self.executor_thread.start()
 
     def register(self):
@@ -692,7 +692,9 @@ class AnsibleJob(object):
         self.ssh_agent.start()
         self.ssh_agent.add(self.private_key_file)
         self.running = True
-        self.thread = threading.Thread(target=self.execute)
+        self.thread = thread.Thread(target=self.execute,
+                                    daemon=False,
+                                    log=self.log)
         self.thread.start()
 
     def stop(self):

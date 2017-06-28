@@ -20,6 +20,7 @@ import traceback
 import gear
 
 from zuul.lib.config import get_default
+from zuul.lib import thread
 from zuul.merger import merger
 
 
@@ -52,8 +53,7 @@ class MergeServer(object):
         self.log.debug("Registering")
         self.register()
         self.log.debug("Starting worker")
-        self.thread = threading.Thread(target=self.run)
-        self.thread.daemon = True
+        self.thread = thread.Thread(target=self.run)
         self.thread.start()
 
     def register(self):
