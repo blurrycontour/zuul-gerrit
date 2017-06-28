@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f201791_f26e0f2d",
+        "filename": "doc/source/index.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 9852
+      },
+      "writtenOn": "2017-06-28T21:15:15Z",
+      "side": 1,
+      "message": "After quick-start, I would suggest add \n\n1) a document of  \u0027workflow-architecture\u0027:\n   - explain adjacent projects/products such gerrit and nodepool interact with zuul, in an architecture diagram\n   -  explain how the triggers/hook/request flow between product boundaries (for a representative workflow like a life of review or a life of gating)\n\n2) a document of \u0027zuul-internals-architecture\u0027:\n  - explain the major building blocks (such as controller, gearman....) in an architecture diagram, \n  - explain how the triggers/hook/request flow between internal component boundaries (for a representative workflow like a life of review or a life of gating)\n\n\nWith these documents, I can see two benefits \n\n  1) it might make zuul grow its user base to a potentially broader audience:  technical savvy enough folks who choose an orgnization\u0027s CI/CD pipleline candiate may be able to make a good conversation\n\n  2) following the above point, it might make zuul grow its contributor base: engineers in an org where existing building blocks differs from the default zuul setup may contribute the drivers so that zuul over time because a framework for different CI/CD environments.\n\n(btw, I volunteer myself that I\u0027d happy to help on anything for this item)",
+      "revId": "d29fdf806a11ece12fb3d2b5fc53e3e0994addc7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
