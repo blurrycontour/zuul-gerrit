@@ -54,9 +54,6 @@ class Executor(zuul.cmd.ZuulApp):
         parser.add_argument('--version', dest='version', action='version',
                             version=self._get_version(),
                             help='show zuul version')
-        parser.add_argument('--keep-jobdir', dest='keep_jobdir',
-                            action='store_true',
-                            help='keep local jobdirs after run completes')
         parser.add_argument('command',
                             choices=zuul.executor.server.COMMANDS,
                             nargs='?')
@@ -135,8 +132,7 @@ class Executor(zuul.cmd.ZuulApp):
 
         ExecutorServer = zuul.executor.server.ExecutorServer
         self.executor = ExecutorServer(self.config, self.connections,
-                                       jobdir_root=self.jobroot_dir,
-                                       keep_jobdir=self.args.keep_jobdir)
+                                       jobdir_root=self.jobroot_dir)
         self.executor.start()
 
         signal.signal(signal.SIGUSR2, zuul.cmd.stack_dump_handler)
