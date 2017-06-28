@@ -15,13 +15,13 @@
 
 import json
 import logging
-import threading
 import traceback
 
 import gear
 
 from zuul import model
 from zuul.lib.config import get_default
+from zuul.lib import thread
 
 
 class RPCListener(object):
@@ -44,8 +44,7 @@ class RPCListener(object):
         self.worker.waitForServer()
         self.log.debug("Registering")
         self.register()
-        self.thread = threading.Thread(target=self.run)
-        self.thread.daemon = True
+        self.thread = thread.Thread(target=self.run)
         self.thread.start()
 
     def register(self):

@@ -22,17 +22,17 @@ from uuid import uuid4
 
 import zuul.model
 from zuul.lib.config import get_default
+from zuul.lib import thread
 from zuul.model import Build
 
 
-class GearmanCleanup(threading.Thread):
+class GearmanCleanup(thread.Thread):
     """ A thread that checks to see if outstanding builds have
     completed without reporting back. """
     log = logging.getLogger("zuul.GearmanCleanup")
 
     def __init__(self, gearman):
-        threading.Thread.__init__(self)
-        self.daemon = True
+        super(GearmanCleanup, self).__init__()
         self.gearman = gearman
         self.wake_event = threading.Event()
         self._stopped = False

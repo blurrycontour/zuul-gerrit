@@ -17,8 +17,9 @@
 import logging
 import os
 import socket
-import threading
 import queue
+
+from zuul.lib import thread
 
 
 class CommandSocket(object):
@@ -36,8 +37,7 @@ class CommandSocket(object):
         self.socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         self.socket.bind(self.path)
         self.socket.listen(1)
-        self.socket_thread = threading.Thread(target=self._socketListener)
-        self.socket_thread.daemon = True
+        self.socket_thread = thread.Thread(target=self._socketListener)
         self.socket_thread.start()
 
     def stop(self):

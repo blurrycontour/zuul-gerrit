@@ -31,6 +31,7 @@ from zuul import model
 from zuul import exceptions
 from zuul import version as zuul_version
 from zuul.lib.config import get_default
+from zuul.lib import thread
 
 
 class ManagementEvent(object):
@@ -173,7 +174,7 @@ def toList(item):
     return [item]
 
 
-class Scheduler(threading.Thread):
+class Scheduler(thread.Thread):
     """The engine of Zuul.
 
     The Scheduler is reponsible for recieving events and dispatching
@@ -197,8 +198,7 @@ class Scheduler(threading.Thread):
     log = logging.getLogger("zuul.Scheduler")
 
     def __init__(self, config, testonly=False):
-        threading.Thread.__init__(self)
-        self.daemon = True
+        super(Scheduler, self).__init__()
         self.hostname = socket.gethostname()
         self.wake_event = threading.Event()
         self.layout_lock = threading.Lock()
@@ -664,7 +664,7 @@ class Scheduler(threading.Thread):
             return True
         return False
 
-    def run(self):
+    def exec(self):
         if self.statsd:
             self.log.debug("Statsd enabled")
         else:

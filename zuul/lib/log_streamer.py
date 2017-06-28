@@ -22,8 +22,9 @@ import re
 import select
 import socket
 import socketserver
-import threading
 import time
+
+from zuul.lib import thread
 
 
 class Log(object):
@@ -217,8 +218,7 @@ class LogStreamer(object):
 
         # We start the actual serving within a thread so we can return to
         # the owner.
-        self.thd = threading.Thread(target=self.server.serve_forever)
-        self.thd.daemon = True
+        self.thd = thread.Thread(target=self.server.serve_forever)
         self.thd.start()
 
     def stop(self):

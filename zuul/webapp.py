@@ -24,6 +24,7 @@ import webob
 from webob import dec
 
 from zuul.lib import encryption
+from zuul.lib import thread
 
 """Zuul main web app.
 
@@ -43,20 +44,19 @@ array of changes, they will not include the queue structure.
 """
 
 
-class WebApp(threading.Thread):
+class WebApp(thread.Thread):
     log = logging.getLogger("zuul.WebApp")
     change_path_regexp = '/status/change/(.*)$'
 
     def __init__(self, scheduler, port=8001, cache_expiry=1,
                  listen_address='0.0.0.0'):
-        threading.Thread.__init__(self)
+        super(WebApp, self).__init__()
         self.scheduler = scheduler
         self.listen_address = listen_address
         self.port = port
         self.cache_expiry = cache_expiry
         self.cache_time = 0
         self.cache = {}
-        self.daemon = True
         self.routes = {}
         self._init_default_routes()
         self.server = httpserver.serve(
@@ -67,7 +67,7 @@ class WebApp(threading.Thread):
         self.register_path('/(status\.json|status)$', self.status)
         self.register_path(self.change_path_regexp, self.change)
 
-    def run(self):
+    def exec(self):
         self.server.serve_forever()
 
     def stop(self):
