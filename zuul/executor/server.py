@@ -35,7 +35,7 @@ import zuul.ansible
 from zuul.lib import commandsocket
 
 COMMANDS = ['stop', 'pause', 'unpause', 'graceful', 'verbose',
-            'unverbose']
+            'unverbose', 'keep', 'nokeep']
 
 
 class Watchdog(object):
@@ -356,10 +356,8 @@ class ExecutorMergeWorker(gear.TextWorker):
 class ExecutorServer(object):
     log = logging.getLogger("zuul.ExecutorServer")
 
-    def __init__(self, config, connections={}, jobdir_root=None,
-                 keep_jobdir=False):
+    def __init__(self, config, connections={}, jobdir_root=None)
         self.config = config
-        self.keep_jobdir = keep_jobdir
         self.jobdir_root = jobdir_root
         # TODOv3(mordred): make the executor name more unique --
         # perhaps hostname+pid.
@@ -367,6 +365,7 @@ class ExecutorServer(object):
         self.zuul_url = config.get('merger', 'zuul_url')
         self.merger_lock = threading.Lock()
         self.verbose = False
+        self.keep_jobdir = False
         self.command_map = dict(
             stop=self.stop,
             pause=self.pause,
@@ -374,6 +373,8 @@ class ExecutorServer(object):
             graceful=self.graceful,
             verbose=self.verboseOn,
             unverbose=self.verboseOff,
+            keep=self.keep,
+            nokeep=self.nokeep,
         )
 
         self.merge_root = get_default(self.config, 'executor', 'git_dir',
@@ -509,6 +510,12 @@ class ExecutorServer(object):
 
     def verboseOff(self):
         self.verbose = False
+
+    def keep(self):
+        self.keep_jobdirs = True
+
+    def nokeep(self):
+        self.keep_jobdirs = False
 
     def join(self):
         self.update_thread.join()
