@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f1d235d_9c08f028",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 820,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-29T20:14:56Z",
+      "side": 1,
+      "message": "I think we can just set worker_log_port to self.executor_server.log_streaming port here.\n\nIt\u0027s either going to be the default or not, we don\u0027t really care.  We\u0027ll set the integer value either way.",
+      "revId": "b4794a940238b665937645a6e8211334fd908794",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
