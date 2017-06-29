@@ -40,7 +40,7 @@ class TestJob(BaseTestCase):
         self.source = Dummy(canonical_hostname='git.example.com',
                             connection=self.connection)
         self.tenant = model.Tenant('tenant')
-        self.layout = model.Layout()
+        self.layout = model.Layout(self.tenant)
         self.project = model.Project('project', self.source)
         self.tpc = model.TenantProjectConfig(self.project)
         self.tenant.addUntrustedProject(self.tpc)
@@ -59,7 +59,7 @@ class TestJob(BaseTestCase):
     @property
     def job(self):
         tenant = model.Tenant('tenant')
-        layout = model.Layout()
+        layout = model.Layout(tenant)
         job = configloader.JobParser.fromYaml(tenant, layout, {
             '_source_context': self.context,
             '_start_mark': self.start_mark,
@@ -170,7 +170,7 @@ class TestJob(BaseTestCase):
     def test_job_inheritance_configloader(self):
         # TODO(jeblair): move this to a configloader test
         tenant = model.Tenant('tenant')
-        layout = model.Layout()
+        layout = model.Layout(tenant)
 
         pipeline = model.Pipeline('gate', layout)
         layout.addPipeline(pipeline)
@@ -334,7 +334,7 @@ class TestJob(BaseTestCase):
 
     def test_job_auth_inheritance(self):
         tenant = model.Tenant('tenant')
-        layout = model.Layout()
+        layout = model.Layout(tenant)
 
         conf = yaml.safe_load('''
 - secret:
@@ -443,7 +443,7 @@ class TestJob(BaseTestCase):
 
     def test_job_inheritance_job_tree(self):
         tenant = model.Tenant('tenant')
-        layout = model.Layout()
+        layout = model.Layout(tenant)
         tpc = model.TenantProjectConfig(self.project)
         tenant.addUntrustedProject(tpc)
 
@@ -520,7 +520,7 @@ class TestJob(BaseTestCase):
 
     def test_inheritance_keeps_matchers(self):
         tenant = model.Tenant('tenant')
-        layout = model.Layout()
+        layout = model.Layout(tenant)
 
         pipeline = model.Pipeline('gate', layout)
         layout.addPipeline(pipeline)
@@ -572,7 +572,7 @@ class TestJob(BaseTestCase):
 
     def test_job_source_project(self):
         tenant = model.Tenant('tenant')
-        layout = model.Layout()
+        layout = model.Layout(tenant)
         base_project = model.Project('base_project', self.source)
         base_context = model.SourceContext(base_project, 'master',
                                            'test', True)
