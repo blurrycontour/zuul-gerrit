@@ -16,6 +16,23 @@
       "revId": "b4794a940238b665937645a6e8211334fd908794",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_bc2ccc99",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 823,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-29T20:15:28Z",
+      "side": 1,
+      "message": "Then we don\u0027t need this line.",
+      "revId": "b4794a940238b665937645a6e8211334fd908794",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
