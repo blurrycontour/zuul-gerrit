@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f1d235d_1791599a",
+        "filename": "etc/console.html",
+        "patchSetId": 26
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-06-29T21:09:50Z",
+      "side": 1,
+      "message": "I think this is still just an example file from when I was poking at this forever ago - probably needs updating or something.",
+      "revId": "f86dc65aab801d871c926676bc01ebdecd0f11f0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_97f20906",
+        "filename": "test-requirements.txt",
+        "patchSetId": 26
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-06-29T21:09:50Z",
+      "side": 1,
+      "message": "This is in requirements.txt - don\u0027t need to repeat here.",
+      "revId": "f86dc65aab801d871c926676bc01ebdecd0f11f0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_1754b9c9",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 26
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-06-29T21:09:50Z",
+      "side": 1,
+      "message": "We can fix this in a followup so we get it everywhere- but we depend on python-daemon\u003e\u003d2.0.4 - so I think this is a stale copy-pasta comment and use of extras.",
+      "revId": "f86dc65aab801d871c926676bc01ebdecd0f11f0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_9759e9ff",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 26
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-06-29T21:09:50Z",
+      "side": 1,
+      "message": "Can probably remove \"Log Streamer\" here.",
+      "revId": "f86dc65aab801d871c926676bc01ebdecd0f11f0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_f7effdad",
+        "filename": "zuul/web.py",
+        "patchSetId": 26
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-06-29T21:09:50Z",
+      "side": 1,
+      "message": "Maybe make this (method, path, function), so:\n\n(\u0027GET\u0027, \u0027/console-stream\u0027, self._handleWebsocket)\n\nand then below use app.router.add_route instead of add_get.\n\n#notaminusone",
+      "revId": "f86dc65aab801d871c926676bc01ebdecd0f11f0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
