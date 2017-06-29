@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f1d235d_d0e1afd2",
+        "filename": "doc/source/admin/drivers/github.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-06-29T18:12:21Z",
+      "side": 1,
+      "message": "Gerrit?",
+      "range": {
+        "startLine": 50,
+        "startChar": 62,
+        "endLine": 50,
+        "endChar": 68
+      },
+      "revId": "2787e585676a2ccb6a88eb2578a870864154e0e5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
