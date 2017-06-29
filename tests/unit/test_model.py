@@ -41,6 +41,7 @@ class TestJob(BaseTestCase):
                             connection=self.connection)
         self.tenant = model.Tenant('tenant')
         self.layout = model.Layout()
+        self.layout.tenant = self.tenant
         self.project = model.Project('project', self.source)
         self.tpc = model.TenantProjectConfig(self.project)
         self.tenant.addUntrustedProject(self.tpc)
