@@ -940,6 +940,10 @@ class TenantParser(object):
             tenant.addConfigProject(tpc)
         for tpc in untrusted_tpcs:
             tenant.addUntrustedProject(tpc)
+
+        for tpc in config_tpcs + untrusted_tpcs:
+            TenantParser._resolveShadowProjects(tenant, tpc)
+
         tenant.config_projects_config, tenant.untrusted_projects_config = \
             TenantParser._loadTenantInRepoLayouts(merger, connections,
                                                   tenant.config_projects,
@@ -952,6 +956,13 @@ class TenantParser(object):
                                                   scheduler,
                                                   connections)
         return tenant
+
+    @staticmethod
+    def _resolveShadowProjects(tenant, tpc):
+        shadow_projects = []
+        for sp in tpc.shadow_projects:
+            shadow_projects.append(tenant.getProject(sp))
+        tpc.shadow_projects = frozenset(shadow_projects)
 
     @staticmethod
     def _loadProjectKeys(project_key_dir, connection_name, project):
@@ -1008,9 +1019,11 @@ class TenantParser(object):
             # Return a project object whether conf is a dict or a str
             project = source.getProject(conf)
             project_include = current_include
+            shadow_projects = []
         else:
             project_name = list(conf.keys())[0]
             project = source.getProject(project_name)
+            shadow_projects = as_list(conf[project_name].get('shadow', []))
 
             project_include = frozenset(
                 as_list(conf[project_name].get('include', [])))
@@ -1023,6 +1036,7 @@ class TenantParser(object):
 
         tenant_project_config = model.TenantProjectConfig(project)
         tenant_project_config.load_classes = frozenset(project_include)
+        tenant_project_config.shadow_projects = shadow_projects
 
         return tenant_project_config
 
@@ -1234,7 +1248,11 @@ class TenantParser(object):
                 continue
             with configuration_exceptions('job', config_job):
                 job = JobParser.fromYaml(tenant, layout, config_job)
-                layout.addJob(job)
+                added = layout.addJob(job)
+                if not added:
+                    TenantParser.log.debug(
+                        "Skipped adding job %s which shadows an existing job" %
+                        (job,))
 
         if not skip_semaphores:
             for config_semaphore in data.semaphores:
@@ -1274,11 +1292,10 @@ class TenantParser(object):
     @staticmethod
     def _parseLayout(base, tenant, data, scheduler, connections):
         layout = model.Layout()
+        layout.tenant = tenant
 
         TenantParser._parseLayoutItems(layout, tenant, data,
                                        scheduler, connections)
-
-        layout.tenant = tenant
 
         for pipeline in layout.pipelines.values():
             pipeline.manager._postConfig(layout)
