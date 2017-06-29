@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f1d235d_c118c3d4",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 831,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-29T20:01:21Z",
+      "side": 1,
+      "message": "Trailing comma causes this to be a tuple (json converts to a list).\n\nWhile we\u0027re at it, it might be nice to use the same format string and values (eg \u0027server\u0027, \u0027unique\u0027, \u0027hostname\u0027, data[\u0027worker_hostname\u0027]/self.executor_server.hostname) in the two url formats.",
+      "revId": "49fc5569917e7529c304e49407c0320830492ff0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
