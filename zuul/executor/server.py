@@ -204,17 +204,19 @@ class JobDir(object):
         os.makedirs(self.src_root)
         self.log_root = os.path.join(self.work_root, 'logs')
         os.makedirs(self.log_root)
-        self.ansible_root = os.path.join(self.root, 'ansible')
-        os.makedirs(self.ansible_root)
-        self.trusted_root = os.path.join(self.root, 'trusted')
-        os.makedirs(self.trusted_root)
+        # SSH
         ssh_dir = os.path.join(self.work_root, '.ssh')
         os.mkdir(ssh_dir, 0o700)
         self.result_data_file = os.path.join(self.work_root, 'results.json')
         with open(self.result_data_file, 'w'):
             pass
         self.known_hosts = os.path.join(ssh_dir, 'known_hosts')
+        # Ansible
+        self.ansible_root = os.path.join(self.root, 'ansible')
+        os.makedirs(self.ansible_root)
         self.inventory = os.path.join(self.ansible_root, 'inventory.yaml')
+        self.secrets = os.path.join(self.ansible_root, 'secrets.yaml')
+        self.has_secrets = False
         self.playbooks = []  # The list of candidate playbooks
         self.playbook = None  # A pointer to the candidate we have chosen
         self.pre_playbooks = []
@@ -1192,8 +1194,12 @@ class AnsibleJob(object):
                 for key in node['host_keys']:
                     known_hosts.write('%s\n' % key)
 
-    def writeAnsibleConfig(self, jobdir_playbook):
-        trusted = jobdir_playbook.trusted
+        secrets = dict(args['secrets'])
+        if secrets:
+            with open(self.jobdir_playbook.secrets, 'w') as secrets_yaml:
+                secrets_yaml.write(
+                    yaml.safe_dump(secrets, default_flow_style=False))
+            self.jobdir.has_secrets = True
 
         with open(jobdir_playbook.ansible_config, 'w') as config:
             config.write('[defaults]\n')
@@ -1372,6 +1378,8 @@ class AnsibleJob(object):
             verbose = '-v'
 
         cmd = ['ansible-playbook', verbose, playbook.path]
+        if self.jobdir.has_secrets:
+            cmd.extend(['-e', '@' + self.jobdir.secrets])
 
         if success is not None:
             cmd.extend(['-e', 'success=%s' % str(bool(success))])
