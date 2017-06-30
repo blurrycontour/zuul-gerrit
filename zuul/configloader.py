@@ -300,6 +300,7 @@ class JobParser(object):
 
         job = {vs.Required('name'): str,
                'parent': str,
+               'final': bool,
                'failure-message': str,
                'success-message': str,
                'failure-url': str,
@@ -332,6 +333,7 @@ class JobParser(object):
         return vs.Schema(job)
 
     simple_attributes = [
+        'final',
         'timeout',
         'workspace',
         'voting',
