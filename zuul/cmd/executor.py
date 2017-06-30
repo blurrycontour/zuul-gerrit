@@ -109,7 +109,8 @@ class Executor(zuul.cmd.ZuulApp):
     def main(self, daemon=True):
         # See comment at top of file about zuul imports
 
-        self.user = get_default(self.config, 'executor', 'user', 'zuul')
+        self.user = get_default(self.config, 'executor', 'default_username',
+                                'zuul')
 
         if self.config.has_option('zuul', 'jobroot_dir'):
             self.jobroot_dir = os.path.expanduser(
