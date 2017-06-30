@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f1d235d_62d42abe",
+        "filename": "zuul/ansible/library/command.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-30T20:14:36Z",
+      "side": 1,
+      "message": "buffered isn\u0027t a thing.  should leave it as it was, or set buffering\u003d0",
+      "revId": "6f729a72b991b6c43e743c8e974731aeb77b76e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
