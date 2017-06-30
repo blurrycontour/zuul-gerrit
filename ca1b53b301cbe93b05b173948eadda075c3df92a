@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f1d235d_201991d6",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1340,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-30T16:50:43Z",
+      "side": 1,
+      "message": "This won\u0027t be reset in any of the cases above ret\u003d\u003d4.  Maybe a try/finally around the whole thing?",
+      "revId": "ca1b53b301cbe93b05b173948eadda075c3df92a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
