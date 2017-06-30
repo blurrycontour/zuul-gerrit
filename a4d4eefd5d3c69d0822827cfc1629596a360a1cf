@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f1d235d_ebb3754c",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 894,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-06-30T22:11:10Z",
+      "side": 1,
+      "message": "I may be just lazy parsing, but I think there\u0027s some real irony in a failing test that requires you to set success to False. :)",
+      "revId": "a4d4eefd5d3c69d0822827cfc1629596a360a1cf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
