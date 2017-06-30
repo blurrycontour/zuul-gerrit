@@ -148,6 +148,8 @@ layout.yaml to be useful.
   optional value and ``1`` is used by default.
   ``status_expiry=1``
 
+**tenant_config**
+  Path to the tenant configuration file (yaml format).
 
 merger
 """"""
