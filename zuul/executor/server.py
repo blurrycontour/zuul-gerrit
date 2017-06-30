@@ -1316,9 +1316,6 @@ class AnsibleJob(object):
                 watchdog.stop()
                 self.log.debug("Stopped watchdog")
 
-        with self.proc_lock:
-            self.proc = None
-
         if timeout and watchdog.timed_out:
             return (self.RESULT_TIMED_OUT, None)
         if ret == 3:
@@ -1328,6 +1325,19 @@ class AnsibleJob(object):
         elif ret == -9:
             # Received abort request.
             return (self.RESULT_ABORTED, None)
+        elif ret == 4:
+            # Ansible could not parse the yaml.
+            self.log.debug("Ansible parse error")
+            self.proc.stdout.seek(0)
+            with open(self.jobdir.job_output_file, 'a') as job_output:
+                job_output.write("{now} | ANSIBLE PARSE ERROR\n".format(
+                    now=datetime.datetime.now()))
+                for line in iter(self.proc.stdout.readline, b''):
+                    job_output.write("{now} | {line}".format(
+                        now=datetime.datetime.now(), line=line))
+
+        with self.proc_lock:
+            self.proc = None
 
         return (self.RESULT_NORMAL, ret)
 
