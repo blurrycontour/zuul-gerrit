@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3f1d235d_67b56331",
+        "filename": "etc/console.html",
+        "patchSetId": 26
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-06-30T14:51:53Z",
+      "side": 1,
+      "message": "Ok, since it was just for your personal testing, I\u0027m just going to remove it.",
+      "parentUuid": "3f1d235d_1791599a",
+      "revId": "f86dc65aab801d871c926676bc01ebdecd0f11f0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f1d235d_97f20906",
         "filename": "test-requirements.txt",
         "patchSetId": 26
@@ -30,6 +48,24 @@
       "writtenOn": "2017-06-29T21:09:50Z",
       "side": 1,
       "message": "This is in requirements.txt - don\u0027t need to repeat here.",
+      "revId": "f86dc65aab801d871c926676bc01ebdecd0f11f0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_678e8379",
+        "filename": "test-requirements.txt",
+        "patchSetId": 26
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-06-30T14:51:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f1d235d_97f20906",
       "revId": "f86dc65aab801d871c926676bc01ebdecd0f11f0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "3f1d235d_87e63f44",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 26
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-06-30T14:51:53Z",
+      "side": 1,
+      "message": "agreed",
+      "parentUuid": "3f1d235d_1754b9c9",
+      "revId": "f86dc65aab801d871c926676bc01ebdecd0f11f0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f1d235d_9759e9ff",
         "filename": "zuul/cmd/web.py",
         "patchSetId": 26
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "3f1d235d_c7dc3776",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 26
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-06-30T14:51:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f1d235d_9759e9ff",
+      "revId": "f86dc65aab801d871c926676bc01ebdecd0f11f0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f1d235d_f7effdad",
         "filename": "zuul/web.py",
         "patchSetId": 26
@@ -81,6 +153,24 @@
       "writtenOn": "2017-06-29T21:09:50Z",
       "side": 1,
       "message": "Maybe make this (method, path, function), so:\n\n(\u0027GET\u0027, \u0027/console-stream\u0027, self._handleWebsocket)\n\nand then below use app.router.add_route instead of add_get.\n\n#notaminusone",
+      "revId": "f86dc65aab801d871c926676bc01ebdecd0f11f0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_c7e67717",
+        "filename": "zuul/web.py",
+        "patchSetId": 26
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-06-30T14:51:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f1d235d_f7effdad",
       "revId": "f86dc65aab801d871c926676bc01ebdecd0f11f0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
