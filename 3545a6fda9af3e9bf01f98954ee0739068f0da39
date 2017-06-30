@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f1d235d_504b342a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-06-30T21:23:14Z",
+      "side": 1,
+      "message": "Most amazing commit message evar.",
+      "revId": "3545a6fda9af3e9bf01f98954ee0739068f0da39",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
