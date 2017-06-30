@@ -25,8 +25,6 @@ from cachecontrol.cache import DictCache
 import iso8601
 import jwt
 import requests
-import webob
-import webob.dec
 import voluptuous as v
 import github3
 from github3.exceptions import MethodNotAllowed
@@ -63,17 +61,15 @@ class GithubWebhookListener():
     def __init__(self, connection):
         self.connection = connection
 
-    def handle_request(self, path, tenant_name, request):
-        if request.method != 'POST':
-            self.log.debug("Only POST method is allowed.")
-            raise webob.exc.HTTPMethodNotAllowed(
-                'Only POST method is allowed.')
+    def handle_request(self):
+        tenant_name = request.match_info.get('tenant', '')
 
         self.log.debug("Github Webhook Received.")
 
         self._validate_signature(request)
 
         try:
+            await self.__dispatch_event(request)
             self.__dispatch_event(request)
         except webob.exc.HTTPNotFound:
             raise
@@ -86,8 +82,7 @@ class GithubWebhookListener():
             self.log.debug("X-Github-Event: " + event)
         except KeyError:
             self.log.debug("Request headers missing the X-Github-Event.")
-            raise webob.exc.HTTPBadRequest('Please specify a X-Github-Event '
-                                           'header.')
+            raise web.HTTPBadRequest('Please specify a X-Github-Event header.')
 
         try:
             method = getattr(self, '_event_' + event)
@@ -95,14 +90,14 @@ class GithubWebhookListener():
             message = "Unhandled X-Github-Event: {0}".format(event)
             self.log.debug(message)
             # Returns empty 200 on unhandled events
-            raise webob.exc.HTTPOk()
+            return web.Response(body='ok')
 
         try:
-            json_body = request.json_body
+            json_body = await request.json()
         except:
             message = 'Exception deserializing JSON body'
             self.log.exception(message)
-            raise webob.exc.HTTPBadRequest(message)
+            raise web.HTTPBadRequest(message)
 
         # If there's any installation mapping information in the body then
         # update the project mapping before any requests are made.
@@ -269,7 +264,7 @@ class GithubWebhookListener():
         try:
             request_signature = request.headers['X-Hub-Signature']
         except KeyError:
-            raise webob.exc.HTTPUnauthorized(
+            raise web.HTTPUnauthorized(
                 'Please specify a X-Hub-Signature header with secret.')
 
         payload_signature = 'sha1=' + hmac.new(secret.encode('utf-8'),
@@ -279,7 +274,7 @@ class GithubWebhookListener():
         self.log.debug("Payload Signature: {0}".format(str(payload_signature)))
         self.log.debug("Request Signature: {0}".format(str(request_signature)))
         if str(payload_signature) != str(request_signature):
-            raise webob.exc.HTTPUnauthorized(
+            raise web.HTTPUnauthorized(
                 'Request signature does not match calculated payload '
                 'signature. Check that secret is correct.')
 
@@ -380,12 +375,14 @@ class GithubConnection(BaseConnection):
 
     def onLoad(self):
         webhook_listener = GithubWebhookListener(self)
-        self.registerHttpHandler(self.payload_path,
+        self.registerHttpHandler('POST', self.payload_path,
                                  webhook_listener.handle_request)
         self._authenticateGithubAPI()
 
     def onStop(self):
-        self.unregisterHttpHandler(self.payload_path)
+        # TODO(mordred) aiohttp does not support un-registering a route.
+        # Do we support unregistering a plugin at runtime?
+        pass
 
     def _createGithubClient(self):
         if self.server != 'github.com':

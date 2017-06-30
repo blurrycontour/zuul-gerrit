@@ -13,15 +13,15 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import asyncio
 import copy
 import json
 import logging
-import re
 import threading
 import time
-from paste import httpserver
-import webob
-from webob import dec
+import uvloop
+
+from aiohttp import web
 
 from zuul.lib import encryption
 
@@ -45,10 +45,9 @@ array of changes, they will not include the queue structure.
 
 class WebApp(threading.Thread):
     log = logging.getLogger("zuul.WebApp")
-    change_path_regexp = '/status/change/(.*)$'
 
     def __init__(self, scheduler, port=8001, cache_expiry=1,
-                 listen_address='0.0.0.0'):
+                 listen_address='0.0.0.0', loop=None):
         threading.Thread.__init__(self)
         self.scheduler = scheduler
         self.listen_address = listen_address
@@ -58,20 +57,59 @@ class WebApp(threading.Thread):
         self.cache = {}
         self.daemon = True
         self.routes = {}
-        self._init_default_routes()
-        self.server = httpserver.serve(
-            dec.wsgify(self.app), host=self.listen_address, port=self.port,
-            start_loop=False)
+        self._finished = False
 
-    def _init_default_routes(self):
-        self.register_path('/(status\.json|status)$', self.status)
-        self.register_path(self.change_path_regexp, self.change)
+        # Set up aiohttp
+        asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+        self.user_supplied_loop = loop is not None
+        if not loop:
+            loop = asyncio.get_event_loop()
+        self.event_loop = loop
+        asyncio.set_event_loop(loop)
+        self._register_default_routes()
+
+    def _register_default_routes(self):
+        self.registerPath(
+                'GET', '/status/change/{change}', self.handle_change)
+        self.registerPath(
+                'GET', '/status', self.handle_status)
+        self.registerPath(
+                'GET', '/keys/{connection}/{project}.pub', self.handle_keys)
 
     def run(self):
-        self.server.serve_forever()
+        while not self._finished:
+            self.app = self._create_application()
+
+            handler = self.app.make_handler(loop=self.event_loop)
+            coro = self.event_loop.create_server(handler,
+                                                 self.listen_address,
+                                                 self.port)
+            self.server = self.event_loop.run_until_complete(coro)
+            self.term = asyncio.Future()
+
+            self.event_loop.run_until_complete(self.term)
+
+            # cleanup
+            self.server.close()
+            self.event_loop.run_until_complete(self.server.wait_closed())
+            self.event_loop.run_until_complete(self.app.shutdown())
+            self.event_loop.run_until_complete(handler.shutdown(60.0))
+            self.event_loop.run_until_complete(self.app.cleanup())
+            self.app = None
+
+        # Only run these if we are controlling the loop - they need to be
+        # run from the main thread
+        if not self.user_supplied_loop:
+            self.event_loop.stop()
+            self.event_loop.close()
 
     def stop(self):
-        self.server.server_close()
+        self._finished = True
+        self.event_loop.call_soon_threadsafe(self.term.set_result, True)
+        await self.server.wait_closed()
+
+    def restart(self):
+        self.event_loop.call_soon_threadsafe(self.term.set_result, True)
 
     def _changes_by_func(self, func, tenant_name):
         """Filter changes by a user provided function.
@@ -97,71 +135,72 @@ class WebApp(threading.Thread):
             return change['id'] == rev
         return self._changes_by_func(func, tenant_name)
 
-    def register_path(self, path, handler):
-        path_re = re.compile(path)
-        self.routes[path] = (path_re, handler)
+    def _makePathAndKey(self, path, tenant)
+        # TODO(mordred) this is currently registering both on the root
+        # and with a tenant argument - I think the desire is to stop having
+        # the tenant argument be a thing.
+        if not path.startswith('/'):
+            path = '/' + path
+        if tenant:
+            path '/{tenant}' + path
+        key = method + path
+        return key, path
 
-    def unregister_path(self, path):
-        if self.routes.get(path):
-            del self.routes[path]
+    def registerPath(self, method, path, handler, tenant):
+        path, key = self._makePathAndKey(path, tenant)
+        if key not in self.routes:
+            self.routes[key] = (method, path, handler)
+            if self.app:
+                self.restart()
 
-    def _handle_keys(self, request, path):
-        m = re.match('/keys/(.*?)/(.*?).pub', path)
-        if not m:
-            raise webob.exc.HTTPNotFound()
-        source_name = m.group(1)
-        project_name = m.group(2)
-        source = self.scheduler.connections.getSource(source_name)
+    def unregisterPath(self, method, path, handler, tenant):
+        path, key = self._tenantityPath(path, tenant)
+        if key in self.routes:
+            del self.routes[key]
+            if self.app:
+                self.restart()
+
+    def _create_application(self):
+        app = web.Application()
+        for path, (method, handler) in self.routes.items()
+            app.add_route(method, '/{tenant}' + path, handler)
+            app.add_route(method, path, handler)
+        return app
+
+    def handle_keys(self, request):
+        connection_name = request.match_info['connection']
+        project_name = request.match_info['project']
+        source = self.scheduler.connections.getSource(connection_name)
         if not source:
-            raise webob.exc.HTTPNotFound()
+            raise web.HTTPNotFound()
         project = source.getProject(project_name)
         if not project:
-            raise webob.exc.HTTPNotFound()
+            raise web.HTTPNotFound()
 
         pem_public_key = encryption.serialize_rsa_public_key(
             project.public_key)
 
-        response = webob.Response(body=pem_public_key,
-                                  content_type='text/plain')
-        return response.conditional_response_app
+        return web.Response(body=pem_public_key,
+                            content_type='text/plain')
 
-    def app(self, request):
-        # Try registered paths without a tenant_name first
-        path = request.path
-        for path_re, handler in self.routes.values():
-            if path_re.match(path):
-                return handler(path, '', request)
-
-        # Now try with a tenant_name stripped
-        tenant_name = request.path.split('/')[1]
-        path = request.path.replace('/' + tenant_name, '')
-        # Handle keys
-        if path.startswith('/keys'):
-            return self._handle_keys(request, path)
-        for path_re, handler in self.routes.values():
-            if path_re.match(path):
-                return handler(path, tenant_name, request)
-        else:
-            raise webob.exc.HTTPNotFound()
-
-    def status(self, path, tenant_name, request):
+    def handle_status(self, request):
+        tenant_name = request.match_info['tenant']
         def func():
-            return webob.Response(body=self.cache[tenant_name],
-                                  content_type='application/json',
-                                  charset='utf8')
+            return web.Response(body=self.cache[tenant_name],
+                                content_type='application/json',
+                                charset='utf8')
         return self._response_with_status_cache(func, tenant_name)
 
-    def change(self, path, tenant_name, request):
+    def handle_change(self, request):
         def func():
-            m = re.match(self.change_path_regexp, path)
-            change_id = m.group(1)
+            change_id = request.match_info.get('tenant', '')
             status = self._status_for_change(change_id, tenant_name)
             if status:
-                return webob.Response(body=status,
-                                      content_type='application/json',
-                                      charset='utf8')
+                return web.Response(body=status,
+                                    content_type='application/json',
+                                    charset='utf8')
             else:
-                raise webob.exc.HTTPNotFound()
+                return web.Response(status=404)
         return self._response_with_status_cache(func, tenant_name)
 
     def _refresh_status_cache(self, tenant_name):
@@ -182,11 +221,14 @@ class WebApp(threading.Thread):
 
         response = func()
 
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.add_header('Access-Control-Allow-Origin', '*')
+        response.add_header(
+            'Cache-Control',
+            'public, max-age={age}'.format(age=self.cache_expiry))
+        response.last_Modified = self.cache_time
 
-        response.cache_control.public = True
-        response.cache_control.max_age = self.cache_expiry
-        response.last_modified = self.cache_time
-        response.expires = self.cache_time + self.cache_expiry
+        # TODO(mordred) Double-check format of these. Also, max-age is
+        # supposed to take precedence, so do we need to send this one?
+        # response.add_header('Expires', self.cache_time + self.cache_expiry)
 
-        return response.conditional_response_app
+        return response
