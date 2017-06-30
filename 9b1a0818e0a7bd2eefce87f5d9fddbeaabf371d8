@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f1d235d_dcc0852d",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-06-30T18:44:16Z",
+      "side": 1,
+      "message": "You\u0027d hope that the logger itself could handle this for us, instead of making devs remember to encode it every single time they log a line.",
+      "revId": "9b1a0818e0a7bd2eefce87f5d9fddbeaabf371d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
