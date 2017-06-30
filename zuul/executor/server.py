@@ -1328,6 +1328,29 @@ class AnsibleJob(object):
         elif ret == -9:
             # Received abort request.
             return (self.RESULT_ABORTED, None)
+        elif ret == 4:
+            # Ansible could not parse the yaml. We need to re-run ansible
+            # so that we can collect the output to report to the user.
+            # Skip the watchdog and the careful output iteration this time ...
+            # it's a parse error. It's going to be quick and short.
+            proc = popen(
+                cmd,
+                cwd=self.jobdir.work_root,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                preexec_fn=os.setsid,
+                env=env_copy,
+            )
+
+            self.log.debug("Ansible output terminated")
+            ret = self.proc.wait()
+            with open(self.jobdir.job_output_file, 'a') as job_output:
+                job_output.write("{now} | ANSIBLE PARSE ERROR\n".format(
+                    now=datetime.datetime.now()))
+                for line in iter(proc.stdout.readline, b''):
+                    job_output.write("{now} | {line}".format(
+                        now=datetime.datetime.now(), line=line))
+                self.proc.wait()
 
         return (self.RESULT_NORMAL, ret)
 
