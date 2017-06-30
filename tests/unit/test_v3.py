@@ -67,6 +67,76 @@ class TestMultipleTenants(AnsibleZuulTestCase):
                          "not affect tenant one")
 
 
+class TestFinal(ZuulTestCase):
+
+    tenant_config_file = 'config/final/main.yaml'
+
+    def test_final(self):
+
+        # test clean usage of final parent job
+        in_repo_conf = textwrap.dedent(
+            """
+            # this job should work as it doesn't override attributes
+            # from the final parent
+            - job:
+                name: project-test
+                parent: job-final
+
+            - project:
+                name: org/project
+                check:
+                  jobs:
+                    - project-test
+            """)
+
+        in_repo_playbook = textwrap.dedent(
+            """
+            - hosts: all
+              tasks: []
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf,
+                     'playbooks/project-test.yaml': in_repo_playbook}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 1)
+        self.assertEqual(A.patchsets[-1]['approvals'][0]['value'], '1')
+
+        # test misuse of final parent job
+
+        in_repo_conf = textwrap.dedent(
+            """
+            # this job should not work as it overrides execution attributes
+            # from the final parent
+            - job:
+                name: project-test
+                parent: job-final
+                vars:
+                  dont_override_this: bar
+
+            - project:
+                name: org/project
+                check:
+                  jobs:
+                    - project-test
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf,
+                     'playbooks/project-test.yaml': in_repo_playbook}
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # The second patch tried to override some variables.
+        # Thus it should fail.
+        self.assertEqual(B.reported, 1)
+        self.assertEqual(B.patchsets[-1]['approvals'][0]['value'], '-1')
+
+
 class TestInRepoConfig(ZuulTestCase):
     # A temporary class to hold new tests while others are disabled
 
