@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "3f1d235d_1c903d4e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-30T18:38:04Z",
+      "side": 1,
+      "message": "I don\u0027t think we want secrets to be trusted-only.",
+      "revId": "e3acd040da24f9a702245f2b1c23b0bff6e0ecda",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f1d235d_bc4dc973",
         "filename": "zuul/executor/server.py",
         "patchSetId": 1
@@ -30,6 +47,23 @@
       "writtenOn": "2017-06-30T18:26:26Z",
       "side": 1,
       "message": "You meant -e",
+      "revId": "e3acd040da24f9a702245f2b1c23b0bff6e0ecda",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_fc9ea161",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1370,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-06-30T18:38:04Z",
+      "side": 1,
+      "message": "I don\u0027t think we want to make secrets trusted-only.",
       "revId": "e3acd040da24f9a702245f2b1c23b0bff6e0ecda",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
