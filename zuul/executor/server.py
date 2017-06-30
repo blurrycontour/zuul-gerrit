@@ -1217,7 +1217,8 @@ class AnsibleJob(object):
                 roles_path = self.jobdir.trusted_roles_path
 
             if roles_path:
-                config.write('roles_path = %s\n' % ':'.join(roles_path))
+                config.write(
+                    'roles_path = %s\n' % ':'.join(reverse(roles_path)))
 
             # On trusted jobs, we want to prevent the printing of args,
             # since trusted jobs might have access to secrets that they may
