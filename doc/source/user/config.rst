@@ -124,7 +124,7 @@ optional unless otherwise specified):
   There are currently two schemes for managing pipelines:
 
   .. _independent_pipeline_manager:
-  
+
   *independent*
     Every event in this pipeline should be treated as independent of
     other events in the pipeline.  This is appropriate when the order of
@@ -141,7 +141,7 @@ optional unless otherwise specified):
     results can not affect any other events in the pipeline.
 
   .. _dependent_pipeline_manager:
-  
+
   *dependent*
     The dependent pipeline manager is designed for gating.  It ensures
     that every change is tested exactly as it is going to be merged
@@ -251,7 +251,7 @@ optional unless otherwise specified):
   **status**
   A string value that corresponds with the status of the change
   reported by the trigger.
-   
+
 **reject**
   If this section is present, it establishes pre-requisites that can
   block an item from being enqueued. It can be considered a negative
@@ -298,7 +298,7 @@ which causes Zuul to enqueue an item, a reporter is the action
 performed on a connection when an item is dequeued after its jobs
 complete.  The actual syntax for a reporter is defined by the driver
 which implements it.  See :ref:`drivers` for more information.
-  
+
 **success**
   Describes where Zuul should report to if all the jobs complete
   successfully.  This section is optional; if it is omitted, Zuul will
@@ -468,6 +468,11 @@ unless otherwise specified:
   this or any other project.  Any attributes not specified on a job
   will be collected from its parent.
 
+**final**
+  If set to ``true`` jobs inheriting from this one cannot override
+  attributes that alter the runtime behavior of the job. Other attributes
+  like selectors or messages may still be overridden.  Default: ``false``.
+
 **description**
   A textual description of the job.  Not currently used directly by
   Zuul, but it is used by the zuul-sphinx extension to Sphinx to
@@ -542,7 +547,7 @@ unless otherwise specified:
     - job:
         name: run-tests
 	nodes: current-release
-      
+
     - job:
         name: run-tests
 	branch: stable/2.0
@@ -567,12 +572,12 @@ unless otherwise specified:
     *untrusted-project* will, if they do not have a branch specifier,
     will have an implied branch specifier for the current branch
     applied.
-  
+
   This allows for the very simple and expected workflow where if a
   project defines a job on the master branch with no branch specifier,
   and then creates a new branch based on master, any changes to that
   job definition within the new branch only affect that branch.
-    
+
 **files**
   This attribute indicates that the job should only run on changes
   where the specified files are modified.  This is a regular
