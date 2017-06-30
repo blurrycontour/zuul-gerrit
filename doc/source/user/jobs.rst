@@ -101,3 +101,18 @@ untrusted job content.
 
 .. TODO: describe standard lib and link to published docs for it.
 
+Return Values
+-------------
+
+The job may return some values to Zuul to affect its behavior.  To
+return a value, use the *zuul_return* Ansible module in a job
+playbook.  For example::
+
+  tasks:
+    - zuul_return:
+        data:
+          foo: bar
+
+Will return the dictionary "{'foo': 'bar'}" to Zuul.
+
+.. TODO: xref to section describing formatting
