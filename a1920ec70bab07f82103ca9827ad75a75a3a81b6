@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f1d235d_d4c96a78",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-07-02T21:04:40Z",
+      "side": 0,
+      "message": "This deletes self.ansible_root \u003d ... , and then uses self.ansible_root below. Leading to this:\n\n    2017-06-30 18:58:38,774 gear.Client.b\u0027Zuul Executor Client\u0027 DEBUG    Job exception; \u003cgear.Job 0x7f41804f6ac8 handle: b\u0027H:127.0.0.1:8\u0027 name: executor:execute unique: c577e3867f214ccbbbd423770349a099\u003e exception: Traceback (most recent call last):\n      File \"/home/jenkins/workspace/gate-zuul-python35/zuul/executor/server.py\", line 721, in execute\n        str(self.job.unique))\n      File \"/home/jenkins/workspace/gate-zuul-python35/zuul/executor/server.py\", line 188, in __init__\n        os.makedirs(self.ansible_root)\n    AttributeError: \u0027JobDir\u0027 object has no attribute \u0027ansible_root\u0027",
+      "revId": "a1920ec70bab07f82103ca9827ad75a75a3a81b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
