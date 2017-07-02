@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f1d235d_9244291d",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-07-02T03:17:15Z",
+      "side": 1,
+      "message": "This likely needs ssl_ca, ssl_cert and ssl_key too.",
+      "revId": "b53624bd4f137fa589f75f208efba828c68d0383",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_d23aa196",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-07-02T03:17:15Z",
+      "side": 1,
+      "message": "Could be replaced by: zuul.lib.config.get_default(server.config, \u0027web\u0027, \u0027pidfile\u0027,  \u0027/var/run/zuul-web/zuul-web.pid\u0027, expand_user\u003dTrue)",
+      "range": {
+        "startLine": 106,
+        "startChar": 0,
+        "endLine": 109,
+        "endChar": 49
+      },
+      "revId": "b53624bd4f137fa589f75f208efba828c68d0383",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_52469123",
+        "filename": "zuul/web.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-07-02T03:17:15Z",
+      "side": 1,
+      "message": "Those default could be added to zuul.conf-sample",
+      "revId": "b53624bd4f137fa589f75f208efba828c68d0383",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
