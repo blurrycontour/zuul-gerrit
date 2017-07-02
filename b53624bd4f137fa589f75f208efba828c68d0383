@@ -2,6 +2,52 @@
   "comments": [
     {
       "key": {
+        "uuid": "3f1d235d_8349858c",
+        "filename": "tests/unit/test_log_streamer.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-02T06:59:58Z",
+      "side": 1,
+      "message": "Couldn\u0027t this lead to problems with parallel test runs?",
+      "range": {
+        "startLine": 164,
+        "startChar": 36,
+        "endLine": 164,
+        "endChar": 40
+      },
+      "revId": "b53624bd4f137fa589f75f208efba828c68d0383",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_0355751d",
+        "filename": "tests/unit/test_log_streamer.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-02T06:59:58Z",
+      "side": 1,
+      "message": "Same as above",
+      "range": {
+        "startLine": 189,
+        "startChar": 22,
+        "endLine": 189,
+        "endChar": 26
+      },
+      "revId": "b53624bd4f137fa589f75f208efba828c68d0383",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f1d235d_9244291d",
         "filename": "zuul/cmd/web.py",
         "patchSetId": 29
@@ -13,6 +59,29 @@
       "writtenOn": "2017-07-02T03:17:15Z",
       "side": 1,
       "message": "This likely needs ssl_ca, ssl_cert and ssl_key too.",
+      "revId": "b53624bd4f137fa589f75f208efba828c68d0383",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_ed4dc272",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-02T06:59:58Z",
+      "side": 1,
+      "message": "What is the reason for exiting on SIGUSR1?",
+      "range": {
+        "startLine": 71,
+        "startChar": 29,
+        "endLine": 71,
+        "endChar": 36
+      },
       "revId": "b53624bd4f137fa589f75f208efba828c68d0383",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -35,6 +104,29 @@
         "startChar": 0,
         "endLine": 109,
         "endChar": 49
+      },
+      "revId": "b53624bd4f137fa589f75f208efba828c68d0383",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_ed9b82c6",
+        "filename": "zuul/web.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-02T06:59:58Z",
+      "side": 1,
+      "message": "I would not request the whole list as even on a busy system there will be many more builds running than streamed so I think frequently requesting the whole list is overkill.\n\nAs we\u0027re on py3 we could just use https://docs.python.org/3.4/library/functools.html#functools.lru_cache and decorate this function with \n\n  @lru_cache(maxsize\u003d64)",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 73
       },
       "revId": "b53624bd4f137fa589f75f208efba828c68d0383",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
