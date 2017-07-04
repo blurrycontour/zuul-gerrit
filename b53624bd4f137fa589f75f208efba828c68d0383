@@ -134,6 +134,29 @@
     },
     {
       "key": {
+        "uuid": "3f1d235d_ad06751b",
+        "filename": "zuul/web.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-04T11:03:29Z",
+      "side": 1,
+      "message": "I think canceled error should be excluded from error log as this is triggered when a user aborts the connection:\n\n  2017-07-04 10:59:18,957 ERROR zuul.web.LogStreamingHandler: Websocket exception:\n  Traceback (most recent call last):\n    File \"/usr/lib/python3.6/site-packages/zuul/web.py\", line 117, in processRequest\n      async for msg in ws:\n    File \"/usr/lib/python3.6/site-packages/aiohttp/web_ws.py\", line 343, in __anext__\n      msg \u003d yield from self.receive()\n    File \"/usr/lib/python3.6/site-packages/aiohttp/web_ws.py\", line 273, in receive\n      msg \u003d yield from self._reader.read()\n    File \"/usr/lib/python3.6/site-packages/aiohttp/streams.py\", line 627, in read\n      return (yield from super().read())\n    File \"/usr/lib/python3.6/site-packages/aiohttp/streams.py\", line 509, in read\n      yield from self._waiter\n  concurrent.futures._base.CancelledError",
+      "range": {
+        "startLine": 135,
+        "startChar": 0,
+        "endLine": 137,
+        "endChar": 69
+      },
+      "revId": "b53624bd4f137fa589f75f208efba828c68d0383",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f1d235d_52469123",
         "filename": "zuul/web.py",
         "patchSetId": 29
