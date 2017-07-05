@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f1d235d_44054545",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-05T20:30:21Z",
+      "side": 1,
+      "message": "Wow. It\u0027s like you read my mind before I did.",
+      "revId": "e5c79dc0f64eb6fb0000e82ccf094551f1f2bef7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_e4f7b158",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-05T20:30:21Z",
+      "side": 1,
+      "message": "This no workie.",
+      "revId": "e5c79dc0f64eb6fb0000e82ccf094551f1f2bef7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
