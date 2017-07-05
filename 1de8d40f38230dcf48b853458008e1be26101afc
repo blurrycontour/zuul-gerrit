@@ -16,6 +16,23 @@
       "revId": "1de8d40f38230dcf48b853458008e1be26101afc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_97c4adf6",
+        "filename": "doc/source/project-config.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-05T21:05:26Z",
+      "side": 1,
+      "message": "Fixed indent in a followup.  Let\u0027s do the code-block conversion in a future change.",
+      "revId": "1de8d40f38230dcf48b853458008e1be26101afc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
