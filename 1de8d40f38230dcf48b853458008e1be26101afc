@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f1d235d_94af0e7c",
+        "filename": "doc/source/project-config.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-05T18:44:47Z",
+      "side": 1,
+      "message": "Indentation issue - name should be indented 2 more spaces.\n\nWe can mark these sections as:\n\n.. code-block:: yaml\n\ninstead of just :: and I sphinx will actually parse them for us",
+      "revId": "1de8d40f38230dcf48b853458008e1be26101afc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
