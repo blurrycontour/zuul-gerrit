@@ -1,3 +1,10 @@
+- job:
+    name: broken
+    parent: base
+    description: |
+      Job with broken pre-playbook
+    pre-run: playbooks/broken
+
 - project:
     name: openstack-infra/zuul
     check:
@@ -12,3 +19,4 @@
         - zuul-tox-linters
         - zuul-tox-py35
         - zuul-tox-tarball
+        - broken
