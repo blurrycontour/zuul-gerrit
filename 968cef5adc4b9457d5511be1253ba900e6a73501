@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f1d235d_e1f7a358",
+        "filename": "etc/zuul.conf-sample",
+        "patchSetId": 6
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-07-05T19:59:36Z",
+      "side": 1,
+      "message": "Entry is \u0027hosts\u0027 here, but...",
+      "revId": "968cef5adc4b9457d5511be1253ba900e6a73501",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_01fbbf46",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-07-05T19:59:36Z",
+      "side": 1,
+      "message": "The code is looking for an entry of \u0027zookeeper_hosts\u0027 here. These are not consistent.",
+      "revId": "968cef5adc4b9457d5511be1253ba900e6a73501",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
