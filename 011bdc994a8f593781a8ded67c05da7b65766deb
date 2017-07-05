@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "3f1d235d_5a375c4e",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-05T21:36:43Z",
+      "side": 1,
+      "message": "fixed",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f1d235d_b4cd6a32",
         "filename": "doc/source/admin/components.rst",
         "patchSetId": 4
@@ -64,6 +81,23 @@
       "writtenOn": "2017-07-05T19:48:11Z",
       "side": 1,
       "message": "\"smalle\"",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_3a4020a5",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-05T21:36:43Z",
+      "side": 1,
+      "message": "fixed",
       "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -240,6 +274,23 @@
     },
     {
       "key": {
+        "uuid": "3f1d235d_1a3d642a",
+        "filename": "doc/source/admin/monitoring.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-05T21:36:43Z",
+      "side": 1,
+      "message": "We should stop using the env vars for this and put it in zuul.conf.",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f1d235d_4fc7a397",
         "filename": "doc/source/admin/quick-start.rst",
         "patchSetId": 4
@@ -291,6 +342,23 @@
     },
     {
       "key": {
+        "uuid": "3f1d235d_fa4508b5",
+        "filename": "doc/source/admin/quick-start.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-05T21:36:43Z",
+      "side": 1,
+      "message": "They have different audiences.  Think system-config vs project-config in openstack.  Keeping them separate is useful I think.",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f1d235d_6fdfff39",
         "filename": "doc/source/admin/tenants.rst",
         "patchSetId": 4
@@ -302,6 +370,40 @@
       "writtenOn": "2017-07-05T19:27:27Z",
       "side": 1,
       "message": "Worth mention that order matters?",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_7a0b387c",
+        "filename": "doc/source/admin/tenants.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-05T21:36:43Z",
+      "side": 1,
+      "message": "Yes, it\u0027s mentioned below.",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_5a107ca8",
+        "filename": "doc/source/admin/tenants.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-05T21:36:43Z",
+      "side": 1,
+      "message": "Order is mentioned here.",
       "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -342,6 +444,23 @@
     },
     {
       "key": {
+        "uuid": "3f1d235d_9a1a94c9",
+        "filename": "doc/source/index.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-05T21:36:43Z",
+      "side": 1,
+      "message": "This sentance *is* in the active voice (in fact, it was previously passive and this change makes it active!).  You make a good point that it seems like this sentence has redundant words, however, I don\u0027t like the way it reads without them, or some kind of equivalent.\n\nI agree that telling people it\u0027s a computer program is weak, and yet, I think we should tell them what it is, not merely what it does.  So the best solution might be to continue to tell them what it is, but find something more interesting to say about what it is.\n\nI\u0027d like to leave this as-is for now and refine this very important bit in its own change later.",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f1d235d_8faffb7b",
         "filename": "doc/source/user/concepts.rst",
         "patchSetId": 4
@@ -359,6 +478,23 @@
     },
     {
       "key": {
+        "uuid": "3f1d235d_da424cab",
+        "filename": "doc/source/user/concepts.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-05T21:36:43Z",
+      "side": 1,
+      "message": "fixed",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f1d235d_cfb973cc",
         "filename": "doc/source/user/concepts.rst",
         "patchSetId": 4
@@ -370,6 +506,23 @@
       "writtenOn": "2017-07-05T19:27:27Z",
       "side": 1,
       "message": "I\u0027m starting to think that, although check, gate and post *are* just config concepts - the use of them as terminology is a thing that has become central to the zuul ecosystem.\n\nIt might be more helpful to lead more with the concepts as we know them - since they each encompass a type of workflow that people already know. Then we can follow with a note that these names are arbitrary and can be redefined - but honestly I think I\u0027d like to discourage people from defining pipelines named check, gate and post with arbitrarily different behaviors.\n\nIt\u0027s super powerful that they are only config - but I worry that that\u0027s too much power out of the gate.",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_ba15509e",
+        "filename": "doc/source/user/concepts.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-05T21:36:43Z",
+      "side": 1,
+      "message": "I think we could reword this later, particularly after we have more examples, suggesting a standardized idea of what check and gate are.\n\nI will note that our post pipeline is *terrible* and not at all what we actually want to do.  I hope to change several aspects of it in the future.  I mention this to suggest that even our rock-solid ideas of these pipelines are will evolve.\n\nI think our experience has shown that folks who want to build their own systems with zuul are capable of grasping this, and folks who don\u0027t are happy to copy-pasta.  I think that makes for a happy compromise.",
       "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
