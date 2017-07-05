@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f1d235d_e48c51d8",
+        "filename": "doc/source/user/jobs.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-05T20:31:12Z",
+      "side": 1,
+      "message": "In a follow up, might want to do work/src/github.com/org/project2 - just so people don\u0027t think we\u0027re lopping off the org for some reason.",
+      "revId": "c9f72cb0f8baf75fd71cbd10546f175bc27e8c99",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
