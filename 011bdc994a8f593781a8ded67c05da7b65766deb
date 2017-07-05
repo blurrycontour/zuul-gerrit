@@ -1,0 +1,327 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f1d235d_74ec728e",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-05T19:27:27Z",
+      "side": 1,
+      "message": "/etc/zuul/zuul.conf",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_b4cd6a32",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-05T19:27:27Z",
+      "side": 1,
+      "message": "This makes me want to dredge up a massively old bikeshed. Namely - is there actual value in keeping zuul.conf as INI format rather than making it yaml too? Since we have things like multiple gerrit connections, maybe we\u0027ve kept it too long just because the migration pain wasn\u0027t worth it?",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_d4bfc65e",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-05T19:27:27Z",
+      "side": 1,
+      "message": "Maybe we should move this paragraph to somewhere about installation/operation and have a few sections: \"All-In-One\" and \"Fully Distributed\" - and collapse this paragraph to simply be \"zuul can be run on a single system `zuul-all-in-one`_ or scale across many hosts `zuul-fully-distributed`_.\" or something.",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_3475dacb",
+        "filename": "doc/source/admin/connections.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-05T19:27:27Z",
+      "side": 1,
+      "message": "This is one of the constructs that makes me think we should at least consider yaml before we release.",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_94438e6c",
+        "filename": "doc/source/admin/drivers/github.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-05T19:27:27Z",
+      "side": 1,
+      "message": "Whenever someone does that - a brief discussion of webhook vs. app would be nice - that question comes up from folks pretty quickly.",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_f4288297",
+        "filename": "doc/source/admin/drivers/github.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-05T19:27:27Z",
+      "side": 1,
+      "message": "I know this is a docs patch - but looking at it here, \"git_host\" as the name here seems weird. Why not \"server?\" it\u0027s a sub-resource of a github connection. \u0027git_host\u0027 makes me think of git.openstack.org.\n\nDoes github not support canonical_hostname?\n\nDoes github driver support port?\n\nSeems that server and port are things that could be standard across connections - and canonical_hostname for anything that can be a source.",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_ef2f8f85",
+        "filename": "doc/source/admin/drivers/zuul.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-05T19:27:27Z",
+      "side": 1,
+      "message": "This is super speculative - but if we added a driver that would let one zuul use another zuul as a trigger, that would make the name of this driver weird. Maybe before we release we should discuss changing this one to \"internal\" or something else to leave the door open for a \"zuul\" driver which lets one zuul connect to another zuul?",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_af53d716",
+        "filename": "doc/source/admin/installation.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-05T19:27:27Z",
+      "side": 1,
+      "message": "Maybe link to how to deal with bindep files?",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_cf85f35b",
+        "filename": "doc/source/admin/installation.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-05T19:27:27Z",
+      "side": 1,
+      "message": "I know it was brought up before- but I think a zookeeper section is warranted, rather than via nodepool.",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_ef442f49",
+        "filename": "doc/source/admin/installation.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-05T19:27:27Z",
+      "side": 1,
+      "message": "Maybe a MySQL/db section - it\u0027s an optional depend, but we include docs for the SQL reporter.\n\nAlso maybe a statsd mention? (the next file is about statsd, but it\u0027s an external system)",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_4f99e3c1",
+        "filename": "doc/source/admin/monitoring.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-05T19:27:27Z",
+      "side": 1,
+      "message": "Do we know how this works best in systemd? New users are less and less likely (sad as it makes me) to be running zuul with sysvinit scripts.\n\nIt also seems weird that we only allow configuring statsd via env vars.",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_4fc7a397",
+        "filename": "doc/source/admin/quick-start.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-05T19:27:27Z",
+      "side": 1,
+      "message": "workers. Or something., \"Can run zero or more of these\" wasn\u0027t immediately clear.",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_2f490730",
+        "filename": "doc/source/admin/quick-start.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-05T19:27:27Z",
+      "side": 1,
+      "message": "Similar - scalable makes me think it\u0027s a description of how well the single component scales, not that one can run 1 or more.",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_ef678fb6",
+        "filename": "doc/source/admin/quick-start.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-05T19:27:27Z",
+      "side": 1,
+      "message": "Both of these files require a system restart to pick up - why do we have two of them?",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_6fdfff39",
+        "filename": "doc/source/admin/tenants.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-05T19:27:27Z",
+      "side": 1,
+      "message": "Worth mention that order matters?",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_4fd1e322",
+        "filename": "doc/source/admin/tenants.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-05T19:27:27Z",
+      "side": 1,
+      "message": "Oh. here\u0027s the ordering.\n\n*untrusted* not trusted.\n\nI\u0027m still not thrilled with where we ended up with config-projects vs. untrusted-projects. I don\u0027t know it\u0027s worth bikeshedding about- but reading the docs it stands out.",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_cfa293ae",
+        "filename": "doc/source/index.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-05T19:27:27Z",
+      "side": 1,
+      "message": "Maybe active voice: \"zuul drives continuous integration ...\"",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_8faffb7b",
+        "filename": "doc/source/user/concepts.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-05T19:27:27Z",
+      "side": 1,
+      "message": "s/multiple/one or more/",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_cfb973cc",
+        "filename": "doc/source/user/concepts.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-05T19:27:27Z",
+      "side": 1,
+      "message": "I\u0027m starting to think that, although check, gate and post *are* just config concepts - the use of them as terminology is a thing that has become central to the zuul ecosystem.\n\nIt might be more helpful to lead more with the concepts as we know them - since they each encompass a type of workflow that people already know. Then we can follow with a note that these names are arbitrary and can be redefined - but honestly I think I\u0027d like to discourage people from defining pipelines named check, gate and post with arbitrarily different behaviors.\n\nIt\u0027s super powerful that they are only config - but I worry that that\u0027s too much power out of the gate.",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
