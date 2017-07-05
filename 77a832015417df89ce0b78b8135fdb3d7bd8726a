@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "3f1d235d_1d9c4968",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-05T16:23:52Z",
+      "side": 1,
+      "message": "Good point, fixed.",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f201791_4606771e",
         "filename": "doc/source/admin/components.rst",
         "patchSetId": 2
@@ -30,6 +47,23 @@
       "writtenOn": "2017-06-26T22:04:18Z",
       "side": 1,
       "message": "This should probably be updated to indicate recent decision to run both trusted and untrusted playbooks inside of bubblewrap.",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_fd986d75",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-05T16:23:52Z",
+      "side": 1,
+      "message": "Yep.  This is getting out of date.  :(",
       "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -87,6 +121,23 @@
     },
     {
       "key": {
+        "uuid": "3f1d235d_9da8598c",
+        "filename": "doc/source/admin/drivers/github.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-05T16:23:52Z",
+      "side": 1,
+      "message": "searched and replaced.  :)",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f201791_8b281897",
         "filename": "doc/source/admin/drivers/github.rst",
         "patchSetId": 2
@@ -132,6 +183,23 @@
       "writtenOn": "2017-06-26T22:04:18Z",
       "side": 1,
       "message": "Missing entry for canonical_hostname. Although I wonder if we should drop git_host in favor of canonical_hostname? I\u0027m not sure that having \"git_host\" as a unique config item for github makes much sense.",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_7dad7d99",
+        "filename": "doc/source/admin/drivers/github.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-05T16:23:52Z",
+      "side": 1,
+      "message": "Fixed later.",
       "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -206,6 +274,23 @@
     },
     {
       "key": {
+        "uuid": "3f1d235d_5d96414e",
+        "filename": "doc/source/admin/drivers/github.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-05T16:23:52Z",
+      "side": 1,
+      "message": "done and done",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f201791_ab04f418",
         "filename": "doc/source/admin/drivers/github.rst",
         "patchSetId": 2
@@ -257,6 +342,23 @@
     },
     {
       "key": {
+        "uuid": "3f1d235d_5d7f6114",
+        "filename": "doc/source/admin/installation.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-05T16:23:52Z",
+      "side": 1,
+      "message": "Good point.  When I was making the outline, I was thinking \"zookeeper is covered by the nodepool installation\".  But maybe we should surface that here rather than recursing into nodepool docs?",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f201791_461f975a",
         "filename": "doc/source/admin/installation.rst",
         "patchSetId": 2
@@ -291,6 +393,23 @@
     },
     {
       "key": {
+        "uuid": "3f1d235d_bd90b54b",
+        "filename": "doc/source/admin/quick-start.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-05T16:23:52Z",
+      "side": 1,
+      "message": "fixed",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f201791_e610e350",
         "filename": "doc/source/admin/quick-start.rst",
         "patchSetId": 2
@@ -308,6 +427,23 @@
     },
     {
       "key": {
+        "uuid": "3f1d235d_9d8179fe",
+        "filename": "doc/source/admin/quick-start.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-05T16:23:52Z",
+      "side": 1,
+      "message": "fixed",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f201791_c619677a",
         "filename": "doc/source/admin/tenants.rst",
         "patchSetId": 2
@@ -319,6 +455,23 @@
       "writtenOn": "2017-06-26T22:04:18Z",
       "side": 1,
       "message": "Not sure why this has a yaml dash. Also, shouldn\u0027t it match up with a driver type?",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_7d869d15",
+        "filename": "doc/source/admin/tenants.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-05T16:23:52Z",
+      "side": 1,
+      "message": "tab error",
       "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -376,6 +529,23 @@
     },
     {
       "key": {
+        "uuid": "3f1d235d_3d93855d",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-05T16:23:52Z",
+      "side": 1,
+      "message": "I agree.  Let\u0027s do that as a followup though.",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f201791_260b7b24",
         "filename": "doc/source/user/jobs.rst",
         "patchSetId": 2
@@ -387,6 +557,23 @@
       "writtenOn": "2017-06-26T22:04:18Z",
       "side": 1,
       "message": "TODO: Document where they source winds up on the remote node if using the base job.",
+      "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_dd8b711c",
+        "filename": "doc/source/user/jobs.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-05T16:23:52Z",
+      "side": 1,
+      "message": "added todo",
       "revId": "77a832015417df89ce0b78b8135fdb3d7bd8726a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
