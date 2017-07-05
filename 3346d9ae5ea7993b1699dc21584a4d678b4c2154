@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f1d235d_e44211ab",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-05T20:27:47Z",
+      "side": 1,
+      "message": "A previous patch moved tenant_config to scheduler - maybe this should go there too?",
+      "revId": "3346d9ae5ea7993b1699dc21584a4d678b4c2154",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_8480fdc0",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-05T20:27:47Z",
+      "side": 1,
+      "message": "That makes me want to make a zookeeper section with a hosts entry.",
+      "revId": "3346d9ae5ea7993b1699dc21584a4d678b4c2154",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
