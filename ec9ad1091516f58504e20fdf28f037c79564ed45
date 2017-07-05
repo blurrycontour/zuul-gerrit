@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "3f1d235d_34e721af",
+        "filename": "doc/source/project-config.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-05T15:44:52Z",
+      "side": 1,
+      "message": "No -- just that projects that aren\u0027t primarily focused on zuul may want to hide the file.",
+      "revId": "ec9ad1091516f58504e20fdf28f037c79564ed45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f201791_b41fde59",
         "filename": "doc/source/project-config.rst",
         "patchSetId": 4
@@ -65,6 +82,23 @@
     },
     {
       "key": {
+        "uuid": "3f1d235d_14ec258d",
+        "filename": "doc/source/project-config.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 564,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-05T15:44:52Z",
+      "side": 1,
+      "message": "Yes, generally we want to override, except for some cases where we think that would not be useful (vars, while being additive, can still be overidden, just not unset).  I\u0027d like to establish that overriding is the norm and then note the cases where it\u0027s different.",
+      "revId": "ec9ad1091516f58504e20fdf28f037c79564ed45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f201791_7354b353",
         "filename": "doc/source/project-config.rst",
         "patchSetId": 4
@@ -76,6 +110,23 @@
       "writtenOn": "2017-06-26T05:56:37Z",
       "side": 1,
       "message": "More a general question about this:\n\nShould the repo containing the job by default add itself as a contained role source? Currently it doesn\u0027t seem like it must explicitly add itself to the roles.",
+      "revId": "ec9ad1091516f58504e20fdf28f037c79564ed45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_f404094c",
+        "filename": "doc/source/project-config.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 677,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-05T15:44:52Z",
+      "side": 1,
+      "message": "Yes, I think we established in IRC that would be a good idea.  We\u0027ll do that in a later change.",
       "revId": "ec9ad1091516f58504e20fdf28f037c79564ed45",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -99,6 +150,23 @@
     },
     {
       "key": {
+        "uuid": "3f1d235d_d4010d3a",
+        "filename": "doc/source/project-config.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 687,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-05T15:44:52Z",
+      "side": 1,
+      "message": "Fixed in a later PS.",
+      "revId": "ec9ad1091516f58504e20fdf28f037c79564ed45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f201791_531ad76e",
         "filename": "doc/source/project-config.rst",
         "patchSetId": 4
@@ -110,6 +178,23 @@
       "writtenOn": "2017-06-26T05:07:23Z",
       "side": 1,
       "message": "It might be noted that vars are additive during inheritance.",
+      "revId": "ec9ad1091516f58504e20fdf28f037c79564ed45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_b4fa1140",
+        "filename": "doc/source/project-config.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 694,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-05T15:44:52Z",
+      "side": 1,
+      "message": "Fixed.",
       "revId": "ec9ad1091516f58504e20fdf28f037c79564ed45",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -133,6 +218,23 @@
     },
     {
       "key": {
+        "uuid": "3f1d235d_94f7155a",
+        "filename": "doc/source/project-config.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 810,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-05T15:44:52Z",
+      "side": 1,
+      "message": "Good point, I should mention the \u0027allow-secrets\u0027 pipeline attribute.",
+      "revId": "ec9ad1091516f58504e20fdf28f037c79564ed45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f201791_9aed648d",
         "filename": "doc/source/project-config.rst",
         "patchSetId": 4
@@ -144,6 +246,23 @@
       "writtenOn": "2017-06-22T14:55:01Z",
       "side": 1,
       "message": "This needs to change to \"label\" actually.",
+      "revId": "ec9ad1091516f58504e20fdf28f037c79564ed45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_7496b9f2",
+        "filename": "doc/source/project-config.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 858,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-05T15:44:52Z",
+      "side": 1,
+      "message": "Fixed in later ps.",
       "revId": "ec9ad1091516f58504e20fdf28f037c79564ed45",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -167,6 +286,23 @@
         "endLine": 874,
         "endChar": 35
       },
+      "revId": "ec9ad1091516f58504e20fdf28f037c79564ed45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_549bbd16",
+        "filename": "doc/source/project-config.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 874,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-05T15:44:52Z",
+      "side": 1,
+      "message": "Fixed.",
       "revId": "ec9ad1091516f58504e20fdf28f037c79564ed45",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
