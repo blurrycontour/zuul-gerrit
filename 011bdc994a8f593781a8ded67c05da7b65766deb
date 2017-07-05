@@ -53,6 +53,23 @@
     },
     {
       "key": {
+        "uuid": "3f1d235d_01ee1fec",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-07-05T19:48:11Z",
+      "side": 1,
+      "message": "\"smalle\"",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f1d235d_3475dacb",
         "filename": "doc/source/admin/connections.rst",
         "patchSetId": 4
@@ -87,6 +104,23 @@
     },
     {
       "key": {
+        "uuid": "3f1d235d_41e897e0",
+        "filename": "doc/source/admin/drivers/github.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-07-05T19:48:11Z",
+      "side": 1,
+      "message": "Agreed, will include that.",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f1d235d_f4288297",
         "filename": "doc/source/admin/drivers/github.rst",
         "patchSetId": 4
@@ -98,6 +132,23 @@
       "writtenOn": "2017-07-05T19:27:27Z",
       "side": 1,
       "message": "I know this is a docs patch - but looking at it here, \"git_host\" as the name here seems weird. Why not \"server?\" it\u0027s a sub-resource of a github connection. \u0027git_host\u0027 makes me think of git.openstack.org.\n\nDoes github not support canonical_hostname?\n\nDoes github driver support port?\n\nSeems that server and port are things that could be standard across connections - and canonical_hostname for anything that can be a source.",
+      "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_21e59b09",
+        "filename": "doc/source/admin/drivers/github.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-07-05T19:48:11Z",
+      "side": 1,
+      "message": "I believe we are changing it to server in a later patch.",
       "revId": "011bdc994a8f593781a8ded67c05da7b65766deb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
