@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f1d235d_9031535d",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-07-05T22:58:24Z",
+      "side": 1,
+      "message": "Did this get moved around in a rebase? The changed note is in a different section entirely?",
+      "revId": "cc0fc443a907d09f81a5f90a38ff1906046098aa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
