@@ -16,6 +16,23 @@
       "revId": "cc0fc443a907d09f81a5f90a38ff1906046098aa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_30571f5b",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-05T23:03:25Z",
+      "side": 1,
+      "message": "Oh, sorry!  I probably should have made a separate change for this since it\u0027s not strictly related.  But as I was performing the audit that lead to the bulk of this change (status_url), I realized I should leave a note as to why the zookeeper section is here.",
+      "revId": "cc0fc443a907d09f81a5f90a38ff1906046098aa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
