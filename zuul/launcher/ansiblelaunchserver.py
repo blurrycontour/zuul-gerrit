@@ -1041,7 +1041,7 @@ class NodeWorker(object):
 
         rsync_cmd = [
             '/usr/bin/rsync', '--delay-updates', '-F',
-            '--compress', '-rt', '--safe-links',
+            '--compress', '-rt', '--safe-links', '--stats',
             '--rsync-path="mkdir -p {dest} && rsync"',
             '--rsh="/usr/bin/ssh -i {private_key_file} -S none '
             '-o StrictHostKeyChecking=no -q"',
