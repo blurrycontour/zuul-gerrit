@@ -1,0 +1,6 @@
+- hosts: all
+  roles:
+  - debug-ansible
+- hosts: ceph-osd
+  tasks:
+  - shell: echo "Only on the OSD nodes $(hostname)"
