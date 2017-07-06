@@ -21,6 +21,11 @@ Contents:
    admin/index
    developer/index
 
+.. toctree::
+   :maxdepth: 1
+
+   presentations/index
+
 Indices and tables
 ==================
 
