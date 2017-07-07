@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f1d235d_11fbd0c0",
+        "filename": "tests/unit/test_bubblewrap.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-07T05:45:11Z",
+      "side": 1,
+      "message": "Shouldn\u0027t there be an assert somewhere?",
+      "range": {
+        "startLine": 71,
+        "startChar": 0,
+        "endLine": 77,
+        "endChar": 25
+      },
+      "revId": "aa4199cd2a568c5cad150cd51f28a285a321ef3c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
