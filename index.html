@@ -1,0 +1,19 @@
+<html>
+<head>
+   <script type="text/javascript">
+
+      window.onload = function() {
+
+        var url = new URL(window.location)
+        uuid = url.searchParams.get('uuid')
+        document.getElementById('pagetitle').innerHTML = uuid
+        document.getElementById('pagecontent').innerHTML = uuid
+   </script>
+
+   <title id="pagetitle"></title>
+</head>
+
+<body>
+    <pre id="pagecontent"></pre>
+</body>
+</html>
