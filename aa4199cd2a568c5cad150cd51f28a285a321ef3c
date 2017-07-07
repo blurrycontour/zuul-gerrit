@@ -22,6 +22,23 @@
       "revId": "aa4199cd2a568c5cad150cd51f28a285a321ef3c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_e048675d",
+        "filename": "tests/unit/test_bubblewrap.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-07T20:00:14Z",
+      "side": 1,
+      "message": "We don\u0027t need an assert -- iterate_timeout will raise an exception if we don\u0027t break out of it within 30 seconds.  That\u0027s equivalent to what we had before (if the process didn\u0027t exit we raise an assertion exception), except that now we give it more time to exit.",
+      "revId": "aa4199cd2a568c5cad150cd51f28a285a321ef3c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
