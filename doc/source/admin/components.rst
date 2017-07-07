@@ -159,6 +159,10 @@ scheduler
 
      state_dir=/var/lib/zuul
 
+**base_web_url**
+  Base URL on which the zuul-web is running.
+  ``base_web_url=https://ci.example.com/zuul``
+
 Operation
 ~~~~~~~~~
 
@@ -384,6 +388,10 @@ web
   Port to use for web server process::
 
      port=9000
+
+**websocket_url**
+  Base URL on which the websocket service is exposed, if different than the
+  base URL of the web app.
 
 Operation
 ~~~~~~~~~
