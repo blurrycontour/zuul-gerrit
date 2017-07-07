@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <style type="text/css">
+
+      body {
+        font-family: monospace;
+        background-color: black;
+        color: lightgrey;
+      }
+
+      #overlay {
+        position: fixed;
+        top: 5px;
+        right: 5px;
+        background-color: darkgrey;
+        color: black;
+      }
+
+      pre {
+        white-space: pre;
+        margin: 0px 10px;
+      }
+    </style>
+
+    <script type="text/javascript">
+
+      window.onload = function() {
+
+        // Define your zuul base url like wss://zuul-host.example.org/zuul
+        var zuulBaseURL = "<ADD YOUR ZUUL BASE URL HERE>"
+
+        pageUpdateInMS = 250;
+        var receiveBuffer = "";
+
+        setInterval(function() {
+          console.log("autoScroll");
+          if (receiveBuffer != "") {
+            document.getElementById('pagecontent').innerHTML += receiveBuffer;
+            receiveBuffer = "";
+            if (document.getElementById('autoscroll').checked) {
+              window.scrollTo(0, document.body.scrollHeight);
+            }
+          }
+        }, pageUpdateInMS);
+
+        var url = new URL(window.location)
+        uuid = url.searchParams.get('uuid')
+        logfile = url.searchParams.get('uuid')
+
+        document.getElementById('pagetitle').innerHTML = uuid + "(" + logfile + ")";
+
+        var ws = new WebSocket(zuulBaseURL + '/zuul/console-stream');
+
+        ws.onmessage = function(event) {
+          console.log("onmessage");
+          receiveBuffer = receiveBuffer + event.data + "\n";
+        };
+
+        ws.onopen = function(event) {
+          console.log("onopen");
+          ws.send('{"uuid": "' + uuid + '", "logfile": "' + logfile + '"}');
+        }
+
+        ws.onclose = function(event) {
+          console.log("onclose");
+          receiveBuffer = receiveBuffer + "\n--- END OF STREAM ---\n";
+        }
+
+      };
+
+    </script>
+
+    <title id="pagetitle"></title>
+  </head>
+
+  <body>
+
+    <div id="overlay">
+      <form>
+        <input type="checkbox" id="autoscroll" checked> autoscroll
+      </form>
+    </div>
+
+    <pre id="pagecontent"></pre>
+
+  </body>
+</html>
