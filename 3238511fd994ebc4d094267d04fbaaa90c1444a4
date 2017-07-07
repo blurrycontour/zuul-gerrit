@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "3f1d235d_9b4b6c5e",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-07-07T15:59:04Z",
+      "side": 1,
+      "message": "Tests are failing because output is assigned here but not used, as Tobias mentions.",
+      "revId": "3238511fd994ebc4d094267d04fbaaa90c1444a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f1d235d_71a684c3",
         "filename": "zuul/executor/server.py",
         "patchSetId": 1
