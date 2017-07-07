@@ -495,14 +495,6 @@ unless otherwise specified:
   the result for the job.  If set, this option may be used to supply a
   different string.  Default: "FAILURE".
 
-**success-url**
-  When a job succeeds, this URL is reported along with the result.
-  Default: none.
-
-**failure-url**
-  When a job fails, this URL is reported along with the result.
-  Default: none.
-
 **hold-following-changes**
   In a dependent pipeline, this option may be used to indicate that no
   jobs should start on any items which depend on the current item

@@ -302,8 +302,6 @@ class JobParser(object):
                'parent': str,
                'failure-message': str,
                'success-message': str,
-               'failure-url': str,
-               'success-url': str,
                'hold-following-changes': bool,
                'voting': bool,
                'semaphore': str,
@@ -341,7 +339,6 @@ class JobParser(object):
         'failure-message',
         'success-message',
         'failure-url',
-        'success-url',
         'override-branch',
     ]
 

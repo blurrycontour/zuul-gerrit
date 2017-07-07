@@ -762,8 +762,6 @@ class Job(object):
             hold_following_changes=False,
             failure_message=None,
             success_message=None,
-            failure_url=None,
-            success_url=None,
             # Matchers.  These are separate so they can be individually
             # overidden.
             branch_matcher=None,
@@ -1617,22 +1615,13 @@ class QueueItem(object):
     def formatJobResult(self, job):
         build = self.current_build_set.getBuild(job.name)
         result = build.result
-        pattern = None
         if result == 'SUCCESS':
             if job.success_message:
                 result = job.success_message
-            if job.success_url:
-                pattern = job.success_url
         elif result == 'FAILURE':
             if job.failure_message:
                 result = job.failure_message
-            if job.failure_url:
-                pattern = job.failure_url
-        url = None
-        if pattern:
-            url = self.formatUrlPattern(pattern, job, build)
-        if not url:
-            url = build.result_data.get('zuul', {}).get('log_url')
+        url = build.result_data.get('zuul', {}).get('log_url')
         if not url:
             url = build.url or job.name
         return (result, url)
