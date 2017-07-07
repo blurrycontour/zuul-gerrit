@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f1d235d_71a684c3",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-07T05:49:29Z",
+      "side": 1,
+      "message": "Did you intentionally remove the output and only log stderr?",
+      "range": {
+        "startLine": 126,
+        "startChar": 44,
+        "endLine": 126,
+        "endChar": 66
+      },
+      "revId": "3238511fd994ebc4d094267d04fbaaa90c1444a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
