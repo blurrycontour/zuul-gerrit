@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f1d235d_8112cb08",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1623,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-09T06:33:59Z",
+      "side": 1,
+      "message": "You might be interested in I8485dee83e36275a1dd439f12cf8c0fdf90999ca where this part is also handled together with according tests.",
+      "revId": "ec5061470a8aef2662b1f16691e780a6b08de5ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
