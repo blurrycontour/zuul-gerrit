@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "3f1d235d_c73f97b3",
+        "filename": "zuul/driver/sql/alembic_reporter/versions/20126015a87d_add_indexes.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-10T16:39:51Z",
+      "side": 1,
+      "message": "Probably so, yes.",
+      "parentUuid": "3f1d235d_871bdf71",
+      "revId": "87287bf1b0f6329ebab953ef4a73799bd3704733",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f1d235d_6718c374",
         "filename": "zuul/driver/sql/alembic_reporter/versions/20126015a87d_add_indexes.py",
         "patchSetId": 2
@@ -47,6 +65,24 @@
       "writtenOn": "2017-07-10T16:36:45Z",
       "side": 1,
       "message": "What\u0027s a \"job lib view\"?",
+      "revId": "87287bf1b0f6329ebab953ef4a73799bd3704733",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_e773b3b0",
+        "filename": "zuul/driver/sql/alembic_reporter/versions/20126015a87d_add_indexes.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-10T16:39:51Z",
+      "side": 1,
+      "message": "I don\u0027t know. I believe I meant \"job build view\" - or just \"job view\" - so that someone could say \"show me tox-py27\" and it would show all of the builds of tox-py27.",
+      "parentUuid": "3f1d235d_6718c374",
       "revId": "87287bf1b0f6329ebab953ef4a73799bd3704733",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
