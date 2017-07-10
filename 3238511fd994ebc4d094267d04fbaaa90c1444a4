@@ -39,6 +39,30 @@
       "revId": "3238511fd994ebc4d094267d04fbaaa90c1444a4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_6c6c3f9c",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 7191
+      },
+      "writtenOn": "2017-07-10T04:07:53Z",
+      "side": 1,
+      "message": "because at this point stdout is empty, and all the details are in stderr. I didn\u0027t notice that we didn\u0027t use output anywhere else.",
+      "parentUuid": "3f1d235d_71a684c3",
+      "range": {
+        "startLine": 126,
+        "startChar": 44,
+        "endLine": 126,
+        "endChar": 66
+      },
+      "revId": "3238511fd994ebc4d094267d04fbaaa90c1444a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
