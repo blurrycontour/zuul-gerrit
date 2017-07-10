@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f1d235d_dcde45d9",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-07-10T20:25:54Z",
+      "side": 1,
+      "message": "This is the output that is getting assigned but not used that is throwing pep8 off.",
+      "revId": "4deb1218c3bcaff8d143c3e292b4bc9b8c3e2fc7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
