@@ -54,6 +54,23 @@
     },
     {
       "key": {
+        "uuid": "3f1d235d_7c561109",
+        "filename": "zuul/driver/sql/alembic_reporter/versions/20126015a87d_add_indexes.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-07-10T20:01:29Z",
+      "side": 1,
+      "message": "Worst case, somebody puts in change \u00271\u0027 and gets back the first PR for every project, and realizes they should narrow down to a project.",
+      "revId": "87287bf1b0f6329ebab953ef4a73799bd3704733",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f1d235d_6718c374",
         "filename": "zuul/driver/sql/alembic_reporter/versions/20126015a87d_add_indexes.py",
         "patchSetId": 2
@@ -100,6 +117,23 @@
       "writtenOn": "2017-07-10T16:43:13Z",
       "side": 1,
       "message": "Gotcha.  This is bound to be painful for openstack.  :)",
+      "revId": "87287bf1b0f6329ebab953ef4a73799bd3704733",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_5c591533",
+        "filename": "zuul/driver/sql/alembic_reporter/versions/20126015a87d_add_indexes.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-07-10T20:01:29Z",
+      "side": 1,
+      "message": "I\u0027d hope that seeing a huge number of results wouldn\u0027t be any more painful than seeing a single page of results. But that\u0027s more a problem for the querying of this index, not for the composition of it, which looks good.",
       "revId": "87287bf1b0f6329ebab953ef4a73799bd3704733",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
