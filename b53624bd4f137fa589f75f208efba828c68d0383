@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "3f1d235d_2aa4dd07",
+        "filename": "tests/unit/test_log_streamer.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-07-10T13:07:09Z",
+      "side": 1,
+      "message": "It could, if we had more than one. Right now, I don\u0027t see any need to have more than the single test. If we find we need more at some point, we should deal with this then. Until then, I think it\u0027s fine as is.",
+      "parentUuid": "3f1d235d_8349858c",
+      "range": {
+        "startLine": 164,
+        "startChar": 36,
+        "endLine": 164,
+        "endChar": 40
+      },
+      "revId": "b53624bd4f137fa589f75f208efba828c68d0383",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f1d235d_0355751d",
         "filename": "tests/unit/test_log_streamer.py",
         "patchSetId": 29
@@ -36,6 +60,30 @@
       "writtenOn": "2017-07-02T06:59:58Z",
       "side": 1,
       "message": "Same as above",
+      "range": {
+        "startLine": 189,
+        "startChar": 22,
+        "endLine": 189,
+        "endChar": 26
+      },
+      "revId": "b53624bd4f137fa589f75f208efba828c68d0383",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_eaadc5ea",
+        "filename": "tests/unit/test_log_streamer.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-07-10T13:07:09Z",
+      "side": 1,
+      "message": "Same response as above.",
+      "parentUuid": "3f1d235d_0355751d",
       "range": {
         "startLine": 189,
         "startChar": 22,
@@ -65,6 +113,24 @@
     },
     {
       "key": {
+        "uuid": "3f1d235d_2d2197a0",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-07-10T13:07:09Z",
+      "side": 1,
+      "message": "Ah yes, so it does. Done.\n\nAlso changed the code to get the gearman parameters from the \u0027gearman\u0027 config client section.",
+      "parentUuid": "3f1d235d_9244291d",
+      "revId": "b53624bd4f137fa589f75f208efba828c68d0383",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f1d235d_ed4dc272",
         "filename": "zuul/cmd/web.py",
         "patchSetId": 29
@@ -88,6 +154,30 @@
     },
     {
       "key": {
+        "uuid": "3f1d235d_6ae89515",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-07-10T13:07:09Z",
+      "side": 1,
+      "message": "Several other of the zuul daemons handle this, with no differentiation of the signal either. Just following the standard that they have set.",
+      "parentUuid": "3f1d235d_ed4dc272",
+      "range": {
+        "startLine": 71,
+        "startChar": 29,
+        "endLine": 71,
+        "endChar": 36
+      },
+      "revId": "b53624bd4f137fa589f75f208efba828c68d0383",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f1d235d_d23aa196",
         "filename": "zuul/cmd/web.py",
         "patchSetId": 29
@@ -99,6 +189,30 @@
       "writtenOn": "2017-07-02T03:17:15Z",
       "side": 1,
       "message": "Could be replaced by: zuul.lib.config.get_default(server.config, \u0027web\u0027, \u0027pidfile\u0027,  \u0027/var/run/zuul-web/zuul-web.pid\u0027, expand_user\u003dTrue)",
+      "range": {
+        "startLine": 106,
+        "startChar": 0,
+        "endLine": 109,
+        "endChar": 49
+      },
+      "revId": "b53624bd4f137fa589f75f208efba828c68d0383",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_ea72657c",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-07-10T13:07:09Z",
+      "side": 1,
+      "message": "Ah, great. Thanks.",
+      "parentUuid": "3f1d235d_d23aa196",
       "range": {
         "startLine": 106,
         "startChar": 0,
@@ -157,6 +271,30 @@
     },
     {
       "key": {
+        "uuid": "3f1d235d_4d64d3b9",
+        "filename": "zuul/web.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-07-10T13:07:09Z",
+      "side": 1,
+      "message": "I\u0027m not convinced that is a good idea. If a user aborts something, you\u0027d expect to see exceptions. If we do NOT include the exception here, then if something else goes wrong in this block during normal operation, we miss the error.",
+      "parentUuid": "3f1d235d_ad06751b",
+      "range": {
+        "startLine": 135,
+        "startChar": 0,
+        "endLine": 137,
+        "endChar": 69
+      },
+      "revId": "b53624bd4f137fa589f75f208efba828c68d0383",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f1d235d_52469123",
         "filename": "zuul/web.py",
         "patchSetId": 29
@@ -168,6 +306,24 @@
       "writtenOn": "2017-07-02T03:17:15Z",
       "side": 1,
       "message": "Those default could be added to zuul.conf-sample",
+      "revId": "b53624bd4f137fa589f75f208efba828c68d0383",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_4d0973db",
+        "filename": "zuul/web.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-07-10T13:07:09Z",
+      "side": 1,
+      "message": "Good idea. Done.",
+      "parentUuid": "3f1d235d_52469123",
       "revId": "b53624bd4f137fa589f75f208efba828c68d0383",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
