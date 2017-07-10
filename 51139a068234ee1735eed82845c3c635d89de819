@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f1d235d_16e13bd1",
+        "filename": "zuul/web.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-10T19:43:43Z",
+      "side": 1,
+      "message": "That may make sense when we port the current status.json stuff over here.  Probably not much of a need to do that before then.",
+      "revId": "51139a068234ee1735eed82845c3c635d89de819",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_f6e59fdd",
+        "filename": "zuul/web.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-10T19:43:43Z",
+      "side": 1,
+      "message": "Yes.",
+      "revId": "51139a068234ee1735eed82845c3c635d89de819",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_d6eaa3aa",
+        "filename": "zuul/web.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-10T19:43:43Z",
+      "side": 1,
+      "message": "There was an earlier suggestion about handling an aborted connection without logging that as an exception.  That may be worth doing depending on how often that kind of disconnection happens.",
+      "revId": "51139a068234ee1735eed82845c3c635d89de819",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
