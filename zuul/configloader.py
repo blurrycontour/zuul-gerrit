@@ -1169,7 +1169,11 @@ class TenantParser(object):
             job.wait()
             loaded = False
             files = sorted(job.files.keys())
-            for conf_root in ['zuul.yaml', '.zuul.yaml', 'zuul.d', '.zuul.d']:
+            if job.source_context.trusted:
+                conf_roots = ['zuul.yaml', 'zuul.d']
+            else:
+                conf_roots = ['.zuul.yaml', '.zuul.d']
+            for conf_root in conf_roots:
                 for fn in files:
                     fn_root = fn.split('/')[0]
                     if fn_root != conf_root or not job.files.get(fn):
@@ -1358,22 +1362,22 @@ class ConfigLoader(object):
     def _loadDynamicProjectData(self, config, project, files, trusted):
         if trusted:
             branches = ['master']
+            conf_root = "zuul.d/"
+            conf_file = "zuul.yaml"
         else:
             branches = project.source.getProjectBranches(project)
+            conf_root = ".zuul.d/"
+            conf_file = ".zuul.yaml"
 
         for branch in branches:
-            fns1 = []
-            fns2 = []
+            fns = []
             files_list = files.connections.get(
                 project.source.connection.connection_name, {}).get(
                     project.name, {}).get(branch, {}).keys()
             for fn in files_list:
-                if fn.startswith("zuul.d/"):
-                    fns1.append(fn)
-                if fn.startswith(".zuul.d/"):
-                    fns2.append(fn)
-
-            fns = ['zuul.yaml', '.zuul.yaml'] + sorted(fns1) + sorted(fns2)
+                if fn.startswith(conf_root):
+                    fns.append(fn)
+            fns = [conf_file] + sorted(fns)
             incdata = None
             loaded = None
             for fn in fns:
