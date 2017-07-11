@@ -617,7 +617,7 @@ class ExecutorServer(object):
         try:
             self.job_workers[job.unique].run()
         except Exception:
-            del self.job_workers[job.unique]
+            self.finishJob(job.unique)
             raise
 
     def finishJob(self, unique):
