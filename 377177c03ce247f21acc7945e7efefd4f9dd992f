@@ -16,6 +16,23 @@
       "revId": "377177c03ce247f21acc7945e7efefd4f9dd992f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_96e63d44",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 619,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-07-11T22:34:01Z",
+      "side": 1,
+      "message": "self.finishJob would do the same thing. Can be fixed in a follow up.",
+      "revId": "377177c03ce247f21acc7945e7efefd4f9dd992f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
