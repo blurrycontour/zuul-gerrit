@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f1d235d_fbb8bce5",
+        "filename": "tools/test-setup.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-07-11T22:04:14Z",
+      "side": 1,
+      "message": "This variable seems unlreated to the comment above, but being stacked right under it makes it seem like it should relate.",
+      "revId": "ca10f85fed7601edfda84ce18f945b97f3e01fda",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
