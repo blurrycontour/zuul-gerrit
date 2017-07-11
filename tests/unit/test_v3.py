@@ -798,6 +798,81 @@ class TestRoles(ZuulTestCase):
         ])
 
 
+class TestImplicitRoles(ZuulTestCase):
+    tenant_config_file = 'config/implicit-roles/main.yaml'
+
+    def _assertRolePath(self, build, trusted_content, untrusted_content):
+        for cfg in ['untrusted.cfg', 'trusted.cfg']:
+            path = os.path.join(self.test_root, build.uuid,
+                                'ansible', cfg)
+            roles_paths = []
+            with open(path) as f:
+                for line in f:
+                    if line.startswith('roles_path'):
+                        roles_paths.append(line)
+            if cfg == 'untrusted.cfg':
+                content = untrusted_content
+            else:
+                content = trusted_content
+            if content:
+                self.assertEqual(len(roles_paths), 1,
+                                 "Should have one roles_path line in %s" %
+                                 (cfg,))
+                self.assertTrue(content in roles_paths[0])
+            else:
+                self.assertEqual(len(roles_paths), 0,
+                                 "Should have one no roles_path line in %s" %
+                                 (cfg,))
+
+    def test_missing_roles(self):
+        # Test implicit and explicit roles for a project which does
+        # not have roles.  The implicit role should be silently
+        # ignored since the project doesn't supply roles, but if a
+        # user declares an explicit role, it should error.
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/norole-project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 2)
+        build = self.getBuildByName('implicit-role-fail')
+        self._assertRolePath(build, None, None)
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+        # The retry_limit doesn't get recorded
+        self.assertHistory([
+            dict(name='implicit-role-fail', result='SUCCESS', changes='1,1'),
+        ])
+
+    def test_roles(self):
+        # Test implicit and explicit roles for a project which does
+        # have roles.  In both cases, we should end up with the role
+        # in the path.  In the explicit case, ensure we end up with
+        # the name we specified.
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/role-project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 2)
+        build = self.getBuildByName('implicit-role-ok')
+        self._assertRolePath(build, None,
+                             'role_0/untrusted/role-project/roles')
+        build = self.getBuildByName('explicit-role-ok')
+        self._assertRolePath(build, None,
+                             'role_0/untrusted/role-name/roles')
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='implicit-role-ok', result='SUCCESS', changes='1,1'),
+            dict(name='explicit-role-ok', result='SUCCESS', changes='1,1'),
+        ])
+
+
 class TestShadow(ZuulTestCase):
     tenant_config_file = 'config/shadow/main.yaml'
 
