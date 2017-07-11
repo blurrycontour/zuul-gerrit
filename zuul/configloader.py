@@ -460,14 +460,18 @@ class JobParser(object):
 
         job.dependencies = frozenset(as_list(conf.get('dependencies')))
 
+        roles = []
         if 'roles' in conf:
-            roles = []
             for role in conf.get('roles', []):
                 if 'zuul' in role:
                     r = JobParser._makeZuulRole(tenant, job, role)
                     if r:
                         roles.append(r)
-            job.roles = job.roles.union(set(roles))
+        # A job's repo should be an implicit role source for that job.
+        r = JobParser._makeImplicitRole(job)
+        roles.append(r)
+        for role in roles:
+            job.addRole(role)
 
         variables = conf.get('vars', None)
         if variables:
@@ -526,6 +530,15 @@ class JobParser(object):
         return model.ZuulRole(role.get('name', name),
                               project.connection_name,
                               project.name)
+
+    @staticmethod
+    def _makeImplicitRole(job):
+        project = job.source_context.project
+        name = project.name.split('/')[-1]
+        return model.ZuulRole(name,
+                              project.connection_name,
+                              project.name,
+                              implicit=True)
 
 
 class ProjectTemplateParser(object):

@@ -41,6 +41,10 @@ COMMANDS = ['stop', 'pause', 'unpause', 'graceful', 'verbose',
 DEFAULT_FINGER_PORT = 79
 
 
+class RoleNotFound(Exception):
+    pass
+
+
 class Watchdog(object):
     def __init__(self, timeout, function, args):
         self.timeout = timeout
@@ -1092,11 +1096,14 @@ class AnsibleJob(object):
         if os.path.isdir(d):
             # This repo has a collection of roles
             if not trusted:
+                self._blockPluginDirs(d)
                 for entry in os.listdir(d):
-                    self._blockPluginDirs(os.path.join(d, entry))
+                    entry_path = os.path.join(d, entry)
+                    if os.path.isdir(entry_path):
+                        self._blockPluginDirs(entry_path)
             return d
         # It is neither a bare role, nor a collection of roles
-        raise Exception("Unable to find role in %s" % (path,))
+        raise RoleNotFound("Unable to find role in %s" % (path,))
 
     def prepareZuulRole(self, args, role, root, trusted, untrusted):
         self.log.debug("Prepare zuul role for %s" % (role,))
@@ -1173,21 +1180,39 @@ class AnsibleJob(object):
                 untrusted_root = trusted_root
 
         if untrusted:
-            untrusted_role_path = self.findRole(untrusted_role_repo,
-                                                trusted=False)
+            try:
+                untrusted_role_path = self.findRole(untrusted_role_repo,
+                                                    trusted=False)
+            except RoleNotFound:
+                if role['implicit']:
+                    self.log.info("Implicit role not found in %s",
+                                  untrusted_role_repo)
+                    return
+                raise
             if untrusted_role_path is None:
                 # In the case of a bare role, add the containing directory
                 untrusted_role_path = os.path.join(untrusted_root,
                                                    project.canonical_hostname)
+            self.log.debug("Adding role path %s to untrusted config",
+                           untrusted_role_path)
             self.jobdir.untrusted_roles_path.append(untrusted_role_path)
 
         if trusted:
-            trusted_role_path = self.findRole(trusted_role_repo,
-                                              trusted=True)
+            try:
+                trusted_role_path = self.findRole(trusted_role_repo,
+                                                  trusted=True)
+            except RoleNotFound:
+                if role['implicit']:
+                    self.log.info("Implicit role not found in %s",
+                                  untrusted_role_repo)
+                    return
+                raise
             if trusted_role_path is None:
                 # In the case of a bare role, add the containing directory
                 trusted_role_path = os.path.join(trusted_root,
                                                  project.canonical_hostname)
+            self.log.debug("Adding role path %s to trusted config",
+                           trusted_role_path)
             self.jobdir.trusted_roles_path.append(trusted_role_path)
 
     def prepareAnsibleFiles(self, args):
@@ -1242,6 +1267,7 @@ class AnsibleJob(object):
             else:
                 roles_path = self.jobdir.trusted_roles_path
 
+            self.log.debug("%s role path %s" % (trusted, roles_path))
             if roles_path:
                 config.write('roles_path = %s\n' % ':'.join(roles_path))
 
