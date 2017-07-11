@@ -41,6 +41,10 @@ COMMANDS = ['stop', 'pause', 'unpause', 'graceful', 'verbose',
 DEFAULT_FINGER_PORT = 79
 
 
+class RoleNotFound(Exception):
+    pass
+
+
 class Watchdog(object):
     def __init__(self, timeout, function, args):
         self.timeout = timeout
@@ -1119,12 +1123,14 @@ class AnsibleJob(object):
         if os.path.isdir(d):
             # This repo has a collection of roles
             if not trusted:
+                self._blockPluginDirs(d)
                 for entry in os.listdir(d):
-                    if os.path.isdir(os.path.join(d, entry)):
-                        self._blockPluginDirs(os.path.join(d, entry))
+                    entry_path = os.path.join(d, entry)
+                    if os.path.isdir(entry_path):
+                        self._blockPluginDirs(entry_path)
             return d
         # It is neither a bare role, nor a collection of roles
-        raise Exception("Unable to find role in %s" % (path,))
+        raise RoleNotFound("Unable to find role in %s" % (path,))
 
     def prepareZuulRole(self, jobdir_playbook, role, args, root):
         self.log.debug("Prepare zuul role for %s" % (role,))
@@ -1165,10 +1171,17 @@ class AnsibleJob(object):
             raise Exception("Invalid role name %s", name)
         os.symlink(path, link)
 
-        role_path = self.findRole(link, trusted=jobdir_playbook.trusted)
+        try:
+            role_path = self.findRole(link, trusted=jobdir_playbook.trusted)
+        except RoleNotFound:
+            if role['implicit']:
+                self.log.info("Implicit role not found in %s", link)
+                return
+            raise
         if role_path is None:
             # In the case of a bare role, add the containing directory
             role_path = root
+        self.log.debug("Adding role path %s", role_path)
         jobdir_playbook.roles_path.append(role_path)
 
     def prepareAnsibleFiles(self, args):
