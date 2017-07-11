@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f1d235d_b1df2a0b",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 625,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-07-11T03:02:11Z",
+      "side": 1,
+      "message": "Would love to see some negative tests here as a follow-up: 1 would check for the skip log message. Another would check that we don\u0027t shadow when not allowed to.",
+      "revId": "6459db123a86bb98d88b6f98b81afa12dad29678",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
