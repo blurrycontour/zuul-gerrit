@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f1d235d_31679a54",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3354,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-07-11T03:08:05Z",
+      "side": 1,
+      "message": "This is a good opportunity to use python3\u0027s new literal sets:\n\n    self.assertEqual(set([x.name for x in builds]), {\u0027project-test1\u0027, \u0027project-test2\u0027})\n\nDoesn\u0027t save any lines though, at 83 chars. :-P",
+      "revId": "df25ddc818b958378287b9a2707cea9171208d30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
