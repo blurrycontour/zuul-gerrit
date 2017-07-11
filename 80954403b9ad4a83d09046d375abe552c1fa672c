@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f1d235d_316e7a96",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 938,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-07-11T02:52:46Z",
+      "side": 1,
+      "message": "So, IMO the default SSH port is none of Zuul\u0027s business. We should use None here and omit it only if unset.",
+      "revId": "80954403b9ad4a83d09046d375abe552c1fa672c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
