@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f1d235d_97ad3b9d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-07-11T06:32:48Z",
+      "side": 1,
+      "message": "And build artifact locations to feed into dependent jobs I hope.",
+      "revId": "ba339a3ffe22873c8f8cb4ad1e9ad15cb16b0f2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f1d235d_7794df44",
+        "filename": "zuul/ansible/library/zuul_return.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-07-11T06:32:48Z",
+      "side": 1,
+      "message": "Hey look I rewrote above with 2 less lines.\n\n    with tempfile.NamedTemporaryFile(mode\u003d\u0027w\u0027, dir\u003dworkdir, delete\u003dFalse) as f:\n        try:\n            json.dump(data, f)\n            os.rename(f.name, path)\n        except Exception:\n            os.unlink(f.name)\n            raise\n        \n... Ignore me.",
+      "revId": "ba339a3ffe22873c8f8cb4ad1e9ad15cb16b0f2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
