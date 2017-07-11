@@ -460,14 +460,21 @@ class JobParser(object):
 
         job.dependencies = frozenset(as_list(conf.get('dependencies')))
 
+        roles = []
         if 'roles' in conf:
-            roles = []
             for role in conf.get('roles', []):
                 if 'zuul' in role:
                     r = JobParser._makeZuulRole(tenant, job, role)
                     if r:
                         roles.append(r)
-            job.roles = job.roles.union(set(roles))
+        # A job's repo should be an implicit role source for that job.
+        r = model.ZuulRole(job.source_context.project.name,
+                           job.source_context.project.connection_name,
+                           job.source_context.project.name,
+                           implicit=True)
+        roles.append(r)
+        for role in roles:
+            job.addRole(role)
 
         variables = conf.get('vars', None)
         if variables:

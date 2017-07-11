@@ -691,10 +691,12 @@ class Role(object, metaclass=abc.ABCMeta):
 class ZuulRole(Role):
     """A reference to an ansible role in a Zuul project."""
 
-    def __init__(self, target_name, connection_name, project_name):
+    def __init__(self, target_name, connection_name, project_name,
+                 implicit=False):
         super(ZuulRole, self).__init__(target_name)
         self.connection_name = connection_name
         self.project_name = project_name
+        self.implicit = implicit
 
     def __repr__(self):
         return '<ZuulRole %s %s>' % (self.project_name, self.target_name)
@@ -704,6 +706,7 @@ class ZuulRole(Role):
     def __eq__(self, other):
         if not isinstance(other, ZuulRole):
             return False
+        # NB: implicit is not consulted for equality
         return (super(ZuulRole, self).__eq__(other) and
                 self.connection_name == other.connection_name,
                 self.project_name == other.project_name)
@@ -714,6 +717,7 @@ class ZuulRole(Role):
         d['type'] = 'zuul'
         d['connection'] = self.connection_name
         d['project'] = self.project_name
+        d['implicit'] = self.implicit
         return d
 
 
@@ -790,7 +794,7 @@ class Job(object):
             semaphore=None,
             attempts=3,
             final=False,
-            roles=frozenset(),
+            roles=(),
             required_projects={},
             allowed_projects=None,
             override_branch=None,
@@ -854,6 +858,22 @@ class Job(object):
     def setRun(self):
         if not self.run:
             self.run = self.implied_run
+
+    def addRole(self, role):
+        # Handles adding a role and converting an implicit to explicit
+        # role.
+        newroles = []
+        for r in self.roles:
+            if r == role:
+                if (isinstance(r, ZuulRole) and
+                    isinstance(role, ZuulRole) and
+                    r.implicit and not role.implicit):
+                    newroles.append(role)
+                else:
+                    return
+            else:
+                newroles.append(r)
+        self.roles = tuple(newroles)
 
     def updateVariables(self, other_vars):
         v = self.variables
@@ -930,7 +950,8 @@ class Job(object):
         if other._get('post_run') is not None:
             self.post_run = other.post_run + self.post_run
         if other._get('roles') is not None:
-            self.roles = self.roles.union(other.roles)
+            for r in other.roles:
+                self.roles.addRole(r)
         if other._get('variables') is not None:
             self.updateVariables(other.variables)
         if other._get('required_projects') is not None:
