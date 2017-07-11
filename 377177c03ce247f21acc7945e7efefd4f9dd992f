@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f1d235d_e3382a3c",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 619,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-11T11:58:18Z",
+      "side": 1,
+      "message": "Should this be self.finishJob(unique) instead?",
+      "revId": "377177c03ce247f21acc7945e7efefd4f9dd992f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
