@@ -38,6 +38,8 @@ mysql -u $DB_USER -p$DB_PW -h 127.0.0.1 -e "
 
 # TODO(pabelanger): Move this into bindep after we figure out how to enable our
 # PPA.
+# NOTE(pabelanger): Avoid hitting http://keyserver.ubuntu.com
+suto apt-key add 018D05F5.gpg
 sudo add-apt-repository ppa:openstack-ci-core/bubblewrap
 sudo apt-get update
 sudo apt-get --assume-yes install bubblewrap
