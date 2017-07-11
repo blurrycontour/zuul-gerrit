@@ -10,3 +10,7 @@
         that:
           - st.stat.exists
           - st.stat.isreg
+
+    - name: Assert hello-world.txt file.
+      shell: |+
+        echo "Hello world"
