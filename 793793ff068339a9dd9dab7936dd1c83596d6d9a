@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f1a1f67_df466150",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-12T17:46:28Z",
+      "side": 1,
+      "message": "This is a much smaller approach than mine :)\n\nBut - it\u0027ll put a space between every stdout line from shell tasks - which for devstack could be quite yuck making",
+      "revId": "793793ff068339a9dd9dab7936dd1c83596d6d9a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
