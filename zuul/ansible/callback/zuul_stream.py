@@ -20,6 +20,7 @@ import socket
 import threading
 import time
 import uuid
+import yaml
 
 from ansible.plugins.callback import default
 
@@ -153,6 +154,8 @@ class CallbackModule(default.CallbackModule):
                 playbook=self._playbook_name, name=name)
 
         self._log(msg)
+        # Log an extra blank line to get space after each play
+        self._log("")
 
     def v2_playbook_on_task_start(self, task, is_conditional):
         self._task = task
@@ -234,12 +237,11 @@ class CallbackModule(default.CallbackModule):
             pass
         else:
             self._log_message(
-                result=result,
-                msg="Results: => {results}".format(
-                    results=self._dump_results(result_dict)),
-                status='ERROR')
+                result=result, status='ERROR', results=result_dict)
         if ignore_errors:
             self._log_message(result, "Ignoring Errors", status="ERROR")
+        # Log an extra blank line to get space after each task
+        self._log("")
 
     def v2_runner_on_ok(self, result):
         if (self._play.strategy == 'free'
@@ -285,9 +287,8 @@ class CallbackModule(default.CallbackModule):
         elif result._task.action not in ('command', 'shell'):
             self._log_message(
                 result=result,
-                msg="Results: => {results}".format(
-                    results=self._dump_results(result_dict)),
-                status=status)
+                status=status,
+                result_dict=result_dict)
         elif 'results' in result_dict:
             for res in result_dict['results']:
                 self._log_message(
@@ -300,6 +301,8 @@ class CallbackModule(default.CallbackModule):
                 result,
                 "Runtime: {delta} Start: {start} End: {end}".format(
                     **result_dict))
+        # Log an extra blank line to get space after each task
+        self._log("")
 
     def v2_runner_item_on_ok(self, result):
         result_dict = dict(result._result)
@@ -313,9 +316,8 @@ class CallbackModule(default.CallbackModule):
         if result._task.action not in ('command', 'shell'):
             self._log_message(
                 result=result,
-                msg="Item: {item} => {results}".format(
-                    item=result_dict['item'],
-                    results=self._dump_results(result_dict)),
+                msg="Item: {item}".format(item=result_dict['item']),
+                result_dict=result_dict,
                 status=status)
         else:
             self._log_message(
@@ -325,6 +327,8 @@ class CallbackModule(default.CallbackModule):
 
         if self._deferred_result:
             self._process_deferred(result)
+        # Log an extra blank line to get space after each task
+        self._log("")
 
     def v2_runner_item_on_failed(self, result):
         result_dict = dict(result._result)
@@ -333,10 +337,9 @@ class CallbackModule(default.CallbackModule):
         if result._task.action not in ('command', 'shell'):
             self._log_message(
                 result=result,
-                msg="Item: {item} => {results}".format(
-                    item=result_dict['item'],
-                    results=self._dump_results(result_dict)),
-                status='ERROR')
+                msg="Item: {item}".format(item=result_dict['item']),
+                status='ERROR',
+                result_dict=result_dict)
         else:
             self._log_message(
                 result,
@@ -345,6 +348,8 @@ class CallbackModule(default.CallbackModule):
 
         if self._deferred_result:
             self._process_deferred(result)
+        # Log an extra blank line to get space after each task
+        self._log("")
 
     def _process_deferred(self, result):
         self._items_done = True
@@ -383,6 +388,8 @@ class CallbackModule(default.CallbackModule):
             task=task_name,
             args=args)
         self._log(msg)
+        # Log an extra blank line to get space after each task
+        self._log("")
         return task
 
     def _get_task_hosts(self, task):
@@ -401,10 +408,26 @@ class CallbackModule(default.CallbackModule):
             hosts = play_vars.keys()
         return hosts
 
-    def _log_message(self, result, msg, status="ok"):
+    def _dump_result_dict(self, result_dict):
+        result_dict = result_dict.copy()
+        for key in result_dict.keys():
+            if key.startswith('_ansible'):
+                del result_dict[key]
+        return dict(results=result_dict)
+
+    def _log_message(self, result, msg=None, status="ok", result_dict=None):
         hostname = self._get_hostname(result)
-        self._log("{host} | {status}: {msg}".format(
-            host=hostname, status=status, msg=msg))
+        if msg:
+            self._log("{host} | {status}: {msg}".format(
+                host=hostname, status=status, msg=msg))
+        else:
+            self._log("{host} | {status}".format(
+                host=hostname, status=status, msg=msg))
+        if result_dict:
+            result_string = yaml.safe_dump(self._dump_result_dict(result_dict),
+                                           default_flow_style=False)
+            for line in result_string.split('\n'):
+                self._log("{host} | {line}".format(host=hostname, line=line))
 
     def _get_hostname(self, result):
         delegated_vars = result._result.get('_ansible_delegated_vars', None)
