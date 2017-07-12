@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "3f1d235d_ec7244ad",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-12T00:15:46Z",
+      "side": 1,
+      "message": "Should be able to.  I think the buildset uuid method will still be useful for that, but in cases where you can\u0027t specify what the location should be and have to deal with what you get back from a service, this should be handy.  Main thing there is we have to think about ansible variable precedence -- we don\u0027t want to be able to hijack a publication job or something with this feature.",
+      "revId": "ba339a3ffe22873c8f8cb4ad1e9ad15cb16b0f2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f1d235d_7794df44",
         "filename": "zuul/ansible/library/zuul_return.py",
         "patchSetId": 7
