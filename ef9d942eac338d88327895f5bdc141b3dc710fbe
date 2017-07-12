@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "1f1a1f67_64d0e1f8",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 714,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-12T20:09:51Z",
+      "side": 1,
+      "message": "Yep.",
+      "revId": "ef9d942eac338d88327895f5bdc141b3dc710fbe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f1a1f67_313589db",
         "filename": "tests/unit/test_v3.py",
         "patchSetId": 3
@@ -42,6 +59,23 @@
         "endLine": 721,
         "endChar": 40
       },
+      "revId": "ef9d942eac338d88327895f5bdc141b3dc710fbe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f1a1f67_44cde55b",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 721,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-12T20:09:51Z",
+      "side": 1,
+      "message": "If it does anything other than hit retry_failure (the desired result), it will show up in the build history.  We do check there are 2 running builds.",
       "revId": "ef9d942eac338d88327895f5bdc141b3dc710fbe",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
