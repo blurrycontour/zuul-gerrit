@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1f1a1f67_75d77b25",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-07-12T13:00:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f1d235d_3166532b",
+      "revId": "b8234585eed3c66078c36d11bb27c345362be7cf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f1d235d_fb3d5cdd",
         "filename": "doc/source/admin/components.rst",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2017-07-11T22:21:26Z",
       "side": 1,
       "message": "Why does this get called out as \"optional\" when \u0027port\u0027 above it does not get the same call out? Both have a default value, both are optional.",
+      "revId": "b8234585eed3c66078c36d11bb27c345362be7cf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f1a1f67_35ba23de",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-07-12T13:00:58Z",
+      "side": 1,
+      "message": "I just didn\u0027t notice it. Fixed.",
+      "parentUuid": "3f1d235d_fb3d5cdd",
       "revId": "b8234585eed3c66078c36d11bb27c345362be7cf",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
