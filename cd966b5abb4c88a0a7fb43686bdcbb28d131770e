@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f1d235d_ccae68e6",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 732,
+      "author": {
+        "id": 7191
+      },
+      "writtenOn": "2017-07-12T00:18:00Z",
+      "side": 1,
+      "message": "this is always going to be true as it\u0027s in __init__. stop() does seem to check it was started before executing a kill.",
+      "revId": "cd966b5abb4c88a0a7fb43686bdcbb28d131770e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
