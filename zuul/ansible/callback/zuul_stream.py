@@ -110,7 +110,7 @@ class CallbackModule(default.CallbackModule):
     def _log(self, msg, ts=None, job=True, executor=False, debug=False):
         if job:
             now = ts or datetime.datetime.now()
-            self._logger.info("{now} | {msg}".format(now=now, msg=msg))
+            self._logger.info("{now} | {msg}\n".format(now=now, msg=msg))
         if executor:
             if debug:
                 self._display.vvv(msg)
