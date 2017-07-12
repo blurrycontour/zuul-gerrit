@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f1a1f67_e25f41e3",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-07-12T21:05:42Z",
+      "side": 1,
+      "message": "This isn\u0027t actually guaranteed at any level that I can see.\n\nZuul uses gitpython\u0027s traverse() method to enumerate the files:\n\nhttp://gitpython.readthedocs.io/en/stable/reference.html#git.objects.util.Traversable.traverse\n\nThis makes no guarantees about a \"sorted path order\". In testing, I did find the files in a single dir do end up coming out in a lexically sorted order. But a new version of gitpython could, in theory, change that and we would be breaking this promise. So i think we should leave it out, or change the code to sort the listing forcibly.\n\nThat said, does ordering in any single dir actually matter? Aren\u0027t they all loaded into one grand structure and then processed?",
+      "revId": "2e3bba22934b115c6b34c91b37fffb5e8e04d904",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
