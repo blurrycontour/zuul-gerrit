@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f1a1f67_a5884071",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 690,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-12T15:05:03Z",
+      "side": 1,
+      "message": "The insertion of the new text doesn\u0027t quite fit with the old, and we also need to mention that the implicit value *does* assume the playbooks/ directory.  Also, the \u0027.::\u0027 at the end will render as \u0027.:\u0027 which is strange.  How about this:\n\nThe name of the main playbook for this job.  This parameter is\nnot normally necessary, as it defaults to a playbook with the\nsame name as the job inside of the `playbooks/` directory (e.g.,\nthe `foo` job would default to `playbooks/foo`.  However, if a\nplaybook with a different name is needed, it can be specified\nhere.  The file extension is not required, but the full path\nwithin the repo is.  When a child inherits from a parent, a\nplaybook with the name of the child job is implicitly searched\nfirst, before falling back on the playbook used by the parent\njob (unless the child job specifies a ``run`` attribute, in which\ncase that value is used).  Example::",
+      "revId": "29e21227dca26b891846790c851b59f1e207e67a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
