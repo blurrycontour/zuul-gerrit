@@ -253,7 +253,13 @@ class CallbackModule(default.CallbackModule):
 
         self._process_result_for_localhost(result)
 
-        if result._task.loop and 'results' in result_dict:
+        # If the only result is failed=True and a message, log the message
+        # in a sane and readable fashion.
+        if set(result_dict.keys()) == set(['msg', 'failed']):
+            self._log_message(result=result, status='ERROR')
+            for line in result_dict['msg'].split('\n'):
+                self._log(line)
+        elif result._task.loop and 'results' in result_dict:
             # items have their own events
             pass
         else:
