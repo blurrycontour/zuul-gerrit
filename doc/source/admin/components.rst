@@ -276,6 +276,15 @@ executor
   Port to use for finger log streamer.
   ``finger_port=79``
 
+**base_web_url**
+  Base URL on which the zuul-web is running.
+  ``base_web_url=https://ci.example.com/zuul``
+
+**console_stream_url**
+  URL on which console streaming can be found. Defaults to
+  "{base_web_url}/static/stream.html".
+  ``console_stream_url=http://ci.example.com/zuul/static/stream.html``
+
 **git_dir**
   Directory that Zuul should clone local git repositories to.
   ``git_dir=/var/lib/zuul/git``
@@ -355,6 +364,10 @@ web
 **port**
   Port to use for web server process.
   ``port=9000``
+
+**websocket_url**
+  Base URL on which the websocket service is exposed, if different than the
+  base URL of the web app.
 
 Operation
 ~~~~~~~~~
