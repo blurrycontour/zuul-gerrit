@@ -128,6 +128,10 @@ class Executor(zuul.cmd.ZuulApp):
             get_default(self.config, 'executor', 'finger_port',
                         zuul.executor.server.DEFAULT_FINGER_PORT)
         )
+        self.base_web_url = get_default(self.config, 'executor',
+                                        'base_web_url', None)
+        self.console_stream_url = get_default(self.config, 'executor',
+                                              'console_stream_url', None)
 
         self.start_log_streamer()
         self.change_privs()
@@ -136,7 +140,9 @@ class Executor(zuul.cmd.ZuulApp):
         self.executor = ExecutorServer(self.config, self.connections,
                                        jobdir_root=self.jobroot_dir,
                                        keep_jobdir=self.args.keep_jobdir,
-                                       log_streaming_port=self.finger_port)
+                                       log_streaming_port=self.finger_port,
+                                       base_web_url=self.base_web_url,
+                                       streaming_url=self.console_stream_url)
         self.executor.start()
 
         signal.signal(signal.SIGUSR2, zuul.cmd.stack_dump_handler)
