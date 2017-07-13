@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f1a1f67_83ae45e5",
+        "filename": "zuul/driver/bubblewrap/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-13T06:43:35Z",
+      "side": 1,
+      "message": "Now that there are more of these optional binds it might make sense to refactor this a bit to simplify adding optional binds.",
+      "range": {
+        "startLine": 168,
+        "startChar": 0,
+        "endLine": 172,
+        "endChar": 56
+      },
+      "revId": "a19e8c57c77d14d4e28644fa92fca24c97742303",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
