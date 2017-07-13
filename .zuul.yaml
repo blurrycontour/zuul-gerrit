@@ -5,5 +5,5 @@
         - tox-docs
         - tox-cover
         - tox-linters
-        - tox-py35
+        - openstack-py35
         - tox-tarball
