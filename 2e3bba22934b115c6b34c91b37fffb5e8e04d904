@@ -16,6 +16,24 @@
       "revId": "2e3bba22934b115c6b34c91b37fffb5e8e04d904",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f1a1f67_f69495ea",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-07-13T07:41:13Z",
+      "side": 1,
+      "message": "The files are sorted right before being processed here: http://git.openstack.org/cgit/openstack-infra/zuul/tree/zuul/configloader.py?h\u003dfeature/zuulv3#n1188 and line 1393. So that should give a consistent lexical order regardless of the gitpython implementation.\n\nI\u0027ve been told that the order matter for job\u0027s variant.",
+      "parentUuid": "1f1a1f67_e25f41e3",
+      "revId": "2e3bba22934b115c6b34c91b37fffb5e8e04d904",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
