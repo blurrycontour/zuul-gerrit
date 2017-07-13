@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f1a1f67_c0831304",
+        "filename": "zuul/driver/bubblewrap/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-13T06:15:46Z",
+      "side": 1,
+      "message": "This file does not exist in every system (e.g. my alpine based executor container) and must be mounted optionally.",
+      "range": {
+        "startLine": 154,
+        "startChar": 26,
+        "endLine": 154,
+        "endChar": 44
+      },
+      "revId": "d7f73a68f6e72f09ba22a8417c4f7f664d35b973",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
