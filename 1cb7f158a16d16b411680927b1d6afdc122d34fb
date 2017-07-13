@@ -16,6 +16,24 @@
       "revId": "1cb7f158a16d16b411680927b1d6afdc122d34fb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f1a1f67_917330e8",
+        "filename": "etc/zuul.conf-sample",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-07-13T05:10:10Z",
+      "side": 1,
+      "message": "Oops, indeed :)",
+      "parentUuid": "1f1a1f67_91521067",
+      "revId": "1cb7f158a16d16b411680927b1d6afdc122d34fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
