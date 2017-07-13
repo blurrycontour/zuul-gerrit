@@ -1,0 +1,4 @@
+- hosts: all
+  tasks:
+    - name: Export UPPER_CONSTRAINTS_FILE variable.
+      shell: echo UPPER_CONSTRAINTS_FILE=test.txt > ~/.profile

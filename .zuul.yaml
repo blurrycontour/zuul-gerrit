@@ -1,3 +1,8 @@
+- job:
+    name: openstack-test
+    parent: tox-py35
+    pre-run: playbook/openstack/test
+
 - project:
     name: openstack-infra/zuul
     check:
@@ -5,5 +10,5 @@
         - tox-docs
         - tox-cover
         - tox-linters
-        - tox-py35
+        - openstack-py35
         - tox-tarball
