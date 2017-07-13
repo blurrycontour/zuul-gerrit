@@ -160,13 +160,34 @@ class CallbackModule(default.CallbackModule):
         self._play = play
         # Get the hostvars from just one host - the vars we're looking for will
         # be identical on all of them
-        hostvars = self._play._variable_manager._hostvars
-        a_host = next(iter(hostvars.keys()))
-        self.phase = hostvars[a_host]['zuul_execution_phase']
+        hostvars = next(iter(self._play._variable_manager._hostvars.values()))
+        self.phase = hostvars['zuul_execution_phase']
         if self.phase != 'run':
             self.phase = '{phase}-{index}'.format(
                 phase=self.phase,
-                index=hostvars[a_host]['zuul_execution_phase_index'])
+                index=hostvars['zuul_execution_phase_index'])
+
+        # TODO(mordred) For now, protect this to make it not absurdly strange
+        # to run local tests with the callback plugin enabled. Remove once we
+        # have a "run playbook like zuul runs playbook" tool.
+        if 'zuul' in hostvars and 'executor' in hostvars['zuul']:
+            # imply work_dir from src_root
+            work_dir = os.path.dirname(
+                hostvars['zuul']['executor']['src_root'])
+        else:
+            work_dir = None
+
+        # Strip work_dir from the beginning of the playbook name. Test for
+        # starts with so that we only do it once
+        if work_dir and self._playbook_name.startswith(work_dir):
+            self._playbook_name = self._playbook_name.replace(
+                work_dir.rstrip('/') + '/', '')
+            # Lop off the first two path elements - ansible/pre_playbook_0
+            for prefix in ('pre', 'playbook', 'post'):
+                full_prefix = 'ansible/{prefix}_'.format(prefix=prefix)
+                if self._playbook_name.startswith(prefix):
+                    self._playbook_name = self._playbook_name.split(
+                        os.path.sep, 2)[2]
 
         # the name of a play defaults to the hosts string
         name = play.get_name().strip()
