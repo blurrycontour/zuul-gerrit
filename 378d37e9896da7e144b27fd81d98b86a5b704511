@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f1a1f67_c1065e87",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1086,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-07-13T17:57:02Z",
+      "side": 1,
+      "message": "Should htis be \"self.prepareRole\"?",
+      "revId": "378d37e9896da7e144b27fd81d98b86a5b704511",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f1a1f67_a1092296",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1128,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-07-13T17:57:02Z",
+      "side": 1,
+      "message": "The \u0027args\u0027 argument has been lost here, but it\u0027s used down on line 1142.",
+      "revId": "378d37e9896da7e144b27fd81d98b86a5b704511",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
