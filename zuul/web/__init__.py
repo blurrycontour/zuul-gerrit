@@ -18,12 +18,15 @@
 import asyncio
 import json
 import logging
+import os
 import uvloop
 
 import aiohttp
 from aiohttp import web
 
 import zuul.rpcclient
+
+STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
 
 
 class LogStreamingHandler(object):
@@ -147,113 +150,19 @@ class LogStreamingHandler(object):
         return ws
 
 
-class StaticStreamingPage(object):
-
-    DOC = """
-        <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-           "http://www.w3.org/TR/html4/strict.dtd">
-        <html>
-          <head>
-            <style type="text/css">
-
-              body {{
-                font-family: monospace;
-                background-color: black;
-                color: lightgrey;
-              }}
-
-              #overlay {{
-                position: fixed;
-                top: 5px;
-                right: 5px;
-                background-color: darkgrey;
-                color: black;
-              }}
-
-              pre {{
-                white-space: pre;
-                margin: 0px 10px;
-              }}
-            </style>
-
-            <script type="text/javascript">
-
-              window.onload = function() {{
-
-                pageUpdateInMS = 250;
-                var receiveBuffer = "";
-
-                setInterval(function() {{
-                  console.log("autoScroll");
-                  if (receiveBuffer != "") {{
-                    document.getElementById('pagecontent').innerHTML += receiveBuffer;
-                    receiveBuffer = "";
-                    if (document.getElementById('autoscroll').checked) {{
-                      window.scrollTo(0, document.body.scrollHeight);
-                    }}
-                  }}
-                }}, pageUpdateInMS);
-
-                var url = new URL(window.location)
-
-                document.getElementById('pagetitle').innerHTML = "{uuid} ({logfile})";
-
-                var ws = new WebSocket('/console-stream');
-
-                ws.onmessage = function(event) {{
-                  console.log("onmessage");
-                  receiveBuffer = receiveBuffer + event.data + "\n";
-                }};
-
-                ws.onopen = function(event) {{
-                  console.log("onopen");
-                  ws.send('{{"uuid": "{uuid}", "logfile": "{logfile}"}}');
-                }}
-
-                ws.onclose = function(event) {{
-                  console.log("onclose");
-                  receiveBuffer = receiveBuffer + "\n--- END OF STREAM ---\n";
-                }}
-
-              }};
-
-            </script>
-
-            <title id="pagetitle"></title>
-          </head>
-
-          <body>
-
-            <div id="overlay">
-              <form>
-                <input type="checkbox" id="autoscroll" checked> autoscroll
-              </form>
-            </div>
-
-            <pre id="pagecontent"></pre>
-
-          </body>
-        </html>
-    """  # noqa: E501
-
-    async def processRequest(self, request):
-        uuid = request.query.get('uuid')
-        logfile = request.query.get('logfile', 'console.log')
-        html = self.DOC.format(uuid=uuid, logfile=logfile)
-        return web.Response(text=html, content_type='text/html')
-
-
 class ZuulWeb(object):
 
     log = logging.getLogger("zuul.web.ZuulWeb")
 
     def __init__(self, listen_address, listen_port,
                  gear_server, gear_port,
+                 websocket_url=None,
                  ssl_key=None, ssl_cert=None, ssl_ca=None):
         self.listen_address = listen_address
         self.listen_port = listen_port
         self.gear_server = gear_server
         self.gear_port = gear_port
+        self.websocket_url = websocket_url
         self.ssl_key = ssl_key
         self.ssl_cert = ssl_cert
         self.ssl_ca = ssl_ca
@@ -268,6 +177,9 @@ class ZuulWeb(object):
         handler = StaticStreamingPage()
         return await handler.processRequest(request)
 
+    async def _handleInfo(self, request):
+        return web.json_response({'websocket_url': self.websocket_url})
+
     def run(self, loop=None):
         '''
         Run the websocket daemon.
@@ -280,8 +192,8 @@ class ZuulWeb(object):
             is run within a separate (non-main) thread.
         '''
         routes = [
-            ('GET', '/console-stream', self._handleWebsocket),
-            ('GET', '/static/stream', self._handleHTTPStream),
+            ('GET', '/console-stream', self._handleWebsocket, 'stream'),
+            ('GET', '/info', self._handleInfo, 'info'),
         ]
 
         self.log.debug("ZuulWeb starting")
@@ -294,8 +206,11 @@ class ZuulWeb(object):
         self.event_loop = loop
 
         app = web.Application()
-        for method, path, handler in routes:
-            app.router.add_route(method, path, handler)
+        for method, path, handler, name in routes:
+            app.router.add_route(method, path, handler, name)
+        if not self.websocket_url:
+            self.websocket_url = app.router['stream'].url_for()
+        app.router.add_static('/static', STATIC_DIR)
         handler = app.make_handler(loop=self.event_loop)
 
         # create the server

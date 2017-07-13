@@ -26,6 +26,7 @@ import tempfile
 import threading
 import time
 import traceback
+import urllib.parse
 from zuul.lib.yamlutil import yaml
 from zuul.lib.config import get_default
 
@@ -360,7 +361,8 @@ class ExecutorServer(object):
     log = logging.getLogger("zuul.ExecutorServer")
 
     def __init__(self, config, connections={}, jobdir_root=None,
-                 keep_jobdir=False, log_streaming_port=DEFAULT_FINGER_PORT):
+                 keep_jobdir=False, log_streaming_port=DEFAULT_FINGER_PORT,
+                 base_web_url=None):
         self.config = config
         self.keep_jobdir = keep_jobdir
         self.jobdir_root = jobdir_root
@@ -368,6 +370,7 @@ class ExecutorServer(object):
         # perhaps hostname+pid.
         self.hostname = socket.gethostname()
         self.log_streaming_port = log_streaming_port
+        self.base_web_url = base_web_url
         self.zuul_url = config.get('merger', 'zuul_url')
         self.merger_lock = threading.Lock()
         self.verbose = False
@@ -821,7 +824,15 @@ class AnsibleJob(object):
             'worker_hostname': self.executor_server.hostname,
             'worker_log_port': self.executor_server.log_streaming_port
         }
-        if self.executor_server.log_streaming_port != DEFAULT_FINGER_PORT:
+        if self.executor_server.base_web_url:
+            data['url'] = "{url}?uuid={uuid}".format(
+                url=urllib.parse.urljoin(
+                    # Ensure the base_web_url has a / on the end so that
+                    # urljoin does the right thing.
+                    self.executor_server.base_web_url.rstrip('/') + '/',
+                    'static/stream.html')
+                uuid=self.join.unique)
+        elif self.executor_server.log_streaming_port != DEFAULT_FINGER_PORT:
             data['url'] = "finger://{hostname}:{port}/{uuid}".format(
                 hostname=data['worker_hostname'],
                 port=data['worker_log_port'],
