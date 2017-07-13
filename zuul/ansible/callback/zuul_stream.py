@@ -116,6 +116,9 @@ class CallbackModule(default.CallbackModule):
 
     def _log(self, msg, ts=None, job=True, executor=False, debug=False):
         if job:
+            if hasattr(msg, 'decode'):
+                # Did we get a bytes here? Decode it for better display
+                msg = msg.decode('utf-8')
             now = ts or datetime.datetime.now()
             self._logger.info("{now} | {msg}".format(now=now, msg=msg))
         if executor:
@@ -274,7 +277,24 @@ class CallbackModule(default.CallbackModule):
 
         self._process_result_for_localhost(result)
 
-        if result._task.loop and 'results' in result_dict:
+        if set(result_dict.keys()) == set(['msg', 'failed']):
+            # If the only result is failed=True and a message, log the message
+            # in a sane and readable fashion.
+            self._log_message(result=result, status='ERROR')
+            for line in result_dict['msg'].split('\n'):
+                self._log(line)
+        elif 'msg' in result_dict and result_dict['msg'] == 'MODULE FAILURE':
+            # Similarly, exceptions in modules return their tracebacks with
+            # a module failure message
+            self._log_message(msg='MODULE FAILURE',
+                              result=result, status='ERROR')
+            self._log("stdout:")
+            for line in result_dict['module_stdout'].split('\n'):
+                self._log(line)
+            self._log("stderr:")
+            for line in result_dict['module_stderr'].split('\n'):
+                self._log(line)
+        elif result._task.loop and 'results' in result_dict:
             # items have their own events
             pass
         else:
