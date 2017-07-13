@@ -1671,7 +1671,6 @@ class QueueItem(object):
             worker = None
             if build:
                 result = build.result
-                build_url = build.url
                 (unused, report_url) = self.formatJobResult(job)
                 if build.start_time:
                     if build.end_time:

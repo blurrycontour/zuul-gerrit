@@ -888,6 +888,12 @@ class Scheduler(threading.Thread):
         data = {}
 
         data['zuul_version'] = self.zuul_version
+        websocket_url = get_default(self.config,
+                                    'web', 'websocket_url', None)
+        base_url = get_default(self.config,
+                                   'web', 'base_url', None)
+        data['websocket_url'] = websocket_url
+        data['base_url'] = base_web_url
 
         if self._pause:
             ret = '<p><b>Queue only mode:</b> preparing to '

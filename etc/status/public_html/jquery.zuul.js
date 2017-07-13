@@ -64,6 +64,9 @@
         }
         var $jq;
 
+        var base_web_url = null;
+        var websocket_url = null;
+
         var xhr,
             zuul_graph_update_count = 0,
             zuul_sparkline_urls = {};
@@ -96,7 +99,23 @@
             job: function(job) {
                 var $job_line = $('<span />');
 
-                if (job.url !== null) {
+                if (base_web_url !== null) {
+                    var job_params = {
+                        uuid: job.uuid,
+                    };
+                    if websocket_url !== null) {
+                        job_params['websocket_url'] = websocket_url;
+                    }
+                    var job_href = base_web_url + '?' + $.param(job_params);
+                    $job_line.append(
+                        $('<a />')
+                            .addClass('zuul-job-name')
+                            .attr('href', job_href)
+                            .text(job.name)
+                    );
+
+                }
+                else if (job.url !== null) {
                     $job_line.append(
                         $('<a />')
                             .addClass('zuul-job-name')
@@ -680,6 +699,12 @@
 
                         if ('zuul_version' in data) {
                             $('#zuul-version-span').text(data.zuul_version);
+                        }
+                        if ('base_web_url' in data) {
+                            this.base_web_url = data.base_web_url;
+                        }
+                        if ('websocket_url' in data) {
+                            this.websocket_url = data.websocket_url;
                         }
                         if ('last_reconfigured' in data) {
                             var last_reconfigured =
