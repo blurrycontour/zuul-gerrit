@@ -450,7 +450,7 @@ class CallbackModule(default.CallbackModule):
         for key in list(result_dict.keys()):
             if key.startswith('_ansible') or key == 'zuul_log_id':
                 del result_dict[key]
-        return result_dict
+        return self._dump_results(result_dict)
 
     def _log_message(self, result, msg=None, status="ok", result_dict=None):
         hostname = self._get_hostname(result)
