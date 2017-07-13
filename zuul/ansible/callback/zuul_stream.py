@@ -160,13 +160,25 @@ class CallbackModule(default.CallbackModule):
         self._play = play
         # Get the hostvars from just one host - the vars we're looking for will
         # be identical on all of them
-        hostvars = self._play._variable_manager._hostvars
-        a_host = next(iter(hostvars.keys()))
-        self.phase = hostvars[a_host]['zuul_execution_phase']
+        hostvars = next(iter(self._play._variable_manager._hostvars.values()))
+        self.phase = hostvars['zuul_execution_phase']
         if self.phase != 'run':
             self.phase = '{phase}-{index}'.format(
                 phase=self.phase,
-                index=hostvars[a_host]['zuul_execution_phase_index'])
+                index=hostvars['zuul_execution_phase_index'])
+
+        # TODO(mordred) For now, protect this to make it not absurdly strange
+        # to run local tests with the callback plugin enabled. Remove once we
+        # have a "run playbook like zuul runs playbook" tool.
+        if 'zuul' in hostvars and 'executor' in hostvars['zuul']:
+            work_dir = hostvars['zuul']['executor']['work_dir']
+        else:
+            work_dir = None
+
+        # Strip work_dir from the beginning of the playbook name
+        if work_dir:
+            self._playbook_name = self._playbook_name.replace(
+                work_dir.rstrip('/') + '/', '')
 
         # the name of a play defaults to the hosts string
         name = play.get_name().strip()
