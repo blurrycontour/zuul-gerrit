@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f1a1f67_260acdd1",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-13T15:10:18Z",
+      "side": 1,
+      "message": "That doesn\u0027t seem to work. I still have the log inside b\u0027...\u0027",
+      "range": {
+        "startLine": 119,
+        "startChar": 0,
+        "endLine": 121,
+        "endChar": 41
+      },
+      "revId": "1a4253c82acd2a2b0680f72cbd6baaa4f422db77",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
