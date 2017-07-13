@@ -1,3 +1,10 @@
+- job:
+    name: openstack-test
+    parent: tox-py35
+    vars:
+      tox_env:
+        UPPER_CONSTRAINTS_FILE: foo.txt
+
 - project:
     name: openstack-infra/zuul
     check:
@@ -5,5 +12,5 @@
         - tox-docs
         - tox-cover
         - tox-linters
-        - tox-py35
+        - openstack-test
         - tox-tarball
