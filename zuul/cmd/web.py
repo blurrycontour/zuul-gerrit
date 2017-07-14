@@ -57,6 +57,8 @@ class WebServer(zuul.cmd.ZuulApp):
         params['listen_port'] = get_default(self.config, 'web', 'port', 9000)
         params['gear_server'] = get_default(self.config, 'gearman', 'server')
         params['gear_port'] = get_default(self.config, 'gearman', 'port', 4730)
+        params['websocket_url'] = get_default(self.config,
+                                              'web', 'websocket_url', None)
         params['ssl_key'] = get_default(self.config, 'gearman', 'ssl_key')
         params['ssl_cert'] = get_default(self.config, 'gearman', 'ssl_cert')
         params['ssl_ca'] = get_default(self.config, 'gearman', 'ssl_ca')
