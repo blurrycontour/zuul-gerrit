@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f1a1f67_a83afe30",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1197,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-14T16:48:31Z",
+      "side": 1,
+      "message": "Isn\u0027t this already a dict?",
+      "revId": "d5e31f026a56d214a81f972a7528b8936e6fefa3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
