@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f1a1f67_0b232caa",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 1179,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-14T17:01:53Z",
+      "side": 1,
+      "message": "in all_vars",
+      "revId": "d10054c4961ebfd1c9db0cb8e3473176a92d3ae5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
