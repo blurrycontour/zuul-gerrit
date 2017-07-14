@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+      <style type="text/css">
+
+        body {
+          font-family: monospace;
+          background-color: black;
+          color: lightgrey;
+        }
+
+        #overlay {
+            position: fixed;
+            top: 5px;
+            right: 5px;
+            background-color: darkgrey;
+            color: black;
+        }
+
+        pre {
+            white-space: pre;
+            margin: 0px 10px;
+        }
+      </style>
+
+    <script type="text/javascript">
+
+      function get(url){
+        var request = new XMLHttpRequest();
+        request.open("GET", url, false);
+        request.send(null);
+        return request.responseText;
+      }
+
+      window.onload = function() {
+
+        pageUpdateInMS = 250;
+        var receiveBuffer = "";
+        var websocket_url = null
+
+        setInterval(function() {
+          console.log("autoScroll");
+          if (receiveBuffer != "") {
+            document.getElementById('pagecontent').innerHTML += receiveBuffer;
+            receiveBuffer = "";
+            if (document.getElementById('autoscroll').checked) {
+              window.scrollTo(0, document.body.scrollHeight);
+            }
+          }
+        }, pageUpdateInMS);
+
+        // static/stream.html expects to find a json document with
+        // websocket_url in ../info.
+
+        var info = JSON.parse(get('../info'));
+
+        var websocket_url = info['websocket_url'];
+
+        var url = new URL(window.location);
+        var params = {
+            uuid: url.searchParams.get('uuid')
+        }
+        document.getElementById('pagetitle').innerHTML = params['uuid'];
+        if (url.searchParams.has('logfile')) {
+            params['logfile'] = url.searchParams.get('logfile');
+            var logfile_suffix = "(" + params['logfile'] + ")";
+            document.getElementById('pagetitle').innerHTML += logfile_suffix;
+        }
+
+        var ws = new WebSocket(websocket_url);
+
+        ws.onmessage = function(event) {
+          console.log("onmessage");
+          receiveBuffer = receiveBuffer + event.data;
+        };
+
+        ws.onopen = function(event) {
+          console.log("onopen");
+          ws.send(JSON.stringify(params));
+        };
+
+        ws.onclose = function(event) {
+          console.log("onclose");
+          receiveBuffer = receiveBuffer + "\n--- END OF STREAM ---\n";
+        };
+
+      };
+
+    </script>
+
+    <title id="pagetitle"></title>
+  </head>
+
+  <body>
+
+    <div id="overlay">
+      <form>
+        <input type="checkbox" id="autoscroll" checked> autoscroll
+      </form>
+    </div>
+
+    <pre id="pagecontent"></pre>
+
+  </body>
+</html>
