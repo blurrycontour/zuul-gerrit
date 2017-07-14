@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f1a1f67_e887d60e",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-14T16:42:11Z",
+      "side": 0,
+      "message": "You removed trusted.",
+      "revId": "e4dc8771e50abc7042747727a781b98d55612d11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
