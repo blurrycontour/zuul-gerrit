@@ -387,6 +387,9 @@ class JobParser(object):
                 job.auth.inherit = conf['auth']['inherit']
 
             for secret_name in conf['auth'].get('secrets', []):
+                if secret_name == 'zuul':
+                    raise Exception("Secrets named 'zuul' are not allowed.")
+
                 secret = layout.secrets[secret_name]
                 if secret.source_context != job.source_context:
                     raise Exception(
@@ -475,6 +478,8 @@ class JobParser(object):
 
         variables = conf.get('vars', None)
         if variables:
+            if 'zuul' in variables:
+                raise Exception("Variables named 'zuul' are not allowed.")
             job.updateVariables(variables)
 
         allowed_projects = conf.get('allowed-projects', None)
