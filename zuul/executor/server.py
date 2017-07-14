@@ -1177,6 +1177,8 @@ class AnsibleJob(object):
         # TODO(mordred) Hack to work around running things with python3
         all_vars['ansible_python_interpreter'] = '/usr/bin/python2'
         if 'zuul' in all_vars:
+            # We block this in configloader, but block it here too to make
+            # sure that a job doesn't pass variables named zuul.
             raise Exception("Defining vars named 'zuul' is not allowed")
         all_vars['zuul'] = args['zuul'].copy()
         all_vars['zuul']['executor'] = dict(
@@ -1200,6 +1202,8 @@ class AnsibleJob(object):
         secrets = args['secrets'].copy()
         if secrets:
             if 'zuul' in secrets:
+                # We block this in configloader, but block it here too to make
+                # sure that a job doesn't pass secrets named zuul.
                 raise Exception("Defining secrets named 'zuul' is not allowed")
             with open(self.jobdir.secrets, 'w') as secrets_yaml:
                 secrets_yaml.write(
