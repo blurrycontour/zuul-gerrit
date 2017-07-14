@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1f1a1f67_c8a3fa9d",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-14T16:46:04Z",
+      "side": 1,
+      "message": "I think for me they were more about providing visual spacing in a long list of dirs. But I don\u0027t value them strongly.",
+      "parentUuid": "1f1a1f67_08857208",
+      "revId": "ff7ca57404c01398e3bd30d98eef09b3eee108f7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f1a1f67_c87e5a18",
         "filename": "zuul/executor/server.py",
         "patchSetId": 6
