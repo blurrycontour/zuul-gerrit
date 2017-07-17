@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f1a1f67_f8078581",
+        "filename": "zuul/web/static/stream.html",
+        "patchSetId": 8
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-07-17T05:37:00Z",
+      "side": 1,
+      "message": "That may be vulnerable to xss attack, for example if the receivebuffer contains \u003cimg onerror\u003d\u003e js handler. See: https://www.owasp.org/index.php/DOM_based_XSS_Prevention_Cheat_Sheet",
+      "range": {
+        "startLine": 45,
+        "startChar": 51,
+        "endLine": 45,
+        "endChar": 78
+      },
+      "revId": "34115732c7f450af53f70bc1e9fe1dc5a62d6ee9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
