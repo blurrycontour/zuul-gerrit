@@ -46,6 +46,30 @@
       "revId": "34115732c7f450af53f70bc1e9fe1dc5a62d6ee9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f1a1f67_524e4397",
+        "filename": "zuul/web/static/stream.html",
+        "patchSetId": 8
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-07-17T17:00:46Z",
+      "side": 1,
+      "message": "I\u0027m not sure it\u0027s actually vulnerable, perhaps the buffer is escaped somewhere else. Moreover the mitigation from owasp seems to require the owasp-esapi-js which may be a burden to integrate.\n\nOn the other hand, a more simple escapeHtml function may do the trick, such as: https://stackoverflow.com/questions/1787322/htmlspecialchars-equivalent-in-javascript/4835406#4835406",
+      "parentUuid": "1f1a1f67_1781ddc3",
+      "range": {
+        "startLine": 45,
+        "startChar": 51,
+        "endLine": 45,
+        "endChar": 78
+      },
+      "revId": "34115732c7f450af53f70bc1e9fe1dc5a62d6ee9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
