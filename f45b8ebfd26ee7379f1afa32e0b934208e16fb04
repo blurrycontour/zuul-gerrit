@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f1a1f67_3de365a6",
+        "filename": "tests/unit/test_inventory.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-18T22:38:32Z",
+      "side": 1,
+      "message": "_get_build_secrets ?",
+      "revId": "f45b8ebfd26ee7379f1afa32e0b934208e16fb04",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
