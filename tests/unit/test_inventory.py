@@ -80,3 +80,31 @@ class TestInventory(ZuulTestCase):
 
         self.executor_server.release()
         self.waitUntilSettled()
+
+    def test_inventory_secrets(self):
+
+        inventory = self._get_build_inventory('inventory-secrets')
+
+        build = self.getBuildByName('inventory-secrets')
+        secrets_path = os.path.join(
+            build.jobdir.root, 'playbook_0', 'secrets.yaml')
+        secrets = yaml.safe_load(open(secrets_path, 'r'))
+
+        # Make sure the secrets file has what we expect
+        self.assertIn('test-secret', secrets)
+        self.assertIn('username', secrets['test-secret'])
+        self.assertIn('password', secrets['test-secret'])
+        self.assertEqual(secrets['test-secret']['username'],
+                         'test-username')
+        self.assertEqual(secrets['test-secret']['password'],
+                         'test-password')
+        self.assertEqual(1, len(secrets.keys()))
+
+        # Make sure the secrets didn't leak into the top-level or host-level
+        # variables in the inventory
+        self.assertNotIn('test-secret', inventory['all']['vars'])
+        for hostvars in inventory['all']['hosts'].values():
+            self.assertNotIn('test-secret', hostvars)
+
+        self.executor_server.release()
+        self.waitUntilSettled()
