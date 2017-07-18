@@ -32,10 +32,16 @@ class TestInventory(ZuulTestCase):
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
-    def _get_build_inventory(self, name):
+    def _get_build_file(self, name, filename):
         build = self.getBuildByName(name)
-        inv_path = os.path.join(build.jobdir.root, 'ansible', 'inventory.yaml')
+        inv_path = os.path.join(build.jobdir.root, 'ansible', filename)
         return yaml.safe_load(open(inv_path, 'r'))
+
+    def _get_build_inventory(self, name):
+        return self._get_build_file(name, 'inventory.yaml')
+
+    def _get_build_secrets(self, name):
+        return self._get_build_file(name, 'secrets.yaml')
 
     def test_single_inventory(self):
 
@@ -77,6 +83,30 @@ class TestInventory(ZuulTestCase):
         self.assertIn('src_root', z_vars['executor'])
         self.assertIn('job', z_vars)
         self.assertEqual(z_vars['job'], 'group-inventory')
+
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+    def test_inventory_secrets(self):
+
+        inventory = self._get_build_inventory('inventory-secrets')
+        secrets = self._get_build_inventory('inventory-secrets')
+
+        # Make sure the secrets file has what we expect
+        self.assertIn('test-secret', secrets)
+        self.assertIn('username', secrets['test-secret'])
+        self.assertIn('password', secrets['test-secret'])
+        self.assertEqual(secrets['test-secret']['username'],
+                         'test-username')
+        self.assertEqual(secrets['test-secret']['password'],
+                         'test-password')
+        self.assertEqual(1, len(secrets.keys()))
+
+        # Make sure the secrets didn't leak into the top-level or host-level
+        # variables in the inventory
+        self.assertNotIn('test-secret', inventory['all']['vars'])
+        for hostvars in inventory['all']['hosts'].values():
+            self.assertNotIn('test-secret', hostvars)
 
         self.executor_server.release()
         self.waitUntilSettled()
