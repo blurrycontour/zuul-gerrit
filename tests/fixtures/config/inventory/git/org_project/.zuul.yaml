@@ -4,3 +4,4 @@
       jobs:
         - single-inventory
         - group-inventory
+        - inventory-secrets
