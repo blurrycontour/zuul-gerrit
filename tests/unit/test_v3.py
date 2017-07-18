@@ -18,6 +18,7 @@ import os
 import textwrap
 
 import testtools
+import yaml
 
 import zuul.configloader
 from zuul.lib import encryption
@@ -587,6 +588,23 @@ class TestAnsible(AnsibleZuulTestCase):
                                     build_python27.uuid + '.secrets')
         with open(secrets_path) as f:
             self.assertEqual(f.read(), "test-username test-password")
+
+        # Make sure the secrets file has what we expect
+        secrets_yaml_path = os.path.join(build_python27.jobdir.root,
+                                         'ansible', 'secrets.yaml')
+        secrets_yaml = yaml.safe_load(open(secrets_yaml_path, 'r'))
+        self.assertIn('test-username', secrets_yaml)
+        self.assertEqual(secrets_yaml['test-username'], 'test-password')
+        self.assertEqual(1, len(secrets_yaml.keys()))
+
+        # Make sure the secrets didn't leak into the top-level or host-level
+        # variables in the inventory
+        inventory_yaml_path = os.path.join(build_python27.jobdir.root,
+                                           'ansible', 'inventory.yaml')
+        inventory_yaml = yaml.safe_load(open(inventory_yaml_path, 'r'))
+        self.assertNotIn('test-username', inventory_yaml['all']['vars'])
+        for inventory_hostvars in inventory_yaml['all']['hosts'].values():
+            self.assertNotIn('test-username', inventory_hostvars)
 
         msg = A.messages[0]
         success = "{} https://success.example.com/zuul-logs/{}"
