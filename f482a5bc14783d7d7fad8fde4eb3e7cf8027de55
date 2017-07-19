@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f1a1f67_bdebd610",
+        "filename": "zuul/ansible/callback/zuul_json.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-19T16:16:07Z",
+      "side": 1,
+      "message": "I\u0027d like to chat about the below section in IRC.",
+      "revId": "f482a5bc14783d7d7fad8fde4eb3e7cf8027de55",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
