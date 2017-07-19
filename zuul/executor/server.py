@@ -158,6 +158,7 @@ class JobDirPlaybook(object):
     def __init__(self, root):
         self.root = root
         self.trusted = None
+        self.branch = None
         self.path = None
         self.roles = []
         self.roles_path = []
@@ -1066,6 +1067,7 @@ class AnsibleJob(object):
         # Check out the playbook repo if needed and set the path to
         # the playbook that should be run.
         jobdir_playbook.trusted = playbook['trusted']
+        jobdir_playbook.branch = playbook['branch']
         source = self.executor_server.connections.getSource(
             playbook['connection'])
         project = source.getProject(playbook['project'])
