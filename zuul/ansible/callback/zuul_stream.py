@@ -442,18 +442,6 @@ class CallbackModule(default.CallbackModule):
         else:
             task_type = 'TASK'
 
-        # TODO(mordred) With the removal of printing task args, do we really
-        # want to keep doing this section?
-        task_args = task.args.copy()
-        is_shell = task_args.pop('_uses_shell', False)
-        if is_shell and task_name == 'command':
-            task_name = 'shell'
-        raw_params = task_args.pop('_raw_params', '').split('\n')
-        # If there's just a single line, go ahead and print it
-        if len(raw_params) == 1 and task_name in ('shell', 'command'):
-            task_name = '{name}: {command}'.format(
-                name=task_name, command=raw_params[0])
-
         msg = "{task_type} [{task}]".format(
             task_type=task_type,
             task=task_name)
