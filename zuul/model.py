@@ -1825,7 +1825,7 @@ class QueueItem(object):
         elif hasattr(self.change, 'newrev'):
             oldrev = self.change.oldrev
             newrev = self.change.newrev
-            branch = self.change.ref
+            branch = self.change.branch
         else:
             oldrev = None
             newrev = None
@@ -1855,15 +1855,7 @@ class Ref(object):
         self.ref = None
         self.oldrev = None
         self.newrev = None
-
         self.files = []
-
-    def getBasePath(self):
-        base_path = ''
-        if hasattr(self, 'ref'):
-            base_path = "%s/%s" % (self.newrev[:2], self.newrev)
-
-        return base_path
 
     def _id(self):
         return self.newrev
@@ -1871,16 +1863,18 @@ class Ref(object):
     def __repr__(self):
         rep = None
         if self.newrev == '0000000000000000000000000000000000000000':
-            rep = '<Ref 0x%x deletes %s from %s' % (
-                  id(self), self.ref, self.oldrev)
+            rep = '<%s 0x%x deletes %s from %s' % (
+                type(self).__name__,
+                id(self), self.ref, self.oldrev)
         elif self.oldrev == '0000000000000000000000000000000000000000':
-            rep = '<Ref 0x%x creates %s on %s>' % (
-                  id(self), self.ref, self.newrev)
+            rep = '<%s 0x%x creates %s on %s>' % (
+                type(self).__name__,
+                id(self), self.ref, self.newrev)
         else:
             # Catch all
-            rep = '<Ref 0x%x %s updated %s..%s>' % (
-                  id(self), self.ref, self.oldrev, self.newrev)
-
+            rep = '<%s 0x%x %s updated %s..%s>' % (
+                type(self).__name__,
+                id(self), self.ref, self.oldrev, self.newrev)
         return rep
 
     def equals(self, other):
@@ -1913,11 +1907,24 @@ class Ref(object):
                           newrev=self.newrev)
 
 
-class Change(Ref):
+class Branch(Ref):
+    """An existing branch state for a Project."""
+    def __init__(self, project):
+        super(Branch, self).__init__(project)
+        self.branch = None
+
+
+class Tag(Ref):
+    """An existing tag state for a Project."""
+    def __init__(self, project):
+        super(Tag, self).__init__(project)
+        self.tag = None
+
+
+class Change(Branch):
     """A proposed new state for a Project."""
     def __init__(self, project):
         super(Change, self).__init__(project)
-        self.branch = None
         self.number = None
         self.url = None
         self.patchset = None
@@ -1940,12 +1947,6 @@ class Change(Ref):
 
     def __repr__(self):
         return '<Change 0x%x %s>' % (id(self), self._id())
-
-    def getBasePath(self):
-        if hasattr(self, 'refspec'):
-            return "%s/%s/%s" % (
-                str(self.number)[-2:], self.number, self.patchset)
-        return super(Change, self).getBasePath()
 
     def equals(self, other):
         if self.number == other.number and self.patchset == other.patchset:
