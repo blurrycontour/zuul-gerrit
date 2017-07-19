@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "1f1a1f67_dc7c6a73",
+        "filename": "zuul/ansible/callback/zuul_json.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-19T05:52:24Z",
+      "side": 1,
+      "message": "Tried this out and it emits the following as playbook:\n\n  /tmp/3e350d9582ad489a9a1f87fb7056e750/trusted/project_0/gerrit/project1/playbooks/base-pre\n\nSo it looks like the work_dir is not yet correct.",
+      "range": {
+        "startLine": 76,
+        "startChar": 0,
+        "endLine": 76,
+        "endChar": 66
+      },
+      "revId": "97f1b85b52ec5bfefc759d4a7a95053a814a8659",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f1a1f67_8901163b",
         "filename": "zuul/ansible/callback/zuul_json.py",
         "patchSetId": 1
