@@ -107,8 +107,79 @@ Zuul Variables
 ~~~~~~~~~~~~~~
 
 Zuul supplies not only the variables specified by the job definition
-to Ansible, but also some variables from the executor itself.  They
-are:
+to Ansible, but also some variables from the Zuul itself.
+
+When a pipeline is triggered an action, it enqueues items which may
+vary based on the pipeline's configuration.  For example, when a new
+change is created, that change may be enqueued into the pipeline,
+while a tag may be enqueued into the pipeline when it is pushed.
+
+Information about these items is available to jobs.  All of the items
+enqueued in a pipeline are git references, and therefore share some
+attributes in common.  But other attributes may vary based on the type
+of item.
+
+All items provide the following information as Ansible variables:
+
+**zuul.buildset**
+**zuul.build**
+**zuul.ref**
+**zuul.pipeline**
+**zuul.job**
+**zuul.project**
+**zuul.tenant**
+**zuul.jobtags**
+**zuul.items**
+
+Change
+++++++
+
+A change to the repository.  Most often, this will be a git reference
+which has not yet been merged into the repository (e.g., a gerrit
+change or a GitHub pull request).  The following additional variables
+are available:
+
+**zuul.branch**
+**zuul.change**
+**zuul.patchset**
+
+Branch
+++++++
+
+This represents a branch tip.  This item may have been enqueued
+because the branch was updated (via a change having merged, or a
+direct push).  Or it may have been enqueued by a timer for the purpose
+of verifying the current condition of the branch.  The following
+additional variables are available:
+
+**zuul.branch**
+**zuul.oldrev**
+**zuul.newrev**
+
+Tag
++++
+
+This represents a git tag.  The item may have been enqueued because a
+tag was created or deleted.  The following additional variables are
+available:
+
+**zuul.tag**
+**zuul.oldrev**
+**zuul.newrev**
+
+Ref
++++
+
+This represents a git reference that is neither a change, branch, or
+tag.  Note that all items include a `ref` attribute which may be used
+to identify the ref.  The following additional variables are
+available:
+
+**zuul.oldrev**
+**zuul.newrev**
+
+Additionally, some information about the executor running the job is
+available:
 
 **zuul.executor.hostname**
   The hostname of the executor.
