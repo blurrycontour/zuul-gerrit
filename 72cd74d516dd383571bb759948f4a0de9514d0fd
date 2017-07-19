@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f1a1f67_b0e9b8e3",
+        "filename": "tests/fixtures/layouts/no-timer.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-07-19T19:06:34Z",
+      "side": 1,
+      "message": "This seems odd",
+      "range": {
+        "startLine": 39,
+        "startChar": 0,
+        "endLine": 40,
+        "endChar": 24
+      },
+      "revId": "72cd74d516dd383571bb759948f4a0de9514d0fd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
