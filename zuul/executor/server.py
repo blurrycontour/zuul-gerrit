@@ -1422,6 +1422,12 @@ class AnsibleJob(object):
         if index is not None:
             cmd.extend(['-e', 'zuul_execution_phase_index=%s' % index])
 
+        cmd.extend(['-e', 'zuul_execution_trusted=%s' % str(playbook.trusted)])
+        cmd.extend([
+            '-e',
+            'zuul_execution_canonical_name=%s' % playbook.canonical_name])
+        cmd.extend(['-e', 'zuul_execution_branch=%s' % str(playbook.branch)])
+
         result, code = self.runAnsible(
             cmd=cmd, timeout=timeout,
             config_file=playbook.ansible_config,
