@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f1a1f67_2908c2d7",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-19T05:11:53Z",
+      "side": 1,
+      "message": "This also matches \u0027ansible-ansible\u0027 from \u0027ansible-ansibleisgreat\u0027.\n\nWhat about making the delimiter mandatory?\n\n  ^(ansible[-_.+]+)*(role[-_.+]+)*",
+      "range": {
+        "startLine": 304,
+        "startChar": 35,
+        "endLine": 304,
+        "endChar": 67
+      },
+      "revId": "967b84d42b169ca2defed7399332b8143c3a7a0b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
