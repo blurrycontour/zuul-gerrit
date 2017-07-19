@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "1f1a1f67_30b93f14",
+        "filename": "zuul/ansible/callback/zuul_json.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-19T08:33:59Z",
+      "side": 1,
+      "message": "ah yes- the directory structure changed recently.",
+      "parentUuid": "1f1a1f67_dc7c6a73",
+      "range": {
+        "startLine": 76,
+        "startChar": 0,
+        "endLine": 76,
+        "endChar": 66
+      },
+      "revId": "97f1b85b52ec5bfefc759d4a7a95053a814a8659",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f1a1f67_8901163b",
         "filename": "zuul/ansible/callback/zuul_json.py",
         "patchSetId": 1
@@ -36,6 +60,30 @@
       "writtenOn": "2017-07-19T05:37:42Z",
       "side": 1,
       "message": "This won\u0027t do what you intend:\n\n  \u003e\u003e\u003e playbook \u003d \u0027playbooks/foo.yaml\u0027\n  \u003e\u003e\u003e print(playbook.rsplit(os.path.sep, 1)[0])\n  playbooks\n\nJudging from the comment you probably want this:\n\n  \u003e\u003e\u003e print(os.path.splitext(playbook)[0])\n  playbooks/foo",
+      "range": {
+        "startLine": 82,
+        "startChar": 0,
+        "endLine": 83,
+        "endChar": 53
+      },
+      "revId": "97f1b85b52ec5bfefc759d4a7a95053a814a8659",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f1a1f67_d03fab84",
+        "filename": "zuul/ansible/callback/zuul_json.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-07-19T08:33:59Z",
+      "side": 1,
+      "message": "I don\u0027t know what I was thinking. I will blame the airplane.",
+      "parentUuid": "1f1a1f67_8901163b",
       "range": {
         "startLine": 82,
         "startChar": 0,
