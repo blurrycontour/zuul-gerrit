@@ -26,7 +26,7 @@ import queue
 import voluptuous as v
 
 from zuul.connection import BaseConnection
-from zuul.model import Ref
+from zuul.model import Ref, Tag, Branch
 from zuul import exceptions
 from zuul.driver.gerrit.gerritmodel import GerritChange, GerritTriggerEvent
 
@@ -87,6 +87,8 @@ class GerritEventConnector(threading.Thread):
         if refupdate:
             event.project_name = refupdate.get('project')
             event.ref = refupdate.get('refName')
+            if not ref.startswith('refs/'):
+                event.ref = 'refs/heads/%s' % event.ref
             event.oldrev = refupdate.get('oldRev')
             event.newrev = refupdate.get('newRev')
         if event.project_name is None:
@@ -293,7 +295,24 @@ class GerritConnection(BaseConnection):
         if event.change_number:
             change = self._getChange(event.change_number, event.patch_number,
                                      refresh=refresh)
+        elif event.ref and event.ref.startswith('refs/tags/'):
+            project = self.source.getProject(event.project_name)
+            change = Tag(project)
+            change.tag = event.ref[len('refs/tags/'):]
+            change.ref = event.ref
+            change.oldrev = event.oldrev
+            change.newrev = event.newrev
+            change.url = self._getGitwebUrl(project, sha=event.newrev)
+        elif event.ref and event.ref.startswith('refs/heads'):
+            project = self.source.getProject(event.project_name)
+            change = Branch(project)
+            change.branch = event.ref[len('refs/heads/'):]
+            change.ref = event.ref
+            change.oldrev = event.oldrev
+            change.newrev = event.newrev
+            change.url = self._getGitwebUrl(project, sha=event.newrev)
         elif event.ref:
+            # catch-all ref (ie, not a branch or head)
             project = self.source.getProject(event.project_name)
             change = Ref(project)
             change.ref = event.ref
@@ -301,14 +320,8 @@ class GerritConnection(BaseConnection):
             change.newrev = event.newrev
             change.url = self._getGitwebUrl(project, sha=event.newrev)
         else:
-            project = self.source.getProject(event.project_name)
-            change = Ref(project)
-            branch = event.branch or 'master'
-            change.ref = 'refs/heads/%s' % branch
-            refs = self.getInfoRefs(project)
-            change.oldrev = refs[change.ref]
-            change.newrev = refs[change.ref]
-            change.url = self._getGitwebUrl(project, sha=change.newrev)
+            self.log.warning("Unable to get change for %s" % (event,))
+            change = None
         return change
 
     def _getChange(self, number, patchset, refresh=False, history=None):

@@ -2777,6 +2777,7 @@ class TestScheduler(ZuulTestCase):
         # with a configuration which does not include a
         # timer-triggered job so that we have an opportunity to set
         # the hold flag before the first job.
+        self.create_branch('org/project', 'stable')
         self.executor_server.hold_jobs_in_build = True
         self.commitConfigUpdate('common-config', 'layouts/timer.yaml')
         self.sched.reconfigure(self.config)
@@ -2803,10 +2804,12 @@ class TestScheduler(ZuulTestCase):
         self.executor_server.release()
         self.waitUntilSettled()
 
-        self.assertEqual(self.getJobFromHistory(
-            'project-bitrot-stable-old').result, 'SUCCESS')
-        self.assertEqual(self.getJobFromHistory(
-            'project-bitrot-stable-older').result, 'SUCCESS')
+        self.assertHistory([
+            dict(name='project-bitrot', result='SUCCESS',
+                 ref='refs/heads/master'),
+            dict(name='project-bitrot', result='SUCCESS',
+                 ref='refs/heads/stable'),
+        ], ordered=False)
 
         data = json.loads(data)
         status_jobs = set()
@@ -2816,8 +2819,7 @@ class TestScheduler(ZuulTestCase):
                     for change in head:
                         for job in change['jobs']:
                             status_jobs.add(job['name'])
-        self.assertIn('project-bitrot-stable-old', status_jobs)
-        self.assertIn('project-bitrot-stable-older', status_jobs)
+        self.assertIn('project-bitrot', status_jobs)
 
     def test_idle(self):
         "Test that frequent periodic jobs work"
