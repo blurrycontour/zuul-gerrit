@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f1a1f67_c915ce4a",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-19T05:42:58Z",
+      "side": 1,
+      "message": "This won\u0027t do what you intend:\n\n  \u003e\u003e\u003e playbook \u003d \u0027playbooks/foo.yaml\u0027\n  \u003e\u003e\u003e print(playbook.rsplit(os.path.sep, 1)[0])\n  playbooks\n\nJudging from the comment you probably want this:\n\n  \u003e\u003e\u003e print(os.path.splitext(playbook)[0])\n  playbooks/foo",
+      "range": {
+        "startLine": 190,
+        "startChar": 0,
+        "endLine": 191,
+        "endChar": 53
+      },
+      "revId": "7f712852642a06918ba165a6b34f01e1258f9669",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
