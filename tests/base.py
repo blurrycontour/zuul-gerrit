@@ -1068,8 +1068,10 @@ class BuildHistory(object):
         self.__dict__.update(kw)
 
     def __repr__(self):
-        return ("<Completed build, result: %s name: %s uuid: %s changes: %s>" %
-                (self.result, self.name, self.uuid, self.changes))
+        return ("<Completed build, result: %s name: %s uuid: %s "
+                "changes: %s ref: %s>" %
+                (self.result, self.name, self.uuid,
+                 self.changes, self.ref))
 
 
 class FakeStatsd(threading.Thread):
@@ -1344,6 +1346,7 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
         self.executor_server.build_history.append(
             BuildHistory(name=build.name, result=result, changes=build.changes,
                          node=build.node, uuid=build.unique,
+                         ref=build.parameters['zuul']['ref'],
                          parameters=build.parameters, jobdir=build.jobdir,
                          pipeline=build.parameters['ZUUL_PIPELINE'])
         )
@@ -2226,8 +2229,8 @@ class ZuulTestCase(BaseTestCase):
             if isinstance(obj, git.Repo):
                 self.log.debug("Leaked git repo object: 0x%x %s" %
                                (id(obj), repr(obj)))
-                for ref in gc.get_referrers(obj):
-                    self.log.debug("  Referrer %s" % (repr(ref)))
+                #for ref in gc.get_referrers(obj):
+                #    self.log.debug("  Referrer %s" % (repr(ref)))
                 repos.append(obj)
         if repos:
             for obj in gc.garbage:

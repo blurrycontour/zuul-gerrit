@@ -745,6 +745,7 @@ class Scheduler(threading.Thread):
                                    "source %s",
                                    e.change, project.source)
                     continue
+                print(change)
                 if (event.branch_updated and
                     hasattr(change, 'files') and
                     change.updatesConfig()):
