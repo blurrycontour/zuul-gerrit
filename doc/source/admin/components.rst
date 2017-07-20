@@ -317,6 +317,13 @@ executor
 
      user=zuul
 
+**disk_limit_per_job**
+  This integer is the maximum number of megabytes that any one job is
+  allowed to consume on disk while it is running. If a job's scratch
+  space has more than this much space consumed, it will be aborted::
+
+      disk_limit_per_job=100
+
 merger
 """"""
 
