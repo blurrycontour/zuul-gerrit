@@ -1252,7 +1252,10 @@ class AnsibleJob(object):
             config.write('remote_tmp = %s/.ansible/remote_tmp\n' %
                          self.jobdir.root)
             config.write('retry_files_enabled = False\n')
-            config.write('gathering = explicit\n')
+            config.write('gathering = smart\n')
+            config.write('fact_caching = jsonfile\n')
+            config.write('fact_caching_connection = %/.ansible/fact-cache\n' %
+                         self.jobdir.root)
             config.write('library = %s\n'
                          % self.executor_server.library_dir)
             config.write('command_warnings = False\n')
