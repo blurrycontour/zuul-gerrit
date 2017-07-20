@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f1a1f67_9702083e",
+        "filename": "doc/source/user/jobs.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-07-20T20:14:32Z",
+      "side": 1,
+      "message": "This all looks good first pass, adding an example inventory file would also be helpful here. Likely part of your TODO",
+      "revId": "757468705a790461f9d8ee24d60d5412863fdb9e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
