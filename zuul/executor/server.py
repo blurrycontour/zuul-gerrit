@@ -828,7 +828,7 @@ class AnsibleJob(object):
                                   project['name'])
             repos[project['canonical_name']] = repo
 
-        merge_items = [i for i in args['items'] if i.get('refspec')]
+        merge_items = [i for i in args['items'] if i.get('change')]
         if merge_items:
             if not self.doMergeChanges(merger, merge_items,
                                        args['repo_state']):
