@@ -55,6 +55,123 @@ class RoleNotFoundError(ExecutorError):
     pass
 
 
+class DirWatch(object):
+    def __init__(self):
+        self.lock = threading.Lock()
+        self.map = dict()  # k=dirname v=condvar
+
+    def notify_all(self, dirname):
+        with self.lock:
+            if dirname in self.map:
+                self.map[dirname].notify_all()
+
+    def wait_for(self, dirname):
+        if dirname not in self.map:
+            cvar = threading.Condition(self.lock)
+            self.map[dirname] = cvar
+        else:
+            cvar = self.map[dirname]
+        with self.lock:
+            return cvar.wait(5)  # Allow threads using this to end voluntarily
+
+
+class DiskAccountant(object):
+    ''' A single thread to periodically run du and monitor a base directory
+
+    The DirWatch object is intended to be a single place for DiskJobKiller's to
+    store a condition variable per running job. Whenever the accountant notices
+    a dir over limit, the DiskJobKiller should respond by running the given
+    function to remediate the problem (generally by killing the job producing
+    the disk bloat).
+    '''
+    log = logging.getLogger("zuul.ExecutorDiskAccountant")
+
+    def __init__(self, jobs_base, limit, dirwatch):
+        '''
+        :param str jobs_base: absolute path name of dir to be monitored
+        :param int limit: maximum number of MB allowed to be in use in any one
+                          subdir
+        :param DirWatch dirwatch: we call notify_all on this with any dir that
+                                  is over limit
+        '''
+        self.thread = threading.Thread(target=self._run,
+                                       name='executor-diskaccountant')
+        self.thread.daemon = True
+        self._running = False
+        self.jobs_base = jobs_base
+        self.limit = limit
+        self.dirwatch = dirwatch
+
+    def _run(self):
+        while self._running:
+            # Walk job base
+            before = time.time()
+            du = subprocess.Popen(
+                ['du', '-m', '--max-depth=1', self.jobs_base],
+                stdout=subprocess.PIPE)
+            for line in du.stdout:
+                (size, dirname) = line.rstrip().split()
+                dirname = dirname.decode('utf8')
+                if dirname == self.jobs_base:
+                    continue
+                size = int(size)
+                if size > self.limit:
+                    self.log.info(
+                        "{job} is using {size}MB (limit={limit})"
+                        .format(size=size, job=dirname, limit=self.limit))
+                    self.dirwatch.notify_all(dirname)
+            du.wait()
+            after = time.time()
+            # Sleep half as long as that took, or 1s, whichever is longer
+            time.sleep(max(after - before, 1.0))
+
+    def start(self):
+        self._running = True
+        self.thread.start()
+
+    def stop(self):
+        self._running = False
+
+
+class DiskJobKiller(object):
+    ''' A thread which waits for notifications from the DiskAccountant
+    about a given directory and runs the given function. This should be
+    a function that kills the job running in that directory or wipes the
+    directory. The function may be run multiple times by this thread as
+    long as the DiskAccountant thread notices it being over the limit.
+    '''
+    log = logging.getLogger("zuul.ExecutorDiskJobKiller")
+
+    def __init__(self, dirname, func, dirwatch):
+        '''
+        :param str dirname: Specific directory to watch
+        :param callable func: Function to call when notified
+        :param DirWatch dirwatch: Object to wait for notifications on
+        '''
+        self.thread = threading.Thread(target=self._run,
+                                       name='executor-diskjobkiller')
+        self.thread.daemon = True
+        self._running = False
+        self.dirwatch = dirwatch
+        self.dirname = dirname
+        self.func = func
+
+    def _run(self):
+        self.log.debug('Monitoring {}'.format(self.dirname))
+        while self._running:
+            if self.dirwatch.wait_for(self.dirname):
+                self.log.info(
+                    '{} is over limit. Running func'.format(self.dirname))
+                self.func()
+
+    def start(self):
+        self._running = True
+        self.thread.start()
+
+    def stop(self):
+        self._running = False
+
+
 class Watchdog(object):
     def __init__(self, timeout, function, args):
         self.timeout = timeout
@@ -429,6 +546,8 @@ class ExecutorServer(object):
                                       '/var/lib/zuul/executor-git')
         self.default_username = get_default(self.config, 'executor',
                                             'default_username', 'zuul')
+        self.disk_limit_per_job = int(get_default(self.config, 'executor',
+                                                  'disk_limit_per_job', 100))
         self.merge_email = get_default(self.config, 'merger', 'git_user_email')
         self.merge_name = get_default(self.config, 'merger', 'git_user_name')
         execution_wrapper_name = get_default(self.config, 'executor',
@@ -472,6 +591,10 @@ class ExecutorServer(object):
             pass
 
         self.job_workers = {}
+        self.dirwatch = DirWatch()
+        self.disk_accountant = DiskAccountant(self.jobdir_root,
+                                              self.disk_limit_per_job,
+                                              self.dirwatch)
 
     def _getMerger(self, root, logger=None):
         if root != self.merge_root:
@@ -516,6 +639,7 @@ class ExecutorServer(object):
         self.executor_thread = threading.Thread(target=self.run_executor)
         self.executor_thread.daemon = True
         self.executor_thread.start()
+        self.disk_accountant.start()
 
     def register(self):
         self.executor_worker.registerFunction("executor:execute")
@@ -526,6 +650,7 @@ class ExecutorServer(object):
 
     def stop(self):
         self.log.debug("Stopping")
+        self.disk_accountant.stop()
         self._running = False
         self._command_running = False
         self.command_socket.stop()
@@ -1366,6 +1491,10 @@ class AnsibleJob(object):
 
         syntax_buffer = []
         ret = None
+        disk_job_killer = DiskJobKiller(self.jobdir.root,
+                                        self.abortRunningProc,
+                                        self.executor_server.dirwatch)
+        disk_job_killer.start()
         if timeout:
             watchdog = Watchdog(timeout, self._ansibleTimeout,
                                 ("Ansible timeout exceeded",))
@@ -1383,6 +1512,8 @@ class AnsibleJob(object):
             if timeout:
                 watchdog.stop()
                 self.log.debug("Stopped watchdog")
+            disk_job_killer.stop()
+            self.log.debug("Stopped disk job killer")
 
         with self.proc_lock:
             self.proc = None

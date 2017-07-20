@@ -2266,6 +2266,8 @@ class ZuulTestCase(BaseTestCase):
         # Further the pydevd threads also need to be whitelisted so debugging
         # e.g. in PyCharm is possible without breaking shutdown.
         whitelist = ['executor-watchdog',
+                     'executor-diskjobkiller',
+                     'executor-diskaccountant',
                      'pydevd.CommandThread',
                      'pydevd.Reader',
                      'pydevd.Writer',
