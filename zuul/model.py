@@ -2286,16 +2286,28 @@ class Layout(object):
     def addPipeline(self, pipeline):
         self.pipelines[pipeline.name] = pipeline
 
+    def _validateExistingJobs(self, config):
+        for key, pipeline in config.pipelines.items():
+            for job in pipeline.job_list.jobs.keys():
+                if job not in self.jobs.keys():
+                    raise Exception("Job %s is inexistent" % job)
+
     def addProjectTemplate(self, project_template):
+        self._validateExistingJobs(project_template)
         self.project_templates[project_template.name] = project_template
 
     def addProjectConfig(self, project_config):
+        self._validateExistingJobs(project_config)
         self.project_configs[project_config.name] = project_config
 
     def _createJobGraph(self, item, job_list, job_graph):
         change = item.change
         pipeline = item.pipeline
         for jobname in job_list.jobs:
+            # The job must be present at least once in the job list
+            # if not self.getJobs(jobname):
+            #     raise Exception("Job %s does not exist" % jobname)
+
             # This is the final job we are constructing
             frozen_job = None
             # Whether the change matches any globally defined variant
