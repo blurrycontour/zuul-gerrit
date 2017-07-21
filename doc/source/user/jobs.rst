@@ -177,21 +177,21 @@ All items provide the following information as Ansible variables:
 
   **project.name**
     The name of the project, excluding hostname.  E.g., `org/project`.
-  
+
   **project.canonical_hostname**
     The canonical hostname where the project lives.  E.g.,
     `git.example.com`.
-  
+
   **project.canonical_name**
     The full canonical name of the project including hostname.  E.g.,
     `git.example.com/org/project`.
-  
+
   **branch**
     The target branch of the change (without the `refs/heads/` prefix).
-  
+
   **change**
     The identifier for the change.
-  
+
   **patchset**
     The patchset identifier for the change.  If a change is revised,
     this will have a different value.
@@ -249,14 +249,12 @@ available:
 **zuul.oldrev**
   If the item was enqueued as the result of a tag being deleted, the
   previous git sha of the tag will be included here.  If the tag was
-  created, this will be set to the value
-  0000000000000000000000000000000000000000.
+  created, this variable will be undefined.
 
 **zuul.newrev**
   If the item was enqueued as the result of a tag being created, the
   new git sha of the tag will be included here.  If the tag was
-  deleted, this will be set to the value
-  0000000000000000000000000000000000000000.
+  deleted, this variable will be undefined.
 
 Ref Items
 +++++++++
@@ -269,14 +267,12 @@ available:
 **zuul.oldrev**
   If the item was enqueued as the result of a ref being deleted, the
   previous git sha of the ref will be included here.  If the ref was
-  created, this will be set to the value
-  0000000000000000000000000000000000000000.
+  created, this variable will be undefined.
 
 **zuul.newrev**
   If the item was enqueued as the result of a ref being created, the
   new git sha of the ref will be included here.  If the ref was
-  deleted, this will be set to the value
-  0000000000000000000000000000000000000000.
+  deleted, this variable will be undefined.
 
 Working Directory
 +++++++++++++++++
