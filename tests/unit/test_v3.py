@@ -89,6 +89,9 @@ class TestInRepoConfig(ZuulTestCase):
         in_repo_conf = textwrap.dedent(
             """
             - job:
+                name: project-test1
+
+            - job:
                 name: project-test2
 
             - project:
@@ -134,6 +137,77 @@ class TestInRepoConfig(ZuulTestCase):
             dict(name='project-test2', result='SUCCESS', changes='1,1'),
             dict(name='project-test2', result='SUCCESS', changes='2,1')])
 
+    def test_dynamic_config_non_existing_job(self):
+        """Test that requesting a non existent job fails"""
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: project-test1
+
+            - project:
+                name: org/project
+                check:
+                  jobs:
+                    - non-existent-job
+            """)
+
+        in_repo_playbook = textwrap.dedent(
+            """
+            - hosts: all
+              tasks: []
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf,
+                     'playbooks/project-test2.yaml': in_repo_playbook}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertEqual(A.reported, 1,
+                         "A should report failure")
+        self.assertEqual(A.patchsets[0]['approvals'][0]['value'], "-1")
+        self.assertIn('Unknown configuration error', A.messages[0],
+                      "A should have failed the check pipeline")
+        self.assertHistory([])
+
+    def test_dynamic_config_non_existing_job_in_template(self):
+        """Test that requesting a non existent job fails"""
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: project-test1
+
+            - project-template:
+                name: test-template
+                check:
+                  jobs:
+                    - non-existent-job
+            
+            - project:
+                name: org/project
+                templates:
+                  - test-template
+            """)
+
+        in_repo_playbook = textwrap.dedent(
+            """
+            - hosts: all
+              tasks: []
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf,
+                     'playbooks/project-test2.yaml': in_repo_playbook}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertEqual(A.reported, 1,
+                         "A should report failure")
+        self.assertEqual(A.patchsets[0]['approvals'][0]['value'], "-1")
+        self.assertIn('Unknown configuration error', A.messages[0],
+                      "A should have failed the check pipeline")
+        self.assertHistory([])
+
     def test_dynamic_config_new_patchset(self):
         self.executor_server.hold_jobs_in_build = True
 
@@ -142,6 +216,9 @@ class TestInRepoConfig(ZuulTestCase):
 
         in_repo_conf = textwrap.dedent(
             """
+            - job:
+                name: project-test1
+
             - job:
                 name: project-test2
 
