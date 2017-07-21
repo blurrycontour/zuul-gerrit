@@ -630,6 +630,10 @@ class ProjectTemplateParser(object):
                     attrs = dict(name=jobname)
             else:
                 raise Exception("Job must be a string or dictionary")
+
+            if conf_job not in layout.jobs:
+                raise Exception("Job does not exist")
+
             attrs['_source_context'] = source_context
             attrs['_start_mark'] = start_mark
             job_list.addJob(JobParser.fromYaml(tenant, layout, attrs,
