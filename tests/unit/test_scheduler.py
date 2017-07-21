@@ -5352,6 +5352,9 @@ class TestSemaphoreInRepo(ZuulTestCase):
         in_repo_conf = textwrap.dedent(
             """
             - job:
+                name: project-test1
+
+            - job:
                 name: project-test2
                 semaphore: test-semaphore
 
