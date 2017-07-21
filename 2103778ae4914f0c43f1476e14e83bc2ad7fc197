@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "1f1a1f67_39c43e40",
+        "filename": "doc/source/user/jobs.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-07-21T03:40:59Z",
+      "side": 1,
+      "message": "s/the Zuul/Zuul/ ? Or is this using the definite article to mean \"the Zuul that is running the job\" ?",
+      "revId": "2103778ae4914f0c43f1476e14e83bc2ad7fc197",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f1a1f67_868418b3",
         "filename": "doc/source/user/jobs.rst",
         "patchSetId": 7
@@ -13,6 +30,57 @@
       "writtenOn": "2017-07-20T23:48:19Z",
       "side": 1,
       "message": "The when clause doesn\u0027t have the right words, but I\u0027m not sure which ones are correct.",
+      "revId": "2103778ae4914f0c43f1476e14e83bc2ad7fc197",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f1a1f67_19c1822f",
+        "filename": "doc/source/user/jobs.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-07-21T03:40:59Z",
+      "side": 1,
+      "message": "I\u0027ll take a stab, because I think there are two problems...\n\n\"When a pipeline *has* triggered an action, items which may vary may be enqueued based on...\"",
+      "revId": "2103778ae4914f0c43f1476e14e83bc2ad7fc197",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f1a1f67_f9db661e",
+        "filename": "doc/source/user/jobs.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-07-21T03:40:59Z",
+      "side": 1,
+      "message": "If this isn\u0027t implemented, should we leave it off?",
+      "revId": "2103778ae4914f0c43f1476e14e83bc2ad7fc197",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f1a1f67_d9e0aacf",
+        "filename": "doc/source/user/jobs.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-07-21T03:40:59Z",
+      "side": 1,
+      "message": "The oldrev/newrev descriptions below say that if the tag was created or deleted those will be present, otherwise not. But this suggests the only way a tag would be enqueued would be on a create or delete. So that leaves me, the reader, wondering why the distinction is made below, and whether or not there is another way a tag gets enqueued.",
       "revId": "2103778ae4914f0c43f1476e14e83bc2ad7fc197",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
