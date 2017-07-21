@@ -630,8 +630,15 @@ class ProjectTemplateParser(object):
                     attrs = dict(name=jobname)
             else:
                 raise Exception("Job must be a string or dictionary")
+
             attrs['_source_context'] = source_context
             attrs['_start_mark'] = start_mark
+
+            # validate that the job is existing
+            with configuration_exceptions('project or project-template',
+                                          attrs):
+                layout.getJob(attrs['name'])
+
             job_list.addJob(JobParser.fromYaml(tenant, layout, attrs,
                                                project_pipeline=True))
 
