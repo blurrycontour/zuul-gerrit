@@ -1,7 +1,26 @@
+- nodeset:
+    name: nodeset1
+    nodes:
+      - name: xenial01
+        label: ubuntu-xenial
+      - name: xenial02
+        label: ubuntu-xenial
+    groups:
+      - name: ubuntu-xenial
+        nodes:
+          - xenial01
+          - xenial02
+
+- job:
+    name: group-inventory
+    parent: tox-pep8
+    nodes: nodeset1
+
 - project:
     name: openstack-infra/zuul
     check:
       jobs:
+        - group-inventory
         - tox-docs
         - tox-cover
         - tox-pep8
