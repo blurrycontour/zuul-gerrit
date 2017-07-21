@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff346bd7_2171d8e1",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2301,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-21T21:13:34Z",
+      "side": 1,
+      "message": "Rather than checking here, which won\u0027t hit until someone actually tries to run a job, how about we check at configuration time.  I think we can add a check to ProjectTemplateParser._parseJobList for this.",
+      "revId": "5b54cf8db601b4186b0bb989d83432b08bf9a7bb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
