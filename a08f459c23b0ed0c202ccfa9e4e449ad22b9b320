@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f1a1f67_39f2fe9b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-07-21T03:43:36Z",
+      "side": 1,
+      "message": "s/via an/via a/",
+      "revId": "a08f459c23b0ed0c202ccfa9e4e449ad22b9b320",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f1a1f67_19ef42b1",
+        "filename": "doc/source/user/jobs.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-07-21T03:43:36Z",
+      "side": 1,
+      "message": "These leading spaces are making my terminal _ANGRY_",
+      "revId": "a08f459c23b0ed0c202ccfa9e4e449ad22b9b320",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
