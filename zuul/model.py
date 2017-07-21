@@ -2296,6 +2296,10 @@ class Layout(object):
         change = item.change
         pipeline = item.pipeline
         for jobname in job_list.jobs:
+            # The job must be present at least once in the job list
+            if not self.getJobs(jobname):
+                raise Exception("Job %s does not exist" % jobname)
+
             # This is the final job we are constructing
             frozen_job = None
             # Whether the change matches any globally defined variant
