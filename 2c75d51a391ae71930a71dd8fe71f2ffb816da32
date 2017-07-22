@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff346bd7_2d278615",
+        "filename": "tests/base.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1126,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-22T07:30:02Z",
+      "side": 1,
+      "message": "What value is expected for self.project?\n\nThe test results indicate that {{ zuul.project }} contains the whole project object (with canonical name etc.).\n\nIf this is correct (I assume so) either the test cases need to check this or self.project needs to just be self.parameters[\u0027zuul\u0027][\u0027project\u0027][\u0027name\u0027].\n\nIn the latter case I think it might make sense to also add a test case for checking the whole {{ zuul.project }} structure.",
+      "range": {
+        "startLine": 1126,
+        "startChar": 0,
+        "endLine": 1126,
+        "endChar": 57
+      },
+      "revId": "2c75d51a391ae71930a71dd8fe71f2ffb816da32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff346bd7_0d696224",
+        "filename": "tests/base.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2514,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-22T07:30:02Z",
+      "side": 1,
+      "message": "In case project means project name I think it might make sense to rename the parameter to project_name to indicate this cleaner (we also have/had some other places in zuul where this confused me). Further the check needs to be against the project name as zuul.project seems to contain the full project object.\n\n  job.parameters[\u0027zuul\u0027][\u0027project\u0027][\u0027name\u0027]",
+      "range": {
+        "startLine": 2514,
+        "startChar": 17,
+        "endLine": 2514,
+        "endChar": 64
+      },
+      "revId": "2c75d51a391ae71930a71dd8fe71f2ffb816da32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
