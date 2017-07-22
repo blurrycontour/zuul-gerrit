@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff346bd7_6de6aeeb",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-22T07:02:07Z",
+      "side": 1,
+      "message": "This actually fixes a bug which was not covered yet by the tests. So it would be cool to also add a test case for this.",
+      "range": {
+        "startLine": 187,
+        "startChar": 0,
+        "endLine": 188,
+        "endChar": 54
+      },
+      "revId": "3e4a72db8ba21c747f79651d6063a151e35f5655",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
