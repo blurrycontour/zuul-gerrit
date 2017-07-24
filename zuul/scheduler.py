@@ -349,6 +349,10 @@ class Scheduler(threading.Thread):
         self.last_reconfigured = int(time.time())
         # TODOv3(jeblair): reconfigure time should be per-tenant
 
+    def autohold(self, job, project):
+        self.log.debug("AutoHold requested for job %s in project %s",
+                       job, project)
+
     def promote(self, tenant_name, pipeline_name, change_ids):
         event = PromoteEvent(tenant_name, pipeline_name, change_ids)
         self.management_event_queue.put(event)

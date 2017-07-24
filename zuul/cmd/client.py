@@ -46,6 +46,14 @@ class Client(zuul.cmd.ZuulApp):
                                            description='valid commands',
                                            help='additional help')
 
+        cmd_autohold = subparsers.add_parser(
+            'autohold', help='hold node for failed jobs')
+        cmd_autohold.add_argument('--job', help='job name',
+                                  required=True)
+        cmd_autohold.add_argument('--project', help='project name',
+                                  required=True)
+        cmd_autohold.set_defaults(func=self.autohold)
+
         cmd_enqueue = subparsers.add_parser('enqueue', help='enqueue a change')
         cmd_enqueue.add_argument('--tenant', help='tenant name',
                                  required=True)
@@ -136,6 +144,12 @@ class Client(zuul.cmd.ZuulApp):
             sys.exit(0)
         else:
             sys.exit(1)
+
+    def autohold(self):
+        client = zuul.rpcclient.RPCClient(
+            self.server, self.port, self.ssl_key, self.ssl_cert, self.ssl_ca)
+        r = client.autohold(job=self.args.job, project=self.args.project)
+        return r
 
     def enqueue(self):
         client = zuul.rpcclient.RPCClient(
