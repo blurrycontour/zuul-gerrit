@@ -231,6 +231,7 @@ class Scheduler(threading.Thread):
         self.zuul_version = zuul_version.version_info.release_string()
         self.last_reconfigured = None
         self.tenant_last_reconfigured = {}
+        self.autohold_requests = {}
 
     def stop(self):
         self._stopped = True
@@ -348,6 +349,33 @@ class Scheduler(threading.Thread):
         self.log.debug("Reconfiguration complete")
         self.last_reconfigured = int(time.time())
         # TODOv3(jeblair): reconfigure time should be per-tenant
+
+    def autohold(self, tenant, project, job, count):
+        self.log.debug("Autohold requested for tenant %s, project %s, job %s",
+                       tenant, project, job)
+
+        # Validate the tenant
+        if tenant not in self.abide.tenants:
+            self.log.error("Autohold denied: Invalid tenant '%s'", tenant)
+            return False
+        tenant_obj = self.abide.tenants[tenant]
+        if tenant not in self.autohold_requests:
+            self.autohold_requests[tenant] = {}
+
+        # Validate the project exists and use the name provided from the
+        # Project object.
+        (trusted, project_obj) = tenant_obj.getProject(project)
+        if not project_obj:
+            self.log.error(
+                "Autohold denied: Invalid project '%s' for tenant %s",
+                project, tenant)
+            return False
+        project_name = str(project_obj)
+        if project_name not in self.autohold_requests[tenant]:
+            self.autohold_requests[tenant][project_name] = {}
+
+        if job not in self.autohold_requests[tenant][project]:
+            self.autohold_requests[tenant][project][job] = count
 
     def promote(self, tenant_name, pipeline_name, change_ids):
         event = PromoteEvent(tenant_name, pipeline_name, change_ids)
