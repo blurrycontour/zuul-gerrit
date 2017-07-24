@@ -231,6 +231,7 @@ class Scheduler(threading.Thread):
         self.zuul_version = zuul_version.version_info.release_string()
         self.last_reconfigured = None
         self.tenant_last_reconfigured = {}
+        self.autohold_requests = {}
 
     def stop(self):
         self._stopped = True
@@ -348,6 +349,19 @@ class Scheduler(threading.Thread):
         self.log.debug("Reconfiguration complete")
         self.last_reconfigured = int(time.time())
         # TODOv3(jeblair): reconfigure time should be per-tenant
+
+    def autohold(self, tenant, project, job, count):
+        self.log.debug("Autohold requested for tenant %s, project %s, job %s",
+                       tenant, project, job)
+
+        if tenant not in self.autohold_requests:
+            self.autohold_requests[tenant] = {}
+
+        if project not in self.autohold_requests[tenant]:
+            self.autohold_requests[tenant][project] = {}
+
+        if job not in self.autohold_requests[tenant][project]:
+            self.autohold_requests[tenant][project][job] = count
 
     def promote(self, tenant_name, pipeline_name, change_ids):
         event = PromoteEvent(tenant_name, pipeline_name, change_ids)
