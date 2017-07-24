@@ -231,6 +231,7 @@ class Scheduler(threading.Thread):
         self.zuul_version = zuul_version.version_info.release_string()
         self.last_reconfigured = None
         self.tenant_last_reconfigured = {}
+        self.autohold_requests = {}
 
     def stop(self):
         self._stopped = True
@@ -348,6 +349,21 @@ class Scheduler(threading.Thread):
         self.log.debug("Reconfiguration complete")
         self.last_reconfigured = int(time.time())
         # TODOv3(jeblair): reconfigure time should be per-tenant
+
+    def autohold(self, tenant, project, job, count):
+        self.log.debug("Autohold requested for tenant %s, project %s, job %s",
+                       tenant, project, job)
+
+        if tenant not in self.autohold_requests:
+            self.autohold_requests[tenant] = {}
+
+        if project not in self.autohold_requests[tenant]:
+            self.autohold_requests[tenant][project] = {}
+
+        if job not in self.autohold_requests[tenant][project]:
+            self.autohold_requests[tenant][project][job] = count
+        else:
+            raise Exception("Autohold already active for job %s" % job)
 
     def promote(self, tenant_name, pipeline_name, change_ids):
         event = PromoteEvent(tenant_name, pipeline_name, change_ids)
@@ -820,6 +836,20 @@ class Scheduler(threading.Thread):
             self.log.exception("Exception estimating build time:")
         pipeline.manager.onBuildStarted(event.build)
 
+    def _autoholdCount(self, tenant, project, job):
+        if tenant in self.autohold_requests:
+            if project in self.autohold_requests[tenant]:
+                if job in self.autohold_requests[tenant][project]:
+                    return self.autohold_requests[tenant][project][job]
+        return 0
+
+    def _removeAutohold(self, tenant, project, job):
+        del self.autohold_requests[tenant][project][job]
+        if not self.autohold_requests[tenant][project]:
+            del self.autohold_requests[tenant][project]
+            if not self.autohold_requests[tenant]:
+                del self.autohold_requests[tenant]
+
     def _doBuildCompletedEvent(self, event):
         build = event.build
 
@@ -828,6 +858,31 @@ class Scheduler(threading.Thread):
         # the nodes to nodepool.
         try:
             nodeset = build.build_set.getJobNodeSet(build.job.name)
+            tenant = build.pipeline.layout.tenant.name
+            project = build.build_set.item.change.project.name
+            job = build.job.name
+
+            hold_iterations = self._autoholdCount(tenant, project, job)
+
+            if hold_iterations:
+                nodes = nodeset.getNodes()
+                for node in nodes:
+                    # If node state is not STATE_IN_USE, returnNodeSet() will
+                    # not change the state to USED before unlocking them.
+                    node.state = model.STATE_HOLD
+                    node.hold_job = " ".join([tenant, project, job])
+                    self.zk.storeNode(node)
+
+                # We remove the autohold when the number of nodes in hold
+                # is equal to the number of nodes used in a single job run
+                # times the number of run iterations requested. And using
+                # >= instead of == because paranoia (o/` they destroy ya' o/`).
+                nodes_in_hold = self.zk.heldNodeCount(tenant, project, job)
+                if nodes_in_hold >= len(nodes) * hold_iterations:
+                    self.log.debug("Removing autohold for (%s, %s, %s)",
+                                   tenant, project, job)
+                    self._removeAutohold(tenant, project, job)
+
             self.nodepool.returnNodeSet(nodeset)
         except Exception:
             self.log.exception("Unable to return nodeset %s" % (nodeset,))
