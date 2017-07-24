@@ -1434,6 +1434,36 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(self.getJobFromHistory('project-test2').result,
                          'FAILURE')
 
+    @simple_layout('layouts/autohold.yaml')
+    def test_autohold(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+
+        self.sched.autohold('tenant-one', 'org/project', 'project-test2', 1)
+
+        self.executor_server.failJob('project-test2', A)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'NEW')
+        self.assertEqual(A.reported, 1)
+        self.assertEqual(self.getJobFromHistory('project-test2').result,
+                         'FAILURE')
+
+        # Check nodepool for a held node
+        held_node = None
+        for node in self.fake_nodepool.getNodes():
+            if node['state'] == zuul.model.STATE_HOLD:
+                held_node = node
+                break
+        self.assertIsNotNone(held_node)
+
+        # Validate node has recorded the failed job
+        self.assertEqual(
+            held_node['hold_job'],
+            " ".join(['tenant-one', 'org/project', 'project-test2'])
+        )
+
     @simple_layout('layouts/three-projects.yaml')
     def test_dependent_behind_dequeue(self):
         # This particular test does a large amount of merges and needs a little
