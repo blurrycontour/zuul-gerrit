@@ -616,6 +616,11 @@ sections of ``zuul.conf`` are used by the web server:
       Base URL on which the websocket service is exposed, if different
       than the base URL of the web app.
 
+   .. attr:: static_path
+      :default: zuul/web/static
+
+      Path containing the static web assets.
+
    .. attr:: static_cache_expiry
       :default: 3600
 
