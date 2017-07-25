@@ -1,3 +1,10 @@
+- job:
+    name: zuul-npm-build
+    parent: base
+    pre-run: playbooks/prep-javascript
+    run: playbooks/run-javascript
+    post-run: playbooks/collect-javascript
+
 - project:
     name: openstack-infra/zuul
     check:
@@ -7,3 +14,4 @@
         - tox-pep8
         - tox-py35
         - tox-tarball
+        - zuul-npm-build
