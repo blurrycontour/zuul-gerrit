@@ -1,9 +1,14 @@
+- job:
+    name: tox-cover-nv
+    parent: tox-cover
+    voting: false
+
 - project:
     name: openstack-infra/zuul
     check:
       jobs:
         - tox-docs
-        - tox-cover
+        - tox-cover-nv
         - tox-pep8
         - tox-py35
         - tox-tarball
