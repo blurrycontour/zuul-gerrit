@@ -41,6 +41,13 @@
       - name: openstack-infra/zuul
         override-branch: feature/zuulv3
 
+- job:
+    name: zuul-npm-build
+    parent: base
+    pre-run: playbooks/prep-javascript
+    run: playbooks/run-javascript
+    post-run: playbooks/collect-javascript
+
 - project:
     name: openstack-infra/zuul
     infra-check:
@@ -60,6 +67,7 @@
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
+        - zuul-npm-build
         - zuul-stream-functional
         - zuul-migrate:
             files:
@@ -74,6 +82,7 @@
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
+        - zuul-npm-build
         - zuul-stream-functional
     infra-post:
       jobs:

@@ -23,6 +23,14 @@
 // @licend  The above is the entire license notice
 // for the JavaScript code in this page.
 
+import _ from 'lodash';
+import 'bootstrap/dist/css/bootstrap.css';
+import 'jquery-visibility/jquery-visibility';
+import 'graphitejs/jquery.graphite.js';
+
+import './styles/zuul.css';
+import './jquery.zuul';
+
 /*exported zuul_build_dom, zuul_start */
 
 function zuul_build_dom($, container) {
@@ -54,16 +62,28 @@ function zuul_start($) {
     // Start the zuul app (expects default dom)
 
     var $container, $indicator;
-    var demo = location.search.match(/[?&]demo=([^?&]*)/),
-        source_url = location.search.match(/[?&]source_url=([^?&]*)/),
-        source = demo ? './status-' + (demo[1] || 'basic') + '.json-sample' :
-            'status.json';
-    source = source_url ? source_url[1] : source;
 
-    var zuul = $.zuul({
-        source: source,
+    var url = new URL(window.location);
+    var params = {
         //graphite_url: 'http://graphite.openstack.org/render/'
-    });
+    };
+
+    if (url.searchParams.has('source_url')) {
+        params['source'] = url.searchParams.get('source_url');
+    } else if (url.searchParams.has('demo')) {
+        var demo = url.searchParams.get('demo') || 'basic';
+        if (demo == 'basic') {
+            params['source_data'] = DemoStatusBasic;
+        } else if (demo == 'openstack') {
+            params['source_data'] = DemoStatusOpenStack;
+        } else if (demo == 'tree') {
+            params['source_data'] = DemoStatusTree;
+        }
+    } else {
+        params['source'] = 'status.json';
+    }
+
+    var zuul = $.zuul(params);
 
     zuul.jq.on('update-start', function () {
         $container.addClass('zuul-container-loading');
@@ -108,3 +128,23 @@ function zuul_start($) {
 
     return zuul;
 }
+
+function component() {
+  var element = document.createElement('div');
+  element.id = 'zuul_container';
+  return element
+}
+
+if (module.hot) {
+  // This doesn't fully work with our jquery plugin because $.zuul is already
+  // instantiated. Leaving it here to show where a hook can happen if we can
+  // figure out a way to live update it. When it's not there, an update to
+  // jquery.zuul.js triggers a page reload.
+  // module.hot.accept('./jquery.zuul', function() {
+  //   console.log('Accepting the updated module!');
+  // })
+}
+document.body.appendChild(component());
+
+zuul_build_dom(jQuery, '#zuul_container');
+zuul_start(jQuery);

@@ -1,0 +1,11 @@
+- hosts: all
+  tasks:
+    - name: Install yarn modules
+      args:
+        chdir: "src/{{ zuul.project.canonical_name }}/etc/status"
+      command: yarn install
+
+    - name: Build web files
+      args:
+        chdir: "src/{{ zuul.project.canonical_name }}/etc/status"
+      command: npm run dist:prod
