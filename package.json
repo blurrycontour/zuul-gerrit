@@ -1,0 +1,43 @@
+{
+  "name": "zuul-web",
+  "version": "1.0.0",
+  "description": "Web Client for Zuul",
+  "main": "index.js",
+  "repository": "https://git.openstack.org/openstack-infra/zuul",
+  "author": "OpenStack Infra",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "angular": "^1.5.8",
+    "bootstrap": "^3.3.7",
+    "graphitejs": "https://github.com/prestontimmons/graphitejs/archive/master.tar.gz",
+    "jquery": "^1.11.1",
+    "jquery-visibility": "https://github.com/mathiasbynens/jquery-visibility/archive/master.tar.gz"
+  },
+  "scripts": {
+    "build": "npm run build:dev",
+    "build:dev": "webpack --env=dev",
+    "build:dist": "webpack -p --env=prod",
+    "build:docker": "docker run -it --rm -v $(pwd):/usr/src/app -w /usr/src/app node:alpine npm run build:dist-with-depends",
+    "build:dist-with-depends": "yarn install && npm run build:dist",
+    "start": "webpack-dev-server --env=dev",
+    "start:status:basic": "webpack-dev-server --env=dev --open-page='status.html?demo=basic'",
+    "start:status:openstack": "webpack-dev-server --env=dev --open-page='status.html?demo=openstack'",
+    "start:status:tree": "webpack-dev-server --env=dev --open-page='status.html?demo=tree'",
+    "start:status": "webpack-dev-server --env=dev --open-page='status.html?source_url=http://zuulv3.openstack.org'",
+    "start:builds": "webpack-dev-server --env=dev --open-page='builds.html?source_url=http://zuulv3.openstack.org'",
+    "start:jobs": "webpack-dev-server --env=dev --open-page='jobs.html?source_url=http://zuulv3.openstack.org'",
+    "start:stream": "webpack-dev-server --env=dev --open-page='stream.html'"
+  },
+  "devDependencies": {
+    "clean-webpack-plugin": "^0.1.16",
+    "css-loader": "^0.28.4",
+    "file-loader": "^0.11.2",
+    "html-webpack-plugin": "^2.29.0",
+    "resolve-url-loader": "^2.1.0",
+    "style-loader": "^0.18.2",
+    "url-loader": "^0.5.9",
+    "webpack": "^3.3.0",
+    "webpack-dev-server": "^2.6.1",
+    "webpack-merge": "^4.1.0"
+  }
+}
