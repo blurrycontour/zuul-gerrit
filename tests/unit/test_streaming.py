@@ -207,6 +207,15 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
             s.shutdown(socket.SHUT_RDWR)
 
     def test_websocket_streaming(self):
+        # TODO(mordred) We need a better answer for integration here. If the
+        # web assets are built before the unittests are run, this works fine.
+        # Should we put tools/install-js-tools.sh into tools/extra-install.sh
+        # ensuring that js stuff is built in the gate but also that locally
+        # people must have the js toolchain stuff installed to do unittests?
+        static_path = os.path.join(
+            os.path.dirname(zuul.__file__), 'web', 'static', 'stream.html')
+        if not os.path.exists(static_path):
+            self.skipTest("Static web assets need to be built")
         # Start the finger streamer daemon
         streamer = zuul.lib.log_streamer.LogStreamer(
             None, self.host, 0, self.executor_server.jobdir_root)
