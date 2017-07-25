@@ -46,6 +46,15 @@
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
+        - javascript-build-content:
+            success-url: 'html/status.html?source_url=http://zuulv3.openstack.org'
+            files:
+              - package.json
+              - webpack.config.js
+              - yarn.lock
+              - web/.*
+            vars:
+              javascript_content_dir: zuul/web/static
         - zuul-stream-functional
     gate:
       jobs:
@@ -58,6 +67,15 @@
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
+        - javascript-build-content:
+            success-url: 'html/status.html?source_url=http://zuulv3.openstack.org'
+            files:
+              - package.json
+              - webpack.config.js
+              - yarn.lock
+              - web/.*
+            vars:
+              javascript_content_dir: zuul/web/static
         - zuul-stream-functional
     post:
       jobs:
