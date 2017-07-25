@@ -1,3 +1,7 @@
+- job:
+    name: tox-cover
+    voting: false
+
 - project:
     name: openstack-infra/zuul
     check:
