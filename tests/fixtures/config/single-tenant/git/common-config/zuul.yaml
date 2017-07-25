@@ -66,6 +66,9 @@
 
 - job:
     name: project-test2
+    nodes:
+      - name: controller
+        label: label1
 
 - job:
     name: project1-project2-integration
