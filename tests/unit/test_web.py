@@ -45,6 +45,9 @@ class BaseTestWeb(ZuulTestCase):
     config_ini_data = {}
 
     def setUp(self):
+        self.assertTrue(
+            os.path.exists(zuul.web.STATIC_DIR),
+            "Static web assets are missing, be sure to run 'npm run build'")
         super(BaseTestWeb, self).setUp()
         self.executor_server.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
@@ -254,7 +257,7 @@ class TestInfo(BaseTestWeb):
         self.assertEqual(
             info, {
                 "info": {
-                    "rest_api_url": None,
+                    "endpoint": None,
                     "capabilities": {
                         "job_history": False
                     },
@@ -275,7 +278,7 @@ class TestInfo(BaseTestWeb):
         self.assertEqual(
             info, {
                 "info": {
-                    "rest_api_url": None,
+                    "endpoint": None,
                     "tenant": "tenant-one",
                     "capabilities": {
                         "job_history": False
