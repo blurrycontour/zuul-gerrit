@@ -18,12 +18,28 @@
 // @licend  The above is the entire license notice
 // for the JavaScript code in this page.
 
+import 'bootstrap/dist/css/bootstrap.css';
+import angular from 'angular';
+
+import './styles/zuul.css';
+import './jquery.zuul';
+
+
+function get_source_url(filename, $location) {
+    var query_args = $location.search();
+    if (query_args['source_url']) {
+        return query_args['source_url'] + '/' + filename;
+    } else {
+        return filename;
+    }
+}
+
 angular.module('zuulTenants', []).controller(
-    'mainController', function($scope, $http)
+    'mainController', function($scope, $http, $location)
 {
     $scope.tenants = undefined;
     $scope.tenants_fetch = function() {
-        $http.get("tenants.json")
+        $http.get(get_source_url("tenants.json", $location))
             .then(function success(result) {
                 $scope.tenants = result.data;
             });
@@ -32,11 +48,11 @@ angular.module('zuulTenants', []).controller(
 });
 
 angular.module('zuulJobs', []).controller(
-    'mainController', function($scope, $http)
+    'mainController', function($scope, $http, $location)
 {
     $scope.jobs = undefined;
     $scope.jobs_fetch = function() {
-        $http.get("jobs.json")
+        $http.get(get_source_url("jobs.json", $location))
             .then(function success(result) {
                 $scope.jobs = result.data;
             });
@@ -72,13 +88,13 @@ angular.module('zuulBuilds', [], function($locationProvider) {
     if (query_args["project"]) {$scope.project = query_args["project"];
     } else {$scope.project = "";}
     $scope.builds_fetch = function() {
-        query_string = "";
+        var query_string = "";
         if ($scope.tenant) {query_string += "&tenant="+$scope.tenant;}
         if ($scope.pipeline) {query_string += "&pipeline="+$scope.pipeline;}
         if ($scope.job_name) {query_string += "&job_name="+$scope.job_name;}
         if ($scope.project) {query_string += "&project="+$scope.project;}
         if (query_string != "") {query_string = "?" + query_string.substr(1);}
-        $http.get("builds.json" + query_string)
+        $http.get(get_source_url("builds.json", $location) + query_string)
             .then(function success(result) {
                 for (build_pos = 0;
                      build_pos < result.data.length;

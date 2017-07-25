@@ -23,6 +23,14 @@
 // @licend  The above is the entire license notice
 // for the JavaScript code in this page.
 
+import RedImage from './images/red.png';
+import GreyImage from './images/grey.png';
+import GreenImage from './images/green.png';
+import BlackImage from './images/black.png';
+import LineImage from './images/line.png';
+import LineAngleImage from './images/line-angle.png';
+import LineTImage from './images/line-t.png';
+
 (function ($) {
     'use strict';
 
@@ -50,6 +58,7 @@
             'enabled': true,
             'graphite_url': '',
             'source': 'status.json',
+            'source_data': null,
             'msg_id': '#zuul_msg',
             'pipelines_id': '#zuul_pipelines',
             'queue_events_num': '#zuul_queue_events_num',
@@ -393,18 +402,18 @@
             },
 
             change_status_icon: function(change) {
-                var icon_name = 'green.png';
+                var icon_file = GreenImage;
                 var icon_title = 'Succeeding';
 
                 if (change.active !== true) {
                     // Grey icon
-                    icon_name = 'grey.png';
+                    icon_file = GreyImage;
                     icon_title = 'Waiting until closer to head of queue to' +
                         ' start jobs';
                 }
                 else if (change.live !== true) {
                     // Grey icon
-                    icon_name = 'grey.png';
+                    icon_file = GreyImage;
                     icon_title = 'Dependent change required for testing';
                 }
                 else if (change.failing_reasons &&
@@ -413,16 +422,16 @@
                     icon_title = 'Failing because ' + reason;
                     if (reason.match(/merge conflict/)) {
                         // Black icon
-                        icon_name = 'black.png';
+                        icon_file = BlackImage;
                     }
                     else {
                         // Red icon
-                        icon_name = 'red.png';
+                        icon_file = RedImage;
                     }
                 }
 
                 var $icon = $('<img />')
-                    .attr('src', 'images/' + icon_name)
+                    .attr('src', icon_file)
                     .attr('title', icon_title)
                     .css('margin-top', '-6px');
 
@@ -444,7 +453,7 @@
 
                     if (i < change._tree.length && change._tree[i] !== null) {
                         $tree_cell.css('background-image',
-                                       'url(\'images/line.png\')')
+                                       'url(' + LineImage + ')')
                             .css('background-repeat', 'repeat-y');
                     }
 
@@ -458,11 +467,11 @@
                         if (change._tree_branches.indexOf(i) ===
                             change._tree_branches.length - 1) {
                             // Angle line
-                            $image.attr('src', 'images/line-angle.png');
+                            $image.attr('src', LineAngleImage);
                         }
                         else {
                             // T line
-                            $image.attr('src', 'images/line-t.png');
+                            $image.attr('src', LineTImage);
                         }
                         $tree_cell.append($image);
                     }
@@ -668,9 +677,47 @@
                     zuul.update_sparklines();
                 }
             },
+            injest: function(data, $msg) {
+                if ('message' in data) {
+                    $msg.removeClass('alert-danger')
+                        .addClass('alert-info')
+                        .text(data.message)
+                        .show();
+                } else {
+                    $msg.empty()
+                        .hide();
+                }
 
+                if ('zuul_version' in data) {
+                    $('#zuul-version-span').text(data.zuul_version);
+                }
+                if ('last_reconfigured' in data) {
+                    var last_reconfigured =
+                        new Date(data.last_reconfigured);
+                    $('#last-reconfigured-span').text(
+                        last_reconfigured.toString());
+                }
+
+                var $pipelines = $(options.pipelines_id);
+                $pipelines.html('');
+                $.each(data.pipelines, function (i, pipeline) {
+                    var count = app.create_tree(pipeline);
+                    $pipelines.append(
+                        format.pipeline(pipeline, count));
+                });
+
+                $(options.queue_events_num).text(
+                    data.trigger_event_queue ?
+                        data.trigger_event_queue.length : '0'
+                );
+                $(options.queue_results_num).text(
+                    data.result_event_queue ?
+                        data.result_event_queue.length : '0'
+                );
+            },
             /** @return {jQuery.Promise} */
             update: function () {
+
                 // Cancel the previous update if it hasn't completed yet.
                 if (xhr) {
                     xhr.abort();
@@ -680,48 +727,13 @@
                 var app = this;
 
                 var $msg = $(options.msg_id);
+                if (options.source_data !== null) {
+                    app.injest(options.source_data, $msg);
+                    return;
+                }
                 xhr = $.getJSON(options.source)
                     .done(function (data) {
-                        if ('message' in data) {
-                            $msg.removeClass('alert-danger')
-                                .addClass('alert-info')
-                                .text(data.message)
-                                .show();
-                        } else {
-                            $msg.empty()
-                                .hide();
-                        }
-
-                        if ('zuul_version' in data) {
-                            $('#zuul-version-span').text(data.zuul_version);
-                        }
-                        if ('last_reconfigured' in data) {
-                            var last_reconfigured =
-                                new Date(data.last_reconfigured);
-                            $('#last-reconfigured-span').text(
-                                last_reconfigured.toString());
-                        }
-
-                        var $pipelines = $(options.pipelines_id);
-                        $pipelines.html('');
-                        $.each(data.pipelines, function (i, pipeline) {
-                            var count = app.create_tree(pipeline);
-                            $pipelines.append(
-                                format.pipeline(pipeline, count));
-                        });
-
-                        $(options.queue_events_num).text(
-                            data.trigger_event_queue ?
-                                data.trigger_event_queue.length : '0'
-                        );
-                        $(options.queue_management_events_num).text(
-                            data.management_event_queue ?
-                                data.management_event_queue.length : '0'
-                        );
-                        $(options.queue_results_num).text(
-                            data.result_event_queue ?
-                                data.result_event_queue.length : '0'
-                        );
+                        app.injest(data, $msg);
                     })
                     .fail(function (jqXHR, statusText, errMsg) {
                         if (statusText === 'abort') {
