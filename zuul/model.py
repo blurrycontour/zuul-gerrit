@@ -3241,7 +3241,7 @@ class WebInfo(object):
     @staticmethod
     def fromConfig(config):
         return WebInfo(
-            rest_api_url=get_default(config, 'web', 'rest_api_url', None),
+            endpoint=get_default(config, 'web', 'rest_api_url', None),
             websocket_url=get_default(config, 'web', 'websocket_url', None),
             stats_url=get_default(config, 'web', 'stats_url', None),
             stats_prefix=get_default(config, 'statsd', 'prefix'),
