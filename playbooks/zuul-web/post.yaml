@@ -1,0 +1,8 @@
+- hosts: all
+  tasks:
+    - name: Collect javascript artifacts
+      synchronize:
+        dest: "{{ zuul.executor.log_root }}/web/"
+        mode: pull
+        src: "src/{{ zuul.project.canonical_name }}/zuul/web/static/"
+        verify_host: true

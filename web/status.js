@@ -23,27 +23,15 @@
 // @licend  The above is the entire license notice
 // for the JavaScript code in this page.
 
-/*exported zuul_build_dom, zuul_start */
+import _ from 'lodash';
+import 'bootstrap/dist/css/bootstrap.css';
+import 'jquery-visibility/jquery-visibility';
+import 'graphitejs/jquery.graphite.js';
 
-function zuul_build_dom($, container) {
-    // Build a default-looking DOM
-    var default_layout = '<div class="container">'
-        + '<div class="zuul-container" id="zuul-container">'
-        + '<div style="display: none;" class="alert" id="zuul_msg"></div>'
-        + '<button class="btn pull-right zuul-spinner">updating <span class="glyphicon glyphicon-refresh"></span></button>'
-        + '<p>Queue lengths: <span id="zuul_queue_events_num">0</span> events, <span id="zuul_queue_management_events_num">0</span> management events, <span id="zuul_queue_results_num">0</span> results.</p>'
-        + '<div id="zuul_controls"></div>'
-        + '<div id="zuul_pipelines" class="row"></div>'
-        + '<p>Zuul version: <span id="zuul-version-span"></span></p>'
-        + '<p>Last reconfigured: <span id="last-reconfigured-span"></span></p>'
-        + '</div></div>';
+import './styles/zuul.css';
+import './jquery.zuul';
 
-    $(function ($) {
-        // DOM ready
-        var $container = $(container);
-        $container.html(default_layout);
-    });
-}
+/*exported zuul_start */
 
 /**
  * @return The $.zuul instance
@@ -52,16 +40,28 @@ function zuul_start($) {
     // Start the zuul app (expects default dom)
 
     var $container, $indicator;
-    var demo = location.search.match(/[?&]demo=([^?&]*)/),
-        source_url = location.search.match(/[?&]source_url=([^?&]*)/),
-        source = demo ? './status-' + (demo[1] || 'basic') + '.json-sample' :
-            'status.json';
-    source = source_url ? source_url[1] : source;
 
-    var zuul = $.zuul({
-        source: source,
+    var url = new URL(window.location);
+    var params = {
         //graphite_url: 'http://graphite.openstack.org/render/'
-    });
+    };
+
+    if (url.searchParams.has('source_url')) {
+        params['source'] = url.searchParams.get('source_url');
+    } else if (url.searchParams.has('demo')) {
+        var demo = url.searchParams.get('demo') || 'basic';
+        if (demo == 'basic') {
+            params['source_data'] = DemoStatusBasic;
+        } else if (demo == 'openstack') {
+            params['source_data'] = DemoStatusOpenStack;
+        } else if (demo == 'tree') {
+            params['source_data'] = DemoStatusTree;
+        }
+    } else {
+        params['source'] = 'status.json';
+    }
+
+    var zuul = $.zuul(params);
 
     zuul.jq.on('update-start', function () {
         $container.addClass('zuul-container-loading');
@@ -106,3 +106,15 @@ function zuul_start($) {
 
     return zuul;
 }
+
+if (module.hot) {
+  // This doesn't fully work with our jquery plugin because $.zuul is already
+  // instantiated. Leaving it here to show where a hook can happen if we can
+  // figure out a way to live update it. When it's not there, an update to
+  // jquery.zuul.js triggers a page reload.
+  // module.hot.accept('./jquery.zuul', function() {
+  //   console.log('Accepting the updated module!');
+  // })
+}
+
+zuul_start(jQuery);
