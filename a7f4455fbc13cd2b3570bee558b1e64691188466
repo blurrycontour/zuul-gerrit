@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff346bd7_668d5a7a",
+        "filename": "tests/unit/test_disk_accountant.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-25T17:33:07Z",
+      "side": 1,
+      "message": "Could throw some more files in cache_dir to exercise the thing I point out might be a problem in ExecutorServer.",
+      "revId": "a7f4455fbc13cd2b3570bee558b1e64691188466",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff346bd7_46ea560f",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-25T17:33:07Z",
+      "side": 1,
+      "message": "Is pep8 going to ding you for this?  I dunno.",
+      "revId": "a7f4455fbc13cd2b3570bee558b1e64691188466",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff346bd7_26ed1225",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-25T17:33:07Z",
+      "side": 1,
+      "message": "Does this need to be dirname.startswith(self.cache_dir) ?  Since the cache dir will have a bunch of repo names under it.",
+      "revId": "a7f4455fbc13cd2b3570bee558b1e64691188466",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
