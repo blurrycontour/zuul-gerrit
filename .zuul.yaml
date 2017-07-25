@@ -28,6 +28,19 @@
       - zuul/ansible/callback/.*
       - playbooks/zuul-stream/.*
 
+- job:
+    name: zuul-npm-build
+    parent: nodejs-npm
+    success-url: 'web/status.html?source_url=http://zuulv3.openstack.org'
+    post-run: playbooks/zuul-web/post.yaml
+    files:
+      - package.json
+      - webpack.config.js
+      - yarn.lock
+      - web/.*
+    vars:
+      npm_command: build:dist
+
 - project:
     name: openstack-infra/zuul
     check:
@@ -46,6 +59,7 @@
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
+        - zuul-npm-build
         - zuul-stream-functional
     gate:
       jobs:
@@ -58,6 +72,7 @@
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
+        - zuul-npm-build
         - zuul-stream-functional
     post:
       jobs:
