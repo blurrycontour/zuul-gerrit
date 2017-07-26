@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff346bd7_5f4f8933",
+        "filename": "doc/source/admin/drivers/gerrit.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-07-26T23:39:30Z",
+      "side": 1,
+      "message": "Slight nit, but considering the case sensitivity issues I think you should upper case Verified here to match \"Verified\" column below and we should have a note about case sensitivity here.",
+      "range": {
+        "startLine": 233,
+        "startChar": 27,
+        "endLine": 233,
+        "endChar": 28
+      },
+      "revId": "7c9e4466ef432172de04e83926e3ed1da9c5ae0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff346bd7_df113906",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 782,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-07-26T23:39:30Z",
+      "side": 1,
+      "message": "As a mirror of require, shouldn\u0027t reject be removed as well (it belongs in the driver specific schema).",
+      "range": {
+        "startLine": 782,
+        "startChar": 20,
+        "endLine": 782,
+        "endChar": 37
+      },
+      "revId": "7c9e4466ef432172de04e83926e3ed1da9c5ae0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
