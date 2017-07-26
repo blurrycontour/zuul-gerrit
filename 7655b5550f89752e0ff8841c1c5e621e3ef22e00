@@ -2,6 +2,57 @@
   "comments": [
     {
       "key": {
+        "uuid": "ff346bd7_8ccef87f",
+        "filename": "tests/base.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2778,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-07-26T17:05:38Z",
+      "side": 1,
+      "message": "s/ecxeption/exception/ #notaminusone",
+      "revId": "7655b5550f89752e0ff8841c1c5e621e3ef22e00",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff346bd7_4cc4905f",
+        "filename": "tests/fixtures/config/ansible/git/common-config/playbooks/check-vars.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-07-26T17:05:38Z",
+      "side": 1,
+      "message": "Having values \u003d\u003d names is really confusing, especially when there\u0027s also an attribute _named_ value. I\u0027d rather see arbitrary values that have no meaning.",
+      "revId": "7655b5550f89752e0ff8841c1c5e621e3ef22e00",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff346bd7_6cc75466",
+        "filename": "zuul/driver/bubblewrap/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-07-26T17:05:38Z",
+      "side": 1,
+      "message": "EEEEEK... mutable defaults! These should be None. Not a problem for this change, but we should follow up with that. Very easy to screw this up later.",
+      "revId": "7655b5550f89752e0ff8841c1c5e621e3ef22e00",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff346bd7_b3b3894d",
         "filename": "zuul/driver/bubblewrap/__init__.py",
         "patchSetId": 4
