@@ -29,6 +29,7 @@ import traceback
 from zuul.lib.yamlutil import yaml
 from zuul.lib.config import get_default
 
+import ara.plugins.callbacks
 import gear
 
 import zuul.merger.merger
@@ -1278,6 +1279,9 @@ class AnsibleJob(object):
     def writeAnsibleConfig(self, jobdir_playbook):
         trusted = jobdir_playbook.trusted
 
+        callback_path = '%s:%s' % (
+            self.executor_server.callback_dir,
+            os.path.dirname(ara.plugins.callback.__file__))
         with open(jobdir_playbook.ansible_config, 'w') as config:
             config.write('[defaults]\n')
             config.write('hostfile = %s\n' % self.jobdir.inventory)
@@ -1293,10 +1297,9 @@ class AnsibleJob(object):
             config.write('library = %s\n'
                          % self.executor_server.library_dir)
             config.write('command_warnings = False\n')
-            config.write('callback_plugins = %s\n'
-                         % self.executor_server.callback_dir)
+            config.write('callback_plugins = %s\n' % callback_path)
             config.write('stdout_callback = zuul_stream\n')
-            config.write('callback_whitelist = zuul_json\n')
+            config.write('callback_whitelist = zuul_json,ara\n')
             # bump the timeout because busy nodes may take more than
             # 10s to respond
             config.write('timeout = 30\n')
