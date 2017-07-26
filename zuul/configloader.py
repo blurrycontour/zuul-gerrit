@@ -768,11 +768,6 @@ class PipelineParser(object):
                               'newer-than': str,
                               }, extra=vs.ALLOW_EXTRA)
 
-        require = {'approval': to_list(approval),
-                   'open': bool,
-                   'current-patchset': bool,
-                   'status': to_list(str)}
-
         reject = {'approval': to_list(approval)}
 
         window = vs.All(int, vs.Range(min=0))
@@ -784,7 +779,6 @@ class PipelineParser(object):
                     vs.Required('manager'): manager,
                     'precedence': precedence,
                     'description': str,
-                    'require': require,
                     'reject': reject,
                     'success-message': str,
                     'failure-message': str,
