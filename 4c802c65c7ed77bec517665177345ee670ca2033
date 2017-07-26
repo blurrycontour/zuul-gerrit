@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff346bd7_4cb3704e",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-07-26T17:00:05Z",
+      "side": 1,
+      "message": "This should be req not request.",
+      "range": {
+        "startLine": 38,
+        "startChar": 42,
+        "endLine": 38,
+        "endChar": 49
+      },
+      "revId": "4c802c65c7ed77bec517665177345ee670ca2033",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
