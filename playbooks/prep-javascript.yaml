@@ -1,4 +1,0 @@
-- hosts: all
-  tasks:
-    - name: Install Javascript Prerequisites
-      shell: "src/{{ zuul.project.canonical_name }}/etc/status/bootstrap.sh"
