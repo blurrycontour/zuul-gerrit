@@ -46,3 +46,9 @@ echo "deb http://ppa.launchpad.net/openstack-ci-core/bubblewrap/ubuntu $LSBDISTC
     sudo tee /etc/apt/sources.list.d/openstack-ci-core-ubuntu-bubblewrap-xenial.list
 sudo apt-get update
 sudo apt-get --assume-yes install bubblewrap
+
+# TODO(mordred) This isn't an awesome place for this - because JS doens't need
+# any of the above, and folks doing non-JS don't need this stuff. But - it lets
+# the unittest base job work for us, which means we can at least show that the
+# yarn steps aren't doing anything as root.
+$TOOLSDIR/install-js-tools.sh
