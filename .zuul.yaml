@@ -43,8 +43,7 @@
 
 - job:
     name: zuul-npm-build
-    parent: base
-    pre-run: playbooks/prep-javascript
+    parent: unittests
     run: playbooks/run-javascript
     post-run: playbooks/collect-javascript
 
