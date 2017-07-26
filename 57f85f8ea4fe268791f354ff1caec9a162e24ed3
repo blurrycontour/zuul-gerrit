@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff346bd7_96c71e65",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-07-26T21:36:37Z",
+      "side": 1,
+      "message": "Seems like we should be able to just update the tests, but that is probably mechanical enough and large enough that a followup change is desireable.",
+      "revId": "57f85f8ea4fe268791f354ff1caec9a162e24ed3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff346bd7_36351290",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-07-26T21:36:37Z",
+      "side": 1,
+      "message": "Can we just remove normalize_category entirely and force everything to match? This way we don\u0027t keep some ambiguity around about which sets of things are ok to be different/normalized.",
+      "range": {
+        "startLine": 113,
+        "startChar": 24,
+        "endLine": 113,
+        "endChar": 42
+      },
+      "revId": "57f85f8ea4fe268791f354ff1caec9a162e24ed3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff346bd7_f62aea29",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-07-26T21:36:37Z",
+      "side": 1,
+      "message": "See above.",
+      "range": {
+        "startLine": 286,
+        "startChar": 24,
+        "endLine": 286,
+        "endChar": 42
+      },
+      "revId": "57f85f8ea4fe268791f354ff1caec9a162e24ed3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
