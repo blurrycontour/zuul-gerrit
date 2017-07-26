@@ -8,7 +8,7 @@ module.exports = Merge(CommonConfig, {
   // Enable Hot Module Replacement for devServer
   devServer: {
     hot: true,
-    contentBase: path.resolve(__dirname, './dist'),
+    contentBase: path.resolve(__dirname, './zuul/web/static'),
     publicPath: '/'
   },
   plugins: [

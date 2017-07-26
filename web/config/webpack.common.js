@@ -5,12 +5,14 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
   entry: {
-    app: './src/index.js',
+    'status': './web/status.js',
+    'stream': './web/stream.js'
   },
   output: {
     filename: '[name].bundle.js',
-    path: path.resolve(__dirname, 'dist'),
-    publicPath: '/'
+    // path.resolve(__dirname winds up relative to the config dir
+    path: path.resolve(__dirname, '../../zuul/web/static'),
+    publicPath: ''
   },
   // Some folks prefer "cheaper" source-map for dev and one that is more
   // expensive to build for prod. Debugging without the full source-map sucks,
@@ -23,7 +25,15 @@ module.exports = {
     }),
     new CleanWebpackPlugin(['dist']),
     new HtmlWebpackPlugin({
+      chunks: ['status'],
+      filename: 'status.html',
       title: 'Zuul Status'
+    }),
+    new HtmlWebpackPlugin({
+      title: 'Zuul Console Stream',
+      chunks: ['stream'],
+      template: 'web/templates/stream.ejs',
+      filename: 'stream.html'
     })
   ],
   module: {
