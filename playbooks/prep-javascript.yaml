@@ -2,6 +2,5 @@
   tasks:
     - name: Install Javascript Prerequisites
       args:
-        chdir: "src/{{ zuul.project.canonical_name }}/etc/status"
-      shell: bootstrap.sh
-      become: yes
+        chdir: "src/{{ zuul.project.canonical_name }}"
+      shell: tools/install-js-tools.sh

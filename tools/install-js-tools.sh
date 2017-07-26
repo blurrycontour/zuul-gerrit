@@ -24,8 +24,6 @@ if type apt-get; then
     sudo apt-get update
     sudo apt-get install -y nodejs yarn
 else
-    sudo bash $(dirname $0)/config/boostrap-rpm.sh
+    sudo $(dirname $0)/install-js-repos-rpm.sh
     sudo yum -y install nodejs yarn
 fi
-
-yarn install
