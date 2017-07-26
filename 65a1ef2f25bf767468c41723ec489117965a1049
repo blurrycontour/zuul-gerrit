@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff346bd7_bfa435a7",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2225,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-07-26T23:43:13Z",
+      "side": 1,
+      "message": "This can be removed as well.",
+      "range": {
+        "startLine": 2225,
+        "startChar": 8,
+        "endLine": 2225,
+        "endChar": 18
+      },
+      "revId": "65a1ef2f25bf767468c41723ec489117965a1049",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff346bd7_df9b7963",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2232,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-07-26T23:43:13Z",
+      "side": 1,
+      "message": "This can be removed as well.",
+      "range": {
+        "startLine": 2232,
+        "startChar": 16,
+        "endLine": 2232,
+        "endChar": 33
+      },
+      "revId": "65a1ef2f25bf767468c41723ec489117965a1049",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
