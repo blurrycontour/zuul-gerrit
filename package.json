@@ -23,13 +23,18 @@
     "webpack-merge": "^4.1.0"
   },
   "scripts": {
+    "build": "npm run build:dev",
     "build:dev": "webpack -d --env=dev",
     "build:dist": "webpack --env=prod",
-    "start": "webpack-dev-server --env=dev --open-page='?demo=basic'",
-    "start:openstack": "webpack-dev-server --env=dev --open-page='?demo=openstack'",
-    "start:tree": "webpack-dev-server --env=dev --open-page='?demo=tree'",
-    "start:live": "webpack-dev-server --env=dev --open-page='?source_url=http://zuul.openstack.org/status.json'",
-    "start:livev3": "webpack-dev-server --env=dev --open-page='?source_url=http://zuulv3.openstack.org/status.json'"
+    "build:docker": "docker run -it --rm -v $(pwd):/usr/src/app -w /usr/src/app node:alpine npm run build:dist-with-depends",
+    "build:dist-with-depends": "yarn install && npm run build:dist",
+    "start": "webpack-dev-server --env=dev",
+    "start:basic": "webpack-dev-server --env=dev --open-page='status.html?demo=basic'",
+    "start:openstack": "webpack-dev-server --env=dev --open-page='status.html?demo=openstack'",
+    "start:tree": "webpack-dev-server --env=dev --open-page='status.html?demo=tree'",
+    "start:live": "webpack-dev-server --env=dev --open-page='status.html?source_url=http://zuul.openstack.org/status.json'",
+    "start:livev3": "webpack-dev-server --env=dev --open-page='status.html?source_url=http://zuulv3.openstack.org/status.json'",
+    "start:stream": "webpack-dev-server --env=dev --open-page='stream.html'"
   },
   "devDependencies": {
     "webpack-dev-server": "^2.6.1"
