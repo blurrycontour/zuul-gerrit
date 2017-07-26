@@ -2,10 +2,10 @@
   tasks:
     - name: Install yarn modules
       args:
-        chdir: "src/{{ zuul.project.canonical_name }}/etc/status"
+        chdir: "{{ zuul.project.src_dir }}"
       command: yarn install
 
     - name: Build web files
       args:
-        chdir: "src/{{ zuul.project.canonical_name }}/etc/status"
-      command: npm run dist:prod
+        chdir: "{{ zuul.project.src_dir }}"
+      command: npm run build:dist
