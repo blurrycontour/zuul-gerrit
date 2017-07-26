@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "ff346bd7_1f38e1ec",
+        "filename": "doc/source/admin/drivers/gerrit.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-26T23:59:17Z",
+      "side": 1,
+      "message": "Agreed, but we should do that after that change lands.  I don\u0027t want to chase it in this change.",
+      "revId": "7c9e4466ef432172de04e83926e3ed1da9c5ae0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff346bd7_df113906",
         "filename": "zuul/configloader.py",
         "patchSetId": 1
@@ -66,6 +83,23 @@
         "endLine": 782,
         "endChar": 37
       },
+      "revId": "7c9e4466ef432172de04e83926e3ed1da9c5ae0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff346bd7_ff387dee",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 782,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-26T23:59:17Z",
+      "side": 1,
+      "message": "Yep, I missed that.",
       "revId": "7c9e4466ef432172de04e83926e3ed1da9c5ae0f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
