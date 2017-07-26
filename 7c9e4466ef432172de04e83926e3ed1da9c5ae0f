@@ -45,6 +45,30 @@
       "revId": "7c9e4466ef432172de04e83926e3ed1da9c5ae0f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff346bd7_df1019ab",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 782,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-07-26T23:50:00Z",
+      "side": 1,
+      "message": "I now see that require is defined below as it does still apply to a pipeline. The raeson it was removed from here is that it is defined below. Reject is also defined below so we should remove this as well.",
+      "parentUuid": "ff346bd7_df113906",
+      "range": {
+        "startLine": 782,
+        "startChar": 20,
+        "endLine": 782,
+        "endChar": 37
+      },
+      "revId": "7c9e4466ef432172de04e83926e3ed1da9c5ae0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
