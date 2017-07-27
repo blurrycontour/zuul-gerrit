@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff346bd7_5d4e4738",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1312,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2017-07-27T21:54:08Z",
+      "side": 1,
+      "message": "Nit, \"callback_whitelist\" is just for enabling callbacks that are bundled/shipped with Ansible itself.\n\nSay you wanted to enable profile_tasks from https://github.com/ansible/ansible/tree/devel/lib/ansible/plugins/callback -- you would put \"profile_tasks\" here.\n\nAnything that is in the \"callback_plugins\" path will get included automatically, for better or for worse.",
+      "range": {
+        "startLine": 1312,
+        "startChar": 0,
+        "endLine": 1312,
+        "endChar": 74
+      },
+      "revId": "40b043b94c8e4a38d9fd24576517585bc06e2a49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
