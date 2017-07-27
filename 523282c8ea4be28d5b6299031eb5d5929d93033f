@@ -37,6 +37,23 @@
     },
     {
       "key": {
+        "uuid": "ff346bd7_6fd15f23",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-27T15:18:25Z",
+      "side": 1,
+      "message": "How about we do this as a try/import, then we don\u0027t have to include it in the deps list.  We can add it to our puppet.",
+      "revId": "523282c8ea4be28d5b6299031eb5d5929d93033f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff346bd7_4f3e9e8b",
         "filename": "zuul/executor/server.py",
         "patchSetId": 2
