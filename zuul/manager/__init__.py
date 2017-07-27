@@ -13,6 +13,7 @@
 import logging
 
 from zuul import exceptions
+from zuul import model
 
 
 class DynamicChangeQueueContextManager(object):
@@ -483,20 +484,18 @@ class PipelineManager(object):
     def scheduleMerge(self, item, files=None, dirs=None):
         build_set = item.current_build_set
 
-        if not hasattr(item.change, 'branch'):
-            self.log.debug("Change %s does not have an associated branch, "
-                           "not scheduling a merge job for item %s" %
-                           (item.change, item))
-            build_set.merge_state = build_set.COMPLETE
-            return True
-
         self.log.debug("Scheduling merge for item %s (files: %s, dirs: %s)" %
                        (item, files, dirs))
         build_set = item.current_build_set
         build_set.merge_state = build_set.PENDING
-        self.sched.merger.mergeChanges(build_set.merger_items,
-                                       item.current_build_set, files, dirs,
-                                       precedence=self.pipeline.precedence)
+        if isinstance(item.change, model.Change):
+            self.sched.merger.mergeChanges(build_set.merger_items,
+                                           item.current_build_set, files, dirs,
+                                           precedence=self.pipeline.precedence)
+        else:
+            self.sched.merger.getItemRepoState(build_set.merger_items,
+                                               item.current_build_set,
+                                               precedence=self.pipeline.precedence)
         return False
 
     def prepareItem(self, item):
