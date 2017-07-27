@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff346bd7_c27a55ef",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 815,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-27T20:20:47Z",
+      "side": 1,
+      "message": "We should probably put this in a tuple for safety since it\u0027s a complex data structure:\n\ndebug(\"... %s\" % (project,))",
+      "revId": "ea8e532e6cdc4f2b6654ffc08a282884499f2943",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff346bd7_a27f51de",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 829,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-27T20:20:47Z",
+      "side": 1,
+      "message": "Ditto.",
+      "revId": "ea8e532e6cdc4f2b6654ffc08a282884499f2943",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
