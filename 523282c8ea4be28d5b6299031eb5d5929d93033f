@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff346bd7_6fd8427a",
+        "filename": "requirements.txt",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2017-07-27T14:00:06Z",
+      "side": 1,
+      "message": "py3 support of ara is in trunk right now. Install from git source (or zuul clone!?) to test it properly if you\u0027d like.\n\nI was hoping to release it this week but there\u0027s still some ongoing reviews to merge before.",
+      "revId": "523282c8ea4be28d5b6299031eb5d5929d93033f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff346bd7_4f3e9e8b",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1302,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2017-07-27T14:00:06Z",
+      "side": 1,
+      "message": "That collects the data, you still need to generate something though. Is that going to be done by the jobs or are we bundling that somewhere in here and sending it as part of the \"default\" logs ?",
+      "revId": "523282c8ea4be28d5b6299031eb5d5929d93033f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
