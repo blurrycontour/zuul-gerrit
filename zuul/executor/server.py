@@ -537,6 +537,7 @@ class ExecutorServer(object):
                                               self.hostname)
         self.merger_worker.registerFunction("merger:merge")
         self.merger_worker.registerFunction("merger:cat")
+        self.merger_worker.registerFunction("merger:refstate")
 
     def stop(self):
         self.log.debug("Stopping")
@@ -632,6 +633,9 @@ class ExecutorServer(object):
                     elif job.name == 'merger:merge':
                         self.log.debug("Got merge job: %s" % job.unique)
                         self.merge(job)
+                    elif job.name == 'merger:refstate':
+                        self.log.debug("Got refstate job: %s" % job.unique)
+                        self.refstate(job)
                     else:
                         self.log.error("Unable to handle job %s" % job.name)
                         job.sendWorkFail()
@@ -703,6 +707,14 @@ class ExecutorServer(object):
         result = dict(updated=True,
                       files=files,
                       zuul_url=self.zuul_url)
+        job.sendWorkComplete(json.dumps(result))
+
+    def refstate(self, job):
+        args = json.loads(job.arguments)
+        with self.merger_lock:
+            success, repo_state = self.merger.getItemRepoState(args['items'])
+        result = dict(updated=success,
+                      repo_state=repo_state)
         job.sendWorkComplete(json.dumps(result))
 
     def merge(self, job):

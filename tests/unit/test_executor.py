@@ -338,19 +338,26 @@ class TestExecutorRepos(ZuulTestCase):
         p1 = "review.example.com/org/project1"
         p2 = "review.example.com/org/project2"
         projects = [p1, p2]
+        upstream = self.getUpstreamRepos(projects)
 
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
         event = A.getRefUpdatedEvent()
         A.setMerged()
+
+        # Add another commit to the repo that merged right after this
+        # one to make sure that our post job runs with the one that we
+        # intended rather than simply the current repo state.
+        B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
+        B.setMerged()
+
         self.fake_gerrit.addEvent(event)
         self.waitUntilSettled()
 
-        upstream = self.getUpstreamRepos(projects)
         states = [
             {p1: dict(commit=str(upstream[p1].commit('master')),
-                      present=[A], branch='master'),
+                      present=[A], absent=[B], branch='master'),
              p2: dict(commit=str(upstream[p2].commit('master')),
-                      absent=[A], branch='master'),
+                      absent=[A, B], branch='master'),
              },
         ]
 
