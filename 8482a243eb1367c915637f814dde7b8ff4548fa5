@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "df3967d1_60e11cd1",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1462,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-07-28T19:56:18Z",
+      "side": 1,
+      "message": "What second node? Only one is defined.",
+      "parentUuid": "df3967d1_65f48e5c",
+      "revId": "8482a243eb1367c915637f814dde7b8ff4548fa5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df3967d1_0524a2c5",
         "filename": "zuul/rpclistener.py",
         "patchSetId": 5
@@ -30,6 +48,30 @@
       "writtenOn": "2017-07-28T19:37:14Z",
       "side": 1,
       "message": "What representation should it be here? Name, canonocal name or possibly the project object itself?\n\nAs the project name can be ambiguous (even in a tenant) I would at least use the canonical name here.",
+      "range": {
+        "startLine": 107,
+        "startChar": 32,
+        "endLine": 107,
+        "endChar": 44
+      },
+      "revId": "8482a243eb1367c915637f814dde7b8ff4548fa5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_40b178e1",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-07-28T19:56:18Z",
+      "side": 1,
+      "message": "Shouldn\u0027t be the object, but should be one of the str names. Wasn\u0027t sure which to use, but can certainly switch it to canonical if that\u0027s the better choice.",
+      "parentUuid": "df3967d1_0524a2c5",
       "range": {
         "startLine": 107,
         "startChar": 32,
@@ -65,6 +107,30 @@
     },
     {
       "key": {
+        "uuid": "df3967d1_60935c51",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-07-28T19:56:18Z",
+      "side": 1,
+      "message": "It will use keyword args, not positional.",
+      "parentUuid": "df3967d1_200d5437",
+      "range": {
+        "startLine": 122,
+        "startChar": 28,
+        "endLine": 122,
+        "endChar": 36
+      },
+      "revId": "8482a243eb1367c915637f814dde7b8ff4548fa5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df3967d1_20743499",
         "filename": "zuul/scheduler.py",
         "patchSetId": 5
@@ -88,6 +154,30 @@
     },
     {
       "key": {
+        "uuid": "df3967d1_00f9307f",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 366,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-07-28T19:56:18Z",
+      "side": 1,
+      "message": "Maybe? Is that something we want?",
+      "parentUuid": "df3967d1_20743499",
+      "range": {
+        "startLine": 366,
+        "startChar": 12,
+        "endLine": 366,
+        "endChar": 71
+      },
+      "revId": "8482a243eb1367c915637f814dde7b8ff4548fa5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df3967d1_20f794f8",
         "filename": "zuul/zk.py",
         "patchSetId": 5
@@ -99,6 +189,30 @@
       "writtenOn": "2017-07-28T19:37:14Z",
       "side": 1,
       "message": "For me the project argument is confusing. Is this the project object, project name or canonical project name?\n\nThis could be annotated or made clearer with naming.",
+      "range": {
+        "startLine": 254,
+        "startChar": 36,
+        "endLine": 254,
+        "endChar": 43
+      },
+      "revId": "8482a243eb1367c915637f814dde7b8ff4548fa5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_a0ef04af",
+        "filename": "zuul/zk.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-07-28T19:56:18Z",
+      "side": 1,
+      "message": "They should all be str\u0027s for the names, but I can certainly add _name to each one if that\u0027s clearer (or add docstrings, or both).",
+      "parentUuid": "df3967d1_20f794f8",
       "range": {
         "startLine": 254,
         "startChar": 36,
