@@ -1,0 +1,113 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df3967d1_65f48e5c",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1462,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-28T19:37:14Z",
+      "side": 1,
+      "message": "Maybe add another change and check that the second node is not held?",
+      "revId": "8482a243eb1367c915637f814dde7b8ff4548fa5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_0524a2c5",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-28T19:37:14Z",
+      "side": 1,
+      "message": "What representation should it be here? Name, canonocal name or possibly the project object itself?\n\nAs the project name can be ambiguous (even in a tenant) I would at least use the canonical name here.",
+      "range": {
+        "startLine": 107,
+        "startChar": 32,
+        "endLine": 107,
+        "endChar": 44
+      },
+      "revId": "8482a243eb1367c915637f814dde7b8ff4548fa5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_200d5437",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-28T19:37:14Z",
+      "side": 1,
+      "message": "Not sure if it\u0027s a good practice to put a dict into positional args.",
+      "range": {
+        "startLine": 122,
+        "startChar": 28,
+        "endLine": 122,
+        "endChar": 36
+      },
+      "revId": "8482a243eb1367c915637f814dde7b8ff4548fa5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_20743499",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 366,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-28T19:37:14Z",
+      "side": 1,
+      "message": "Maybe one might want to change the count for an already active autohold?",
+      "range": {
+        "startLine": 366,
+        "startChar": 12,
+        "endLine": 366,
+        "endChar": 71
+      },
+      "revId": "8482a243eb1367c915637f814dde7b8ff4548fa5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_20f794f8",
+        "filename": "zuul/zk.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-28T19:37:14Z",
+      "side": 1,
+      "message": "For me the project argument is confusing. Is this the project object, project name or canonical project name?\n\nThis could be annotated or made clearer with naming.",
+      "range": {
+        "startLine": 254,
+        "startChar": 36,
+        "endLine": 254,
+        "endChar": 43
+      },
+      "revId": "8482a243eb1367c915637f814dde7b8ff4548fa5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
