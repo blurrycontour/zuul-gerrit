@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff346bd7_b26f8729",
+        "filename": "zuul/driver/sql/alembic_reporter/versions/60c119eb1e3f_use_build_set_results.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-28T15:27:47Z",
+      "side": 1,
+      "message": "Should we make this 255 to match the build table since it\u0027s kind of free-form?\n\nOr should we start to formalize this more and set a limit for our selves of 16 (or 24 or 32) in both places?",
+      "revId": "1400ce91539d44c07a12ec9649a7bc87d3e04000",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
