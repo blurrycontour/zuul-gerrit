@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df3967d1_91efbcaf",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-28T17:41:47Z",
+      "side": 1,
+      "message": "Maybe use consistent casing now?\n\n  Code-Review",
+      "range": {
+        "startLine": 322,
+        "startChar": 17,
+        "endLine": 322,
+        "endChar": 28
+      },
+      "revId": "9fd98ab08ba465e0666ed4048aead3f408de53ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
