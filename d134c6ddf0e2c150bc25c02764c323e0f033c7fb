@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df3967d1_517dd4e5",
+        "filename": "doc/source/admin/drivers/gerrit.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-28T17:47:13Z",
+      "side": 1,
+      "message": "configuration",
+      "range": {
+        "startLine": 182,
+        "startChar": 35,
+        "endLine": 182,
+        "endChar": 49
+      },
+      "revId": "d134c6ddf0e2c150bc25c02764c323e0f033c7fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_d151c464",
+        "filename": "doc/source/admin/drivers/gerrit.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-28T17:47:13Z",
+      "side": 1,
+      "message": "Maybe use consistent casing? Code-Review",
+      "range": {
+        "startLine": 189,
+        "startChar": 12,
+        "endLine": 189,
+        "endChar": 23
+      },
+      "revId": "d134c6ddf0e2c150bc25c02764c323e0f033c7fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_31d010ca",
+        "filename": "doc/source/admin/drivers/gerrit.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-28T17:47:13Z",
+      "side": 1,
+      "message": "Maybe use Code-Review?",
+      "range": {
+        "startLine": 271,
+        "startChar": 16,
+        "endLine": 271,
+        "endChar": 27
+      },
+      "revId": "d134c6ddf0e2c150bc25c02764c323e0f033c7fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
