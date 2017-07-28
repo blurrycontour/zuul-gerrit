@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df3967d1_45dcea45",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-28T19:14:40Z",
+      "side": 1,
+      "message": "nit: unmatched parentheses",
+      "range": {
+        "startLine": 64,
+        "startChar": 32,
+        "endLine": 64,
+        "endChar": 33
+      },
+      "revId": "dc8a090c4cc5d68c60588c2778b60f6f918b9c1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
