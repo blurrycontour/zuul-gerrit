@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "df3967d1_cbb7c93a",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1462,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-28T20:36:20Z",
+      "side": 1,
+      "message": "You define autohold for one node. So I think it might make sense to add a second change triggering a second job and ensuring that no further node is held.",
+      "parentUuid": "df3967d1_60e11cd1",
+      "revId": "8482a243eb1367c915637f814dde7b8ff4548fa5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df3967d1_0524a2c5",
         "filename": "zuul/rpclistener.py",
         "patchSetId": 5
@@ -72,6 +90,30 @@
       "side": 1,
       "message": "Shouldn\u0027t be the object, but should be one of the str names. Wasn\u0027t sure which to use, but can certainly switch it to canonical if that\u0027s the better choice.",
       "parentUuid": "df3967d1_0524a2c5",
+      "range": {
+        "startLine": 107,
+        "startChar": 32,
+        "endLine": 107,
+        "endChar": 44
+      },
+      "revId": "8482a243eb1367c915637f814dde7b8ff4548fa5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_8ba0a1a7",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-28T20:36:20Z",
+      "side": 1,
+      "message": "Yeah, I think the canonical is the more robust here.",
+      "parentUuid": "df3967d1_40b178e1",
       "range": {
         "startLine": 107,
         "startChar": 32,
@@ -178,6 +220,30 @@
     },
     {
       "key": {
+        "uuid": "df3967d1_4b5999fc",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 366,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-28T20:36:20Z",
+      "side": 1,
+      "message": "Don\u0027t know if we want that. But I can imagine the following scenario:\n\n  Dev: Can you hold me a node for job foo?\n  Ops: sure... types \u0027zuul hold openstack foo test-foo 100\u0027\n  Ops: Shit I didn\u0027t want to hold 100 nodes...\n  Ops: types \u0027zuul hold openstack foo test-foo 1\u0027\n  Zuul: Wuahaha, autohold is already active\n  Ops: :( Now I have to delete 100 held nodes by hand",
+      "parentUuid": "df3967d1_00f9307f",
+      "range": {
+        "startLine": 366,
+        "startChar": 12,
+        "endLine": 366,
+        "endChar": 71
+      },
+      "revId": "8482a243eb1367c915637f814dde7b8ff4548fa5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df3967d1_20f794f8",
         "filename": "zuul/zk.py",
         "patchSetId": 5
@@ -213,6 +279,30 @@
       "side": 1,
       "message": "They should all be str\u0027s for the names, but I can certainly add _name to each one if that\u0027s clearer (or add docstrings, or both).",
       "parentUuid": "df3967d1_20f794f8",
+      "range": {
+        "startLine": 254,
+        "startChar": 36,
+        "endLine": 254,
+        "endChar": 43
+      },
+      "revId": "8482a243eb1367c915637f814dde7b8ff4548fa5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_6bd69d52",
+        "filename": "zuul/zk.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-28T20:36:20Z",
+      "side": 1,
+      "message": "That would be cool. We currently have an inconsistent usage of project/project_name, tenant/tenant_name, etc at several locations where I think we need to cleanup a bit in the long run.",
+      "parentUuid": "df3967d1_a0ef04af",
       "range": {
         "startLine": 254,
         "startChar": 36,
