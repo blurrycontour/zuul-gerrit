@@ -22,6 +22,30 @@
       "revId": "cf1b74275daa81f2b25020d91d81ee535d633d09",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff346bd7_29058111",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-07-28T01:06:24Z",
+      "side": 1,
+      "message": "Reading more the webob request headers may not be str, looks like that is based on encoding headers sent in the request? but in that case you\u0027d get b\u0027foo\u0027 and str(b\u0027foo\u0027) \u003d\u003d \"b\u0027foo\u0027\" so the comparison may not work out exactly there either.\n\nThis might need more investigating into webob behavior.",
+      "parentUuid": "ff346bd7_eea09f44",
+      "range": {
+        "startLine": 286,
+        "startChar": 12,
+        "endLine": 286,
+        "endChar": 15
+      },
+      "revId": "cf1b74275daa81f2b25020d91d81ee535d633d09",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
