@@ -1,0 +1,10 @@
+Verified+1: Zuul
+Code-Review+2: Clint 'SpamapS' Byrum <clint@fewbar.com>
+Code-Review+2: Tobias Henkel <tobias.henkel@bmw.de>
+Workflow+1: Tobias Henkel <tobias.henkel@bmw.de>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Fri, 28 Jul 2017 03:58:32 +0000
+Reviewed-on: https://review.openstack.org/488161
+Project: openstack-infra/zuul
+Branch: refs/heads/feature/zuulv3
