@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff346bd7_833c332f",
+        "filename": "doc/source/admin/drivers/gerrit.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-28T17:02:44Z",
+      "side": 1,
+      "message": "configuration",
+      "range": {
+        "startLine": 182,
+        "startChar": 35,
+        "endLine": 182,
+        "endChar": 49
+      },
+      "revId": "b1ca2adc3bb0b3f72d386159e357f9916ecff9e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
