@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff346bd7_2b132e68",
+        "filename": "zuul/driver/sql/alembic_reporter/versions/60c119eb1e3f_use_build_set_results.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-28T08:59:06Z",
+      "side": 1,
+      "message": "A string of length 8 won\u0027t be able to hold \u0027NODE_FAILURE\u0027.",
+      "range": {
+        "startLine": 23,
+        "startChar": 54,
+        "endLine": 23,
+        "endChar": 66
+      },
+      "revId": "b03326875cd57ef277dc14ab6bb35366379fb480",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
