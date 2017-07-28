@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff346bd7_eea09f44",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-07-28T00:57:13Z",
+      "side": 1,
+      "message": "The old code had the str conversions too but I don\u0027t think they are necessary because the variables are already of type str (tested locally with python3). This shouldn\u0027t affect constant time comparison though because converting str to str should be constant time and not vary in the length of the strings.\n\nThat said it would be kind of nice to remove the redundant function calls.",
+      "range": {
+        "startLine": 286,
+        "startChar": 12,
+        "endLine": 286,
+        "endChar": 15
+      },
+      "revId": "cf1b74275daa81f2b25020d91d81ee535d633d09",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
