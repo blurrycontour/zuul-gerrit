@@ -317,7 +317,7 @@ class Merger(object):
                                (hostname, project_name))
         return repo
 
-    def getRepo(self, connection_name, project_name):
+    def getRepo(self, connection_name, project_name) -> Repo:
         source = self.connections.getSource(connection_name)
         project = source.getProject(project_name)
         hostname = project.canonical_hostname
