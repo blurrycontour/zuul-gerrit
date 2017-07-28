@@ -70,6 +70,7 @@ class TestMultipleTenants(AnsibleZuulTestCase):
 class TestInRepoConfig(ZuulTestCase):
     # A temporary class to hold new tests while others are disabled
 
+    config_file = 'zuul-connections-gerrit-and-github.conf'
     tenant_config_file = 'config/in-repo/main.yaml'
 
     def test_in_repo_config(self):
