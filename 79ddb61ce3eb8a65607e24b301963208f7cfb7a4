@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df3967d1_0ba2719b",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-28T20:40:13Z",
+      "side": 1,
+      "message": "0: We might want to allow count to be 0 to indicate \"remove the existing autohold request\".",
+      "revId": "79ddb61ce3eb8a65607e24b301963208f7cfb7a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_eb9e0d53",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 366,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-28T20:40:13Z",
+      "side": 1,
+      "message": "0: We might want to allow updating the request, both in terms of removing it with a zero count, or simply changing the number.  If we do, this makes your paranoia below rather forward thinking.  :)",
+      "revId": "79ddb61ce3eb8a65607e24b301963208f7cfb7a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_cbab4973",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 843,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-28T20:40:13Z",
+      "side": 1,
+      "message": "nit: Sometimes for things like this where the intermediate data structures don\u0027t matter, I just let python hash a tuple.  Like:\n\nkey \u003d (tenant, project, job)\nself.autohold_requests[key] \u003d foo",
+      "revId": "79ddb61ce3eb8a65607e24b301963208f7cfb7a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_aba80577",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 860,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-28T20:40:13Z",
+      "side": 1,
+      "message": "-1ish: We should probably put all the new code in its own try/except handler so if there\u0027s an error with holding the node, we log it, but then continue to attempt to return the nodeset.\n\nThat might be a bit easier to accomplish if you move most of the code into one or two methods on zuul.Nodepool (eg, holdNodSet() could do the work and return the count, or make holdNodeSet() and countHeldNodes()).",
+      "revId": "79ddb61ce3eb8a65607e24b301963208f7cfb7a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_8bb781d9",
+        "filename": "zuul/zk.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-28T20:40:13Z",
+      "side": 1,
+      "message": "nit: shorter as: node_data.get(\u0027hold_job\u0027) \u003d\u003d identifier\n(since we know identifier is not None)",
+      "revId": "79ddb61ce3eb8a65607e24b301963208f7cfb7a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
