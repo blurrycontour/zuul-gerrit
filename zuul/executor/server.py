@@ -26,6 +26,7 @@ import tempfile
 import threading
 import time
 import traceback
+from typing import List, Dict
 from zuul.lib.yamlutil import yaml
 from zuul.lib.config import get_default
 
@@ -930,7 +931,8 @@ class AnsibleJob(object):
             self.log.exception("Unable to load result data:")
         return data
 
-    def doMergeChanges(self, merger, items, repo_state):
+    def doMergeChanges(self, merger: zuul.merger.merger.Merger,
+                       items: List[Dict], repo_state):
         ret = merger.mergeChanges(items, repo_state=repo_state)
         if not ret:  # merge conflict
             result = dict(result='MERGER_FAILURE')
@@ -943,7 +945,8 @@ class AnsibleJob(object):
             repo.setRef('refs/heads/' + branch, commit)
         return True
 
-    def checkoutBranch(self, repo, project_name, ref, zuul_branch,
+    def checkoutBranch(self, repo: zuul.merger.merger.Repo,
+                       project_name, ref, zuul_branch,
                        job_branch, project_override_branch,
                        project_default_branch):
         branches = repo.getBranches()
@@ -1279,7 +1282,7 @@ class AnsibleJob(object):
                     yaml.safe_dump(secrets, default_flow_style=False))
             self.jobdir.has_secrets = True
 
-    def writeAnsibleConfig(self, jobdir_playbook):
+    def writeAnsibleConfig(self, jobdir_playbook: JobDirPlaybook):
         trusted = jobdir_playbook.trusted
 
         with open(jobdir_playbook.ansible_config, 'w') as config:
