@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "df3967d1_9ae8ec16",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 557,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-28T21:14:08Z",
+      "side": 1,
+      "message": "This yes, mypy requires this.",
+      "parentUuid": "df3967d1_4b82b9ca",
+      "revId": "24dd37e13ac7fc1c64531eaa629ab3fce6229051",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df3967d1_2b8775da",
         "filename": "zuul/driver/gerrit/gerritconnection.py",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2017-07-28T20:44:53Z",
       "side": 1,
       "message": "and this?",
+      "revId": "24dd37e13ac7fc1c64531eaa629ab3fce6229051",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_7ad66852",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 609,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-07-28T21:14:08Z",
+      "side": 1,
+      "message": "This is not needed, but covers additionally this (which is not found otherwise):\n\n  changes.append(5)",
+      "parentUuid": "df3967d1_2b8775da",
       "revId": "24dd37e13ac7fc1c64531eaa629ab3fce6229051",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
