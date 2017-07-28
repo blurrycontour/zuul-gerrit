@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df3967d1_4b82b9ca",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 557,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-28T20:44:53Z",
+      "side": 1,
+      "message": "Is it necessary to annotate this?",
+      "revId": "24dd37e13ac7fc1c64531eaa629ab3fce6229051",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_2b8775da",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 609,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-28T20:44:53Z",
+      "side": 1,
+      "message": "and this?",
+      "revId": "24dd37e13ac7fc1c64531eaa629ab3fce6229051",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
