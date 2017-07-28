@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df3967d1_7a0ae88a",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 382,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-28T21:32:02Z",
+      "side": 1,
+      "message": "Er, sorry, but as long as we\u0027re repainting the bikeshed -- these should probably be plural.",
+      "revId": "969c06c3f9300ba1e3df7ed5157f2d76434d820c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
