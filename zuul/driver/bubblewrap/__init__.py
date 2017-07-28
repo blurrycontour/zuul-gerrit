@@ -173,9 +173,9 @@ class BubblewrapDriver(Driver, WrapperInterface):
 
         if os.path.isdir('/lib64'):
             bwrap_command.extend(['--ro-bind', '/lib64', '/lib64'])
-        if os.path.isfile('/etc/nsswitch.conf'):
-            bwrap_command.extend(['--ro-bind', '/etc/nsswitch.conf',
-                                  '/etc/nsswitch.conf'])
+        for maybe_file in ('/etc/nsswitch.conf', '/etc/zuul/executor.keytab'):
+            if os.path.isfile(maybe_file):
+                bwrap_command.extend(['--ro-bind', maybe_file, maybe_file])
 
         return bwrap_command
 
