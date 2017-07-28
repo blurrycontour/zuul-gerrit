@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff346bd7_c3859b08",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-07-28T16:56:21Z",
+      "side": 1,
+      "message": "As noted on IRC this seems to result in a link suffix of #index-0 rather than #pipeline. We should go back to #pipeline.",
+      "range": {
+        "startLine": 78,
+        "startChar": 0,
+        "endLine": 79,
+        "endChar": 19
+      },
+      "revId": "5dfd887b7c89df6568c4f3412315149b3f551378",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
