@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df3967d1_c83b3c9a",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 479,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-07-30T15:46:15Z",
+      "side": 1,
+      "message": "s/a ny other/any other/",
+      "revId": "32c5248256045f1ec5c2afae2dd4b410471165c9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
