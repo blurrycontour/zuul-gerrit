@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df3967d1_d3f2c806",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2017-07-31T09:07:34Z",
+      "side": 1,
+      "message": "Why not using a .join here? you can refer to the columns in the same way as you do here.",
+      "revId": "76cfd4620bb5e2c639b2906f9d9e796555b1ff4d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_f33b8c99",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2017-07-31T09:07:34Z",
+      "side": 1,
+      "message": "implementing ordering as well would be nice",
+      "revId": "76cfd4620bb5e2c639b2906f9d9e796555b1ff4d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
