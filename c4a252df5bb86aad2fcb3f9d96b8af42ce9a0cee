@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df3967d1_1bfa9a41",
+        "filename": "etc/status/bootstrap.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-07-31T16:15:06Z",
+      "side": 1,
+      "message": "Can we add this GPG key into tools folder? So we don\u0027t need to download it every time in the gate",
+      "revId": "c4a252df5bb86aad2fcb3f9d96b8af42ce9a0cee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_db99b21f",
+        "filename": "etc/status/bootstrap.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-07-31T16:15:06Z",
+      "side": 1,
+      "message": "same comment",
+      "revId": "c4a252df5bb86aad2fcb3f9d96b8af42ce9a0cee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
