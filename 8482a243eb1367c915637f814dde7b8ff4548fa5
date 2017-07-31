@@ -126,6 +126,30 @@
     },
     {
       "key": {
+        "uuid": "df3967d1_ea670225",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-07-31T14:42:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df3967d1_8ba0a1a7",
+      "range": {
+        "startLine": 107,
+        "startChar": 32,
+        "endLine": 107,
+        "endChar": 44
+      },
+      "revId": "8482a243eb1367c915637f814dde7b8ff4548fa5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df3967d1_200d5437",
         "filename": "zuul/rpclistener.py",
         "patchSetId": 5
