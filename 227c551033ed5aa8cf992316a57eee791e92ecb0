@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df3967d1_7a9e3664",
+        "filename": "tests/unit/test_disk_accountant.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-07-31T22:16:41Z",
+      "side": 1,
+      "message": "Perhaps we should wrap the whole test except the last line in this try/finally.",
+      "revId": "227c551033ed5aa8cf992316a57eee791e92ecb0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_5a9b7271",
+        "filename": "tests/unit/test_disk_accountant.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-07-31T22:16:41Z",
+      "side": 1,
+      "message": "This one would probably be done better as\n\n    self.addCleanup(da.stop)",
+      "revId": "227c551033ed5aa8cf992316a57eee791e92ecb0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
