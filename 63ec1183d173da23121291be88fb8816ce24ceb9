@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df3967d1_841ce16a",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 638,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-31T20:40:02Z",
+      "side": 1,
+      "message": "Oh sorry -- you don\u0027t need the outer conditional here, you can just use the two lines below.",
+      "revId": "63ec1183d173da23121291be88fb8816ce24ceb9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
