@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "df3967d1_814cd8c7",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1441,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-07-31T18:03:48Z",
+      "side": 1,
+      "message": "Do you think we can update this to use rpcclient.autohold? This would give more coverage like we did for client_enqueue tests.",
+      "revId": "4fae0413c6bd48621f27251629fd921e7d8f8bcb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df3967d1_e1d044fa",
         "filename": "tests/unit/test_scheduler.py",
         "patchSetId": 9
@@ -13,6 +30,23 @@
       "writtenOn": "2017-07-31T18:00:41Z",
       "side": 1,
       "message": "I think the test should continue with a check if count is respected by autohold. This could be done by adding another fake change and counting the held nodes afterwards.",
+      "revId": "4fae0413c6bd48621f27251629fd921e7d8f8bcb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_41ccb034",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-07-31T18:03:48Z",
+      "side": 1,
+      "message": "-1 Please add documentation to zuul client section.",
       "revId": "4fae0413c6bd48621f27251629fd921e7d8f8bcb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
