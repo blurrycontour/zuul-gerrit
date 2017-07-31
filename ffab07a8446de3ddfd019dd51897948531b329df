@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df3967d1_d094e846",
+        "filename": "zuul/rpcclient.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-31T20:18:35Z",
+      "side": 1,
+      "message": "This feels a little nitpicky, sorry.  But I think it would be better to put this json structure back the way you had it in PS6 (with no \"_name\" suffixes), which matched the other functions here.  There\u0027s no difference between the \"project_name\" here and the \"project\" in the method below.\n\nFixed in   https://review.openstack.org/489375",
+      "revId": "ffab07a8446de3ddfd019dd51897948531b329df",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
