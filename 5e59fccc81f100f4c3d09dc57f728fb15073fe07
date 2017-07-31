@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df3967d1_9bfd693c",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 635,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-07-31T16:47:57Z",
+      "side": 1,
+      "message": "Instead of this, I suggest:\n\n            with configuration_exceptions(\u0027project or project-template\u0027, attrs):\n                layout.getJob(attrs[\u0027name\u0027])\n\nSo we get nice error messages, and we use the getJob() method for its side effect of raising an exception.",
+      "revId": "5e59fccc81f100f4c3d09dc57f728fb15073fe07",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
