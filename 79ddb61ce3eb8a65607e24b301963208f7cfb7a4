@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "df3967d1_0f193878",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-07-31T14:42:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df3967d1_0ba2719b",
+      "revId": "79ddb61ce3eb8a65607e24b301963208f7cfb7a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df3967d1_eb9e0d53",
         "filename": "zuul/scheduler.py",
         "patchSetId": 6
@@ -30,6 +48,24 @@
       "writtenOn": "2017-07-28T20:40:13Z",
       "side": 1,
       "message": "0: We might want to allow updating the request, both in terms of removing it with a zero count, or simply changing the number.  If we do, this makes your paranoia below rather forward thinking.  :)",
+      "revId": "79ddb61ce3eb8a65607e24b301963208f7cfb7a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_4f3d00ba",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 366,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-07-31T14:42:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df3967d1_eb9e0d53",
       "revId": "79ddb61ce3eb8a65607e24b301963208f7cfb7a4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "df3967d1_cfed7026",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 843,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-07-31T14:42:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df3967d1_cbab4973",
+      "revId": "79ddb61ce3eb8a65607e24b301963208f7cfb7a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df3967d1_aba80577",
         "filename": "zuul/scheduler.py",
         "patchSetId": 6
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "df3967d1_ca7d5e6f",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 860,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-07-31T14:42:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df3967d1_aba80577",
+      "revId": "79ddb61ce3eb8a65607e24b301963208f7cfb7a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df3967d1_8bb781d9",
         "filename": "zuul/zk.py",
         "patchSetId": 6
@@ -81,6 +153,24 @@
       "writtenOn": "2017-07-28T20:40:13Z",
       "side": 1,
       "message": "nit: shorter as: node_data.get(\u0027hold_job\u0027) \u003d\u003d identifier\n(since we know identifier is not None)",
+      "revId": "79ddb61ce3eb8a65607e24b301963208f7cfb7a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_caf2fe06",
+        "filename": "zuul/zk.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-07-31T14:42:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df3967d1_8bb781d9",
       "revId": "79ddb61ce3eb8a65607e24b301963208f7cfb7a4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
