@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "df3967d1_7d6d0703",
+        "filename": "doc/source/admin/tenants.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-08-01T07:54:39Z",
+      "side": 1,
+      "message": "We could define -1 as the \u0027no limit\u0027 value and it may be the default. Though I think 5 nodes limit is a sane setting too.",
+      "parentUuid": "df3967d1_4fa849da",
+      "range": {
+        "startLine": 53,
+        "startChar": 49,
+        "endLine": 53,
+        "endChar": 61
+      },
+      "revId": "8d4e4ff21b87aa72a1058265a3ae7d5025f97c83",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df3967d1_2f9865be",
         "filename": "zuul/configloader.py",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2017-08-01T06:08:08Z",
       "side": 1,
       "message": "exceeds",
+      "range": {
+        "startLine": 73,
+        "startChar": 24,
+        "endLine": 73,
+        "endChar": 30
+      },
+      "revId": "8d4e4ff21b87aa72a1058265a3ae7d5025f97c83",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_fd07b71b",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-08-01T07:54:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df3967d1_2f9865be",
       "range": {
         "startLine": 73,
         "startChar": 24,
