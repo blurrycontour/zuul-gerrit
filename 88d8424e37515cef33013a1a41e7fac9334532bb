@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df3967d1_eff37d9d",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-08-01T06:22:44Z",
+      "side": 1,
+      "message": "This could be ripped out.",
+      "range": {
+        "startLine": 222,
+        "startChar": 6,
+        "endLine": 222,
+        "endChar": 33
+      },
+      "revId": "88d8424e37515cef33013a1a41e7fac9334532bb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
