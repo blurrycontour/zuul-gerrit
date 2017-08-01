@@ -28,6 +28,7 @@ configuration.  An example tenant definition is::
 
   - tenant:
       name: my-tenant
+      max-nodes-per-job: 5
       source:
         gerrit:
           config-projects:
@@ -47,6 +48,9 @@ The following attributes are supported:
   monitoring fields, and so should be restricted to URL friendly
   characters (ASCII letters, numbers, hyphen and underscore) and you
   should avoid changing it unless necessary.
+
+**max-nodes-per-job** (optional)
+  The maxinum number of nodes a job can request, default to 5.
 
 **source** (required)
   A dictionary of sources to consult for projects.  A tenant may
