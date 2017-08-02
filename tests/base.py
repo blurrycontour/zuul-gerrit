@@ -551,6 +551,18 @@ class GithubChangeReference(git.Reference):
     _points_to_commits_only = True
 
 
+class FakeGithub(object):
+
+    class FakeUser(object):
+        def __init__(self, login):
+            self.login = login
+            self.name = "Github User"
+            self.email = "github.user@example.com"
+
+    def user(self, login):
+        return self.FakeUser(login)
+
+
 class FakeGithubPullRequest(object):
 
     def __init__(self, github, number, project, branch,
@@ -966,12 +978,7 @@ class FakeGithubConnection(githubconnection.GithubConnection):
         return pr.reviews
 
     def getUser(self, login):
-        data = {
-            'username': login,
-            'name': 'Github User',
-            'email': 'github.user@example.com'
-        }
-        return data
+        return githubconnection.GithubUser(FakeGithub(), login)
 
     def getRepoPermission(self, project, login):
         owner, proj = project.split('/')
