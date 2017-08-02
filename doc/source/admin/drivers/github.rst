@@ -81,6 +81,16 @@ The supported options in zuul.conf connections are:
   to ``true``.
   ``verify_ssl=true``
 
+**skip_unprotected_branches*
+  Optional: When using a branch and pull model on a shared repository there are
+  usually one or more protected branches which are gated and a dynamic number of
+  personal/feature branches which are the source for the pull requests. These
+  branches can potentially include broken zuul config and therefore break the
+  global tenant wide configuration. In order to deal with this zuul's operations
+  can be limited to the protected branches which are gated. If not specified,
+  defaults to ``false``.
+  ``skip_unprotected_branches=false``
+
 Trigger Configuration
 ---------------------
 GitHub webhook events can be configured as triggers.
