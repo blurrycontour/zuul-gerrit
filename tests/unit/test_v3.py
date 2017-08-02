@@ -701,6 +701,7 @@ class TestAnsible(AnsibleZuulTestCase):
             ('csvfile_bad', 'FAILURE'),
             ('uri_bad_path', 'FAILURE'),
             ('uri_bad_scheme', 'FAILURE'),
+            ('block_local_override', 'FAILURE'),
         ]
         for job, result in plugin_tests:
             count += 1
