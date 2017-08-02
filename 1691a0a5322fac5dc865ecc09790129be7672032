@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df3967d1_e287e260",
+        "filename": "doc/source/admin/drivers/github.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-08-02T12:55:22Z",
+      "side": 1,
+      "message": "Missing trailing *",
+      "revId": "1691a0a5322fac5dc865ecc09790129be7672032",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
