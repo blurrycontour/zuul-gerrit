@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df3967d1_9b2633ce",
+        "filename": "zuul/driver/bubblewrap/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-08-02T21:05:34Z",
+      "side": 1,
+      "message": "https://docs.openstack.org/infra/zuul/feature/zuulv3/admin/components.html#id7",
+      "revId": "bf8eee50274576fb5ee3e19f643fdfa8741932da",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
