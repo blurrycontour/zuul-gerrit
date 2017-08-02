@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
+from ansible.module_utils.six.moves.urllib.parse import urlparse
+
 from zuul.ansible import paths
 normal = paths._import_ansible_action_plugin('normal')
 
@@ -35,6 +37,17 @@ class ActionModule(normal.ActionModule):
                         'dest', self._task.args.get(
                             'name')))
                 paths._fail_if_unsafe(dest)
+            elif self._task.action == 'uri':
+                # Whitelist uri - we want to be able to have jobs do things
+                # like ping RTFD
+                for arg in ('dest', 'path', 'name'):
+                    value = self._task.args.get(arg)
+                    if value:
+                        paths._fail_if_unsafe(value)
+                if urlparse(self._task.args['url']).scheme == 'file':
+                    return dict(
+                        failed=True,
+                        msg="file:// uris are not allowed")
             else:
                 return dict(
                     failed=True,
