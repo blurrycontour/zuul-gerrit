@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df3967d1_8d8714b6",
+        "filename": "tests/fixtures/config/ansible/git/org_lookup-project/playbooks/consul_kv.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-08-02T22:48:51Z",
+      "side": 1,
+      "message": "Style wise it\u0027s pretty common to see {{ item }}, where there is a space around the innerds of something in mustache brackets, like you have in other places in this change. It looks odd to not have the spaces when referencing item here.",
+      "revId": "88859440279f56e4e8e55495fc56d1d92f97c393",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_ad8ad8bb",
+        "filename": "tests/fixtures/config/ansible/git/org_lookup-project/playbooks/csvfile_good.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-08-02T22:48:51Z",
+      "side": 1,
+      "message": "Is this left here in purpose?",
+      "revId": "88859440279f56e4e8e55495fc56d1d92f97c393",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
