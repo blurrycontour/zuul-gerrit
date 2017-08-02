@@ -155,6 +155,11 @@ class BubblewrapDriver(Driver, WrapperInterface):
             '--ro-bind', '/lib', '/lib',
             '--ro-bind', '/bin', '/bin',
             '--ro-bind', '/sbin', '/sbin',
+            # TODO(pabelanger): /etc/lsb-release doesn't exist under fedora. We
+            # should improve this and expose these values into a configuration
+            # file like we did with ro_bind / rw_bind for operators to better
+            # control this.
+            '--ro-bind', '/etc/lsb-release', '/etc/lsb-release',
             '--ro-bind', '/etc/resolv.conf', '/etc/resolv.conf',
             '--ro-bind', '/etc/hosts', '/etc/hosts',
             '--ro-bind', '{ssh_auth_sock}', '{ssh_auth_sock}',
