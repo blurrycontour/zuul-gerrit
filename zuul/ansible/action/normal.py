@@ -29,6 +29,12 @@ class ActionModule(normal.ActionModule):
                 or self._task.delegate_to == 'localhost'
                 or (self._task.delegate_to
                     and self._task.delegate_to.startswtih('127.'))):
+
+            # We allow some level of use of these locally
+            if self._task.action in ('stat', 'file', 'uri'):
+                if not paths._is_official_module(self):
+                    return paths._fail_module_dict(self._task.action)
+
             if self._task.action == 'stat':
                 paths._fail_if_unsafe(self._task.args['path'])
             elif self._task.action == 'file':
