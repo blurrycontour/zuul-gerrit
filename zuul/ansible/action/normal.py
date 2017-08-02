@@ -35,6 +35,10 @@ class ActionModule(normal.ActionModule):
                         'dest', self._task.args.get(
                             'name')))
                 paths._fail_if_unsafe(dest)
+            elif self._task.action == 'uri':
+                # Whitelist uri - we want to be able to have jobs do things
+                # like ping RTFD
+                pass
             else:
                 return dict(
                     failed=True,
