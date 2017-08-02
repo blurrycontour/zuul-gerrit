@@ -21,6 +21,8 @@ fetch = paths._import_ansible_action_plugin("fetch")
 class ActionModule(fetch.ActionModule):
 
     def run(self, tmp=None, task_vars=None):
+        if not paths._is_official_module(self._task):
+            return paths._fail_module_dict(self._task.action)
 
         dest = self._task.args.get('dest', None)
 
