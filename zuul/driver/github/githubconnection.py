@@ -369,6 +369,13 @@ class GithubConnection(BaseConnection):
         if verify_ssl.lower() == 'false':
             self.verify_ssl = False
 
+        # limit getProjectBranches to protected branches if true
+        skip_unprotected = self.connection_config.get(
+            'skip_unprotected_branches', 'false')
+        self.skip_unprotected = False
+        if skip_unprotected.lower() == 'true':
+            self.skip_unprotected = True
+
         self._github = None
         self.app_id = None
         self.app_key = None
@@ -701,7 +708,8 @@ class GithubConnection(BaseConnection):
         github = self.getGithubClient()
         owner, proj = project.name.split('/')
         repository = github.repository(owner, proj)
-        branches = [branch.name for branch in repository.branches()]
+        branches = [branch.name for branch in repository.branches(
+            protected=self.skip_unprotected)]
         log_rate_limit(self.log, github)
         return branches
 
