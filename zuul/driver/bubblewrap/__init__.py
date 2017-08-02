@@ -170,11 +170,14 @@ class BubblewrapDriver(Driver, WrapperInterface):
             '--file', '{gid_fd}', '/etc/group',
         ]
 
-        if os.path.isdir('/lib64'):
-            bwrap_command.extend(['--ro-bind', '/lib64', '/lib64'])
-        if os.path.isfile('/etc/nsswitch.conf'):
-            bwrap_command.extend(['--ro-bind', '/etc/nsswitch.conf',
-                                  '/etc/nsswitch.conf'])
+        for path in ['/lib64',
+                     '/etc/nsswitch.conf',
+                     '/etc/lsb-release',
+                     '/etc/lsb-release.d',
+                     '/etc/distro-release',
+                     ]:
+            if os.path.exists(path):
+                bwrap_command.extend(['--ro-bind', path, path])
 
         return bwrap_command
 
