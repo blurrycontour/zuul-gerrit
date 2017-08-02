@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df3967d1_000c0beb",
+        "filename": "zuul/ansible/action/normal.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-08-02T23:15:34Z",
+      "side": 1,
+      "message": "Welp, the URI module purports to take all the same arguments as the file module, so we may have to check for the \u0027path\u0027 and \u0027name\u0027 arguments too.",
+      "revId": "f03853ceb06953fb9d1e6cb35e93c1a1159e4470",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
