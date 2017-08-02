@@ -69,6 +69,23 @@
       "revId": "24dd37e13ac7fc1c64531eaa629ab3fce6229051",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_2e660753",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 803,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-08-02T01:27:30Z",
+      "side": 1,
+      "message": "This seems to be changing the signature of the function itself. But looking at the callers, that seems the correct thing to do here.",
+      "revId": "24dd37e13ac7fc1c64531eaa629ab3fce6229051",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
