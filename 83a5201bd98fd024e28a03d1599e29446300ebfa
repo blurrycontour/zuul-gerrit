@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df3967d1_2ba90b23",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-08-03T22:58:05Z",
+      "side": 1,
+      "message": "Shouldn\u0027t the default value be documented? /var/run/zuul-merger/zuul-merger.pid",
+      "revId": "83a5201bd98fd024e28a03d1599e29446300ebfa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_0ba64754",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-08-03T22:58:05Z",
+      "side": 1,
+      "message": "THis seems to be missing state_dir, unless that\u0027s covered somewhere else.",
+      "revId": "83a5201bd98fd024e28a03d1599e29446300ebfa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_eb642324",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-08-03T22:58:05Z",
+      "side": 1,
+      "message": "Missing pidfile",
+      "revId": "83a5201bd98fd024e28a03d1599e29446300ebfa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
