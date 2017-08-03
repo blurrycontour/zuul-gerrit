@@ -1,0 +1,10 @@
+Verified+1: Zuul
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Code-Review+2: Jesse Keating <omgjlk@us.ibm.com>
+Workflow+1: Jesse Keating <omgjlk@us.ibm.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Thu, 03 Aug 2017 22:50:10 +0000
+Reviewed-on: https://review.openstack.org/490654
+Project: openstack-infra/zuul
+Branch: refs/heads/feature/zuulv3
