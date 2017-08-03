@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df3967d1_63c3e139",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 529,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-08-03T00:21:44Z",
+      "side": 1,
+      "message": "What is this used for? It doesn\u0027t seem to ever pick up a value, it\u0027s just passed along to _safeRepoState().",
+      "revId": "289f5930facc76a9d5f3328a3c0a11be59eca596",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
