@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df3967d1_8c54a422",
+        "filename": "zuul/ansible/action/normal.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-08-03T12:11:19Z",
+      "side": 1,
+      "message": "What are the known url schemes? We might consider to change this blacklist into a whitelist in order to be better safe than sorry for these security topics.",
+      "range": {
+        "startLine": 47,
+        "startChar": 0,
+        "endLine": 47,
+        "endChar": 69
+      },
+      "revId": "ec907a385284c1d56b5f8badb2783b004ba5e72d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
