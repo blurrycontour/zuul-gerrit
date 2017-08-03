@@ -16,6 +16,23 @@
       "revId": "289f5930facc76a9d5f3328a3c0a11be59eca596",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_9234b694",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 529,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-08-03T16:35:47Z",
+      "side": 1,
+      "message": "In the call path from mergeChanges, where we\u0027re stacking up proposed changes, recent is used to record the most recent commit on each project-branch in the stack, and _saveRepoState updates it.  But we don\u0027t care about it in this path, so it\u0027s ignored.",
+      "revId": "289f5930facc76a9d5f3328a3c0a11be59eca596",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
