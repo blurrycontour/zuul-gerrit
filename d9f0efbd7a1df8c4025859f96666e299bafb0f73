@@ -16,6 +16,24 @@
       "revId": "d9f0efbd7a1df8c4025859f96666e299bafb0f73",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_313f5588",
+        "filename": "doc/source/user/jobs.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-08-03T11:13:37Z",
+      "side": 1,
+      "message": "To me this looks consistent as is (compare to zuul.items). The sentence below is related to this var.",
+      "parentUuid": "df3967d1_3e3970a3",
+      "revId": "d9f0efbd7a1df8c4025859f96666e299bafb0f73",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
