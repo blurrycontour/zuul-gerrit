@@ -22,6 +22,23 @@
       "revId": "a68d23b9d24603ee8688b206aa1a21bebf3892e7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_7af6c465",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2017-08-03T20:01:52Z",
+      "side": 1,
+      "message": "I was thinking something similar... there\u0027s no need to preserve backward compatibility yet so we can just say that encrypted/pkcs1-oaep is always derived from a list base type, and then if we get something like encrypted/pkcs7 (S/MIME) or encrypted/rfc4880 (OpenPGP) to support arbitrary-length payloads in the future, we can still decide that\u0027s derived from a string base type instead.",
+      "revId": "a68d23b9d24603ee8688b206aa1a21bebf3892e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
