@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df3967d1_4e3d7d29",
+        "filename": "doc/source/admin/drivers/gerrit.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-08-03T23:44:37Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this be ``my-gerrit`` ? Maybe I misunderstood when to use bold vs `1",
+      "revId": "f7c72823402279d7b2ea73c76621529c704dcd24",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
