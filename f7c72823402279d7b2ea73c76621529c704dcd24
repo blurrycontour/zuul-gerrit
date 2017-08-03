@@ -16,6 +16,23 @@
       "revId": "f7c72823402279d7b2ea73c76621529c704dcd24",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_6e57215a",
+        "filename": "doc/source/admin/drivers/gerrit.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-08-03T23:47:02Z",
+      "side": 1,
+      "message": "Good call.  I\u0027m rebasing anyway so I updated.",
+      "revId": "f7c72823402279d7b2ea73c76621529c704dcd24",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
