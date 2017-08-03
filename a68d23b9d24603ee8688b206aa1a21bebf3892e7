@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df3967d1_1a7fb815",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-08-03T19:46:35Z",
+      "side": 1,
+      "message": "I would vote for making self.ciphertext a list in any case. That way we would not need an additional if/else below in decrypt (and avoid duplication of the decrypt call which cries for divergences in future enhancements).",
+      "range": {
+        "startLine": 226,
+        "startChar": 0,
+        "endLine": 230,
+        "endChar": 58
+      },
+      "revId": "a68d23b9d24603ee8688b206aa1a21bebf3892e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
