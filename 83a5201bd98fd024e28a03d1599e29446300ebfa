@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "df3967d1_ee15519d",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-08-03T23:44:40Z",
+      "side": 1,
+      "message": "Done.",
+      "revId": "83a5201bd98fd024e28a03d1599e29446300ebfa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df3967d1_0ba64754",
         "filename": "doc/source/admin/components.rst",
         "patchSetId": 1
@@ -30,6 +47,23 @@
       "writtenOn": "2017-08-03T22:58:05Z",
       "side": 1,
       "message": "THis seems to be missing state_dir, unless that\u0027s covered somewhere else.",
+      "revId": "83a5201bd98fd024e28a03d1599e29446300ebfa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_ce1a8dca",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-08-03T23:44:40Z",
+      "side": 1,
+      "message": "It looks like the merger command requires a state_dir but does not use it.  I will leave the doc as-is and remove the requirement in a followup change.",
       "revId": "83a5201bd98fd024e28a03d1599e29446300ebfa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
