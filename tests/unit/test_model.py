@@ -342,6 +342,25 @@ class TestJob(BaseTestCase):
     name: pypi-credentials
     data:
       username: test-username
+      longpassword: !encrypted/pkcs1-oaep
+        - BFhtdnm8uXx7kn79RFL/zJywmzLkT1GY78P3bOtp4WghUFWobkifSu7ZpaV4NeO0s71YUsi1wGZZ
+          L0LveZjUN0t6OU1VZKSG8R5Ly7urjaSo1pPVIq5Rtt/H7W14Lecd+cUeKb4joeusC9drN3AA8a4o
+          ykcVpt1wVqUnTbMGC9ARMCQP6eopcs1l7tzMseprW4RDNhIuz3CRgd0QBMPl6VDoFgBPB8vxtJw+
+          3m0rqBYZCLZgCXekqlny8s2s92nJMuUABbJOEcDRarzibDsSXsfJt1y+5n7yOURsC7lovMg4GF/v
+          Cl/0YMKjBO5bpv9EM5fToeKYyPGSKQoHOnCYceb3cAVcv5UawcCic8XjhEhp4K7WPdYf2HVAC/qt
+          xhbpjTxG4U5Q/SoppOJ60WqEkQvbXs6n5Dvy7xmph6GWmU/bAv3eUK3pdD3xa2Ue1lHWz3U+rsYr
+          aI+AKYsMYx3RBlfAmCeC1ve2BXPrqnOo7G8tnUvfdYPbK4Aakk0ds/AVqFHEZN+S6hRBmBjLaRFW
+          Z3QSO1NjbBxWnaHKZYT7nkrJm8AMCgZU0ZArFLpaufKCeiK5ECSsDxic4FIsY1OkWT42qEUfL0Wd
+          +150AKGNZpPJnnP3QYY4W/MWcKH/zdO400+zWN52WevbSqZy90tqKDJrBkMl1ydqbuw1E4ZHvIs=
+        - BFhtdnm8uXx7kn79RFL/zJywmzLkT1GY78P3bOtp4WghUFWobkifSu7ZpaV4NeO0s71YUsi1wGZZ
+          L0LveZjUN0t6OU1VZKSG8R5Ly7urjaSo1pPVIq5Rtt/H7W14Lecd+cUeKb4joeusC9drN3AA8a4o
+          ykcVpt1wVqUnTbMGC9ARMCQP6eopcs1l7tzMseprW4RDNhIuz3CRgd0QBMPl6VDoFgBPB8vxtJw+
+          3m0rqBYZCLZgCXekqlny8s2s92nJMuUABbJOEcDRarzibDsSXsfJt1y+5n7yOURsC7lovMg4GF/v
+          Cl/0YMKjBO5bpv9EM5fToeKYyPGSKQoHOnCYceb3cAVcv5UawcCic8XjhEhp4K7WPdYf2HVAC/qt
+          xhbpjTxG4U5Q/SoppOJ60WqEkQvbXs6n5Dvy7xmph6GWmU/bAv3eUK3pdD3xa2Ue1lHWz3U+rsYr
+          aI+AKYsMYx3RBlfAmCeC1ve2BXPrqnOo7G8tnUvfdYPbK4Aakk0ds/AVqFHEZN+S6hRBmBjLaRFW
+          Z3QSO1NjbBxWnaHKZYT7nkrJm8AMCgZU0ZArFLpaufKCeiK5ECSsDxic4FIsY1OkWT42qEUfL0Wd
+          +150AKGNZpPJnnP3QYY4W/MWcKH/zdO400+zWN52WevbSqZy90tqKDJrBkMl1ydqbuw1E4ZHvIs=
       password: !encrypted/pkcs1-oaep |
         BFhtdnm8uXx7kn79RFL/zJywmzLkT1GY78P3bOtp4WghUFWobkifSu7ZpaV4NeO0s71YUsi1wGZZ
         L0LveZjUN0t6OU1VZKSG8R5Ly7urjaSo1pPVIq5Rtt/H7W14Lecd+cUeKb4joeusC9drN3AA8a4o
@@ -441,6 +460,12 @@ class TestJob(BaseTestCase):
         self.assertEqual(in_repo_job_with_inherit.auth.secrets[0].name,
                          'pypi-credentials')
         self.assertIsNone(in_repo_job_with_inherit_false.auth)
+        self.assertEqual(in_repo_job_with_inherit.auth.secrets[0].
+                         secret_data['longpassword'],
+                         'test-passwordtest-password')
+        self.assertEqual(in_repo_job_with_inherit.auth.secrets[0].
+                         secret_data['password'],
+                         'test-password')
 
     def test_job_inheritance_job_tree(self):
         tenant = model.Tenant('tenant')
