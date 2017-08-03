@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df3967d1_9fd4baea",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 619,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-08-03T19:10:43Z",
+      "side": 1,
+      "message": "Shouldn\u0027t the tenant argument get a hint here?",
+      "revId": "eca4620efa07ca1eb8675eba6ec4ab5b6cb35fb2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
