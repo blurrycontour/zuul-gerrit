@@ -39,6 +39,23 @@
       "revId": "a68d23b9d24603ee8688b206aa1a21bebf3892e7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_33d97056",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-08-04T15:05:25Z",
+      "side": 1,
+      "message": "We could do that, but I was thinking of trying to keep this as simple as possible for what we still think (time will tell!) will be the more common case of smaller secrets.",
+      "revId": "a68d23b9d24603ee8688b206aa1a21bebf3892e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
