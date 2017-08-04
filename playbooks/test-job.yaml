@@ -1,0 +1,9 @@
+---
+
+- hosts: test-node
+  tasks:
+    - name: Wait a bit
+      command: sleep 30
+
+    - name: Shell with undefined variable
+      shell: exit 1
