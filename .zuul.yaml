@@ -1,10 +1,12 @@
+- job:
+  name: test-job
+  parent: base
+  nodes:
+    - name: test-node
+      label: ubuntu-xenial
+
 - project:
     name: openstack-infra/zuul
     check:
       jobs:
-        - tox-docs
-        - tox-cover:
-            voting: false
-        - tox-pep8
-        - tox-py35
-        - tox-tarball
+        - test-job
