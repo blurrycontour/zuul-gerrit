@@ -1,0 +1,10 @@
+Verified+1: Zuul
+Code-Review+2: Tobias Henkel <tobias.henkel@bmw.de>
+Code-Review+2: Paul Belanger <pabelanger@redhat.com>
+Workflow+1: Paul Belanger <pabelanger@redhat.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Fri, 04 Aug 2017 23:14:57 +0000
+Reviewed-on: https://review.openstack.org/490970
+Project: openstack-infra/zuul
+Branch: refs/heads/feature/zuulv3
