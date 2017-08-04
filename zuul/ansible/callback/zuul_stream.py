@@ -98,6 +98,7 @@ class CallbackModule(default.CallbackModule):
         self._daemon_running = False
         self._play = None
         self._streamers = []
+        self._streamers_stop = False
         self.configure_logger()
         self._items_done = False
         self._deferred_result = None
@@ -141,6 +142,8 @@ class CallbackModule(default.CallbackModule):
             s.send(msg.encode("utf-8"))
             for line in linesplit(s):
                 if "[Zuul] Task exit code" in line:
+                    return
+                elif self._streamers_stop and "[Zuul] Log not found" in line:
                     return
                 else:
                     ts, ln = line.split(' | ', 1)
@@ -223,6 +226,7 @@ class CallbackModule(default.CallbackModule):
                 self._streamers.append(streamer)
 
     def _stop_streamers(self):
+        self._streamers_stop = True
         while True:
             if not self._streamers:
                 break
@@ -231,6 +235,7 @@ class CallbackModule(default.CallbackModule):
             if streamer.is_alive():
                 msg = "[Zuul] Log Stream did not terminate"
                 self._log(msg, job=True, executor=True)
+        self._streamers_stop = False
 
     def _process_result_for_localhost(self, result, is_task=True):
         result_dict = dict(result._result)
