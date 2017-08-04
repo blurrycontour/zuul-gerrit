@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df3967d1_a79d1167",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-08-04T19:30:26Z",
+      "side": 1,
+      "message": "Comment to myself as my dev machine is already off: What\u0027s missing here when I look at this is to also filter this line if no stop was requested:\n\n  ...\n  elif \"[Zuul] Log not found\" in line:\n      pass\n  else:\n  ...",
+      "revId": "b417f8e8861cfef1b50e7dd667528b9afb8cca78",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
