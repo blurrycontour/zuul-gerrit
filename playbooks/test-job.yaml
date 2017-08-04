@@ -1,0 +1,6 @@
+---
+
+- hosts: test-node
+  tasks:
+    - name: Empty shell
+      shell: ' '
