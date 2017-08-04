@@ -22,6 +22,23 @@
       "revId": "e89b96a25bf045359748f1db2225b47d22957b70",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df3967d1_6534c9fc",
+        "filename": "doc/source/admin/drivers/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-08-04T16:21:15Z",
+      "side": 1,
+      "message": "That might be a good idea, but I\u0027m not sure I can write that without a more thorough look into that myself, and I\u0027m not sure I\u0027m up for diving into that rabbit hole right now :).",
+      "revId": "e89b96a25bf045359748f1db2225b47d22957b70",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
