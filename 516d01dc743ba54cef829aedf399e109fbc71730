@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df3967d1_1f531319",
+        "filename": "tests/fixtures/config/ansible/git/org_plugin-project/playbooks/uri_bad_scheme.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-08-04T12:57:27Z",
+      "side": 1,
+      "message": "that would be actually /etc/passwd, but doesn\u0027t matter for the test ;)",
+      "range": {
+        "startLine": 5,
+        "startChar": 25,
+        "endLine": 5,
+        "endChar": 30
+      },
+      "revId": "516d01dc743ba54cef829aedf399e109fbc71730",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
