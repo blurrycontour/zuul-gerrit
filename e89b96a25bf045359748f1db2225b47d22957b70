@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df3967d1_65d6092b",
+        "filename": "doc/source/admin/drivers/zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-08-04T16:03:26Z",
+      "side": 1,
+      "message": "I just looked into the source because I wasn\u0027t sure if depends-on is honored here but it seems so. Maybe we could mention that that a change which has a depends-on this change will also get the event.\n\nNow as I read that I think this setting solves an issue I had which I thought was a bug about not enqueuing changes if the last one is approved first. :)",
+      "range": {
+        "startLine": 31,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 51
+      },
+      "revId": "e89b96a25bf045359748f1db2225b47d22957b70",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
