@@ -430,6 +430,21 @@ appear in the playbook for that job while the attributes that appear in the
 Zuul configuration specify information about when, where, and how the
 job should be run.
 
+For example, in the ``simple`` example project, the ``zuul.yaml`` file
+describes the jobs and which ones should be run for that project (with the
+highlighted lines emphasising the relationship between the project and the
+jobs):
+
+.. literalinclude:: ../../../examples/simple/zuul.yaml
+   :emphasize-lines: 4,12-13
+
+The actual tasks for the job are defined within the Ansible playbook
+included with the project, named using the same name as the job in
+the above ``zuul.yaml``:
+
+.. literalinclude:: ../../../examples/simple/playbooks/test-job.yaml
+
+
 Jobs in Zuul support inheritance.  Any job may specify a single parent
 job, and any attributes not set on the child job are collected from
 the parent job.  In this way, a configuration structure may be built

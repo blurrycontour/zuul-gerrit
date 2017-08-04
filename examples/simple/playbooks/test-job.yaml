@@ -1,0 +1,8 @@
+# file: examples/simple/playbooks/test-job.yaml
+---
+- hosts: test-node
+  tasks:
+      - name: Test Hello World
+        command: python simple/main.py
+        args:
+            chdir: "src/{{ zuul.project.canonical_name }}"

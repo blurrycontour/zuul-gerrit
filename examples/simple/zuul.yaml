@@ -1,0 +1,13 @@
+# file: examples/simple/zuul.yaml
+- job:
+    parent: base
+    name: test-job
+    nodes:
+        - name: test-node
+          label: ubuntu-xenial
+
+- project:
+    name: examples/simple
+    check:
+      jobs:
+        - test-job
