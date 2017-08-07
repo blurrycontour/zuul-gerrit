@@ -41,6 +41,10 @@
           ref: ^(?!refs/).*$
 
 - job:
+    name: my-base
+    parent: null
+
+- job:
     name: project-merge
     hold-following-changes: true
 
