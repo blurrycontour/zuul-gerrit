@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf3e73b7_44ee0023",
+        "filename": "tests/fixtures/config/base-jobs/git/common-config/zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-08-07T22:42:49Z",
+      "side": 1,
+      "message": "Looks like some errant whitespace here?",
+      "revId": "2bab6e7361873b326de5620b16c92570e76cc763",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
