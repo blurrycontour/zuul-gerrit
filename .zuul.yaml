@@ -1,3 +1,9 @@
+- job:
+    name: zuul-migrate
+    base: unittests
+    required-projects:
+      - openstack-infra/project-config
+
 - project:
     name: openstack-infra/zuul
     check:
@@ -8,3 +14,4 @@
         - tox-pep8
         - tox-py35
         - tox-tarball
+        - zuul-migrate
