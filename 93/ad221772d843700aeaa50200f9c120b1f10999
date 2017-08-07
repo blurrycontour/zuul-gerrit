@@ -1,0 +1,10 @@
+Code-Review+2: Tobias Henkel <tobias.henkel@bmw.de>
+Code-Review+2: Jesse Keating <omgjlk@us.ibm.com>
+Workflow+1: Jesse Keating <omgjlk@us.ibm.com>
+Verified+1: Zuul
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Mon, 07 Aug 2017 19:12:18 +0000
+Reviewed-on: https://review.openstack.org/490215
+Project: openstack-infra/zuul
+Branch: refs/heads/feature/zuulv3
