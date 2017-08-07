@@ -1,3 +1,12 @@
+- job:
+    name: zuul-migrate
+    parent: unittests
+    # We're adding zuul to the required-projects so that we can also trigger
+    # this from project-config changes
+    required-projects:
+      - openstack-infra/project-config
+      - openstack-infra/zuul
+
 - project:
     name: openstack-infra/zuul
     check:
@@ -8,3 +17,4 @@
         - tox-pep8
         - tox-py35
         - tox-tarball
+        - zuul-migrate
