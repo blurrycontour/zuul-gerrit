@@ -3,7 +3,7 @@
     zuul_work_dir: "src/{{ zuul.project.canonical_name }}"
   tasks:
     - name: Install migration dependencies
-      command: "pip install --user {{ zuul_work_dir }}[migrate]"
+      command: "pip3 install --user {{ zuul_work_dir }}[migrate]"
     - name: Migrate the data
       command: "zuul-migrate zuul/layout.yaml jenkins/jobs nodepool/nodepool.yaml . --mapping=zuul/mapping.yaml -v"
       args:
