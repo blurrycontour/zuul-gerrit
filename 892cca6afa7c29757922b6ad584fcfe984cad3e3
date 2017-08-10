@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f436f4f_18a392a0",
+        "filename": "zuul/driver/bubblewrap/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-08-10T16:32:08Z",
+      "side": 1,
+      "message": "Note that work_dir is changing to jobdir/work, so the cwd will be different.  I don\u0027t expect that to affect anything because ansible seems to be using the playbook directory as cwd anyway.",
+      "revId": "892cca6afa7c29757922b6ad584fcfe984cad3e3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}

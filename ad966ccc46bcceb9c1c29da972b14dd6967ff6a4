@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f436f4f_389c165c",
+        "filename": "zuul/driver/bubblewrap/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-08-10T16:32:08Z",
+      "side": 0,
+      "message": "This removal isn\u0027t strictly related; I just noticed that this seemed redundant as I was auditing all of the binds.",
+      "revId": "ad966ccc46bcceb9c1c29da972b14dd6967ff6a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
