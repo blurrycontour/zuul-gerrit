@@ -697,8 +697,8 @@ class TestJob(BaseTestCase):
                 "Project project2 is not allowed to run job job"):
             item.freezeJobGraph()
 
-    def test_job_pipeline_allow_secrets(self):
-        self.pipeline.allow_secrets = False
+    def test_job_pipeline_allow_untrusted_secrets(self):
+        self.pipeline.allow_untrusted_secrets = False
         job = configloader.JobParser.fromYaml(self.tenant, self.layout, {
             '_source_context': self.context,
             '_start_mark': self.start_mark,
