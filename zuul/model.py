@@ -98,7 +98,7 @@ class Pipeline(object):
         self.success_message = None
         self.footer_message = None
         self.start_message = None
-        self.allow_secrets = False
+        self.pre_review = True
         self.dequeue_on_new_patchset = True
         self.ignore_dependencies = False
         self.manager = None
@@ -801,7 +801,7 @@ class Job(object):
             required_projects={},
             allowed_projects=None,
             override_branch=None,
-            untrusted_secrets=None,
+            allow_in_pre_review_pipelines = None,
         )
 
         # These are generally internal attributes which are not
@@ -2322,9 +2322,10 @@ class Layout(object):
                 change.project.name not in frozen_job.allowed_projects):
                 raise Exception("Project %s is not allowed to run job %s" %
                                 (change.project.name, frozen_job.name))
-            if ((not pipeline.allow_secrets) and frozen_job.untrusted_secrets):
-                raise Exception("Pipeline %s does not allow jobs with "
-                                "secrets (job %s)" % (
+            if (pipeline.pre_review and
+                (not frozen_job.allow_in_pre_review_pipelines)):
+                raise Exception("Pre-review pipeline %s does not allow "
+                                "post-review job %s" % (
                                     pipeline.name, frozen_job.name))
             job_graph.addJob(frozen_job)
 
