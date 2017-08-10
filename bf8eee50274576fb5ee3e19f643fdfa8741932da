@@ -16,6 +16,23 @@
       "revId": "bf8eee50274576fb5ee3e19f643fdfa8741932da",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f436f4f_16dda36f",
+        "filename": "zuul/driver/bubblewrap/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-08-10T17:43:58Z",
+      "side": 1,
+      "message": "I tihnk we should put debuntu+rh files down here in an os.path.isfile|isdir and skip making it conditional.",
+      "revId": "bf8eee50274576fb5ee3e19f643fdfa8741932da",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
