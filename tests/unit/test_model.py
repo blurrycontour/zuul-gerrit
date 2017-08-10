@@ -461,16 +461,16 @@ class TestJob(BaseTestCase):
                 })
         layout.addJob(untrusted_secrets_untrusted_child_job)
 
-        self.assertIsNone(trusted_secrets_job.untrusted_secrets)
-        self.assertTrue(untrusted_secrets_job.untrusted_secrets)
+        self.assertIsNone(trusted_secrets_job.post_review)
+        self.assertTrue(untrusted_secrets_job.post_review)
         self.assertIsNone(
-            trusted_secrets_trusted_child_job.untrusted_secrets)
+            trusted_secrets_trusted_child_job.post_review)
         self.assertIsNone(
-            trusted_secrets_untrusted_child_job.untrusted_secrets)
+            trusted_secrets_untrusted_child_job.post_review)
         self.assertTrue(
-            untrusted_secrets_trusted_child_job.untrusted_secrets)
+            untrusted_secrets_trusted_child_job.post_review)
         self.assertTrue(
-            untrusted_secrets_untrusted_child_job.untrusted_secrets)
+            untrusted_secrets_untrusted_child_job.post_review)
 
         self.assertEqual(trusted_secrets_job.implied_run[0].secrets[0].name,
                          'trusted-secret')
@@ -697,15 +697,15 @@ class TestJob(BaseTestCase):
                 "Project project2 is not allowed to run job job"):
             item.freezeJobGraph()
 
-    def test_job_pipeline_allow_secrets(self):
-        self.pipeline.allow_secrets = False
+    def test_job_pipeline_allow_untrusted_secrets(self):
+        self.pipeline.post_review = False
         job = configloader.JobParser.fromYaml(self.tenant, self.layout, {
             '_source_context': self.context,
             '_start_mark': self.start_mark,
             'name': 'job',
             'parent': None,
         })
-        job.untrusted_secrets = True
+        job.post_review = True
 
         self.layout.addJob(job)
 
