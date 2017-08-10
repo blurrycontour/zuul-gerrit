@@ -369,7 +369,7 @@ class JobParser(object):
                'allowed-projects': to_list(str),
                'override-branch': str,
                'description': str,
-               'untrusted-secrets': bool
+               'allow-in-pre-review-pipelines': bool
                }
 
         return vs.Schema(job)
@@ -465,14 +465,15 @@ class JobParser(object):
         # through inheritance to ensure that we don't run this job in
         # an unsafe check pipeline.
         if secrets and not conf['_source_context'].trusted:
-            job.untrusted_secrets = True
+            job.allow_in_pre_review_pipelines = False
 
-        if 'untrusted-secrets' in conf:
-            if conf['untrusted-secrets']:
-                job.untrusted_secrets = True
+        if 'allow-in-pre-review-pipelines' in conf:
+            if conf['allow-in-pre-review-pipelines'] is False:
+                job.allow_in_pre_review_pipelines = False
             else:
-                raise Exception("Once set, the untrusted_secrets "
-                                "attribute may not be unset")
+                raise Exception(
+                    "Once set, the allow-in-pre-review-pipelines "
+                    "attribute may not be unset")
 
         # Roles are part of the playbook context so we must establish
         # them earlier than playbooks.
@@ -836,7 +837,7 @@ class PipelineParser(object):
                     'footer-message': str,
                     'dequeue-on-new-patchset': bool,
                     'ignore-dependencies': bool,
-                    'allow-secrets': bool,
+                    'pre-review': bool,
                     'disable-after-consecutive-failures':
                         vs.All(int, vs.Range(min=1)),
                     'window': window,
@@ -886,7 +887,8 @@ class PipelineParser(object):
             'dequeue-on-new-patchset', True)
         pipeline.ignore_dependencies = conf.get(
             'ignore-dependencies', False)
-        pipeline.allow_secrets = conf.get('allow-secrets', False)
+        pipeline.pre_review = conf.get(
+            'pre-review', True)
 
         for conf_key, action in PipelineParser.reporter_actions.items():
             reporter_set = []
