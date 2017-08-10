@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f436f4f_86dba019",
+        "filename": "zuul/driver/bubblewrap/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-08-10T20:49:47Z",
+      "side": 1,
+      "message": "Sorry, I made a mistake, this should be /etc/fedora-release, /etc/centos-release.\n\n/etc/os-release and /etc/redhat-release and /etc/system-release are also files.",
+      "revId": "6a179366407e9d7fcc623edfef061643df1be928",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
