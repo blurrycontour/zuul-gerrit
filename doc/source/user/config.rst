@@ -184,7 +184,7 @@ success, the pipeline reports back to Gerrit with ``Verified`` vote of
          For more detail on the theory and operation of Zuul's
          dependent pipeline manager, see: :doc:`gating`.
 
-   .. attr:: allow-secrets
+   .. attr:: allow-untrusted-secrets
       :default: false
 
       This is a boolean which can be used to prevent jobs which use
@@ -898,13 +898,14 @@ Here is an example of two job definitions:
    .. attr:: untrusted-secrets
 
       A boolean value which indicates that this job should not be used
-      in a pipeline where allow-secrets is ``false``.  This is
-      automatically set to ``true`` if this job is defined in a
-      :term:`untrusted-project`.  It may be explicitly set to obtain
-      the same behavior for jobs defined in :term:`config projects
-      <config-project>`.  Once this is set to ``true`` anywhere in the
-      inheritance hierarchy for a job, it will remain set for all
-      child jobs and variants (it can not be set to ``false``).
+      in a pipeline where :attr:`pipeline.allow-untrusted-secrets` is
+      ``false``.  This is automatically set to ``true`` if this job is
+      defined in a :term:`untrusted-project`.  It may be explicitly
+      set to obtain the same behavior for jobs defined in
+      :term:`config projects <config-project>`.  Once this is set to
+      ``true`` anywhere in the inheritance hierarchy for a job, it
+      will remain set for all child jobs and variants (it can not be
+      set to ``false``).
 
 .. _project:
 
@@ -1082,8 +1083,8 @@ proposed but unreviewed changes.  By default, pipelines will refuse to
 run jobs which have playbooks that use secrets in the untrusted
 execution context to protect against someone proposing a change which
 exposes a secret.  To permit this (for instance, in a pipeline which
-only runs after code review), the :attr:`pipeline.allow-secrets`
-attribute may be set.
+only runs after code review), the
+:attr:`pipeline.allow-untrusted-secrets` attribute may be set.
 
 If a job with secrets is unsafe to be used by other projects, the
 `allowed-projects` job attribute can be used to restrict the projects

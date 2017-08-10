@@ -98,7 +98,7 @@ class Pipeline(object):
         self.success_message = None
         self.footer_message = None
         self.start_message = None
-        self.allow_secrets = False
+        self.allow_untrusted_secrets = False
         self.dequeue_on_new_patchset = True
         self.ignore_dependencies = False
         self.manager = None
@@ -2322,7 +2322,8 @@ class Layout(object):
                 change.project.name not in frozen_job.allowed_projects):
                 raise Exception("Project %s is not allowed to run job %s" %
                                 (change.project.name, frozen_job.name))
-            if ((not pipeline.allow_secrets) and frozen_job.untrusted_secrets):
+            if ((not pipeline.allow_untrusted_secrets) and
+                frozen_job.untrusted_secrets):
                 raise Exception("Pipeline %s does not allow jobs with "
                                 "secrets (job %s)" % (
                                     pipeline.name, frozen_job.name))
