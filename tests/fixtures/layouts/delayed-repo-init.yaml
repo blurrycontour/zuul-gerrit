@@ -1,6 +1,6 @@
-pipelines:
-  - name: check
-    manager: IndependentPipelineManager
+- pipeline:
+    name: check
+    manager: independent
     trigger:
       gerrit:
         - event: patchset-created
@@ -11,15 +11,17 @@ pipelines:
       gerrit:
         Verified: -1
 
-  - name: post
-    manager: IndependentPipelineManager
+- pipeline:
+    name: post
+    manager: independent
     trigger:
       gerrit:
         - event: ref-updated
           ref: ^(?!refs/).*$
 
-  - name: gate
-    manager: DependentPipelineManager
+- pipeline:
+    name: gate
+    manager: dependent
     failure-message: Build failed.  For information on how to proceed, see http://wiki.example.org/Test_Failures
     trigger:
       gerrit:
@@ -38,15 +40,22 @@ pipelines:
         Verified: 0
     precedence: high
 
-projects:
-  - name: org/new-project
+- project:
+    name: org/new-project
     check:
-      - project-merge:
-        - project-test1
-        - project-test2
+      jobs:
+        - project-merge
+        - project-test1:
+            dependencies: project-merge
+        - project-test2:
+            dependencies: project-merge
     gate:
-      - project-merge:
-        - project-test1
-        - project-test2
+      jobs:
+        - project-merge:
+        - project-test1:
+            dependencies: project-merge
+        - project-test2:
+            dependencies: project-merge
     post:
-      - project-post
+      jobs:
+        - project-post

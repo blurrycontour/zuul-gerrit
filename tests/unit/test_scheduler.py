@@ -2759,13 +2759,14 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(len(tenant.layout.pipelines['check'].queues), 0)
         self.assertIn('Build succeeded', A.messages[0])
 
-    @skip("Disabled for early v3 development")
     def test_delayed_repo_init(self):
-        self.updateConfigLayout(
-            'tests/fixtures/layout-delayed-repo-init.yaml')
-        self.sched.reconfigure(self.config)
-
         self.init_repo("org/new-project")
+        self.commitConfigUpdate(
+            'common-config',
+            'layouts/delayed-repo-init.yaml')
+        self.sched.reconfigure(self.config)
+        self.waitUntilSettled()
+
         A = self.fake_gerrit.addFakeChange('org/new-project', 'master', 'A')
 
         A.addApproval('Code-Review', 2)
