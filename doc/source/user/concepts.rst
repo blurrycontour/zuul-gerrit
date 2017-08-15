@@ -4,6 +4,25 @@ Zuul Concepts
 =============
 
 Zuul's configuration is organized around the concept of a *pipeline*.
+An example pipeline, defined in the Zuul configuration file, might
+look similar to the following (see the :ref:`pipeline` section for
+a more detailed discussion on pipeline configuration):
+
+.. code-block:: yaml
+
+   - pipeline:
+       name: check
+       manager: independent
+       trigger:
+         my_gerrit:
+           - event: patchset-created
+       success:
+         my_gerrit:
+           Verified: 1
+       failure:
+         my_gerrit
+           Verified: -1
+
 In Zuul, a pipeline encompasses a workflow process which can be
 applied to one or more projects.  For instance, a "check" pipeline
 might describe the actions which should cause newly proposed changes
@@ -20,6 +39,21 @@ implemented as pipelines.
 Once a pipeline has been defined, any number of projects may be
 associated with it, each one specifying what jobs should be run for
 that project in a given pipeline.
+
+For example, a project, which we'll arbitrarily call "simple",
+associated with the example pipeline above that we named "check", would
+look like:
+
+.. code-block:: yaml
+
+    - project:
+        name: simple
+        check:
+          jobs:
+            - test-job
+
+Project definitions are discussed in more detail in the :ref:`project`
+section.
 
 Pipelines have associated *triggers* which are descriptions of events
 which should cause something to be enqueued into a pipeline.  For
@@ -74,6 +108,21 @@ nodes or contact cloud providers to create or delete nodes as
 necessary.  The types of nodes available to Zuul are determined by the
 Nodepool administrator.
 
+Continuing our "simple" example project above, and assuming our
+Nodepool adminstrator has defined an "ubuntu-xenial" node type for us,
+the "test-job" referenced in the project definition might look like:
+
+.. code-block:: yaml
+
+    - job:
+        parent: base
+        name: test-job
+        nodes:
+           - name: test-node
+             label: ubuntu-xenial
+
+Job definitions are discussed in more detail in the :ref:`job` section.
+
 The executable contents of jobs themselves are Ansible playbooks.
 Ansible's support for orchestrating tasks on remote nodes is
 particularly suited to Zuul's support for multi-node testing.  Ansible
@@ -84,3 +133,20 @@ Ansible might be used to orchestrate remote systems.  Ansible itself
 is run on the :ref:`executor <executor>` and acts remotely upon the test
 nodes supplied to a job.  This facilitates continuous delivery by making it
 possible to use the same Ansible playbooks in testing and production.
+
+Furthering our "simple" example project, we could have a playbook to execute
+on the test node, which we've cleverly named "test-node" in our job definition
+above, that might look like:
+
+.. code-block:: yaml
+
+    ---
+    - hosts: test-node
+      tasks:
+          - name: Run PEP8 check
+            command: tox -e pep8
+            args:
+                chdir: "src/{{ zuul.project.canonical_name }}"
+
+Job content is discussed in more detail in the :doc:`Job Content <jobs>`
+page.
