@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f436f4f_4cefa9e8",
+        "filename": "tests/fixtures/config/secret-leaks/git/common-config/playbooks/secret-file-fail.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2017-08-15T21:26:21Z",
+      "side": 1,
+      "message": "Missing final newline?",
+      "revId": "db08903c810e1c33cb33c33f81fc0de0c091e802",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
