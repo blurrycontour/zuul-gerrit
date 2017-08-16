@@ -1,0 +1,11 @@
+Verified+1: Jenkins
+Code-Review+1: David Moreau Simard <dms@redhat.com>
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Code-Review+2: Clint 'SpamapS' Byrum <clint@fewbar.com>
+Workflow+1: Monty Taylor <mordred@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Wed, 16 Aug 2017 18:09:32 +0000
+Reviewed-on: https://review.openstack.org/487853
+Project: openstack-infra/zuul
+Branch: refs/heads/feature/zuulv3
