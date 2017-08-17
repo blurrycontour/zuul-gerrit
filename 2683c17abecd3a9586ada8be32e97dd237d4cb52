@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f436f4f_3b70e2dc",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 706,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-08-17T18:33:39Z",
+      "side": 1,
+      "message": "important-secret should be one more space in (and obviously so too the line below).",
+      "revId": "2683c17abecd3a9586ada8be32e97dd237d4cb52",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f436f4f_1b751ecd",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 713,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-08-17T18:33:39Z",
+      "side": 1,
+      "message": "- job:\n             name: amazing-job\n             secrets:\n               - name: ssh-key\n                 secret: important-secret.\n\nIt turns out it\u0027s really hard to use ansible variables with \u0027-\u0027 in their names, so I\u0027ve been using _ in the names of secrets when necessary.  We may want to carry that over to the examples here. and use \"ssh_key\" instead.  I actually like that this feature will let us have secrets with hyphen names which then get mapped to _ in ansible vars.",
+      "revId": "2683c17abecd3a9586ada8be32e97dd237d4cb52",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f436f4f_5b6ba6f0",
+        "filename": "tests/fixtures/config/ansible/git/common-config/zuul.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-08-17T18:33:39Z",
+      "side": 1,
+      "message": "Is this change missing a playbook?  Also, I wonder if you\u0027ll run into problems because of the hyphen in renamed-secret.",
+      "revId": "2683c17abecd3a9586ada8be32e97dd237d4cb52",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
