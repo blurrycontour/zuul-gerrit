@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9f436f4f_0e115e54",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 706,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-08-17T18:39:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f436f4f_3b70e2dc",
+      "revId": "2683c17abecd3a9586ada8be32e97dd237d4cb52",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f436f4f_1b751ecd",
         "filename": "doc/source/user/config.rst",
         "patchSetId": 3
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "9f436f4f_ce1a366e",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 713,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-08-17T18:39:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f436f4f_1b751ecd",
+      "revId": "2683c17abecd3a9586ada8be32e97dd237d4cb52",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f436f4f_5b6ba6f0",
         "filename": "tests/fixtures/config/ansible/git/common-config/zuul.yaml",
         "patchSetId": 3
@@ -47,6 +83,24 @@
       "writtenOn": "2017-08-17T18:33:39Z",
       "side": 1,
       "message": "Is this change missing a playbook?  Also, I wonder if you\u0027ll run into problems because of the hyphen in renamed-secret.",
+      "revId": "2683c17abecd3a9586ada8be32e97dd237d4cb52",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f436f4f_ae3012ea",
+        "filename": "tests/fixtures/config/ansible/git/common-config/zuul.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-08-17T18:39:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f436f4f_5b6ba6f0",
       "revId": "2683c17abecd3a9586ada8be32e97dd237d4cb52",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
