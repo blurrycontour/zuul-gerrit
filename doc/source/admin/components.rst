@@ -437,6 +437,21 @@ The following sections of ``zuul.conf`` are used by the executor:
       List of paths, separated by ``:`` to read-write bind mount into
       untrusted bubblewrap contexts.
 
+   .. attr:: execution_wrapper
+      :default: bubblewrap
+
+      Name of the trusted execution wrapper to use when executing
+      `ansible-playbook`. The default, `bubblewrap` is recommended
+      for all installations.
+
+      There is also a `nullwrap` driver for situations where one wants
+      to run Zuul without access to bubblewrap or in such a way that
+      bubblewrap may interfere with the jobs themselves. However,
+      `nullwrap` is considered unsafe, as `bubblewrap` provides
+      significant protections against malicious users and accidental
+      breakage in playbooks. As such,  `nullwrap` is not recommended
+      for use in production.
+
 .. attr:: merger
 
    .. attr:: git_user_email
