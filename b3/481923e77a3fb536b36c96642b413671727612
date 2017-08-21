@@ -1,0 +1,10 @@
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Code-Review+1: Jamie Lennox <jamielennox@gmail.com>
+Code-Review+2: Jesse Keating <omgjlk@us.ibm.com>
+Workflow+1: Jesse Keating <omgjlk@us.ibm.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Mon, 21 Aug 2017 20:45:42 +0000
+Reviewed-on: https://review.openstack.org/495561
+Project: openstack-infra/zuul
+Branch: refs/heads/feature/zuulv3
