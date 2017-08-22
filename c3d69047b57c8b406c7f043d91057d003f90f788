@@ -16,6 +16,23 @@
       "revId": "c3d69047b57c8b406c7f043d91057d003f90f788",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f287b81_439f3350",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-08-22T22:50:29Z",
+      "side": 1,
+      "message": "I believe that would be ineffective as we mount a filesystem on top of this with its own permissions.",
+      "revId": "c3d69047b57c8b406c7f043d91057d003f90f788",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
