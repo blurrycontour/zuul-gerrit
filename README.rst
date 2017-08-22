@@ -25,3 +25,7 @@ that links to your launchpad account). Example::
     # Do your commits
     $ git review
     # Enter your username if prompted
+
+The `OpenStack Infra Manual <
+https://docs.openstack.org/infra/manual/developers.html>`_ explains
+in detail how to contribute to OpenStack.
