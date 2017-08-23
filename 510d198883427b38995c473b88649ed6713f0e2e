@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f287b81_1c517ed9",
+        "filename": "zuul/executor/ansiblelaunchserver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-08-23T12:40:47Z",
+      "side": 1,
+      "message": "We can delete this file",
+      "revId": "510d198883427b38995c473b88649ed6713f0e2e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
