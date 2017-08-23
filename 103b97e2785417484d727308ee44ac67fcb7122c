@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f287b81_fd5b3e84",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-08-23T22:23:16Z",
+      "side": 1,
+      "message": "This seems unrelated, but looks fine anyway.",
+      "revId": "103b97e2785417484d727308ee44ac67fcb7122c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
