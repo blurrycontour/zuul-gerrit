@@ -22,6 +22,23 @@
       "revId": "aab45ecf6bfb2c6e9d2623c29be3472fd6f5c4e7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f287b81_24ade987",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1166,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-08-25T22:17:06Z",
+      "side": 1,
+      "message": "It will, but it may end up as a tuple?",
+      "revId": "aab45ecf6bfb2c6e9d2623c29be3472fd6f5c4e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
