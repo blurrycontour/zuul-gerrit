@@ -1,0 +1,107 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f287b81_053e618b",
+        "filename": ".zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2017-08-26T19:46:40Z",
+      "side": 1,
+      "message": "Are you missing a \"nodes\" parameter in the job to consume the \"zuul-two-node\" nodeset ?",
+      "range": {
+        "startLine": 9,
+        "startChar": 2,
+        "endLine": 9,
+        "endChar": 5
+      },
+      "revId": "00dbdd70c57b70d2bb3e4601f5410443c5efaf8d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f287b81_e53eb589",
+        "filename": "playbooks/zuul-stream/fixtures/test-stream.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2017-08-26T19:46:40Z",
+      "side": 1,
+      "message": "typo",
+      "range": {
+        "startLine": 4,
+        "startChar": 16,
+        "endLine": 4,
+        "endChar": 20
+      },
+      "revId": "00dbdd70c57b70d2bb3e4601f5410443c5efaf8d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f287b81_85493132",
+        "filename": "playbooks/zuul-stream/fixtures/test-stream.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2017-08-26T19:46:40Z",
+      "side": 1,
+      "message": "A useful test to do, from experience, is to add something with non-ascii characters. I got it nailed down in ARA now but it was troublesome for a while. The tests for that are here [1].\n\nAlternatively, you might find some inspiration about worthwhile tests in ARA\u0027s integration tests [2].\n\n[1]: https://github.com/openstack/ara/blob/dc3acf627d99c394dbe1bb6c1eafee9efc28738a/ara/tests/integration/smoke.yml#L44\n[2]: https://github.com/openstack/ara/tree/master/ara/tests/integration",
+      "revId": "00dbdd70c57b70d2bb3e4601f5410443c5efaf8d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f287b81_656be584",
+        "filename": "playbooks/zuul-stream/functional.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2017-08-26T19:46:40Z",
+      "side": 1,
+      "message": "This sounds like it\u0027s already done in the post_tasks of your  pre.yaml playbook. Should the post_tasks from the pre.yaml be removed ?",
+      "range": {
+        "startLine": 4,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 17
+      },
+      "revId": "00dbdd70c57b70d2bb3e4601f5410443c5efaf8d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f287b81_056781bf",
+        "filename": "playbooks/zuul-stream/pre.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2017-08-26T19:46:40Z",
+      "side": 1,
+      "message": "Note that ARA also has a bindep file [1] that you probably want to install too.\n\n[1]: https://github.com/openstack/ara/blob/master/bindep.txt",
+      "revId": "00dbdd70c57b70d2bb3e4601f5410443c5efaf8d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
