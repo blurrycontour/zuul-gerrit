@@ -43,6 +43,55 @@ BUFFER_LINES_FOR_SYNTAX = 200
 COMMANDS = ['stop', 'pause', 'unpause', 'graceful', 'verbose',
             'unverbose', 'keep', 'nokeep']
 DEFAULT_FINGER_PORT = 79
+LOGGING_CONF = """
+[loggers]
+keys = root,sqlalchemy,alembic,zuul
+
+[handlers]
+keys = console,file
+
+[formatters]
+keys = plain,verbose
+
+[logger_root]
+level = WARN
+handlers =
+qualname =
+
+[logger_sqlalchemy]
+level = WARN
+handlers = console
+qualname = sqlalchemy.engine
+
+[logger_alembic]
+level = WARN
+handlers = console
+qualname = alembic
+
+[logger_zuul]
+level = INFO
+handlers = file
+qualname = zuul.executor.ansible
+
+[handler_console]
+class = StreamHandler
+args = (sys.stderr,)
+level = INFO
+formatter = verbose
+
+[handler_file]
+class = FileHandler
+args = ('{logfile}',)
+level = DEBUG
+formatter = plain
+
+[formatter_plain]
+format = %(message)s
+
+[formatter_verbose]
+format = %(levelname)-5.5s [%(name)s] %(message)s
+datefmt = %H:%M:%S
+"""
 
 
 class ExecutorError(Exception):
@@ -280,6 +329,7 @@ class JobDir(object):
         '''
         # root
         #   ansible (mounted in bwrap read-only)
+        #     logging.conf
         #     inventory.yaml
         #   .ansible (mounted in bwrap read-write)
         #     fact-cache/localhost
@@ -336,11 +386,13 @@ class JobDir(object):
             pass
         self.known_hosts = os.path.join(ssh_dir, 'known_hosts')
         self.inventory = os.path.join(self.ansible_root, 'inventory.yaml')
+        self.logging_conf = os.path.join(self.ansible_root, 'logging.conf')
         self.playbooks = []  # The list of candidate playbooks
         self.playbook = None  # A pointer to the candidate we have chosen
         self.pre_playbooks = []
         self.post_playbooks = []
         self.job_output_file = os.path.join(self.log_root, 'job-output.txt')
+        self.json_output_file = os.path.join(self.log_root, 'job-output.json')
         self.trusted_projects = []
         self.trusted_project_index = {}
 
@@ -1400,6 +1452,10 @@ class AnsibleJob(object):
                 for key in node['host_keys']:
                     known_hosts.write('%s\n' % key)
 
+        with open(self.jobdir.logging_conf, 'w') as logging_conf:
+            logging_conf.write(
+                LOGGING_CONF.format(logfile=self.jobdir.job_output_file))
+
     def writeAnsibleConfig(self, jobdir_playbook, playbook):
         trusted = jobdir_playbook.trusted
 
@@ -1482,7 +1538,9 @@ class AnsibleJob(object):
         config_file = playbook.ansible_config
         env_copy = os.environ.copy()
         env_copy.update(self.ssh_agent.env)
-        env_copy['ZUUL_JOB_OUTPUT_FILE'] = self.jobdir.job_output_file
+        env_copy['ZUUL_JSON_OUTPUT_FILE'] = self.jobdir.json_output_file
+        env_copy['ARA_LOGGING_CONFIG_FILE'] = self.jobdir.logging_config
+        env_copy['ZUUL_JOB_LOGGING_CONFIG_FILE'] = self.jobdir.logging_config
         env_copy['ZUUL_JOBDIR'] = self.jobdir.root
         pythonpath = env_copy.get('PYTHONPATH')
         if pythonpath:

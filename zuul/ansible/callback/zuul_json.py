@@ -45,8 +45,7 @@ class CallbackModule(CallbackBase):
         self.results = []
         self.output = []
         self.playbook = {}
-        self.output_path = os.path.splitext(
-            os.environ['ZUUL_JOB_OUTPUT_FILE'])[0] + '.json'
+        self.output_path = os.environ['ZUUL_JSON_OUTPUT_FILE']
         # For now, just read in the old file and write it all out again
         # This may well not scale from a memory perspective- but let's see how
         # it goes.

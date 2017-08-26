@@ -21,6 +21,7 @@ from __future__ import absolute_import
 
 import datetime
 import logging
+import logging.config
 import json
 import os
 import socket
@@ -108,14 +109,12 @@ class CallbackModule(default.CallbackModule):
         # ansible appends timestamp, user and pid to the log lines emitted
         # to the log file. We're doing other things though, so we don't want
         # this.
-        path = os.environ['ZUUL_JOB_OUTPUT_FILE']
+        logging_config = os.environ['ZUUL_JOB_LOGGING_CONFIG_FILE']
         if self._display.verbosity > 2:
             level = logging.DEBUG
         else:
             level = logging.INFO
-        logging.basicConfig(filename=path, level=level, format='%(message)s')
-        # Squelch logging from ara so we don't get the initializing message
-        logging.getLogger('ara').setLevel(logging.ERROR)
+        logging.config.fileConfig(logging_config)
 
         self._logger = logging.getLogger('zuul.executor.ansible')
 
