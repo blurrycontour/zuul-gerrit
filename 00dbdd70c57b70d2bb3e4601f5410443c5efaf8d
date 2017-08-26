@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "7f287b81_e50c75ed",
+        "filename": ".zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-08-26T19:53:06Z",
+      "side": 1,
+      "message": "YUP!",
+      "parentUuid": "7f287b81_053e618b",
+      "range": {
+        "startLine": 9,
+        "startChar": 2,
+        "endLine": 9,
+        "endChar": 5
+      },
+      "revId": "00dbdd70c57b70d2bb3e4601f5410443c5efaf8d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7f287b81_e53eb589",
         "filename": "playbooks/zuul-stream/fixtures/test-stream.yaml",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2017-08-26T19:46:40Z",
       "side": 1,
       "message": "typo",
+      "range": {
+        "startLine": 4,
+        "startChar": 16,
+        "endLine": 4,
+        "endChar": 20
+      },
+      "revId": "00dbdd70c57b70d2bb3e4601f5410443c5efaf8d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f287b81_650085ac",
+        "filename": "playbooks/zuul-stream/fixtures/test-stream.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-08-26T19:53:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7f287b81_e53eb589",
       "range": {
         "startLine": 4,
         "startChar": 16,
@@ -65,6 +113,24 @@
     },
     {
       "key": {
+        "uuid": "7f287b81_25303d9f",
+        "filename": "playbooks/zuul-stream/fixtures/test-stream.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-08-26T19:53:06Z",
+      "side": 1,
+      "message": "Yes indeed - totally agree - I think we can add a bunch of good stuff ...",
+      "parentUuid": "7f287b81_85493132",
+      "revId": "00dbdd70c57b70d2bb3e4601f5410443c5efaf8d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7f287b81_656be584",
         "filename": "playbooks/zuul-stream/functional.yaml",
         "patchSetId": 2
@@ -88,6 +154,30 @@
     },
     {
       "key": {
+        "uuid": "7f287b81_0535418f",
+        "filename": "playbooks/zuul-stream/functional.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-08-26T19:53:06Z",
+      "side": 1,
+      "message": "Nah - I forgot to remove them from here when I added them here.",
+      "parentUuid": "7f287b81_656be584",
+      "range": {
+        "startLine": 4,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 17
+      },
+      "revId": "00dbdd70c57b70d2bb3e4601f5410443c5efaf8d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7f287b81_056781bf",
         "filename": "playbooks/zuul-stream/pre.yaml",
         "patchSetId": 2
@@ -99,6 +189,24 @@
       "writtenOn": "2017-08-26T19:46:40Z",
       "side": 1,
       "message": "Note that ARA also has a bindep file [1] that you probably want to install too.\n\n[1]: https://github.com/openstack/ara/blob/master/bindep.txt",
+      "revId": "00dbdd70c57b70d2bb3e4601f5410443c5efaf8d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f287b81_c52a992a",
+        "filename": "playbooks/zuul-stream/pre.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-08-26T19:53:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7f287b81_056781bf",
       "revId": "00dbdd70c57b70d2bb3e4601f5410443c5efaf8d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
