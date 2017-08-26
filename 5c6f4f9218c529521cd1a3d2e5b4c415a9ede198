@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "7f287b81_c45742ca",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2017-08-26T01:01:18Z",
+      "side": 1,
+      "message": "The Depends-On isn\u0027t effective because we\u0027re not installing ara from source",
+      "range": {
+        "startLine": 16,
+        "startChar": 12,
+        "endLine": 16,
+        "endChar": 53
+      },
+      "revId": "5c6f4f9218c529521cd1a3d2e5b4c415a9ede198",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7f287b81_24ba8609",
         "filename": "zuul/executor/server.py",
         "patchSetId": 1
