@@ -1,0 +1,23 @@
+- hosts: controller
+  tasks:
+
+    - set_fact:
+        output_dir: "{{ zuul.executor.log_root }}/stream-files"
+    - name: Make log subdir
+      file:
+        path: "{{ output_dir }}"
+      delegate_to: localhost
+
+    - name: Fetch text log file
+      fetch:
+        src: "{{ ansible_user_dir }}/{{ item }}"
+        dest: "{{ output_dir }}"
+      with_items:
+        - job-output.txt
+        - job-output.json
+
+    - name: Fetch ARA html
+      synchronize:
+        src: "{{ ansible_user_dir}}/ara-output"
+        dest: "{{ output_dir }}"
+        mode: pull
