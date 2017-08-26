@@ -28,6 +28,7 @@ import time
 import traceback
 from zuul.lib.yamlutil import yaml
 from zuul.lib.config import get_default
+from zuul.lib import logconfig
 
 try:
     import ara.plugins.callbacks as ara_callbacks
@@ -280,6 +281,7 @@ class JobDir(object):
         '''
         # root
         #   ansible (mounted in bwrap read-only)
+        #     logging.json
         #     inventory.yaml
         #   .ansible (mounted in bwrap read-write)
         #     fact-cache/localhost
@@ -336,6 +338,7 @@ class JobDir(object):
             pass
         self.known_hosts = os.path.join(ssh_dir, 'known_hosts')
         self.inventory = os.path.join(self.ansible_root, 'inventory.yaml')
+        self.logging_json = os.path.join(self.ansible_root, 'logging.json')
         self.playbooks = []  # The list of candidate playbooks
         self.playbook = None  # A pointer to the candidate we have chosen
         self.pre_playbooks = []
@@ -1004,6 +1007,7 @@ class AnsibleJob(object):
         self.preparePlaybooks(args)
 
         self.prepareAnsibleFiles(args)
+        self.writeLoggingConfig()
 
         data = {
             # TODO(mordred) worker_name is needed as a unique name for the
@@ -1400,6 +1404,11 @@ class AnsibleJob(object):
                 for key in node['host_keys']:
                     known_hosts.write('%s\n' % key)
 
+    def writeLoggingConfig(self):
+        logging_config = logconfig.JobLoggingConfig(
+            job_output_file=self.jobdir.job_output_file)
+        logging_config.writeJson(self.jobdir.logging_json)
+
     def writeAnsibleConfig(self, jobdir_playbook, playbook):
         trusted = jobdir_playbook.trusted
 
@@ -1482,7 +1491,8 @@ class AnsibleJob(object):
         config_file = playbook.ansible_config
         env_copy = os.environ.copy()
         env_copy.update(self.ssh_agent.env)
-        env_copy['ZUUL_JOB_OUTPUT_FILE'] = self.jobdir.job_output_file
+        env_copy['ARA_LOG_CONFIG'] = self.jobdir.logging_json
+        env_copy['ZUUL_JOB_LOG_CONFIG'] = self.jobdir.logging_json
         env_copy['ZUUL_JOBDIR'] = self.jobdir.root
         pythonpath = env_copy.get('PYTHONPATH')
         if pythonpath:
@@ -1550,7 +1560,15 @@ class AnsibleJob(object):
                                 ("Ansible timeout exceeded",))
             watchdog.start()
         try:
-            for idx, line in enumerate(iter(self.proc.stdout.readline, b'')):
+            # Use manual idx instead of enumerate so that RESULT lines
+            # don't count towards BUFFER_LINES_FOR_SYNTAX
+            idx = 0
+            for line in iter(self.proc.stdout.readline, b''):
+                if line.startswith(b'RESULT'):
+                    # TODO(mordred) Process result commands if sent
+                    continue
+                else:
+                    idx += 1
                 if idx < BUFFER_LINES_FOR_SYNTAX:
                     syntax_buffer.append(line)
                 line = line[:1024].rstrip()
