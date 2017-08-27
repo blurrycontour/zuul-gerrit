@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f287b81_b961f807",
+        "filename": "playbooks/zuul-stream/fixtures/test-stream.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2017-08-27T17:59:44Z",
+      "side": 1,
+      "message": "Nit: give the play a name",
+      "range": {
+        "startLine": 1,
+        "startChar": 2,
+        "endLine": 1,
+        "endChar": 13
+      },
+      "revId": "a00cdd1850e92b911cd9d93adfe2c9f322938b1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f287b81_d9484488",
+        "filename": "playbooks/zuul-stream/fixtures/test-stream.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2017-08-27T17:59:44Z",
+      "side": 1,
+      "message": "Nit: maybe run a command that is a bit less verbose [1]\n\n[1]: http://logs.openstack.org/09/498209/11/check/zuul-stream-functional/1563afa/stream-files/ara-output/result/92b0dfeb-f474-4e1a-878c-b8daa9aaf663/",
+      "range": {
+        "startLine": 13,
+        "startChar": 6,
+        "endLine": 13,
+        "endChar": 21
+      },
+      "revId": "a00cdd1850e92b911cd9d93adfe2c9f322938b1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
