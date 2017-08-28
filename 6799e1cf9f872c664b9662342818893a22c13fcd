@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f287b81_380cd0eb",
+        "filename": "tests/unit/test_inventory.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-08-28T15:32:21Z",
+      "side": 1,
+      "message": "This path would be:\nbuild.jobdir.root, \u0027ansible\u0027, \u0027playbook_0\u0027, \u0027secrets\u0027, \u0027secrets.yaml\u0027\n\nExcept that it won\u0027t be accessible from here.  To avoid having the secrets hit the disk, we recently switched to writing the secrets to a tmpfs created by bubblewrap, so it\u0027s not accessible outside the playbook.  I think we\u0027ll either need to skip validation that the secret is what we expect, or have the job write the decrypted secret to a file in the jobdir that we can read from outside the bwrap.",
+      "revId": "6799e1cf9f872c664b9662342818893a22c13fcd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
