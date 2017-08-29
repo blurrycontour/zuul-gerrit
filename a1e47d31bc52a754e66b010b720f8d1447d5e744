@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7f287b81_22724fae",
+        "filename": "zuul/ansible/logconfig.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-08-29T01:02:24Z",
+      "side": 1,
+      "message": "k",
+      "parentUuid": "7f287b81_9f016009",
+      "revId": "a1e47d31bc52a754e66b010b720f8d1447d5e744",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7f287b81_8200e302",
         "filename": "zuul/ansible/logconfig.py",
         "patchSetId": 9
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "7f287b81_829c63c0",
+        "filename": "zuul/ansible/logconfig.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-08-29T01:02:24Z",
+      "side": 1,
+      "message": "Yes, it is indeed - and that is the reason. I\u0027m also not 100% sure what the ramifications are of adding a WatchedFileHandler that is then never attached to a logger. Does it try to make the file anyway and just never send things to it?",
+      "parentUuid": "7f287b81_8200e302",
+      "revId": "a1e47d31bc52a754e66b010b720f8d1447d5e744",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7f287b81_6205f710",
         "filename": "zuul/ansible/logconfig.py",
         "patchSetId": 9
@@ -47,6 +83,24 @@
       "writtenOn": "2017-08-29T00:53:59Z",
       "side": 1,
       "message": "0: I\u0027m not sure how intentional that is -- we may want to have everything go to files, but we have to be careful with propogate.",
+      "revId": "a1e47d31bc52a754e66b010b720f8d1447d5e744",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f287b81_e267a7e8",
+        "filename": "zuul/ansible/logconfig.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-08-29T01:02:24Z",
+      "side": 1,
+      "message": "Yah- I actually would prefer root: [] and a good list of opt-in values.",
+      "parentUuid": "7f287b81_6205f710",
       "revId": "a1e47d31bc52a754e66b010b720f8d1447d5e744",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
