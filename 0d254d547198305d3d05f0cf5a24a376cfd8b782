@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f287b81_4bbb1dc4",
+        "filename": ".zuul.yaml",
+        "patchSetId": 14
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2017-08-29T21:06:49Z",
+      "side": 1,
+      "message": "Crazy idea for the future, we can add github.com/ansible/ansible in there :)",
+      "range": {
+        "startLine": 16,
+        "startChar": 4,
+        "endLine": 16,
+        "endChar": 21
+      },
+      "revId": "0d254d547198305d3d05f0cf5a24a376cfd8b782",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
