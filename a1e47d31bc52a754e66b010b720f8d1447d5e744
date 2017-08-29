@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f287b81_9f016009",
+        "filename": "zuul/ansible/logconfig.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-08-29T00:53:59Z",
+      "side": 1,
+      "message": "-1: I think we should omit the debug log from the default.  Ultimately the goal is to have the main log useful for anything short of diagnosing bugs in Zuul.",
+      "revId": "a1e47d31bc52a754e66b010b720f8d1447d5e744",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f287b81_8200e302",
+        "filename": "zuul/ansible/logconfig.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-08-29T00:53:59Z",
+      "side": 1,
+      "message": "0: It took me a minute to figure out why the file handlers aren\u0027t simply in the config -- (I think the reason is for ease of templating in the servername).  That may be worth a comment.",
+      "revId": "a1e47d31bc52a754e66b010b720f8d1447d5e744",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f287b81_6205f710",
+        "filename": "zuul/ansible/logconfig.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-08-29T00:53:59Z",
+      "side": 1,
+      "message": "0: I\u0027m not sure how intentional that is -- we may want to have everything go to files, but we have to be careful with propogate.",
+      "revId": "a1e47d31bc52a754e66b010b720f8d1447d5e744",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
