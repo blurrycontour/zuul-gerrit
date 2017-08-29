@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f287b81_fc3f3984",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 763,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-08-29T17:19:58Z",
+      "side": 1,
+      "message": "This has a shadow method in tests/base.py that should be updated I think.",
+      "revId": "ae952d8bbecd2bc874c356a3f7728fef70d5c9df",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
