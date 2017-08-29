@@ -252,7 +252,7 @@ class GithubWebhookListener():
         action = body.get('action')
         if action == 'pending':
             return
-        pr_body = self.connection.getPullBySha(body['sha'])
+        pr_body = self.connection.getPullBySha(body['sha'], body['name'])
         if pr_body is None:
             return
 
@@ -760,8 +760,8 @@ class GithubConnection(BaseConnection):
         # For now, just send back a True value.
         return True
 
-    def getPullBySha(self, sha):
-        query = '%s type:pr is:open' % sha
+    def getPullBySha(self, sha, repo):
+        query = '%s repo:%s type:pr is:open' % (sha, repo)
         pulls = []
         github = self.getGithubClient()
         for issue in github.search_issues(query=query):
