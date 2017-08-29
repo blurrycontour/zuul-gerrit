@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f287b81_1db55cee",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 808,
+      "author": {
+        "id": 6039
+      },
+      "writtenOn": "2017-08-29T21:31:28Z",
+      "side": 1,
+      "message": "Why are we only looking at change_ids[0]? If two change_ids are given and are in different pipeline queues, will change_ids[1] ever be removed from its pipeline queue? It looks to me like change_queue would only ever be the queue for change_ids[0] and the items for change_ids[1] would never be found in the next loop.",
+      "revId": "00da71ba2c5e6320de365fadfc0739340e4c19ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
