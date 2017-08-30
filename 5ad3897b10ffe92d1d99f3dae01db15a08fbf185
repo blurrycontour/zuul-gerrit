@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f287b81_ddf21b70",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-08-30T16:31:30Z",
+      "side": 1,
+      "message": "I\u0027d strike the TODO.  There\u0027s lots of api calls we make in the event handlers here.  Only reason to make it an event would be if you need to have the scheduler do something.",
+      "revId": "5ad3897b10ffe92d1d99f3dae01db15a08fbf185",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
