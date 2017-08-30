@@ -89,6 +89,10 @@ _DEFAULT_SERVER_LOGGING_CONFIG = {
             'handlers': ['console'],
             'level': 'INFO',
         },
+        'cachecontrol': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
         'sqlalchemy.engine': {
             'handlers': ['console'],
             'level': 'WARN',
