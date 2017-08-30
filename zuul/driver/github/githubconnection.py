@@ -268,6 +268,17 @@ class GithubWebhookListener():
         event.status = "%s:%s:%s" % _status_as_tuple(body)
         return event
 
+    def _event_create(self, body):
+        ref_type = body.get('ref_type')
+        if ref_type != 'branch':
+            return
+        branch_name = body['ref'].replace('refs/heads', '')
+        # TODO(mordred) This should be an event that we schedule and then
+        # process since it has the potential to make an API call.
+        self.connection.updateProjectBranches(
+            body['repository']['full_name'], branch_name)
+        return
+
     def _issue_to_pull_request(self, body):
         number = body.get('issue').get('number')
         project_name = body.get('repository').get('full_name')
@@ -717,16 +728,7 @@ class GithubConnection(BaseConnection):
     def addProject(self, project):
         self.projects[project.name] = project
 
-    def getProjectBranches(self, project, tenant):
-
-        # Evaluate if unprotected branches should be excluded or not. The first
-        # match wins. The order is project -> tenant (default is false).
-        project_config = tenant.project_configs.get(project.canonical_name)
-        if project_config.exclude_unprotected_branches is not None:
-            exclude_unprotected = project_config.exclude_unprotected_branches
-        else:
-            exclude_unprotected = tenant.exclude_unprotected_branches
-
+    def _updateProjectBranchCache(self, project, tenant):
         # TODO(mordred) Does it work for Github Apps to get repository
         # branches? If not, can we avoid doing this as an API for projects that
         # aren't trying to exclude protected branches by doing a git command
@@ -735,9 +737,12 @@ class GithubConnection(BaseConnection):
         try:
             owner, proj = project.name.split('/')
             repository = github.repository(owner, proj)
-            self._project_branch_cache[project.name] = [
-                branch.name for branch in repository.branches(
-                    protected=exclude_unprotected)]
+            branch_data = {'protected': [], 'all': []}
+            for branch in repository.branches():
+                if branch.protected:
+                    branch_data['protected'].append(branch.name)
+                branch_data['all'].append(branch.name)
+            self._project_branch_cache[project.name] = branch_data
             self.log.debug('Got project branches for %s', project.name)
             log_rate_limit(self.log, github)
         except github3.exceptions.ForbiddenError as e:
@@ -748,7 +753,42 @@ class GithubConnection(BaseConnection):
             else:
                 self.log.error(str(e), exc_info=True)
 
-        return self._project_branch_cache[project.name]
+    def getProjectBranches(self, project, tenant):
+
+        # Evaluate if unprotected branches should be excluded or not. The first
+        # match wins. The order is project -> tenant (default is false).
+        project_config = tenant.project_configs.get(project.canonical_name)
+        if project_config.exclude_unprotected_branches is not None:
+            exclude_unprotected = project_config.exclude_unprotected_branches
+        else:
+            exclude_unprotected = tenant.exclude_unprotected_branches
+
+        if project.name not in self._project_branch_cache:
+            self._updateProjectBranchCache(project, tenant)
+
+        if exclude_unprotected:
+            return self._project_branch_cache[project.name]['protected']
+        else:
+            return self._project_branch_cache[project.name]['all']
+
+    def updateProjectBranches(self, project, branch_name):
+        github = self.getGithubClient(project.name)
+        try:
+            owner, proj = project.name.split('/')
+            repository = github.repository(owner, proj)
+            branch = repository.branch(branch_name)
+            if branch.protected:
+                self._project_branch_cache[project]['protected'] = branch.name
+            self._project_branch_cache[project]['all'] = branch.name
+            self.log.debug('Got branch %s for %s', branch.name, project.name)
+            log_rate_limit(self.log, github)
+        except github3.exceptions.ForbiddenError as e:
+            self.log.error(str(e), exc_info=True)
+            rate_limit = github.rate_limit()
+            if rate_limit['resources']['core']['remaining'] == 0:
+                self.log.debug("Rate limit exceeded, using stale branch list")
+            else:
+                self.log.error(str(e), exc_info=True)
 
     def getPullUrl(self, project, number):
         return '%s/pull/%s' % (self.getGitwebUrl(project), number)
