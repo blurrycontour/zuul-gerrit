@@ -22,6 +22,30 @@
       "revId": "0d254d547198305d3d05f0cf5a24a376cfd8b782",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f287b81_15fcef3b",
+        "filename": ".zuul.yaml",
+        "patchSetId": 14
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-08-31T00:31:59Z",
+      "side": 1,
+      "message": "Yes. Yes we can.",
+      "parentUuid": "7f287b81_4bbb1dc4",
+      "range": {
+        "startLine": 16,
+        "startChar": 4,
+        "endLine": 16,
+        "endChar": 21
+      },
+      "revId": "0d254d547198305d3d05f0cf5a24a376cfd8b782",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
