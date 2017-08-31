@@ -293,6 +293,11 @@ class CallbackModule(default.CallbackModule):
         if result._task.loop and 'results' in result_dict:
             # items have their own events
             pass
+        elif (result_dict.get('msg') == 'MODULE FAILURE' and
+              'module_stdout' in result_dict):
+            self._log_message(
+                result,
+                "ERROR: {module_stdout}".format(**result_dict))
         else:
             self._log_message(
                 result=result, status='ERROR', result_dict=result_dict)
@@ -423,10 +428,26 @@ class CallbackModule(default.CallbackModule):
                 status='ERROR',
                 result_dict=result_dict)
         else:
-            self._log_message(
-                result,
-                "Item: {item} Runtime: {delta}"
-                " Start: {start} End: {end}".format(**result_dict))
+            if 'exception' in result_dict:
+                self._log_message(
+                    result,
+                    "Item: {item} Exception: {exception}".format(
+                        **result_dict))
+            elif 'delta' in result_dict and 'start' in result_dict:
+                self._log_message(
+                    result,
+                    "Item: {item} Runtime: {delta}"
+                    " Start: {start} End: {end}".format(**result_dict))
+            elif (result_dict.get('msg') == 'MODULE FAILURE' and
+                  'module_stdout' in result_dict):
+                self._log_message(
+                    result,
+                    "Item: {item} Output: {module_stdout}".format(
+                        **result_dict))
+            else:
+                self._log_message(
+                    result, "Item: {item} Result: {result}".format(
+                        **result_dict))
 
         if self._deferred_result:
             self._process_deferred(result)
