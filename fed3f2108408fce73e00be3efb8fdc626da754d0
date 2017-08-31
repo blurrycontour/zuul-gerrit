@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f287b81_8361ac14",
+        "filename": "playbooks/zuul-stream/functional.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-08-31T21:04:15Z",
+      "side": 1,
+      "message": "This is super fun to read...",
+      "revId": "fed3f2108408fce73e00be3efb8fdc626da754d0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
