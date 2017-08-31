@@ -7,6 +7,18 @@
         ZUUL_JOB_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
         ARA_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
 
+    - name: Validate output - setupvar
+      command: 'fgrep ''"setupvar": {'' job-output.txt'
+
+    - name: Validate output - shell task
+      command: 'fgrep "link/loopback" job-output.txt'
+
+    - name: Validate output - loop with items
+      shell: |
+        fgrep "Item: item1" job-output.txt
+        fgrep "Item: item2" job-output.txt
+        fgrep "Item: item3" job-output.txt
+
     - name: Generate ARA html
       command: ara generate html ara-output
 
