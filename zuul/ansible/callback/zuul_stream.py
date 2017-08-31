@@ -366,6 +366,16 @@ class CallbackModule(default.CallbackModule):
             # items have their own events
             pass
 
+        elif (len([key for key in result_dict.keys()
+                   if not key.startswith('_ansible')]) == 1):
+            # this is a debug statement, handle it special
+            for key in [k for k in result_dict.keys()
+                        if k.startswith('_ansible')]:
+                del result_dict[key]
+            self._log_message(
+                msg=json.dumps(result_dict, indent=2, sort_keys=True),
+                status=status, result=result)
+
         elif result._task.action not in ('command', 'shell'):
             if 'msg' in result_dict:
                 self._log_message(msg=result_dict['msg'],
