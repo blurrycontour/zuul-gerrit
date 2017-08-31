@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f287b81_59d7424c",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 450,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2017-08-31T14:55:25Z",
+      "side": 1,
+      "message": "Those if/elif are quite optimistic since modules can return whatever they want but I guess it\u0027s okay for now.\n\nWe\u0027re probably not interested in maintaining and growing an endless list to support variations of how modules report failures which can be different even across Ansible versions.\n\nI don\u0027t have any great ideas about this right now.",
+      "range": {
+        "startLine": 431,
+        "startChar": 0,
+        "endLine": 450,
+        "endChar": 39
+      },
+      "revId": "92c4ea7f2b858234e74a2139d8b99dc4881a4129",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
