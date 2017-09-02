@@ -33,6 +33,7 @@
         - tox-pep8
         - tox-py35
         - zuul-stream-functional
+        - openstack-doc-build
     gate:
       jobs:
         - tox-docs
