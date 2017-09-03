@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7f287b81_ad035273",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-09-03T03:01:02Z",
+      "side": 1,
+      "message": "I\u0027ve replaced the where() by .select_from(build.join(buildset)).\n\nNot sure what it does though, results are identic.",
+      "parentUuid": "df3967d1_d3f2c806",
+      "revId": "76cfd4620bb5e2c639b2906f9d9e796555b1ff4d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df3967d1_f33b8c99",
         "filename": "zuul/web/__init__.py",
         "patchSetId": 6
@@ -30,6 +48,24 @@
       "writtenOn": "2017-07-31T09:07:34Z",
       "side": 1,
       "message": "implementing ordering as well would be nice",
+      "revId": "76cfd4620bb5e2c639b2906f9d9e796555b1ff4d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f287b81_ad1112af",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-09-03T03:01:02Z",
+      "side": 1,
+      "message": "I added static ordering to get last build first.",
+      "parentUuid": "df3967d1_f33b8c99",
       "revId": "76cfd4620bb5e2c639b2906f9d9e796555b1ff4d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
