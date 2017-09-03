@@ -13,6 +13,12 @@
     - name: Rename job-output.txt
       command: mv job-output.txt stream-job-output.txt
 
+    - name: Generate ARA html
+      command: ara generate html ara-output
+
+    - name: Compress ARA html
+      command: gzip --recursive --best ara-output
+
     - name: Fetch files
       synchronize:
         src: "{{ ansible_user_dir }}/{{ item }}"
