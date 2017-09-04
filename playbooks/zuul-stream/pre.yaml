@@ -1,4 +1,19 @@
 - hosts: controller
+
+  tasks:
+
+    - name: Add PPA with python segfault backport
+      apt_repository:
+        repo: 'ppa:openstack-ci-core/python-bpo-27945-backport'
+
+    - name: Update python 3.5
+      apt:
+        name: python3.5
+        state: latest:
+        update_cache: yes
+
+- hosts: controller
+
   roles:
 
     - role: bindep
