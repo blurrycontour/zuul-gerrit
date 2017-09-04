@@ -3,15 +3,6 @@
     nodes:
       - name: controller
         label: ubuntu-xenial
-      - name: node1
-        label: ubuntu-xenial
-      - name: node2
-        label: ubuntu-xenial
-    groups:
-      - name: node
-        nodes:
-          - node1
-          - node2
 
 - job:
     name: zuul-stream-functional
@@ -19,11 +10,8 @@
     nodes: zuul-functional
     pre-run: playbooks/zuul-stream/pre
     run: playbooks/zuul-stream/functional
-    post-run:
-      - playbooks/zuul-stream/post
-      - playbooks/zuul-stream/post-ara
     required-projects:
-      - openstack/ara
+      - openstack-dev/devstack
     files:
       - "zuul/ansible/callback/.*"
       - "playbooks/zuul-stream/.*"
