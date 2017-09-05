@@ -37,6 +37,14 @@ class TestInventory(ZuulTestCase):
         inv_path = os.path.join(build.jobdir.root, 'ansible', 'inventory.yaml')
         return yaml.safe_load(open(inv_path, 'r'))
 
+    def _get_separate_hostvars(self, build_name, host_name):
+        build = self.getBuildByName(build_name)
+        path = os.path.join(build.jobdir.root, 'ansible', 'host_vars',
+                            '{}.yaml'.format(host_name))
+        if not os.path.exists(path):
+            return {}
+        return yaml.safe_load(open(path, 'r'))
+
     def test_single_inventory(self):
 
         inventory = self._get_build_inventory('single-inventory')
@@ -85,12 +93,13 @@ class TestInventory(ZuulTestCase):
 
         inventory = self._get_build_inventory('hostvars-inventory')
 
-        all_nodes = ('default', 'fakeuser')
+        all_nodes = ('default', 'fakeuser', 'fakepassword')
         self.assertIn('all', inventory)
         self.assertIn('hosts', inventory['all'])
         self.assertIn('vars', inventory['all'])
         for node_name in all_nodes:
             self.assertIn(node_name, inventory['all']['hosts'])
+
             # check if the nodes use the correct username
             if node_name == 'fakeuser':
                 username = 'fakeuser'
@@ -98,6 +107,21 @@ class TestInventory(ZuulTestCase):
                 username = 'zuul'
             self.assertEqual(
                 inventory['all']['hosts'][node_name]['ansible_user'], username)
+
+            # check if the nodes have the correct (or missing) password
+            separate_hostvars = self._get_separate_hostvars(
+                'hostvars-inventory', node_name)
+            if node_name == 'fakepassword':
+                self.assertIn('ansible_password', separate_hostvars.keys())
+                self.assertEqual(separate_hostvars.get('ansible_password'),
+                                 'fakepassword')
+            else:
+                self.assertNotIn('ansible_password', separate_hostvars.keys())
+
+            # check that there is no password in the inventory hostvars as
+            # this must be in the separate hostvars
+            self.assertNotIn('ansible_password',
+                             inventory['all']['hosts'][node_name].keys())
 
         self.executor_server.release()
         self.waitUntilSettled()

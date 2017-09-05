@@ -38,6 +38,8 @@
         label: default-label
       - name: fakeuser
         label: fakeuser-label
+      - name: fakepassword
+        label: fakepassword-label
 
 - job:
     name: base

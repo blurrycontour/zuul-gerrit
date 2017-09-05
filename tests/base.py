@@ -1698,6 +1698,8 @@ class FakeNodepool(object):
                     executor='fake-nodepool')
         if 'fakeuser' in node_type:
             data['username'] = 'fakeuser'
+        if 'fakepassword' in node_type:
+            data['password'] = 'fakepassword'
         data = json.dumps(data).encode('utf8')
         path = self.client.create(path, data,
                                   makepath=True,

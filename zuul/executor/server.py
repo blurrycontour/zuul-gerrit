@@ -282,6 +282,8 @@ class JobDir(object):
         #   ansible (mounted in bwrap read-only)
         #     logging.json
         #     inventory.yaml
+        #     host_vars
+        #       node1.yaml
         #   .ansible (mounted in bwrap read-write)
         #     fact-cache/localhost
         #   playbook_0 (mounted in bwrap for each playbook read-only)
@@ -316,6 +318,8 @@ class JobDir(object):
         os.makedirs(self.log_root)
         self.ansible_root = os.path.join(self.root, 'ansible')
         os.makedirs(self.ansible_root)
+        self.hostvars_root = os.path.join(self.ansible_root, 'host_vars')
+        os.makedirs(self.hostvars_root)
         self.trusted_root = os.path.join(self.root, 'trusted')
         os.makedirs(self.trusted_root)
         ssh_dir = os.path.join(self.work_root, '.ssh')
@@ -1171,9 +1175,18 @@ class AnsibleJob(object):
                     private_ipv4=node.get('private_ipv4'),
                     public_ipv6=node.get('public_ipv6')))
 
+            # Sensitive data like passwords for accessing the node should
+            # be in a separate host specific file such that the inventory
+            # can be published safely.
+            separate_host_vars = dict()
+
             username = node.get('username')
             if username:
                 host_vars['ansible_user'] = username
+
+            password = node.get('password')
+            if password:
+                separate_host_vars['ansible_password'] = password
 
             host_keys = []
             for key in node.get('host_keys'):
@@ -1185,7 +1198,8 @@ class AnsibleJob(object):
             hosts.append(dict(
                 name=node['name'],
                 host_vars=host_vars,
-                host_keys=host_keys))
+                host_keys=host_keys,
+                separate_host_vars=separate_host_vars))
         return hosts
 
     def _blockPluginDirs(self, path):
@@ -1413,6 +1427,17 @@ class AnsibleJob(object):
             for node in nodes:
                 for key in node['host_keys']:
                     known_hosts.write('%s\n' % key)
+
+        for node in nodes:
+            if node.get('separate_host_vars', None):
+                # The node contains host vars which should be separate from the
+                # inventory.
+                filename = '%s.yaml' % node['name']
+                path = os.path.join(self.jobdir.hostvars_root, filename)
+                with open(path, 'w') as separate_hostvars_yaml:
+                    separate_hostvars_yaml.write(
+                        yaml.safe_dump(node['separate_host_vars'],
+                                       default_flow_style=False))
 
     def writeLoggingConfig(self):
         self.log.debug("Writing logging config for job %s %s",
