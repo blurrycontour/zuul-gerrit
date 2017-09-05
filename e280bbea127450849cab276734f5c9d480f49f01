@@ -16,6 +16,23 @@
       "revId": "e280bbea127450849cab276734f5c9d480f49f01",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f287b81_19a5d304",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-09-05T21:32:47Z",
+      "side": 1,
+      "message": "This watcher class is 1:1 with a connection, and the connection has a canonical hostname.  So we can use tenant.getProject(self.connection.canonical_hostname + \u0027/\u0027 + event.project_name) to fully qualify the project name.\n\nOf course tenant.getProject is going to immediately split that into two strings again, so this is a really good case for refactoring that method into two: one that takes a string, and one that takes two arguments (hostname, project name).  Or at least leaving a TODO here for that.  :)",
+      "revId": "e280bbea127450849cab276734f5c9d480f49f01",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
