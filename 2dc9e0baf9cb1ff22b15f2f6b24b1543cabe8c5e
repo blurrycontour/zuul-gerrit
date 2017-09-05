@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f287b81_407da16c",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2017-09-05T17:40:00Z",
+      "side": 1,
+      "message": "AttributeError: \u0027GerritEventConnector\u0027 object has no attribute \u0027abide\u0027",
+      "revId": "2dc9e0baf9cb1ff22b15f2f6b24b1543cabe8c5e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
