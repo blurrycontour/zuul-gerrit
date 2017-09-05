@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f287b81_a049e5b7",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2017-09-05T18:04:52Z",
+      "side": 1,
+      "message": "Exception: Project name \u0027org/project1\u0027 is ambiguous, please fully qualify the project with a hostname",
+      "revId": "e280bbea127450849cab276734f5c9d480f49f01",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
