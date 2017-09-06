@@ -32,7 +32,7 @@
     name: openstack-infra/zuul
     check:
       jobs:
-        - tox-docs
+        - build-openstack-sphinx-docs
         - tox-cover:
             voting: false
         - tox-pep8
@@ -40,7 +40,7 @@
         - zuul-stream-functional
     gate:
       jobs:
-        - tox-docs
+        - build-openstack-sphinx-docs
         - tox-pep8
         - tox-py35
     post:
