@@ -46,14 +46,14 @@ class TestLogStreamer(tests.base.BaseTestCase):
         streamer = self.startStreamer(port)
         self.addCleanup(streamer.stop)
 
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
         self.addCleanup(s.close)
         self.assertEqual(0, s.connect_ex((self.host, port)))
         s.close()
 
         streamer.stop()
 
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
         self.addCleanup(s.close)
         self.assertNotEqual(0, s.connect_ex((self.host, port)))
         s.close()
@@ -80,7 +80,7 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
             root = tempfile.gettempdir()
         self.streamer = zuul.lib.log_streamer.LogStreamer(None, self.host,
                                                           port, root)
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
         s.connect((self.host, port))
         self.addCleanup(s.close)
 
@@ -237,7 +237,7 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
         self.addCleanup(web_server.stop)
 
         # Wait until web server is started
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        with socket.socket(socket.AF_INET6, socket.SOCK_STREAM) as s:
             while s.connect_ex((self.host, 9000)):
                 time.sleep(0.1)
 
