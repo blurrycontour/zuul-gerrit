@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f287b81_87f395e7",
+        "filename": "zuul/ansible/library/command.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2017-09-06T02:02:17Z",
+      "side": 0,
+      "message": "the original problem here being that \"outln\" from commands is a binary string, not unicode.  this is hidden on python2 if everything is ascii and thus the bytes \u003d\u003d unicode anyway.  But if a non-ascii character is in there (such as wgets\u0027s fancy output) we have no idea how to represent that in utf-8 without being told what encoding it came from.",
+      "revId": "6fcf115d02461540b1abde92d26a010a6ba978a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}

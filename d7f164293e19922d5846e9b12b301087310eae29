@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f287b81_f4aa0983",
+        "filename": "zuul/ansible/library/command.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2017-09-06T02:02:17Z",
+      "side": 1,
+      "message": "3/ ln is either\n\n - binary string from follow()\n - unicode string from addLine(\"String\") [python3, or python2 if addLine(unicode(\"String\"))]",
+      "revId": "d7f164293e19922d5846e9b12b301087310eae29",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f287b81_74e4d9ac",
+        "filename": "zuul/ansible/library/command.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2017-09-06T02:02:17Z",
+      "side": 1,
+      "message": "4/ at this point, ln must be a python3 inline string or a python2 unicode() string.  Command output is already in bytes.\n\nTherefore we know that this *is* utf-8 because it\u0027s a python unicode, and this is valid to convert it to bytes.\n\nI think this is counter to what is suggested by the changelog",
+      "revId": "d7f164293e19922d5846e9b12b301087310eae29",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f287b81_f4e9e97f",
+        "filename": "zuul/ansible/library/command.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2017-09-06T02:02:17Z",
+      "side": 1,
+      "message": "5/ per 4 above, i\u0027m not sure why we would fall into an exception case here",
+      "revId": "d7f164293e19922d5846e9b12b301087310eae29",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f287b81_349531e5",
+        "filename": "zuul/ansible/library/command.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2017-09-06T02:02:17Z",
+      "side": 1,
+      "message": "6/ ts \u0026 ln both binary now",
+      "revId": "d7f164293e19922d5846e9b12b301087310eae29",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f287b81_f49e8905",
+        "filename": "zuul/ansible/library/command.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2017-09-06T02:02:17Z",
+      "side": 1,
+      "message": "7/ logfile is binary and outline is binary, so should be happy",
+      "revId": "d7f164293e19922d5846e9b12b301087310eae29",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f287b81_741bb91a",
+        "filename": "zuul/ansible/library/command.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2017-09-06T02:02:17Z",
+      "side": 1,
+      "message": "2/ this is returning binary strings, per 1 being opened in binary mode",
+      "revId": "d7f164293e19922d5846e9b12b301087310eae29",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f287b81_5430bde8",
+        "filename": "zuul/ansible/library/command.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2017-09-06T02:02:17Z",
+      "side": 1,
+      "message": "1/ so cmd.stdout will be opened in binary mode by default here (python2 or 3)",
+      "revId": "d7f164293e19922d5846e9b12b301087310eae29",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
