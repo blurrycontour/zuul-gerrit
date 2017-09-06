@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f287b81_d8273b64",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-09-06T07:44:07Z",
+      "side": 1,
+      "message": "Creating a set of all changes (which could be potentially thousands on large installations) on every gerrit event for checking if a change is in the cache looks a bit overkill to me. We might want to modify the cache data structure such that we can also access the cache without patchset.\n\nMaybe with a two layer dict approach:\n\n  change_cache[change_id][patchset]",
+      "range": {
+        "startLine": 318,
+        "startChar": 0,
+        "endLine": 318,
+        "endChar": 77
+      },
+      "revId": "7c665a787e4cb1f33d82d52dfdf5e9a721c8b3ae",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
