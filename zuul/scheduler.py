@@ -585,8 +585,7 @@ class Scheduler(threading.Thread):
 
             self._reenqueueTenant(old_tenant, tenant)
 
-        # TODOv3(jeblair): update for tenants
-        # self.maintainConnectionCache()
+        self.maintainConnectionCache()
         self.connections.reconfigureDrivers(tenant)
 
         # TODOv3(jeblair): remove postconfig calls?
@@ -719,7 +718,6 @@ class Scheduler(threading.Thread):
                 self.run_handler_lock.release()
 
     def maintainConnectionCache(self):
-        # TODOv3(jeblair): update for tenants
         relevant = set()
         for tenant in self.abide.tenants.values():
             for pipeline in tenant.layout.pipelines.values():
