@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f287b81_edf58158",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 557,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-09-06T19:57:59Z",
+      "side": 1,
+      "message": "We need to do the rstrip() before the split here, otherwise we end up with a blank empty trailing line.",
+      "revId": "d4c5622c038a291c11422a330e1b7fb783ffeb3e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
