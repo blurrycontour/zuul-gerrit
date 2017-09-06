@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f287b81_956f31fb",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1159,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-09-06T14:12:11Z",
+      "side": 1,
+      "message": "I think here, even though it\u0027s _slight_ overkill, we should do:\n\n  port \u003d node.get(\u0027connection_port\u0027, node.get(\u0027ssh_port\u0027, 22))\n\nBecause nodepool and zuul are separate so the nodepool change might land before the zuul change. We can then have a follow up change to remove ssh_port once we\u0027re happy folks have updated (for now, \u0027folks\u0027 \u003d\u003d BMW, OpenStack and Bonny - anybody else is running at their own risk)",
+      "revId": "96b7195ec86adb3e4a61cb35350e791ee0889b1c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
