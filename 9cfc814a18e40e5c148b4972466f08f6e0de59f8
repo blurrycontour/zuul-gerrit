@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f287b81_e27c52b7",
+        "filename": "tests/unit/test_log_streamer.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-09-07T14:40:54Z",
+      "side": 1,
+      "message": "This should be create_connection as well.",
+      "revId": "9cfc814a18e40e5c148b4972466f08f6e0de59f8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
