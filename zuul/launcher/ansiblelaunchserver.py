@@ -317,6 +317,7 @@ class LaunchServer(object):
         if self.accept_nodes:
             new_functions.add("node_assign:zuul")
         new_functions.add("stop:%s" % self.hostname)
+        new_functions.add("cancel:%s" % self.hostname)
         new_functions.add("set_description:%s" % self.hostname)
         new_functions.add("node_revoke:%s" % self.hostname)
 
@@ -458,6 +459,9 @@ class LaunchServer(object):
                     elif job.name.startswith('stop:'):
                         self.log.debug("Got stop job: %s" % job.unique)
                         self.stopJob(job)
+                    elif job.name.startswith('cancel:'):
+                        self.log.info("Got cancel job: %s" % job.unique)
+                        self.cancelJob(job)
                     elif job.name.startswith('set_description:'):
                         self.log.debug("Got set_description job: %s" %
                                        job.unique)
@@ -518,7 +522,7 @@ class LaunchServer(object):
         finally:
             job.sendWorkComplete()
 
-    def stopJob(self, job):
+    def stopJob(self, job, action='abort'):
         try:
             args = json.loads(job.arguments)
             self.log.debug("Stop job with arguments: %s" % (args,))
@@ -533,7 +537,7 @@ class LaunchServer(object):
                 return
             try:
                 if node.isAlive():
-                    node.queue.put(dict(action='abort'))
+                    node.queue.put(dict(action=action))
                 else:
                     self.log.debug("Node %s is not alive while aborting job" %
                                    (node.name,))
@@ -542,6 +546,9 @@ class LaunchServer(object):
                                    "to worker:")
         finally:
             job.sendWorkComplete()
+
+    def cancelJob(self, job):
+        self.stopJob(job, action='cancel')
 
     def runReaper(self):
         # We don't actually care if all the events are processed
@@ -713,6 +720,10 @@ class NodeWorker(object):
             elif item['action'] == 'abort':
                 self.log.debug("Received abort request")
                 self.abortRunningJob()
+            elif item['action'] == 'cancel':
+                self.log.debug("Received cancel request")
+                self._canceled_job = True
+                self.abortRunningJob()
         finally:
             self.queue.task_done()
 
@@ -820,6 +831,7 @@ class NodeWorker(object):
         result = None
         self._sent_complete_event = False
         self._aborted_job = False
+        self._canceled_job = False
         self._watchdog_timeout = False
 
         try:
@@ -917,18 +929,24 @@ class NodeWorker(object):
             job.sendWorkStatus(0, 100)
 
             pre_status = self.runAnsiblePrePlaybook(jobdir)
+            if self._canceled_job:
+                return 'CANCELED'
             if pre_status is None:
                 # These should really never fail, so return None and have
                 # zuul try again
                 return result
 
             job_status = self.runAnsiblePlaybook(jobdir, timeout)
+            if self._canceled_job:
+                return 'CANCELED'
             if job_status is None:
                 # The result of the job is indeterminate.  Zuul will
                 # run it again.
                 return result
 
             post_status = self.runAnsiblePostPlaybook(jobdir, job_status)
+            if self._canceled_job:
+                return 'CANCELED'
             if not post_status:
                 result = 'POST_FAILURE'
             elif job_status:
