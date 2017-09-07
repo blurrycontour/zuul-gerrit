@@ -19,8 +19,7 @@
         label: controller-label
       - name: compute1
         label: compute-label
-      - name: compute2
-        label: compute-label
+      - compute-label
     groups:
       - name: ceph-osd
         nodes:
@@ -29,7 +28,7 @@
         nodes:
           - controller
           - compute1
-          - compute2
+          - compute-label
 
 - job:
     name: base
@@ -38,8 +37,7 @@
 - job:
     name: single-inventory
     nodes:
-      - name: ubuntu-xenial
-        label: ubuntu-xenial
+      - ubuntu-xenial
 
 - job:
     name: group-inventory

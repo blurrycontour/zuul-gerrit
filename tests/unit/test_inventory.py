@@ -61,7 +61,7 @@ class TestInventory(ZuulTestCase):
 
         inventory = self._get_build_inventory('group-inventory')
 
-        all_nodes = ('controller', 'compute1', 'compute2')
+        all_nodes = ('controller', 'compute1', 'compute-label')
         self.assertIn('all', inventory)
         self.assertIn('hosts', inventory['all'])
         self.assertIn('vars', inventory['all'])

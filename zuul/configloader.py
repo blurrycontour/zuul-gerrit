@@ -264,7 +264,7 @@ class NodeSetParser(object):
                  }
 
         nodeset = {vs.Required('name'): str,
-                   vs.Required('nodes'): to_list(node),
+                   vs.Required('nodes'): to_list(vs.Any(node, str)),
                    'groups': to_list(group),
                    '_source_context': model.SourceContext,
                    '_start_mark': ZuulMark,
@@ -279,6 +279,8 @@ class NodeSetParser(object):
         node_names = set()
         group_names = set()
         for conf_node in as_list(conf['nodes']):
+            if isinstance(conf_node, str):
+                conf_node = {'name': conf_node, 'label': conf_node}
             if conf_node['name'] in node_names:
                 raise DuplicateNodeError(conf['name'], conf_node['name'])
             node = model.Node(conf_node['name'], conf_node['label'])
@@ -357,7 +359,7 @@ class JobParser(object):
                'files': to_list(str),
                'secrets': to_list(vs.Any(secret, str)),
                'irrelevant-files': to_list(str),
-               'nodes': vs.Any([node], str),
+               'nodes': to_list(vs.Any(node, str)),
                'timeout': int,
                'attempts': int,
                'pre-run': to_list(str),
@@ -540,7 +542,11 @@ class JobParser(object):
             else:
                 ns = model.NodeSet()
                 for conf_node in conf_nodes:
-                    node = model.Node(conf_node['name'], conf_node['label'])
+                    if isinstance(conf_node, str):
+                        node = model.Node(conf_node, conf_node)
+                    else:
+                        node = model.Node(conf_node['name'],
+                                          conf_node['label'])
                     ns.addNode(node)
             if tenant.max_nodes_per_job != -1 and \
                len(ns) > tenant.max_nodes_per_job:

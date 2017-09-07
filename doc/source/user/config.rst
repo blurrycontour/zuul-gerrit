@@ -1197,7 +1197,10 @@ configuration may be simplified.
    .. attr:: nodes
       :required:
 
-      A list of node definitions, each of which has the following format:
+      A list of node definitions, each of which can either be a string
+      or a dictionary. If it is a string, its value will be used for both
+      :attr:`name` and :attr:`label`. If it is a dictionary, it should have
+      the following format:
 
       .. attr:: name
          :required:
