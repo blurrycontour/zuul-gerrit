@@ -1,0 +1,9 @@
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Code-Review+2: Jesse Keating <omgjlk@us.ibm.com>
+Workflow+1: Jesse Keating <omgjlk@us.ibm.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Thu, 07 Sep 2017 03:21:14 +0000
+Reviewed-on: https://review.openstack.org/501499
+Project: openstack-infra/zuul
+Branch: refs/heads/feature/zuulv3
