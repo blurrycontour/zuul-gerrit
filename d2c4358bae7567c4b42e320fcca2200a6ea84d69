@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f2577a7_bcaa8d16",
+        "filename": "zuul/cmd/migrate.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2017-09-08T18:58:15Z",
+      "side": 1,
+      "message": "Should there be a else here with a debug to let us know there is a problem ?",
+      "range": {
+        "startLine": 245,
+        "startChar": 11,
+        "endLine": 245,
+        "endChar": 25
+      },
+      "revId": "d2c4358bae7567c4b42e320fcca2200a6ea84d69",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_9c4471b9",
+        "filename": "zuul/lib/yamlutil.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2017-09-08T18:58:15Z",
+      "side": 1,
+      "message": "should this be yaml.safe_load or the safe_load function that\u0027s in this file ?",
+      "range": {
+        "startLine": 107,
+        "startChar": 16,
+        "endLine": 107,
+        "endChar": 20
+      },
+      "revId": "d2c4358bae7567c4b42e320fcca2200a6ea84d69",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
