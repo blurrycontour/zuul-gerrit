@@ -35,7 +35,7 @@ class TestLogStreamer(tests.base.BaseTestCase):
 
     def setUp(self):
         super(TestLogStreamer, self).setUp()
-        self.host = '0.0.0.0'
+        self.host = '::'
 
     def startStreamer(self, port, root=None):
         if not root:
@@ -64,7 +64,7 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
 
     def setUp(self):
         super(TestStreaming, self).setUp()
-        self.host = '0.0.0.0'
+        self.host = '::'
         self.streamer = None
         self.stop_streamer = False
         self.streaming_data = ''
