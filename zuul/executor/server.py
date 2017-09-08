@@ -1188,6 +1188,10 @@ class AnsibleJob(object):
             if password:
                 separate_host_vars['ansible_password'] = password
 
+            connection_type = node.get('connection_type')
+            if connection_type:
+                host_vars['ansible_connection'] = connection_type
+
             host_keys = []
             for key in node.get('host_keys'):
                 if port != 22:

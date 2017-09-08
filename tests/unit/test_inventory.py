@@ -108,6 +108,15 @@ class TestInventory(ZuulTestCase):
             self.assertEqual(
                 inventory['all']['hosts'][node_name]['ansible_user'], username)
 
+            # check if the nodes use the correct or no ansible_connection
+            if node_name == 'windows':
+                self.assertEqual(
+                    inventory['all']['hosts'][node_name]['ansible_connection'],
+                    'winrm')
+            else:
+                self.assertNotIn('ansible_password',
+                                 inventory['all']['hosts'][node_name].keys())
+
             # check if the nodes have the correct (or missing) password
             separate_hostvars = self._get_separate_hostvars(
                 'hostvars-inventory', node_name)
