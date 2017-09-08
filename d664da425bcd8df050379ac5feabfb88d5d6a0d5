@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f2577a7_c7f2229b",
+        "filename": "tests/unit/test_log_streamer.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-09-08T19:50:31Z",
+      "side": 1,
+      "message": "Why not \u0027localhost\u0027? This should work with ipv4 and 6.",
+      "range": {
+        "startLine": 161,
+        "startChar": 26,
+        "endLine": 161,
+        "endChar": 31
+      },
+      "revId": "d664da425bcd8df050379ac5feabfb88d5d6a0d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_470d128f",
+        "filename": "tests/unit/test_log_streamer.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-09-08T19:50:31Z",
+      "side": 1,
+      "message": "unrelated, but this also might be better \u0027localhost\u0027.",
+      "range": {
+        "startLine": 227,
+        "startChar": 25,
+        "endLine": 227,
+        "endChar": 34
+      },
+      "revId": "d664da425bcd8df050379ac5feabfb88d5d6a0d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
