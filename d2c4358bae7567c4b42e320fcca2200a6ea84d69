@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "5f2577a7_5c1e0971",
+        "filename": "zuul/cmd/migrate.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-09-08T20:05:44Z",
+      "side": 1,
+      "message": "No - there are plenty of jobs that don\u0027t have node names in their job names - so it\u0027s legit to fall through silently.",
+      "parentUuid": "5f2577a7_bcaa8d16",
+      "range": {
+        "startLine": 245,
+        "startChar": 11,
+        "endLine": 245,
+        "endChar": 25
+      },
+      "revId": "d2c4358bae7567c4b42e320fcca2200a6ea84d69",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f2577a7_47ff5267",
         "filename": "zuul/lib/yamlutil.py",
         "patchSetId": 9
@@ -36,6 +60,24 @@
       "writtenOn": "2017-09-08T19:45:24Z",
       "side": 1,
       "message": "I think these are being globally added, and since this is called 3 times, I think they\u0027re being called 3 times?\n\nAt any rate, since most of this is only really used for the migrate script, let\u0027s move it into there so we don\u0027t have to worry about any impacts it may have on the rest of zuul.  In doing so, maybe move these add_ methods out of here and into the global scope?",
+      "revId": "d2c4358bae7567c4b42e320fcca2200a6ea84d69",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_c72d82a9",
+        "filename": "zuul/lib/yamlutil.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-09-08T20:05:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f2577a7_47ff5267",
       "revId": "d2c4358bae7567c4b42e320fcca2200a6ea84d69",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -76,6 +118,24 @@
       "writtenOn": "2017-09-08T19:45:24Z",
       "side": 1,
       "message": "yeah, safe_load in this file (which will be available in zuul.lib.yamlutil.safe_load after this gets moved into migrate) is probably the way to go.",
+      "revId": "d2c4358bae7567c4b42e320fcca2200a6ea84d69",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_0724aac5",
+        "filename": "zuul/lib/yamlutil.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-09-08T20:05:44Z",
+      "side": 1,
+      "message": "it\u0027s not using safe_load or safe_dump because it\u0027s overriding resolvers/loaders/dumpers. I\u0027m sure there\u0027s probably some way to make that work with the safe versions - but I don\u0027t know what it is or if it\u0027s worth figuring out.",
+      "parentUuid": "5f2577a7_2704467b",
       "revId": "d2c4358bae7567c4b42e320fcca2200a6ea84d69",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
