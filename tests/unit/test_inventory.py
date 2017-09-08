@@ -99,5 +99,14 @@ class TestInventory(ZuulTestCase):
             self.assertEqual(
                 inventory['all']['hosts'][node_name]['ansible_user'], username)
 
+            # check if the nodes use the correct or no ansible_connection
+            if node_name == 'windows':
+                self.assertEqual(
+                    inventory['all']['hosts'][node_name]['ansible_connection'],
+                    'winrm')
+            else:
+                self.assertNotIn('ansible_connection',
+                                 inventory['all']['hosts'][node_name].keys())
+
         self.executor_server.release()
         self.waitUntilSettled()

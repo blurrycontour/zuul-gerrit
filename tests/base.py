@@ -1698,6 +1698,9 @@ class FakeNodepool(object):
                     executor='fake-nodepool')
         if 'fakeuser' in node_type:
             data['username'] = 'fakeuser'
+        if 'windows' in node_type:
+            data['connection_type'] = 'winrm'
+
         data = json.dumps(data).encode('utf8')
         path = self.client.create(path, data,
                                   makepath=True,
