@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "5f2577a7_47ff5267",
+        "filename": "zuul/lib/yamlutil.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-09-08T19:45:24Z",
+      "side": 1,
+      "message": "I think these are being globally added, and since this is called 3 times, I think they\u0027re being called 3 times?\n\nAt any rate, since most of this is only really used for the migrate script, let\u0027s move it into there so we don\u0027t have to worry about any impacts it may have on the rest of zuul.  In doing so, maybe move these add_ methods out of here and into the global scope?",
+      "revId": "d2c4358bae7567c4b42e320fcca2200a6ea84d69",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f2577a7_9c4471b9",
         "filename": "zuul/lib/yamlutil.py",
         "patchSetId": 9
@@ -42,6 +59,23 @@
         "endLine": 107,
         "endChar": 20
       },
+      "revId": "d2c4358bae7567c4b42e320fcca2200a6ea84d69",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_2704467b",
+        "filename": "zuul/lib/yamlutil.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-09-08T19:45:24Z",
+      "side": 1,
+      "message": "yeah, safe_load in this file (which will be available in zuul.lib.yamlutil.safe_load after this gets moved into migrate) is probably the way to go.",
       "revId": "d2c4358bae7567c4b42e320fcca2200a6ea84d69",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
