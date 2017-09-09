@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "5f2577a7_7eb1afe1",
+        "filename": "tests/unit/test_log_streamer.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-09-09T12:52:29Z",
+      "side": 1,
+      "message": "Because \u0027localhost\u0027 did not work for me.",
+      "parentUuid": "5f2577a7_c7f2229b",
+      "range": {
+        "startLine": 161,
+        "startChar": 26,
+        "endLine": 161,
+        "endChar": 31
+      },
+      "revId": "d664da425bcd8df050379ac5feabfb88d5d6a0d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f2577a7_470d128f",
         "filename": "tests/unit/test_log_streamer.py",
         "patchSetId": 3
