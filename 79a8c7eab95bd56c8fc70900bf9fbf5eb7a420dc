@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f2577a7_3d5c444a",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1576,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2017-09-10T23:49:50Z",
+      "side": 1,
+      "message": "I do not mind, but I\u0027ve found it less fiddly to convert to unicode (the python type) at the point of input (i.e. here) ...",
+      "revId": "79a8c7eab95bd56c8fc70900bf9fbf5eb7a420dc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_bd35d4f9",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1577,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2017-09-10T23:49:50Z",
+      "side": 1,
+      "message": "... because you have to remember to do things like this ...",
+      "revId": "79a8c7eab95bd56c8fc70900bf9fbf5eb7a420dc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_fd559c1e",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1585,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2017-09-10T23:49:50Z",
+      "side": 1,
+      "message": "... and because stuff like this will still have \"b\u0027line\u0027\"",
+      "revId": "79a8c7eab95bd56c8fc70900bf9fbf5eb7a420dc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_5d24b0c6",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1621,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2017-09-10T23:49:50Z",
+      "side": 1,
+      "message": "and technically this may not be utf-8; at the point of input you can probably get the system encoding",
+      "revId": "79a8c7eab95bd56c8fc70900bf9fbf5eb7a420dc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
