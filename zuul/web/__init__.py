@@ -150,6 +150,38 @@ class LogStreamingHandler(object):
         return ws
 
 
+class StatusHandler(object):
+    log = logging.getLogger("zuul.web.StatusHandler")
+
+    def __init__(self, gear_server, gear_port,
+                 ssl_key=None, ssl_cert=None, ssl_ca=None):
+        self.gear_server = gear_server
+        self.gear_port = gear_port
+        self.ssl_key = ssl_key
+        self.ssl_cert = ssl_cert
+        self.ssl_ca = ssl_ca
+
+    def getStatus(self, tenant):
+        rpc = zuul.rpcclient.RPCClient(self.gear_server, self.gear_port,
+                                       self.ssl_key, self.ssl_cert,
+                                       self.ssl_ca)
+        job = rpc.submitJob('status:get', {'tenant': tenant})
+        return json.loads(job.data[0])
+
+    async def processRequest(self, tenant):
+        try:
+            data = self.getStatus(tenant)
+            resp = web.json_response(data)
+        except asyncio.CancelledError:
+            self.log.debug("Websocket request handling cancelled")
+            pass
+        except Exception as e:
+            self.log.exception("Websocket exception:")
+            resp = web.json_response({'error_description': 'Internal error'},
+                                     status=500)
+        return resp
+
+
 class ZuulWeb(object):
 
     log = logging.getLogger("zuul.web.ZuulWeb")
@@ -166,12 +198,17 @@ class ZuulWeb(object):
         self.ssl_ca = ssl_ca
         self.event_loop = None
         self.term = None
+        self.status_handler = None
 
     async def _handleWebsocket(self, request):
         handler = LogStreamingHandler(self.event_loop,
                                       self.gear_server, self.gear_port,
                                       self.ssl_key, self.ssl_cert, self.ssl_ca)
         return await handler.processRequest(request)
+
+    async def _handleStatus(self, request):
+        tenant = request.match_info["tenant"]
+        return await self.status_handler.processRequest(tenant)
 
     def run(self, loop=None):
         """
@@ -186,6 +223,7 @@ class ZuulWeb(object):
         """
         routes = [
             ('GET', '/console-stream', self._handleWebsocket),
+            ('GET', '/{tenant}/status', self._handleStatus)
         ]
 
         self.log.debug("ZuulWeb starting")
@@ -202,6 +240,11 @@ class ZuulWeb(object):
             app.router.add_route(method, path, handler)
         app.router.add_static('/static', STATIC_DIR)
         handler = app.make_handler(loop=self.event_loop)
+
+        # Instanciate handlers
+        self.status_handler = StatusHandler(
+            self.gear_server, self.gear_port, self.ssl_key, self.ssl_cert,
+            self.ssl_ca)
 
         # create the server
         coro = self.event_loop.create_server(handler,
