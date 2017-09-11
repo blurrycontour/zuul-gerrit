@@ -68,6 +68,7 @@ class Scheduler(zuul.cmd.ZuulApp):
 
     def exit_handler(self, signum, frame):
         signal.signal(signal.SIGUSR1, signal.SIG_IGN)
+        self.sched.status.stop()
         self.sched.exit()
         self.sched.join()
         self.stop_gear_server()
@@ -147,6 +148,7 @@ class Scheduler(zuul.cmd.ZuulApp):
 
         self.sched = zuul.scheduler.Scheduler(self.config)
 
+        status = zuul.scheduler.SchedulerStatusServer(self.config, self.sched)
         gearman = zuul.executor.client.ExecutorClient(self.config, self.sched)
         merger = zuul.merger.client.MergeClient(self.config, self.sched)
         nodepool = zuul.nodepool.Nodepool(self.sched)
@@ -172,6 +174,7 @@ class Scheduler(zuul.cmd.ZuulApp):
         self.sched.setMerger(merger)
         self.sched.setNodepool(nodepool)
         self.sched.setZooKeeper(zookeeper)
+        self.sched.setStatusServer(status)
 
         self.log.info('Starting scheduler')
         try:
@@ -188,6 +191,8 @@ class Scheduler(zuul.cmd.ZuulApp):
         webapp.start()
         self.log.info('Starting RPC')
         rpc.start()
+        self.log.info('Starting StatusServer')
+        status.start()
 
         signal.signal(signal.SIGHUP, self.reconfigure_handler)
         signal.signal(signal.SIGUSR1, self.exit_handler)

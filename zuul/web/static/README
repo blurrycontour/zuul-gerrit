@@ -1,0 +1,8 @@
+External requirements needs to be installed in these location
+* /static/js/jquery.min.js
+* /static/js/jquery-visibility.min.js
+* /static/js/jquery.graphite.min.js
+* /static/bootstrap/css/bootstrap.min.css
+
+When serving static file from an external webserver, update the config.json
+with the zuul-web endpoint, e.g.: zuul-web.example.com:9000

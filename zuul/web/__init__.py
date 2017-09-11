@@ -19,6 +19,7 @@ import asyncio
 import json
 import logging
 import os
+import time
 import uvloop
 
 import aiohttp
@@ -150,6 +151,50 @@ class LogStreamingHandler(object):
         return ws
 
 
+class StatusHandler(object):
+    log = logging.getLogger("zuul.web.StatusHandler")
+
+    cache_expiry = 1
+
+    def __init__(self, gear_server, gear_port,
+                 ssl_key=None, ssl_cert=None, ssl_ca=None):
+        self.gear_server = gear_server
+        self.gear_port = gear_port
+        self.ssl_key = ssl_key
+        self.ssl_cert = ssl_cert
+        self.ssl_ca = ssl_ca
+        self.cache = {}
+        self.cache_time = {}
+
+    def getStatus(self, tenant):
+        if tenant not in self.cache or \
+           (time.time() - self.cache_time[tenant]) > self.cache_expiry:
+            rpc = zuul.rpcclient.RPCClient(self.gear_server, self.gear_port,
+                                           self.ssl_key, self.ssl_cert,
+                                           self.ssl_ca)
+            job = rpc.submitJob('status:get', {'tenant': tenant})
+            self.cache[tenant] = json.loads(job.data[0])
+            self.cache_time[tenant] = time.time()
+        return self.cache[tenant], self.cache_time[tenant]
+
+    async def processRequest(self, tenant):
+        try:
+            data, data_time = self.getStatus(tenant)
+            resp = web.json_response(data)
+            resp.headers['Access-Control-Allow-Origin'] = '*'
+            resp.headers["Cache-Control"] = "public, max-age=%d" % \
+                                            self.cache_expiry
+            resp.last_modified = data_time
+        except asyncio.CancelledError:
+            self.log.debug("Websocket request handling cancelled")
+            pass
+        except Exception as e:
+            self.log.exception("Websocket exception:")
+            resp = web.json_response({'error_description': 'Internal error'},
+                                     status=500)
+        return resp
+
+
 class ZuulWeb(object):
 
     log = logging.getLogger("zuul.web.ZuulWeb")
@@ -166,12 +211,17 @@ class ZuulWeb(object):
         self.ssl_ca = ssl_ca
         self.event_loop = None
         self.term = None
+        self.status_handler = None
 
     async def _handleWebsocket(self, request):
         handler = LogStreamingHandler(self.event_loop,
                                       self.gear_server, self.gear_port,
                                       self.ssl_key, self.ssl_cert, self.ssl_ca)
         return await handler.processRequest(request)
+
+    async def _handleStatus(self, request):
+        tenant = request.match_info["tenant"]
+        return await self.status_handler.processRequest(tenant)
 
     def run(self, loop=None):
         """
@@ -186,6 +236,7 @@ class ZuulWeb(object):
         """
         routes = [
             ('GET', '/console-stream', self._handleWebsocket),
+            ('GET', '/{tenant}/status', self._handleStatus)
         ]
 
         self.log.debug("ZuulWeb starting")
@@ -202,6 +253,11 @@ class ZuulWeb(object):
             app.router.add_route(method, path, handler)
         app.router.add_static('/static', STATIC_DIR)
         handler = app.make_handler(loop=self.event_loop)
+
+        # Instanciate handlers
+        self.status_handler = StatusHandler(
+            self.gear_server, self.gear_port, self.ssl_key, self.ssl_cert,
+            self.ssl_ca)
 
         # create the server
         coro = self.event_loop.create_server(handler,
