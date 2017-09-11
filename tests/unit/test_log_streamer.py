@@ -163,6 +163,7 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
                 session = aiohttp.ClientSession(loop=loop)
                 async with session.ws_connect(uri) as ws:
                     req = {'uuid': build_uuid, 'logfile': None}
+                    self.log.debug("DWS: client sending request")
                     ws.send_str(json.dumps(req))
                     event.set()  # notify we are connected and req sent
                     async for msg in ws:
@@ -205,6 +206,8 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
             time.sleep(0.1)
             build = self.builds[0]
 
+        self.log.debug("DWS: Build %s exists!", build.uuid)
+
         # Wait for the job to begin running and create the ansible log file.
         # The job waits to complete until the flag file exists, so we can
         # safely access the log here. We only open it (to force a file handle
@@ -242,6 +245,7 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
                 time.sleep(0.1)
 
         # Start a thread with the websocket client
+        self.log.debug("DWS: Starting ws client")
         ws_client_event = threading.Event()
         self.ws_client_results = ''
         ws_client_thread = threading.Thread(
@@ -251,6 +255,7 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
         ws_client_event.wait()
 
         # Allow the job to complete
+        self.log.debug("DWS: Allowing job to complete")
         flag_file = os.path.join(build_dir, 'test_wait')
         open(flag_file, 'w').close()
 
