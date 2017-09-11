@@ -1565,6 +1565,7 @@ class AnsibleJob(object):
 
         syntax_buffer = []
         ret = None
+        crashed = False
         if timeout:
             watchdog = Watchdog(timeout, self._ansibleTimeout,
                                 ("Ansible timeout exceeded",))
@@ -1577,6 +1578,8 @@ class AnsibleJob(object):
                 if line.startswith(b'RESULT'):
                     # TODO(mordred) Process result commands if sent
                     continue
+                elif 'found in a dead state' in line.decode('utf-8'):
+                    crashed = True
                 else:
                     idx += 1
                 if idx < BUFFER_LINES_FOR_SYNTAX:
@@ -1619,6 +1622,11 @@ class AnsibleJob(object):
                     job_output.write("{now} | {line}\n".format(
                         now=datetime.datetime.now(),
                         line=line.decode('utf-8').rstrip()))
+        elif crashed:
+            with open(self.jobdir.job_output_file, 'a') as job_output:
+                job_output.write(
+                    "{now} | ANSIBLE CRASHED\n".format(
+                    now=datetime.datetime.now()))
 
         return (self.RESULT_NORMAL, ret)
 
