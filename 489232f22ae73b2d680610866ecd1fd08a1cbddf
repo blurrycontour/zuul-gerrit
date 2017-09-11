@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f2577a7_70cb0553",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-09-11T19:26:03Z",
+      "side": 1,
+      "message": "This is s, not socket, socket is themodule name.",
+      "range": {
+        "startLine": 131,
+        "startChar": 19,
+        "endLine": 131,
+        "endChar": 25
+      },
+      "revId": "489232f22ae73b2d680610866ecd1fd08a1cbddf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_30c57d3d",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-09-11T19:26:03Z",
+      "side": 1,
+      "message": "See above.",
+      "revId": "489232f22ae73b2d680610866ecd1fd08a1cbddf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
