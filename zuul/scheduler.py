@@ -33,6 +33,7 @@ from zuul import configloader
 from zuul import model
 from zuul import exceptions
 from zuul import version as zuul_version
+from zuul.lib import encryption
 from zuul.lib.config import get_default
 
 
@@ -960,8 +961,18 @@ class SchedulerGearmanWorker(object):
         output = self.sched.formatStatusJSON(args.get("tenant"))
         job.sendWorkComplete(output)
 
+    def key(self, job):
+        args = json.loads(job.arguments)
+        source_name, project_name = args.get("source"), args.get("project")
+        source = self.sched.connections.getSource(source_name)
+        project = source.getProject(project_name)
+        output = encryption.serialize_rsa_public_key(
+            project.public_key)
+        job.sendWorkComplete(output)
+
     def register(self):
         self.gearman.registerFunction("status:get")
+        self.gearman.registerFunction("key:get")
 
     def _run(self):
         while self._running:
@@ -971,6 +982,9 @@ class SchedulerGearmanWorker(object):
                     if job.name == 'status:get':
                         self.log.debug("Got status job: %s" % job.unique)
                         self.status(job)
+                    elif job.name == 'key:get':
+                        self.log.debug("Got key:get job: %s" % job.unique)
+                        self.key(job)
                     else:
                         self.log.error("Unable to handle job %s" % job.name)
                         job.sendWorkFail()

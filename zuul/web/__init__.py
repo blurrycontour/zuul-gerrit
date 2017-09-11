@@ -194,6 +194,23 @@ class GearmanHandler(object):
                                      status=500)
         return resp
 
+    async def processKeyRequest(self, source, project):
+        try:
+            rpc = zuul.rpcclient.RPCClient(self.gear_server, self.gear_port,
+                                           self.ssl_key, self.ssl_cert,
+                                           self.ssl_ca)
+            job = rpc.submitJob('key:get', {'source': source,
+                                            'project': project})
+            resp = web.Response(body=job.data[0])
+        except asyncio.CancelledError:
+            self.log.debug("Websocket request handling cancelled")
+            pass
+        except Exception as e:
+            self.log.exception("Websocket exception:")
+            resp = web.json_response({'error_description': 'Internal error'},
+                                     status=500)
+        return resp
+
 
 class ZuulWeb(object):
 
@@ -223,6 +240,11 @@ class ZuulWeb(object):
         tenant = request.match_info["tenant"]
         return await self.gearman_handler.processStatusRequest(tenant)
 
+    async def _handleKeyRequest(self, request):
+        source = request.match_info["source"]
+        project = request.match_info["project"]
+        return await self.gearman_handler.processKeyRequest(source, project)
+
     def run(self, loop=None):
         """
         Run the websocket daemon.
@@ -237,6 +259,7 @@ class ZuulWeb(object):
         routes = [
             ('GET', '/console-stream', self._handleWebsocket),
             ('GET', '/{tenant}/status', self._handleStatusRequest),
+            ('GET', '/{source}/{project}.pem', self._handleKeyRequest),
         ]
 
         self.log.debug("ZuulWeb starting")
