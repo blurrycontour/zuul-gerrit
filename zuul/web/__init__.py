@@ -150,6 +150,45 @@ class LogStreamingHandler(object):
         return ws
 
 
+class GearmanHandler(object):
+    log = logging.getLogger("zuul.web.GearmanHandler")
+
+    # Tenant status cache expiry
+    cache_expiry = 1
+
+    def __init__(self, gear_server, gear_port,
+                 ssl_key=None, ssl_cert=None, ssl_ca=None):
+        self.gear_server = gear_server
+        self.gear_port = gear_port
+        self.ssl_key = ssl_key
+        self.ssl_cert = ssl_cert
+        self.ssl_ca = ssl_ca
+        self.controllers = {
+            'tenant': self.tenant_list,
+        }
+
+    def getClient(self):
+        return zuul.rpcclient.RPCClient(self.gear_server, self.gear_port,
+                                        self.ssl_key, self.ssl_cert,
+                                        self.ssl_ca)
+
+    def tenant_list(self, rpc, request):
+        job = rpc.submitJob('tenant:list', {})
+        return web.json_response(json.loads(job.data[0]))
+
+    async def processRequest(self, request, action):
+        try:
+            rpc = self.getClient()
+            resp = self.controllers[action](rpc, request)
+        except asyncio.CancelledError:
+            self.log.debug("request handling cancelled")
+        except Exception as e:
+            self.log.exception("exception:")
+            resp = web.json_response({'error_description': 'Internal error'},
+                                     status=500)
+        return resp
+
+
 class ZuulWeb(object):
 
     log = logging.getLogger("zuul.web.ZuulWeb")
@@ -166,12 +205,25 @@ class ZuulWeb(object):
         self.ssl_ca = ssl_ca
         self.event_loop = None
         self.term = None
+        # instanciate handlers
+        self.gearman_handler = GearmanHandler(
+            self.gear_server, self.gear_port, self.ssl_key, self.ssl_cert,
+            self.ssl_ca)
 
     async def _handleWebsocket(self, request):
         handler = LogStreamingHandler(self.event_loop,
                                       self.gear_server, self.gear_port,
                                       self.ssl_key, self.ssl_cert, self.ssl_ca)
         return await handler.processRequest(request)
+
+    async def _handleTenantsRequest(self, request):
+        return await self.gearman_handler.processRequest(request, 'tenant')
+
+    async def _handleStaticRequest(self, request):
+        fp = None
+        if request.path.endswith("tenants.html") or request.path.endswith("/"):
+            fp = os.path.join(STATIC_DIR, "index.html")
+        return web.FileResponse(fp)
 
     def run(self, loop=None):
         """
@@ -186,6 +238,9 @@ class ZuulWeb(object):
         """
         routes = [
             ('GET', '/console-stream', self._handleWebsocket),
+            ('GET', '/tenants.json', self._handleTenantsRequest),
+            ('GET', '/tenants.html', self._handleStaticRequest),
+            ('GET', '/', self._handleStaticRequest),
         ]
 
         self.log.debug("ZuulWeb starting")

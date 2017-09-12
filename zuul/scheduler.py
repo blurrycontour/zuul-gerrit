@@ -24,7 +24,10 @@ import queue
 import socket
 import sys
 import threading
+import traceback
 import time
+
+import gear
 
 from zuul import configloader
 from zuul import model
@@ -257,6 +260,9 @@ class Scheduler(threading.Thread):
 
     def setZooKeeper(self, zk):
         self.zk = zk
+
+    def setGearmanWorker(self, gearman_worker):
+        self.gearman_worker = gearman_worker
 
     def addEvent(self, event):
         self.log.debug("Adding trigger event: %s" % event)
@@ -936,3 +942,69 @@ class Scheduler(threading.Thread):
         for pipeline in tenant.layout.pipelines.values():
             pipelines.append(pipeline.formatStatusJSON(websocket_url))
         return json.dumps(data)
+
+
+class SchedulerGearmanWorker(object):
+    """A thread that answer gearman request"""
+    log = logging.getLogger("zuul.SchedulerGearmanWorker")
+
+    def __init__(self, config, sched):
+        self.config = config
+        self.sched = sched
+        self.thread = threading.Thread(target=self._run,
+                                       name='scheduler-gearman-worker')
+        self._running = False
+        self.jobs = {
+            'tenant:list': self.tenant_list,
+        }
+
+    def tenant_list(self, args):
+        output = []
+        for tenant_name, tenant in self.sched.abide.tenants.items():
+            output.append({'name': tenant_name,
+                           'projects': len(tenant.untrusted_projects)})
+        return json.dumps(output)
+
+    def _run(self):
+        while self._running:
+            try:
+                job = self.gearman.getJob()
+                try:
+                    if job.name not in self.jobs:
+                        self.log.exception("Exception while running job")
+                        job.sendWorkException(
+                            traceback.format_exc().encode('utf8'))
+                        continue
+                    output = self.jobs[job.name](json.loads(job.arguments))
+                    job.sendWorkComplete(output)
+                except Exception:
+                    self.log.exception("Exception while running job")
+                    job.sendWorkException(
+                        traceback.format_exc().encode('utf8'))
+            except gear.InterruptedError:
+                pass
+            except Exception:
+                self.log.exception("Exception while getting job")
+
+    def start(self):
+        self._running = True
+        server = self.config.get('gearman', 'server')
+        port = get_default(self.config, 'gearman', 'port', 4730)
+        ssl_key = get_default(self.config, 'gearman', 'ssl_key')
+        ssl_cert = get_default(self.config, 'gearman', 'ssl_cert')
+        ssl_ca = get_default(self.config, 'gearman', 'ssl_ca')
+        self.gearman = gear.TextWorker('Zuul Scheduler Server')
+        self.log.debug("Going to ", server, port, ssl_key, ssl_cert, ssl_ca)
+        self.gearman.addServer(server, port, ssl_key, ssl_cert, ssl_ca)
+        self.log.debug("Waiting for server")
+        self.gearman.waitForServer()
+        self.log.debug("Registering")
+        for job in self.jobs:
+            self.gearman.registerFunction(job)
+        self.thread.start()
+
+    def stop(self):
+        self._running = False
+        # We join here to avoid whitelisting the thread -- if it takes more
+        # than 5s to stop in tests, there's a problem.
+        self.thread.join(timeout=5)
