@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f2577a7_874a8ca9",
+        "filename": "zuul/web/static/index.html",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-09-12T22:46:43Z",
+      "side": 1,
+      "message": "This should be tenants.html",
+      "range": {
+        "startLine": 33,
+        "startChar": 34,
+        "endLine": 33,
+        "endChar": 44
+      },
+      "revId": "04f0d961238a0c3369e2d6b2aca9d99a13951478",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
