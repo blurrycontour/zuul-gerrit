@@ -33,6 +33,7 @@ from zuul import configloader
 from zuul import model
 from zuul import exceptions
 from zuul import version as zuul_version
+from zuul.lib import encryption
 from zuul.lib.config import get_default
 
 
@@ -958,6 +959,7 @@ class SchedulerGearmanWorker(object):
             'tenant:list': self.tenant_list,
             'status:get': self.status_get,
             'job:list': self.job_list,
+            'key:get': self.key_get,
         }
 
     def tenant_list(self, args):
@@ -976,6 +978,12 @@ class SchedulerGearmanWorker(object):
         for job_name in sorted(tenant.layout.jobs):
             output.append({"name": job_name})
         return json.dumps(output)
+
+    def key_get(self, args):
+        source_name, project_name = args.get("source"), args.get("project")
+        source = self.sched.connections.getSource(source_name)
+        project = source.getProject(project_name)
+        return encryption.serialize_rsa_public_key(project.public_key)
 
     def _run(self):
         while self._running:
