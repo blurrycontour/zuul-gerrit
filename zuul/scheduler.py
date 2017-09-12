@@ -955,6 +955,7 @@ class SchedulerGearmanWorker(object):
         self._running = False
         self.jobs = {
             'tenant:list': self.tenant_list,
+            'status:get': self.status_get,
         }
 
     def tenant_list(self, args):
@@ -963,6 +964,9 @@ class SchedulerGearmanWorker(object):
             output.append({'name': tenant_name,
                            'projects': len(tenant.untrusted_projects)})
         return json.dumps(output)
+
+    def status_get(self, args):
+        return self.sched.formatStatusJSON(args.get("tenant"))
 
     def _run(self):
         while self._running:
