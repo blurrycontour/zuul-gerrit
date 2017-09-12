@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f2577a7_a5d35638",
+        "filename": "zuul/merger/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-09-12T14:57:23Z",
+      "side": 1,
+      "message": "Does data[updated] have content if the git ref doesn\u0027t move?",
+      "range": {
+        "startLine": 137,
+        "startChar": 8,
+        "endLine": 137,
+        "endChar": 48
+      },
+      "revId": "8dc5c88f5423205fe65d47e807a0e073d71f3818",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
