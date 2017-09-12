@@ -134,14 +134,14 @@ class MergeClient(object):
     def onBuildCompleted(self, job):
         data = getJobData(job)
         merged = data.get('merged', False)
-        updated = data.get('updated', False)
+        job.updated = data.get('updated', False)
         commit = data.get('commit')
         files = data.get('files', {})
         repo_state = data.get('repo_state', {})
         job.files = files
         self.log.info("Merge %s complete, merged: %s, updated: %s, "
                       "commit: %s" %
-                      (job, merged, updated, commit))
+                      (job, merged, job.updated, commit))
         job.setComplete()
         if job.build_set:
             self.sched.onMergeCompleted(job.build_set,
