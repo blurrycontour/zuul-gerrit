@@ -25,6 +25,7 @@ import threading
 import zuul.cmd
 import zuul.web
 
+from zuul.driver.sql import sqlconnection
 from zuul.lib.config import get_default
 
 # as of python-daemon 1.6 it doesn't bundle pidlockfile anymore
@@ -61,6 +62,26 @@ class WebServer(zuul.cmd.ZuulApp):
         params['ssl_cert'] = get_default(self.config, 'gearman', 'ssl_cert')
         params['ssl_ca'] = get_default(self.config, 'gearman', 'ssl_ca')
 
+        sql_conn_name = get_default(self.config, 'web',
+                                    'sql_connection_name')
+        params['sql_connection'] = None
+        for conn_name, connection in self.connections.connections.items():
+            if not isinstance(connection, sqlconnection.SQLConnection):
+                continue
+            if sql_conn_name:
+                if conn_name == sql_conn_name:
+                    params['sql_connection'] = connection
+            elif params['sql_connection'] is None:
+                params['sql_connection'] = connection
+            else:
+                self.log.error("Multiple sql connection found, "
+                               "set the sql_connection_name option "
+                               "in zuul.conf [web] section")
+                sys.exit(1)
+        if sql_conn_name and params['sql_connection'] is None:
+            self.log.error("Couldn't find sql connection '%s'" % sql_conn_name)
+            sys.exit(1)
+
         try:
             self.web = zuul.web.ZuulWeb(**params)
         except Exception as e:
@@ -91,6 +112,8 @@ class WebServer(zuul.cmd.ZuulApp):
     def main(self):
         self.setup_logging('web', 'log_config')
         self.log = logging.getLogger("zuul.WebServer")
+
+        self.configure_connections()
 
         try:
             self._main()
