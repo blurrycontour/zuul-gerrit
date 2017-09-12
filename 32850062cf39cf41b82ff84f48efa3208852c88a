@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f2577a7_f22127a1",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1346,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-09-12T13:25:10Z",
+      "side": 1,
+      "message": "I think it might make sense to retry failed cat jobs a few times. I can imagine that in case some flaky network stuff \n is going on it could get quite hard to get 2000 cat jobs passing with this all-or-nothing approach. Retrying single cat jobs could make this process much more resilient for transient errors.",
+      "range": {
+        "startLine": 1345,
+        "startChar": 0,
+        "endLine": 1346,
+        "endChar": 61
+      },
+      "revId": "32850062cf39cf41b82ff84f48efa3208852c88a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
