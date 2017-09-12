@@ -956,6 +956,7 @@ class SchedulerGearmanWorker(object):
         self.jobs = {
             'tenant:list': self.tenant_list,
             'status:get': self.status_get,
+            'job:list': self.job_list,
         }
 
     def tenant_list(self, args):
@@ -967,6 +968,13 @@ class SchedulerGearmanWorker(object):
 
     def status_get(self, args):
         return self.sched.formatStatusJSON(args.get("tenant"))
+
+    def job_list(self, args):
+        tenant = self.sched.abide.tenants.get(args.get("tenant"))
+        output = []
+        for job_name in sorted(tenant.layout.jobs):
+            output.append({"name": job_name})
+        return json.dumps(output)
 
     def _run(self):
         while self._running:

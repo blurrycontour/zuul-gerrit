@@ -169,6 +169,7 @@ class GearmanHandler(object):
         self.controllers = {
             'tenant': self.tenant_list,
             'status': self.status_get,
+            'jobs': self.jobs_list,
         }
 
     def getClient(self):
@@ -192,6 +193,11 @@ class GearmanHandler(object):
 
     def tenant_list(self, rpc, request):
         job = rpc.submitJob('tenant:list', {})
+        return web.json_response(json.loads(job.data[0]))
+
+    def jobs_list(self, rpc, request):
+        tenant = request.match_info["tenant"]
+        job = rpc.submitJob('job:list', {'tenant': tenant})
         return web.json_response(json.loads(job.data[0]))
 
     async def processRequest(self, request, action):
@@ -240,12 +246,17 @@ class ZuulWeb(object):
     async def _handleStatusRequest(self, request):
         return await self.gearman_handler.processRequest(request, 'status')
 
+    async def _handleJobsRequest(self, request):
+        return await self.gearman_handler.processRequest(request, 'jobs')
+
     async def _handleStaticRequest(self, request):
         fp = None
         if request.path.endswith("tenants.html") or request.path.endswith("/"):
             fp = os.path.join(STATIC_DIR, "index.html")
         elif request.path.endswith("status.html"):
             fp = os.path.join(STATIC_DIR, "status.html")
+        elif request.path.endswith("jobs.html"):
+            fp = os.path.join(STATIC_DIR, "jobs.html")
         return web.FileResponse(fp)
 
     def run(self, loop=None):
@@ -263,7 +274,9 @@ class ZuulWeb(object):
             ('GET', '/console-stream', self._handleWebsocket),
             ('GET', '/tenants.json', self._handleTenantsRequest),
             ('GET', '/{tenant}/status.json', self._handleStatusRequest),
+            ('GET', '/{tenant}/jobs.json', self._handleJobsRequest),
             ('GET', '/{tenant}/status.html', self._handleStaticRequest),
+            ('GET', '/{tenant}/jobs.html', self._handleStaticRequest),
             ('GET', '/tenants.html', self._handleStaticRequest),
             ('GET', '/', self._handleStaticRequest),
         ]
