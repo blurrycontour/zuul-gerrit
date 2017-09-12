@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f2577a7_97009536",
+        "filename": "doc/source/user/jobs.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-09-12T13:08:31Z",
+      "side": 1,
+      "message": "s/jobs/playbooks/",
+      "revId": "2de259450d8eb1921122bcf4baaf9d9a2707be25",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
