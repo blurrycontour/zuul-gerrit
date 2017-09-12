@@ -282,8 +282,7 @@ class Job:
 
         if self.content and not self.name:
             self.name = get_single_key(content)
-        if not self.name:
-            self.name = self.orig.replace('-{name}', '').replace('{name}-', '')
+        self.name = self.orig.replace('-{name}', '').replace('{name}-', '')
         if self.orig.endswith('-nv'):
             self.voting = False
         if self.name.endswith('-nv'):
