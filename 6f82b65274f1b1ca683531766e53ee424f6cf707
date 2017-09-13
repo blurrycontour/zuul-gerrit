@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f2577a7_bd5d7dea",
+        "filename": "zuul/cmd/migrate.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-09-13T21:57:11Z",
+      "side": 1,
+      "message": "It may be safer to trim the string off the end using something like:\n\n   self.name \u003d self.name[:-len(suffix)]\n\nbecause replace() would match all occurrences.",
+      "revId": "6f82b65274f1b1ca683531766e53ee424f6cf707",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
