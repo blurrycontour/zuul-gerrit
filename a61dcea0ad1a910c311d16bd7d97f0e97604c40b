@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f2577a7_c0bbbe6f",
+        "filename": "zuul/ansible/filter/zuul_filters.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-09-13T22:48:05Z",
+      "side": 1,
+      "message": "pep8 does not want spaces around this last \u003d sign.",
+      "revId": "a61dcea0ad1a910c311d16bd7d97f0e97604c40b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
