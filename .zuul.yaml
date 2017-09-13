@@ -36,7 +36,8 @@
     # this from project-config changes
     required-projects:
       - openstack-infra/project-config
-      - openstack-infra/zuul
+      - openstack-infra/zuul:
+          branch-override: feature/zuulv3
 
 - project:
     name: openstack-infra/zuul
