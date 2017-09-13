@@ -22,6 +22,30 @@
       "revId": "4cf18846167266f018732301b7fe6a924e03d3a4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_20de0211",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-09-13T22:39:33Z",
+      "side": 1,
+      "message": "Oh I thought the change.url would be correct at that stage.",
+      "parentUuid": "5f2577a7_e0a59a05",
+      "range": {
+        "startLine": 46,
+        "startChar": 16,
+        "endLine": 46,
+        "endChar": 40
+      },
+      "revId": "4cf18846167266f018732301b7fe6a924e03d3a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
