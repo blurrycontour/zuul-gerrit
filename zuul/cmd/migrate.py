@@ -301,14 +301,12 @@ class Job:
         if not self.name:
             self.name = self.orig
         self.name = self.name.replace('-{name}', '').replace('{name}-', '')
-        if self.orig.endswith('-nv'):
-            self.voting = False
-        if self.name.endswith('-nv'):
-            # NOTE(mordred) This MIGHT not be safe - it's possible, although
-            # silly, for someone to have -nv and normal versions of the same
-            # job in the same pipeline. Let's deal with that if we find it
-            # though.
-            self.name = self.name.replace('-nv', '')
+
+    def stripSuffixes(self, suffixes):
+        for suffix in suffixes:
+            suffix = '-{suffix}'.format(suffix=suffix)
+            if self.name.endswith(suffix):
+                self.name = self.name.replace(suffix, '')
 
     def _stripNodeName(self, node):
         node_key = '-{node}'.format(node=node)
@@ -344,7 +342,7 @@ class Job:
     def getNodes(self):
         return self.nodes
 
-    def toDict(self):
+    def toPipelineDict(self):
         if self.content:
             output = self.content
         else:
@@ -386,6 +384,7 @@ class JobMapping:
         self.labels = []
         self.job_mapping = []
         self.template_mapping = {}
+        self.strip_suffixes = []
         nodepool_data = ordered_load(open(nodepool_config, 'r'))
         for label in nodepool_data['labels']:
             self.labels.append(label['name'])
@@ -394,6 +393,7 @@ class JobMapping:
         else:
             mapping_data = ordered_load(open(mapping_file, 'r'))
             self.default_node = mapping_data['default-node']
+            self.strip_suffixes = mapping_data.get('strip-suffixes', [])
             for map_info in mapping_data.get('job-mapping', []):
                 if map_info['old'].startswith('^'):
                     map_info['pattern'] = re.compile(map_info['old'])
@@ -430,6 +430,7 @@ class JobMapping:
             job.setRequiredProjects(
                 self._expandRequiredProjects(info, match_dict))
 
+        job.stripSuffixes(self.strip_suffixes)
         return job
 
     def _expandVars(self, info, match_dict):
@@ -681,7 +682,7 @@ class ZuulMigrate:
         for key, value in template.items():
             if key == 'name':
                 continue
-            jobs = [job.toDict() for job in self.makeNewJobs(value)]
+            jobs = [job.toPipelineDict() for job in self.makeNewJobs(value)]
             new_template[key] = dict(jobs=jobs)
 
         return new_template
@@ -707,7 +708,8 @@ class ZuulMigrate:
                         if len(queue.getProjects()) == 1:
                             continue
                         new_project[key]['queue'] = queue.name
-                jobs = [job.toDict() for job in self.makeNewJobs(value)]
+                jobs = [
+                    job.toPipelineDict() for job in self.makeNewJobs(value)]
                 new_project[key]['jobs'] = jobs
 
         return new_project
