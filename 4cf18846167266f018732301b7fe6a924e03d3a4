@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f2577a7_e0a59a05",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-09-13T22:21:26Z",
+      "side": 1,
+      "message": "You might want to initialize ref_url like ref as in periodic pipelines changes probably won\u0027t have an url.",
+      "range": {
+        "startLine": 46,
+        "startChar": 16,
+        "endLine": 46,
+        "endChar": 40
+      },
+      "revId": "4cf18846167266f018732301b7fe6a924e03d3a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
