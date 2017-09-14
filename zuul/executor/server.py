@@ -1620,6 +1620,15 @@ class AnsibleJob(object):
                     job_output.write("{now} | {line}\n".format(
                         now=datetime.datetime.now(),
                         line=line.decode('utf-8').rstrip()))
+        elif ret == 250:
+            # Unexpected error from ansible
+            with open(self.jobdir.job_output_file, 'a') as job_output:
+                job_output.write("{now} | UNEXPECTED ANSIBLE ERROR\n".format(
+                    now=datetime.datetime.now()))
+                for line in syntax_buffer:
+                    job_output.write("{now} | {line}\n".format(
+                        now=datetime.datetime.now(),
+                        line=line.decode('utf-8').rstrip()))
 
         return (self.RESULT_NORMAL, ret)
 
