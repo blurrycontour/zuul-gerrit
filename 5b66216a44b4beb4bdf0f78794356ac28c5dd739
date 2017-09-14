@@ -1,0 +1,170 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f2577a7_14db2c4f",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-09-14T22:43:21Z",
+      "side": 1,
+      "message": "Maybe when adding the github_connections params, we could have: {connection_name: webhook_secret}.",
+      "revId": "5b66216a44b4beb4bdf0f78794356ac28c5dd739",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_d4c7e495",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-09-14T22:43:21Z",
+      "side": 1,
+      "message": "This could maybe simplified as: \"github-%s:payload\"",
+      "range": {
+        "startLine": 82,
+        "startChar": 19,
+        "endLine": 82,
+        "endChar": 41
+      },
+      "revId": "5b66216a44b4beb4bdf0f78794356ac28c5dd739",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_d44c8443",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-09-14T22:43:21Z",
+      "side": 1,
+      "message": "handle_payload ?",
+      "range": {
+        "startLine": 84,
+        "startChar": 26,
+        "endLine": 84,
+        "endChar": 40
+      },
+      "revId": "5b66216a44b4beb4bdf0f78794356ac28c5dd739",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_94615cd6",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-09-14T22:43:21Z",
+      "side": 1,
+      "message": "This could be removed",
+      "range": {
+        "startLine": 109,
+        "startChar": 8,
+        "endLine": 109,
+        "endChar": 46
+      },
+      "revId": "5b66216a44b4beb4bdf0f78794356ac28c5dd739",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_948f1c74",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-09-14T22:43:21Z",
+      "side": 1,
+      "message": "Maybe adding: output \u003d {\"return_code\": 200}",
+      "revId": "5b66216a44b4beb4bdf0f78794356ac28c5dd739",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_748cb07e",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-09-14T22:43:21Z",
+      "side": 1,
+      "message": "Here: output \u003d {\"return_code\": 503}",
+      "revId": "5b66216a44b4beb4bdf0f78794356ac28c5dd739",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_14f1ec01",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-09-14T22:43:21Z",
+      "side": 1,
+      "message": "And then: return output",
+      "range": {
+        "startLine": 124,
+        "startChar": 8,
+        "endLine": 125,
+        "endChar": 20
+      },
+      "revId": "5b66216a44b4beb4bdf0f78794356ac28c5dd739",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_d4236455",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 469,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-09-14T22:43:21Z",
+      "side": 1,
+      "message": "This could be removed",
+      "range": {
+        "startLine": 469,
+        "startChar": 12,
+        "endLine": 469,
+        "endChar": 51
+      },
+      "revId": "5b66216a44b4beb4bdf0f78794356ac28c5dd739",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
