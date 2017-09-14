@@ -1,0 +1,4 @@
+# This is meant to test https://github.com/ansible/ansible/issues/30385
+- name: Successfully included role task
+  debug:
+    msg: Message from an included role

@@ -114,6 +114,12 @@ class CallbackModule(CallbackBase):
         self.results[-1]['tasks'].append(self._new_task(task))
 
     def v2_runner_on_ok(self, result, **kwargs):
+        # An include_role task might end up putting an IncludeRole object
+        # inside the result object which we don't need
+        # https://github.com/ansible/ansible/issues/30385
+        if 'include_role' in result._result:
+            del result._result['include_role']
+
         host = result._host
         if result._result.get('_ansible_no_log', False):
             self.results[-1]['tasks'][-1]['hosts'][host.name] = dict(
