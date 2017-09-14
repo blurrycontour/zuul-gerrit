@@ -26,3 +26,19 @@
 
     - name: Generate logging config
       command: python3 src/git.openstack.org/openstack-infra/zuul/zuul/ansible/logconfig.py
+
+# Tests for https://github.com/ansible/ansible/issues/30385
+- name: Test include role without static
+  hosts: controller
+  tasks:
+    - name: Include role without static
+      include_role:
+        name: included_role
+
+- name: Test include role with static
+  hosts: controller
+  tasks:
+    - name: Include role with static
+      include_role:
+        name: included_role
+      static: no
