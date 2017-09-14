@@ -1,3 +1,21 @@
+# Tests for https://github.com/ansible/ansible/issues/30385
+- name: Test include role without static
+  hosts: controller
+  gather_facts: no
+  tasks:
+    - name: Include role without static
+      include_role:
+        name: included-role
+
+- name: Test include role with static
+  hosts: controller
+  gather_facts: no
+  tasks:
+    - name: Include role with static
+      include_role:
+        name: included-role
+      static: no
+
 - hosts: controller
   tasks:
 
