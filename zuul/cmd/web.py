@@ -23,6 +23,7 @@ import zuul.cmd
 import zuul.web
 
 from zuul.driver.sql import sqlconnection
+from zuul.driver.github import githubconnection
 from zuul.lib.config import get_default
 
 
@@ -38,7 +39,7 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
 
         params['listen_address'] = get_default(self.config,
                                                'web', 'listen_address',
-                                               '127.0.0.1')
+                                               '0.0.0.0')
         params['listen_port'] = get_default(self.config, 'web', 'port', 9000)
         params['static_cache_expiry'] = get_default(self.config, 'web',
                                                     'static_cache_expiry',
@@ -72,6 +73,16 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
                 # use this sql connection by default
                 sql_conn = connections[0]
         params['sql_connection'] = sql_conn
+
+        params['github_connections'] = {}
+        for conn_name, connection in self.connections.connections.items():
+            if isinstance(connection, githubconnection.GithubConnection):
+                try:
+                    token = connection.connection_config['webhook_token']
+                except KeyError as e:
+                    self.log.exception("Error reading webhook token:")
+                    sys.exit(1)
+                params['github_connections'][conn_name] = token
 
         try:
             self.web = zuul.web.ZuulWeb(**params)

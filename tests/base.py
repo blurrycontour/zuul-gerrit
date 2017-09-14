@@ -38,7 +38,6 @@ import threading
 import traceback
 import time
 import uuid
-import urllib
 
 
 import git
@@ -66,9 +65,11 @@ import zuul.merger.merger
 import zuul.merger.server
 import zuul.model
 import zuul.nodepool
+import zuul.rpcclient
 import zuul.zk
 import zuul.configloader
 from zuul.exceptions import MergeFailure
+from zuul.lib.config import get_default
 
 FIXTURE_DIR = os.path.join(os.path.dirname(__file__),
                            'fixtures')
@@ -1017,7 +1018,7 @@ class FakeGithubPullRequest(object):
 class FakeGithubConnection(githubconnection.GithubConnection):
     log = logging.getLogger("zuul.test.FakeGithubConnection")
 
-    def __init__(self, driver, connection_name, connection_config,
+    def __init__(self, driver, connection_name, connection_config, rpcclient,
                  upstream_root=None):
         super(FakeGithubConnection, self).__init__(driver, connection_name,
                                                    connection_config)
@@ -1030,6 +1031,7 @@ class FakeGithubConnection(githubconnection.GithubConnection):
         self.merge_not_allowed_count = 0
         self.reports = []
         self.github_client = FakeGithub()
+        self.rpcclient = rpcclient
 
     def getGithubClient(self,
                         project=None,
@@ -1071,17 +1073,16 @@ class FakeGithubConnection(githubconnection.GithubConnection):
 
     def emitEvent(self, event):
         """Emulates sending the GitHub webhook event to the connection."""
-        port = self.webapp.server.socket.getsockname()[1]
         name, data = event
         payload = json.dumps(data).encode('utf8')
         secret = self.connection_config['webhook_token']
         signature = githubconnection._sign_request(payload, secret)
         headers = {'X-Github-Event': name, 'X-Hub-Signature': signature}
-        req = urllib.request.Request(
-            'http://localhost:%s/connection/%s/payload'
-            % (port, self.connection_name),
-            data=payload, headers=headers)
-        return urllib.request.urlopen(req)
+
+        job = self.rpcclient.submitJob(
+            'github:%s:payload' % self.connection_name,
+            {'headers': headers, 'body': data})
+        return json.loads(job.data[0])
 
     def addProject(self, project):
         # use the original method here and additionally register it in the
@@ -2093,6 +2094,13 @@ class ZuulTestCase(BaseTestCase):
                 'gearman', 'ssl_key',
                 os.path.join(FIXTURE_DIR, 'gearman/client.key'))
 
+        self.rpcclient = zuul.rpcclient.RPCClient(
+            self.config.get('gearman', 'server'),
+            self.gearman_server.port,
+            get_default(self.config, 'gearman', 'ssl_key'),
+            get_default(self.config, 'gearman', 'ssl_cert'),
+            get_default(self.config, 'gearman', 'ssl_ca'))
+
         gerritsource.GerritSource.replication_timeout = 1.5
         gerritsource.GerritSource.replication_retry_interval = 0.5
         gerritconnection.GerritEventConnector.delay = 0.0
@@ -2110,7 +2118,7 @@ class ZuulTestCase(BaseTestCase):
         ]
 
         self.configure_connections()
-        self.sched.registerConnections(self.connections, self.webapp)
+        self.sched.registerConnections(self.connections)
 
         self.executor_server = RecordingExecutorServer(
             self.config, self.connections,
@@ -2172,6 +2180,7 @@ class ZuulTestCase(BaseTestCase):
 
         def getGithubConnection(driver, name, config):
             con = FakeGithubConnection(driver, name, config,
+                                       self.rpcclient,
                                        upstream_root=self.upstream_root)
             self.event_queues.append(con.event_queue)
             setattr(self, 'fake_' + name, con)
@@ -2403,6 +2412,7 @@ class ZuulTestCase(BaseTestCase):
         self.statsd.join()
         self.webapp.stop()
         self.webapp.join()
+        self.rpcclient.shutdown()
         self.gearman_server.shutdown()
         self.fake_nodepool.stop()
         self.zk.disconnect()
