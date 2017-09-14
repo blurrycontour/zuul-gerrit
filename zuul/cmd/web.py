@@ -54,7 +54,7 @@ class WebServer(zuul.cmd.ZuulApp):
 
         params['listen_address'] = get_default(self.config,
                                                'web', 'listen_address',
-                                               '127.0.0.1')
+                                               '0.0.0.0')
         params['listen_port'] = get_default(self.config, 'web', 'port', 9000)
         params['gear_server'] = get_default(self.config, 'gearman', 'server')
         params['gear_port'] = get_default(self.config, 'gearman', 'port', 4730)
