@@ -280,6 +280,12 @@ class CallbackModule(default.CallbackModule):
                     self._log("%s | %s " % (hostname, line))
 
     def v2_runner_on_failed(self, result, ignore_errors=False):
+        # An include_role task might end up putting an IncludeRole object
+        # inside the result object which we don't need
+        # https://github.com/ansible/ansible/issues/30385
+        if 'include_role' in result._result:
+            del result._result['include_role']
+
         result_dict = dict(result._result)
 
         self._handle_exception(result_dict)
@@ -306,6 +312,12 @@ class CallbackModule(default.CallbackModule):
             self._log_message(result, "Ignoring Errors", status="ERROR")
 
     def v2_runner_on_skipped(self, result):
+        # An include_role task might end up putting an IncludeRole object
+        # inside the result object which we don't need
+        # https://github.com/ansible/ansible/issues/30385
+        if 'include_role' in result._result:
+            del result._result['include_role']
+
         if result._task.loop:
             self._items_done = False
             self._deferred_result = dict(result._result)
@@ -326,6 +338,12 @@ class CallbackModule(default.CallbackModule):
             self._process_deferred(result)
 
     def v2_runner_on_ok(self, result):
+        # An include_role task might end up putting an IncludeRole object
+        # inside the result object which we don't need
+        # https://github.com/ansible/ansible/issues/30385
+        if 'include_role' in result._result:
+            del result._result['include_role']
+
         if (self._play.strategy == 'free'
                 and self._last_task_banner != result._task._uuid):
             self._print_task_banner(result._task)
