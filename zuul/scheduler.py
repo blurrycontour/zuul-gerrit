@@ -266,7 +266,6 @@ class Scheduler(threading.Thread):
         # load: whether or not to trigger the onLoad for the connection. This
         # is useful for not doing a full load during layout validation.
         self.connections = connections
-        self.connections.registerWebapp(webapp)
         self.connections.registerScheduler(self, load)
 
     def stopConnections(self):
