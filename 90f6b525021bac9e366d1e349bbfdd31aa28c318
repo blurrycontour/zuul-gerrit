@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5f2577a7_9214da45",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-09-14T16:19:08Z",
+      "side": 1,
+      "message": "Oh indeed, next PS will use it instead.",
+      "parentUuid": "5f2577a7_4cc7f765",
+      "revId": "90f6b525021bac9e366d1e349bbfdd31aa28c318",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f2577a7_2cc4ab5e",
         "filename": "zuul/scheduler.py",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2017-09-14T15:34:37Z",
       "side": 1,
       "message": "The function names are generally \u0027component:function\u0027 except the name of the scheduler component is \u0027zuul\u0027.  so maybe call this \u0027zuul:tenant_list\u0027?",
+      "revId": "90f6b525021bac9e366d1e349bbfdd31aa28c318",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_f22e7e90",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 957,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-09-14T16:19:08Z",
+      "side": 1,
+      "message": "Good idea",
+      "parentUuid": "5f2577a7_2cc4ab5e",
       "revId": "90f6b525021bac9e366d1e349bbfdd31aa28c318",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
