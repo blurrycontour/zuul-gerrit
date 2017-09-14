@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f2577a7_949cbc6a",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-09-14T22:45:50Z",
+      "side": 1,
+      "message": "It seems like the github_connections dictionary could contains a {connection_name: webhook_secrets} that could be checked and extracted here for the validate_signature function.",
+      "revId": "ff1484328081f7e45c5549353a807a5c59c99ccc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
