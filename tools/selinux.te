@@ -1,0 +1,302 @@
+policy_module(zuul, 0.1)
+
+########################################
+#
+# Declarations
+#
+
+# Contextes
+type zuul_t;
+type zuul_scheduler_t;
+type zuul_executor_t;
+type zuul_merger_t;
+type zuul_web_t;
+
+# Daemon transition
+type zuul_exec_t;
+init_daemon_domain(zuul_t, zuul_exec_t)
+type zuul_scheduler_exec_t;
+init_daemon_domain(zuul_scheduler_t, zuul_scheduler_exec_t)
+type zuul_executor_exec_t;
+init_daemon_domain(zuul_executor_t, zuul_executor_exec_t)
+type zuul_merger_exec_t;
+init_daemon_domain(zuul_merger_t, zuul_merger_exec_t)
+type zuul_web_exec_t;
+init_daemon_domain(zuul_web_t, zuul_web_exec_t)
+
+# Unit file
+type zuul_scheduler_unit_file_t;
+systemd_unit_file(zuul_scheduler_unit_file_t)
+type zuul_executor_unit_file_t;
+systemd_unit_file(zuul_executor_unit_file_t)
+type zuul_web_unit_file_t;
+systemd_unit_file(zuul_web_unit_file_t)
+type zuul_merger_unit_file_t;
+systemd_unit_file(zuul_merger_unit_file_t)
+
+# Files
+# /etc/zuul
+type zuul_conf_t;
+files_type(zuul_conf_t)
+# /var/lib/zuul
+type zuul_var_lib_t;
+files_type(zuul_var_lib_t)
+# /var/log/zuul
+type zuul_log_t;
+logging_log_file(zuul_log_t)
+
+# State files
+# ~zuul/keys
+type zuul_keys_t;
+files_type(zuul_keys_t)
+# ~zuul/executor
+type zuul_executor_git_t;
+files_type(zuul_executor_git_t)
+# ~zuul/ansible
+type zuul_ansible_t;
+files_type(zuul_ansible_t)
+
+# Network
+type zuul_gearman_port_t;
+corenet_port(zuul_gearman_port_t)
+type zuul_webapp_port_t;
+corenet_port(zuul_webapp_port_t);
+type zuul_web_port_t;
+corenet_port(zuul_web_port_t)
+
+# Permissive mode
+permissive zuul_t;
+permissive zuul_scheduler_t;
+permissive zuul_executor_t;
+permissive zuul_merger_t;
+permissive zuul_web_t;
+
+
+########################################
+#
+# zuul local policy
+#
+files_read_etc_files(zuul_t)
+files_read_etc_files(zuul_scheduler_t)
+files_read_etc_files(zuul_executor_t)
+files_read_etc_files(zuul_web_t)
+files_read_etc_files(zuul_merger_t)
+miscfiles_read_localization(zuul_t)
+miscfiles_read_localization(zuul_scheduler_t)
+miscfiles_read_localization(zuul_executor_t)
+miscfiles_read_localization(zuul_web_t)
+miscfiles_read_localization(zuul_merger_t)
+
+# Executor special policy
+fs_getattr_binfmt_misc_dirs(zuul_executor_t)
+kernel_read_fs_sysctls(zuul_executor_t)
+sysnet_manage_ifconfig_run(zuul_executor_t)
+
+########################################
+#
+# zuul runtime policy
+#
+require {
+    type bin_t;
+    type cert_t;
+    type cgroup_t;
+    type configfs_t;
+    type devpts_t;
+    type ephemeral_port_t;
+    type fs_t;
+    type gerrit_port_t;
+    type hugetlbfs_t;
+    type ifconfig_exec_t;
+    type ldconfig_exec_t;
+    type lib_t;
+    type mysqld_port_t;
+    type net_conf_t;
+    type nfsd_fs_t;
+    type node_t;
+    type passwd_file_t;
+    type proc_net_t;
+    type proc_t;
+    type pstore_t;
+    type random_device_t;
+    type root_t;
+    type rsync_exec_t;
+    type shell_exec_t;
+    type ssh_agent_exec_t;
+    type ssh_exec_t;
+    type ssh_home_t;
+    type ssh_keygen_exec_t;
+    type ssh_port_t;
+    type sysctl_irq_t;
+    type sysctl_net_t;
+    type sysctl_t;
+    type sysfs_t;
+    type tmp_t;
+    type tmpfs_t;
+    type unreserved_port_t;
+    type user_tmp_t;
+    type zookeeper_client_port_t;
+    type zuul_ansible_t;
+    type zuul_conf_t;
+    type zuul_exec_t;
+    type zuul_executor_git_t;
+    type zuul_executor_t;
+    type zuul_gearman_port_t;
+    type zuul_keys_t;
+    type zuul_log_t;
+    type zuul_merger_t;
+    type zuul_scheduler_t;
+    type zuul_var_lib_t;
+    type zuul_web_port_t;
+    type zuul_web_t;
+    type zuul_webapp_port_t;
+    class capability { setpcap setuid sys_chroot };
+    class chr_file { getattr open read };
+    class dir { add_name create getattr mounton open read relabelfrom relabelto remove_name rmdir search setattr write };
+    class file { append create execute execute_no_trans getattr ioctl link mounton open read relabelfrom relabelto rename setattr unlink write };
+    class filesystem { getattr mount remount unmount };
+    class lnk_file { create getattr unlink };
+    class netlink_route_socket { bind create getattr nlmsg_read };
+    class process { setcap setrlimit };
+    class sock_file { create getattr link unlink write };
+    class tcp_socket { accept bind connect create getattr getopt listen name_bind name_connect node_bind read setopt shutdown };
+    class udp_socket { connect create getattr ioctl };
+    class unix_dgram_socket { connect create };
+    class unix_stream_socket { connectto };
+}
+
+#============= zuul_executor_t ==============
+allow zuul_executor_t bin_t:file { execute execute_no_trans };
+allow zuul_executor_t cert_t:file { getattr open read };
+allow zuul_executor_t cgroup_t:dir getattr;
+allow zuul_executor_t configfs_t:dir getattr;
+allow zuul_executor_t devpts_t:filesystem mount;
+allow zuul_executor_t ephemeral_port_t:tcp_socket name_connect;
+allow zuul_executor_t fs_t:filesystem { remount unmount };
+allow zuul_executor_t gerrit_port_t:tcp_socket name_connect;
+allow zuul_executor_t hugetlbfs_t:dir getattr;
+allow zuul_executor_t ifconfig_exec_t:file { execute execute_no_trans getattr open read };
+allow zuul_executor_t ldconfig_exec_t:file { execute execute_no_trans open read };
+allow zuul_executor_t lib_t:dir relabelto;
+allow zuul_executor_t lib_t:file relabelto;
+allow zuul_executor_t net_conf_t:file { getattr open read };
+allow zuul_executor_t nfsd_fs_t:dir getattr;
+allow zuul_executor_t node_t:tcp_socket node_bind;
+allow zuul_executor_t passwd_file_t:file { getattr open read };
+allow zuul_executor_t proc_net_t:file { getattr open read };
+allow zuul_executor_t proc_t:dir mounton;
+allow zuul_executor_t proc_t:file { getattr open read };
+allow zuul_executor_t proc_t:filesystem { mount remount };
+allow zuul_executor_t pstore_t:dir getattr;
+allow zuul_executor_t random_device_t:chr_file { getattr open read };
+allow zuul_executor_t root_t:dir mounton;
+allow zuul_executor_t rsync_exec_t:file { execute execute_no_trans getattr open read };
+allow zuul_executor_t self:capability { setpcap setuid sys_chroot };
+allow zuul_executor_t self:process { setcap setrlimit };
+allow zuul_executor_t self:tcp_socket { bind connect create getattr getopt listen setopt shutdown };
+allow zuul_executor_t self:udp_socket { create ioctl };
+allow zuul_executor_t self:unix_dgram_socket { connect create };
+allow zuul_executor_t self:unix_stream_socket connectto;
+allow zuul_executor_t shell_exec_t:file { execute execute_no_trans };
+allow zuul_executor_t ssh_agent_exec_t:file { execute execute_no_trans open read };
+allow zuul_executor_t ssh_exec_t:file { execute execute_no_trans getattr open read };
+allow zuul_executor_t ssh_home_t:dir getattr;
+allow zuul_executor_t ssh_home_t:file { append getattr open read };
+allow zuul_executor_t ssh_keygen_exec_t:file { execute execute_no_trans getattr open read };
+allow zuul_executor_t ssh_port_t:tcp_socket name_connect;
+allow zuul_executor_t sysctl_irq_t:dir { getattr mounton };
+allow zuul_executor_t sysctl_net_t:dir search;
+allow zuul_executor_t sysctl_t:dir mounton;
+allow zuul_executor_t sysctl_t:file { getattr mounton };
+allow zuul_executor_t sysfs_t:file { getattr open read };
+allow zuul_executor_t tmp_t:dir { add_name create mounton read remove_name rmdir setattr write };
+allow zuul_executor_t tmp_t:file { create open relabelto rename setattr unlink write };
+allow zuul_executor_t tmp_t:lnk_file { create unlink };
+allow zuul_executor_t tmp_t:sock_file { create getattr link unlink write };
+allow zuul_executor_t tmpfs_t:dir { add_name create mounton read remove_name rmdir write };
+allow zuul_executor_t tmpfs_t:file { append create getattr ioctl link mounton open read relabelfrom setattr unlink write };
+allow zuul_executor_t tmpfs_t:filesystem { getattr mount };
+allow zuul_executor_t tmpfs_t:lnk_file create;
+allow zuul_executor_t unreserved_port_t:tcp_socket { name_bind name_connect };
+allow zuul_executor_t user_tmp_t:dir { add_name create mounton write };
+allow zuul_executor_t zuul_ansible_t:dir { getattr open read remove_name rmdir write };
+allow zuul_executor_t zuul_ansible_t:file { getattr unlink };
+allow zuul_executor_t zuul_conf_t:dir getattr;
+allow zuul_executor_t zuul_conf_t:file { getattr ioctl open read };
+allow zuul_executor_t zuul_exec_t:file getattr;
+allow zuul_executor_t zuul_executor_git_t:dir { add_name create getattr open read remove_name search write };
+allow zuul_executor_t zuul_executor_git_t:file { append create getattr ioctl link open read rename setattr unlink write };
+allow zuul_executor_t zuul_executor_git_t:lnk_file { create getattr unlink };
+allow zuul_executor_t zuul_gearman_port_t:tcp_socket name_connect;
+allow zuul_executor_t zuul_log_t:dir { add_name write };
+allow zuul_executor_t zuul_log_t:file { create open };
+allow zuul_executor_t zuul_var_lib_t:dir { add_name create getattr open read relabelfrom remove_name search setattr write };
+allow zuul_executor_t zuul_var_lib_t:file { create getattr ioctl open read relabelfrom setattr write };
+allow zuul_executor_t zuul_var_lib_t:sock_file { create getattr unlink };
+
+#============= zuul_scheduler_t ==============
+allow zuul_scheduler_t bin_t:file { execute execute_no_trans };
+allow zuul_scheduler_t gerrit_port_t:tcp_socket name_connect;
+allow zuul_scheduler_t ldconfig_exec_t:file { execute execute_no_trans open read };
+allow zuul_scheduler_t mysqld_port_t:tcp_socket name_connect;
+allow zuul_scheduler_t net_conf_t:file { getattr open read };
+allow zuul_scheduler_t node_t:tcp_socket node_bind;
+allow zuul_scheduler_t proc_t:file { getattr open read };
+allow zuul_scheduler_t random_device_t:chr_file { open read };
+allow zuul_scheduler_t self:netlink_route_socket { bind create getattr nlmsg_read };
+allow zuul_scheduler_t self:tcp_socket { accept bind connect create getattr getopt listen setopt shutdown };
+allow zuul_scheduler_t self:udp_socket { connect create getattr };
+allow zuul_scheduler_t shell_exec_t:file { execute execute_no_trans };
+allow zuul_scheduler_t ssh_home_t:dir search;
+allow zuul_scheduler_t ssh_home_t:file { getattr ioctl open read };
+allow zuul_scheduler_t zookeeper_client_port_t:tcp_socket name_connect;
+allow zuul_scheduler_t zuul_conf_t:dir { getattr search };
+allow zuul_scheduler_t zuul_conf_t:file { getattr ioctl open read };
+allow zuul_scheduler_t zuul_exec_t:file getattr;
+allow zuul_scheduler_t zuul_gearman_port_t:tcp_socket { name_bind name_connect };
+allow zuul_scheduler_t zuul_keys_t:dir { add_name create getattr search write };
+allow zuul_scheduler_t zuul_keys_t:file { create getattr ioctl open read setattr write };
+allow zuul_scheduler_t zuul_log_t:dir { add_name search write };
+allow zuul_scheduler_t zuul_log_t:file { create open };
+allow zuul_scheduler_t zuul_var_lib_t:dir { add_name create getattr remove_name write };
+allow zuul_scheduler_t zuul_var_lib_t:file { create getattr ioctl open read rename unlink write };
+allow zuul_scheduler_t zuul_webapp_port_t:tcp_socket name_bind;
+
+#============= zuul_web_t ==============
+allow zuul_web_t bin_t:file { execute execute_no_trans };
+allow zuul_web_t ldconfig_exec_t:file { execute execute_no_trans open read };
+allow zuul_web_t mysqld_port_t:tcp_socket name_connect;
+allow zuul_web_t net_conf_t:file { getattr open read };
+allow zuul_web_t node_t:tcp_socket node_bind;
+allow zuul_web_t proc_t:file { getattr open read };
+allow zuul_web_t random_device_t:chr_file { open read };
+allow zuul_web_t self:tcp_socket { bind connect create getopt listen setopt };
+allow zuul_web_t shell_exec_t:file { execute execute_no_trans };
+allow zuul_web_t zuul_conf_t:file { getattr ioctl open read };
+allow zuul_web_t zuul_exec_t:file getattr;
+allow zuul_web_t zuul_log_t:dir { add_name write };
+allow zuul_web_t zuul_log_t:file { create open };
+allow zuul_web_t zuul_web_port_t:tcp_socket name_bind;
+
+#============= zuul_merger_t ==============
+allow zuul_merger_t bin_t:file { execute execute_no_trans };
+allow zuul_merger_t cert_t:file { getattr open read };
+allow zuul_merger_t gerrit_port_t:tcp_socket name_connect;
+allow zuul_merger_t ldconfig_exec_t:file { execute execute_no_trans open read };
+allow zuul_merger_t net_conf_t:file { getattr open read };
+allow zuul_merger_t node_t:tcp_socket node_bind;
+allow zuul_merger_t passwd_file_t:file { getattr open read };
+allow zuul_merger_t proc_t:file { getattr open read };
+allow zuul_merger_t random_device_t:chr_file { open read };
+allow zuul_merger_t self:tcp_socket { bind connect create getattr getopt setopt shutdown };
+allow zuul_merger_t shell_exec_t:file { execute execute_no_trans };
+allow zuul_merger_t ssh_exec_t:file { execute execute_no_trans getattr open read };
+allow zuul_merger_t ssh_home_t:dir getattr;
+allow zuul_merger_t ssh_home_t:file { getattr open read };
+allow zuul_merger_t zuul_conf_t:file { getattr ioctl open read };
+allow zuul_merger_t zuul_exec_t:file getattr;
+allow zuul_merger_t zuul_gearman_port_t:tcp_socket name_connect;
+allow zuul_merger_t zuul_log_t:dir { add_name write };
+allow zuul_merger_t zuul_log_t:file { create open };
+allow zuul_merger_t zuul_var_lib_t:dir { add_name create getattr open read remove_name write };
+allow zuul_merger_t zuul_var_lib_t:file { append create getattr ioctl link open read rename setattr unlink write };
+allow zuul_merger_t zuul_var_lib_t:lnk_file { create getattr unlink };
