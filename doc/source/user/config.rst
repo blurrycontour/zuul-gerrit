@@ -540,6 +540,13 @@ Here is an example of two job definitions:
       specified in a project's pipeline, set this attribute to
       ``true``.
 
+   .. attr:: abstract
+      :default: false
+
+      To indicate a job is not intended to be run directly, but
+      instead must be inherited from (and these jobs may be intended
+      to be run), set this attribute to ``true``.
+
    .. attr:: success-message
       :default: SUCCESS
 

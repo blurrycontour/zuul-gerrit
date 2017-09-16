@@ -798,6 +798,7 @@ class Job(object):
             semaphore=None,
             attempts=3,
             final=False,
+            abstract=False,
             roles=(),
             required_projects={},
             allowed_projects=None,
@@ -963,7 +964,7 @@ class Job(object):
 
         for k in self.execution_attributes:
             if (other._get(k) is not None and
-                k not in set(['final'])):
+                k not in set(['final', 'abstract'])):
                 if self.final:
                     raise Exception("Unable to modify final job %s attribute "
                                     "%s=%s with variant %s" % (
@@ -977,7 +978,8 @@ class Job(object):
         # through assignment.
         if other.final != self.attributes['final']:
             self.final = other.final
-
+        # Abstract may not be reset by a variant, it may only be
+        # cleared by inheriting.
         if other._get('pre_run') is not None:
             self.pre_run = self.pre_run + other.pre_run
         if other._get('post_run') is not None:
@@ -2404,6 +2406,10 @@ class Layout(object):
                 # A change must match at least one project pipeline
                 # job variant.
                 continue
+            if frozen_job.abstract:
+                raise Exception("Job %s is abstract and may not be "
+                                "directly run" %
+                                (frozen_job.name,))
             if (frozen_job.allowed_projects and
                 change.project.name not in frozen_job.allowed_projects):
                 raise Exception("Project %s is not allowed to run job %s" %

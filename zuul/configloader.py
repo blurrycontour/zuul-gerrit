@@ -378,6 +378,7 @@ class JobParser(object):
         job = {vs.Required('name'): str,
                'parent': vs.Any(str, None),
                'final': bool,
+               'abstract': bool,
                'failure-message': str,
                'success-message': str,
                'failure-url': str,
@@ -412,6 +413,7 @@ class JobParser(object):
 
     simple_attributes = [
         'final',
+        'abstract',
         'timeout',
         'workspace',
         'voting',
