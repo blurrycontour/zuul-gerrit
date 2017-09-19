@@ -59,12 +59,14 @@ class CallbackModule(CallbackBase):
         if os.path.exists(self.output_path):
             self.output = json.load(open(self.output_path, 'r'))
         self._playbook_name = None
+        self._banner_emitted = False
 
     def _new_playbook(self, play):
         # Get the hostvars from just one host - the vars we're looking for will
         # be identical on all of them
+        if not play._variable_manager._hostvars:
+            return
         hostvars = next(iter(play._variable_manager._hostvars.values()))
-        self._playbook_name = None
 
         # TODO(mordred) For now, protect specific variable lookups to make it
         # not absurdly strange to run local tests with the callback plugin
@@ -103,9 +105,10 @@ class CallbackModule(CallbackBase):
 
     def v2_playbook_on_start(self, playbook):
         self._playbook_name = os.path.splitext(playbook._file_name)[0]
+        self._banner_emitted = False
 
     def v2_playbook_on_play_start(self, play):
-        if self._playbook_name:
+        if not self._banner_emitted:
             self._new_playbook(play)
 
         self.results.append(self._new_play(play))
