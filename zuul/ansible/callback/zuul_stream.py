@@ -85,6 +85,7 @@ class CallbackModule(default.CallbackModule):
         self._play = None
         self._streamers = []
         self._streamers_stop = False
+        self._banner_emitted = False
         self.configure_logger()
         self._items_done = False
         self._deferred_result = None
@@ -161,6 +162,7 @@ class CallbackModule(default.CallbackModule):
 
     def v2_playbook_on_start(self, playbook):
         self._playbook_name = os.path.splitext(playbook._file_name)[0]
+        self._banner_emitted = False
 
     def v2_playbook_on_include(self, included_file):
         for host in included_file._hosts:
