@@ -566,7 +566,7 @@ class Job:
         return dict(tasks=tasks, artifacts=artifacts, draft=draft)
 
     def _emitShellTask(self, data, syntax_check):
-        shell, data = deal_with_shebang(data)
+        shell, data = deal_with_shebang(data).lstrip()
         task = collections.OrderedDict()
         task['shell'] = data
         if shell:
@@ -613,7 +613,10 @@ class Job:
 
     def _makeBuilderTask(self, playbook_dir, builder, sequence, syntax_check):
         # Don't write a script to echo the template line
+        # TODO(mordred) Put these into mapping.yaml
         if builder['shell'].startswith('echo JJB template: '):
+            return
+        if 'echo "Detailed logs:' in builder['shell']:
             return
 
         task = self._emitShellTask(builder['shell'], syntax_check)
