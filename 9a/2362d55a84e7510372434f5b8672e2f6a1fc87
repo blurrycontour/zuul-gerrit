@@ -1,0 +1,9 @@
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Code-Review+2: David Shrewsbury <shrewsbury.dave@gmail.com>
+Workflow+1: David Shrewsbury <shrewsbury.dave@gmail.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Tue, 19 Sep 2017 19:14:38 +0000
+Reviewed-on: https://review.openstack.org/505369
+Project: openstack-infra/zuul
+Branch: refs/heads/feature/zuulv3
