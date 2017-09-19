@@ -635,7 +635,6 @@ class SourceContext(object):
             return False
         return (self.project == other.project and
                 self.branch == other.branch and
-                self.path == other.path and
                 self.trusted == other.trusted)
 
 
