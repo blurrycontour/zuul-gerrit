@@ -85,6 +85,7 @@ class CallbackModule(default.CallbackModule):
         self._play = None
         self._streamers = []
         self._streamers_stop = False
+        self._banner_emitted = False
         self.configure_logger()
         self._items_done = False
         self._deferred_result = None
@@ -161,6 +162,7 @@ class CallbackModule(default.CallbackModule):
 
     def v2_playbook_on_start(self, playbook):
         self._playbook_name = os.path.splitext(playbook._file_name)[0]
+        self._banner_emitted = False
 
     def v2_playbook_on_include(self, included_file):
         for host in included_file._hosts:
@@ -171,8 +173,9 @@ class CallbackModule(default.CallbackModule):
     def _emit_playbook_banner(self):
         # Get the hostvars from just one host - the vars we're looking for will
         # be identical on all of them
+        if not self._play._variable_manager._hostvars:
+            return
         hostvars = next(iter(self._play._variable_manager._hostvars.values()))
-        self._playbook_name = None
 
         phase = hostvars.get('zuul_execution_phase', '')
         playbook = hostvars.get('zuul_execution_canonical_name_and_path')
@@ -186,12 +189,13 @@ class CallbackModule(default.CallbackModule):
 
         self._log("{phase} [{trusted} : {playbook}@{branch}]".format(
             trusted=trusted, phase=phase, playbook=playbook, branch=branch))
+        self._banner_emitted = True
 
     def v2_playbook_on_play_start(self, play):
         self._play = play
 
         # We can't fill in this information until the first play
-        if self._playbook_name:
+        if not self._banner_emitted:
             self._emit_playbook_banner()
 
         # Log an extra blank line to get space before each play
