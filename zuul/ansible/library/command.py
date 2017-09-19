@@ -123,18 +123,16 @@ import traceback
 import threading
 
 from ansible.module_utils.basic import AnsibleModule, heuristic_log_sanitize
-from ansible.module_utils.pycompat24 import get_exception, literal_eval
 from ansible.module_utils.six import (
     PY2,
     PY3,
-    b,
     binary_type,
     integer_types,
     iteritems,
     string_types,
     text_type,
 )
-from ansible.module_utils.six.moves import map, reduce
+from ansible.module_utils.six.moves import map, reduce, shlex_quote
 from ansible.module_utils._text import to_native, to_bytes, to_text
 
 LOG_STREAM_FILE = '/tmp/console-{log_uuid}.log'
@@ -187,7 +185,8 @@ def follow(fd, log_uuid):
 
 # Taken from ansible/module_utils/basic.py ... forking the method for now
 # so that we can dive in and figure out how to make appropriate hook points
-def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, executable=None, data=None, binary_data=False, path_prefix=None, cwd=None, use_unsafe_shell=False, prompt_regex=None, environ_update=None, umask=None, encoding='utf-8', errors='surrogate_or_strict'):
+def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, executable=None, data=None, binary_data=False, path_prefix=None, cwd=None,
+                     use_unsafe_shell=False, prompt_regex=None, environ_update=None, umask=None, encoding='utf-8', errors='surrogate_or_strict'):
     '''
     Execute a command, returns rc, stdout, and stderr.
 
@@ -232,24 +231,33 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
         strings on python3, use encoding=None to turn decoding to text off.
     '''
 
-    shell = False
     if isinstance(args, list):
         if use_unsafe_shell:
-            args = " ".join([pipes.quote(x) for x in args])
+            args = " ".join([shlex_quote(x) for x in args])
             shell = True
     elif isinstance(args, (binary_type, text_type)) and use_unsafe_shell:
         shell = True
     elif isinstance(args, (binary_type, text_type)):
-        # On python2.6 and below, shlex has problems with text type
-        # On python3, shlex needs a text type.
-        if PY2:
-            args = to_bytes(args, errors='surrogate_or_strict')
-        elif PY3:
-            args = to_text(args, errors='surrogateescape')
-        args = shlex.split(args)
+        if not use_unsafe_shell:
+            # On python2.6 and below, shlex has problems with text type
+            # On python3, shlex needs a text type.
+            if PY2:
+                args = to_bytes(args, errors='surrogate_or_strict')
+            elif PY3:
+                args = to_text(args, errors='surrogateescape')
+            args = shlex.split(args)
     else:
         msg = "Argument 'args' to run_command must be list or string"
         self.fail_json(rc=257, cmd=args, msg=msg)
+
+    shell = False
+    if use_unsafe_shell:
+        if executable is None:
+            executable = os.environ.get('SHELL')
+        if executable:
+            args = [executable, '-c', args]
+        else:
+            shell = True
 
     prompt_re = None
     if prompt_regex:
@@ -315,7 +323,7 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
 
     clean_args = []
     is_passwd = False
-    for arg in to_clean_args:
+    for arg in (to_native(a) for a in to_clean_args):
         if is_passwd:
             is_passwd = False
             clean_args.append('********')
@@ -329,7 +337,7 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
                 is_passwd = True
         arg = heuristic_log_sanitize(arg, self.no_log_values)
         clean_args.append(arg)
-    clean_args = ' '.join(pipes.quote(arg) for arg in clean_args)
+    clean_args = ' '.join(shlex_quote(arg) for arg in clean_args)
 
     if data:
         st_in = subprocess.PIPE
@@ -353,9 +361,9 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
         kwargs['cwd'] = cwd
         try:
             os.chdir(cwd)
-        except (OSError, IOError):
-            e = get_exception()
-            self.fail_json(rc=e.errno, msg="Could not open %s, %s" % (cwd, str(e)))
+        except (OSError, IOError) as e:
+            self.fail_json(rc=e.errno, msg="Could not open %s, %s" % (cwd, to_native(e)),
+                           exception=traceback.format_exc())
 
     old_umask = None
     if umask:
@@ -396,16 +404,14 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
 
         # ZUUL: stdout and stderr are in the console log file
         # ZUUL: return the saved log lines so we can ship them back
-        stdout = b('').join(_log_lines)
-        stderr = b('')
+        stdout = b''.join(_log_lines)
+        stderr = b''
 
         rc = cmd.returncode
-    except (OSError, IOError):
-        e = get_exception()
+    except (OSError, IOError) as e:
         self.log("Error Executing CMD:%s Exception:%s" % (clean_args, to_native(e)))
         fail_json_kwargs=dict(rc=e.errno, msg=str(e), cmd=clean_args)
-    except Exception:
-        e = get_exception()
+    except Exception as e:
         self.log("Error Executing CMD:%s Exception:%s" % (clean_args, to_native(traceback.format_exc())))
         fail_json_kwargs = dict(rc=257, msg=str(e), exception=traceback.format_exc(), cmd=clean_args)
     finally:
@@ -448,25 +454,23 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
     return (rc, stdout, stderr)
 
 
-def check_command(commandline):
-    arguments = { 'chown': 'owner', 'chmod': 'mode', 'chgrp': 'group',
-                  'ln': 'state=link', 'mkdir': 'state=directory',
-                  'rmdir': 'state=absent', 'rm': 'state=absent', 'touch': 'state=touch' }
-    commands  = { 'hg': 'hg', 'curl': 'get_url or uri', 'wget': 'get_url or uri',
-                  'svn': 'subversion', 'service': 'service',
-                  'mount': 'mount', 'rpm': 'yum, dnf or zypper', 'yum': 'yum', 'apt-get': 'apt',
-                  'tar': 'unarchive', 'unzip': 'unarchive', 'sed': 'template or lineinfile',
-                  'dnf': 'dnf', 'zypper': 'zypper' }
-    become   = [ 'sudo', 'su', 'pbrun', 'pfexec', 'runas' ]
-    warnings = list()
+def check_command(module, commandline):
+    arguments = {'chown': 'owner', 'chmod': 'mode', 'chgrp': 'group',
+                 'ln': 'state=link', 'mkdir': 'state=directory',
+                 'rmdir': 'state=absent', 'rm': 'state=absent', 'touch': 'state=touch'}
+    commands  = {'hg': 'hg', 'curl': 'get_url or uri', 'wget': 'get_url or uri',
+                 'svn': 'subversion', 'service': 'service',
+                 'mount': 'mount', 'rpm': 'yum, dnf or zypper', 'yum': 'yum', 'apt-get': 'apt',
+                 'tar': 'unarchive', 'unzip': 'unarchive', 'sed': 'template or lineinfile',
+                 'dnf': 'dnf', 'zypper': 'zypper'}
+    become   = ['sudo', 'su', 'pbrun', 'pfexec', 'runas']
     command = os.path.basename(commandline.split()[0])
     if command in arguments:
-        warnings.append("Consider using file module with %s rather than running %s" % (arguments[command], command))
+        module.warn("Consider using file module with %s rather than running %s" % (arguments[command], command))
     if command in commands:
-        warnings.append("Consider using %s module rather than running %s" % (commands[command], command))
+        module.warn("Consider using %s module rather than running %s" % (commands[command], command))
     if command in become:
-        warnings.append("Consider using 'become', 'become_method', and 'become_user' rather than running %s" % (command,))
-    return warnings
+        module.warn("Consider using 'become', 'become_method', and 'become_user' rather than running %s" % (command,))
 
 
 def main():
@@ -482,7 +486,7 @@ def main():
             creates = dict(type='path'),
             removes = dict(type='path'),
             warn = dict(type='bool', default=True),
-            environ = dict(type='dict', default=None),
+            stdin=dict(required=False),
             zuul_log_id = dict(type='str'),
         )
     )
@@ -494,8 +498,15 @@ def main():
     creates = module.params['creates']
     removes = module.params['removes']
     warn = module.params['warn']
-    environ = module.params['environ']
+    stdin = module.params['stdin']
     zuul_log_id = module.params['zuul_log_id']
+
+    if not shell and executable:
+        module.warn(
+            "As of Ansible 2.4, the parameter 'executable' is no longer"
+            " supported with the 'command' module."
+            " Not using '%s'." % executable)
+        executable = None
 
     if args.strip() == '':
         module.fail_json(rc=256, msg="no command given")
@@ -528,36 +539,40 @@ def main():
                 rc=0
             )
 
-    warnings = list()
     if warn:
-        warnings = check_command(args)
+        check_command(args)
 
     if not shell:
         args = shlex.split(args)
     startd = datetime.datetime.now()
 
-    rc, out, err = zuul_run_command(module, args, zuul_log_id, executable=executable, use_unsafe_shell=shell, encoding=None, environ_update=environ)
+    rc, out, err = zuul_run_command(module, args, zuul_log_id, executable=executable, use_unsafe_shell=shell, encoding=None, data=stdin)
 
     endd = datetime.datetime.now()
     delta = endd - startd
 
     if out is None:
-        out = b('')
+        out = b''
     if err is None:
-        err = b('')
+        err = b''
 
-    module.exit_json(
-        cmd      = args,
-        stdout   = out.rstrip(b("\r\n")),
-        stderr   = err.rstrip(b("\r\n")),
-        rc       = rc,
-        start    = str(startd),
-        end      = str(endd),
-        delta    = str(delta),
-        changed  = True,
-        warnings = warnings,
-        zuul_log_id = zuul_log_id
+    result = dict(
+        cmd=args,
+        stdout=out.rstrip(b"\r\n"),
+        stderr=err.rstrip(b"\r\n"),
+        rc=rc,
+        start=str(startd),
+        end=str(endd),
+        delta=str(delta),
+        changed=True,
+        zuul_log_id=zuul_log_id
     )
+
+    if rc != 0:
+        module.fail_json(msg='non-zero return code', **result)
+
+    module.exit_json(**result)
+
 
 if __name__ == '__main__':
     main()
