@@ -26,6 +26,7 @@
       - openstack/ara
     files:
       - zuul/ansible/callback/.*
+      - zuul/ansible/library/.*
       - playbooks/zuul-stream/.*
 
 - project:
