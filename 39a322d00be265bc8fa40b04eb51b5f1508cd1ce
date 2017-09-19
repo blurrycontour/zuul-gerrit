@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf57530f_e8f8537d",
+        "filename": "zuul/ansible/library/command.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-09-19T23:28:56Z",
+      "side": 1,
+      "message": "Why did this get broken into two lines?",
+      "revId": "39a322d00be265bc8fa40b04eb51b5f1508cd1ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
