@@ -37,9 +37,10 @@
 
 - job:
     name: single-inventory
-    nodes:
-      - name: ubuntu-xenial
-        label: ubuntu-xenial
+    nodeset:
+      nodes:
+        - name: ubuntu-xenial
+          label: ubuntu-xenial
 
 - job:
     name: group-inventory
