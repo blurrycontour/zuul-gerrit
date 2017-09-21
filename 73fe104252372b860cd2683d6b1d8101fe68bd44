@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f515b1d_f5494232",
+        "filename": "zuul/cmd/migrate.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 493,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-09-21T21:42:16Z",
+      "side": 1,
+      "message": "white space, but whatever.",
+      "revId": "73fe104252372b860cd2683d6b1d8101fe68bd44",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f515b1d_d5464622",
+        "filename": "zuul/cmd/migrate.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 510,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-09-21T21:42:16Z",
+      "side": 1,
+      "message": "more white",
+      "revId": "73fe104252372b860cd2683d6b1d8101fe68bd44",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f515b1d_b553cae2",
+        "filename": "zuul/cmd/migrate.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 574,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-09-21T21:42:16Z",
+      "side": 1,
+      "message": "I love the mixing of \u0027yes\u0027 and True here.",
+      "revId": "73fe104252372b860cd2683d6b1d8101fe68bd44",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f515b1d_9550ced6",
+        "filename": "zuul/cmd/migrate.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 578,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-09-21T21:42:16Z",
+      "side": 1,
+      "message": "on node to what?",
+      "revId": "73fe104252372b860cd2683d6b1d8101fe68bd44",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
