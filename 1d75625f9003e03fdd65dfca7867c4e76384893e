@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f5c4f37_6761323a",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 579,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2017-09-21T00:11:10Z",
+      "side": 1,
+      "message": "Could this key not exist ? Should we do a try/catch or a get ?",
+      "range": {
+        "startLine": 579,
+        "startChar": 37,
+        "endLine": 579,
+        "endChar": 49
+      },
+      "revId": "1d75625f9003e03fdd65dfca7867c4e76384893e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
