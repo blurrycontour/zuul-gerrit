@@ -22,6 +22,23 @@
       "revId": "1d75625f9003e03fdd65dfca7867c4e76384893e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f5c4f37_077156e1",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 579,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-09-21T00:14:45Z",
+      "side": 1,
+      "message": "If it doesn\u0027t exist, it will be reported to the user; I\u0027m not certain how friendly the error is right now, we may want to make it more explicit (for this and secret).",
+      "revId": "1d75625f9003e03fdd65dfca7867c4e76384893e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
