@@ -1,3 +1,14 @@
+Code-Review+2: Joshua Hesketh <josh@nitrotech.org>
+Code-Review+1: Morgan Fainberg <morgan.fainberg@gmail.com>
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Mon, 25 Jul 2016 23:24:53 +0000
+Reviewed-on: https://review.openstack.org/345560
+Project: openstack-infra/zuul
+Branch: refs/heads/feature/zuulv3
+
 Code-Review+2: Joshua Hesketh <joshua.hesketh@rackspace.com>
 Code-Review+1: Morgan Fainberg <morgan.fainberg@gmail.com>
 Code-Review+2: James E. Blair <corvus@inaugust.com>

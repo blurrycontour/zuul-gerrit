@@ -1,4 +1,15 @@
 Code-Review+1: Tobias Henkel <tobias.henkel@bmw.de>
+Code-Review+2: Joshua Hesketh <josh@nitrotech.org>
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Wed, 15 Feb 2017 21:47:55 +0000
+Reviewed-on: https://review.openstack.org/430456
+Project: openstack-infra/zuul
+Branch: refs/heads/feature/zuulv3
+
+Code-Review+1: Tobias Henkel <tobias.henkel@bmw.de>
 Code-Review+2: Joshua Hesketh <joshua.hesketh@rackspace.com>
 Code-Review+2: James E. Blair <corvus@inaugust.com>
 Workflow+1: James E. Blair <corvus@inaugust.com>

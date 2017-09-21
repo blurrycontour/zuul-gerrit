@@ -1,5 +1,16 @@
 Code-Review+2: Paul Belanger <pabelanger@redhat.com>
 Code-Review+1: Morgan Fainberg <morgan.fainberg@gmail.com>
+Code-Review+2: Joshua Hesketh <josh@nitrotech.org>
+Workflow+1: Joshua Hesketh <josh@nitrotech.org>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Fri, 12 Aug 2016 02:22:08 +0000
+Reviewed-on: https://review.openstack.org/351897
+Project: openstack-infra/zuul
+Branch: refs/heads/feature/zuulv3
+
+Code-Review+2: Paul Belanger <pabelanger@redhat.com>
+Code-Review+1: Morgan Fainberg <morgan.fainberg@gmail.com>
 Code-Review+2: Joshua Hesketh <joshua.hesketh@rackspace.com>
 Workflow+1: Joshua Hesketh <joshua.hesketh@rackspace.com>
 Verified+2: Jenkins

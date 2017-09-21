@@ -1,4 +1,15 @@
 Verified+1: Zuul
+Code-Review+2: Joshua Hesketh <josh@nitrotech.org>
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Mon, 27 Mar 2017 17:29:57 +0000
+Reviewed-on: https://review.openstack.org/448820
+Project: openstack-infra/zuul
+Branch: refs/heads/feature/zuulv3
+
+Verified+1: Zuul
 Code-Review+2: Joshua Hesketh <joshua.hesketh@rackspace.com>
 Code-Review+2: James E. Blair <corvus@inaugust.com>
 Workflow+1: James E. Blair <corvus@inaugust.com>
