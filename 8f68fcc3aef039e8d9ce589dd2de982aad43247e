@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f515b1d_4882ad51",
+        "filename": "zuul/cmd/migrate.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1312,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-09-22T09:33:23Z",
+      "side": 1,
+      "message": "Is it correct that this hasn\u0027t a name?",
+      "range": {
+        "startLine": 1312,
+        "startChar": 30,
+        "endLine": 1312,
+        "endChar": 75
+      },
+      "revId": "8f68fcc3aef039e8d9ce589dd2de982aad43247e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
