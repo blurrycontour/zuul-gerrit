@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "7f515b1d_89f4275d",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-09-22T12:24:23Z",
+      "side": 1,
+      "message": "oh I figured that a user looking at the tenant list would be interested in the number of project being tested or deployed. Though this could be extended for sure.",
+      "parentUuid": "7f515b1d_5a603733",
+      "range": {
+        "startLine": 243,
+        "startChar": 28,
+        "endLine": 243,
+        "endChar": 71
+      },
+      "revId": "23de513953f291825a0989d4b8b0a0837c3eb6c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7f515b1d_da2ae78e",
         "filename": "zuul/web/__init__.py",
         "patchSetId": 6
@@ -36,6 +60,24 @@
       "writtenOn": "2017-09-22T08:48:23Z",
       "side": 1,
       "message": "The LogStreamingHandler above also has the gearman config. We might want to refactor that so we only have one gearman client running in zuul-web.",
+      "revId": "23de513953f291825a0989d4b8b0a0837c3eb6c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f515b1d_0985d7ad",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-09-22T12:24:23Z",
+      "side": 1,
+      "message": "I\u0027ll rebase the patch chain on top of https://review.openstack.org/506602, which refactor the logstreaminghandler to support a shared rpcclient.",
+      "parentUuid": "7f515b1d_da2ae78e",
       "revId": "23de513953f291825a0989d4b8b0a0837c3eb6c6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
