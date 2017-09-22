@@ -451,6 +451,18 @@ The following sections of ``zuul.conf`` are used by the executor:
 
       SSH private key file to be used when logging into worker nodes.
 
+   .. attr:: winrm_cert_key_file
+      :default: ~/.winrm/winrm_client_cert.key
+
+      The private key file of the client certificate to use for winrm
+      connections to Windows nodes.
+
+   .. attr:: winrm_cert_pem_file
+      :default: ~/.winrm/winrm_client_cert.pem
+
+      The certificate file of the client certificate to use for winrm
+      connections to Windows nodes.
+
    .. attr:: user
       :default: zuul
 
