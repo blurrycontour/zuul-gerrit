@@ -657,9 +657,11 @@ class Job:
     def _emitShellTask(self, data, syntax_check):
         shell, data = deal_with_shebang(data)
         task = collections.OrderedDict()
-        task['shell'] = data
+        task['shell'] = {}
+        task['args'] = dict(cmd=data)
         if shell:
-            task['args'] = dict(executable=shell)
+            task['args']['executable'] = shell
+
 
         if syntax_check:
             # Emit a test playbook with this shell task in it then run
