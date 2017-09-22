@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f515b1d_ca0e87e4",
+        "filename": "zuul/cmd/migrate.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 662,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-09-22T16:48:19Z",
+      "side": 1,
+      "message": "I did this and it worked:\n\ntasks:\n  - shell:\n      cmd: |\n        foo",
+      "revId": "47b5b2ad91ec5aaf9f1c12af34ddd2e5c85c8f56",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
