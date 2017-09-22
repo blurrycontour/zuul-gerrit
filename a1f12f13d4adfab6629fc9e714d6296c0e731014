@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f515b1d_1d94f98a",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-09-22T08:56:10Z",
+      "side": 1,
+      "message": "I\u0027m wondering if we have a policy or best practices if we want \u0027add a specific method for this in rpcclient\u0027 vs. \u0027direct use of submitjob\u0027.",
+      "range": {
+        "startLine": 185,
+        "startChar": 12,
+        "endLine": 185,
+        "endChar": 75
+      },
+      "revId": "a1f12f13d4adfab6629fc9e714d6296c0e731014",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
