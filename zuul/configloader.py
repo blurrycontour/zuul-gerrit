@@ -85,6 +85,14 @@ class MaxTimeoutError(Exception):
         super(MaxTimeoutError, self).__init__(message)
 
 
+class RestrictedNodeError(Exception):
+    def __init__(self, job, node):
+        message = textwrap.dedent("""\
+        The job "{job}" is not allowed to use the node "{node}".""")
+        message = textwrap.fill(message.format(job=job.name, node=node))
+        super(RestrictedNodeError, self).__init__(message)
+
+
 class DuplicateGroupError(Exception):
     def __init__(self, nodeset, group):
         message = textwrap.dedent("""\
@@ -464,7 +472,7 @@ class JobParser(object):
         return None
 
     @staticmethod
-    def fromYaml(tenant, layout, conf, project_pipeline=False):
+    def fromYaml(tenant, layout, conf, project_pipeline=False, limits={}):
         with configuration_exceptions('job', conf):
             JobParser.getSchema()(conf)
 
@@ -596,6 +604,13 @@ class JobParser(object):
                     raise NodesetNotFoundError(conf_nodeset)
             else:
                 ns = NodeSetParser.fromYaml(conf_nodeset, anonymous=True)
+            for node in ns.nodes.values():
+                if node.label in limits.get('restricted-node-labels', {}) and (
+                        tenant.name not in limits['restricted-node-labels'][
+                            node.label] or
+                        job.name not in limits['restricted-node-labels'][
+                            node.label][tenant.name]):
+                    raise RestrictedNodeError(job, node)
             if tenant.max_nodes_per_job != -1 and \
                len(ns) > tenant.max_nodes_per_job:
                 raise MaxNodeError(job, tenant)
@@ -720,7 +735,7 @@ class ProjectTemplateParser(object):
         return vs.Schema(project_template)
 
     @staticmethod
-    def fromYaml(tenant, layout, conf):
+    def fromYaml(tenant, layout, conf, limits):
         with configuration_exceptions('project or project-template', conf):
             ProjectTemplateParser.getSchema(layout)(conf)
         # Make a copy since we modify this later via pop
@@ -737,12 +752,12 @@ class ProjectTemplateParser(object):
             project_pipeline.queue_name = conf_pipeline.get('queue')
             ProjectTemplateParser._parseJobList(
                 tenant, layout, conf_pipeline.get('jobs', []),
-                source_context, start_mark, project_pipeline.job_list)
+                source_context, start_mark, project_pipeline.job_list, limits)
         return project_template
 
     @staticmethod
     def _parseJobList(tenant, layout, conf, source_context,
-                      start_mark, job_list):
+                      start_mark, job_list, limits):
         for conf_job in conf:
             if isinstance(conf_job, str):
                 attrs = dict(name=conf_job)
@@ -766,7 +781,8 @@ class ProjectTemplateParser(object):
                 layout.getJob(attrs['name'])
 
             job_list.addJob(JobParser.fromYaml(tenant, layout, attrs,
-                                               project_pipeline=True))
+                                               project_pipeline=True,
+                                               limits=limits))
 
 
 class ProjectParser(object):
@@ -791,7 +807,7 @@ class ProjectParser(object):
         return vs.Schema(project)
 
     @staticmethod
-    def fromYaml(tenant, layout, conf_list):
+    def fromYaml(tenant, layout, conf_list, limits={}):
         for conf in conf_list:
             with configuration_exceptions('project', conf):
                 ProjectParser.getSchema(layout)(conf)
@@ -817,7 +833,7 @@ class ProjectParser(object):
             # definition as a template, then applying all of the
             # templates, including the newly parsed one, in order.
             project_template = ProjectTemplateParser.fromYaml(
-                tenant, layout, conf)
+                tenant, layout, conf, limits)
             configs.extend([layout.project_templates[name]
                             for name in conf_templates])
             configs.append(project_template)
@@ -1042,6 +1058,32 @@ class SemaphoreParser(object):
         return semaphore
 
 
+class LimitParser(object):
+    log = logging.getLogger("zuul.LimitParser")
+
+    @staticmethod
+    def getSchema():
+        tenant_job = {str: [str]}
+        return vs.Schema(vs.Any({
+            'restricted-node-labels': {str: tenant_job},
+        }))
+
+    @staticmethod
+    def fromYaml(conf):
+        LimitParser.getSchema()(conf)
+        limits = {
+            'restricted-node-labels': conf.get('restricted-node-labels', {})
+        }
+        return limits
+
+    @staticmethod
+    def validateTenants(limits, tenants):
+        for node_labels in limits['restricted-node-labels'].values():
+            for tenant_name in node_labels.keys():
+                if tenant_name not in tenants:
+                    raise Exception('Tenant %s does not exists' % tenant_name)
+
+
 class TenantParser(object):
     log = logging.getLogger("zuul.TenantParser")
 
@@ -1098,7 +1140,7 @@ class TenantParser(object):
 
     @staticmethod
     def fromYaml(base, project_key_dir, connections, scheduler, merger, conf,
-                 cached):
+                 limits, cached):
         TenantParser.getSchema(connections)(conf)
         tenant = model.Tenant(conf['name'])
         if conf.get('max-nodes-per-job') is not None:
@@ -1134,7 +1176,8 @@ class TenantParser(object):
         tenant.layout = TenantParser._parseLayout(base, tenant,
                                                   unparsed_config,
                                                   scheduler,
-                                                  connections)
+                                                  connections,
+                                                  limits)
         return tenant
 
     @staticmethod
@@ -1448,7 +1491,8 @@ class TenantParser(object):
 
     @staticmethod
     def _parseLayoutItems(layout, tenant, data, scheduler, connections,
-                          skip_pipelines=False, skip_semaphores=False):
+                          skip_pipelines=False, skip_semaphores=False,
+                          limits={}):
         if not skip_pipelines:
             for config_pipeline in data.pipelines:
                 classes = TenantParser._getLoadClasses(
@@ -1478,7 +1522,8 @@ class TenantParser(object):
             if 'job' not in classes:
                 continue
             with configuration_exceptions('job', config_job):
-                job = JobParser.fromYaml(tenant, layout, config_job)
+                job = JobParser.fromYaml(tenant, layout, config_job,
+                                         limits=limits)
                 added = layout.addJob(job)
                 if not added:
                     TenantParser.log.debug(
@@ -1508,7 +1553,7 @@ class TenantParser(object):
             if 'project-template' not in classes:
                 continue
             layout.addProjectTemplate(ProjectTemplateParser.fromYaml(
-                tenant, layout, config_template))
+                tenant, layout, config_template, limits))
 
         for config_projects in data.projects.values():
             # Unlike other config classes, we expect multiple project
@@ -1528,16 +1573,16 @@ class TenantParser(object):
                 continue
 
             layout.addProjectConfig(ProjectParser.fromYaml(
-                tenant, layout, filtered_projects))
+                tenant, layout, filtered_projects, limits))
 
     @staticmethod
-    def _parseLayout(base, tenant, data, scheduler, connections):
+    def _parseLayout(base, tenant, data, scheduler, connections, limits):
         # Don't call this method from dynamic reconfiguration because
         # it interacts with drivers and connections.
         layout = model.Layout(tenant)
 
         TenantParser._parseLayoutItems(layout, tenant, data,
-                                       scheduler, connections)
+                                       scheduler, connections, limits=limits)
 
         for pipeline in layout.pipelines.values():
             pipeline.manager._postConfig(layout)
@@ -1568,18 +1613,26 @@ class ConfigLoader(object):
         config.extend(data)
         base = os.path.dirname(os.path.realpath(config_path))
 
+        abide.limits = LimitParser.fromYaml(config.limits)
+
         for conf_tenant in config.tenants:
             # When performing a full reload, do not use cached data.
             tenant = TenantParser.fromYaml(
                 base, project_key_dir, connections, scheduler, merger,
-                conf_tenant, cached=False)
+                conf_tenant, abide.limits, cached=False)
             abide.tenants[tenant.name] = tenant
+
+        LimitParser.validateTenants(abide.limits, list(abide.tenants.keys()))
         return abide
 
     def reloadTenant(self, config_path, project_key_dir, scheduler,
                      merger, connections, abide, tenant):
         new_abide = model.Abide()
         new_abide.tenants = abide.tenants.copy()
+        if not scheduler:
+            limits = {}
+        else:
+            limits = scheduler.abide.limits
 
         config_path = self.expandConfigPath(config_path)
         base = os.path.dirname(os.path.realpath(config_path))
@@ -1587,7 +1640,7 @@ class ConfigLoader(object):
         # When reloading a tenant only, use cached data if available.
         new_tenant = TenantParser.fromYaml(
             base, project_key_dir, connections, scheduler, merger,
-            tenant.unparsed_config, cached=True)
+            tenant.unparsed_config, limits, cached=True)
         new_abide.tenants[tenant.name] = new_tenant
         return new_abide
 
@@ -1657,6 +1710,11 @@ class ConfigLoader(object):
         for project in tenant.untrusted_projects:
             self._loadDynamicProjectData(config, project, files, False, tenant)
 
+        if not scheduler:
+            limits = {}
+        else:
+            limits = scheduler.abide.limits
+
         layout = model.Layout(tenant)
         if not include_config_projects:
             # NOTE: the actual pipeline objects (complete with queues
@@ -1681,6 +1739,7 @@ class ConfigLoader(object):
         TenantParser._parseLayoutItems(layout, tenant, config,
                                        scheduler, connections,
                                        skip_pipelines=skip_pipelines,
-                                       skip_semaphores=skip_semaphores)
+                                       skip_semaphores=skip_semaphores,
+                                       limits=limits)
 
         return layout

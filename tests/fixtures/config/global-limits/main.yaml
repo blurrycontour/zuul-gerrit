@@ -1,0 +1,13 @@
+- limit:
+    restricted-node-labels:
+      hsm-worker:
+        tenant-one: [sign-job]
+
+- tenant:
+    name: tenant-one
+    source:
+      gerrit:
+        config-projects:
+          - common-config
+        untrusted-projects:
+          - org/project
