@@ -2189,6 +2189,7 @@ class UnparsedAbideConfig(object):
 
     def __init__(self):
         self.tenants = []
+        self.limits = {}
 
     def extend(self, conf):
         if isinstance(conf, UnparsedAbideConfig):
@@ -2206,6 +2207,8 @@ class UnparsedAbideConfig(object):
             key, value = list(item.items())[0]
             if key == 'tenant':
                 self.tenants.append(value)
+            elif key == 'limit':
+                self.limits.update(value)
             else:
                 raise ConfigItemUnknownError()
 
@@ -2617,6 +2620,7 @@ class Tenant(object):
 class Abide(object):
     def __init__(self):
         self.tenants = OrderedDict()
+        self.limits = {}
 
 
 class JobTimeData(object):
