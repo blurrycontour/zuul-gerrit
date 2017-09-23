@@ -86,6 +86,14 @@ class MaxTimeoutError(Exception):
         super(MaxTimeoutError, self).__init__(message)
 
 
+class RestrictedNodeError(Exception):
+    def __init__(self, job, node):
+        message = textwrap.dedent("""\
+        The job "{job}" is not allowed to use the node label "{node}".""")
+        message = textwrap.fill(message.format(job=job.name, node=node.label))
+        super(RestrictedNodeError, self).__init__(message)
+
+
 class DuplicateGroupError(Exception):
     def __init__(self, nodeset, group):
         message = textwrap.dedent("""\
@@ -679,6 +687,16 @@ class JobParser(object):
                     raise NodesetNotFoundError(conf_nodeset)
             else:
                 ns = NodeSetParser.fromYaml(conf_nodeset, anonymous=True)
+            for node in ns.nodes.values():
+                if node.label in tenant.limits['restricted-node-labels']:
+                    node_limit = tenant.limits['restricted-node-labels'][
+                        node.label]
+                    project_uri = "%s/%s" % (
+                        job.source_context.project.connection_name,
+                        job.source_context.project.name)
+                    if project_uri not in node_limit or \
+                       job.name not in node_limit[project_uri]:
+                        raise RestrictedNodeError(job, node)
             if tenant.max_nodes_per_job != -1 and \
                len(ns) > tenant.max_nodes_per_job:
                 raise MaxNodeError(job, tenant)
@@ -1138,6 +1156,25 @@ class SemaphoreParser(object):
         return semaphore
 
 
+class LimitParser(object):
+    log = logging.getLogger("zuul.LimitParser")
+
+    @staticmethod
+    def getSchema():
+        project_job = {str: [str]}
+        return vs.Schema(vs.Any({
+            'restricted-node-labels': {str: project_job},
+        }))
+
+    @staticmethod
+    def fromYaml(conf):
+        LimitParser.getSchema()(conf)
+        limits = {
+            'restricted-node-labels': conf.get('restricted-node-labels', {})
+        }
+        return limits
+
+
 class TenantParser(object):
     log = logging.getLogger("zuul.TenantParser")
 
@@ -1194,7 +1231,7 @@ class TenantParser(object):
 
     @staticmethod
     def fromYaml(base, project_key_dir, connections, scheduler, merger, conf,
-                 old_tenant):
+                 limits, old_tenant):
         TenantParser.getSchema(connections)(conf)
         tenant = model.Tenant(conf['name'])
         if conf.get('max-nodes-per-job') is not None:
@@ -1205,6 +1242,7 @@ class TenantParser(object):
             tenant.exclude_unprotected_branches = \
                 conf['exclude-unprotected-branches']
         tenant.default_base_job = conf.get('default-parent', 'base')
+        tenant.limits = limits
 
         tenant.unparsed_config = conf
         unparsed_config = model.UnparsedTenantConfig()
@@ -1708,11 +1746,13 @@ class ConfigLoader(object):
         config.extend(data)
         base = os.path.dirname(os.path.realpath(config_path))
 
+        limits = LimitParser.fromYaml(config.limits)
+
         for conf_tenant in config.tenants:
             # When performing a full reload, do not use cached data.
             tenant = TenantParser.fromYaml(
                 base, project_key_dir, connections, scheduler, merger,
-                conf_tenant, old_tenant=None)
+                conf_tenant, limits, old_tenant=None)
             abide.tenants[tenant.name] = tenant
         return abide
 
@@ -1727,7 +1767,7 @@ class ConfigLoader(object):
         # When reloading a tenant only, use cached data if available.
         new_tenant = TenantParser.fromYaml(
             base, project_key_dir, connections, scheduler, merger,
-            tenant.unparsed_config, old_tenant=tenant)
+            tenant.unparsed_config, tenant.limits, old_tenant=tenant)
         new_abide.tenants[tenant.name] = new_tenant
         return new_abide
 
