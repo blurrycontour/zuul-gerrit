@@ -1506,6 +1506,29 @@ class TestMaxTimeout(AnsibleZuulTestCase):
                          "B should not fail because of timeout limit")
 
 
+class TestGlobalLimits(AnsibleZuulTestCase):
+    tenant_config_file = 'config/global-limits/main.yaml'
+
+    def test_restricted_nodes(self):
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: test-job
+                nodeset:
+                  nodes:
+                    - name: signer
+                      label: hsm-worker
+            """)
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertIn('The job "test-job" is not allowed to use the node '
+                      '"hsm-worker"',
+                      A.messages[0], "Test-job should be prevented")
+
+
 class TestBaseJobs(ZuulTestCase):
     tenant_config_file = 'config/base-jobs/main.yaml'
 

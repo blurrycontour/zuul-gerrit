@@ -2257,6 +2257,8 @@ class ZuulTestCase(BaseTestCase):
         with open(os.path.join(FIXTURE_DIR, path)) as f:
             tenant_config = yaml.safe_load(f.read())
         for tenant in tenant_config:
+            if 'tenant' not in tenant:
+                continue
             sources = tenant['tenant']['source']
             for source, conf in sources.items():
                 for project in conf.get('config-projects', []):
