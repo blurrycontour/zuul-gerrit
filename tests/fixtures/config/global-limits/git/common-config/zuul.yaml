@@ -1,0 +1,11 @@
+- job:
+    name: base
+    parent: null
+
+- job:
+    name: sign-job
+    parent: base
+    nodeset:
+      nodes:
+        - name: signer
+          label: hsm-worker
