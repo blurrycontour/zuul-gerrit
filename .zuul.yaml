@@ -31,10 +31,12 @@
 - job:
     name: zuul-migrate
     parent: unittests
-    run: playbooks/zuul-migrate
+    run: playbooks/zuul-migrate/run
+    post-run: playbooks/zuul-migrate/post
     # We're adding zuul to the required-projects so that we can also trigger
     # this from project-config changes
     required-projects:
+      - openstack-infra/openstack-zuul-jobs
       - openstack-infra/project-config
       - name: openstack-infra/zuul
         override-branch: feature/zuulv3
