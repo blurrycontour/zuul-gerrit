@@ -34,6 +34,23 @@
       "revId": "fd867324432154a9208cb1d30ad3126362f757d3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f515b1d_6165ff1d",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1667,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-09-27T17:44:46Z",
+      "side": 1,
+      "message": "I think we want to get some amount of data, but not too much.  I think our playbooks perform some about of fact gathering already, so probably matching that so we don\u0027t ultimately do any more work is what we want.  I think what Paul suggested is what we\u0027re typically using...?",
+      "revId": "fd867324432154a9208cb1d30ad3126362f757d3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
