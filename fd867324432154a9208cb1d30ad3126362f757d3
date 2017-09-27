@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f515b1d_ae7e46ac",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1667,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-09-27T17:18:12Z",
+      "side": 1,
+      "message": "clarkb pointed me to the following a while back:\n\n  ansible * -m setup -a \u0027gather_subset\u003d!all\u0027\n\nthat will get us the minimal facts possible, maybe enough for network check?",
+      "revId": "fd867324432154a9208cb1d30ad3126362f757d3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
