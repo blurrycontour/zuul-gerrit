@@ -36,6 +36,8 @@ class SQLReporter(BaseReporter):
             change = getattr(item.change, 'number', '')
             patchset = getattr(item.change, 'patchset', '')
             ref = getattr(item.change, 'ref', '')
+            if ref.startswith("refs/heads/"):
+                ref = getattr(item.change, 'newrev', '')
             buildset_ins = self.connection.zuul_buildset_table.insert().values(
                 zuul_ref=item.current_build_set.ref,
                 pipeline=item.pipeline.name,
