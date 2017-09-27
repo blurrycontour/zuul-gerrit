@@ -16,6 +16,23 @@
       "revId": "3d623ca44bb42b94ab0d37a5a1d6e37ef6993f70",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f515b1d_611cdf77",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1668,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-09-27T17:48:04Z",
+      "side": 1,
+      "message": "It\u0027s going through popen as a varargs list, so shouldn\u0027t be interpreted by a shell.",
+      "revId": "3d623ca44bb42b94ab0d37a5a1d6e37ef6993f70",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
