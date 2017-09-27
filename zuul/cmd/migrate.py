@@ -42,6 +42,9 @@ from jenkins_jobs.parser import matches
 import jenkins_jobs.parser
 import yaml
 
+JOB_MATCHERS = {}  # type: Dict[str, Dict[str, Dict]]
+TEMPLATES_TO_EXPAND = {}  # type: Dict[str, List]
+JOBS_FOR_EXPAND = collections.defaultdict(dict)  # type: ignore
 JOBS_BY_ORIG_TEMPLATE = {}  # type: ignore
 SUFFIXES = []  # type: ignore
 ENVIRONMENT = '{{ zuul | zuul_legacy_vars }}'
@@ -184,6 +187,37 @@ def merge_project_dict(project_dicts, name, project):
         elif isinstance(old[key], dict) and 'jobs' in old[key]:
             old[key]['jobs'].extend(project[key]['jobs'])
     return
+
+
+def normalize_project_expansions():
+    remove_from_job_matchers = []
+    template = None
+    # First find the matchers that are the same for all jobs
+    for job_name, project in copy.deepcopy(JOBS_FOR_EXPAND).items():
+        JOB_MATCHERS[job_name] = None
+        for project_name, expansion in project.items():
+            template = expansion['template']
+            if not JOB_MATCHERS[job_name]:
+                JOB_MATCHERS[job_name] = copy.deepcopy(expansion['info'])
+            else:
+                if JOB_MATCHERS[job_name] != expansion['info']:
+                    # We have different expansions for this job, it can't be
+                    # done at the job level
+                    remove_from_job_matchers.append(job_name)
+
+    for job_name in remove_from_job_matchers:
+        JOB_MATCHERS.pop(job_name, None)
+
+    # Second, find out which projects need to expand a given template
+    for job_name, project in copy.deepcopy(JOBS_FOR_EXPAND).items():
+        # There is a job-level expansion for this one
+        if job_name in JOB_MATCHERS.keys():
+            continue
+        for project_name, expansion in project.items():
+            TEMPLATES_TO_EXPAND[project_name] = []
+            if expansion['info']:
+                # There is an expansion for this project
+                TEMPLATES_TO_EXPAND[project_name].append(expansion['template'])
 
 
 # from :
@@ -895,6 +929,10 @@ class Job:
         if self.vars:
             output['vars'] = self.vars.copy()
 
+        if self.name in JOB_MATCHERS:
+            for k, v in JOB_MATCHERS[self.name].items():
+                output[k] = v
+
         timeout = self.getTimeout()
         if timeout:
             output['timeout'] = timeout
@@ -1345,7 +1383,7 @@ class ZuulMigrate:
         for pipeline, value in template.items():
             if pipeline == 'name':
                 continue
-            if pipeline not in project:
+            if pipeline not in project or 'jobs' not in project[pipeline]:
                 project[pipeline] = dict(jobs=[])
             project[pipeline]['jobs'].extend(value['jobs'])
 
@@ -1398,7 +1436,7 @@ class ZuulMigrate:
                 if k in ('templates', 'name'):
                     continue
                 project[k]['jobs'] = processPipeline(
-                    project[k]['jobs'], job_name_regex, files)
+                    project[k].get('jobs', []), job_name_regex, files)
 
         for matcher in matchers:
             # find the project-specific section
@@ -1423,12 +1461,7 @@ class ZuulMigrate:
         if 'name' in project:
             new_project['name'] = project['name']
 
-        job_matchers = self.scanForProjectMatchers(project['name'])
-        if job_matchers:
-            exp_template_names = self.findReferencedTemplateNames(
-                job_matchers, project['name'])
-        else:
-            exp_template_names = []
+        exp_template_names = TEMPLATES_TO_EXPAND.get(project['name'], [])
 
         templates_to_expand = []
         if 'template' in project:
@@ -1447,6 +1480,52 @@ class ZuulMigrate:
                 new_project[key] = collections.OrderedDict()
                 if key == 'gate':
                     for queue in self.change_queues:
+                        if (project['name'] not in queue.getProjects() or
+                                len(queue.getProjects()) == 1):
+                            continue
+                        new_project[key]['queue'] = queue.name
+                tmp = [job for job in self.makeNewJobs(value)]
+                # Don't insert into self.job_objects - that was done
+                # in the speculative pass
+                jobs = [job.toPipelineDict() for job in tmp]
+                if jobs:
+                    new_project[key]['jobs'] = jobs
+                if not new_project[key]:
+                    del new_project[key]
+
+        for name in templates_to_expand:
+            self.expandTemplateIntoProject(name, new_project)
+
+        job_matchers = self.scanForProjectMatchers(project['name'])
+
+        # Need a deep copy after expansion, else our templates end up
+        # also getting this change.
+        new_project = copy.deepcopy(new_project)
+        if job_matchers:
+            self.applyProjectMatchers(job_matchers, new_project)
+
+        return new_project
+
+    def checkSpeculativeProject(self, project):
+        '''
+        Create a new v3 project definition expanding all templates.
+        '''
+        new_project = collections.OrderedDict()
+        if 'name' in project:
+            new_project['name'] = project['name']
+
+        templates_to_expand = []
+        for template in project.get('template', []):
+            templates_to_expand.append(template['name'])
+
+        # We have to do this section to expand self.job_objects
+        for key, value in project.items():
+            if key in ('name', 'template'):
+                continue
+            else:
+                new_project[key] = collections.OrderedDict()
+                if key == 'gate':
+                    for queue in self.change_queues:
                         if project['name'] not in queue.getProjects():
                             continue
                         if len(queue.getProjects()) == 1:
@@ -1454,18 +1533,56 @@ class ZuulMigrate:
                         new_project[key]['queue'] = queue.name
                 tmp = [job for job in self.makeNewJobs(value)]
                 self.job_objects.extend(tmp)
-                jobs = [job.toPipelineDict() for job in tmp]
-                new_project[key]['jobs'] = jobs
 
         for name in templates_to_expand:
-            self.expandTemplateIntoProject(name, new_project)
 
-        # Need a deep copy after expansion, else our templates end up
-        # also getting this change.
-        new_project = copy.deepcopy(new_project)
-        self.applyProjectMatchers(job_matchers, new_project)
+            expand_project = copy.deepcopy(new_project)
+            self.expandTemplateIntoProject(name, expand_project)
 
-        return new_project
+            # Need a deep copy after expansion, else our templates end up
+            # also getting this change.
+            expand_project = copy.deepcopy(expand_project)
+            job_matchers = self.scanForProjectMatchers(project['name'])
+            self.applyProjectMatchers(job_matchers, expand_project)
+
+            # We should now have a project-pipeline with only the
+            # jobs expanded from this one template
+            for project_part in expand_project.values():
+                # The pipelines are dicts - we only want pipelines
+                if isinstance(project_part, dict):
+                    if 'jobs' not in project_part:
+                        continue
+                    self.processProjectTemplateExpansion(
+                        project_part, project, name)
+
+    def processProjectTemplateExpansion(self, project_part, project, template):
+        # project_part should be {'jobs': []}
+        job_list = project_part['jobs']
+        for new_job in job_list:
+            if isinstance(new_job, dict):
+                new_job_name = get_single_key(new_job)
+                info = new_job[new_job_name]
+            else:
+                new_job_name = new_job
+                info = None
+            orig_name = self.getOldJobName(new_job_name)
+            if not orig_name:
+                self.log.error("Job without old name: %s", new_job_name)
+                continue
+            orig_name = orig_name.format(name=project['name'])
+            for layout_job in self.mapping.layout.get('jobs', []):
+                if re.search(layout_job['name'], orig_name):
+                    if not info:
+                        info = {}
+                    if not layout_job.get('voting', True):
+                        info['voting'] = False
+                    if layout_job.get('branch'):
+                        info['branch'] = layout_job['branch']
+                    if layout_job.get('files'):
+                        info['files'] = layout_job['files']
+
+            expansion = dict(info=info, template=template)
+            JOBS_FOR_EXPAND[new_job_name][project['name']] = expansion
 
     def writeJobs(self):
         output_dir = self.setupDir()
@@ -1486,6 +1603,10 @@ class ZuulMigrate:
         template_config = sorted(
             template_config,
             key=lambda template: template['project-template']['name'])
+
+        for project in self.layout.get('projects', []):
+            self.checkSpeculativeProject(project)
+        normalize_project_expansions()
 
         project_names = []
         for project in self.layout.get('projects', []):
