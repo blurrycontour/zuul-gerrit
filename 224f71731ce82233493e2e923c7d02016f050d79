@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f515b1d_02c537f1",
+        "filename": "zuul/cmd/migrate.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 633,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-09-27T13:05:55Z",
+      "side": 1,
+      "message": "I think we need a trailing slash here",
+      "revId": "224f71731ce82233493e2e923c7d02016f050d79",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
