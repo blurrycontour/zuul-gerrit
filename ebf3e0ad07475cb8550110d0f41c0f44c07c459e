@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f515b1d_9e90384c",
+        "filename": "zuul/ansible/filter/zuul_filters.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2017-09-28T20:37:39Z",
+      "side": 1,
+      "message": "\"if zuul.get(\u0027timeout\u0027)\" would probably also work here",
+      "revId": "ebf3e0ad07475cb8550110d0f41c0f44c07c459e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
