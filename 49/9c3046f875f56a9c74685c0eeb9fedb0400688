@@ -1,0 +1,9 @@
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Code-Review+2: David Shrewsbury <shrewsbury.dave@gmail.com>
+Workflow+1: David Shrewsbury <shrewsbury.dave@gmail.com>
+Verified+2: Monty Taylor <mordred@inaugust.com>
+Submitted-by: Monty Taylor <mordred@inaugust.com>
+Submitted-at: Thu, 28 Sep 2017 18:25:12 +0000
+Reviewed-on: https://review.openstack.org/508237
+Project: openstack-infra/zuul
+Branch: refs/heads/feature/zuulv3
