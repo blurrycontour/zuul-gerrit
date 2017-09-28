@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f515b1d_d2d3475f",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1913,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2017-09-28T17:00:56Z",
+      "side": 1,
+      "message": "It\u0027s not entirely clear to me why this change is upping the kazoo loglevel in tests.",
+      "revId": "d6a3b1bc77241441500f1d4ff6ea02c88911393e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
