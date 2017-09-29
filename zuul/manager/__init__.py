@@ -420,7 +420,12 @@ class PipelineManager(object):
         for jobname, nodeset in list(old_build_set.nodesets.items()):
             if jobname in canceled_jobs:
                 continue
-            self.sched.nodepool.returnNodeSet(nodeset)
+            try:
+                self.sched.nodepool.returnNodeSet(nodeset)
+            except Exception:
+                self.log.exception("Unable to return nodeset %s for "
+                                   "canceled job %s" %
+                                   (nodeset, jobname))
         for item_behind in item.items_behind:
             self.log.debug("Canceling jobs for change %s, behind change %s" %
                            (item_behind.change, item.change))
