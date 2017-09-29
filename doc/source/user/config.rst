@@ -645,6 +645,9 @@ Here is an example of two job definitions:
         branch specifier is used.  If no branch specifier appears, the
         job applies to all branches.
 
+      * In the case of a job variant defined within a
+        :ref:`project-template`, no implied branch specifier is used.
+
       * In the case of an :term:`untrusted-project`, no implied branch
         specifier is applied to the reference definition of a job.
         That is to say, that if the first appearance of the job
@@ -655,8 +658,8 @@ Here is an example of two job definitions:
 
       * Any further job variants other than the reference definition
         in an untrusted-project will, if they do not have a branch
-        specifier, will have an implied branch specifier for the
-        current branch applied.
+        specifier, have an implied branch specifier for the current
+        branch applied.
 
       This allows for the very simple and expected workflow where if a
       project defines a job on the ``master`` branch with no branch
