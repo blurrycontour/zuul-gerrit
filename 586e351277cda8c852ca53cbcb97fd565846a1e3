@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7f515b1d_db30e958",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 4619,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-09-29T21:55:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7f515b1d_7be9f5e3",
+      "revId": "586e351277cda8c852ca53cbcb97fd565846a1e3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7f515b1d_3b1a5d16",
         "filename": "tests/unit/test_scheduler.py",
         "patchSetId": 2
@@ -65,6 +83,24 @@
       "writtenOn": "2017-09-29T21:49:37Z",
       "side": 1,
       "message": "Can we add comments for each of these pairs of assertions mapping them back to the original three changes? Would just make it easier to grok what is going on.",
+      "revId": "586e351277cda8c852ca53cbcb97fd565846a1e3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f515b1d_1bed61b6",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 4652,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-09-29T21:55:59Z",
+      "side": 1,
+      "message": "Yes - I\u0027ll also change the order so that it\u0027s clear it\u0027s not just sequential.",
+      "parentUuid": "7f515b1d_1bea01d7",
       "revId": "586e351277cda8c852ca53cbcb97fd565846a1e3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
