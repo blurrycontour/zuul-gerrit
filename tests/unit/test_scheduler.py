@@ -4613,6 +4613,51 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertIn('project-test1 : SKIPPED', A.messages[1])
         self.assertIn('project-test2 : SKIPPED', A.messages[1])
 
+    def test_nodepool_priority(self):
+        "Test that nodes are requested at the correct priority"
+
+
+        self.fake_nodepool.paused = True
+
+        p = "review.example.com/org/project"
+        upstream = self.getUpstreamRepos([p])
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+
+        B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+        C_commit = str(upstream[p].commit('master'))
+
+        e = {
+            "type": "ref-updated",
+            "submitter": {
+                "name": "User Name",
+            },
+            "refUpdate": {
+                "oldRev": "90f173846e3af9154517b88543ffbd1691f31366",
+                "newRev": C_commit,
+                "refName": "master",
+                "project": "org/project",
+            }
+        }
+        self.fake_gerrit.addEvent(e)
+        self.waitUntilSettled()
+
+        reqs = self.fake_nodepool.getNodeRequests()
+        self.assertEqual(reqs[0]['_oid'], '100-0000000000')
+        self.assertEqual(reqs[0]['node_types'], ['label1'])
+        self.assertEqual(reqs[1]['_oid'], '200-0000000001')
+        self.assertEqual(reqs[1]['node_types'], ['label1'])
+        self.assertEqual(reqs[2]['_oid'], '300-0000000002')
+        self.assertEqual(reqs[2]['node_types'], ['ubuntu-xenial'])
+
+        self.fake_nodepool.paused = False
+        self.waitUntilSettled()
+
 
 class TestExecutor(ZuulTestCase):
     tenant_config_file = 'config/single-tenant/main.yaml'
