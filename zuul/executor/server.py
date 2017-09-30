@@ -563,6 +563,8 @@ class ExecutorServer(object):
         self.merge_name = get_default(self.config, 'merger', 'git_user_name')
         execution_wrapper_name = get_default(self.config, 'executor',
                                              'execution_wrapper', 'bubblewrap')
+        self.max_concurrent_jobs = get_default(self.config, 'executor',
+                                               'max_concurrent_jobs', 5)
         self.execution_wrapper = connections.drivers[execution_wrapper_name]
 
         self.connections = connections
@@ -655,12 +657,18 @@ class ExecutorServer(object):
         self.disk_accountant.start()
 
     def register(self):
-        self.executor_worker.registerFunction("executor:execute")
+        self.register_work()
         self.executor_worker.registerFunction("executor:stop:%s" %
                                               self.hostname)
         self.merger_worker.registerFunction("merger:merge")
         self.merger_worker.registerFunction("merger:cat")
         self.merger_worker.registerFunction("merger:refstate")
+
+    def register_work(self):
+        self.executor_worker.registerFunction("executor:execute")
+
+    def unregister_work(self):
+        self.executor_worker.unregisterFunction("executor:execute")
 
     def stop(self):
         self.log.debug("Stopping")
@@ -799,9 +807,15 @@ class ExecutorServer(object):
     def executeJob(self, job):
         self.job_workers[job.unique] = AnsibleJob(self, job)
         self.job_workers[job.unique].run()
+        # Too busy!
+        if len(self.job_workers) >= self.max_concurrent_jobs:
+            self.unregister_work()
 
     def finishJob(self, unique):
         del(self.job_workers[unique])
+        # Bored
+        if len(self.job_workers) < self.max_concurrent_jobs:
+            self.register_work()
 
     def stopJobByJobdir(self, jobdir):
         unique = os.path.basename(jobdir)
