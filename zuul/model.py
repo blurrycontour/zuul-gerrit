@@ -785,7 +785,7 @@ class Job(object):
     (e.g., "job.run = ..." rather than "job.run.append(...)").
     """
 
-    def __init__(self, name):
+    def __init__(self, name, description=None):
         # These attributes may override even the final form of a job
         # in the context of a project-pipeline.  They can not affect
         # the execution of the job, but only whether the job is run
@@ -836,7 +836,7 @@ class Job(object):
             source_context=None,
             source_line=None,
             inheritance_path=(),
-            description=None,
+            description=description,
         )
 
         self.inheritable_attributes = {}
@@ -2338,7 +2338,8 @@ class Layout(object):
         # elements are aspects of that job with different matchers
         # that override some attribute of the job.  These aspects all
         # inherit from the reference definition.
-        self.jobs = {'noop': [Job('noop')]}
+        self.jobs = {'noop': [Job('noop', description='A job that will '
+                                  'always succeed, no operation.')]}
         self.nodesets = {}
         self.secrets = {}
         self.semaphores = {}
