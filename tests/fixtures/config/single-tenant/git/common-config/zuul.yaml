@@ -70,6 +70,14 @@
           label: label2
 
 - job:
+    name: ignore-branch
+    branches: ^(?!featureA).*$
+    nodeset:
+      nodes:
+        - name: controller
+          label: label2
+
+- job:
     name: project-post
     nodeset:
       nodes:
@@ -104,6 +112,7 @@
             dependencies: project-merge
         - project-test2:
             dependencies: project-merge
+        - ignore-branch
     gate:
       jobs:
         - project-merge
@@ -113,6 +122,7 @@
             dependencies: project-merge
         - project-testfile:
             dependencies: project-merge
+        - ignore-branch
     post:
       jobs:
         - project-post

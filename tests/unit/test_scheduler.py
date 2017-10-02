@@ -138,6 +138,31 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(self.getJobFromHistory('project-test1').node,
                          'label2')
 
+    def test_job_branch_ignored(self):
+        '''
+        Test that branch matching logic works.
+
+        The 'ignore-branch' job has a branch matcher that is supposed to
+        match every branch except for the 'featureA' branch, so it should
+        not be run on a change to that branch.
+        '''
+        self.create_branch('org/project', 'featureA')
+        A = self.fake_gerrit.addFakeChange('org/project', 'featureA', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.printHistory()
+        self.assertEqual(self.getJobFromHistory('project-test1').result,
+                         'SUCCESS')
+        self.assertEqual(self.getJobFromHistory('project-test2').result,
+                         'SUCCESS')
+        self.assertJobNotInHistory('ignore-branch')
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2,
+                         "A should report start and success")
+        self.assertIn('gate', A.messages[1],
+                      "A should transit gate")
+
     def test_parallel_changes(self):
         "Test that changes are tested in parallel and merged in series"
 
