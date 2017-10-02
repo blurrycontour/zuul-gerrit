@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f515b1d_f6483e5c",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 836,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-10-02T19:32:04Z",
+      "side": 1,
+      "message": "maybe move to single if statement to reduce indentation?",
+      "range": {
+        "startLine": 834,
+        "startChar": 0,
+        "endLine": 836,
+        "endChar": 32
+      },
+      "revId": "f2c2879512d2e493dcdf1b0f978ff60b8157be65",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
