@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f515b1d_9c293938",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 828,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-10-02T08:20:03Z",
+      "side": 1,
+      "message": "nit: asking",
+      "range": {
+        "startLine": 828,
+        "startChar": 15,
+        "endLine": 828,
+        "endChar": 21
+      },
+      "revId": "3cef7ed2aa343de035b0b6a88e34ebbe68f71847",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
