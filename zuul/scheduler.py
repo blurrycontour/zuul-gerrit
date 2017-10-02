@@ -37,6 +37,7 @@ from zuul.lib.config import get_default
 from zuul.lib.gear_utils import getGearmanFunctions
 from zuul.lib.statsd import get_statsd
 import zuul.lib.queue
+import zuul.lib.repl
 
 COMMANDS = ['full-reconfigure', 'stop']
 
@@ -284,6 +285,7 @@ class Scheduler(threading.Thread):
         self.connections = None
         self.statsd = get_statsd(config)
         self.rpc = rpclistener.RPCListener(config, self)
+        self.repl = zuul.lib.repl.REPLServer(self)
         self.stats_thread = threading.Thread(target=self.runStats)
         self.stats_thread.daemon = True
         self.stats_stop = threading.Event()
@@ -340,6 +342,7 @@ class Scheduler(threading.Thread):
         self.command_thread.start()
 
         self.rpc.start()
+        self.repl.start()
         self.stats_thread.start()
 
     def stop(self):
