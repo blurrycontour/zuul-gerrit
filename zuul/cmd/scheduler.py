@@ -136,6 +136,7 @@ class Scheduler(zuul.cmd.ZuulApp):
         import zuul.webapp
         import zuul.rpclistener
         import zuul.zk
+        import zuul.lib.repl
 
         signal.signal(signal.SIGUSR2, zuul.cmd.stack_dump_handler)
         if (self.config.has_option('gearman_server', 'start') and
@@ -168,6 +169,7 @@ class Scheduler(zuul.cmd.ZuulApp):
             self.sched, port=port, cache_expiry=cache_expiry,
             listen_address=listen_address)
         rpc = zuul.rpclistener.RPCListener(self.config, self.sched)
+        repl = zuul.lib.repl.ReplServer(self.sched)
 
         self.configure_connections()
         self.sched.setExecutor(gearman)
@@ -186,6 +188,8 @@ class Scheduler(zuul.cmd.ZuulApp):
             # TODO(jeblair): If we had all threads marked as daemon,
             # we might be able to have a nicer way of exiting here.
             sys.exit(1)
+        self.log.info('Starting REPL')
+        repl.start()
         self.log.info('Starting Webapp')
         webapp.start()
         self.log.info('Starting RPC')
