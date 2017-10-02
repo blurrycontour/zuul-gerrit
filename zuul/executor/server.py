@@ -18,6 +18,7 @@ import json
 import logging
 import multiprocessing
 import os
+import psutil
 import shutil
 import signal
 import shlex
@@ -567,6 +568,8 @@ class ExecutorServer(object):
         load_multiplier = float(get_default(self.config, 'executor',
                                             'load_multiplier', '2.5'))
         self.max_load_avg = multiprocessing.cpu_count() * load_multiplier
+        self.min_avail_mem = float(get_default(self.config, 'executor',
+                                   'min_avail_mem', '5.0'))
         self.accepting_work = False
         self.execution_wrapper = connections.drivers[execution_wrapper_name]
 
@@ -827,17 +830,27 @@ class ExecutorServer(object):
         ''' Apply some heuristics to decide whether or not we should
             be askign for more jobs '''
         load_avg = os.getloadavg()[0]
+        virtual_mem = psutil.virtual_memory()
         if self.accepting_work:
             # Don't unregister if we don't have any active jobs.
-            if load_avg > self.max_load_avg and self.job_workers:
-                self.log.info(
-                    "Unregistering due to high system load {} > {}".format(
-                        load_avg, self.max_load_avg))
-                self.unregister_work()
-        elif load_avg <= self.max_load_avg:
+            if self.job_workers:
+                if load_avg > self.max_load_avg:
+                    self.log.info(
+                        "Unregistering due to high system load {} > {}".format(
+                            load_avg, self.max_load_avg))
+                    self.unregister_work()
+                elif virtual_mem.percent < self.min_avail_mem:
+                    self.log.info("Unregistering due to low avail memory "
+                                  "{}% < {}".format(virtual_mem.percent,
+                                                    self.min_avail_mem))
+                    self.unregister_work()
+        elif (load_avg <= self.max_load_avg
+                and virtual_mem.percent >= self.min_avail_mem):
             self.log.info(
-                "Re-registering as load is within limits {} <= {}".format(
-                    load_avg, self.max_load_avg))
+                "Re-registering as load and memory are within limits "
+                "{} <= {} {}% <= {}".format(load_avg, self.max_load_avg,
+                                            virtual_mem.percent,
+                                            self.min_avail_mem))
             self.register_work()
 
     def finishJob(self, unique):
