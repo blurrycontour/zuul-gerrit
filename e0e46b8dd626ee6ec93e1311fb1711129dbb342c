@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f515b1d_76b0cedd",
+        "filename": "tests/fixtures/config/matcher-test/git/common-config/zuul.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-10-02T19:54:20Z",
+      "side": 1,
+      "message": "Don\u0027t need colon here",
+      "revId": "e0e46b8dd626ee6ec93e1311fb1711129dbb342c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f515b1d_56b392e9",
+        "filename": "tests/fixtures/config/matcher-test/git/common-config/zuul.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-10-02T19:54:20Z",
+      "side": 1,
+      "message": "or here",
+      "revId": "e0e46b8dd626ee6ec93e1311fb1711129dbb342c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
