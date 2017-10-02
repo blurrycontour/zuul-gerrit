@@ -69,6 +69,8 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
         if not params["zk_hosts"]:
             raise Exception("The zookeeper hosts config value is required")
 
+        params['repl'] = get_default(self.config, 'repl', 'enable', False)
+
         try:
             self.web = zuul.web.ZuulWeb(**params)
         except Exception:

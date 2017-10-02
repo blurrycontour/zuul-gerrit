@@ -31,6 +31,7 @@ import threading
 
 import re2
 
+import zuul.lib.repl
 import zuul.model
 import zuul.rpcclient
 import zuul.zk
@@ -726,7 +727,8 @@ class ZuulWeb(object):
                  connections=None,
                  info=None,
                  static_path=None,
-                 zk_hosts=None):
+                 zk_hosts=None,
+                 repl=False):
         self.start_time = time.time()
         self.listen_address = listen_address
         self.listen_port = listen_port
@@ -744,6 +746,11 @@ class ZuulWeb(object):
             self.zk.connect(hosts=zk_hosts, read_only=True)
         self.connections = connections
         self.stream_manager = StreamManager()
+
+        if repl:
+            self.repl = zuul.lib.repl.REPLServer(self)
+        else:
+            self.repl = None
 
         route_map = cherrypy.dispatch.RoutesDispatcher()
         api = ZuulWebAPI(self)
@@ -837,6 +844,8 @@ class ZuulWeb(object):
         self.wsplugin = WebSocketPlugin(cherrypy.engine)
         self.wsplugin.subscribe()
         cherrypy.engine.start()
+        if self.repl:
+            self.repl.start()
 
     def stop(self):
         self.log.debug("ZuulWeb stopping")
@@ -849,6 +858,8 @@ class ZuulWeb(object):
         self.wsplugin.unsubscribe()
         self.stream_manager.stop()
         self.zk.disconnect()
+        if self.repl:
+            self.repl.stop()
 
 
 if __name__ == "__main__":

@@ -40,6 +40,7 @@ from zuul.lib import filecomments
 
 import gear
 
+import zuul.lib.repl
 import zuul.merger.merger
 import zuul.ansible.logconfig
 from zuul.executor.sensors.cpu import CPUSensor
@@ -2359,6 +2360,11 @@ class ExecutorServer(object):
                 self.ansible_manager.install()
         self.ansible_manager.copyAnsibleFiles()
 
+        if get_default(config, 'repl', 'enable', False):
+            self.repl = zuul.lib.repl.REPLServer(self)
+        else:
+            self.repl = None
+
     def _getMerger(self, root, cache_root, logger=None):
         return zuul.merger.merger.Merger(
             root, self.connections, self.merge_email, self.merge_name,
@@ -2416,6 +2422,9 @@ class ExecutorServer(object):
         self.governor_thread.daemon = True
         self.governor_thread.start()
         self.disk_accountant.start()
+
+        if self.repl:
+            self.repl.start()
 
     def register(self):
         self.register_work()
@@ -2495,6 +2504,10 @@ class ExecutorServer(object):
             self.statsd.gauge(base_key + '.running_builds', 0)
 
         self.command_socket.stop()
+
+        if self.repl:
+            self.repl.stop()
+
         self.log.debug("Stopped")
 
     def join(self):
