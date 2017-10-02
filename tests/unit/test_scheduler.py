@@ -5647,6 +5647,7 @@ class TestSemaphoreInRepo(ZuulTestCase):
 class TestSchedulerBranchMatcher(ZuulTestCase):
     tenant_config_file = 'config/matcher-test/main.yaml'
 
+    @simple_layout('layouts/matcher-test.yaml')
     def test_job_branch_ignored(self):
         '''
         Test that branch matching logic works.
