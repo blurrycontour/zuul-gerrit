@@ -877,7 +877,7 @@ class Job(object):
     def __getattr__(self, name):
         v = self.__dict__.get(name)
         if v is None:
-            return copy.deepcopy(self.attributes[name])
+            return self.attributes[name]
         return v
 
     def _get(self, name):
@@ -958,7 +958,7 @@ class Job(object):
         # copy all attributes
         for k in self.inheritable_attributes:
             if (other._get(k) is not None):
-                setattr(self, k, copy.deepcopy(getattr(other, k)))
+                setattr(self, k, getattr(other, k))
 
         msg = 'inherit from %s' % (repr(other),)
         self.inheritance_path = other.inheritance_path + (msg,)
