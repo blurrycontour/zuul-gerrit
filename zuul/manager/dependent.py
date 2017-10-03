@@ -25,7 +25,6 @@ class DependentPipelineManager(PipelineManager):
     using the Optmistic Branch Prediction logic with Nearest Non-Failing Item
     reparenting algorithm for handling errors.
     """
-    log = logging.getLogger("zuul.DependentPipelineManager")
     changes_merge = True
 
     def __init__(self, *args, **kwargs):
