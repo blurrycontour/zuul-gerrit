@@ -55,6 +55,41 @@ encryption tag may be a list rather than a scalar.  For example:
           - HdWDS9lCBaBJnhMsm/O9tpzCq+GKRELpRzUwVgU5k822uBwhZemeSrUOLQ8hQ7q/vVHln
             ...
 
+Using the secrets can only be done in whitelisted pipelines. Most commonly this
+will be in a job running the post pipeline.
+
+The secret must be defined in the job description. There are two ways to define
+the secret. The first uses the secret name to as the variable name. The second
+renames the secret to a new variable name before use. For example:
+
+.. code-block:: yaml
+
+  - job:
+      name: publish-my-project
+      secrets:
+        - long_secret
+        - secret: test_secret
+          name: myapp
+
+After defining the secret you can use it as you would any other variable. You
+must be careful not to expose the secret via the ansible logs since the logs
+are publically available. The ``no_log: True`` paramater for Ansible can help
+with that. Using the secrets above to continue the example:
+
+.. code-block:: yaml
+
+  - hosts: all
+    tasks:
+      - name: Log into application
+        command: myapp -p {{ myapp.password }}
+        no_log: True
+
+      - name: Write password to file
+        copy:
+          content: "{{ long_secret.password }}"
+          dest: /etc/myapp/password_file
+        no_log: True
+
 Zuul provides a standalone script to make encrypting values easy; it
 can be found at `tools/encrypt_secret.py` in the Zuul source
 directory.
