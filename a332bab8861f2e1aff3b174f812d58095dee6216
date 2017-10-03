@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f515b1d_8d30d0a0",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-10-03T07:05:17Z",
+      "side": 1,
+      "message": "It might make sense to check if the tenant is also useful here as a pipeline is tenant specific (and different tenants can have same pipeline names).",
+      "revId": "a332bab8861f2e1aff3b174f812d58095dee6216",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
