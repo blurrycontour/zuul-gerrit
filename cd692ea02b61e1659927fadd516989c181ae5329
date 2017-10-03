@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f515b1d_0d150040",
+        "filename": "zuul/manager/dependent.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2017-10-03T06:52:04Z",
+      "side": 1,
+      "message": "this is now unused and pep8 complains",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 14
+      },
+      "revId": "cd692ea02b61e1659927fadd516989c181ae5329",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f515b1d_ed0f442b",
+        "filename": "zuul/manager/independent.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2017-10-03T06:52:04Z",
+      "side": 1,
+      "message": "this is now unused and pep8 complains",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 14
+      },
+      "revId": "cd692ea02b61e1659927fadd516989c181ae5329",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
