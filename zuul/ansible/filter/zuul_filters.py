@@ -57,9 +57,48 @@ def zuul_legacy_vars(zuul):
     return params
 
 
+def zuul_projects_by_name(zuul):
+    ret = {}
+    for project in zuul['projects']:
+        ret[project['name']] = project
+    return name
+
+
+def zuul_projects_by_canonical_name(zuul):
+    ret = {}
+    for project in zuul['projects']:
+        ret[project['canonical_name']] = project
+    return name
+
+
+def zuul_projects_by_short_name(zuul):
+    ret = {}
+    for project in zuul['projects']:
+        ret[project['short_name']] = project
+    return name
+
+
+def zuul_project(zuul, name):
+    for func in (zuul_projects_by_short_name, zuul_projects_by_name,
+                 zuul_projects_by_canonical_name):
+        projects = func(zuul)
+        if name in projects:
+            return projects[name]
+    return None
+
+
+def zuul_required_projects(zuul):
+    return [project for project in zuul['projects'] if project['required']]
+
+
 class FilterModule(object):
 
     def filters(self):
         return {
             'zuul_legacy_vars': zuul_legacy_vars,
+            'zuul_project': zuul_project,
+            'zuul_projects_by_canonical_name': zuul_projects_by_canonical_name,
+            'zuul_projects_by_name': zuul_projects_by_name,
+            'zuul_projects_by_short_name': zuul_projects_by_short_name,
+            'zuul_required_projects': zuul_required_projects,
         }
