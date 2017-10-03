@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7f515b1d_0393815e",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1743,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2017-10-03T20:45:00Z",
+      "side": 1,
+      "message": "Done, will be in next patchset.",
+      "parentUuid": "7f515b1d_63d6b52a",
+      "revId": "521104701721d3dc1ada84f3937c38f1634f651e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7f515b1d_43dbb94e",
         "filename": "zuul/executor/server.py",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2017-10-03T20:41:32Z",
       "side": 1,
       "message": "playbook.trusted isn\u0027t a string.",
+      "revId": "521104701721d3dc1ada84f3937c38f1634f651e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f515b1d_e38f452c",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1751,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2017-10-03T20:45:00Z",
+      "side": 1,
+      "message": "Done, will be in next patchset.",
+      "parentUuid": "7f515b1d_43dbb94e",
       "revId": "521104701721d3dc1ada84f3937c38f1634f651e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
