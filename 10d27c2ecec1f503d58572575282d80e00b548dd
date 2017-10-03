@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f515b1d_2d7f9c66",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 495,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-10-03T07:00:31Z",
+      "side": 1,
+      "message": "I think considering caches allocated is dangerous here. One just needs to do a large copy operation (which is not uncommon on e.g. k8s where the executor is not exclusively on the system) to fill up all free memory with caches. After that the executor blocks itself forever.\n\nThus I think considering buffers and cache as available memory would be safer in this case and the meaning of min_avail_mem would then be \"leave at least 5% of mem to buffers and cache\" which would be more natural to me.",
+      "range": {
+        "startLine": 495,
+        "startChar": 55,
+        "endLine": 495,
+        "endChar": 60
+      },
+      "revId": "10d27c2ecec1f503d58572575282d80e00b548dd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
