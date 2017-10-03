@@ -1774,4 +1774,10 @@ class AnsibleJob(object):
             cmd=cmd, timeout=timeout, playbook=playbook)
         self.log.debug("Ansible complete, result %s code %s" % (
             self.RESULT_MAP[result], code))
+        with open(self.jobdir.job_output_file, 'a') as job_output:
+            msg = "{now} | [Zuul] Playbook execution ended: {line}".format(
+                now=datetime.datetime.now(),
+                line="%s for %s" % (self.RESULT_MAP[result], playbook.path)
+            )
+            job_output.write(msg)
         return result, code
