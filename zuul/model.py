@@ -531,6 +531,11 @@ class NodeRequest(object):
         # overwritten).
         self.failed = False
         self.canceled = False
+        self.change_id = None
+
+        # Since 'change' can be any Ref, need to check for this attr first
+        if hasattr(build_set.item.change, 'getId'):
+            self.change_id = build_set.item.change.getId()
 
     @property
     def priority(self):
@@ -556,7 +561,8 @@ class NodeRequest(object):
         self.state_time = time.time()
 
     def __repr__(self):
-        return '<NodeRequest %s %s>' % (self.id, self.nodeset)
+        return '<NodeRequest %s %s %s>' % (self.id, self.change_id,
+                                           self.nodeset)
 
     def toDict(self):
         d = {}
@@ -565,6 +571,7 @@ class NodeRequest(object):
         d['requestor'] = self.requestor
         d['state'] = self.state
         d['state_time'] = self.state_time
+        d['change_id'] = self.change_id
         return d
 
     def updateFromDict(self, data):
@@ -1995,6 +2002,9 @@ class Change(Branch):
 
     def __repr__(self):
         return '<Change 0x%x %s>' % (id(self), self._id())
+
+    def getId(self):
+        return self._id()
 
     def equals(self, other):
         if self.number == other.number and self.patchset == other.patchset:
