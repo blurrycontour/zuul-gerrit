@@ -21,6 +21,7 @@ import logging
 import zuul.model
 
 NULL_REF = '0000000000000000000000000000000000000000'
+GIT_TIMEOUT = 300
 
 
 def reset_repo_to_head(repo):
@@ -36,6 +37,17 @@ def reset_repo_to_head(repo):
         # modifications after the reset
         if e.status != 1:
             raise
+
+
+@contextmanager
+def timeout_handler(path):
+    try:
+        yield
+    except git.exc.GitCommandError as e:
+        if e.status == -9:
+            # Timeout.  The repo could be in a bad state, so delete it.
+            shutil.rmtree(path)
+        raise
 
 
 class ZuulReference(git.Reference):
@@ -78,12 +90,10 @@ class Repo(object):
             self.log.debug("Cloning from %s to %s" % (self.remote_url,
                                                       self.local_path))
             if self.cache_path:
-                git.Repo.clone_from(self.cache_path, self.local_path,
-                                    env=self.env)
+                self._git_clone(self.cache_path)
                 rewrite_url = True
             else:
-                git.Repo.clone_from(self.remote_url, self.local_path,
-                                    env=self.env)
+                self._git_clone(self.remote_url)
         repo = git.Repo(self.local_path)
         repo.git.update_environment(**self.env)
         # Create local branches corresponding to all the remote branches
@@ -106,6 +116,19 @@ class Repo(object):
 
     def isInitialized(self):
         return self._initialized
+
+    def _git_clone(self, url):
+        mygit = git.cmd.Git(os.getcwd())
+        mygit.update_environment(**self.env)
+        with timeout_handler(self.local_path):
+            mygit.clone(git.cmd.Git.polish_url(url), self.local_path,
+                        kill_after_timeout=GIT_TIMEOUT)
+
+    @staticmethod
+    def _git_fetch(repo, remote, ref, **kwargs):
+        with timeout_handler(self.local_path):
+            repo.git.fetch(remote, ref, kill_after_timeout=GIT_TIMEOUT,
+                           **kwargs)
 
     def createRepoObject(self):
         self._ensure_cloned()
@@ -228,19 +251,18 @@ class Repo(object):
 
     def fetch(self, ref):
         repo = self.createRepoObject()
-        # The git.remote.fetch method may read in git progress info and
-        # interpret it improperly causing an AssertionError. Because the
-        # data was fetched properly subsequent fetches don't seem to fail.
-        # So try again if an AssertionError is caught.
-        origin = repo.remotes.origin
-        try:
-            origin.fetch(ref)
-        except AssertionError:
-            origin.fetch(ref)
+        # NOTE: The following is currently not applicable, but if we
+        # switch back to fetch methods from GitPython, we need to
+        # consider it:
+        #   The git.remote.fetch method may read in git progress info and
+        #   interpret it improperly causing an AssertionError. Because the
+        #   data was fetched properly subsequent fetches don't seem to fail.
+        #   So try again if an AssertionError is caught.
+        self._git_fetch(repo, 'origin', ref)
 
     def fetchFrom(self, repository, ref):
         repo = self.createRepoObject()
-        repo.git.fetch(repository, ref)
+        self._git_fetch(repo, repository, ref)
 
     def createZuulRef(self, ref, commit='HEAD'):
         repo = self.createRepoObject()
@@ -264,8 +286,8 @@ class Repo(object):
             # commands in that case.  Starting with 1.9, 'git fetch
             # --tags' is all that is necessary.  See
             # https://github.com/git/git/blob/master/Documentation/RelNotes/1.9.0.txt#L18-L20
-            origin.fetch()
-        origin.fetch(tags=True)
+            self._git_fetch(repo, 'origin', ref)
+        self._git_fetch(repo, 'origin', ref, tags=True)
 
     def getFiles(self, files, dirs=[], branch=None, commit=None):
         ret = {}
