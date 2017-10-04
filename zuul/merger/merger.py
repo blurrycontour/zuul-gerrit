@@ -21,6 +21,7 @@ import logging
 import zuul.model
 
 NULL_REF = '0000000000000000000000000000000000000000'
+GIT_TIMEOUT = 180
 
 
 def reset_repo_to_head(repo):
@@ -76,10 +77,12 @@ class Repo(object):
                                                       self.local_path))
             if self.cache_path:
                 git.Repo.clone_from(self.cache_path, self.local_path,
+                                    kill_after_timeout=GIT_TIMEOUT,
                                     env=self.env)
                 rewrite_url = True
             else:
                 git.Repo.clone_from(self.remote_url, self.local_path,
+                                    kill_after_timeout=GIT_TIMEOUT,
                                     env=self.env)
         repo = git.Repo(self.local_path)
         repo.git.update_environment(**self.env)
@@ -231,13 +234,13 @@ class Repo(object):
         # So try again if an AssertionError is caught.
         origin = repo.remotes.origin
         try:
-            origin.fetch(ref)
+            origin.fetch(ref, kill_after_timeout=GIT_TIMEOUT)
         except AssertionError:
-            origin.fetch(ref)
+            origin.fetch(ref, kill_after_timeout=GIT_TIMEOUT)
 
     def fetchFrom(self, repository, ref):
         repo = self.createRepoObject()
-        repo.git.fetch(repository, ref)
+        repo.git.fetch(repository, ref, kill_after_timeout=GIT_TIMEOUT)
 
     def createZuulRef(self, ref, commit='HEAD'):
         repo = self.createRepoObject()
@@ -261,8 +264,8 @@ class Repo(object):
             # commands in that case.  Starting with 1.9, 'git fetch
             # --tags' is all that is necessary.  See
             # https://github.com/git/git/blob/master/Documentation/RelNotes/1.9.0.txt#L18-L20
-            origin.fetch()
-        origin.fetch(tags=True)
+            origin.fetch(kill_after_timeout=GIT_TIMEOUT)
+        origin.fetch(tags=True, kill_after_timeout=GIT_TIMEOUT)
 
     def getFiles(self, files, dirs=[], branch=None, commit=None):
         ret = {}
