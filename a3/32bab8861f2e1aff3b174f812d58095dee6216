@@ -1,0 +1,10 @@
+Code-Review+1: Andreas Jaeger <jaegerandi@gmail.com>
+Code-Review+2: Tobias Henkel <tobias.henkel@bmw.de>
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Wed, 04 Oct 2017 13:46:19 +0000
+Reviewed-on: https://review.openstack.org/509057
+Project: openstack-infra/zuul
+Branch: refs/heads/feature/zuulv3
