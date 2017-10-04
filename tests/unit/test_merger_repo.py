@@ -17,6 +17,7 @@
 
 import logging
 import os
+from unittest import skip
 
 import git
 
@@ -74,3 +75,22 @@ class TestMergerRepo(ZuulTestCase):
             os.path.join(self.upstream_root, 'org/project2'),
             sub_repo.createRepoObject().remotes[0].url,
             message="Sub repository points to upstream project2")
+
+    @skip("Network test")
+    def test_clone_timeout(self):
+        # TODO: find a way to execute this test without using the Internet.
+        # parent_path = os.path.join(self.upstream_root, 'org/project1')
+        parent_path = 'https://git.openstack.org/openstack-infra/gear'
+        work_repo = Repo(parent_path, self.workspace_root,
+                         'none@example.org', 'User Name', '0', '0',
+                         git_timeout=0.001)
+
+    @skip("Network test")
+    def test_fetch_timeout(self):
+        # TODO: find a way to execute this test without using the Internet.
+        # parent_path = os.path.join(self.upstream_root, 'org/project1')
+        parent_path = 'https://git.openstack.org/openstack-infra/gear'
+        work_repo = Repo(parent_path, self.workspace_root,
+                         'none@example.org', 'User Name', '0', '0')
+        work_repo.git_timeout=0.001
+        work_repo.update()
