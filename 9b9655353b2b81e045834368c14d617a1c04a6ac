@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f515b1d_d443deae",
+        "filename": "tests/fixtures/layouts/job-vars.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1004
+      },
+      "writtenOn": "2017-10-04T01:46:00Z",
+      "side": 1,
+      "message": "Extra whitespace",
+      "range": {
+        "startLine": 37,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 6
+      },
+      "revId": "9b9655353b2b81e045834368c14d617a1c04a6ac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f515b1d_9417a6a4",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 712,
+      "author": {
+        "id": 1004
+      },
+      "writtenOn": "2017-10-04T01:46:00Z",
+      "side": 1,
+      "message": "pep8 says this is not used",
+      "range": {
+        "startLine": 712,
+        "startChar": 0,
+        "endLine": 712,
+        "endChar": 61
+      },
+      "revId": "9b9655353b2b81e045834368c14d617a1c04a6ac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f515b1d_1423b607",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 781,
+      "author": {
+        "id": 1004
+      },
+      "writtenOn": "2017-10-04T01:46:00Z",
+      "side": 1,
+      "message": "ditto",
+      "range": {
+        "startLine": 781,
+        "startChar": 0,
+        "endLine": 781,
+        "endChar": 53
+      },
+      "revId": "9b9655353b2b81e045834368c14d617a1c04a6ac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
