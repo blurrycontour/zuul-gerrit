@@ -34,7 +34,7 @@
       override: 1
       child1override: 1
       child1: 1
-      
+
 - job:
     name: child2
     parent: parentjob
