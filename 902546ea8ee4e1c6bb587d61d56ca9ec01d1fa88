@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f515b1d_8af644f9",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-10-04T19:57:04Z",
+      "side": 1,
+      "message": "This feels like a good check, but I wonder if we can just check whether request.id \u003d\u003d request_id.  The only time that wouldn\u0027t work is if the request was *just* deleted but the zookeeper callback hasn\u0027t run yet.  That\u0027s probably only going to happen if we\u0027re right in the middle of a connection problem, and the next zk call will likely fail anyway.  In other words, this may only buy us a few microseconds of race prevention, at the cost of a few milliseconds of network traffic.\n\nA further thing we can do to mitigate this is, when we lock the nodes (which is the next zk action we would do without this), we can verify that each node we lock was assigned to the request we think we\u0027re handling.  If we do that inside the lock, then I think we\u0027ve closed the race window.  (Obviously, if the request doesn\u0027t match allocated_to, then we unlock and raise an exception.)",
+      "revId": "902546ea8ee4e1c6bb587d61d56ca9ec01d1fa88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
