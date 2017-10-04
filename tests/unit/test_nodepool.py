@@ -22,12 +22,10 @@ from zuul import model
 from tests.base import BaseTestCase, ChrootedKazooFixture, FakeNodepool
 
 
-class TestNodepool(BaseTestCase):
-    # Tests the Nodepool interface class using a fake nodepool and
-    # scheduler.
+class BaseTestScheduler(BaseTestCase):
 
     def setUp(self):
-        super(TestNodepool, self).setUp()
+        super(BaseTestScheduler, self).setUp()
 
         self.zk_chroot_fixture = self.useFixture(
             ChrootedKazooFixture(self.id()))
@@ -62,6 +60,11 @@ class TestNodepool(BaseTestCase):
         # back when a request is provisioned.
         self.provisioned_requests.append(request)
 
+
+class TestNodepool(BaseTestScheduler):
+    # Tests the Nodepool interface class using a fake nodepool and
+    # scheduler.
+
     def test_node_request(self):
         # Test a simple node request
 
@@ -76,7 +79,7 @@ class TestNodepool(BaseTestCase):
         self.assertEqual(request.state, 'fulfilled')
 
         # Accept the nodes
-        self.nodepool.acceptNodes(request)
+        self.nodepool.acceptNodes(request, request.id)
         nodeset = request.nodeset
 
         for node in nodeset.getNodes():
@@ -125,3 +128,32 @@ class TestNodepool(BaseTestCase):
 
         self.waitForRequests()
         self.assertEqual(len(self.provisioned_requests), 0)
+
+
+class TestAcceptNodes(BaseTestScheduler):
+
+    def onNodesProvisioned(self, request):
+        if self.fail_first_request:
+            self.fail_first_request = False
+            self.zk.client.stop()
+            self.zk.client.start()
+        self.provisioned_requests.append(request)
+
+    def test_lost_request(self):
+        # Test that a request that becomes lost after entering the event
+        # queue is resubmitted.
+
+        nodeset = model.NodeSet()
+        nodeset.addNode(model.Node('controller', 'ubuntu-xenial'))
+        nodeset.addNode(model.Node('compute', 'ubuntu-xenial'))
+        job = model.Job('testjob')
+        job.nodeset = nodeset
+
+        self.fail_first_request = True
+        request = self.nodepool.requestNodes(None, job)
+        self.first_request_id = request.id
+
+        self.waitForRequests()
+        self.assertEqual(len(self.provisioned_requests), 1)
+        self.assertEqual(request.state, 'fulfilled')
+        self.assertNotEqual(self.first_request_id, request.id)
