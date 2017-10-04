@@ -271,23 +271,33 @@ class CallbackModule(default.CallbackModule):
             # items have their own events
             pass
         elif (result_dict.get('msg') == 'MODULE FAILURE'):
-            if 'module_stdout' in result_dict:
-                self._log_message(
-                    result, status='MODULE FAILURE',
-                    msg=result_dict['module_stdout'])
-            elif 'exception' in result_dict:
-                self._log_message(
-                    result, status='MODULE FAILURE',
-                    msg=result_dict['exception'])
-            elif 'module_stderr' in result_dict:
-                self._log_message(
-                    result, status='MODULE FAILURE',
-                    msg=result_dict['module_stderr'])
+            self._log_module_failure(result, result_dict)
         else:
             self._log_message(
                 result=result, status='ERROR', result_dict=result_dict)
         if ignore_errors:
             self._log_message(result, "Ignoring Errors", status="ERROR")
+
+    def _log_module_failure(self, result, result_dict):
+        logged_failure = False
+        if 'exception' in result_dict:
+            self._log_message(
+                result, status='MODULE FAILURE',
+                msg=result_dict['exception'])
+            logged_failure = True
+        elif result_dict.get('module_stderr'):
+            self._log_message(
+                result, status='MODULE FAILURE',
+                msg=result_dict['module_stderr'])
+            logged_failure = True
+
+        if result_dict.get('module_stdout'):
+            if logged_failure:
+                self._log(msg=result_dict['module_stdout'])
+            else:
+                self._log_message(
+                    result, status='MODULE FAILURE',
+                    msg=result_dict['module_stdout'])
 
     def v2_runner_on_skipped(self, result):
         if result._task.loop:
@@ -348,18 +358,7 @@ class CallbackModule(default.CallbackModule):
             pass
 
         elif (result_dict.get('msg') == 'MODULE FAILURE'):
-            if 'module_stdout' in result_dict:
-                self._log_message(
-                    result, status='MODULE FAILURE',
-                    msg=result_dict['module_stdout'])
-            elif 'exception' in result_dict:
-                self._log_message(
-                    result, status='MODULE FAILURE',
-                    msg=result_dict['exception'])
-            elif 'module_stderr' in result_dict:
-                self._log_message(
-                    result, status='MODULE FAILURE',
-                    msg=result_dict['module_stderr'])
+            self._log_module_failure(result, result_dict)
         elif (len([key for key in result_dict.keys()
                    if not key.startswith('_ansible')]) == 1):
             # this is a debug statement, handle it special
@@ -410,11 +409,9 @@ class CallbackModule(default.CallbackModule):
         else:
             status = 'ok'
 
-        if (result_dict.get('msg') == 'MODULE FAILURE' and
-                'module_stdout' in result_dict):
-            self._log_message(
-                result, status='MODULE FAILURE',
-                msg="Item: {item}\n{module_stdout}".format(**result_dict))
+        if (result_dict.get('msg') == 'MODULE FAILURE'):
+            self._log_module_failure(result, result_dict)
+            self._log(msg="Item: {item}".format(**result_dict))
         elif result._task.action not in ('command', 'shell'):
             if 'msg' in result_dict:
                 self._log_message(
@@ -443,11 +440,9 @@ class CallbackModule(default.CallbackModule):
         result_dict = dict(result._result)
         self._process_result_for_localhost(result, is_task=False)
 
-        if (result_dict.get('msg') == 'MODULE FAILURE' and
-                'module_stdout' in result_dict):
-            self._log_message(
-                result, status='MODULE FAILURE',
-                msg="Item: {item}\n{module_stdout}".format(**result_dict))
+        if (result_dict.get('msg') == 'MODULE FAILURE'):
+            self._log_module_failure(result, result_dict)
+            self._log("Item: {item}".format(**result_dict))
         elif result._task.action not in ('command', 'shell'):
             self._log_message(
                 result=result,
