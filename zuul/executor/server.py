@@ -560,8 +560,6 @@ class ExecutorServer(object):
                                             'default_username', 'zuul')
         self.disk_limit_per_job = int(get_default(self.config, 'executor',
                                                   'disk_limit_per_job', 250))
-        self.merge_email = get_default(self.config, 'merger', 'git_user_email')
-        self.merge_name = get_default(self.config, 'merger', 'git_user_name')
         execution_wrapper_name = get_default(self.config, 'executor',
                                              'execution_wrapper', 'bubblewrap')
         load_multiplier = float(get_default(self.config, 'executor',
@@ -618,8 +616,7 @@ class ExecutorServer(object):
             cache_root = self.merge_root
         else:
             cache_root = None
-        return zuul.merger.merger.Merger(root, self.connections,
-                                         self.merge_email, self.merge_name,
+        return zuul.merger.merger.Merger(root, self.connections, self.config,
                                          cache_root, logger)
 
     def start(self):

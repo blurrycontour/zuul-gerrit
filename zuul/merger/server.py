@@ -31,11 +31,7 @@ class MergeServer(object):
 
         merge_root = get_default(self.config, 'merger', 'git_dir',
                                  '/var/lib/zuul/merger-git')
-        merge_email = get_default(self.config, 'merger', 'git_user_email')
-        merge_name = get_default(self.config, 'merger', 'git_user_name')
-
-        self.merger = merger.Merger(merge_root, connections, merge_email,
-                                    merge_name)
+        self.merger = merger.Merger(merge_root, connections, self.config)
 
     def start(self):
         self._running = True

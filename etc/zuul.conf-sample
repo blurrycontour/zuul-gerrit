@@ -25,6 +25,8 @@ state_dir=/var/lib/zuul
 git_dir=/var/lib/zuul/git
 ;git_user_email=zuul@example.com
 ;git_user_name=zuul
+git_http_low_speed_limit=1000
+git_http_low_speed_time=30
 
 [executor]
 default_username=zuul

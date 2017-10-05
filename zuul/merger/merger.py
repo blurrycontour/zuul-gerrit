@@ -18,6 +18,7 @@ import gitdb
 import os
 import logging
 
+from zuul.lib.config import get_default
 import zuul.model
 
 NULL_REF = '0000000000000000000000000000000000000000'
@@ -44,16 +45,15 @@ class ZuulReference(git.Reference):
 
 
 class Repo(object):
-    def __init__(self, remote, local, email, username, sshkey=None,
-                 cache_path=None, logger=None):
+    def __init__(self, remote, local, email, username, speed_limit, speed_time,
+                 sshkey=None, cache_path=None, logger=None):
         if logger is None:
             self.log = logging.getLogger("zuul.Repo")
         else:
             self.log = logger
-        # TODO(pabelanger): Expose to user via zuul.conf.
         self.env = {
-            'GIT_HTTP_LOW_SPEED_LIMIT': '1000',
-            'GIT_HTTP_LOW_SPEED_TIME': '30',
+            'GIT_HTTP_LOW_SPEED_LIMIT': speed_limit,
+            'GIT_HTTP_LOW_SPEED_TIME': speed_time,
         }
         if sshkey:
             self.env['GIT_SSH_COMMAND'] = 'ssh -i %s' % (sshkey,)
@@ -296,7 +296,7 @@ class Repo(object):
 
 
 class Merger(object):
-    def __init__(self, working_root, connections, email, username,
+    def __init__(self, working_root, connections, config,
                  cache_root=None, logger=None):
         self.logger = logger
         if logger is None:
@@ -308,8 +308,12 @@ class Merger(object):
         if not os.path.exists(working_root):
             os.makedirs(working_root)
         self.connections = connections
-        self.email = email
-        self.username = username
+        self.email = get_default(config, 'merger', 'git_user_email')
+        self.username = get_default(config, 'merger', 'git_user_name')
+        self.speed_limit = get_default(
+            config, 'merger', 'git_http_low_speed_limit', '1000')
+        self.speed_time = get_default(
+            config, 'merger', 'git_http_low_speed_time', '30')
         self.cache_root = cache_root
 
     def _addProject(self, hostname, project_name, url, sshkey):
@@ -322,8 +326,9 @@ class Merger(object):
                                           project_name)
             else:
                 cache_path = None
-            repo = Repo(url, path, self.email, self.username,
-                        sshkey, cache_path, self.logger)
+            repo = Repo(
+                url, path, self.email, self.username, self.speed_limit,
+                self.speed_time, sshkey, cache_path, self.logger)
 
             self.repos[key] = repo
         except Exception:
