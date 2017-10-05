@@ -953,7 +953,7 @@ Here is an example of two job definitions:
       A boolean value which indicates whether this job may only be
       used in pipelines where :attr:`pipeline.post-review` is
       ``true``.  This is automatically set to ``true`` if this job is
-      defined in a :term:`untrusted-project`.  It may be explicitly
+      defined in a :term:`config-project`.  It may be explicitly
       set to obtain the same behavior for jobs defined in
       :term:`config projects <config-project>`.  Once this is set to
       ``true`` anywhere in the inheritance hierarchy for a job, it
