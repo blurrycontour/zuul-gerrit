@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f515b1d_eb3d932c",
+        "filename": "etc/zuul.conf-sample",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-10-05T20:19:56Z",
+      "side": 1,
+      "message": "Omit these here since we don\u0027t expect users to set them.  This file has only required or strongly suggested settings (eg the two comments above).",
+      "revId": "003701b675ca95a0e96fb0a2f4ab69ad25218e7b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f515b1d_2b34cb49",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-10-05T20:19:56Z",
+      "side": 1,
+      "message": "I\u0027d rather leave the config object out of this and keep this a pure-python api.",
+      "revId": "003701b675ca95a0e96fb0a2f4ab69ad25218e7b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f515b1d_0b37cf4f",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-10-05T20:19:56Z",
+      "side": 1,
+      "message": "The executor will need similar changes for its mergers.",
+      "revId": "003701b675ca95a0e96fb0a2f4ab69ad25218e7b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
