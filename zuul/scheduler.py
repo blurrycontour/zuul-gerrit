@@ -855,12 +855,14 @@ class Scheduler(threading.Thread):
         # the nodes to nodepool.
         try:
             nodeset = build.build_set.getJobNodeSet(build.job.name)
-            autohold_key = (build.pipeline.layout.tenant.name,
-                            build.build_set.item.change.project.canonical_name,
-                            build.job.name)
-
             try:
-                self.nodepool.holdNodeSet(nodeset, autohold_key)
+                if build.pipeline:
+                    autohold_key = (build.pipeline.layout.tenant.name,
+                                    build.build_set.item.change.
+                                    project.canonical_name,
+                                    build.job.name)
+
+                    self.nodepool.holdNodeSet(nodeset, autohold_key)
             except Exception:
                 self.log.exception("Unable to process autohold for %s",
                                    autohold_key)
@@ -875,8 +877,8 @@ class Scheduler(threading.Thread):
             return
         pipeline = build.build_set.item.pipeline
         if not pipeline:
-            self.log.warning("Build %s is not associated with a pipeline" %
-                             (build,))
+            self.log.debug("Build %s is not associated with a pipeline" %
+                           (build,))
             return
         if build.end_time and build.start_time and build.result:
             duration = build.end_time - build.start_time

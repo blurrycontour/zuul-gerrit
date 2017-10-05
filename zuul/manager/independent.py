@@ -100,8 +100,9 @@ class IndependentPipelineManager(PipelineManager):
         return True
 
     def dequeueItem(self, item):
+        old_queue = item.queue
         super(IndependentPipelineManager, self).dequeueItem(item)
         # An independent pipeline manager dynamically removes empty
         # queues
-        if not item.queue.queue:
-            self.pipeline.removeQueue(item.queue)
+        if not old_queue.queue:
+            self.pipeline.removeQueue(old_queue)

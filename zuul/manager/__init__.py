@@ -550,13 +550,13 @@ class PipelineManager(object):
             self.log.info("Dequeuing change %s because "
                           "it can no longer merge" % item.change)
             self.cancelJobs(item)
-            self.dequeueItem(item)
             item.setDequeuedNeedingChange()
             if item.live:
                 try:
                     self.reportItem(item)
                 except exceptions.MergeFailure:
                     pass
+            self.dequeueItem(item)
             return (True, nnfi)
 
         actionable = change_queue.isActionable(item)

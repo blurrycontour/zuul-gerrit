@@ -280,6 +280,9 @@ class ChangeQueue(object):
             item_behind.item_ahead = item.item_ahead
         item.item_ahead = None
         item.items_behind = []
+        item.queue = None
+        item.pipeline = None
+        item.layout = None
         item.dequeue_time = time.time()
 
     def moveItem(self, item, item_ahead):

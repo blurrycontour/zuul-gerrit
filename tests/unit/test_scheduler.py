@@ -4715,6 +4715,39 @@ For CI problems and help debugging, contact ci@example.org"""
         build = self.getJobFromHistory('py27')
         self.assertEqual(build.parameters['zuul']['jobtags'], [])
 
+    def test_outstanding_jobs_for_dequeued_items(self):
+        # Test that if we have an outstanding job for a dequeued item,
+        # it isn't causing us to hold on to outdated layout objects.
+        # Hold the job until the end of the test to expose any
+        # lingering outdated layout references.
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.setMerged()
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
+        self.waitUntilSettled()
+        # The item should be enqued and waiting on a job.  Remove the
+        # item from the queue, but leave the job outstanding as if it
+        # were stuck, or somehow didn't get canceled in a timely
+        # manner.
+        post = self.sched.abide.tenants['tenant-one'].layout.pipelines['post']
+        post.manager.dequeueItem(post.queues[0].queue[0])
+        del post
+        self.sched.reconfigureTenant(self.sched.abide.tenants['tenant-one'],
+                                     None)
+        self.waitUntilSettled()
+
+        # After dequeuing, the item should have lost all references to
+        # running configuration.  Verify that by checking we have the
+        # correct number of Pipeline objects in memory.
+        gc.collect()
+        pipelines = [obj for obj in gc.get_objects()
+                     if isinstance(obj, zuul.model.Pipeline)]
+        self.assertEqual(len(pipelines), 3)
+        # Release the job to clean up.
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
 
 class TestExecutor(ZuulTestCase):
     tenant_config_file = 'config/single-tenant/main.yaml'

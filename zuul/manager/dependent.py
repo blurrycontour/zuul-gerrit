@@ -213,9 +213,10 @@ class DependentPipelineManager(PipelineManager):
         return None
 
     def dequeueItem(self, item):
+        old_queue = item.queue
         super(DependentPipelineManager, self).dequeueItem(item)
         # If this was a dynamic queue from a speculative change,
         # remove the queue (if empty)
-        if item.queue.dynamic:
-            if not item.queue.queue:
-                self.pipeline.removeQueue(item.queue)
+        if old_queue.dynamic:
+            if not old_queue.queue:
+                self.pipeline.removeQueue(old_queue)
