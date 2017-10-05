@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f515b1d_0367b353",
+        "filename": "zuul/web/static/javascripts/zuul.angular.js",
+        "patchSetId": 16
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-10-05T22:41:55Z",
+      "side": 1,
+      "message": "These should actually be +\u003d",
+      "range": {
+        "startLine": 73,
+        "startChar": 42,
+        "endLine": 73,
+        "endChar": 43
+      },
+      "revId": "6f2c73c69776e15bbf436f523c4666f56155a250",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
