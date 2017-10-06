@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f515b1d_7a926fa1",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 376,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-10-06T20:37:05Z",
+      "side": 1,
+      "message": "should we be concerned if a job is endlessly aborted, it would never hit a limit?",
+      "revId": "a777fef1c6b6f435fd85452e3dfec6bd4780f4c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
