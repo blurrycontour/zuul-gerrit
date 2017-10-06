@@ -367,15 +367,21 @@ class ExecutorClient(object):
             if result is None:
                 result = data.get('result')
                 build.error_detail = data.get('error_detail')
-            if result is None or result == 'ABORTED':
+            if result is None:
                 if (build.build_set.getTries(build.job.name) >=
                     build.job.attempts):
                     result = 'RETRY_LIMIT'
                 else:
                     build.retry = True
             result_data = data.get('data', {})
-            self.log.info("Build %s complete, result %s" %
-                          (job, result))
+            if result in ('DISCONNECT', 'ABORTED'):
+                # Always retry if the executor just went away
+                build.retry = True
+                self.log.info("Build %s executor disconnected, retrying" % job)
+                self.sched.onBuildCompleted(build, result, {})
+            else:
+                self.log.info("Build %s complete, result %s" %
+                              (job, result))
             self.sched.onBuildCompleted(build, result, result_data)
             # The test suite expects the build to be removed from the
             # internal dict after it's added to the report queue.
@@ -404,7 +410,7 @@ class ExecutorClient(object):
 
     def onDisconnect(self, job):
         self.log.info("Gearman job %s lost due to disconnect" % job)
-        self.onBuildCompleted(job)
+        self.onBuildCompleted(job, 'DISCONNECT')
 
     def onUnknownJob(self, job):
         self.log.info("Gearman job %s lost due to unknown handle" % job)
