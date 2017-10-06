@@ -16,6 +16,23 @@
       "revId": "a777fef1c6b6f435fd85452e3dfec6bd4780f4c6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f515b1d_ba5c67ed",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 376,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-10-06T20:41:46Z",
+      "side": 1,
+      "message": "I think at this point we\u0027re unaware of a likely cause for such a thing.",
+      "revId": "a777fef1c6b6f435fd85452e3dfec6bd4780f4c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
