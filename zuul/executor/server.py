@@ -1196,9 +1196,7 @@ class AnsibleJob(object):
         if not pre_failed:
             job_status, job_code = self.runAnsiblePlaybook(
                 self.jobdir.playbook, args['timeout'], phase='run')
-            if job_status == self.RESULT_ABORTED:
-                return 'ABORTED'
-            elif job_status == self.RESULT_TIMED_OUT:
+            if job_status == self.RESULT_TIMED_OUT:
                 # Set the pre-failure flag so this doesn't get
                 # overridden by a post-failure.
                 pre_failed = True
