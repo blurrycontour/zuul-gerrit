@@ -361,6 +361,12 @@ class ExecutorClient(object):
 
         build = self.builds.get(job.unique)
         if build:
+            if result == 'DISCONNECT':
+                # Always retry if the executor just went away
+                build.retry = True
+                self.log.info("Build %s executor disconnected, retrying" % job)
+                self.sched.onBuildCompleted(build, result, {})
+                return
             data = getJobData(job)
             build.node_labels = data.get('node_labels', [])
             build.node_name = data.get('node_name')
@@ -404,7 +410,7 @@ class ExecutorClient(object):
 
     def onDisconnect(self, job):
         self.log.info("Gearman job %s lost due to disconnect" % job)
-        self.onBuildCompleted(job)
+        self.onBuildCompleted(job, 'DISCONNECT')
 
     def onUnknownJob(self, job):
         self.log.info("Gearman job %s lost due to unknown handle" % job)
