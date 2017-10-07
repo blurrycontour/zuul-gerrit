@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f515b1d_ecefc284",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 956,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-10-07T08:28:23Z",
+      "side": 1,
+      "message": "missing \u0027and\u0027 here?",
+      "range": {
+        "startLine": 956,
+        "startChar": 6,
+        "endLine": 956,
+        "endChar": 37
+      },
+      "revId": "542856cf44469041efbb4b94c518e5bcdf084f6f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
