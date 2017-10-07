@@ -4607,6 +4607,26 @@ For CI problems and help debugging, contact ci@example.org"""
         self.waitUntilSettled()
 
         self.assertEqual(len(self.builds), 2)
+
+        # first abort
+        self.builds[0].aborted = True
+        self.executor_server.release('.*-test*')
+        self.waitUntilSettled()
+        self.assertEqual(len(self.builds), 1)
+
+        # second abort
+        self.builds[0].aborted = True
+        self.executor_server.release('.*-test*')
+        self.waitUntilSettled()
+        self.assertEqual(len(self.builds), 1)
+
+        # third abort
+        self.builds[0].aborted = True
+        self.executor_server.release('.*-test*')
+        self.waitUntilSettled()
+        self.assertEqual(len(self.builds), 1)
+
+        # fourth abort
         self.builds[0].aborted = True
         self.executor_server.release('.*-test*')
         self.waitUntilSettled()
