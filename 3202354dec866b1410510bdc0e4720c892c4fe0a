@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f515b1d_713e0d2a",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-10-07T06:41:43Z",
+      "side": 1,
+      "message": "Just wanted to ask if we want to count here for the retry limit and then saw the followup patch :)",
+      "range": {
+        "startLine": 370,
+        "startChar": 0,
+        "endLine": 370,
+        "endChar": 53
+      },
+      "revId": "3202354dec866b1410510bdc0e4720c892c4fe0a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
