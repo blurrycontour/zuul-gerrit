@@ -4183,6 +4183,47 @@ For CI problems and help debugging, contact ci@example.org"""
         tenant = self.sched.abide.tenants.get('tenant-one')
         self.assertEqual(len(tenant.layout.pipelines['check'].queues), 0)
 
+    def test_crd_multi_branch(self):
+        "Test cross-repo dependencies in multiple branches"
+        self.executor_server.hold_jobs_in_build = True
+        self.gearman_server.hold_jobs_in_queue = True
+        self.create_branch('org/project2', 'stable')
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+        C = self.fake_gerrit.addFakeChange('org/project2', 'stable', 'C')
+
+        C.data['id'] = B.data['id']
+        # A Depends-On: B
+        A.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
+            A.subject, B.data['id'])
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.gearman_server.hold_jobs_in_queue = False
+        self.gearman_server.release()
+        self.waitUntilSettled()
+
+        self.executor_server.release('.*-merge')
+        self.waitUntilSettled()
+
+        self.assertTrue(self.builds[0].hasChanges(A, B))
+        #TODO test C
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'NEW')
+        self.assertEqual(B.data['status'], 'NEW')
+        self.assertEqual(A.reported, 1)
+        self.assertEqual(B.reported, 0)
+        self.assertEqual(C.reported, 0)
+
+        self.assertEqual(self.history[0].changes, '2,1 3,1 1,1')
+        tenant = self.sched.abide.tenants.get('tenant-one')
+        self.assertEqual(len(tenant.layout.pipelines['check'].queues), 0)
+
     def test_crd_check_git_depends(self):
         "Test single-repo dependencies in independent pipelines"
         self.gearman_server.hold_jobs_in_build = True
