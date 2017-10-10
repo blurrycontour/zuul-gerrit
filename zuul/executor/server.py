@@ -18,6 +18,7 @@ import json
 import logging
 import multiprocessing
 import os
+import pprint
 import shutil
 import signal
 import shlex
@@ -1229,7 +1230,31 @@ class AnsibleJob(object):
                 # precedence over the post result.
                 if not pre_failed:
                     result = 'POST_FAILURE'
+                if (index + 1) == len(self.jobdir.post_playbooks):
+                    self._logFinalPlaybookError()
+
         return result
+
+    def _logFinalPlaybookError(self):
+        # Failures in the final post playbook can include failures
+        # uploading logs, which makes diagnosing issues difficult.
+        # Grab the output from the last playbook from the json
+        # file and log it.
+        self.log.debug("Final playbook failed")
+        if not os.path.exists(self.jobdir.job_output_file):
+            self.log.debug("JSON logfile {logfile} is missing".format(
+                logfile=self.jobdir.job_output_file))
+            return
+        try:
+            output = json.load(
+                open(self.jobdir.job_output_file, 'r'))
+            last_playbook = output[-1]
+            # Use pprint.pformat for this - given the size it'll be extra
+            # difficult to read as an all-on-one-line string.
+            for line in pprint.pformat(last_playbook).split('\n'):
+                self.log.debug(line)
+        except json.decoder.JSONDecodeError as e:
+            self.log.exception("Could not decode json log")
 
     def getHostList(self, args):
         hosts = []
