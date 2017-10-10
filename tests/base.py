@@ -1361,90 +1361,6 @@ class FakeBuild(object):
         return repos
 
 
-class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
-    """An Ansible executor to be used in tests.
-
-    :ivar bool hold_jobs_in_build: If true, when jobs are executed
-        they will report that they have started but then pause until
-        released before reporting completion.  This attribute may be
-        changed at any time and will take effect for subsequently
-        executed builds, but previously held builds will still need to
-        be explicitly released.
-
-    """
-    def __init__(self, *args, **kw):
-        self._run_ansible = kw.pop('_run_ansible', False)
-        self._test_root = kw.pop('_test_root', False)
-        super(RecordingExecutorServer, self).__init__(*args, **kw)
-        self.hold_jobs_in_build = False
-        self.lock = threading.Lock()
-        self.running_builds = []
-        self.build_history = []
-        self.fail_tests = {}
-        self.job_builds = {}
-
-    def failJob(self, name, change):
-        """Instruct the executor to report matching builds as failures.
-
-        :arg str name: The name of the job to fail.
-        :arg Change change: The :py:class:`~tests.base.FakeChange`
-            instance which should cause the job to fail.  This job
-            will also fail for changes depending on this change.
-
-        """
-        l = self.fail_tests.get(name, [])
-        l.append(change)
-        self.fail_tests[name] = l
-
-    def release(self, regex=None):
-        """Release a held build.
-
-        :arg str regex: A regular expression which, if supplied, will
-            cause only builds with matching names to be released.  If
-            not supplied, all builds will be released.
-
-        """
-        builds = self.running_builds[:]
-        self.log.debug("Releasing build %s (%s)" % (regex,
-                                                    len(self.running_builds)))
-        for build in builds:
-            if not regex or re.match(regex, build.name):
-                self.log.debug("Releasing build %s" %
-                               (build.parameters['zuul']['build']))
-                build.release()
-            else:
-                self.log.debug("Not releasing build %s" %
-                               (build.parameters['zuul']['build']))
-        self.log.debug("Done releasing builds %s (%s)" %
-                       (regex, len(self.running_builds)))
-
-    def executeJob(self, job):
-        build = FakeBuild(self, job)
-        job.build = build
-        self.running_builds.append(build)
-        self.job_builds[job.unique] = build
-        args = json.loads(job.arguments)
-        args['zuul']['_test'] = dict(test_root=self._test_root)
-        job.arguments = json.dumps(args)
-        self.job_workers[job.unique] = RecordingAnsibleJob(self, job)
-        self.job_workers[job.unique].run()
-
-    def stopJob(self, job):
-        self.log.debug("handle stop")
-        parameters = json.loads(job.arguments)
-        uuid = parameters['uuid']
-        for build in self.running_builds:
-            if build.unique == uuid:
-                build.aborted = True
-                build.release()
-        super(RecordingExecutorServer, self).stopJob(job)
-
-    def stop(self):
-        for build in self.running_builds:
-            build.release()
-        super(RecordingExecutorServer, self).stop()
-
-
 class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
     def doMergeChanges(self, merger, items, repo_state):
         # Get a merger in order to update the repos involved in this job.
@@ -1500,6 +1416,92 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
             host_vars=dict(ansible_connection='local'),
             host_keys=[]))
         return hosts
+
+
+class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
+    """An Ansible executor to be used in tests.
+
+    :ivar bool hold_jobs_in_build: If true, when jobs are executed
+        they will report that they have started but then pause until
+        released before reporting completion.  This attribute may be
+        changed at any time and will take effect for subsequently
+        executed builds, but previously held builds will still need to
+        be explicitly released.
+
+    """
+
+    _job_class = RecordingAnsibleJob
+
+    def __init__(self, *args, **kw):
+        self._run_ansible = kw.pop('_run_ansible', False)
+        self._test_root = kw.pop('_test_root', False)
+        super(RecordingExecutorServer, self).__init__(*args, **kw)
+        self.hold_jobs_in_build = False
+        self.lock = threading.Lock()
+        self.running_builds = []
+        self.build_history = []
+        self.fail_tests = {}
+        self.job_builds = {}
+
+    def failJob(self, name, change):
+        """Instruct the executor to report matching builds as failures.
+
+        :arg str name: The name of the job to fail.
+        :arg Change change: The :py:class:`~tests.base.FakeChange`
+            instance which should cause the job to fail.  This job
+            will also fail for changes depending on this change.
+
+        """
+        l = self.fail_tests.get(name, [])
+        l.append(change)
+        self.fail_tests[name] = l
+
+    def release(self, regex=None):
+        """Release a held build.
+
+        :arg str regex: A regular expression which, if supplied, will
+            cause only builds with matching names to be released.  If
+            not supplied, all builds will be released.
+
+        """
+        builds = self.running_builds[:]
+        self.log.debug("Releasing build %s (%s)" % (regex,
+                                                    len(self.running_builds)))
+        for build in builds:
+            if not regex or re.match(regex, build.name):
+                self.log.debug("Releasing build %s" %
+                               (build.parameters['zuul']['build']))
+                build.release()
+            else:
+                self.log.debug("Not releasing build %s" %
+                               (build.parameters['zuul']['build']))
+        self.log.debug("Done releasing builds %s (%s)" %
+                       (regex, len(self.running_builds)))
+
+    def executeJob(self, job):
+        build = FakeBuild(self, job)
+        job.build = build
+        self.running_builds.append(build)
+        self.job_builds[job.unique] = build
+        args = json.loads(job.arguments)
+        args['zuul']['_test'] = dict(test_root=self._test_root)
+        job.arguments = json.dumps(args)
+        super(RecordingExecutorServer, self).executeJob(job)
+
+    def stopJob(self, job):
+        self.log.debug("handle stop")
+        parameters = json.loads(job.arguments)
+        uuid = parameters['uuid']
+        for build in self.running_builds:
+            if build.unique == uuid:
+                build.aborted = True
+                build.release()
+        super(RecordingExecutorServer, self).stopJob(job)
+
+    def stop(self):
+        for build in self.running_builds:
+            build.release()
+        super(RecordingExecutorServer, self).stop()
 
 
 class FakeGearmanServer(gear.Server):
