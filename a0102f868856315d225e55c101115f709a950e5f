@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "5f4e5783_4bda9ee9",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1234,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-10-10T18:06:02Z",
+      "side": 1,
+      "message": "Actually, we always run all of the playbooks. We only want to extract info from the log if we fail on the actual final one ... The only way we\u0027ll leave this loop before running the final playbook would be if runAnsiblePlaybook threw an exception and we popped out of the whole method.",
+      "parentUuid": "5f4e5783_70454b17",
+      "range": {
+        "startLine": 1233,
+        "startChar": 0,
+        "endLine": 1234,
+        "endChar": 49
+      },
+      "revId": "a0102f868856315d225e55c101115f709a950e5f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f4e5783_106df797",
         "filename": "zuul/executor/server.py",
         "patchSetId": 1
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "5f4e5783_0be4a6ab",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1251,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-10-10T18:06:02Z",
+      "side": 1,
+      "message": "Yah - it\u0027s a good point- it\u0027s just that we\u0027ll also never get here if we don\u0027t run all the playbooks for some reason.",
+      "parentUuid": "5f4e5783_106df797",
+      "range": {
+        "startLine": 1251,
+        "startChar": 12,
+        "endLine": 1251,
+        "endChar": 38
+      },
+      "revId": "a0102f868856315d225e55c101115f709a950e5f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f4e5783_50f80fc3",
         "filename": "zuul/executor/server.py",
         "patchSetId": 1
@@ -59,6 +107,24 @@
       "writtenOn": "2017-10-10T17:19:24Z",
       "side": 1,
       "message": "Would be helpful to have the file path here like in the debug log above?",
+      "revId": "a0102f868856315d225e55c101115f709a950e5f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f4e5783_0b9266f7",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1257,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-10-10T18:06:02Z",
+      "side": 1,
+      "message": "Yah. Totes.",
+      "parentUuid": "5f4e5783_50f80fc3",
       "revId": "a0102f868856315d225e55c101115f709a950e5f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
