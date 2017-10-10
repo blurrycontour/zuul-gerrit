@@ -64,7 +64,7 @@
             files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
-    infra-gate:
+    gate:
       jobs:
         - build-openstack-sphinx-docs:
             irrelevant-files:
