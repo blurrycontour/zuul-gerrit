@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f4e5783_6b71dae0",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1257,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-10-10T18:06:37Z",
+      "side": 1,
+      "message": "How about making this \"except Exception\" because i think in all cases, we want to proceed as if the error had not happened?",
+      "revId": "27f85e5470438e4f90b0b8bbd44d92d04630361b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
