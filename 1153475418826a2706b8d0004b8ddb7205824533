@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f4e5783_46e61519",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1260,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-10-10T18:23:56Z",
+      "side": 1,
+      "message": "You don\u0027t need {e} or str(e) -- log.exception logs the full exception and traceback.",
+      "revId": "1153475418826a2706b8d0004b8ddb7205824533",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
