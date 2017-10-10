@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f4e5783_70454b17",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1234,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-10-10T17:19:24Z",
+      "side": 1,
+      "message": "Rather than check against the last playbook that should\u0027ve run maybe drop this outside of the for loop and check the last playbook that did run? Python variable scoping should make this easy as post_status etc will all have their in loop values when we fall out of the loop.\n\nJust thinking this might be a bit more of a belts and suspenders approach if something goes really wrong and we don\u0027t run the last playbook but do run some of them.",
+      "range": {
+        "startLine": 1233,
+        "startChar": 0,
+        "endLine": 1234,
+        "endChar": 49
+      },
+      "revId": "a0102f868856315d225e55c101115f709a950e5f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f4e5783_106df797",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1251,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-10-10T17:19:24Z",
+      "side": 1,
+      "message": "This line here is what made me think of the above comment. Basically the output isn\u0027t necessary going to line up with the last playbook if we don\u0027t run all playbooks for some reason.",
+      "range": {
+        "startLine": 1251,
+        "startChar": 12,
+        "endLine": 1251,
+        "endChar": 38
+      },
+      "revId": "a0102f868856315d225e55c101115f709a950e5f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f4e5783_50f80fc3",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1257,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-10-10T17:19:24Z",
+      "side": 1,
+      "message": "Would be helpful to have the file path here like in the debug log above?",
+      "revId": "a0102f868856315d225e55c101115f709a950e5f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
