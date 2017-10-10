@@ -67,6 +67,24 @@
       "revId": "f03173b72f8987536a500118efe58bdd01143aa9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f4e5783_2b52c268",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 481,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2017-10-10T18:02:22Z",
+      "side": 1,
+      "message": "instead of recheck say \"run the checks again\" ?",
+      "parentUuid": "5f4e5783_6beb1ab0",
+      "revId": "f03173b72f8987536a500118efe58bdd01143aa9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
