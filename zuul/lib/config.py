@@ -14,7 +14,7 @@ import os
 
 
 def get_default(config, section, option, default=None, expand_user=False):
-    if config.has_option(section, option):
+    if if config.has_section(section) and config.has_option(section, option):
         value = config.get(section, option)
     else:
         value = default
