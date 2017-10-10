@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f4e5783_55a2419c",
+        "filename": "requirements.txt",
+        "patchSetId": 8
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2017-10-10T16:59:12Z",
+      "side": 1,
+      "message": "Do we need a comment here similar to the one above for github3.py?",
+      "revId": "ba1c8c0e310bbe4a874aaa81042b8f1d3e8ac078",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f4e5783_359fc551",
+        "filename": "tests/fixtures/fake_git.sh",
+        "patchSetId": 8
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2017-10-10T16:59:12Z",
+      "side": 1,
+      "message": "Mixing spaces and hard tabs... intentional?",
+      "revId": "ba1c8c0e310bbe4a874aaa81042b8f1d3e8ac078",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f4e5783_759d3d58",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2017-10-10T16:59:12Z",
+      "side": 1,
+      "message": "It at least used to be the case that this could randomly raise OSError with ENOENT due to out-of-order removal of parent nodes. I can\u0027t seem to find any current information suggesting whether it\u0027s still recommended to wrap this in a try/except, but we should probably keep a suspicious eye on it.",
+      "revId": "ba1c8c0e310bbe4a874aaa81042b8f1d3e8ac078",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
