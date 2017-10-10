@@ -7,7 +7,7 @@
             voting: false
         - tox-pep8
         - tox-py27
-    infra-gate:
+    gate:
       jobs:
         - tox-docs
         - tox-pep8
