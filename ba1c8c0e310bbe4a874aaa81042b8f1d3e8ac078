@@ -50,6 +50,29 @@
       "revId": "ba1c8c0e310bbe4a874aaa81042b8f1d3e8ac078",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f4e5783_f046db4f",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-10-10T17:13:25Z",
+      "side": 1,
+      "message": "This doesn\u0027t mean clone into the CWD does it? I expect that we actually clone into the self.local_path below when running clone. Just odd to see us need to use a CWD to instantiate a git client (I guess a GitPython ism?)",
+      "range": {
+        "startLine": 124,
+        "startChar": 28,
+        "endLine": 124,
+        "endChar": 39
+      },
+      "revId": "ba1c8c0e310bbe4a874aaa81042b8f1d3e8ac078",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
