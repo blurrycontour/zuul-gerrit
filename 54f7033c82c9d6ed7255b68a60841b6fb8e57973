@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f4e5783_414a7f27",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1908,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-10-10T18:59:25Z",
+      "side": 1,
+      "message": "Erm, this line should maybe just be removed?",
+      "revId": "54f7033c82c9d6ed7255b68a60841b6fb8e57973",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
