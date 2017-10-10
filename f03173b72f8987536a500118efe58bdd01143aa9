@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f4e5783_2bcc0288",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 468,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-10-10T17:51:35Z",
+      "side": 1,
+      "message": "Is it still useful to log this at info level? Seems like maybe we should put the self.log.info call into each branch of the if/else with different text.",
+      "revId": "f03173b72f8987536a500118efe58bdd01143aa9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
