@@ -153,7 +153,7 @@ class TestFinal(ZuulTestCase):
         # Thus it should fail.
         self.assertEqual(A.reported, 1)
         self.assertEqual(A.patchsets[-1]['approvals'][0]['value'], '-1')
-        self.assertIn('Unable to inherit from final job', A.messages[0])
+        self.assertIn('Unable to modify final job', A.messages[0])
 
 
 class TestBranchVariants(ZuulTestCase):
