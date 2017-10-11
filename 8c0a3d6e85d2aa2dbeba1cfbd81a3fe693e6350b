@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f4e5783_5c86c1dd",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-10-11T18:20:26Z",
+      "side": 1,
+      "message": "It seems like this should be:\n\n  statsd_prefix \u003d \u0027zuul.geard\u0027\n\ninstead of +\u003d.",
+      "revId": "8c0a3d6e85d2aa2dbeba1cfbd81a3fe693e6350b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
