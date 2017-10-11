@@ -12,7 +12,7 @@
     parent: puppet-module-base
     run: playbooks/run-lint
     tags:
-      - master
+      - stable
 
 - project-template:
     name: puppet-check-jobs
