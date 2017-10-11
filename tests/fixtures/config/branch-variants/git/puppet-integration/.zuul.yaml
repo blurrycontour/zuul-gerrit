@@ -11,6 +11,8 @@
     name: puppet-lint
     parent: puppet-module-base
     run: playbooks/run-lint
+    tags:
+      - master
 
 - project-template:
     name: puppet-check-jobs
