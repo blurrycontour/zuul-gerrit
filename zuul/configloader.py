@@ -498,12 +498,10 @@ class JobParser(object):
         job.source_context = conf.get('_source_context')
         job.source_line = conf.get('_start_mark').line + 1
 
-        is_variant = layout.hasJob(name)
         if 'parent' in conf:
             if conf['parent'] is not None:
                 # Parent job is explicitly specified, so inherit from it.
-                parent = layout.getJob(conf['parent'])
-                job.inheritFrom(parent)
+                job.parent = conf['parent']
             else:
                 # Parent is explicitly set as None, so user intends
                 # this to be a base job.  That's only okay if we're in
@@ -511,14 +509,6 @@ class JobParser(object):
                 if not conf['_source_context'].trusted:
                     raise Exception(
                         "Base jobs must be defined in config projects")
-        else:
-            # Parent is not explicitly set, so inherit from the
-            # default -- but only if this is the primary definition
-            # for the job (ie, not a variant -- variants don't need to
-            # have a parent as long as the main job does).
-            if not is_variant:
-                parent = layout.getJob(tenant.default_base_job)
-                job.inheritFrom(parent)
         # Secrets are part of the playbook context so we must establish
         # them earlier than playbooks.
         secrets = []
@@ -552,16 +542,16 @@ class JobParser(object):
         if secrets and not conf['_source_context'].trusted:
             job.post_review = True
 
-        if conf.get('timeout') and tenant.max_job_timeout != -1 and \
-           int(conf['timeout']) > tenant.max_job_timeout:
-            raise MaxTimeoutError(job, tenant)
-
         if 'post-review' in conf:
             if conf['post-review']:
                 job.post_review = True
             else:
                 raise Exception("Once set, the post-review attribute "
                                 "may not be unset")
+
+        if conf.get('timeout') and tenant.max_job_timeout != -1 and \
+           int(conf['timeout']) > tenant.max_job_timeout:
+            raise MaxTimeoutError(job, tenant)
 
         # Roles are part of the playbook context so we must establish
         # them earlier than playbooks.
@@ -637,14 +627,11 @@ class JobParser(object):
                 job_project = model.JobProject(project_name,
                                                project_override_branch)
                 new_projects[project_name] = job_project
-            job.updateProjects(new_projects)
+            job.required_projects = new_projects
 
         tags = conf.get('tags')
         if tags:
-            # Tags are merged via a union rather than a
-            # destructive copy because they are intended to
-            # accumulate onto any previously applied tags.
-            job.tags = job.tags.union(set(tags))
+            job.tags = set(tags)
 
         job.dependencies = frozenset(as_list(conf.get('dependencies')))
 
@@ -652,7 +639,7 @@ class JobParser(object):
         if variables:
             if 'zuul' in variables:
                 raise Exception("Variables named 'zuul' are not allowed.")
-            job.updateVariables(variables)
+            job.variables = variables
 
         allowed_projects = conf.get('allowed-projects', None)
         if allowed_projects:
