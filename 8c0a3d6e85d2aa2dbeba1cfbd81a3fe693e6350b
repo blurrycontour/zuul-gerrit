@@ -16,6 +16,23 @@
       "revId": "8c0a3d6e85d2aa2dbeba1cfbd81a3fe693e6350b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f4e5783_c7c77a12",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-10-11T18:58:16Z",
+      "side": 1,
+      "message": "Ayup.",
+      "revId": "8c0a3d6e85d2aa2dbeba1cfbd81a3fe693e6350b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
