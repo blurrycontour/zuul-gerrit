@@ -811,6 +811,7 @@ class Job(object):
         # declared "final", these may not be overriden in a
         # project-pipeline.
         self.execution_attributes = dict(
+            parent=None,
             timeout=None,
             variables={},
             nodeset=NodeSet(),
@@ -818,7 +819,6 @@ class Job(object):
             pre_run=(),
             post_run=(),
             run=(),
-            implied_run=(),
             semaphore=None,
             attempts=3,
             final=False,
@@ -964,24 +964,6 @@ class Job(object):
             else:
                 a[k] = bv
 
-    def inheritFrom(self, other):
-        """Copy the inheritable attributes which have been set on the other
-        job to this job."""
-        if not isinstance(other, Job):
-            raise Exception("Job unable to inherit from %s" % (other,))
-
-        if other.final:
-            raise Exception("Unable to inherit from final job %s" %
-                            (repr(other),))
-
-        # copy all attributes
-        for k in self.inheritable_attributes:
-            if (other._get(k) is not None):
-                setattr(self, k, getattr(other, k))
-
-        msg = 'inherit from %s' % (repr(other),)
-        self.inheritance_path = other.inheritance_path + (msg,)
-
     def copy(self):
         job = Job(self.name)
         for k in self.attributes:
@@ -1006,12 +988,18 @@ class Job(object):
                                         repr(other)))
                 if k not in set(['pre_run', 'post_run', 'roles', 'variables',
                                  'required_projects']):
+                    # TODO(jeblair): determine if deepcopy is required
                     setattr(self, k, copy.deepcopy(other._get(k)))
 
         # Don't set final above so that we don't trip an error halfway
         # through assignment.
         if other.final != self.attributes['final']:
             self.final = other.final
+
+        # We only want to update implied run for inheritance, not
+        # variance.
+        if self.name != other.name:
+            self.implied_run = self.implied_run + other.implied_run
 
         if other._get('pre_run') is not None:
             self.pre_run = self.pre_run + other.pre_run
@@ -1032,8 +1020,7 @@ class Job(object):
         if other._get('tags') is not None:
             self.tags = self.tags.union(other.tags)
 
-        msg = 'apply variant %s' % (repr(other),)
-        self.inheritance_path = self.inheritance_path + (msg,)
+        self.inheritance_path = self.inheritance_path + (repr(other),)
 
     def changeMatches(self, change):
         if self.branch_matcher and not self.branch_matcher.matches(change):
@@ -2452,27 +2439,50 @@ class Layout(object):
     def addProjectConfig(self, project_config):
         self.project_configs[project_config.name] = project_config
 
+    def collectJobs(self, jobname, change, path=None, jobs=None, stack=None):
+        if stack is None:
+            stack = []
+        if jobs is None:
+            jobs = []
+        if path is None:
+            path = []
+        path.append(jobname)
+        for variant in self.getJobs(jobname):
+            if not variant.changeMatches(change):
+                continue
+            parent = variant.parent
+            if not jobs and parent is None:
+                parent = self.tenant.default_base_job
+            if parent not in path:
+                if parent in stack:
+                    raise Exception("Cycle")
+                self.collectJobs(parent, change, path, jobs, stack + [jobname])
+            jobs.append(variant)
+        return jobs
+
     def _createJobGraph(self, item, job_list, job_graph):
         change = item.change
         pipeline = item.pipeline
         for jobname in job_list.jobs:
             # This is the final job we are constructing
             frozen_job = None
-            # Whether the change matches any globally defined variant
-            matched = False
-            for variant in self.getJobs(jobname):
-                if variant.changeMatches(change):
-                    if frozen_job is None:
-                        frozen_job = variant.copy()
-                        frozen_job.setRun()
-                    else:
-                        frozen_job.applyVariant(variant)
-                    matched = True
-            if not matched:
+            variants = self.collectJobs(jobname, change)
+            if not variants:
                 # A change must match at least one defined job variant
                 # (that is to say that it must match more than just
                 # the job that is defined in the tree).
                 continue
+            for variant in variants:
+                if frozen_job is None:
+                    frozen_job = variant.copy()
+                else:
+                    frozen_job.applyVariant(variant)
+                    frozen_job.name = variant.name
+            # Set the implied run based on the last top-level job
+            # definition, before we start applying project-pipeline
+            # variants.
+            frozen_job.name = jobname
+            frozen_job.setRun()
             # Whether the change matches any of the project pipeline
             # variants
             matched = False
