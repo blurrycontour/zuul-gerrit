@@ -1,0 +1,10 @@
+Code-Review+2: Tobias Henkel <tobias.henkel@bmw.de>
+Code-Review+1: David Moreau Simard <dmsimard@redhat.com>
+Code-Review+1: Vu Cong Tuan <tuanvc@vn.fujitsu.com>
+Workflow+1: Monty Taylor <mordred@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Fri, 13 Oct 2017 12:21:55 +0000
+Reviewed-on: https://review.openstack.org/509905
+Project: openstack-infra/zuul
+Branch: refs/heads/feature/zuulv3
