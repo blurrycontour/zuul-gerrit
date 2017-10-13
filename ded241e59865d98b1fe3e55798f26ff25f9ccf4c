@@ -16,6 +16,23 @@
       "revId": "ded241e59865d98b1fe3e55798f26ff25f9ccf4c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f4e5783_63687086",
+        "filename": "zuul/lib/statsd.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-10-13T23:09:06Z",
+      "side": 1,
+      "message": "Yeah, I\u0027ll work out a solution for that.",
+      "revId": "ded241e59865d98b1fe3e55798f26ff25f9ccf4c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
