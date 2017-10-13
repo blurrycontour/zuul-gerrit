@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f4e5783_a3054948",
+        "filename": "zuul/lib/statsd.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2017-10-13T22:32:59Z",
+      "side": 1,
+      "message": "Can this also go away, on the assumption that if someone adds a statsd section to their configuration it\u0027s okay to just assume they\u0027ve made it available for import (rather than silently continuing and not emitting stats).",
+      "revId": "ded241e59865d98b1fe3e55798f26ff25f9ccf4c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
