@@ -16,6 +16,23 @@
       "revId": "faf8198f2a360e9a780c3006c660d1178ad86d8a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f4e5783_4330d49f",
+        "filename": "doc/source/admin/monitoring.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-10-13T23:10:27Z",
+      "side": 1,
+      "message": "Yep.  Or statsd at least.  Can\u0027t remember if it\u0027s also graphite.",
+      "revId": "faf8198f2a360e9a780c3006c660d1178ad86d8a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
