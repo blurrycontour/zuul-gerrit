@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f4e5783_238b986e",
+        "filename": "doc/source/admin/monitoring.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2017-10-13T23:02:02Z",
+      "side": 1,
+      "message": "The scaling factor is because we want better granularity but Graphite wants integer gauges instead of floats?",
+      "revId": "faf8198f2a360e9a780c3006c660d1178ad86d8a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
