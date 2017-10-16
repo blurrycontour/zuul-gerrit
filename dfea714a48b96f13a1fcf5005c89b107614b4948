@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f4e5783_8e1a5bc9",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1192,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-10-16T05:57:41Z",
+      "side": 1,
+      "message": "do we want this to be configurable?",
+      "revId": "dfea714a48b96f13a1fcf5005c89b107614b4948",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
