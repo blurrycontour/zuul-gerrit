@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f4e5783_5a864a15",
+        "filename": "zuul/cmd/executor.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-10-16T21:34:39Z",
+      "side": 1,
+      "message": "This is no longer used because we don\u0027t have the if daemon branch below.\n\nDos the keyboard interrupt make sense in the case of a daemon? I suppose we can always kill the process to send the appropriate sigint.",
+      "range": {
+        "startLine": 108,
+        "startChar": 19,
+        "endLine": 108,
+        "endChar": 30
+      },
+      "revId": "842beed959ffc2f814869caabc847668418386ea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
