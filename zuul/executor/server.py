@@ -558,6 +558,8 @@ class AnsibleJob(object):
         self.aborted = True
         self.aborted_reason = reason
         self.abortRunningProc()
+
+    def wait(self):
         if self.thread:
             self.thread.join()
 
@@ -1530,6 +1532,7 @@ class ExecutorServer(object):
         self.hostname = socket.gethostname()
         self.log_streaming_port = log_streaming_port
         self.merger_lock = threading.Lock()
+        self.run_lock = threading.Lock()
         self.verbose = False
         self.command_map = dict(
             stop=self.stop,
@@ -1676,17 +1679,26 @@ class ExecutorServer(object):
         self.log.debug("Stopping")
         self.disk_accountant.stop()
         self.governor_stop_event.set()
-        self._running = False
-        self._command_running = False
+        with self.run_lock:
+            self._running = False
+            self._command_running = False
+            workers = list(self.job_workers.values())
         self.command_socket.stop()
         self.update_queue.put(None)
 
-        for job_worker in list(self.job_workers.values()):
+        for job_worker in workers:
             try:
                 job_worker.stop()
             except Exception:
                 self.log.exception("Exception sending stop command "
                                    "to worker:")
+        for job_worker in workers:
+            try:
+                job_worker.wait()
+            except Exception:
+                self.log.exception("Exception waiting for worker "
+                                   "to stop:")
+
         self.merger_worker.shutdown()
         self.executor_worker.shutdown()
         if self.statsd:
@@ -1767,18 +1779,7 @@ class ExecutorServer(object):
             try:
                 job = self.merger_worker.getJob()
                 try:
-                    if job.name == 'merger:cat':
-                        self.log.debug("Got cat job: %s" % job.unique)
-                        self.cat(job)
-                    elif job.name == 'merger:merge':
-                        self.log.debug("Got merge job: %s" % job.unique)
-                        self.merge(job)
-                    elif job.name == 'merger:refstate':
-                        self.log.debug("Got refstate job: %s" % job.unique)
-                        self.refstate(job)
-                    else:
-                        self.log.error("Unable to handle job %s" % job.name)
-                        job.sendWorkFail()
+                    self.mergerJobDispatch(job)
                 except Exception:
                     self.log.exception("Exception while running job")
                     job.sendWorkException(
@@ -1787,6 +1788,24 @@ class ExecutorServer(object):
                 pass
             except Exception:
                 self.log.exception("Exception while getting job")
+
+    def mergerJobDispatch(self, job):
+        with self.run_lock:
+            if not self._running:
+                job.sendWorkFail()
+                return
+            if job.name == 'merger:cat':
+                self.log.debug("Got cat job: %s" % job.unique)
+                self.cat(job)
+            elif job.name == 'merger:merge':
+                self.log.debug("Got merge job: %s" % job.unique)
+                self.merge(job)
+            elif job.name == 'merger:refstate':
+                self.log.debug("Got refstate job: %s" % job.unique)
+                self.refstate(job)
+            else:
+                self.log.error("Unable to handle job %s" % job.name)
+                job.sendWorkFail()
 
     def run_executor(self):
         self.log.debug("Starting executor listener")
@@ -1794,15 +1813,7 @@ class ExecutorServer(object):
             try:
                 job = self.executor_worker.getJob()
                 try:
-                    if job.name == 'executor:execute':
-                        self.log.debug("Got execute job: %s" % job.unique)
-                        self.executeJob(job)
-                    elif job.name.startswith('executor:stop'):
-                        self.log.debug("Got stop job: %s" % job.unique)
-                        self.stopJob(job)
-                    else:
-                        self.log.error("Unable to handle job %s" % job.name)
-                        job.sendWorkFail()
+                    executorJobDispatch(job)
                 except Exception:
                     self.log.exception("Exception while running job")
                     job.sendWorkException(
@@ -1812,9 +1823,20 @@ class ExecutorServer(object):
             except Exception:
                 self.log.exception("Exception while getting job")
 
-    def run_governor(self):
-        while not self.governor_stop_event.wait(30):
-            self.manageLoad()
+    def executorJobDispatch(self, job):
+        with self.run_lock:
+            if not self._running:
+                job.sendWorkFail()
+                return
+            if job.name == 'executor:execute':
+                self.log.debug("Got execute job: %s" % job.unique)
+                self.executeJob(job)
+            elif job.name.startswith('executor:stop'):
+                self.log.debug("Got stop job: %s" % job.unique)
+                self.stopJob(job)
+            else:
+                self.log.error("Unable to handle job %s" % job.name)
+                job.sendWorkFail()
 
     def executeJob(self, job):
         if self.statsd:
@@ -1822,6 +1844,10 @@ class ExecutorServer(object):
             self.statsd.incr(base_key + '.builds')
         self.job_workers[job.unique] = self._job_class(self, job)
         self.job_workers[job.unique].run()
+
+    def run_governor(self):
+        while not self.governor_stop_event.wait(30):
+            self.manageLoad()
 
     def manageLoad(self):
         ''' Apply some heuristics to decide whether or not we should
