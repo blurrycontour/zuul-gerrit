@@ -22,6 +22,23 @@
       "revId": "842beed959ffc2f814869caabc847668418386ea",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f4e5783_358a81be",
+        "filename": "zuul/cmd/executor.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-10-16T22:16:00Z",
+      "side": 1,
+      "message": "You know what, why don\u0027t we just put this back the way it was before and double-join the threads.  That\u0027s a legit thing to do.  That way we avoid opening this can of worms.  :)",
+      "revId": "842beed959ffc2f814869caabc847668418386ea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
