@@ -22,6 +22,23 @@
       "revId": "b9704302bdb6857026319ac80df7b490a2282f89",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f4e5783_9305e813",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 940,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-10-16T03:29:18Z",
+      "side": 1,
+      "message": "We should extend this to check that the expected items are in cache.\n\nWe should also test (either here or separately) that after a change is properly de-referenced the cache is clear. Perhaps also asserting that when the cache is used gerrit isn\u0027t re-queried.",
+      "revId": "b9704302bdb6857026319ac80df7b490a2282f89",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
