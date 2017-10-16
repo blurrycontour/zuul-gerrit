@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f4e5783_adde410e",
+        "filename": "tests/fixtures/config/branch-variants/git/puppet-integration/.zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-10-16T01:17:37Z",
+      "side": 1,
+      "message": "blob",
+      "revId": "0999879bf12b5ed24de42833756179ba8f3cd88e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
