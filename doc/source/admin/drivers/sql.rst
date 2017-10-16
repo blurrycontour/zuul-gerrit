@@ -35,6 +35,13 @@ The connection options for the SQL driver are:
       .. code-block:: sql
         GRANT ALL ON my_database TO 'my_user'@'%';
 
+   .. attr:: pool_recycle
+      :default: 1
+
+      Tune the pool_recycle value. See `The SQLAlchemy manual
+      <http://docs.sqlalchemy.org/en/latest/core/pooling.html#setting-pool-recycle>`_
+      for more information.
+
 Reporter Configuration
 ----------------------
 
