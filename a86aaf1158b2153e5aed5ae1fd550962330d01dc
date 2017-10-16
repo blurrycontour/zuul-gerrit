@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f4e5783_296b4e1e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-10-16T19:03:35Z",
+      "side": 1,
+      "message": "This part was a bit confusing, because it\u0027s a setup process, not a ping process. Once I knew what to look for everything became more clear :D",
+      "revId": "a86aaf1158b2153e5aed5ae1fd550962330d01dc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
