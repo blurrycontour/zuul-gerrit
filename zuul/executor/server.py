@@ -1189,6 +1189,7 @@ class AnsibleJob(object):
             config.write('internal_poll_interval = 0.01\n')
 
             config.write('[ssh_connection]\n')
+            config.write('retries = 3\n')
             # NB: when setting pipelining = True, keep_remote_files
             # must be False (the default).  Otherwise it apparently
             # will override the pipelining option and effectively
