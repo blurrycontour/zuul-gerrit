@@ -71,7 +71,6 @@ class Executor(zuul.cmd.ZuulApp):
 
     def exit_handler(self):
         self.executor.stop()
-        self.executor.join()
 
     def start_log_streamer(self):
         pipe_read, pipe_write = os.pipe()
@@ -140,16 +139,13 @@ class Executor(zuul.cmd.ZuulApp):
         self.executor.start()
 
         signal.signal(signal.SIGUSR2, zuul.cmd.stack_dump_handler)
-        if daemon:
-            self.executor.join()
-        else:
-            while True:
-                try:
-                    signal.pause()
-                except KeyboardInterrupt:
-                    print("Ctrl + C: asking executor to exit nicely...\n")
-                    self.exit_handler()
-                    sys.exit(0)
+        while True:
+            try:
+                signal.pause()
+            except KeyboardInterrupt:
+                print("Ctrl + C: asking executor to exit nicely...\n")
+                self.exit_handler()
+                sys.exit(0)
 
 
 def main():
