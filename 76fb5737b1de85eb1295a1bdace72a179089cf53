@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f4e5783_77b91813",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1559,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-10-17T05:37:09Z",
+      "side": 1,
+      "message": "Maybe I misunderstand that but this looks to me like \u0027Only the first parent job with result data updates the parent_data\u0027. I think the \u0027and not job.parent_data\u0027 could be left out.",
+      "range": {
+        "startLine": 1558,
+        "startChar": 0,
+        "endLine": 1559,
+        "endChar": 64
+      },
+      "revId": "76fb5737b1de85eb1295a1bdace72a179089cf53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
