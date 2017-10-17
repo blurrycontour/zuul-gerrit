@@ -249,6 +249,12 @@ of item.
          A boolean indicating whether this project appears in the
          :attr:`job.required-projects` list for this job.
 
+   .. var:: projects_by_name
+      :type: dictionary
+
+      The same as ``projects`` but a dictionary indexed by the
+      ``name`` value of each entry.
+
    .. var:: tenant
 
       The name of the current Zuul tenant.

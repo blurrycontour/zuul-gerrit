@@ -279,6 +279,11 @@ class ExecutorClient(object):
                 required=(p in required_projects),
             ))
 
+        # This view is sometimes easier to access in playbooks as you
+        # can index into a project name
+        projects_by_name = { project.name : project for project in projects }
+        zuul_params['projects_by_name'] = projects_by_name
+
         build = Build(job, uuid)
         build.parameters = params
 
