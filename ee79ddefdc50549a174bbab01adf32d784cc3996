@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f4e5783_14cd2f30",
+        "filename": "tests/fixtures/config/post-playbook/git/common-config/playbooks/python27.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-10-17T17:00:16Z",
+      "side": 1,
+      "message": "This file doesn\u0027t appear to be used can we just make this a noop task list?",
+      "range": {
+        "startLine": 4,
+        "startChar": 14,
+        "endLine": 4,
+        "endChar": 65
+      },
+      "revId": "ee79ddefdc50549a174bbab01adf32d784cc3996",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
