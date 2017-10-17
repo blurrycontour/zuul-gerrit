@@ -48,7 +48,8 @@ def zuul_legacy_vars(zuul):
         params['ZUUL_CHANGE'] = str(zuul['change'])
         params['ZUUL_PATCHSET'] = str(zuul['patchset'])
 
-    if 'newrev' in zuul or 'oldrev' in zuul:
+    else:
+        # Don't set these on change-based builds
         params['ZUUL_REFNAME'] = zuul['ref']
         params['ZUUL_OLDREV'] = zuul.get('oldrev', '0' * 40)
         params['ZUUL_NEWREV'] = zuul.get('newrev', '0' * 40)
