@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f4b6375_603b3dd1",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 944,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2017-10-18T21:15:14Z",
+      "side": 1,
+      "message": "Should probably add it to the zuul-web interface [1] too.\n\n[1]: http://git.openstack.org/cgit/openstack-infra/zuul/tree/etc/status/public_html/zuul.app.js?h\u003dfeature/zuulv3#n36",
+      "range": {
+        "startLine": 942,
+        "startChar": 0,
+        "endLine": 944,
+        "endChar": 47
+      },
+      "revId": "3692b613c5c79deedccf0d40bbd37cbc09ba6332",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
