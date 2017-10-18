@@ -42,6 +42,24 @@
     },
     {
       "key": {
+        "uuid": "3f4b6375_3f4a0927",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1378,
+      "author": {
+        "id": 14985
+      },
+      "writtenOn": "2017-10-18T16:58:27Z",
+      "side": 1,
+      "message": "Well that was the problem we were seeing is that stable/ocata was being picked over the master version.  All this did was make master the first place to go looking. Once you get passed master it\u0027s still the same problem where if it exists in stable/ocata but is a different set of playbooks you will get a job failure.  It seems that the branch the change is on should take precedence over master.  Ie. job on stable/pike should pike stable/pike up before master.",
+      "parentUuid": "3f4b6375_ff90f197",
+      "revId": "11bd5ee86cb423c15d6da50397d3720857c48fc2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f4b6375_9c934b50",
         "filename": "zuul/model.py",
         "patchSetId": 1
