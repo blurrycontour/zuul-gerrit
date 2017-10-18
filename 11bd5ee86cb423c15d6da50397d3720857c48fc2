@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "3f4b6375_ff90f197",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1378,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-10-18T16:54:50Z",
+      "side": 1,
+      "message": "Zuul isn\u0027t really in a position to understand the meaning underlying branch names.  As far as we can go is \"master\" and \"not-master\".  What we might consider though is changing the implied branch logic so that rather than treating the first definition of a job as the reference definition, only do that if it occurs on the master branch.  That would put all of the non-master branches on equal footing (order wouldn\u0027t matter among them at all in that case).\n\nHowever, even that is sort of an edge case that would only come up if a job was defined on multiple non-master branches but not master itself.  For the most part, even now, ordering between branches shouldn\u0027t matter much.",
+      "revId": "11bd5ee86cb423c15d6da50397d3720857c48fc2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f4b6375_9c934b50",
         "filename": "zuul/model.py",
         "patchSetId": 1
