@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "3f4b6375_1f0f4d2f",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1378,
+      "author": {
+        "id": 14985
+      },
+      "writtenOn": "2017-10-18T16:50:07Z",
+      "side": 1,
+      "message": "Forgive me if I\u0027m not understanding this but, this is sorted alphabetallically right? In this case would that mean that stable/ocata is before stable/pike. Would we want to reverse sort based on newer stable branches?  I guess that also applies to version numbers as well but you would need to know the specific hierarchy of branches to get the parsing right.",
+      "range": {
+        "startLine": 1377,
+        "startChar": 12,
+        "endLine": 1378,
+        "endChar": 33
+      },
+      "revId": "11bd5ee86cb423c15d6da50397d3720857c48fc2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f4b6375_9c934b50",
         "filename": "zuul/model.py",
         "patchSetId": 1
