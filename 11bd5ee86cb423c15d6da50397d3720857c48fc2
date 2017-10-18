@@ -39,6 +39,23 @@
       "revId": "11bd5ee86cb423c15d6da50397d3720857c48fc2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f4b6375_5c603333",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 892,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-10-18T16:43:38Z",
+      "side": 1,
+      "message": "The initial value is the empty tuple ().",
+      "revId": "11bd5ee86cb423c15d6da50397d3720857c48fc2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
