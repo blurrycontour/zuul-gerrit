@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f4b6375_8b409537",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 292,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-10-19T04:45:10Z",
+      "side": 1,
+      "message": "This key is already being set above, this appears to be overwriting the key with the exact same value, unless I\u0027m misinterpreting it.",
+      "revId": "e23734cb0ad92bc1b4af1bbc4aeead0088d6d027",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
