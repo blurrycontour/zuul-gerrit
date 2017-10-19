@@ -1654,6 +1654,21 @@ class TenantParser(object):
                     pcontext.project_template_parser.fromYaml(
                         config_template))
 
+        # The project stanzas containing a regex are separated from the normal
+        # project stanzas and organized by regex. We need to loop over each
+        # regex and copy each stanza below the regex for each matching project.
+        for regex, config_projects in data.projects_by_regex.items():
+            projects_matching_regex = tenant.getProjectsByRegex(regex)
+
+            for trusted, project in projects_matching_regex:
+                for config_project in config_projects:
+                    # we just override the project name here so a simple copy
+                    # should be enough
+                    conf = copy.copy(config_project)
+                    name = project.canonical_name
+                    conf['name'] = name
+                    data.projects.append(conf)
+
         for config_project in data.projects:
             classes = self._getLoadClasses(tenant, config_project)
             if 'project' not in classes:
