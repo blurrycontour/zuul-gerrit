@@ -16,6 +16,24 @@
       "revId": "e23734cb0ad92bc1b4af1bbc4aeead0088d6d027",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f4b6375_8bdc1575",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 292,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2017-10-19T04:49:59Z",
+      "side": 1,
+      "message": "oh yeah, sorry i changed that and didn\u0027t drop it here.\n\nI decided to leave it when writing the converters as you can then just do .values() really easy",
+      "parentUuid": "3f4b6375_8b409537",
+      "revId": "e23734cb0ad92bc1b4af1bbc4aeead0088d6d027",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
