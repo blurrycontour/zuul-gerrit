@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f4b6375_91e9e981",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1431,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-10-19T00:52:58Z",
+      "side": 0,
+      "message": "Do we no longer want to mark the current build set as CANCELED ? Is the assumption that since we will be overwriting the value of the variable, the build set currently at current_build_set will just poof away in garbage collection, and it doesn\u0027t really matter if it\u0027s set to CANCELED or not?",
+      "revId": "8fe53b44410034e44af0bf473ab2560f7ca8a1c8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
