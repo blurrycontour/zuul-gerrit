@@ -797,6 +797,10 @@ class ProjectParser(object):
     def getSchema(self):
         project = {
             vs.Required('name'): str,
+            # The validation is done after expanding the regex'd projects
+            # stanzas. So just add 'regex' as optional as it is not used
+            # afterwards.
+            'regex': str,
             'description': str,
             'templates': [str],
             'merge-mode': vs.Any('merge', 'merge-resolve',
@@ -1547,6 +1551,19 @@ class TenantParser(object):
                 continue
             layout.addProjectTemplate(project_template_parser.fromYaml(
                 config_template))
+
+        # expand regex projects
+        for config_projects in data.projects_by_regex.values():
+            projects = tenant.getProjectsByRegex(config_projects[0]['regex'])
+
+            for trusted, project in projects:
+                for config_project in config_projects:
+                    # we just override the project name here so a simple copy
+                    # should be enough
+                    conf = copy.copy(config_project)
+                    name = project.canonical_name
+                    conf['name'] = name
+                    data.projects.setdefault(name, []).append(conf)
 
         project_parser = ProjectParser(tenant, layout, project_template_parser)
         for config_projects in data.projects.values():
