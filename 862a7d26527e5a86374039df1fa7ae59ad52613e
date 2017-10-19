@@ -33,6 +33,24 @@
       "revId": "862a7d26527e5a86374039df1fa7ae59ad52613e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f4b6375_6ea9d579",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2292,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-10-19T18:06:19Z",
+      "side": 1,
+      "message": "yepp, makes the patch much smaller, I\u0027ve updated it this way.",
+      "parentUuid": "3f4b6375_8304ea18",
+      "revId": "862a7d26527e5a86374039df1fa7ae59ad52613e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
