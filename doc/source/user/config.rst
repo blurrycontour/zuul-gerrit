@@ -1029,6 +1029,16 @@ pipeline.
       unique projects with the same name, the canonical hostname for
       the project should be included (e.g., `git.example.com/foo`).
 
+   .. attr:: regex
+
+      Can be given instead of the ``name``. If given the project
+      matches this regex against all known zuul projects. The regex
+      is tested against both the project name and the canonical project
+      name and matches if either fits. If zuul is configured with two or
+      more unique projects with the same name, the regex should include
+      the canonical hostname. If both ``regex`` and ``name`` are given
+      only the ``name`` is taken into account.
+
    .. attr:: templates
 
       A list of :ref:`project-template` references; the
