@@ -16,6 +16,23 @@
       "revId": "8fe53b44410034e44af0bf473ab2560f7ca8a1c8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f4b6375_e7697f8b",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1431,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-10-19T02:33:44Z",
+      "side": 0,
+      "message": "Exactly -- nothing will ever see this result.\n\nI probably should have mentioned the following in the commit message: most of this was in support of helping us understand what builds were for in Jenkins.  There isn\u0027t anything left in Zuul which actually reports this information anywhere now.",
+      "revId": "8fe53b44410034e44af0bf473ab2560f7ca8a1c8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
