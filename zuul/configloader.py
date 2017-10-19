@@ -1578,6 +1578,19 @@ class TenantParser(object):
                 layout.addProjectTemplate(project_template_parser.fromYaml(
                     config_template))
 
+        # expand regex projects
+        for config_projects in data.projects_by_regex.values():
+            projects = tenant.getProjectsByRegex(config_projects[0]['name'])
+
+            for trusted, project in projects:
+                for config_project in config_projects:
+                    # we just override the project name here so a simple copy
+                    # should be enough
+                    conf = copy.copy(config_project)
+                    name = project.canonical_name
+                    conf['name'] = name
+                    data.projects.setdefault(name, []).append(conf)
+
         project_parser = ProjectParser(tenant, layout, project_template_parser)
         for config_projects in data.projects.values():
             # Unlike other config classes, we expect multiple project
