@@ -17,6 +17,7 @@ from collections import OrderedDict
 import copy
 import logging
 import os
+import re
 import struct
 import time
 from uuid import uuid4
@@ -2344,6 +2345,7 @@ class UnparsedTenantConfig(object):
         self.jobs = []
         self.project_templates = []
         self.projects = {}
+        self.projects_by_regex = {}
         self.nodesets = []
         self.secrets = []
         self.semaphores = []
@@ -2355,6 +2357,7 @@ class UnparsedTenantConfig(object):
         r.jobs = copy.deepcopy(self.jobs)
         r.project_templates = copy.deepcopy(self.project_templates)
         r.projects = copy.deepcopy(self.projects)
+        r.projects_by_regex = copy.deepcopy(self.projects_by_regex)
         r.nodesets = copy.deepcopy(self.nodesets)
         r.secrets = copy.deepcopy(self.secrets)
         r.semaphores = copy.deepcopy(self.semaphores)
@@ -2379,6 +2382,8 @@ class UnparsedTenantConfig(object):
                     if project is not None:
                         name = project.canonical_name
                 self.projects.setdefault(name, []).extend(v)
+            for k, v in conf.projects_by_regex.items():
+                self.projects_by_regex.setdefault(k, []).extend(v)
             self.nodesets.extend(conf.nodesets)
             self.secrets.extend(conf.secrets)
             self.semaphores.extend(conf.semaphores)
@@ -2394,8 +2399,14 @@ class UnparsedTenantConfig(object):
                 raise ConfigItemMultipleKeysError()
             key, value = list(item.items())[0]
             if key == 'project':
-                name = value['name']
-                self.projects.setdefault(name, []).append(value)
+                # Put regex projects into a separate list. This makes it
+                # possible to easily expand them later without filtering the
+                # projects again.
+                name = value.get('name')
+                if not name.startswith('^'):
+                    self.projects.setdefault(name, []).append(value)
+                else:
+                    self.projects_by_regex.setdefault(name, []).append(value)
             elif key == 'job':
                 self.jobs.append(value)
             elif key == 'project-template':
@@ -2790,6 +2801,46 @@ class Tenant(object):
         # This should never happen:
         raise Exception("Project %s is neither trusted nor untrusted" %
                         (project,))
+
+    def getProjectsByRegex(self, regex):
+        """Return all projects with a full match to either project name or
+        canonical project name.
+
+        :arg str regex: The regex to match
+        :returns: A list of tuples (trusted, project) describing the found
+            projects. Raises an exception if the same project name is found
+            several times across multiple hostnames.
+        """
+
+        matcher = re.compile(regex)
+        projects = []
+        result = []
+
+        for name, hostname_dict in self.projects.items():
+
+            if matcher.fullmatch(name):
+                # validate that this match is unambiguous
+                values = list(hostname_dict.values())
+                if len(values) > 1:
+                    raise Exception("Project name '%s' is ambiguous, "
+                                    "please fully qualify the project "
+                                    "with a hostname" % (name,))
+                projects.append(values[0])
+            else:
+                # try to match canonical project names
+                for project in hostname_dict.values():
+                    if matcher.fullmatch(project.canonical_name):
+                        project.append(project)
+
+        for project in projects:
+            if project in self.config_projects:
+                result.append((True, project))
+            elif project in self.untrusted_projects:
+                result.append((False, project))
+            else:
+                raise Exception("Project %s is neither trusted nor untrusted" %
+                                (project,))
+        return result
 
     def getProjectBranches(self, project):
         """Return a project's branches (filtered by this tenant config)
