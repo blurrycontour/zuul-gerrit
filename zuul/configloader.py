@@ -1703,6 +1703,20 @@ class TenantParser(object):
                         config_template))
 
         flattened_projects = self._flattenProjects(data.projects, tenant)
+
+        # expand regex projects
+        for config_projects in data.projects_by_regex.values():
+            projects = tenant.getProjectsByRegex(config_projects[0]['name'])
+
+            for trusted, project in projects:
+                for config_project in config_projects:
+                    # we just override the project name here so a simple copy
+                    # should be enough
+                    conf = copy.copy(config_project)
+                    name = project.canonical_name
+                    conf['name'] = name
+                    flattened_projects.setdefault(name, []).append(conf)
+
         for config_projects in flattened_projects.values():
             # Unlike other config classes, we expect multiple project
             # stanzas with the same name, so that a config repo can
