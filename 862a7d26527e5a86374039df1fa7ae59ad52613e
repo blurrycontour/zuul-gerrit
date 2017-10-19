@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f4b6375_a307e61c",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 771,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-10-19T17:43:59Z",
+      "side": 1,
+      "message": "This is probably fine, but to be honest, I\u0027d prefer to stick to the pattern of how defaults are handled in this class, and not make description special.",
+      "revId": "862a7d26527e5a86374039df1fa7ae59ad52613e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f4b6375_8304ea18",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2292,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-10-19T17:43:59Z",
+      "side": 1,
+      "message": "We can just change this to something like:\nj \u003d Job(\u0027noop\u0027)\nj.description \u003d ...\nself.jobs \u003d {\u0027noop\u0027: [j]}",
+      "revId": "862a7d26527e5a86374039df1fa7ae59ad52613e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
