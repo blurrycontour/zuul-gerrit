@@ -1682,6 +1682,19 @@ class TenantParser(object):
                     pcontext.project_template_parser.fromYaml(
                         config_template))
 
+        # expand regex projects
+        for config_projects in data.projects_by_regex.values():
+            projects = tenant.getProjectsByRegex(config_projects[0]['name'])
+
+            for trusted, project in projects:
+                for config_project in config_projects:
+                    # we just override the project name here so a simple copy
+                    # should be enough
+                    conf = copy.copy(config_project)
+                    name = project.canonical_name
+                    conf['name'] = name
+                    data.projects.setdefault(name, []).append(conf)
+
         flattened_projects = self._flattenProjects(data.projects, tenant)
         for config_projects in flattened_projects.values():
             # Unlike other config classes, we expect multiple project
