@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f4b6375_95709574",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1980,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-10-19T23:51:01Z",
+      "side": 1,
+      "message": "Should this also have the ref in it?",
+      "revId": "9e5b8116b8fef2c10d746ebd2abd4af3a4e83aaf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f4b6375_150a65d1",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1993,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-10-19T23:51:01Z",
+      "side": 1,
+      "message": "We put the branch in here.",
+      "revId": "9e5b8116b8fef2c10d746ebd2abd4af3a4e83aaf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
