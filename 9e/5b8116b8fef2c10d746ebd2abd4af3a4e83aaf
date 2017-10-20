@@ -1,0 +1,9 @@
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Code-Review+2: Clark Boylan <cboylan@sapwetik.org>
+Workflow+1: Clark Boylan <cboylan@sapwetik.org>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Fri, 20 Oct 2017 00:28:15 +0000
+Reviewed-on: https://review.openstack.org/513441
+Project: openstack-infra/zuul
+Branch: refs/heads/feature/zuulv3
