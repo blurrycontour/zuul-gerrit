@@ -49,6 +49,8 @@ class RequestHandler(socketserver.BaseRequestHandler):
     MAX_REQUEST_LEN = 1024
     REQUEST_TIMEOUT = 10
 
+    log = logging.getLogger("zuul.lib.log_streamer.RequestHandler")
+
     def get_command(self):
         poll = select.poll()
         bitmask = (select.POLLIN | select.POLLERR |
@@ -78,18 +80,28 @@ class RequestHandler(socketserver.BaseRequestHandler):
                 pass
 
     def handle(self):
-        build_uuid = self.get_command()
+        try:
+            build_uuid = self.get_command()
+        except Exception:
+            self.log.exception("Failure during get_command:")
+            msg = 'Internal streaming error'
+            self.request.sendall(msg.encode("utf-8"))
+            return
+
         build_uuid = build_uuid.rstrip()
+        self.log.info("Requested build UUID: %s", build_uuid)
 
         # validate build ID
         if not re.match("[0-9A-Fa-f]+$", build_uuid):
             msg = 'Build ID %s is not valid' % build_uuid
+            self.log.info(msg)
             self.request.sendall(msg.encode("utf-8"))
             return
 
         job_dir = os.path.join(self.server.jobdir_root, build_uuid)
         if not os.path.exists(job_dir):
             msg = 'Build ID %s not found' % build_uuid
+            self.log.info(msg)
             self.request.sendall(msg.encode("utf-8"))
             return
 
@@ -97,10 +109,22 @@ class RequestHandler(socketserver.BaseRequestHandler):
         log_file = os.path.join(job_dir, 'work', 'logs', 'job-output.txt')
         if not os.path.exists(log_file):
             msg = 'Log not found for build ID %s' % build_uuid
+            self.log.info(msg)
             self.request.sendall(msg.encode("utf-8"))
             return
 
-        self.stream_log(log_file)
+        self.log.info("Streaming build UUID %s log file: %s",
+                      build_uuid, log_file)
+
+        try:
+            self.stream_log(log_file)
+        except Exception:
+            self.log.exception("Streaming failure for build UUID %s:",
+                               build_uuid)
+            msg = 'Internal streaming error'
+            self.request.sendall(msg.encode("utf-8"))
+
+        self.log.info("Done streaming for build UUID %s", build_uuid)
 
     def stream_log(self, log_file):
         log = None
