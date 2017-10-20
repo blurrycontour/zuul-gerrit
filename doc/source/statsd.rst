@@ -6,7 +6,7 @@ Statsd reporting
 Zuul comes with support for the statsd protocol, when enabled and configured
 (see below), the Zuul scheduler will emit raw metrics to a statsd receiver
 which let you in turn generate nice graphics. An example is OpenStack Zuul
-status page: http://status.openstack.org/zuul/
+status page: http://zuulv3.openstack.org/
 
 Configuration
 -------------
