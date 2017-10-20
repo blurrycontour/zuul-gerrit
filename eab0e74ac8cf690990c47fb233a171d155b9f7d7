@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f4b6375_617c2aeb",
+        "filename": "zuul/lib/log_streamer.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-10-20T17:14:39Z",
+      "side": 1,
+      "message": "Maybe just use \"zuul.log_streamer.RequestHandler\" as the logger so we can configure \"zuul.log_streamer\" as the prefix in the logging config and route it to its own file.",
+      "revId": "eab0e74ac8cf690990c47fb233a171d155b9f7d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
