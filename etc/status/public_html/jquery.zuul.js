@@ -94,106 +94,6 @@
         }
 
         var format = {
-            job: function(job) {
-                var $job_line = $('<span />');
-
-                if (job.result !== null) {
-                    $job_line.append(
-                        $('<a />')
-                            .addClass('zuul-job-name')
-                            .attr('href', job.report_url)
-                            .text(job.name)
-                    );
-                }
-                else if (job.url !== null) {
-                    $job_line.append(
-                        $('<a />')
-                            .addClass('zuul-job-name')
-                            .attr('href', job.url)
-                            .text(job.name)
-                    );
-                }
-                else {
-                    $job_line.append(
-                        $('<span />')
-                            .addClass('zuul-job-name')
-                            .text(job.name)
-                    );
-                }
-
-                $job_line.append(this.job_status(job));
-
-                if (job.voting === false) {
-                    $job_line.append(
-                        $(' <small />')
-                            .addClass('zuul-non-voting-desc')
-                            .text(' (non-voting)')
-                    );
-                }
-
-                $job_line.append($('<div style="clear: both"></div>'));
-                return $job_line;
-            },
-
-            job_status: function(job) {
-                var result = job.result ? job.result.toLowerCase() : null;
-                if (result === null) {
-                    result = job.url ? 'in progress' : 'queued';
-                }
-
-                if (result === 'in progress') {
-                    return this.job_progress_bar(job.elapsed_time,
-                                                        job.remaining_time);
-                }
-                else {
-                    return this.status_label(result);
-                }
-            },
-
-            status_label: function(result) {
-                var $status = $('<span />');
-                $status.addClass('zuul-job-result label');
-
-                switch (result) {
-                    case 'success':
-                        $status.addClass('label-success');
-                        break;
-                    case 'failure':
-                        $status.addClass('label-danger');
-                        break;
-                    case 'unstable':
-                        $status.addClass('label-warning');
-                        break;
-                    case 'skipped':
-                        $status.addClass('label-info');
-                        break;
-                    // 'in progress' 'queued' 'lost' 'aborted' ...
-                    default:
-                        $status.addClass('label-default');
-                }
-                $status.text(result);
-                return $status;
-            },
-
-            job_progress_bar: function(elapsed_time, remaining_time) {
-                var progress_percent = 100 * (elapsed_time / (elapsed_time +
-                                                              remaining_time));
-                var $bar_inner = $('<div />')
-                    .addClass('progress-bar')
-                    .attr('role', 'progressbar')
-                    .attr('aria-valuenow', 'progressbar')
-                    .attr('aria-valuemin', progress_percent)
-                    .attr('aria-valuemin', '0')
-                    .attr('aria-valuemax', '100')
-                    .css('width', progress_percent + '%');
-
-                var $bar_outter = $('<div />')
-                    .addClass('progress zuul-job-result')
-                    .append($bar_inner);
-
-                return $bar_outter;
-            },
-
             enqueue_time: function(ms) {
                 // Special format case for enqueue time to add style
                 var hours = 60 * 60 * 1000;
@@ -364,11 +264,9 @@
                     .addClass('list-group zuul-patchset-body');
 
                 $.each(jobs, function (i, job) {
-                    var $item = $('<li />')
-                        .addClass('list-group-item')
-                        .addClass('zuul-change-job')
-                        .append(format.job(job));
-                    $list.append($item);
+                    $list.append(new ZuulJob({
+                      propsData: { job: job }
+                    }).$mount().$el);
                 });
 
                 return $list;

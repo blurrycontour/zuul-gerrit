@@ -25,6 +25,99 @@
 
 /*exported zuul_build_dom, zuul_start */
 
+var ZuulJob = Vue.component('zuul-job', {
+  data: function() {
+    var jobUrl = undefined;
+
+    if (this.$props.job.result !== null) {
+      jobUrl = this.$props.job.report_url;
+    } else if (this.$props.job.url !== null) {
+      jobUrl = this.$props.job.url;
+    }
+
+    return {
+      jobUrl: jobUrl
+    }
+  },
+  props: ['job'],
+  template: '<li class="list-group-item zuul-change-job">' +
+            '  <span>' +
+            '    <a class="zuul-job-name" :href="jobUrl"' +
+            '       v-if="jobUrl !== undefined">' +
+            '      {{ job.name }}' +
+            '    </a>' +
+            '    <span class="zuul-job-name" v-else>{{ job.name }}</span>' +
+            '    <zuul-job-status :job="job"></zuul-job-status>' +
+            '    <small class="zuul-non-voting-desc"' +
+            '           v-if="job.voting == false"> (non-voting)</small>' +
+            '    <div style="clear: both"></div>' +
+            '  </span>' +
+            '</li>'
+});
+
+Vue.component('zuul-job-status', {
+  data: function() {
+    var result = this.$props.job.result ? this.$props.job.result.toLowerCase() : null;
+    if (result === null) {
+      result = this.$props.job.url ? 'in progress' : 'queued';
+    }
+
+    return {
+      result: result
+    };
+  },
+  props: ['job'],
+  template: "<zuul-progress-bar :elapsed-time=\"job.elapsed_time\"" +
+            "                   :remaining-time=\"job.remaining_time\" " +
+            "                   v-if=\"result == 'in progress'\" />" +
+            "<zuul-status-label :result=\"result\" v-else />"
+})
+
+Vue.component('zuul-progress-bar', {
+  data: function() {
+    var totalTime = this.$props.elapsedTime + this.$props.remainingTime;
+    var progressPercentage = this.$props.elapsedTime / totalTime * 100;
+
+    return {
+      style: "width: " + progressPercentage + "%",
+      progressPercentage: progressPercentage
+    }
+  },
+  props: ['elapsedTime', 'remainingTime'],
+  template: '<div class="progress zuul-job-result">' +
+            '  <div class="progress-bar" role="progressbar" ' +
+            '       :aria-valuenow="progressPercentage" aria-valuemin="0" ' +
+            '       aria-valuemax="100" :style="style"></div> ' +
+            '</div>'
+});
+
+Vue.component('zuul-status-label', {
+  data: function() {
+    var labelClass = 'label-default';
+
+    switch (this.$props.result) {
+    case 'success':
+      labelClass = 'label-success';
+      break;
+    case 'failure':
+      labelClass = 'label-danger';
+      break;
+    case 'unstable':
+      labelClass = 'label-warning';
+      break;
+    case 'skipped':
+      labelClass = 'label-info';
+      break;
+    }
+
+    return {
+      labelClass: labelClass
+    }
+  },
+  props: ['result'],
+  template: '<span class="zuul-job-result label" :class="labelClass">{{ result }}</span>',
+});
+
 function zuul_build_dom($, container) {
     // Build a default-looking DOM
     var default_layout = '<div class="container">'
