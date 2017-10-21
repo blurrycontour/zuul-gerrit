@@ -258,20 +258,6 @@
                 return $header;
             },
 
-            change_list: function(jobs) {
-                var format = this;
-                var $list = $('<ul />')
-                    .addClass('list-group zuul-patchset-body');
-
-                $.each(jobs, function (i, job) {
-                    $list.append(new ZuulJob({
-                      propsData: { job: job }
-                    }).$mount().$el);
-                });
-
-                return $list;
-            },
-
             change_panel: function (change) {
                 var $header = $('<div />')
                     .addClass('panel-heading zuul-patchset-header')
@@ -284,7 +270,9 @@
                     .attr('id', panel_id)
                     .addClass('panel panel-default zuul-change')
                     .append($header)
-                    .append(this.change_list(change.jobs));
+                    .append(new ZuulChangeList({
+                      propsData: { jobs: change.jobs }
+                    }).$mount().$el);
 
                 $header.click(this.toggle_patchset);
                 return $panel;

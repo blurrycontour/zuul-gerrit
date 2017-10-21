@@ -25,7 +25,15 @@
 
 /*exported zuul_build_dom, zuul_start */
 
-var ZuulJob = Vue.component('zuul-job', {
+var ZuulChangeList = Vue.component('zuul-change-list', {
+  props: ['jobs'],
+  template: '<ul class="list-group zuul-patchset-body">' +
+            '  <zuul-job v-for="job in jobs" :job="job" :key="job.name">' +
+            '  </zuul-job>' +
+            '</ul>'
+});
+
+Vue.component('zuul-job', {
   data: function() {
     var jobUrl = undefined;
 
