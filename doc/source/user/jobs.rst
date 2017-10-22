@@ -540,6 +540,6 @@ To set the log URL for a build, use *zuul_return* to set the
 Any values other than those in the ``zuul`` hierarchy will be supplied
 as Ansible variables to child jobs.  These variables have less
 precedence than any other type of variable in Zuul, so be sure their
-names are not shared by any job variables.  If more than one parent
-job returns the same variable, the value from the later job in the job
-graph will take precedence.
+names are not shared by any job variables.  Note that if more than one
+parent job returns the same variable, this will lead to races as it is
+undefined behavior which value gets used.
