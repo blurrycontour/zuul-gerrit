@@ -541,5 +541,7 @@ Any values other than those in the ``zuul`` hierarchy will be supplied
 as Ansible variables to child jobs.  These variables have less
 precedence than any other type of variable in Zuul, so be sure their
 names are not shared by any job variables.  If more than one parent
-job returns the same variable, the value from the later job in the job
-graph will take precedence.
+job returns the same variable, the value from the later finished job in
+the job graph will take precedence. Note that multiple parents returning
+the same variable is only deterministic within a single dependency line
+(child jobs overwriting vars of their parents).

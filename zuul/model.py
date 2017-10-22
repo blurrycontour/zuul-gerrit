@@ -1593,6 +1593,7 @@ class QueueItem(object):
             if job not in jobs_not_started:
                 continue
             all_parent_jobs_successful = True
+            parent_builds_with_data = []
             for parent_job in self.job_graph.getParentJobsRecursively(
                     job.name):
                 if parent_job.name not in successful_job_names:
@@ -1600,8 +1601,21 @@ class QueueItem(object):
                     break
                 parent_build = self.current_build_set.getBuild(parent_job.name)
                 if parent_build.result_data:
-                    job.updateParentData(parent_build.result_data)
+                    parent_builds_with_data.append(parent_build)
+
             if all_parent_jobs_successful:
+                # Apply parent data in reverse time sorted order as the
+                # updateParentData function doesn't update already existing
+                # variables. This way child jobs can overwrite vars of their
+                # parents and change/update vars further downstream to their
+                # own children.
+                parent_builds_with_data = \
+                    sorted(parent_builds_with_data,
+                           key=lambda pb: pb.end_time,
+                           reverse=True)
+                for parent_build in parent_builds_with_data:
+                    job.updateParentData(parent_build.result_data)
+
                 nodeset = self.current_build_set.getJobNodeSet(job.name)
                 if nodeset is None:
                     # The nodes for this job are not ready, skip

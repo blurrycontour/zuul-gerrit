@@ -31,7 +31,9 @@
     check:
       jobs:
         - data-return
-        - data-return-relative
+        - data-return-relative:
+            dependencies:
+              - data-return
         - child:
             dependencies:
               - data-return
