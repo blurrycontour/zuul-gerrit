@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f4b6375_5390d243",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1479,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-10-22T07:50:46Z",
+      "side": 1,
+      "message": "nit: project",
+      "range": {
+        "startLine": 1479,
+        "startChar": 10,
+        "endLine": 1479,
+        "endChar": 17
+      },
+      "revId": "50d76721498608addaa307dae9ce1906f21d0a9d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f4b6375_13e81ab2",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1490,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-10-22T07:50:46Z",
+      "side": 1,
+      "message": "A check if aborted builds don\u0027t autohold (the original reason for this patch as stated in the commit message) should be inserted here (or added as an additional test).",
+      "revId": "50d76721498608addaa307dae9ce1906f21d0a9d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f4b6375_139a5a62",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1526,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-10-22T07:50:46Z",
+      "side": 1,
+      "message": "nit: project",
+      "range": {
+        "startLine": 1526,
+        "startChar": 10,
+        "endLine": 1526,
+        "endChar": 17
+      },
+      "revId": "50d76721498608addaa307dae9ce1906f21d0a9d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
