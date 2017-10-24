@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f4b6375_7866cdc3",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-10-24T17:28:52Z",
+      "side": 1,
+      "message": "Why wouldn\u0027t we default a NULL?",
+      "revId": "3aa17193b207f7d14f250891b907b17669b1ee10",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
