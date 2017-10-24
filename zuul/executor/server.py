@@ -353,6 +353,8 @@ class JobDir(object):
         self.pre_playbooks = []
         self.post_playbooks = []
         self.job_output_file = os.path.join(self.log_root, 'job-output.txt')
+        with open(self.job_output_file, 'w'):
+            pass
         self.trusted_projects = []
         self.trusted_project_index = {}
 
