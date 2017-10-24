@@ -1,0 +1,18 @@
+#!/bin/bash
+
+function _cleanup_tmp {
+    rm -rf $MYTMPDIR
+    return 0
+}
+
+
+function setup_temp_space {
+    MYTMPDIR=`mktemp -d _tmp-${1}-XXX`
+    mkdir -p "$MYTMPDIR"
+    trap _cleanup_tmp EXIT
+    cd "$MYTMPDIR"
+    # NOTE(dhellmann): On some platforms mktemp returns a short name
+    # instead of a full path, so expand the full path by looking at
+    # where we ended up after the cd operation.
+    MYTMPDIR="$(pwd)"
+}

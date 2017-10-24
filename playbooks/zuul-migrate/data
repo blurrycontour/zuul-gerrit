@@ -1,0 +1,10 @@
+castellan queens 0.14.1 - openstack/castellan b13187b34ddcc88bee57e4e99b0115cb92540b97 no no
+oslo.config queens 4.13.2 - openstack/oslo.config 36aded18660fc4d515aaabfc7bf1afbfb65e6411 yes no
+oslo.context queens 2.19.2 - openstack/oslo.context e75f4c5ad91962e272d65daa770e00f70f931ecb yes no
+oslo.db queens 4.29.0 - openstack/oslo.db fa578a91a134fec9212c742205a7b717d4bacd2f yes no
+oslo.log queens 3.32.0 - openstack/oslo.log eec56ea5ceda146b65066f150f413a2f391105d8 yes no
+oslo.messaging queens 5.33.1 - openstack/oslo.messaging c2bb75f1e72e2a183400ad1f540ed39fa05bc1b5 yes no
+oslo.policy queens 1.29.0 - openstack/oslo.policy 7ade2ed547e690d4737114af467088df17a63ac8 yes no
+oslo.reports queens 1.24.0 - openstack/oslo.reports b5d9bb98c38f7caf55223b2411780505f0131b14 yes no
+oslo.serialization queens 2.21.2 - openstack/oslo.serialization c1a7079c26d27a2e46cca26963d3d9aa040bdbe8 yes no
+oslo.versionedobjects queens 1.29.0 - openstack/oslo.versionedobjects 15c83a2654d94b364b0662c61b5ecd4b38569f62 yes no

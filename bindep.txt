@@ -1,19 +1,2 @@
 # This is a cross-platform list tracking distribution packages needed by tests;
 # see http://docs.openstack.org/infra/bindep/ for additional information.
-
-mysql-client [test]
-mysql-server [test]
-libjpeg-dev [test]
-openssl [test]
-zookeeperd [platform:dpkg]
-build-essential [platform:dpkg]
-gcc [platform:rpm]
-graphviz [test]
-libssl-dev [platform:dpkg]
-openssl-devel [platform:rpm]
-libffi-dev [platform:dpkg]
-libffi-devel [platform:rpm]
-python-dev [platform:dpkg]
-python-devel [platform:rpm]
-bubblewrap [platform:rpm]
-redhat-rpm-config [platform:rpm]
