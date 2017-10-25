@@ -145,7 +145,23 @@ class RPCListener(object):
             job.sendWorkException(error.encode('utf8'))
             return
 
+        if args['change'] and args['ref']:
+            job.sendWorkException("Change and ref can't be both used "
+                                  "for the same request")
+
+        if args['change']:
+            self.log.debug("Scoping to change")
+            # Convert change into ref based on zuul connection
+            ref_filter = project.source.getRefForChange(args['change'])
+        elif args['ref']:
+            self.log.debug("Scoping to ref")
+            ref_filter = "%s" % args['ref']
+        else:
+            self.log.debug("Scoping to job")
+            ref_filter = ".*"
+
         params['job_name'] = args['job']
+        params['ref_filter'] = ref_filter
         params['reason'] = args['reason']
 
         if args['count'] < 0:
