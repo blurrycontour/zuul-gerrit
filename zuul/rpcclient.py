@@ -48,10 +48,11 @@ class RPCClient(object):
         self.log.debug("Job complete, success: %s" % (not job.failure))
         return job
 
-    def autohold(self, tenant, project, job, reason, count):
+    def autohold(self, tenant, project, job, scope, reason, count):
         data = {'tenant': tenant,
                 'project': project,
                 'job': job,
+                'scope': scope,
                 'reason': reason,
                 'count': count}
         return not self.submitJob('zuul:autohold', data).failure

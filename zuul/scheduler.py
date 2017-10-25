@@ -414,8 +414,9 @@ class Scheduler(threading.Thread):
         self.last_reconfigured = int(time.time())
         # TODOv3(jeblair): reconfigure time should be per-tenant
 
-    def autohold(self, tenant_name, project_name, job_name, reason, count):
-        key = (tenant_name, project_name, job_name)
+    def autohold(self, tenant_name, project_name, job_name, scope,
+                 reason, count):
+        key = (tenant_name, project_name, job_name, scope)
         if count == 0 and key in self.autohold_requests:
             self.log.debug("Removing autohold for %s", key)
             del self.autohold_requests[key]
@@ -923,17 +924,40 @@ class Scheduler(threading.Thread):
 
     def _doBuildCompletedEvent(self, event):
         build = event.build
+        change = build.build_set.item.change
 
         # Regardless of any other conditions which might cause us not
         # to pass this on to the pipeline manager, make sure we return
         # the nodes to nodepool.
         try:
             nodeset = build.build_set.getJobNodeSet(build.job.name)
-            autohold_key = (build.pipeline.layout.tenant.name,
-                            build.build_set.item.change.project.canonical_name,
-                            build.job.name)
-            if (build.result == "FAILURE" and
-                autohold_key in self.autohold_requests):
+            autohold_key_base = (build.pipeline.layout.tenant.name,
+                                 change.project.canonical_name,
+                                 build.job.name)
+
+            # Check if there is an autohold request for either that specific
+            # change, of the job itself. Match against specific changes first,
+            # to ensure that we fullfill the actual request.
+            autohold_request_found = False
+            autohold_keys = []
+
+            if isinstance(change, model.Change):
+                # Only changes can be referenced by numbers
+                autohold_keys.append(
+                    autohold_key_base + ("change:%s" % change.number,)
+                )
+
+            autohold_keys.extend([
+                autohold_key_base + ("ref:%s" % change.ref,),
+                autohold_key_base + ("job:",)
+            ])
+
+            for key in autohold_keys:
+                if key in self.autohold_requests:
+                    autohold_key = key
+                    autohold_request_found = True
+
+            if (build.result == "FAILURE" and autohold_request_found):
                 # We explicitly only want to hold nodes for jobs if they have
                 # failed and have an autohold request.
                 try:

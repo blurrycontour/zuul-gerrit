@@ -29,6 +29,9 @@ class GerritChange(Change):
         super(GerritChange, self).__init__(project)
         self.approvals = []
 
+    def ref_for_change(self):
+        pass
+
 
 class GerritTriggerEvent(TriggerEvent):
     """Incoming event from an external system."""

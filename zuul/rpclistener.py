@@ -146,6 +146,7 @@ class RPCListener(object):
             return
 
         params['job_name'] = args['job']
+        params['scope'] = args['scope']
         params['reason'] = args['reason']
 
         if args['count'] < 0:

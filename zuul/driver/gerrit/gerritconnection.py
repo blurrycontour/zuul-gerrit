@@ -275,6 +275,7 @@ class GerritConnection(BaseConnection):
                                re.MULTILINE | re.IGNORECASE)
     replication_timeout = 300
     replication_retry_interval = 5
+    ref_pattern = "refs/changes/%s/%s/%s"
 
     def __init__(self, driver, connection_name, connection_config):
         super(GerritConnection, self).__init__(driver, connection_name,
