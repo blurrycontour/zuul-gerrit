@@ -145,7 +145,15 @@ class RPCListener(object):
             job.sendWorkException(error.encode('utf8'))
             return
 
+        scope = "job:"
+        if args['change']:
+            # Convert change into ref based on zuul connection
+            scope = "ref:%s" % project.source.getRefForChange(args['change'])
+        elif args['ref']:
+            scope = "ref:%s" % args['ref']
+
         params['job_name'] = args['job']
+        params['scope'] = scope
         params['reason'] = args['reason']
 
         if args['count'] < 0:
