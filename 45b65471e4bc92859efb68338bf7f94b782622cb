@@ -33,6 +33,23 @@
       "revId": "45b65471e4bc92859efb68338bf7f94b782622cb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f4b6375_0b6f61c5",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-10-25T18:57:29Z",
+      "side": 1,
+      "message": "I agree... but to clarify, are you suggesting that we should keep --change and also add other options?  (I kind of like that idea, though we may want to have our autohold_key be something other than a tuple.)",
+      "revId": "45b65471e4bc92859efb68338bf7f94b782622cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
