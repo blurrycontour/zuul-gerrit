@@ -338,3 +338,36 @@ class TestConnectionsMerger(ZuulTestCase):
         self.assertNotIn("sql", self.connections.connections)
         self.assertNotIn("timer", self.connections.connections)
         self.assertNotIn("zuul", self.connections.connections)
+
+
+class TestGerritConnection(ZuulTestCase):
+    config_file = 'zuul-connections-cgit.conf'
+    tenant_config_file = 'config/single-tenant/main.yaml'
+
+    def test_web_url(self):
+        self.assertIn("gerrit", self.connections.connections)
+        conn = self.connections.connections['gerrit']
+        source = conn.source
+        proj = source.getProject('foo/bar')
+        url = conn._getWebUrl(proj, '1')
+        self.assertEqual(url,
+                         'https://cgit.example.com/cgit/foo/bar/commit/?id=1')
+
+    def test_cgit_url(self):
+        self.assertIn("gerrit", self.connections.connections)
+        conn = self.connections.connections['gerrit']
+        source = conn.source
+        proj = source.getProject('foo/bar')
+        url = conn._getCGitwebUrl(proj, '1')
+        self.assertEqual(url,
+                         'https://cgit.example.com/cgit/foo/bar/commit/?id=1')
+
+    def test_gitweb_url(self):
+        self.assertIn("gerrit", self.connections.connections)
+        conn = self.connections.connections['gerrit']
+        source = conn.source
+        proj = source.getProject('foo/bar')
+        url = conn._getGitwebUrl(proj, '1')
+        url_should_be = 'https://review.example.com/' \
+                        'gitweb?p=foo/bar.git;a=commitdiff;h=1'
+        self.assertEqual(url, url_should_be)

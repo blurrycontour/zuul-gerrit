@@ -61,6 +61,11 @@ The supported options in ``zuul.conf`` connections are:
 
       Path to Gerrit web interface.
 
+   .. attr:: cgiturl
+
+      Url to CGit web interface. If this is omitted Gerrit's built
+      in Gitweb is assumed.
+
    .. attr:: user
       :default: zuul
 
