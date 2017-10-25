@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f4b6375_90e37ca4",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1476,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-10-25T18:47:28Z",
+      "side": 1,
+      "message": "Since the change is a non required argument can we leave this test as is and add a new test that tests using the change number? (we should test both cases).",
+      "revId": "45b65471e4bc92859efb68338bf7f94b782622cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f4b6375_30cde830",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-10-25T18:47:28Z",
+      "side": 1,
+      "message": "Thinking about this more generically you may want to hold post merge jobs or periodic jobs which won\u0027t necessarily have a change associated to them.\n\nMaybe we can hold using --build-uuid and hold based on a specific build instance (or instances?).",
+      "revId": "45b65471e4bc92859efb68338bf7f94b782622cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
