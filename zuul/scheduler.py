@@ -19,6 +19,7 @@ import json
 import logging
 import os
 import pickle
+import re
 import queue
 import socket
 import sys
@@ -436,8 +437,9 @@ class Scheduler(threading.Thread):
         self.last_reconfigured = int(time.time())
         # TODOv3(jeblair): reconfigure time should be per-tenant
 
-    def autohold(self, tenant_name, project_name, job_name, reason, count):
-        key = (tenant_name, project_name, job_name)
+    def autohold(self, tenant_name, project_name, job_name, ref_filter,
+                 reason, count):
+        key = (tenant_name, project_name, job_name, ref_filter)
         if count == 0 and key in self.autohold_requests:
             self.log.debug("Removing autohold for %s", key)
             del self.autohold_requests[key]
@@ -975,17 +977,62 @@ class Scheduler(threading.Thread):
 
     def _doBuildCompletedEvent(self, event):
         build = event.build
+        change = build.build_set.item.change
 
         # Regardless of any other conditions which might cause us not
         # to pass this on to the pipeline manager, make sure we return
         # the nodes to nodepool.
         try:
             nodeset = build.nodeset
-            autohold_key = (build.pipeline.layout.tenant.name,
-                            build.build_set.item.change.project.canonical_name,
-                            build.job.name)
-            if (build.result == "FAILURE" and
-                autohold_key in self.autohold_requests):
+            autohold_key = None
+            autohold_key_base = (build.pipeline.layout.tenant.name,
+                                 change.project.canonical_name,
+                                 build.job.name)
+
+            class Scope(object):
+                NONE = 0
+                JOB = 1
+                CHANGE = 2
+                REF = 3
+
+            def autohold_key_base_issubset(base, request_key):
+                index = 0
+                base_len = len(base)
+                while index < base_len:
+                    if base[index] != request_key[index]:
+                        return False
+                    index += 1
+                return True
+
+            # Do a partial match of the autohold key against all autohold
+            # requests, ignoring the last element of the key (ref filter),
+            # and finally do a regex match between ref filter from
+            # the autohold request and the build's change ref to check
+            # if it matches. Lastly, make sure that we match the most
+            # specific autohold request by comparing "scopes"
+            # of requests - the most specific is selected.
+            scope = Scope.NONE
+            for request in self.autohold_requests:
+                ref_filter = request[-1]
+                if autohold_key_base_issubset(autohold_key_base, request) \
+                    and re.match(ref_filter, change.ref):
+                    if ref_filter == ".*":
+                        candidate_scope = Scope.JOB
+                    elif ref_filter.endswith(".*"):
+                        candidate_scope = Scope.CHANGE
+                    else:
+                        candidate_scope = Scope.REF
+
+                    # Scope.REF is the most specific, and if found
+                    # there is no need to check other requests.
+                    if candidate_scope == Scope.REF:
+                        autohold_key = request
+                        break
+                    elif candidate_scope > scope:
+                        scope = candidate_scope
+                        autohold_key = request
+
+            if (build.result == "FAILURE" and autohold_key):
                 # We explicitly only want to hold nodes for jobs if they have
                 # failed and have an autohold request.
                 try:
@@ -993,10 +1040,9 @@ class Scheduler(threading.Thread):
                 except Exception:
                     self.log.exception("Unable to process autohold for %s:",
                                        autohold_key)
-                    if autohold_key in self.autohold_requests:
-                        self.log.debug("Removing autohold %s due to exception",
-                                       autohold_key)
-                        del self.autohold_requests[autohold_key]
+                    self.log.debug("Removing autohold %s due to exception",
+                                   autohold_key)
+                    del self.autohold_requests[autohold_key]
 
             self.nodepool.returnNodeSet(nodeset)
         except Exception:
