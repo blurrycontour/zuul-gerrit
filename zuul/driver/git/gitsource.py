@@ -59,3 +59,6 @@ class GitSource(BaseSource):
 
     def getRejectFilters(self, config):
         return []
+
+    def getRefForChange(self, change):
+        raise NotImplemented()
