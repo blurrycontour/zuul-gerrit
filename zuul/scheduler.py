@@ -19,6 +19,7 @@ import json
 import logging
 import os
 import pickle
+import re
 import queue
 import socket
 import sys
@@ -414,8 +415,9 @@ class Scheduler(threading.Thread):
         self.last_reconfigured = int(time.time())
         # TODOv3(jeblair): reconfigure time should be per-tenant
 
-    def autohold(self, tenant_name, project_name, job_name, reason, count):
-        key = (tenant_name, project_name, job_name)
+    def autohold(self, tenant_name, project_name, job_name, ref_filter,
+                 reason, count):
+        key = (tenant_name, project_name, job_name, ref_filter)
         if count == 0 and key in self.autohold_requests:
             self.log.debug("Removing autohold for %s", key)
             del self.autohold_requests[key]
@@ -923,17 +925,34 @@ class Scheduler(threading.Thread):
 
     def _doBuildCompletedEvent(self, event):
         build = event.build
+        change = build.build_set.item.change
 
         # Regardless of any other conditions which might cause us not
         # to pass this on to the pipeline manager, make sure we return
         # the nodes to nodepool.
         try:
             nodeset = build.build_set.getJobNodeSet(build.job.name)
-            autohold_key = (build.pipeline.layout.tenant.name,
-                            build.build_set.item.change.project.canonical_name,
-                            build.job.name)
-            if (build.result == "FAILURE" and
-                autohold_key in self.autohold_requests):
+            autohold_key = None
+            autohold_key_base = (build.pipeline.layout.tenant.name,
+                                 change.project.canonical_name,
+                                 build.job.name)
+
+            # Check if there is an autohold request for either that specific
+            # change, of the job itself. Match against specific changes first,
+            # to ensure that we fullfill the actual request.
+            autohold_patterns = [
+                "ref:%s" % change.ref,
+                "job:",
+            ]
+
+            for request in self.autohold_requests:
+                # XXX(kklimonda): can all keys be converted into sets?
+                if set(autohold_key_base).issubset(request) and \
+                    re.match(request[-1], change.ref):
+                    autohold_key = request
+                    break
+
+            if (build.result == "FAILURE" and autohold_key):
                 # We explicitly only want to hold nodes for jobs if they have
                 # failed and have an autohold request.
                 try:
@@ -941,10 +960,9 @@ class Scheduler(threading.Thread):
                 except Exception:
                     self.log.exception("Unable to process autohold for %s:",
                                        autohold_key)
-                    if autohold_key in self.autohold_requests:
-                        self.log.debug("Removing autohold %s due to exception",
-                                       autohold_key)
-                        del self.autohold_requests[autohold_key]
+                    self.log.debug("Removing autohold %s due to exception",
+                                   autohold_key)
+                    del self.autohold_requests[autohold_key]
 
             self.nodepool.returnNodeSet(nodeset)
         except Exception:
