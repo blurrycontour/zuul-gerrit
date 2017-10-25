@@ -1468,18 +1468,22 @@ class TestScheduler(ZuulTestCase):
         client = zuul.rpcclient.RPCClient('127.0.0.1',
                                           self.gearman_server.port)
         self.addCleanup(client.shutdown)
+
+        # Create that job early so we can use its change's number for
+        # autohold request
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         r = client.autohold('tenant-one', 'org/project', 'project-test2',
-                            "reason text", 1)
+                            str(A.number), "reason text", 1)
         self.assertTrue(r)
 
         # First check that successful jobs do not autohold
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
 
         self.waitUntilSettled()
 
-        self.assertEqual(A.data['status'], 'NEW')
-        self.assertEqual(A.reported, 1)
+        self.assertEqual(B.data['status'], 'NEW')
+        self.assertEqual(B.reported, 1)
         # project-test2
         self.assertEqual(self.history[0].result, 'SUCCESS')
 
@@ -1491,15 +1495,34 @@ class TestScheduler(ZuulTestCase):
                 break
         self.assertIsNone(held_node)
 
-        # Now test that failed jobs are autoheld
-        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
-        self.executor_server.failJob('project-test2', B)
-        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        # Then check that unrelated failed changes do not autohold nodes
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+        self.executor_server.failJob('project-test2', C)
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
 
         self.waitUntilSettled()
 
-        self.assertEqual(B.data['status'], 'NEW')
-        self.assertEqual(B.reported, 1)
+        self.assertEqual(C.data['status'], 'NEW')
+        self.assertEqual(C.reported, 1)
+        # project-test2
+        self.assertEqual(self.history[1].result, 'FAILURE')
+
+        # Check nodepool for a held node
+        held_node = None
+        for node in self.fake_nodepool.getNodes():
+            if node['state'] == zuul.model.STATE_HOLD:
+                held_node = node
+                break
+        self.assertIsNone(held_node)
+
+        # Now test that failed jobs are autoheld
+        self.executor_server.failJob('project-test2', A)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'NEW')
+        self.assertEqual(A.reported, 1)
         # project-test2
         self.assertEqual(self.history[1].result, 'FAILURE')
 
@@ -1516,17 +1539,17 @@ class TestScheduler(ZuulTestCase):
             held_node['hold_job'],
             " ".join(['tenant-one',
                       'review.example.com/org/project',
-                      'project-test2'])
+                      'project-test2', '1'])
         )
         self.assertEqual(held_node['comment'], "reason text")
 
         # Another failed change should not hold any more nodes
-        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
-        self.executor_server.failJob('project-test2', C)
-        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.executor_server.failJob('project-test2', A)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
-        self.assertEqual(C.data['status'], 'NEW')
-        self.assertEqual(C.reported, 1)
+        self.assertEqual(A.data['status'], 'NEW')
+        self.assertEqual(A.reported, 1)
         # project-test2
         self.assertEqual(self.history[2].result, 'FAILURE')
 
@@ -1542,7 +1565,7 @@ class TestScheduler(ZuulTestCase):
                                           self.gearman_server.port)
         self.addCleanup(client.shutdown)
         r = client.autohold('tenant-one', 'org/project', 'project-test2',
-                            "reason text", 1)
+                            "", "reason text", 1)
         self.assertTrue(r)
 
         self.executor_server.hold_jobs_in_build = True
@@ -1586,7 +1609,7 @@ class TestScheduler(ZuulTestCase):
         self.addCleanup(client.shutdown)
 
         r = client.autohold('tenant-one', 'org/project', 'project-test2',
-                            "reason text", 1)
+                            "", "reason text", 1)
         self.assertTrue(r)
 
         autohold_requests = client.autohold_list()
@@ -1595,7 +1618,7 @@ class TestScheduler(ZuulTestCase):
 
         # The single dict key should be a CSV string value
         key = list(autohold_requests.keys())[0]
-        tenant, project, job = key.split(',')
+        tenant, project, job, change = key.split(',')
 
         self.assertEqual('tenant-one', tenant)
         self.assertIn('org/project', project)

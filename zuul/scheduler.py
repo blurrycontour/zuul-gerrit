@@ -413,8 +413,8 @@ class Scheduler(threading.Thread):
         self.last_reconfigured = int(time.time())
         # TODOv3(jeblair): reconfigure time should be per-tenant
 
-    def autohold(self, tenant_name, project_name, job_name, reason, count):
-        key = (tenant_name, project_name, job_name)
+    def autohold(self, tenant_name, project_name, job_name, change, reason, count):
+        key = (tenant_name, project_name, job_name, change)
         if count == 0 and key in self.autohold_requests:
             self.log.debug("Removing autohold for %s", key)
             del self.autohold_requests[key]
@@ -919,11 +919,26 @@ class Scheduler(threading.Thread):
         # the nodes to nodepool.
         try:
             nodeset = build.build_set.getJobNodeSet(build.job.name)
-            autohold_key = (build.pipeline.layout.tenant.name,
-                            build.build_set.item.change.project.canonical_name,
-                            build.job.name)
-            if (build.result == "FAILURE" and
-                autohold_key in self.autohold_requests):
+            autohold_key_base = (build.pipeline.layout.tenant.name,
+                                 build.build_set.item.change.project.canonical_name,
+                                 build.job.name)
+
+            # Check if there is an autohold request for either that specific change,
+            # of the job itself. Match against specific changes first, to ensure that
+            # we fill the request.
+            autohold_request_found = False
+            autohold_keys = [
+                autohold_key_base + (str(build.build_set.item.change.number),),
+                autohold_key_base + ("",)
+            ]
+            self.log.debug("autohold_requests: %s", self.autohold_requests)
+            for key in autohold_keys:
+                self.log.debug("Looking for autohold_request: %s", key)
+                if key in self.autohold_requests:
+                    autohold_key = key
+                    autohold_request_found = True
+
+            if (build.result == "FAILURE" and autohold_request_found):
                 # We explicitly only want to hold nodes for jobs if they have
                 # failed and have an autohold request.
                 try:
