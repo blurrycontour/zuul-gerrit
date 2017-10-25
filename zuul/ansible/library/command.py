@@ -167,6 +167,7 @@ class Console(object):
                 ln = repr(ln).encode('utf-8') + b'\n'
         outln = b'%s | %s' % (ts, ln)
         self.logfile.write(outln)
+        self.logfile.flush()
 
 
 def follow(fd, log_uuid):
