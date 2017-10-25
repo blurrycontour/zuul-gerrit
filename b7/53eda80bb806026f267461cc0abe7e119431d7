@@ -1,0 +1,9 @@
+Code-Review+2: Joshua Hesketh <josh@nitrotech.org>
+Code-Review+2: Clint 'SpamapS' Byrum <clint@fewbar.com>
+Workflow+1: Clint 'SpamapS' Byrum <clint@fewbar.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Wed, 25 Oct 2017 16:24:31 +0000
+Reviewed-on: https://review.openstack.org/514617
+Project: openstack-infra/zuul
+Branch: refs/heads/feature/zuulv3
