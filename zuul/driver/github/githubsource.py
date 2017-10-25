@@ -108,6 +108,10 @@ class GithubSource(BaseSource):
         )
         return [f]
 
+    def getRefForChange(self, change):
+        # TODO(kklimonda): Can github generate events for non-head changes?
+        return "refs/pull/%s/head" % change
+
 
 review = v.Schema({'username': str,
                    'email': str,
