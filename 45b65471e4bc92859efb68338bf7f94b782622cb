@@ -85,6 +85,24 @@
       "revId": "45b65471e4bc92859efb68338bf7f94b782622cb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f4b6375_8bab5173",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 16036
+      },
+      "writtenOn": "2017-10-25T19:10:00Z",
+      "side": 1,
+      "message": "I\u0027d definitely like to keep --change, it both feels more friendly to use, as well as lets you create request before starting the job (as James said). I have also been thinking, whether this should actually be `--changeset change,patchset\u0027 to match enqueue, but I can\u0027t think of a reason to autohold nodes for past patchsets.",
+      "parentUuid": "3f4b6375_cbe949e6",
+      "revId": "45b65471e4bc92859efb68338bf7f94b782622cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
