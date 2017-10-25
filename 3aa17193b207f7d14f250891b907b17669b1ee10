@@ -16,6 +16,23 @@
       "revId": "3aa17193b207f7d14f250891b907b17669b1ee10",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f4b6375_76b59f7d",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2017-10-25T15:40:04Z",
+      "side": 1,
+      "message": "I didn\u0027t realize that was a possibility. Not being much of a database person I don\u0027t know what Python literals the ORM will coerce to that. Do I use the string \u0027NULL\u0027 or a None or a False? The empty string obviously isn\u0027t considered coercable according to the exception getting raised.",
+      "revId": "3aa17193b207f7d14f250891b907b17669b1ee10",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
