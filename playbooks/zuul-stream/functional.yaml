@@ -15,6 +15,13 @@
         ZUUL_JOB_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
         ARA_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
 
+    - name: Run ansible playbook that kills itself
+      command: ansible-playbook src/git.openstack.org/openstack-infra/zuul/playbooks/zuul-stream/fixtures/test-stream-failure-kill-ansible.yaml
+      failed_when: false
+      environment:
+        ZUUL_JOB_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
+        ARA_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
+
     - name: Validate output - setupvar
       shell: |
         egrep "^.*\| node1 \|\s+\"setupvar\": {" job-output.txt
@@ -58,3 +65,10 @@
       shell: |
         egrep "^.+\| node1 \| OSError.+\/failure-itemloop\/" job-output.txt
         egrep "^.+\| node2 \| OSError.+\/failure-itemloop\/" job-output.txt
+
+    - name: Validate output - task killed ansible
+      shell: |
+        egrep "^.+\| node1 \| one line before crash" job-output.txt
+        egrep "^.+\| node1 \| crashing now" job-output.txt
+        egrep "^.+\| node2 \| one line before crash" job-output.txt
+        egrep "^.+\| node2 \| crashing now" job-output.txt
