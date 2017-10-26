@@ -2231,7 +2231,6 @@ class ZuulTestCase(BaseTestCase):
                                      branch='master', tag='init')
             if 'job' in item:
                 jobname = item['job']['name']
-                files['playbooks/%s.yaml' % jobname] = ''
                 if 'run' in item['job']:
                     files['%s.yaml' % item['job']['run']] = ''
                 for fn in zuul.configloader.as_list(
