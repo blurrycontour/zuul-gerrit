@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f4b6375_96b0edde",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 815,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2017-10-26T23:56:30Z",
+      "side": 0,
+      "message": "I remember reading this and thinking \"it\u0027s not required, except when it is, except when it\u0027s inherited, except when it\u0027s overriden\" :)  the new statement is *much* clearer",
+      "revId": "2f589fec6b1781ab96dea4d3249fbb8fa05e189f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
