@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f4b6375_e91631a8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-10-26T16:21:03Z",
+      "side": 1,
+      "message": "Also is usually a sign that there\u0027s need for another test and a separate patch. This is a small change, and an awesome find, but I wonder if it will bite us some day to have it lumped with late decoding. :)",
+      "revId": "677e6e88abe01e94495c974121ded337322ed7d4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
