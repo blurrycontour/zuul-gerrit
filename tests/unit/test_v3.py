@@ -128,6 +128,7 @@ class TestFinal(ZuulTestCase):
             - job:
                 name: project-test
                 parent: job-final
+                run: playbooks/project-test.yaml
 
             - project:
                 name: org/project
@@ -310,6 +311,7 @@ class TestInRepoConfig(ZuulTestCase):
 
             - job:
                 name: project-test2
+                run: playbooks/project-test2.yaml
 
             - project:
                 name: org/project
@@ -460,9 +462,11 @@ class TestInRepoConfig(ZuulTestCase):
             """
             - job:
                 name: project-test1
+                run: playbooks/project-test1.yaml
 
             - job:
                 name: project-test2
+                run: playbooks/project-test2.yaml
 
             - project:
                 name: org/project
@@ -493,9 +497,11 @@ class TestInRepoConfig(ZuulTestCase):
             """
             - job:
                 name: project-test1
+                run: playbooks/project-test1.yaml
 
             - job:
                 name: project-test2
+                run: playbooks/project-test2.yaml
 
             - project:
                 name: org/project
@@ -536,6 +542,7 @@ class TestInRepoConfig(ZuulTestCase):
 
             - job:
                 name: project-test2
+                run: playbooks/project-test2.yaml
 
             - project:
                 name: org/project
@@ -608,6 +615,7 @@ class TestInRepoConfig(ZuulTestCase):
 
             - job:
                 name: project-test2
+                run: playbooks/project-test2.yaml
 
             - project:
                 name: org/project
@@ -1075,6 +1083,7 @@ class TestInRepoConfig(ZuulTestCase):
             """
             - job:
                 name: project-test1
+                run: playbooks/project-test1.yaml
             - project-template:
                 name: some-jobs
                 tenant-one-gate:
@@ -1133,6 +1142,7 @@ class TestInRepoConfig(ZuulTestCase):
             """
             - job:
                 name: project-test1
+                run: playbooks/project-test1.yaml
 
             - project:
                 name: org/project1
@@ -1187,6 +1197,7 @@ class TestInRepoConfig(ZuulTestCase):
             """
             - job:
                 name: project-test1
+                run: playbooks/project-test1.yaml
 
             - job:
                 name: project-test2
@@ -1303,9 +1314,11 @@ class TestInRepoJoin(ZuulTestCase):
             """
             - job:
                 name: project-test1
+                run: playbooks/project-test1.yaml
 
             - job:
                 name: project-test2
+                run: playbooks/project-test2.yaml
 
             - project:
                 name: org/project
@@ -1349,6 +1362,7 @@ class TestInRepoJoin(ZuulTestCase):
             """
             - job:
                 name: project-test1
+                run: playbooks/project-test1.yaml
 
             - project:
                 name: org/project
@@ -1482,13 +1496,14 @@ class TestAnsible(AnsibleZuulTestCase):
             """
             - job:
                 name: %s
+                run: playbooks/%s.yaml
 
             - project:
                 name: org/plugin-project
                 check:
                   jobs:
                     - %s
-            """ % (job_name, job_name))
+            """ % (job_name, job_name, job_name))
 
         file_dict = {'.zuul.yaml': conf}
         A = self.fake_gerrit.addFakeChange('org/plugin-project', 'master', 'A',
@@ -1690,6 +1705,7 @@ class TestRoles(RoleTestCase):
             - job:
                 name: project-test
                 parent: parent
+                run: playbooks/project-test.yaml
                 roles:
                   - zuul: org/project
 
@@ -1726,6 +1742,7 @@ class TestRoles(RoleTestCase):
             """
             - job:
                 name: project-test
+                run: playbooks/project-test.yaml
                 roles:
                   - zuul: common-config
 
