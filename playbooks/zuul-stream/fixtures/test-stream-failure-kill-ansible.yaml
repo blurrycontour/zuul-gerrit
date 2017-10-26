@@ -1,0 +1,10 @@
+- name: Run some commands to show that logging works on crashed tasks too
+  hosts: node
+  tasks:
+
+    - name: Run a shell task that kills its parent ansible process without logging a linebreak
+      shell: |
+        echo 'one line before crash'
+        echo -n 'crashing now'
+        sleep 1
+        kill -9 $PPID
