@@ -16,6 +16,24 @@
       "revId": "677e6e88abe01e94495c974121ded337322ed7d4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f4b6375_9458f030",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-10-26T16:40:42Z",
+      "side": 1,
+      "message": "Yes, I also thought about whether I should do this separate or within the change. I did it in this change because I changed this line anyway. But I\u0027m also fine with making this separate.\n\nHowever I\u0027m not really sure how this can be tested. Maybe I\u0027m wrong but I think this code path is only taken if there is some output from the command but then ansible crashes. Looking at the interaction between command.py and the zuul stream it might even be almost dead code which cannot be triggered in a normal way other than ansible segfaulting (or getting sigkilled by the script it\u0027s running.",
+      "parentUuid": "3f4b6375_e91631a8",
+      "revId": "677e6e88abe01e94495c974121ded337322ed7d4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
