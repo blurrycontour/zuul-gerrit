@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f4b6375_8fd5681e",
+        "filename": "tests/fixtures/layouts/parent-matchers.yaml",
+        "patchSetId": 21
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-10-27T12:36:40Z",
+      "side": 1,
+      "message": "nit: trailing whitespace",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 4
+      },
+      "revId": "c32a83538a1a3464ecb398068531b471ee380a07",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
