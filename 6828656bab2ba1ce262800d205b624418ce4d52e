@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f4b6375_5ea6fcc2",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 821,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-10-27T14:47:52Z",
+      "side": 1,
+      "message": "What\u0027s missing here is what happens if no job has a main playbook through the whole inheritance chain (but that\u0027s unrelated to this change).",
+      "revId": "6828656bab2ba1ce262800d205b624418ce4d52e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
