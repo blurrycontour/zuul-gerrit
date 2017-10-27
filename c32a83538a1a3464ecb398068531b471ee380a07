@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "3f4b6375_2d3c3cdf",
+        "filename": "tests/fixtures/config/branch-variants/git/puppet-integration/.zuul.yaml",
+        "patchSetId": 21
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2017-10-27T12:57:39Z",
+      "side": 1,
+      "message": "oops",
+      "revId": "c32a83538a1a3464ecb398068531b471ee380a07",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f4b6375_8fd5681e",
         "filename": "tests/fixtures/layouts/parent-matchers.yaml",
         "patchSetId": 21
