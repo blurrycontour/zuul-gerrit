@@ -16,6 +16,23 @@
       "revId": "2f589fec6b1781ab96dea4d3249fbb8fa05e189f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f4b6375_5e671c4e",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2084,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-10-27T14:58:10Z",
+      "side": 1,
+      "message": "When you set an explicit run on a playbook, Zuul drops the implicit runs that it calculates.  So before, with no explicit run, this job ran with 3 implicit playbooks: the one for this job, the one for it\u0027s parent (which has a secret), and the one for base.  But now that it\u0027s set explicitly, Zuul knows that we only need to look for the playbook for this job.",
+      "revId": "2f589fec6b1781ab96dea4d3249fbb8fa05e189f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
