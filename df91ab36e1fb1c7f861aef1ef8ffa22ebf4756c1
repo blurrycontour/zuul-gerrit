@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f4b6375_6d511436",
+        "filename": "tests/fixtures/config/secret-inheritance/git/common-config/zuul.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-10-27T12:56:07Z",
+      "side": 1,
+      "message": "nit: trailing whitespace",
+      "range": {
+        "startLine": 51,
+        "startChar": 0,
+        "endLine": 51,
+        "endChar": 4
+      },
+      "revId": "df91ab36e1fb1c7f861aef1ef8ffa22ebf4756c1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
