@@ -62,6 +62,23 @@
       "revId": "c32a83538a1a3464ecb398068531b471ee380a07",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f4b6375_d8f43d8a",
+        "filename": "zuul/model.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 1042,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-10-27T18:14:27Z",
+      "side": 1,
+      "message": "The \u0027run\u0027 attribute is always a single playbook.  The playbook to run for this job (sometimes it is unset, in which case we\u0027ll use the implied_run instead, which is a list).  That isn\u0027t really changing here, it\u0027s just that with the current early inheritance, the binding of roles to playbooks only happened in configloader.  That binding would previously have created a playbook context with all the roles of the job and its parents.  But since all inheritance happens here now, we have to modify the playbook context created earlier to add the new inherited roles.  But it\u0027s all still just one playbook for run.",
+      "revId": "c32a83538a1a3464ecb398068531b471ee380a07",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
