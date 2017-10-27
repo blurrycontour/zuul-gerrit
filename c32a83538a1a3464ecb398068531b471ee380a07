@@ -39,6 +39,29 @@
       "revId": "c32a83538a1a3464ecb398068531b471ee380a07",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f4b6375_b86bc183",
+        "filename": "zuul/model.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 1042,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-10-27T18:03:34Z",
+      "side": 1,
+      "message": "Below for post and pre run we append/prepend the playbooks. Isn\u0027t that how runs work too? implying we need to do the same as below?",
+      "range": {
+        "startLine": 1040,
+        "startChar": 0,
+        "endLine": 1042,
+        "endChar": 32
+      },
+      "revId": "c32a83538a1a3464ecb398068531b471ee380a07",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
