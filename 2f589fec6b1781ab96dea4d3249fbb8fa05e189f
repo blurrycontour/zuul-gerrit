@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f4b6375_3e26a069",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2084,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-10-27T14:42:53Z",
+      "side": 1,
+      "message": "how is that stuff related?",
+      "revId": "2f589fec6b1781ab96dea4d3249fbb8fa05e189f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
