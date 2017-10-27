@@ -16,6 +16,23 @@
       "revId": "daaf3265040fd0739e98edb72e94c573dab3627d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f4b6375_def66c8f",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1166,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-10-27T14:54:06Z",
+      "side": 1,
+      "message": "I agree.  Or the default branch configuration in the tenant.",
+      "revId": "daaf3265040fd0739e98edb72e94c573dab3627d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
