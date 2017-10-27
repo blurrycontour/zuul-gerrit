@@ -33,6 +33,24 @@
       "revId": "2f589fec6b1781ab96dea4d3249fbb8fa05e189f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f4b6375_1ed2c4d1",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2084,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-10-27T14:59:30Z",
+      "side": 1,
+      "message": "Ah, I see",
+      "parentUuid": "3f4b6375_5e671c4e",
+      "revId": "2f589fec6b1781ab96dea4d3249fbb8fa05e189f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
