@@ -477,12 +477,7 @@ class JobParser(object):
     ]
 
     @staticmethod
-    def _getImpliedBranches(tenant, job, project_pipeline):
-        # If this is a project pipeline, don't create implied branch
-        # matchers -- that's handled in ProjectParser.
-        if project_pipeline:
-            return None
-
+    def _getImpliedBranches(tenant, job):
         # If the user has set a pragma directive for this, use the
         # value (if unset, the value is None).
         if job.source_context.implied_branch_matchers is True:
@@ -673,8 +668,7 @@ class JobParser(object):
 
         branches = None
         if ('branches' not in conf):
-            branches = JobParser._getImpliedBranches(
-                tenant, job, project_pipeline)
+            branches = JobParser._getImpliedBranches(tenant, job)
         if (not branches) and ('branches' in conf):
             branches = as_list(conf['branches'])
         if branches:
@@ -745,8 +739,8 @@ class ProjectTemplateParser(object):
         if validate:
             with configuration_exceptions('project-template', conf):
                 self.schema(conf)
-        project_template = model.ProjectConfig(conf['name'])
         source_context = conf['_source_context']
+        project_template = model.ProjectConfig(conf['name'], source_context)
         start_mark = conf['_start_mark']
         for pipeline in self.layout.pipelines.values():
             conf_pipeline = conf.get(pipeline.name)
@@ -825,7 +819,6 @@ class ProjectParser(object):
 
         configs = []
         for conf in conf_list:
-            implied_branch = None
             with configuration_exceptions('project', conf):
                 if not conf['_source_context'].trusted:
                     if project != conf['_source_context'].project:
@@ -838,17 +831,12 @@ class ProjectParser(object):
                 # one, in order.
                 project_template = self.project_template_parser.fromYaml(
                     conf, validate=False)
-                # If this project definition is in a place where it
-                # should get implied branch matchers, set it.
-                if (not conf['_source_context'].trusted):
-                    implied_branch = conf['_source_context'].branch
                 for name in conf_templates:
                     if name not in self.layout.project_templates:
                         raise TemplateNotFoundError(name)
-                configs.extend([(self.layout.project_templates[name],
-                                 implied_branch)
+                configs.extend([self.layout.project_templates[name]
                                 for name in conf_templates])
-                configs.append((project_template, implied_branch))
+                configs.append(project_template)
                 # Set the following values to the first one that we
                 # find and ignore subsequent settings.
                 mode = conf.get('merge-mode')
@@ -869,13 +857,12 @@ class ProjectParser(object):
             # For every template, iterate over the job tree and replace or
             # create the jobs in the final definition as needed.
             pipeline_defined = False
-            for (template, implied_branch) in configs:
+            for template in configs:
                 if pipeline.name in template.pipelines:
                     pipeline_defined = True
                     template_pipeline = template.pipelines[pipeline.name]
                     project_pipeline.job_list.inheritFrom(
-                        template_pipeline.job_list,
-                        implied_branch)
+                        template_pipeline.job_list)
                     if template_pipeline.queue_name:
                         queue_name = template_pipeline.queue_name
             if queue_name:
@@ -1562,8 +1549,9 @@ class TenantParser(object):
             classes = TenantParser._getLoadClasses(tenant, config_template)
             if 'project-template' not in classes:
                 continue
-            layout.addProjectTemplate(project_template_parser.fromYaml(
-                config_template))
+            with configuration_exceptions('project-template', config_template):
+                layout.addProjectTemplate(project_template_parser.fromYaml(
+                    config_template))
 
         project_parser = ProjectParser(tenant, layout, project_template_parser)
         for config_projects in data.projects.values():

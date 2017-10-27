@@ -357,6 +357,8 @@ class TestInRepoConfig(ZuulTestCase):
             dict(name='project-test2', result='SUCCESS', changes='2,1')])
 
     def test_dynamic_template(self):
+        # Tests that a project can't update a template in another
+        # project.
         in_repo_conf = textwrap.dedent(
             """
             - job:
@@ -378,8 +380,12 @@ class TestInRepoConfig(ZuulTestCase):
                                            files=file_dict)
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
-        self.assertHistory([
-            dict(name='template-job', result='SUCCESS', changes='1,1')])
+
+        self.assertEqual(A.patchsets[0]['approvals'][0]['value'], "-1")
+        self.assertIn('Project template common-config-template '
+                      'is already defined',
+                      A.messages[0],
+                      "A should have failed the check pipeline")
 
     def test_dynamic_config_non_existing_job(self):
         """Test that requesting a non existent job fails"""
