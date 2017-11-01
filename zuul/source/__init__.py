@@ -14,6 +14,8 @@
 
 import abc
 
+from zuul.model import Project
+
 
 class BaseSource(object, metaclass=abc.ABCMeta):
     """Base class for sources.
@@ -59,9 +61,17 @@ class BaseSource(object, metaclass=abc.ABCMeta):
     def getGitUrl(self, project):
         """Get the git url for a project."""
 
-    @abc.abstractmethod
     def getProject(self, name):
         """Get a project."""
+        p = self.getProjectReadonly(name)
+        if not p:
+            p = Project(name, self)
+            self.connection.addProject(p)
+        return p
+
+    def getProjectReadonly(self, name):
+        """Get a project. Do not add it if it does not exist."""
+        return self.connection.getProject(name)
 
     @abc.abstractmethod
     def getProjectBranches(self, project, tenant):
