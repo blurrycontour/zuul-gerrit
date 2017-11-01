@@ -115,7 +115,7 @@ class WebApp(threading.Thread):
         if not source:
             raise webob.exc.HTTPNotFound(
                 detail="Cannot locate a source named %s" % source_name)
-        project = source.getProject(project_name)
+        project = source.getProjectReadonly(project_name)
         if not project or not hasattr(project, 'public_key'):
             raise webob.exc.HTTPNotFound(
                 detail="Cannot locate a project named %s" % project_name)
