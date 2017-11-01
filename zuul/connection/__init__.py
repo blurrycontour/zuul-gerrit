@@ -92,3 +92,7 @@ class BaseConnection(object, metaclass=abc.ABCMeta):
 
     def _connectionPath(self, path):
         return '/connection/%s/%s' % (self.connection_name, path)
+
+    @abc.abstractmethod
+    def addProject(self, project: Project) -> None:
+        """ Add a Project object to the connection """

@@ -14,7 +14,6 @@
 
 import logging
 from zuul.source import BaseSource
-from zuul.model import Project
 
 
 class GitSource(BaseSource):
@@ -37,13 +36,6 @@ class GitSource(BaseSource):
 
     def getChange(self, event, refresh=False):
         raise NotImplemented()
-
-    def getProject(self, name):
-        p = self.connection.getProject(name)
-        if not p:
-            p = Project(name, self)
-            self.connection.addProject(p)
-        return p
 
     def getProjectBranches(self, project, tenant):
         return self.connection.getProjectBranches(project, tenant)

@@ -15,7 +15,6 @@
 import logging
 import voluptuous as vs
 from zuul.source import BaseSource
-from zuul.model import Project
 from zuul.driver.gerrit.gerritmodel import GerritRefFilter
 from zuul.driver.util import scalar_or_list, to_list
 
@@ -43,13 +42,6 @@ class GerritSource(BaseSource):
 
     def getChange(self, event, refresh=False):
         return self.connection.getChange(event, refresh)
-
-    def getProject(self, name):
-        p = self.connection.getProject(name)
-        if not p:
-            p = Project(name, self)
-            self.connection.addProject(p)
-        return p
 
     def getProjectOpenChanges(self, project):
         return self.connection.getProjectOpenChanges(project)
