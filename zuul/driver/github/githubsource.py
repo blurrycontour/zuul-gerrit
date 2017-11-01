@@ -61,13 +61,6 @@ class GithubSource(BaseSource):
     def getChange(self, event, refresh=False):
         return self.connection.getChange(event, refresh)
 
-    def getProject(self, name):
-        p = self.connection.getProject(name)
-        if not p:
-            p = Project(name, self)
-            self.connection.addProject(p)
-        return p
-
     def getProjectBranches(self, project, tenant):
         return self.connection.getProjectBranches(project, tenant)
 
