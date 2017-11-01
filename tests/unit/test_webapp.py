@@ -98,6 +98,16 @@ class TestWebapp(ZuulTestCase):
         f = urllib.request.urlopen(req)
         self.assertEqual(f.read(), public_pem)
 
+    def test_webapp_keys_ignores_invalid_projects(self):
+        project = 'non-existent-project'
+        req = urllib.request.Request(
+            "http://localhost:%s/tenant-one/keys/gerrit/org/%s.pub" %
+            (self.port, project))
+        self.assertRaises(urllib.error.HTTPError, urllib.request.urlopen, req)
+        # Make sure we didn't add this to the source
+        source = self.sched.connections.getSource('gerrit')
+        self.assertNotIn('org/%s' % project, source.connection.projects)
+
     def test_webapp_custom_handler(self):
         def custom_handler(path, tenant_name, request):
             return webob.Response(body='ok')
