@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f4b6375_e0b7b0f4",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 502,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-11-02T16:38:36Z",
+      "side": 1,
+      "message": "pep8 going to fail here?",
+      "revId": "8ad4341eb7db7a70f21b69762e2e6504ece0976d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
