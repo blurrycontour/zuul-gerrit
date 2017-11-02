@@ -39,6 +39,24 @@
       "revId": "d57c385b5ae3d40ebd2a9f688abc6b1db20a0d1d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f4b6375_03bad36c",
+        "filename": "zuul/source/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-11-02T18:53:12Z",
+      "side": 1,
+      "message": "I think of this from the perspective of the class design. addProject is a function in the specialized connection classes which inherit from BaseConnection. But with the move of getProject into the base class it calls addProject on the connection without knowing that this method really exists (it currently exists in every sub class of BaseConnection so there is no immediate danger here).\n\nSo I think we should also move addProject into the base class. But I\u0027m also ok with doing this as a follow up.",
+      "parentUuid": "3f4b6375_409684f2",
+      "revId": "d57c385b5ae3d40ebd2a9f688abc6b1db20a0d1d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
