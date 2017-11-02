@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f4b6375_4631f959",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 449,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-11-02T19:26:07Z",
+      "side": 1,
+      "message": "Does this break when using github enterprise? To me it looks like this hard codes the app auth method, but maybe I\u0027m wrong.",
+      "range": {
+        "startLine": 449,
+        "startChar": 8,
+        "endLine": 449,
+        "endChar": 38
+      },
+      "revId": "99fc58da908601e8575fcface1640746f36f7117",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f4b6375_c62289b9",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 572,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-11-02T19:26:07Z",
+      "side": 1,
+      "message": "This probably is the cause of the test failure. Currently the tests create a subclass of the GithubConnection (FakeGithubConnection in base.py) and inject a fake github client. However this is a separate way of accessing github without a client the test could fake.",
+      "range": {
+        "startLine": 568,
+        "startChar": 8,
+        "endLine": 572,
+        "endChar": 35
+      },
+      "revId": "99fc58da908601e8575fcface1640746f36f7117",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
