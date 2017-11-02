@@ -41,25 +41,19 @@ from zuul.lib.config import get_default
 # Similar situation with gear and statsd.
 
 
-class Executor(zuul.cmd.ZuulApp):
+class Executor(zuul.cmd.ZuulDaemonApp):
+    app_name = 'executor'
+    app_description = 'A standalone Zuul executor.'
 
-    def parse_arguments(self):
-        parser = argparse.ArgumentParser(description='Zuul executor.')
-        parser.add_argument('-c', dest='config',
-                            help='specify the config file')
-        parser.add_argument('-d', dest='nodaemon', action='store_true',
-                            help='do not run as a daemon')
-        parser.add_argument('--version', dest='version', action='version',
-                            version=self._get_version(),
-                            help='show zuul version')
+    def createParser(self):
+        parser = super(Executor, self).createParser()
         parser.add_argument('--keep-jobdir', dest='keep_jobdir',
                             action='store_true',
                             help='keep local jobdirs after run completes')
         parser.add_argument('command',
                             choices=zuul.executor.server.COMMANDS,
                             nargs='?')
-
-        self.args = parser.parse_args()
+        return parser
 
     def send_command(self, cmd):
         state_dir = get_default(self.config, 'executor', 'state_dir',
@@ -111,7 +105,7 @@ class Executor(zuul.cmd.ZuulApp):
         os.chdir(pw.pw_dir)
         os.umask(0o022)
 
-    def main(self, daemon=True):
+    def run(self):
         # See comment at top of file about zuul imports
 
         self.user = get_default(self.config, 'executor', 'user', 'zuul')
@@ -145,9 +139,8 @@ class Executor(zuul.cmd.ZuulApp):
         self.executor.start()
 
         signal.signal(signal.SIGUSR2, zuul.cmd.stack_dump_handler)
-        if daemon:
-            self.executor.join()
-        else:
+
+        if self.args.nodaemon:
             while True:
                 try:
                     signal.pause()
@@ -155,31 +148,13 @@ class Executor(zuul.cmd.ZuulApp):
                     print("Ctrl + C: asking executor to exit nicely...\n")
                     self.exit_handler()
                     sys.exit(0)
+        else:
+            self.executor.join()
 
 
 def main():
-    server = Executor()
-    server.parse_arguments()
-    server.read_config()
-
-    if server.args.command in zuul.executor.server.COMMANDS:
-        server.send_command(server.args.command)
-        sys.exit(0)
-
-    server.configure_connections(source_only=True)
-
-    pid_fn = get_default(server.config, 'executor', 'pidfile',
-                         '/var/run/zuul-executor/zuul-executor.pid',
-                         expand_user=True)
-    pid = pid_file_module.TimeoutPIDLockFile(pid_fn, 10)
-
-    if server.args.nodaemon:
-        server.main(False)
-    else:
-        with daemon.DaemonContext(pidfile=pid):
-            server.main(True)
+    Executor().main()
 
 
 if __name__ == "__main__":
-    sys.path.insert(0, '.')
     main()

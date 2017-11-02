@@ -32,23 +32,14 @@ from zuul.lib.config import get_default
 pid_file_module = extras.try_imports(['daemon.pidlockfile', 'daemon.pidfile'])
 
 
-class WebServer(zuul.cmd.ZuulApp):
-
-    def parse_arguments(self):
-        parser = argparse.ArgumentParser(description='Zuul Web Server.')
-        parser.add_argument('-c', dest='config',
-                            help='specify the config file')
-        parser.add_argument('-d', dest='nodaemon', action='store_true',
-                            help='do not run as a daemon')
-        parser.add_argument('--version', dest='version', action='version',
-                            version=self._get_version(),
-                            help='show zuul version')
-        self.args = parser.parse_args()
+class WebServer(zuul.cmd.ZuulDaemonApp):
+    app_name = 'web'
+    app_description = 'A standalone Zuul web server.'
 
     def exit_handler(self, signum, frame):
         self.web.stop()
 
-    def _main(self):
+    def _run(self):
         params = dict()
 
         params['listen_address'] = get_default(self.config,
@@ -88,28 +79,19 @@ class WebServer(zuul.cmd.ZuulApp):
         loop.close()
         self.log.info("Zuul Web Server stopped")
 
-    def main(self):
+    def run(self):
         self.setup_logging('web', 'log_config')
         self.log = logging.getLogger("zuul.WebServer")
 
         try:
-            self._main()
+            self._run()
         except Exception:
             self.log.exception("Exception from WebServer:")
 
 
 def main():
-    server = WebServer()
-    server.parse_arguments()
-    server.read_config()
+    WebServer().main()
 
-    pid_fn = get_default(server.config, 'web', 'pidfile',
-                         '/var/run/zuul-web/zuul-web.pid', expand_user=True)
 
-    pid = pid_file_module.TimeoutPIDLockFile(pid_fn, 10)
-
-    if server.args.nodaemon:
-        server.main()
-    else:
-        with daemon.DaemonContext(pidfile=pid):
-            server.main()
+if __name__ == "__main__":
+    main()
