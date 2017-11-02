@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "3f4b6375_92fa8740",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 449,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-11-02T22:30:14Z",
+      "side": 1,
+      "message": "It might actually. When I started coding this I was going to put an escape hatch in the function to bail early if there was no app ID. I need to fix that.",
+      "parentUuid": "3f4b6375_4631f959",
+      "range": {
+        "startLine": 449,
+        "startChar": 8,
+        "endLine": 449,
+        "endChar": 38
+      },
+      "revId": "99fc58da908601e8575fcface1640746f36f7117",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f4b6375_c62289b9",
         "filename": "zuul/driver/github/githubconnection.py",
         "patchSetId": 2
