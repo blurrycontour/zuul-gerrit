@@ -22,6 +22,23 @@
       "revId": "10d27c2ecec1f503d58572575282d80e00b548dd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f4b6375_9b250d0c",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 495,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-11-02T17:10:06Z",
+      "side": 1,
+      "message": "The executor does not block itself forever, it will always allow one concurrent job to be run. However, your point is absolutely right that this memory is shared amongst processes. I think you\u0027re right that we should just consider it available to newly spawned jobs. I do wonder if we should consider it separately but just putting all of it in a free bin seems like the right thing to do for a simple solution.",
+      "revId": "10d27c2ecec1f503d58572575282d80e00b548dd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
