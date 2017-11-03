@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f4b6375_553cef91",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-11-03T08:49:55Z",
+      "side": 1,
+      "message": "from zuul.model import Project",
+      "revId": "ba28e531c572c6a0a68647fdfe1d5e234f8ac696",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
