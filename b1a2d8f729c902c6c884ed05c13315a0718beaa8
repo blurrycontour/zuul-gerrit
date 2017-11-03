@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f4b6375_35e3b3da",
+        "filename": "zuul/web/static/README",
+        "patchSetId": 10
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-11-03T09:00:29Z",
+      "side": 1,
+      "message": "locations",
+      "range": {
+        "startLine": 1,
+        "startChar": 53,
+        "endLine": 1,
+        "endChar": 61
+      },
+      "revId": "b1a2d8f729c902c6c884ed05c13315a0718beaa8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
