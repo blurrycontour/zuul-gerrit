@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f4b6375_78ffe200",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-11-03T09:18:08Z",
+      "side": 1,
+      "message": "We should support getting this from an env var as well (as a follow up).",
+      "range": {
+        "startLine": 272,
+        "startChar": 0,
+        "endLine": 273,
+        "endChar": 62
+      },
+      "revId": "94098e8b745a79b7a204d8bcb8fafeca38ed1096",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
