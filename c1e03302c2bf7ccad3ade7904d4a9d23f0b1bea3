@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f4b6375_f5275b11",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-11-03T09:12:20Z",
+      "side": 1,
+      "message": "it might make sense to make this configurable (in a follow up)",
+      "range": {
+        "startLine": 156,
+        "startChar": 4,
+        "endLine": 156,
+        "endChar": 20
+      },
+      "revId": "c1e03302c2bf7ccad3ade7904d4a9d23f0b1bea3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
