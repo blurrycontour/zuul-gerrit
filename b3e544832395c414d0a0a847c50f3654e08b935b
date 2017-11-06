@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f4b6375_77010f05",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-11-06T04:36:46Z",
+      "side": 1,
+      "message": "I think we should use an ORM data model for this.  It should be easy to do that as a followup change, so I don\u0027t think we need to hold this one up, but we should certainly do it before we add to many more routes and queries.",
+      "revId": "b3e544832395c414d0a0a847c50f3654e08b935b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f4b6375_5704d314",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-11-06T04:36:46Z",
+      "side": 1,
+      "message": "The data model helps with this.",
+      "revId": "b3e544832395c414d0a0a847c50f3654e08b935b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f4b6375_3707171b",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-11-06T04:36:46Z",
+      "side": 1,
+      "message": "And this.",
+      "revId": "b3e544832395c414d0a0a847c50f3654e08b935b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
