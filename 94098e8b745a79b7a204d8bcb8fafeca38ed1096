@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3f4b6375_1742db0f",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-11-06T04:59:33Z",
+      "side": 1,
+      "message": "Agreed about keeping \u0027zuul\u0027 as just an admin utility, this was mostly useful for testing the zuul-web api from the command line.\n\nHowever, when zuul-web will have an \u0027/admin\u0027 endpoint, it might make sense to have a zuul-web command line client, could this be accepted as a \u0027zuul-client\u0027 utility?",
+      "parentUuid": "3f4b6375_dc78eac4",
+      "revId": "94098e8b745a79b7a204d8bcb8fafeca38ed1096",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f4b6375_78ffe200",
         "filename": "zuul/cmd/client.py",
         "patchSetId": 10
