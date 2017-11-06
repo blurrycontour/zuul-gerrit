@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "3f4b6375_dc78eac4",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-11-06T04:28:49Z",
+      "side": 1,
+      "message": "I have mixed feelings about adding this to the admin client.  On the one hand, it\u0027s pretty easy to add, and the way it\u0027s been added means other queries can be added pretty easily.  On the other hand, it\u0027s showing information that\u0027s now available in the web ui, and doesn\u0027t require administrative privileges, which the other \u0027zuul\u0027 commands do.\n\nUnless there\u0027s a compelling reason to add this, maybe we should keep \u0027zuul\u0027 as just an admin utility?",
+      "revId": "94098e8b745a79b7a204d8bcb8fafeca38ed1096",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f4b6375_78ffe200",
         "filename": "zuul/cmd/client.py",
         "patchSetId": 10
