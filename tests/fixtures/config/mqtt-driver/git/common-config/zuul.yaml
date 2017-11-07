@@ -1,0 +1,30 @@
+- pipeline:
+    name: check
+    manager: independent
+    trigger:
+      gerrit:
+        - event: patchset-created
+    success:
+      gerrit:
+        Verified: 1
+      mqtt:
+        topic: zuul_buildset
+    failure:
+      gerrit:
+        Verified: -1
+      mqtt:
+        topic: zuul_buildset
+
+- job:
+    name: base
+    parent: null
+
+- job:
+    name: test
+    run: playbooks/test.yaml
+
+- project:
+    name: org/project
+    check:
+      jobs:
+        - test
