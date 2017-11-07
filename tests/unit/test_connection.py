@@ -377,3 +377,22 @@ class TestConnectionsGitweb(ZuulTestCase):
         url_should_be = 'https://review.example.com/' \
                         'gitweb?p=foo/bar.git;a=commitdiff;h=1'
         self.assertEqual(url, url_should_be)
+
+
+class TestMQTTConnection(ZuulTestCase):
+    config_file = 'zuul-mqtt-driver.conf'
+    tenant_config_file = 'config/mqtt-driver/main.yaml'
+
+    def test_mqtt_reporter(self):
+        "Test the MQTT reporter"
+        # Add a success result
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        mqtt_event = self.mqtt_messages.pop()
+        self.assertEquals(mqtt_event.get('topic'), 'zuul_buildset')
+        mqtt_payload = mqtt_event['msg']
+        self.assertEquals(mqtt_payload['project'], 'org/project')
+        self.assertEquals(mqtt_payload['branch'], 'master')
+        self.assertEquals(mqtt_payload['buildset'][0]['job_name'],
+                          'test')
