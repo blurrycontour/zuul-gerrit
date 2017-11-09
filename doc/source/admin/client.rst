@@ -40,6 +40,60 @@ Example::
 
 Note that the format of change id is <number>,<patchset>.
 
+Enqueue-ref
+^^^^^^^^^^^
+
+.. program-output:: zuul enqueue-ref --help
+
+This command is useful in a situation where it is difficult to get the
+external source to retrigger the job.  Some familiarity with the
+arguments emitted by ``gerrit`` update hooks such as
+``patchset-created`` and ``update-ref`` is recommended.  The arguments
+to ``enqueue-ref`` will vary depending on the type of trigger you are
+wanting to insert or replay; below we give some common examples as a
+guide.
+
+Manual enqueue examples
+***********************
+
+It is common to have a ``release`` pipeline that listens
+for new tags coming from ``gerrit`` and performs a range of code
+packaging jobs.  If there is an unexpected issue the same tag can not
+be recreated; thus the user must either tag a new release or a request
+a manual re-triggering of the jobs.
+
+In that case, it is likely you would perform an operation such as::
+
+  zuul enqueue-ref --tenant openstack --trigger gerrit --pipeline release --project openstack/example_project --ref refs/tags/X.Y.Z --newrev abc123...
+
+Where the ``newrev`` would be the change associated with the tag in
+the project repository (i.e. what you see from ``git show X.Y.Z``).
+
+Another situation may be a ``periodic`` pipeline where you wish to
+asynchronously trigger a job that would usually be run by the
+``timer`` driver.  The command for this would be something like::
+
+  zuul enqueue-ref --tenant openstack --trigger timer --pipeline periodic --project openstack/example_project --ref ref/heads/master
+
+Another common pipeline is a ``post`` queue listening for ``gerrit``
+merge results.  Triggering here is slightly more complicated as you
+wish to recreate the ``ref-updated`` event from ``gerrit``.  For a new
+commit on ``master``, the gerrit trigger is essentially saying "I
+reset ``refs/heads/master`` for the project from ``oldrev`` to
+``newrev``" (``newrev`` being the committed change).  Thus to replay
+the event to zuul, you would ``git log`` in the project and take the
+current ``HEAD`` and the prior change, then enqueue the event::
+
+  NEW_REF=$(git rev-parse HEAD)
+  OLD_REF=$(git rev-parse HEAD~1)
+
+  zuul enqueue-ref --tenant openstack --trigger gerrit --pipeline post --project openstack/example_project --ref ref/heads/master --newrev $NEW_REF --oldrev $OLD_REF
+
+Note that zero values for ``oldrev`` and ``newrev`` can indicate
+branch creation and deletion; the source code is the best reference
+for these more advanced operations.
+
+
 Promote
 ^^^^^^^
 .. program-output:: zuul promote --help
