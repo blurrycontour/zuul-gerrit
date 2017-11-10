@@ -16,6 +16,24 @@
       "revId": "896de620de4aa905e17d28556d26c7fa669b63d5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f485f77_078a5a1a",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2017-11-10T21:26:46Z",
+      "side": 1,
+      "message": "heh, i did that then thought it looked a bit ugly :)  in other places i think we do 40 * \u00270\u0027 ... i can switch it to that?\n\nit actually has to be all these zeros i think, to make exactly what gerrit outputs.",
+      "parentUuid": "1f485f77_23666bef",
+      "revId": "896de620de4aa905e17d28556d26c7fa669b63d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
