@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f485f77_23666bef",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-11-10T18:21:12Z",
+      "side": 1,
+      "message": "There\u0027s.. a lot of 0\u0027s there. Could we maybe make this a variable with a symbolic name as long as we\u0027re touching this code?",
+      "revId": "896de620de4aa905e17d28556d26c7fa669b63d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
