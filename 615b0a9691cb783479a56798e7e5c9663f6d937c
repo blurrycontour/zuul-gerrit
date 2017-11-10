@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f485f77_6dbc5269",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2017-11-10T16:50:03Z",
+      "side": 1,
+      "message": "The ordering criteria could be set as an argument of the query",
+      "revId": "615b0a9691cb783479a56798e7e5c9663f6d937c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f485f77_2d853aae",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2017-11-10T16:50:03Z",
+      "side": 1,
+      "message": "Since the request is limited by default, it would be good to get also the total amount of builds the query returns, and the offset of the response:\n\nreturn {\u0027builds\u0027: builds,\n        \u0027total\u0027: XXX,\n        \u0027offset\u0027: args[\u0027skip\u0027]}",
+      "revId": "615b0a9691cb783479a56798e7e5c9663f6d937c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
