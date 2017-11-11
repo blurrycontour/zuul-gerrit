@@ -1,0 +1,142 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f485f77_db83f703",
+        "filename": "doc/source/admin/client.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-11-11T11:09:17Z",
+      "side": 1,
+      "message": "intended semicolon?",
+      "range": {
+        "startLine": 53,
+        "startChar": 27,
+        "endLine": 53,
+        "endChar": 28
+      },
+      "revId": "49ba1b1fc4c6137fbc360950d4670df8ac5317e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f485f77_9b7d7f1e",
+        "filename": "doc/source/admin/client.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-11-11T11:09:17Z",
+      "side": 1,
+      "message": "intended semicolon?",
+      "range": {
+        "startLine": 62,
+        "startChar": 12,
+        "endLine": 62,
+        "endChar": 13
+      },
+      "revId": "49ba1b1fc4c6137fbc360950d4670df8ac5317e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f485f77_7b7ac324",
+        "filename": "doc/source/admin/client.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-11-11T11:09:17Z",
+      "side": 1,
+      "message": "superfluous \u0027a\u0027",
+      "range": {
+        "startLine": 62,
+        "startChar": 61,
+        "endLine": 62,
+        "endChar": 62
+      },
+      "revId": "49ba1b1fc4c6137fbc360950d4670df8ac5317e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f485f77_fb93534e",
+        "filename": "doc/source/admin/client.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-11-11T11:09:17Z",
+      "side": 1,
+      "message": "refs",
+      "range": {
+        "startLine": 76,
+        "startChar": 116,
+        "endLine": 76,
+        "endChar": 119
+      },
+      "revId": "49ba1b1fc4c6137fbc360950d4670df8ac5317e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f485f77_9ba21f9a",
+        "filename": "doc/source/admin/client.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-11-11T11:09:17Z",
+      "side": 1,
+      "message": "refs",
+      "range": {
+        "startLine": 90,
+        "startChar": 113,
+        "endLine": 90,
+        "endChar": 116
+      },
+      "revId": "49ba1b1fc4c6137fbc360950d4670df8ac5317e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f485f77_7b9f6350",
+        "filename": "doc/source/admin/client.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-11-11T11:09:17Z",
+      "side": 1,
+      "message": "intended semicolon?",
+      "range": {
+        "startLine": 93,
+        "startChar": 28,
+        "endLine": 93,
+        "endChar": 29
+      },
+      "revId": "49ba1b1fc4c6137fbc360950d4670df8ac5317e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
