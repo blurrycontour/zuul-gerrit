@@ -34,6 +34,24 @@
       "revId": "896de620de4aa905e17d28556d26c7fa669b63d5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f485f77_9be69f16",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-11-11T10:51:59Z",
+      "side": 1,
+      "message": "You might want to have a look at merger/merge.py. There it is already defined as\n\n NULL_REF \u003d \u00270000000000000000000000000000000000000000\u0027\n\nSo it might make sense to be consistent there.",
+      "parentUuid": "1f485f77_078a5a1a",
+      "revId": "896de620de4aa905e17d28556d26c7fa669b63d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
