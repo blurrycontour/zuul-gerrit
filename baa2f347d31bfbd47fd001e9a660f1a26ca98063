@@ -22,6 +22,30 @@
       "revId": "baa2f347d31bfbd47fd001e9a660f1a26ca98063",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f485f77_22577205",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2017-11-13T04:18:57Z",
+      "side": 1,
+      "message": "Nit done\n\nI was actually trying to word it a bit differently to \"enqueue a ref\" because if you don\u0027t exactly know what a ref is ... and it\u0027s pretty closely related to the gerrit trigger and the name of the update hooks ... you\u0027ve got no idea what this is for.  although you\u0027re going to have to grok that, i thought this was an easier way into it.  can change if you feel strongly, however! :)",
+      "parentUuid": "1f485f77_b985d9af",
+      "range": {
+        "startLine": 86,
+        "startChar": 19,
+        "endLine": 86,
+        "endChar": 21
+      },
+      "revId": "baa2f347d31bfbd47fd001e9a660f1a26ca98063",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
