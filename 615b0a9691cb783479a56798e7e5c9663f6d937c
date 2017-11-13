@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "1f485f77_1f284d32",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-11-13T05:50:59Z",
+      "side": 1,
+      "message": "(nit) I wonder if this is something the connections lib should understand how to return",
+      "range": {
+        "startLine": 66,
+        "startChar": 54,
+        "endLine": 66,
+        "endChar": 65
+      },
+      "revId": "615b0a9691cb783479a56798e7e5c9663f6d937c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f485f77_6dbc5269",
         "filename": "zuul/web/__init__.py",
         "patchSetId": 20
