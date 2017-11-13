@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f485f77_b985d9af",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-11-13T01:35:13Z",
+      "side": 1,
+      "message": "Should this be \"Submit a trigger event\"?\n\nActually, should this first line change to something more generic, for example: \"Enqueue a ref or change into a pipeline\"?",
+      "range": {
+        "startLine": 86,
+        "startChar": 19,
+        "endLine": 86,
+        "endChar": 21
+      },
+      "revId": "baa2f347d31bfbd47fd001e9a660f1a26ca98063",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
