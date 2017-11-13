@@ -166,10 +166,7 @@ class Client(zuul.cmd.ZuulApp):
         self.ssl_cert = get_default(self.config, 'gearman', 'ssl_cert')
         self.ssl_ca = get_default(self.config, 'gearman', 'ssl_ca')
 
-        if self.args.func():
-            sys.exit(0)
-        else:
-            sys.exit(1)
+        return self.args.func()
 
     def autohold(self):
         client = zuul.rpcclient.RPCClient(
