@@ -30,3 +30,6 @@
         - post-timeout
         - hello-world
         - failpost
+        - multiple-child
+        - multiple-run
+        - multiple-run-failure
