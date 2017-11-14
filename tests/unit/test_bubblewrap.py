@@ -42,14 +42,17 @@ class TestBubblewrap(testtools.TestCase):
         self.assertTrue(po.fds[0] > 2)
         self.assertTrue(po.fds[1] > 2)
         self.assertTrue(work_dir in po.command)
-        # Now run /usr/bin/id to verify passwd/group entries made it in
-        true_proc = po(['/usr/bin/id'], stdout=subprocess.PIPE,
-                       stderr=subprocess.PIPE)
+        # Now run a script to verify passwd/group entries made it in
+        # and environment is set
+        cmd = ['/bin/bash', '-c', '/usr/bin/id && echo $HOME']
+        true_proc = po(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (output, errs) = true_proc.communicate()
         # Make sure it printed things on stdout
         self.assertTrue(len(output.strip()))
         # And that it did not print things on stderr
         self.assertEqual(0, len(errs.strip()))
+        # And that HOME == work_dir
+        self.assertEqual("HOME={}".format(work_dir), output.split('\n')[1])
         # Make sure the _r's are closed
         self.assertEqual([], po.fds)
 

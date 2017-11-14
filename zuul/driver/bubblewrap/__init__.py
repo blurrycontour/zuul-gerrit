@@ -34,9 +34,10 @@ from zuul.execution_context import BaseExecutionContext
 
 
 class WrappedPopen(object):
-    def __init__(self, command, fds):
+    def __init__(self, command, fds, env_overrides=None):
         self.command = command
         self.fds = fds
+        self.env_overrides = env_overrides
 
     def __call__(self, args, *sub_args, **kwargs):
         try:
@@ -52,6 +53,10 @@ class WrappedPopen(object):
                     if fd not in pass_fds:
                         pass_fds.append(fd)
                 kwargs['pass_fds'] = pass_fds
+            if self.env_overrides:
+                env = kwargs.get('env', os.environ).copy()
+                env.update(self.env_overrides)
+                kwargs['env'] = env
             proc = subprocess.Popen(args, *sub_args, **kwargs)
         finally:
             self.__del__()
@@ -161,7 +166,9 @@ class BubblewrapExecutionContext(BaseExecutionContext):
         self.log.debug("Bubblewrap command: %s",
                        " ".join(shlex.quote(c) for c in command))
 
-        wrapped_popen = WrappedPopen(command, read_fds)
+        env_overrides = dict(HOME=kwargs['work_dir'])
+
+        wrapped_popen = WrappedPopen(command, read_fds, env_overrides)
 
         return wrapped_popen
 
