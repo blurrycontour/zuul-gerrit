@@ -1547,6 +1547,9 @@ class TestAnsible(AnsibleZuulTestCase):
         build_hello = self.getJobFromHistory('hello-world')
         with self.jobLog(build_hello):
             self.assertEqual(build_hello.result, 'SUCCESS')
+        build_foobar = self.getJobFromHistory('foobar')
+        with self.jobLog(build_foobar):
+            self.assertEqual(build_foobar.result, 'SUCCESS')
         build_python27 = self.getJobFromHistory('python27')
         with self.jobLog(build_python27):
             self.assertEqual(build_python27.result, 'SUCCESS')
