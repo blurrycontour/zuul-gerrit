@@ -22,6 +22,30 @@
       "revId": "be442cb4a4dbaed401108e03fbd913f7a9b58ed7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f485f77_5099eb6b",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-11-14T13:18:43Z",
+      "side": 1,
+      "message": "That\u0027s a good question, we could also consider handling job variant entirely so that the jobs page could display all of them.",
+      "parentUuid": "1f485f77_7f6aa180",
+      "range": {
+        "startLine": 296,
+        "startChar": 20,
+        "endLine": 296,
+        "endChar": 24
+      },
+      "revId": "be442cb4a4dbaed401108e03fbd913f7a9b58ed7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
