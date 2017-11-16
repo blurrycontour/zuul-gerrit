@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f485f77_52e51c08",
+        "filename": "tests/unit/test_bubblewrap.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-11-16T20:57:00Z",
+      "side": 1,
+      "message": "nit: /bin/sh would be sufficient",
+      "range": {
+        "startLine": 47,
+        "startChar": 16,
+        "endLine": 47,
+        "endChar": 25
+      },
+      "revId": "33c4ff8654c557fde8d4e6200ee730d751de5460",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f485f77_b2a8d08b",
+        "filename": "tests/unit/test_bubblewrap.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-11-16T20:57:00Z",
+      "side": 1,
+      "message": "according to the test failure one side needs en/decoding",
+      "range": {
+        "startLine": 55,
+        "startChar": 8,
+        "endLine": 55,
+        "endChar": 75
+      },
+      "revId": "33c4ff8654c557fde8d4e6200ee730d751de5460",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
