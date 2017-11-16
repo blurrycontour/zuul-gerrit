@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f485f77_6fc71398",
+        "filename": "zuul/webapp.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-11-16T20:11:26Z",
+      "side": 1,
+      "message": "This sounds good, but I don\u0027t see any added files to add this method. Did you forget to git add a file?",
+      "revId": "ae44048950788ef93c4297ed7f3e8c3ad6cd8e79",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
