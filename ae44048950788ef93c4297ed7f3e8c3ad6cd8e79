@@ -16,6 +16,24 @@
       "revId": "ae44048950788ef93c4297ed7f3e8c3ad6cd8e79",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f485f77_4f0c5740",
+        "filename": "zuul/webapp.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-11-16T20:44:09Z",
+      "side": 1,
+      "message": "The parent change adds this",
+      "parentUuid": "1f485f77_6fc71398",
+      "revId": "ae44048950788ef93c4297ed7f3e8c3ad6cd8e79",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
