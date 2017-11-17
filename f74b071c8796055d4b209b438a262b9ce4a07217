@@ -22,6 +22,30 @@
       "revId": "f74b071c8796055d4b209b438a262b9ce4a07217",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f485f77_779c7d0d",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-11-17T07:55:55Z",
+      "side": 1,
+      "message": "I\u0027m not sure to understand the first sentence. If no connections are configured, then the sql_connection will be None and the builds endpoint disabled.\n\nIIUC, you would prefer the sql_connection to be set explicitly, e.g. the operator would have to set the [web] sql_connection_name setting to enable the builds endpoint?",
+      "parentUuid": "1f485f77_3796054e",
+      "range": {
+        "startLine": 80,
+        "startChar": 16,
+        "endLine": 80,
+        "endChar": 27
+      },
+      "revId": "f74b071c8796055d4b209b438a262b9ce4a07217",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
