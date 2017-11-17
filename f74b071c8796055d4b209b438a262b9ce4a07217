@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f485f77_3796054e",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-11-17T07:32:53Z",
+      "side": 1,
+      "message": "So this will require a working connection to continue. It also requires it for every page load, not just pages that need the db.\n\nWe should instead raise a warning about no database but still allow other pages (eg status/api endpoints) to function.\n\nThis also made me think of another case where a user may have an sql connection that isn\u0027t being used for reporting, or perhaps they have one but don\u0027t want the build results to be exposed via the web page. We should probably not assume the first result is fine and instead allow the builds page to be disabled by not providing any at all.",
+      "range": {
+        "startLine": 80,
+        "startChar": 16,
+        "endLine": 80,
+        "endChar": 27
+      },
+      "revId": "f74b071c8796055d4b209b438a262b9ce4a07217",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
