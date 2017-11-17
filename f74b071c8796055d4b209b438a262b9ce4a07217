@@ -46,6 +46,30 @@
       "revId": "f74b071c8796055d4b209b438a262b9ce4a07217",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f485f77_bbfc1f70",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-11-17T08:26:18Z",
+      "side": 1,
+      "message": "Ah, so my mistake. I took line 83 below to mean it always exited, but that\u0027s only in the case if sql_conn_name exists. So the current functionality of disabling the endpoint is what I was after :-).\n\nRegarding setting the connection explicitly, yes that is what I was thinking. ie, what if somebody has an sqlconnection configured but doesn\u0027t want it exposed via the webapp for some reason. I\u0027m not sure though and could go either way.\n\nI suppose we could leave it as it is and if we really want a feature to disable the builds endpoint we can add another config flag down the road.",
+      "parentUuid": "1f485f77_779c7d0d",
+      "range": {
+        "startLine": 80,
+        "startChar": 16,
+        "endLine": 80,
+        "endChar": 27
+      },
+      "revId": "f74b071c8796055d4b209b438a262b9ce4a07217",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
