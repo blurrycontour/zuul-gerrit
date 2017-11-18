@@ -1201,7 +1201,9 @@ configuration may be simplified.
            label: controller-label
          - name: compute1
            label: compute-label
-         - name: compute2
+         - name:
+             - compute2
+             - web
            label: compute-label
        groups:
          - name: ceph-osd
@@ -1212,6 +1214,9 @@ configuration may be simplified.
              - controller
              - compute1
              - compute2
+          - name: ceph-web
+            nodes:
+              - web
 
 .. attr:: nodeset
 
@@ -1221,6 +1226,8 @@ configuration may be simplified.
       :required:
 
       The name of the Nodeset, to be referenced by a :ref:`job`.
+
+      This can be specified as a list of strings.
 
    .. attr:: nodes
       :required:
