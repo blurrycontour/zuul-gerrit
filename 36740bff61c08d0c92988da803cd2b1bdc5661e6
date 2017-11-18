@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f485f77_ca712caa",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 1230,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-11-18T21:13:10Z",
+      "side": 1,
+      "message": "I guess you mean the next name down further (name of node, not name of nodeset).",
+      "range": {
+        "startLine": 1230,
+        "startChar": 6,
+        "endLine": 1230,
+        "endChar": 49
+      },
+      "revId": "36740bff61c08d0c92988da803cd2b1bdc5661e6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
