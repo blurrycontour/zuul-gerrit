@@ -48,6 +48,23 @@
     },
     {
       "key": {
+        "uuid": "ff82abbf_cdfedc04",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-11-20T21:46:44Z",
+      "side": 1,
+      "message": "Good point.",
+      "revId": "ba257f28725ef07b210a34d57a041631473151c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff82abbf_fa0a7888",
         "filename": "zuul/cmd/client.py",
         "patchSetId": 2
