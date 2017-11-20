@@ -88,6 +88,30 @@
     },
     {
       "key": {
+        "uuid": "ff82abbf_6d38f0d2",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-11-20T21:48:07Z",
+      "side": 1,
+      "message": "Jeblair points out that its ClassName().main() and I missed the first pair of ()s. This is fine.",
+      "parentUuid": "ff82abbf_fa0a7888",
+      "range": {
+        "startLine": 142,
+        "startChar": 4,
+        "endLine": 142,
+        "endChar": 19
+      },
+      "revId": "ba257f28725ef07b210a34d57a041631473151c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff82abbf_1a487cca",
         "filename": "zuul/cmd/executor.py",
         "patchSetId": 2
