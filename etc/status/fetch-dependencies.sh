@@ -21,3 +21,6 @@ curl -L --silent https://github.com/twbs/bootstrap/releases/download/v3.1.1/boot
 unzip -q -o bootstrap.zip -d $DEST_DIR/
 mv $DEST_DIR/bootstrap-3.1.1-dist $DEST_DIR/bootstrap
 rm bootstrap.zip
+
+echo "Fetching angular..."
+curl -L --silent https://code.angularjs.org/1.5.8/angular.min.js > $DEST_DIR/angular.min.js
