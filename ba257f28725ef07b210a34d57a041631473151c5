@@ -1,0 +1,165 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff82abbf_5a3e042a",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-11-20T21:39:02Z",
+      "side": 1,
+      "message": "See comments in other files about making this a static method so that it can be called on the class directly.",
+      "range": {
+        "startLine": 173,
+        "startChar": 4,
+        "endLine": 173,
+        "endChar": 19
+      },
+      "revId": "ba257f28725ef07b210a34d57a041631473151c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff82abbf_9ae6cce8",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-11-20T21:39:02Z",
+      "side": 1,
+      "message": "I think this block should happen after the nodaemon check. That way you can run this as non daemon without also needing to have a pid file.",
+      "range": {
+        "startLine": 180,
+        "startChar": 8,
+        "endLine": 183,
+        "endChar": 16
+      },
+      "revId": "ba257f28725ef07b210a34d57a041631473151c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff82abbf_fa0a7888",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-11-20T21:39:02Z",
+      "side": 1,
+      "message": "Below we call this as a class method not an instance method, but it still takes a self argument. I think you want to make this a class static method and drop the self arg?",
+      "range": {
+        "startLine": 142,
+        "startChar": 4,
+        "endLine": 142,
+        "endChar": 19
+      },
+      "revId": "ba257f28725ef07b210a34d57a041631473151c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff82abbf_1a487cca",
+        "filename": "zuul/cmd/executor.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-11-20T21:39:02Z",
+      "side": 1,
+      "message": "I think this may also require main() to be redefined. See other comments.",
+      "range": {
+        "startLine": 148,
+        "startChar": 4,
+        "endLine": 148,
+        "endChar": 21
+      },
+      "revId": "ba257f28725ef07b210a34d57a041631473151c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff82abbf_9a824cc8",
+        "filename": "zuul/cmd/merger.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-11-20T21:39:02Z",
+      "side": 1,
+      "message": "See other comments.",
+      "range": {
+        "startLine": 57,
+        "startChar": 4,
+        "endLine": 57,
+        "endChar": 19
+      },
+      "revId": "ba257f28725ef07b210a34d57a041631473151c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff82abbf_7a698823",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-11-20T21:39:02Z",
+      "side": 1,
+      "message": "See other comments.",
+      "range": {
+        "startLine": 176,
+        "startChar": 4,
+        "endLine": 176,
+        "endChar": 22
+      },
+      "revId": "ba257f28725ef07b210a34d57a041631473151c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff82abbf_3a730018",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-11-20T21:39:02Z",
+      "side": 1,
+      "message": "See other comments.",
+      "range": {
+        "startLine": 86,
+        "startChar": 4,
+        "endLine": 86,
+        "endChar": 22
+      },
+      "revId": "ba257f28725ef07b210a34d57a041631473151c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
