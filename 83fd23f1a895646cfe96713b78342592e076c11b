@@ -1,0 +1,113 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff82abbf_1c18741b",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-11-21T03:13:40Z",
+      "side": 1,
+      "message": "This argument is already set up in ZuulApp",
+      "range": {
+        "startLine": 162,
+        "startChar": 31,
+        "endLine": 162,
+        "endChar": 38
+      },
+      "revId": "83fd23f1a895646cfe96713b78342592e076c11b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff82abbf_7caae085",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-11-21T03:13:40Z",
+      "side": 1,
+      "message": "(nit) Could make sense to call the super parseArguments for the above 2 lines so that if another argument is added at the ZuulApp level that needs special handling it is picked up.",
+      "range": {
+        "startLine": 136,
+        "startChar": 8,
+        "endLine": 136,
+        "endChar": 12
+      },
+      "revId": "83fd23f1a895646cfe96713b78342592e076c11b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff82abbf_bc05c87c",
+        "filename": "zuul/cmd/executor.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-11-21T03:13:40Z",
+      "side": 1,
+      "message": "Sending a command is no longer handled.\n\nThis is also confusing as \u0027zuul-executor\u0027 is both a daemon service, and an RPC type interface to a running executor.\n\nPerhaps commands should be moved into the admin cli tool \u0027zuul\u0027, so it\u0027s a subcommand eg: \u0027zuul executor verbose\u0027 and \u0027zuul-executor\u0027 stays a service.",
+      "range": {
+        "startLine": 50,
+        "startChar": 8,
+        "endLine": 50,
+        "endChar": 20
+      },
+      "revId": "83fd23f1a895646cfe96713b78342592e076c11b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff82abbf_7c34204b",
+        "filename": "zuul/cmd/executor.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-11-21T03:13:40Z",
+      "side": 1,
+      "message": "You need to configure the connections here as it\u0027s now being missed out from main()",
+      "revId": "83fd23f1a895646cfe96713b78342592e076c11b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff82abbf_3cf9b87f",
+        "filename": "zuul/cmd/merger.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-11-21T03:13:40Z",
+      "side": 1,
+      "message": "ditto connections",
+      "range": {
+        "startLine": 36,
+        "startChar": 8,
+        "endLine": 36,
+        "endChar": 11
+      },
+      "revId": "83fd23f1a895646cfe96713b78342592e076c11b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
