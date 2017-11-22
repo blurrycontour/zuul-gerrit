@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff82abbf_25939fa5",
+        "filename": "zuul/web/static/jobs.html",
+        "patchSetId": 15
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-11-22T18:32:25Z",
+      "side": 1,
+      "message": "There is a mixture of absolute and relative paths.\n\nWouldn\u0027t it be more generic to use relative urls everywhere (e.g. when running zuul-web under /zuul instead of /)?",
+      "range": {
+        "startLine": 21,
+        "startChar": 33,
+        "endLine": 21,
+        "endChar": 36
+      },
+      "revId": "399b5adbb5381adbeca3e0eb316df719e29845b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff82abbf_c591939b",
+        "filename": "zuul/web/static/jobs.html",
+        "patchSetId": 15
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-11-22T18:32:25Z",
+      "side": 1,
+      "message": "ditto",
+      "range": {
+        "startLine": 24,
+        "startChar": 17,
+        "endLine": 24,
+        "endChar": 20
+      },
+      "revId": "399b5adbb5381adbeca3e0eb316df719e29845b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
