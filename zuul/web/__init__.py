@@ -292,6 +292,8 @@ class ZuulWeb(object):
 
     log = logging.getLogger("zuul.web.ZuulWeb")
 
+    static_cache_expiry = 3600
+
     def __init__(self, listen_address, listen_port,
                  gear_server, gear_port,
                  ssl_key=None, ssl_cert=None, ssl_ca=None,
@@ -337,7 +339,8 @@ class ZuulWeb(object):
             fp = os.path.join(STATIC_DIR, "jobs.html")
         elif request.path.endswith("builds.html"):
             fp = os.path.join(STATIC_DIR, "builds.html")
-        return web.FileResponse(fp)
+        return web.FileResponse(fp, headers={
+            "Cache-Control": "public, max-age=%d" % self.static_cache_expiry})
 
     def run(self, loop=None):
         """
