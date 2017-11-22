@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "ff82abbf_2ff951c7",
+        "filename": "tests/fixtures/config/inventory/git/common-config/zuul.yaml",
+        "patchSetId": 7
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-11-22T07:22:57Z",
+      "side": 1,
+      "message": "ups, rebase mistake",
+      "parentUuid": "ff82abbf_f82c9c48",
+      "revId": "f1139e209449a402fea4d491797b0536236d40fd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff82abbf_b81e140a",
         "filename": "tests/fixtures/config/inventory/git/common-config/zuul.yaml",
         "patchSetId": 7
@@ -30,6 +48,24 @@
       "writtenOn": "2017-11-22T01:30:41Z",
       "side": 1,
       "message": "ditto",
+      "revId": "f1139e209449a402fea4d491797b0536236d40fd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff82abbf_ef0289b4",
+        "filename": "tests/fixtures/config/inventory/git/common-config/zuul.yaml",
+        "patchSetId": 7
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-11-22T07:22:57Z",
+      "side": 1,
+      "message": "ditto",
+      "parentUuid": "ff82abbf_b81e140a",
       "revId": "f1139e209449a402fea4d491797b0536236d40fd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
