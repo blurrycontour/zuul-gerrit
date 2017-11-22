@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff82abbf_f82c9c48",
+        "filename": "tests/fixtures/config/inventory/git/common-config/zuul.yaml",
+        "patchSetId": 7
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-11-22T01:30:41Z",
+      "side": 1,
+      "message": "Some weird merging/duplication here (see line 53)",
+      "revId": "f1139e209449a402fea4d491797b0536236d40fd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff82abbf_b81e140a",
+        "filename": "tests/fixtures/config/inventory/git/common-config/zuul.yaml",
+        "patchSetId": 7
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-11-22T01:30:41Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "f1139e209449a402fea4d491797b0536236d40fd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
