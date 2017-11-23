@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "ff82abbf_394d079a",
+        "filename": "zuul/web/static/jobs.html",
+        "patchSetId": 15
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-11-23T01:32:57Z",
+      "side": 1,
+      "message": "Indeed, I thought those external libraries (jquery/bootstrap/..) would be served by a proxy layer. But these could definitely go into the zuul-web static directory.\n\nThough from an integration point of view, it may be worthy to isolate external libraries from the zuul/web/static directory.\n\nFinally, this may be irrelevant when we switch to webpack, which i assume will produce a single js and css.",
+      "parentUuid": "ff82abbf_25939fa5",
+      "range": {
+        "startLine": 21,
+        "startChar": 33,
+        "endLine": 21,
+        "endChar": 36
+      },
+      "revId": "399b5adbb5381adbeca3e0eb316df719e29845b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff82abbf_c591939b",
         "filename": "zuul/web/static/jobs.html",
         "patchSetId": 15
