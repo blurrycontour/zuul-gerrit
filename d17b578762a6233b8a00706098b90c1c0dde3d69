@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "ff82abbf_26b61e40",
+        "filename": "zuul/driver/mqtt/mqttconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-11-24T08:53:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff82abbf_1c739417",
+      "range": {
+        "startLine": 32,
+        "startChar": 52,
+        "endLine": 32,
+        "endChar": 58
+      },
+      "revId": "d17b578762a6233b8a00706098b90c1c0dde3d69",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff82abbf_bc61483c",
         "filename": "zuul/driver/mqtt/mqttconnection.py",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2017-11-21T03:25:43Z",
       "side": 1,
       "message": "ditto",
+      "range": {
+        "startLine": 35,
+        "startChar": 50,
+        "endLine": 35,
+        "endChar": 56
+      },
+      "revId": "d17b578762a6233b8a00706098b90c1c0dde3d69",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff82abbf_46b3224e",
+        "filename": "zuul/driver/mqtt/mqttconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-11-24T08:53:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff82abbf_bc61483c",
       "range": {
         "startLine": 35,
         "startChar": 50,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "ff82abbf_a67b0e79",
+        "filename": "zuul/driver/mqtt/mqttconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-11-24T08:53:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff82abbf_5c527c69",
+      "range": {
+        "startLine": 38,
+        "startChar": 13,
+        "endLine": 38,
+        "endChar": 21
+      },
+      "revId": "d17b578762a6233b8a00706098b90c1c0dde3d69",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff82abbf_9cd564bc",
         "filename": "zuul/driver/mqtt/mqttconnection.py",
         "patchSetId": 2
@@ -82,6 +154,24 @@
       "writtenOn": "2017-11-21T03:25:43Z",
       "side": 1,
       "message": "Instead of the above validation, why not try to connect and catch any connection exceptions. Any exception should disable the driver.",
+      "revId": "d17b578762a6233b8a00706098b90c1c0dde3d69",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff82abbf_46c4825f",
+        "filename": "zuul/driver/mqtt/mqttconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-11-24T08:53:39Z",
+      "side": 1,
+      "message": "I don\u0027t get why we should remove the above validation. Well I added a try/except clause.",
+      "parentUuid": "ff82abbf_9cd564bc",
       "revId": "d17b578762a6233b8a00706098b90c1c0dde3d69",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -105,6 +195,24 @@
     },
     {
       "key": {
+        "uuid": "ff82abbf_664c2642",
+        "filename": "zuul/driver/mqtt/mqttconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-11-24T08:53:39Z",
+      "side": 1,
+      "message": "It seems like the configloader should/will use it. The other drivers do implement a getSchema.",
+      "parentUuid": "ff82abbf_dcf44c5e",
+      "revId": "d17b578762a6233b8a00706098b90c1c0dde3d69",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff82abbf_dcc20cea",
         "filename": "zuul/driver/mqtt/mqttreporter.py",
         "patchSetId": 2
@@ -116,6 +224,24 @@
       "writtenOn": "2017-11-21T03:25:43Z",
       "side": 1,
       "message": "This seems confusing. We\u0027re publishing both the build_set and the builds at the same mqtt level/schema. Wouldn\u0027t it make more sense to have the builds as a list inside the buildset and publish one message to the queue?",
+      "revId": "d17b578762a6233b8a00706098b90c1c0dde3d69",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff82abbf_c6adf29b",
+        "filename": "zuul/driver/mqtt/mqttreporter.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-11-24T08:53:39Z",
+      "side": 1,
+      "message": "Yes it would, thanks for the suggestion.",
+      "parentUuid": "ff82abbf_dcc20cea",
       "revId": "d17b578762a6233b8a00706098b90c1c0dde3d69",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
