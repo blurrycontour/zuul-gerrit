@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff82abbf_59a6a455",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-11-24T12:14:42Z",
+      "side": 1,
+      "message": "It took me quite a while to understand this search algorithm because of the at first glance weird looking if/elif/else construction.\n\nI think it would be much easier to understand if you do something like this:\n\n if sql_conn_name:\n   # we want a specific connection\n\n   conn \u003d self.connections.connections.get(sql_conn_name)\n   if not conn:\n     # named connection not found\n     sys.exit(1)\n   params[\u0027sql_connection\u0027] \u003d conn\n else:\n   # we want the one and only sql connection\n\n   # get all sql connections\n   connections \u003d [c for c in self.connections.connections.values()\n                  if isinstance(...)]\n   if not connections:\n     # no sql connection found\n     sys.exit(1)\n   if len(connections) \u003e 1:\n     # multiple connections found\n     sys.exit(1)\n   params[\u0027sql_connection\u0027] \u003d connections[0]",
+      "revId": "cf99874e546cdf6c7f7f551ed77e29560ea2e510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
