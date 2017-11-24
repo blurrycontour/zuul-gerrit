@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff82abbf_30b41b35",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 775,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-11-24T03:20:00Z",
+      "side": 1,
+      "message": "Why is this not elif?",
+      "range": {
+        "startLine": 775,
+        "startChar": 8,
+        "endLine": 775,
+        "endChar": 10
+      },
+      "revId": "bae8fecfea07cdc262e0a4560389404fd5f820c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff82abbf_b0810b4d",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 779,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-11-24T03:20:00Z",
+      "side": 1,
+      "message": "Tangential to this change, why are we preferring branch overrides over checkout overrides? (I suspect this is desired behaviour, but I would have guessed checkout overrides to be more explicit and therefore desirable)",
+      "range": {
+        "startLine": 779,
+        "startChar": 13,
+        "endLine": 779,
+        "endChar": 32
+      },
+      "revId": "bae8fecfea07cdc262e0a4560389404fd5f820c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
