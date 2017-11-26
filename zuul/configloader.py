@@ -426,6 +426,7 @@ class JobParser(object):
     # Attributes of a job that can also be used in Project and ProjectTemplate
     job_attributes = {'parent': vs.Any(str, None),
                       'final': bool,
+                      'protected': bool,
                       'failure-message': str,
                       'success-message': str,
                       'failure-url': str,
@@ -465,6 +466,7 @@ class JobParser(object):
 
     simple_attributes = [
         'final',
+        'protected',
         'timeout',
         'workspace',
         'voting',
