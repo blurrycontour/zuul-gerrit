@@ -28,6 +28,7 @@ state_dir=/var/lib/zuul
 git_dir=/var/lib/zuul/git
 ;git_user_email=zuul@example.com
 ;git_user_name=zuul
+command_socket=/var/lib/zuul/merger.socket
 
 [executor]
 default_username=zuul
