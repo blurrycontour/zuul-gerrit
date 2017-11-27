@@ -26,7 +26,6 @@ import grp
 import logging
 import os
 import pwd
-import socket
 import sys
 import signal
 import tempfile
@@ -60,15 +59,6 @@ class Executor(zuul.cmd.ZuulApp):
                             nargs='?')
 
         self.args = parser.parse_args()
-
-    def send_command(self, cmd):
-        state_dir = get_default(self.config, 'executor', 'state_dir',
-                                '/var/lib/zuul', expand_user=True)
-        path = os.path.join(state_dir, 'executor.socket')
-        s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-        s.connect(path)
-        cmd = '%s\n' % cmd
-        s.sendall(cmd.encode('utf8'))
 
     def exit_handler(self):
         self.executor.stop()
@@ -163,7 +153,10 @@ def main():
     server.read_config()
 
     if server.args.command in zuul.executor.server.COMMANDS:
-        server.send_command(server.args.command)
+        state_dir = get_default(server.config, 'executor', 'state_dir',
+                                '/var/lib/zuul', expand_user=True)
+        path = os.path.join(state_dir, 'executor.socket')
+        server.send_command(path, server.args.command)
         sys.exit(0)
 
     server.configure_connections(source_only=True)

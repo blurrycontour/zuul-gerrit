@@ -17,7 +17,6 @@
 import argparse
 import daemon
 import extras
-import socket
 
 # as of python-daemon 1.6 it doesn't bundle pidlockfile anymore
 # instead it depends on lockfile-0.9.1 which uses pidfile.
@@ -52,15 +51,6 @@ class Merger(zuul.cmd.ZuulApp):
                             nargs='?')
         self.args = parser.parse_args()
 
-    def send_command(self, cmd):
-        command_socket = get_default(
-            self.config, 'merger', 'command_socket',
-            '/var/lib/zuul/merger.socket')
-        s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-        s.connect(command_socket)
-        cmd = '%s\n' % cmd
-        s.sendall(cmd.encode('utf8'))
-
     def exit_handler(self):
         self.merger.stop()
         self.merger.join()
@@ -94,7 +84,10 @@ def main():
     server.read_config()
 
     if server.args.command in zuul.merger.server.COMMANDS:
-        server.send_command(server.args.command)
+        path = get_default(
+            server.config, 'merger', 'command_socket',
+            '/var/lib/zuul/merger.socket')
+        server.send_command(path, server.args.command)
         sys.exit(0)
 
     server.configure_connections(source_only=True)

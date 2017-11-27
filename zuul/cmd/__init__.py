@@ -21,6 +21,7 @@ import logging
 import logging.config
 import os
 import signal
+import socket
 import sys
 import traceback
 import threading
@@ -130,3 +131,9 @@ class ZuulApp(object):
     def configure_connections(self, source_only=False):
         self.connections = zuul.lib.connections.ConnectionRegistry()
         self.connections.configure(self.config, source_only)
+
+    def send_command(self, path, cmd):
+        s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        s.connect(path)
+        cmd = '%s\n' % cmd
+        s.sendall(cmd.encode('utf8'))
