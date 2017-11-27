@@ -15,7 +15,6 @@
 # under the License.
 
 import signal
-import socket
 import sys
 
 import zuul.cmd
@@ -44,15 +43,6 @@ class Merger(zuul.cmd.ZuulDaemonApp):
         if self.args.command:
             self.args.nodaemon = True
 
-    def send_command(self, cmd):
-        command_socket = get_default(
-            self.config, 'merger', 'command_socket',
-            '/var/lib/zuul/merger.socket')
-        s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-        s.connect(command_socket)
-        cmd = '%s\n' % cmd
-        s.sendall(cmd.encode('utf8'))
-
     def exit_handler(self):
         self.merger.stop()
         self.merger.join()
@@ -61,7 +51,10 @@ class Merger(zuul.cmd.ZuulDaemonApp):
         # See comment at top of file about zuul imports
         import zuul.merger.server
         if self.args.command in zuul.merger.server.COMMANDS:
-            self.send_command(self.args.command)
+            path = get_default(
+                self.config, 'merger', 'command_socket',
+                '/var/lib/zuul/merger.socket')
+            self.send_command(path, self.args.command)
             sys.exit(0)
 
         self.configure_connections(source_only=True)
