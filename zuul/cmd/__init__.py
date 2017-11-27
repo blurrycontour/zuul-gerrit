@@ -23,6 +23,7 @@ import logging
 import logging.config
 import os
 import signal
+import socket
 import sys
 import traceback
 import threading
@@ -184,3 +185,9 @@ class ZuulDaemonApp(ZuulApp):
                 pass
             with daemon.DaemonContext(pidfile=pid):
                 self.run()
+
+    def send_command(self, path, cmd):
+        s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        s.connect(path)
+        cmd = '%s\n' % cmd
+        s.sendall(cmd.encode('utf8'))
