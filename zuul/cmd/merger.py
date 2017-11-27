@@ -17,6 +17,7 @@
 import argparse
 import daemon
 import extras
+import socket
 
 # as of python-daemon 1.6 it doesn't bundle pidlockfile anymore
 # instead it depends on lockfile-0.9.1 which uses pidfile.
@@ -27,6 +28,7 @@ import signal
 
 import zuul.cmd
 from zuul.lib.config import get_default
+import zuul.merger.server
 
 # No zuul imports here because they pull in paramiko which must not be
 # imported until after the daemonization.
@@ -45,14 +47,25 @@ class Merger(zuul.cmd.ZuulApp):
         parser.add_argument('--version', dest='version', action='version',
                             version=self._get_version(),
                             help='show zuul version')
+        parser.add_argument('command',
+                            choices=zuul.merger.server.COMMANDS,
+                            nargs='?')
         self.args = parser.parse_args()
 
-    def exit_handler(self, signum, frame):
-        signal.signal(signal.SIGUSR1, signal.SIG_IGN)
+    def send_command(self, cmd):
+        command_socket = get_default(
+            self.config, 'merger', 'command_socket',
+            '/var/lib/zuul/merger.socket')
+        s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        s.connect(command_socket)
+        cmd = '%s\n' % cmd
+        s.sendall(cmd.encode('utf8'))
+
+    def exit_handler(self):
         self.merger.stop()
         self.merger.join()
 
-    def main(self):
+    def main(self, daemon=True):
         # See comment at top of file about zuul imports
         import zuul.merger.server
 
@@ -62,21 +75,28 @@ class Merger(zuul.cmd.ZuulApp):
                                                      self.connections)
         self.merger.start()
 
-        signal.signal(signal.SIGUSR1, self.exit_handler)
         signal.signal(signal.SIGUSR2, zuul.cmd.stack_dump_handler)
-        while True:
-            try:
-                signal.pause()
-            except KeyboardInterrupt:
-                print("Ctrl + C: asking merger to exit nicely...\n")
-                self.exit_handler(signal.SIGINT, None)
+        if daemon:
+            self.merger.join()
+        else:
+            while True:
+                try:
+                    signal.pause()
+                except KeyboardInterrupt:
+                    print("Ctrl + C: asking merger to exit nicely...\n")
+                    self.exit_handler()
+                    sys.exit(0)
 
 
 def main():
     server = Merger()
     server.parse_arguments()
-
     server.read_config()
+
+    if server.args.command in zuul.merger.server.COMMANDS:
+        server.send_command(server.args.command)
+        sys.exit(0)
+
     server.configure_connections(source_only=True)
 
     pid_fn = get_default(server.config, 'merger', 'pidfile',
@@ -85,10 +105,10 @@ def main():
     pid = pid_file_module.TimeoutPIDLockFile(pid_fn, 10)
 
     if server.args.nodaemon:
-        server.main()
+        server.main(False)
     else:
         with daemon.DaemonContext(pidfile=pid):
-            server.main()
+            server.main(False)
 
 
 if __name__ == "__main__":
