@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff82abbf_9644b148",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 928,
+      "author": {
+        "id": 1106
+      },
+      "writtenOn": "2017-11-28T18:59:25Z",
+      "side": 1,
+      "message": "not sure if maybe we should error out here in case the connection is local?\n\nIIRC, local is not something we should allow on executor",
+      "revId": "ff297306392654630c1d546a87ea2454216a1b8e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
