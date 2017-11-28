@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff82abbf_976121ac",
+        "filename": "zuul/driver/mqtt/mqttconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-11-28T05:28:47Z",
+      "side": 1,
+      "message": "(note) I checked and it looks like having None as username/password is the same effect as not calling username_pw_set(). Thus this is safe to run when no username is provided (see comment on ps2).",
+      "range": {
+        "startLine": 40,
+        "startChar": 12,
+        "endLine": 40,
+        "endChar": 47
+      },
+      "revId": "4b8e3ea5f5edfaa3068ee1c8dd3a91f51c50c6e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
