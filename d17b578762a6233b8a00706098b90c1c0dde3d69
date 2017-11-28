@@ -178,6 +178,24 @@
     },
     {
       "key": {
+        "uuid": "ff82abbf_973841a0",
+        "filename": "zuul/driver/mqtt/mqttconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-11-28T05:28:47Z",
+      "side": 1,
+      "message": "There may be cases where somebody is connecting without a username/password (for example, non-publish uses of the connection).",
+      "parentUuid": "ff82abbf_46c4825f",
+      "revId": "d17b578762a6233b8a00706098b90c1c0dde3d69",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff82abbf_dcf44c5e",
         "filename": "zuul/driver/mqtt/mqttconnection.py",
         "patchSetId": 2
