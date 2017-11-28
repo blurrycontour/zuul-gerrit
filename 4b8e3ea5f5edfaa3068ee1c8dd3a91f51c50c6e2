@@ -70,6 +70,30 @@
       "revId": "4b8e3ea5f5edfaa3068ee1c8dd3a91f51c50c6e2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff82abbf_d77d69b2",
+        "filename": "zuul/driver/mqtt/mqttconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-11-28T06:11:57Z",
+      "side": 1,
+      "message": "That\u0027s ok, paho does a \u0027if self._username\u0027 in the connect() method to check if authentication is needed. So we can call that method regardless.",
+      "parentUuid": "ff82abbf_b7f6a562",
+      "range": {
+        "startLine": 40,
+        "startChar": 12,
+        "endLine": 40,
+        "endChar": 47
+      },
+      "revId": "4b8e3ea5f5edfaa3068ee1c8dd3a91f51c50c6e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
