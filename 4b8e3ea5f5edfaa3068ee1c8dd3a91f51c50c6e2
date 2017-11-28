@@ -118,6 +118,30 @@
       "revId": "4b8e3ea5f5edfaa3068ee1c8dd3a91f51c50c6e2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff82abbf_72726baf",
+        "filename": "zuul/driver/mqtt/mqttconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-11-28T06:22:51Z",
+      "side": 1,
+      "message": "Oh good catch! My version (v1.1) doesn\u0027t have the \u0027is not None\u0027... Ok then let\u0027s call that block only if \u0027user\u0027 is set in zuul.conf",
+      "parentUuid": "ff82abbf_773d7ddb",
+      "range": {
+        "startLine": 40,
+        "startChar": 12,
+        "endLine": 40,
+        "endChar": 47
+      },
+      "revId": "4b8e3ea5f5edfaa3068ee1c8dd3a91f51c50c6e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
