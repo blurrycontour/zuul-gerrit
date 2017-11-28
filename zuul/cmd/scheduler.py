@@ -30,6 +30,7 @@ import signal
 import zuul.cmd
 from zuul.lib.config import get_default
 from zuul.lib.statsd import get_statsd_config
+import zuul.scheduler
 
 # No zuul imports here because they pull in paramiko which must not be
 # imported until after the daemonization.
@@ -54,6 +55,10 @@ class Scheduler(zuul.cmd.ZuulApp):
         parser.add_argument('--version', dest='version', action='version',
                             version=self._get_version(),
                             help='show zuul version')
+        parser.add_argument('command',
+                            choices=zuul.scheduler.COMMANDS,
+                            nargs='?')
+
         self.args = parser.parse_args(args)
 
     def reconfigure_handler(self, signum, frame):
@@ -67,8 +72,7 @@ class Scheduler(zuul.cmd.ZuulApp):
             self.log.exception("Reconfiguration failed:")
         signal.signal(signal.SIGHUP, self.reconfigure_handler)
 
-    def exit_handler(self, signum, frame):
-        signal.signal(signal.SIGUSR1, signal.SIG_IGN)
+    def exit_handler(self):
         self.sched.exit()
         self.sched.join()
         self.stop_gear_server()
@@ -134,7 +138,7 @@ class Scheduler(zuul.cmd.ZuulApp):
         if self.gear_server_pid:
             os.kill(self.gear_server_pid, signal.SIGKILL)
 
-    def main(self):
+    def main(self, daemon=True):
         # See comment at top of file about zuul imports
         import zuul.scheduler
         import zuul.executor.client
@@ -195,21 +199,30 @@ class Scheduler(zuul.cmd.ZuulApp):
         webapp.start()
 
         signal.signal(signal.SIGHUP, self.reconfigure_handler)
-        signal.signal(signal.SIGUSR1, self.exit_handler)
         signal.signal(signal.SIGTERM, self.term_handler)
-        while True:
-            try:
-                signal.pause()
-            except KeyboardInterrupt:
-                print("Ctrl + C: asking scheduler to exit nicely...\n")
-                self.exit_handler(signal.SIGINT, None)
+        if daemon:
+            self.sched.join()
+        else:
+            while True:
+                try:
+                    signal.pause()
+                except KeyboardInterrupt:
+                    print("Ctrl + C: asking scheduler to exit nicely...\n")
+                    self.exit_handler()
+                    sys.exit(0)
 
 
 def main():
     scheduler = Scheduler()
     scheduler.parse_arguments()
-
     scheduler.read_config()
+
+    if scheduler.args.command in zuul.scheduler.COMMANDS:
+        path = get_default(
+            scheduler.config, 'scheduler', 'command_socket',
+            '/var/lib/zuul/scheduler.socket')
+        scheduler.send_command(path, scheduler.args.command)
+        sys.exit(0)
 
     if scheduler.args.validate:
         sys.exit(scheduler.test_config())
@@ -220,10 +233,10 @@ def main():
     pid = pid_file_module.TimeoutPIDLockFile(pid_fn, 10)
 
     if scheduler.args.nodaemon:
-        scheduler.main()
+        scheduler.main(False)
     else:
         with daemon.DaemonContext(pidfile=pid):
-            scheduler.main()
+            scheduler.main(False)
 
 
 if __name__ == "__main__":
