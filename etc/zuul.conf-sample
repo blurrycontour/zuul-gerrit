@@ -34,6 +34,7 @@ command_socket=/var/lib/zuul/merger.socket
 default_username=zuul
 trusted_ro_paths=/opt/zuul-scripts:/var/cache
 trusted_rw_paths=/opt/zuul-logs
+command_socket=/var/lib/zuul/executor.socket
 
 [web]
 listen_address=127.0.0.1

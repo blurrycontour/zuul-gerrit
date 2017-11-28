@@ -153,9 +153,9 @@ def main():
     server.read_config()
 
     if server.args.command in zuul.executor.server.COMMANDS:
-        state_dir = get_default(server.config, 'executor', 'state_dir',
-                                '/var/lib/zuul', expand_user=True)
-        path = os.path.join(state_dir, 'executor.socket')
+        path = get_default(
+            server.config, 'executor', 'command_socket',
+            '/var/lib/zuul/executor.socket')
         server.send_command(path, server.args.command)
         sys.exit(0)
 
