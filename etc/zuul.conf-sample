@@ -23,6 +23,7 @@ tenant_config=/etc/zuul/main.yaml
 log_config=/etc/zuul/logging.conf
 pidfile=/var/run/zuul/zuul.pid
 state_dir=/var/lib/zuul
+command_socket=/var/lib/zuul/scheduler.socket
 
 [merger]
 git_dir=/var/lib/zuul/git

@@ -224,6 +224,10 @@ The following sections of ``zuul.conf`` are used by the scheduler:
 
 .. attr:: scheduler
 
+   .. attr:: command_socket
+
+      Path to command socket file for the scheduler process.
+
    .. attr:: tenant_config
       :required:
 
