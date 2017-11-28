@@ -46,6 +46,30 @@
       "revId": "4b8e3ea5f5edfaa3068ee1c8dd3a91f51c50c6e2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff82abbf_b7f6a562",
+        "filename": "zuul/driver/mqtt/mqttconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-11-28T06:06:03Z",
+      "side": 1,
+      "message": "ah, you\u0027re right, in that case it won\u0027t be the same as not providing a username/pass. So instead username_pw_set should only be called if the username is configured.",
+      "parentUuid": "ff82abbf_77e9fdb4",
+      "range": {
+        "startLine": 40,
+        "startChar": 12,
+        "endLine": 40,
+        "endChar": 47
+      },
+      "revId": "4b8e3ea5f5edfaa3068ee1c8dd3a91f51c50c6e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
