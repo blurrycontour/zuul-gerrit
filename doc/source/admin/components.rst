@@ -282,6 +282,10 @@ The following section of ``zuul.conf`` is used by the merger:
 
 .. attr:: merger
 
+   .. attr:: command_socket
+
+      Path to command socket file for the merger process.
+
    .. attr:: git_dir
 
       Directory in which Zuul should clone git repositories.
@@ -391,6 +395,10 @@ Configuration
 The following sections of ``zuul.conf`` are used by the executor:
 
 .. attr:: executor
+
+   .. attr:: command_socket
+
+      Path to command socket file for the executor process.
 
    .. attr:: finger_port
       :default: 79
