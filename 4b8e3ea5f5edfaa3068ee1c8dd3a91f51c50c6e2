@@ -22,6 +22,30 @@
       "revId": "4b8e3ea5f5edfaa3068ee1c8dd3a91f51c50c6e2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff82abbf_77e9fdb4",
+        "filename": "zuul/driver/mqtt/mqttconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-11-28T05:49:16Z",
+      "side": 1,
+      "message": "Ok fair enough, less code works for me too :-)\n\nThough, the username_pw_set() does a username.encode(\u0027utf-8\u0027) so I used a default \u0027\u0027 here.",
+      "parentUuid": "ff82abbf_976121ac",
+      "range": {
+        "startLine": 40,
+        "startChar": 12,
+        "endLine": 40,
+        "endChar": 47
+      },
+      "revId": "4b8e3ea5f5edfaa3068ee1c8dd3a91f51c50c6e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
