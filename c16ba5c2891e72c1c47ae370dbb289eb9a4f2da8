@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff82abbf_a97ce871",
+        "filename": "doc/source/admin/drivers/github.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-11-29T06:34:10Z",
+      "side": 1,
+      "message": "Does that work already before configuring zuul?",
+      "range": {
+        "startLine": 90,
+        "startChar": 2,
+        "endLine": 90,
+        "endChar": 88
+      },
+      "revId": "c16ba5c2891e72c1c47ae370dbb289eb9a4f2da8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
