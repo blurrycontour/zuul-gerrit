@@ -156,7 +156,7 @@ class FakeAnsibleManager(zuul.lib.ansible.AnsibleManager):
     def validate(self):
         return True
 
-    def copyAnsibleFiles(self):
+    def copyAnsibleFiles(self, config):
         pass
 
 
