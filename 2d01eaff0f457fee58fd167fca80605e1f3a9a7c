@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff82abbf_97dfaf0b",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 24
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-11-29T17:41:17Z",
+      "side": 1,
+      "message": "Can we drop build.id and buildset.tenant from the returned data?  The id is an internal implementation detail, and the tenant should be implied (see below).",
+      "revId": "2d01eaff0f457fee58fd167fca80605e1f3a9a7c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff82abbf_b7e2f3d3",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 24
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-11-29T17:41:17Z",
+      "side": 1,
+      "message": "The tenant should be implied by the request endpoint.",
+      "revId": "2d01eaff0f457fee58fd167fca80605e1f3a9a7c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
