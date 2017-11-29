@@ -2321,7 +2321,7 @@ class ExecutorServer(object):
                                 'ansible versions.')
             else:
                 self.ansible_manager.install()
-        self.ansible_manager.copyAnsibleFiles()
+        self.ansible_manager.copyAnsibleFiles(self.config)
 
     def _getMerger(self, root, cache_root, logger=None):
         return zuul.merger.merger.Merger(
