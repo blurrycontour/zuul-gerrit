@@ -500,7 +500,7 @@ The following sections of ``zuul.conf`` are used by the executor:
       significant protections against malicious users and accidental
       breakage in playbooks. As such,  `nullwrap` is not recommended
       for use in production.
-      
+
       This option, and thus, `nullwrap`, may be removed in the future.
       `bubblewrap` has become integral to securely operating Zuul.  If you
       have a valid use case for it, we encourage you to let us know.
@@ -600,6 +600,12 @@ sections of ``zuul.conf`` are used by the web server:
 
       Base URL on which the websocket service is exposed, if different
       than the base URL of the web app.
+
+   .. attr:: static_cache_expiry
+      :default: 3600
+
+      The Cache-Control max-age response header value for static files served
+      by the zuul-web. Set to 0 during development to disable Cache-Control.
 
 Operation
 ~~~~~~~~~
