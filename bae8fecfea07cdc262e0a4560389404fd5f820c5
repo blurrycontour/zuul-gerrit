@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "ff82abbf_1cb18647",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 775,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-11-29T16:44:13Z",
+      "side": 1,
+      "message": "Because we missed it in review of Icc2907e72596626e96d2dc9f6ab1c3026f4085ab.  Will fix in followup.",
+      "revId": "bae8fecfea07cdc262e0a4560389404fd5f820c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff82abbf_b0810b4d",
         "filename": "zuul/executor/server.py",
         "patchSetId": 1
@@ -42,6 +59,23 @@
         "endLine": 779,
         "endChar": 32
       },
+      "revId": "bae8fecfea07cdc262e0a4560389404fd5f820c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff82abbf_3cac8aeb",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 779,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-11-29T16:44:13Z",
+      "side": 1,
+      "message": "We\u0027re deprecating branch in favor of checkout, so the order isn\u0027t really defined.  However, the order you suggest might make more sense during the transition.",
       "revId": "bae8fecfea07cdc262e0a4560389404fd5f820c5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
