@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "ff82abbf_fc6f0225",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-11-29T17:10:33Z",
+      "side": 1,
+      "message": "Fixed.",
+      "revId": "83fd23f1a895646cfe96713b78342592e076c11b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff82abbf_7caae085",
         "filename": "zuul/cmd/client.py",
         "patchSetId": 3
@@ -42,6 +59,23 @@
         "endLine": 136,
         "endChar": 12
       },
+      "revId": "83fd23f1a895646cfe96713b78342592e076c11b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff82abbf_9c64b64b",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-11-29T17:10:33Z",
+      "side": 1,
+      "message": "Done.",
       "revId": "83fd23f1a895646cfe96713b78342592e076c11b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -71,6 +105,23 @@
     },
     {
       "key": {
+        "uuid": "ff82abbf_3c6a4a19",
+        "filename": "zuul/cmd/executor.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-11-29T17:10:33Z",
+      "side": 1,
+      "message": "Oops, I did not mean to change this.  I will add back sending a command.\n\nI\u0027m open to your idea, but I\u0027d like to fix this first, then get command support in all the other services and standardize that, then consider moving those commands to the zuul CLI.",
+      "revId": "83fd23f1a895646cfe96713b78342592e076c11b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff82abbf_7c34204b",
         "filename": "zuul/cmd/executor.py",
         "patchSetId": 3
@@ -82,6 +133,23 @@
       "writtenOn": "2017-11-21T03:13:40Z",
       "side": 1,
       "message": "You need to configure the connections here as it\u0027s now being missed out from main()",
+      "revId": "83fd23f1a895646cfe96713b78342592e076c11b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff82abbf_dc747e00",
+        "filename": "zuul/cmd/executor.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-11-29T17:10:33Z",
+      "side": 1,
+      "message": "Fixed.",
       "revId": "83fd23f1a895646cfe96713b78342592e076c11b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
