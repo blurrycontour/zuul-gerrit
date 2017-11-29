@@ -1619,6 +1619,26 @@ class ExecutorServer(object):
 
         _copy_ansible_files(zuul.ansible, plugin_dir)
 
+        # Update LOG_STREAM parameters in plugin_dir copies
+        log_stream_port = int(get_default(
+            self.config, 'executor', 'log_stream_port', 19885))
+        log_stream_file = get_default(
+            self.config, 'executor', 'log_stream_file',
+            '/tmp/console-{log_uuid}.log')
+        for fn in ("library/zuul_console.py", "library/command.py",
+                   "callback/zuul_stream.py"):
+            fn_path = os.path.join(plugin_dir, fn)
+            content = open(fn_path).read()
+            new_content = content.replace(
+                "LOG_STREAM_PORT = 19885",
+                "LOG_STREAM_PORT = %d" % log_stream_port).replace(
+                    "LOG_STREAM_FILE = '/tmp/console-{log_uuid}.log'",
+                    "LOG_STREAM_FILE = '%s'" % log_stream_file)
+            if content != new_content:
+                with open(fn_path, "w") as of:
+                    of.write(new_content)
+                self.log.debug("%s: updated log_stream default" % fn_path)
+
         # We're copying zuul.ansible.* into a directory we are going
         # to add to pythonpath, so our plugins can "import
         # zuul.ansible".  But we're not installing all of zuul, so
