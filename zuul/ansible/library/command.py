@@ -157,6 +157,12 @@ _log_lines = []
 class Console(object):
     def __init__(self, log_uuid):
         self.logfile_name = LOG_STREAM_FILE.format(log_uuid=log_uuid)
+        if not os.path.isdir(os.path.dirname(self.logfile_name)):
+            oldmask = os.umask(0)
+            try:
+                os.makedirs(os.path.dirname(self.logfile_name), mode=0o1777)
+            finally:
+                os.umask(oldmask)
 
     def __enter__(self):
         self.logfile = open(self.logfile_name, 'ab', buffering=0)
