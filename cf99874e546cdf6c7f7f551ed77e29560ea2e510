@@ -16,6 +16,24 @@
       "revId": "cf99874e546cdf6c7f7f551ed77e29560ea2e510",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff82abbf_8ec9ea59",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-11-29T05:54:04Z",
+      "side": 1,
+      "message": "Alright, next PS will make the logic easier to understand. Thanks for the suggestion Tobias!",
+      "parentUuid": "ff82abbf_59a6a455",
+      "revId": "cf99874e546cdf6c7f7f551ed77e29560ea2e510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
