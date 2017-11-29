@@ -539,6 +539,17 @@ The following sections of ``zuul.conf`` are used by the executor:
       List of paths, separated by ``:`` to read-write bind mount into
       untrusted bubblewrap contexts.
 
+   .. attr:: log_stream_file
+      :default: /tmp/console-{log_uuid}.log
+
+      The filename template used to store Ansible command output,
+      formated with the log_uuid parameter.
+
+   .. attr:: log_stream_port
+      :default: 19885
+
+      The TCP port the zuul_console will listen for the zuul_stream callback.
+
    .. attr:: execution_wrapper
       :default: bubblewrap
 
