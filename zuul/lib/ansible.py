@@ -252,7 +252,7 @@ class AnsibleManager:
             versions.append((version, version == self.default_version))
         return versions
 
-    def copyAnsibleFiles(self):
+    def copyAnsibleFiles(self, config):
         if os.path.exists(self.zuul_ansible_dir):
             shutil.rmtree(self.zuul_ansible_dir)
 
@@ -284,3 +284,23 @@ class AnsibleManager:
                 with open(os.path.join(fn, '__init__.py'), 'w'):
                     # Nothing to do here, we just want the file to exist.
                     pass
+
+            # Update LOG_STREAM parameters in plugin_dir copies
+            log_stream_port = int(get_default(
+                config, 'executor', 'log_stream_port', 19885))
+            log_stream_file = get_default(
+                config, 'executor', 'log_stream_file',
+                '/tmp/console-{log_uuid}.log')
+            for fn in ("library/zuul_console.py", "library/command.py",
+                       "callback/zuul_stream.py"):
+                fn_path = os.path.join(plugin_dir, fn)
+                content = open(fn_path).read()
+                new_content = content.replace(
+                    "LOG_STREAM_PORT = 19885",
+                    "LOG_STREAM_PORT = %d" % log_stream_port).replace(
+                        "LOG_STREAM_FILE = '/tmp/console-{log_uuid}.log'",
+                        "LOG_STREAM_FILE = '%s'" % log_stream_file)
+                if content != new_content:
+                    with open(fn_path, "w") as of:
+                        of.write(new_content)
+                    self.log.debug("%s: updated log_stream default" % fn_path)
