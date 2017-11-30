@@ -1,0 +1,9 @@
+Code-Review+2: Joshua Hesketh <josh@nitrotech.org>
+Code-Review+2: Clark Boylan <cboylan@sapwetik.org>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Thu, 30 Nov 2017 00:36:10 +0000
+Reviewed-on: https://review.openstack.org/521976
+Project: openstack-infra/zuul
+Branch: refs/heads/feature/zuulv3
