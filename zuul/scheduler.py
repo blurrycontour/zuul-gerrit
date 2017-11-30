@@ -595,10 +595,17 @@ class Scheduler(threading.Thread):
                                  "when reconfiguring" % name)
                 continue
             self.log.debug("Re-enqueueing changes for pipeline %s" % name)
+            new_pipeline.window = max(old_pipeline.window,
+                                      new_pipeline.window_floor)
             items_to_remove = []
             builds_to_cancel = []
             last_head = None
             for shared_queue in old_pipeline.queues:
+                # Attempt to keep window sizes from shrinking where possible
+                new_queue = new_pipeline.getQueue(shared_queue.projects[0])
+                if new_queue:
+                    new_queue.window = max(shared_queue.window,
+                                           new_queue.window_floor)
                 for item in shared_queue.queue:
                     if not item.item_ahead:
                         last_head = item

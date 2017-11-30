@@ -3879,27 +3879,25 @@ class TestScheduler(ZuulTestCase):
         self.sched.reconfigure(self.config)
         tenant = self.sched.abide.tenants.get('tenant-one')
         queue = tenant.layout.pipelines['gate'].queues[0]
-        self.assertEqual(queue.window, 1)
-        # B is now outside the window, but builds haven't been canceled
+        # Even though we have configured a smaller window, the value
+        # on the existing shared queue should be used.
+        self.assertEqual(queue.window, 20)
         self.assertTrue(len(self.builds), 4)
 
         self.sched.reconfigure(self.config)
         tenant = self.sched.abide.tenants.get('tenant-one')
         queue = tenant.layout.pipelines['gate'].queues[0]
-        self.assertEqual(queue.window, 1)
-        # B's builds have been canceled now
-        self.assertTrue(len(self.builds), 2)
+        self.assertEqual(queue.window, 20)
+        self.assertTrue(len(self.builds), 4)
 
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
-        # This will run new builds for B
+
         self.waitUntilSettled()
         self.assertHistory([
             dict(name='job1', result='SUCCESS', changes='1,1'),
             dict(name='job1', result='SUCCESS', changes='1,1 2,1'),
             dict(name='job2', result='SUCCESS', changes='1,1'),
-            dict(name='job2', result='SUCCESS', changes='1,1 2,1'),
-            dict(name='job1', result='SUCCESS', changes='1,1 2,1'),
             dict(name='job2', result='SUCCESS', changes='1,1 2,1'),
         ], ordered=False)
 
