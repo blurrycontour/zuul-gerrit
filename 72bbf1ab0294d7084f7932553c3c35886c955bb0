@@ -22,6 +22,30 @@
       "revId": "72bbf1ab0294d7084f7932553c3c35886c955bb0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff82abbf_dc30e5eb",
+        "filename": "zuul/ansible/callback/zuul_json.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-11-30T13:54:35Z",
+      "side": 1,
+      "message": "I agree - setting self._banner_emitted to true looks like it got lost somewhere.",
+      "parentUuid": "7f515b1d_63bad10a",
+      "range": {
+        "startLine": 111,
+        "startChar": 8,
+        "endLine": 111,
+        "endChar": 35
+      },
+      "revId": "72bbf1ab0294d7084f7932553c3c35886c955bb0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
