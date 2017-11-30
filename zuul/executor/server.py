@@ -358,8 +358,8 @@ class JobDir(object):
         # there is a period of time where the user can click on the live log
         # link on the status page but the log streaming fails because the file
         # is not there yet.
-        with open(self.job_output_file, 'w'):
-            pass
+        with open(self.job_output_file, 'w') as f:
+            f.write('Job console starting...')
         self.trusted_projects = []
         self.trusted_project_index = {}
 
