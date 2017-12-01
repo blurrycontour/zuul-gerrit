@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff82abbf_611d570e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-12-01T06:24:54Z",
+      "side": 1,
+      "message": "I think the test still will be valid if someone has a constant window and decreases this constant window by configuration. Then it still can occur that builds are canceled during reconfiguration.",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 28,
+        "endChar": 63
+      },
+      "revId": "8fd207bdf2212a838ddc14a26d96e66544e5882a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
