@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff82abbf_a144bf1c",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 600,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-12-01T06:15:48Z",
+      "side": 1,
+      "message": "I think this doesn\u0027t take one use case into account. If someone has a pipeline with constant (increase factor \u003d\u003d 0) window (not sure who wants this though...) and decreases it. That probably would keep the window size on the old (higher) level.",
+      "range": {
+        "startLine": 598,
+        "startChar": 0,
+        "endLine": 600,
+        "endChar": 68
+      },
+      "revId": "ac18c9ebbf984d3ca30b1ce7ff5858f743def735",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
