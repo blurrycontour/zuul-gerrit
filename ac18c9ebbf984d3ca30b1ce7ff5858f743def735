@@ -22,6 +22,23 @@
       "revId": "ac18c9ebbf984d3ca30b1ce7ff5858f743def735",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_2783fe06",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 600,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-01T15:04:49Z",
+      "side": 1,
+      "message": "The increase factor has a minimum value of 1, however, as you point out in irc, you can get a constant window with increase factor of 1 and exponential type.",
+      "revId": "ac18c9ebbf984d3ca30b1ce7ff5858f743def735",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
