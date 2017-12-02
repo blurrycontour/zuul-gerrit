@@ -1702,6 +1702,7 @@ class ExecutorServer(object):
         self.merger_worker.registerFunction("merger:merge")
         self.merger_worker.registerFunction("merger:cat")
         self.merger_worker.registerFunction("merger:refstate")
+        self.merger_worker.registerFunction("merger:fileschanges")
 
     def register_work(self):
         if self._running:
@@ -1855,6 +1856,9 @@ class ExecutorServer(object):
             elif job.name == 'merger:refstate':
                 self.log.debug("Got refstate job: %s" % job.unique)
                 self.refstate(job)
+            elif job.name == 'merger:fileschanges':
+                self.log.debug("Got fileschanges job: %s" % job.unique)
+                self.fileschanges(job)
             else:
                 self.log.error("Unable to handle job %s" % job.name)
                 job.sendWorkFail()
@@ -1962,6 +1966,18 @@ class ExecutorServer(object):
             files = self.merger.getFiles(args['connection'], args['project'],
                                          args['branch'], args['files'],
                                          args.get('dirs', []))
+        result = dict(updated=True,
+                      files=files)
+        job.sendWorkComplete(json.dumps(result))
+
+    def fileschanges(self, job):
+        args = json.loads(job.arguments)
+        task = self.update(args['connection'], args['project'])
+        task.wait()
+        with self.merger_lock:
+            files = self.merger.getFilesChanges(
+                args['connection'], args['project'],
+                args['branch'])
         result = dict(updated=True,
                       files=files)
         job.sendWorkComplete(json.dumps(result))

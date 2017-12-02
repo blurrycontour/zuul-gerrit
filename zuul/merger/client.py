@@ -131,6 +131,14 @@ class MergeClient(object):
         job = self.submitJob('merger:cat', data, None, precedence)
         return job
 
+    def getFilesChanges(self, connection_name, project_name, branch,
+                        precedence=zuul.model.PRECEDENCE_HIGH):
+        data = dict(connection=connection_name,
+                    project=project_name,
+                    branch=branch)
+        job = self.submitJob('merger:fileschanges', data, None, precedence)
+        return job
+
     def onBuildCompleted(self, job):
         data = getJobData(job)
         merged = data.get('merged', False)
