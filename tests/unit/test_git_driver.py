@@ -12,6 +12,12 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+
+import os
+import time
+import yaml
+import shutil
+
 from tests.base import ZuulTestCase
 
 
@@ -23,7 +29,7 @@ class TestGitDriver(ZuulTestCase):
         super(TestGitDriver, self).setup_config()
         self.config.set('connection git', 'baseurl', self.upstream_root)
 
-    def test_git_driver(self):
+    def test_basic(self):
         tenant = self.sched.abide.tenants.get('tenant-one')
         # Check that we have the git source for common-config and the
         # gerrit source for the project.
@@ -40,3 +46,41 @@ class TestGitDriver(ZuulTestCase):
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 1)
         self.assertEqual(A.reported, 1)
+
+    def test_config_refreshed(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 1)
+        self.assertEqual(A.reported, 1)
+        self.assertEqual(self.history[0].name, 'project-test1')
+
+        # Update zuul.yaml to force a tenant reconfiguration
+        path = os.path.join(self.upstream_root, 'common-config', 'zuul.yaml')
+        config = yaml.load(open(path, 'r').read())
+        change = {
+            'name': 'org/project',
+            'check': {
+                'jobs': [
+                    'project-test2'
+                ]
+            }
+        }
+        config[4]['project'] = change
+        files = {'zuul.yaml': yaml.dump(config)}
+        self.addCommitToRepo(
+            'common-config', 'Change zuul.yaml configuration', files)
+
+        # Let some time for the tenant reconfiguration to happen
+        time.sleep(2)
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 2)
+        self.assertEqual(A.reported, 1)
+        # We make sure the new job has run
+        self.assertEqual(self.history[1].name, 'project-test2')
+
+        # Will put that to true in order to push multi common-config commit
+        # self.sched.connections.getSource('git').connection.watcher_pause
