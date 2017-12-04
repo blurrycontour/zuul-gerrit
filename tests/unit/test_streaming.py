@@ -28,6 +28,7 @@ import time
 
 import zuul.web
 import zuul.lib.log_streamer
+import zuul.lib.fingergw
 import tests.base
 
 
@@ -60,7 +61,7 @@ class TestLogStreamer(tests.base.BaseTestCase):
 class TestStreaming(tests.base.AnsibleZuulTestCase):
 
     tenant_config_file = 'config/streamer/main.yaml'
-    log = logging.getLogger("zuul.test.test_log_streamer.TestStreaming")
+    log = logging.getLogger("zuul.test_streaming")
 
     def setUp(self):
         super(TestStreaming, self).setUp()
@@ -181,6 +182,30 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
         loop.run_until_complete(client(loop, build_uuid, event))
         loop.close()
 
+    def runFingerClient(self, build_uuid, gateway_address, event):
+        # Wait until the gateway is started
+        while True:
+            try:
+                # NOTE(Shrews): This causes the gateway to begin to handle
+                # a request for which it never receives data, and thus
+                # causes the getCommand() method to timeout (seen in the
+                # test results, but is harmless).
+                with socket.create_connection(gateway_address) as s:
+                    break
+            except ConnectionRefusedError:
+                time.sleep(0.1)
+
+        with socket.create_connection(gateway_address) as s:
+            msg = "%s\n" % build_uuid
+            s.sendall(msg.encode('utf-8'))
+            event.set()  # notify we are connected and req sent
+            while True:
+                data = s.recv(1024)
+                if not data:
+                    break
+                self.streaming_data += data.decode('utf-8')
+            s.shutdown(socket.SHUT_RDWR)
+
     def test_websocket_streaming(self):
         # Need to set the streaming port before submitting the job
         finger_port = 7902
@@ -265,3 +290,79 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
         self.log.debug("\n\nFile contents: %s\n\n", file_contents)
         self.log.debug("\n\nStreamed: %s\n\n", self.ws_client_results)
         self.assertEqual(file_contents, self.ws_client_results)
+
+    def test_finger_gateway(self):
+        # Need to set the streaming port before submitting the job
+        finger_port = 7903
+        self.executor_server.log_streaming_port = finger_port
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+
+        # We don't have any real synchronization for the ansible jobs, so
+        # just wait until we get our running build.
+        while not len(self.builds):
+            time.sleep(0.1)
+        build = self.builds[0]
+        self.assertEqual(build.name, 'python27')
+
+        build_dir = os.path.join(self.executor_server.jobdir_root, build.uuid)
+        while not os.path.exists(build_dir):
+            time.sleep(0.1)
+
+        # Need to wait to make sure that jobdir gets set
+        while build.jobdir is None:
+            time.sleep(0.1)
+            build = self.builds[0]
+
+        # Wait for the job to begin running and create the ansible log file.
+        # The job waits to complete until the flag file exists, so we can
+        # safely access the log here. We only open it (to force a file handle
+        # to be kept open for it after the job finishes) but wait to read the
+        # contents until the job is done.
+        ansible_log = os.path.join(build.jobdir.log_root, 'job-output.txt')
+        while not os.path.exists(ansible_log):
+            time.sleep(0.1)
+        logfile = open(ansible_log, 'r')
+        self.addCleanup(logfile.close)
+
+        # Start the finger streamer daemon
+        streamer = zuul.lib.log_streamer.LogStreamer(
+            None, self.host, finger_port, self.executor_server.jobdir_root)
+        self.addCleanup(streamer.stop)
+
+        # Start the finger gateway daemon
+        gateway_address = (self.host, 9001)
+        gateway = zuul.lib.fingergw.FingerGateway(
+            ('127.0.0.1', self.gearman_server.port, None, None, None),
+            gateway_address,
+            None
+        )
+        gateway.start()
+        self.addCleanup(gateway.stop)
+
+        # Start a thread with the finger client
+        finger_client_event = threading.Event()
+        self.finger_client_results = ''
+        finger_client_thread = threading.Thread(
+            target=self.runFingerClient,
+            args=(build.uuid, gateway_address, finger_client_event)
+        )
+        finger_client_thread.start()
+        finger_client_event.wait()
+
+        # Allow the job to complete
+        flag_file = os.path.join(build_dir, 'test_wait')
+        open(flag_file, 'w').close()
+
+        # Wait for the finger client to complete, which it should when
+        # it's received the full log.
+        finger_client_thread.join()
+
+        self.waitUntilSettled()
+
+        file_contents = logfile.read()
+        logfile.close()
+        self.log.debug("\n\nFile contents: %s\n\n", file_contents)
+        self.log.debug("\n\nStreamed: %s\n\n", self.streaming_data)
+        self.assertEqual(file_contents, self.streaming_data)
