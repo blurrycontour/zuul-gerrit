@@ -60,7 +60,7 @@ class TestLogStreamer(tests.base.BaseTestCase):
 class TestStreaming(tests.base.AnsibleZuulTestCase):
 
     tenant_config_file = 'config/streamer/main.yaml'
-    log = logging.getLogger("zuul.test.test_log_streamer.TestStreaming")
+    log = logging.getLogger("zuul.test_streaming")
 
     def setUp(self):
         super(TestStreaming, self).setUp()
