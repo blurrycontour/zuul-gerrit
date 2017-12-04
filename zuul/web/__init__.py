@@ -26,6 +26,7 @@ import aiohttp
 from aiohttp import web
 
 import zuul.rpcclient
+from zuul.lib import streamer_utils
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
 
@@ -38,44 +39,6 @@ class LogStreamingHandler(object):
 
     def setEventLoop(self, event_loop):
         self.event_loop = event_loop
-
-    def _getPortLocation(self, job_uuid):
-        """
-        Query Gearman for the executor running the given job.
-
-        :param str job_uuid: The job UUID we want to stream.
-        """
-        # TODO: Fetch the entire list of uuid/file/server/ports once and
-        #       share that, and fetch a new list on cache misses perhaps?
-        ret = self.rpc.get_job_log_stream_address(job_uuid)
-        return ret
-
-    async def _fingerClient(self, ws, server, port, job_uuid):
-        """
-        Create a client to connect to the finger streamer and pull results.
-
-        :param aiohttp.web.WebSocketResponse ws: The websocket response object.
-        :param str server: The executor server running the job.
-        :param str port: The executor server port.
-        :param str job_uuid: The job UUID to stream.
-        """
-        self.log.debug("Connecting to finger server %s:%s", server, port)
-        reader, writer = await asyncio.open_connection(host=server, port=port,
-                                                       loop=self.event_loop)
-
-        self.log.debug("Sending finger request for %s", job_uuid)
-        msg = "%s\n" % job_uuid    # Must have a trailing newline!
-
-        writer.write(msg.encode('utf8'))
-        await writer.drain()
-
-        while True:
-            data = await reader.read(1024)
-            if data:
-                await ws.send_str(data.decode('utf8'))
-            else:
-                writer.close()
-                return
 
     async def _streamLog(self, ws, request):
         """
@@ -91,7 +54,11 @@ class LogStreamingHandler(object):
 
         # Schedule the blocking gearman work in an Executor
         gear_task = self.event_loop.run_in_executor(
-            None, self._getPortLocation, request['uuid'])
+            None,
+            streamer_utils.get_port_location,
+            self.rpc,
+            request['uuid'],
+        )
 
         try:
             port_location = await asyncio.wait_for(gear_task, 10)
@@ -102,9 +69,12 @@ class LogStreamingHandler(object):
             return (4011, "Error with Gearman")
 
         try:
-            await self._fingerClient(
-                ws, port_location['server'], port_location['port'],
-                request['uuid']
+            await streamer_utils.finger_client(
+                self.event_loop,
+                ws,
+                port_location['server'],
+                port_location['port'],
+                request['uuid'],
             )
         except Exception as e:
             self.log.exception("Finger client exception:")

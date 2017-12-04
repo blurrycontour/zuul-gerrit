@@ -18,13 +18,13 @@
 import logging
 import os
 import os.path
-import pwd
 import re
 import select
-import socket
 import socketserver
 import threading
 import time
+
+from zuul.lib import streamer_utils
 
 
 class Log(object):
@@ -182,49 +182,11 @@ class RequestHandler(socketserver.BaseRequestHandler):
                     return False
 
 
-class CustomThreadingTCPServer(socketserver.ThreadingTCPServer):
-    '''
-    Custom version that allows us to drop privileges after port binding.
-    '''
-    address_family = socket.AF_INET6
+class LogStreamerServer(streamer_utils.CustomThreadingTCPServer):
 
     def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user')
+        super(LogStreamerServer, self).__init__(*args, **kwargs)
         self.jobdir_root = kwargs.pop('jobdir_root')
-        # For some reason, setting custom attributes does not work if we
-        # call the base class __init__ first. Wha??
-        socketserver.ThreadingTCPServer.__init__(self, *args, **kwargs)
-
-    def change_privs(self):
-        '''
-        Drop our privileges to the zuul user.
-        '''
-        if os.getuid() != 0:
-            return
-        pw = pwd.getpwnam(self.user)
-        os.setgroups([])
-        os.setgid(pw.pw_gid)
-        os.setuid(pw.pw_uid)
-        os.umask(0o022)
-
-    def server_bind(self):
-        self.allow_reuse_address = True
-        socketserver.ThreadingTCPServer.server_bind(self)
-        if self.user:
-            self.change_privs()
-
-    def server_close(self):
-        '''
-        Overridden from base class to shutdown the socket immediately.
-        '''
-        try:
-            self.socket.shutdown(socket.SHUT_RD)
-            self.socket.close()
-        except socket.error as e:
-            # If it's already closed, don't error.
-            if e.errno == socket.EBADF:
-                return
-            raise
 
     def process_request(self, request, client_address):
         '''
@@ -245,10 +207,10 @@ class LogStreamer(object):
     def __init__(self, user, host, port, jobdir_root):
         self.log = logging.getLogger('zuul.lib.LogStreamer')
         self.log.debug("LogStreamer starting on port %s", port)
-        self.server = CustomThreadingTCPServer((host, port),
-                                               RequestHandler,
-                                               user=user,
-                                               jobdir_root=jobdir_root)
+        self.server = LogStreamerServer((host, port),
+                                        RequestHandler,
+                                        user=user,
+                                        jobdir_root=jobdir_root)
 
         # We start the actual serving within a thread so we can return to
         # the owner.
