@@ -32,10 +32,12 @@
     name: openstack-infra/zuul
     check:
       jobs:
-        - build-openstack-sphinx-docs:
+        - build-sphinx-docs:
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
+            vars:
+              use_python3: true
         - tox-cover:
             irrelevant-files:
               - zuul/cmd/migrate.py
