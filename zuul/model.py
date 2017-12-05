@@ -1195,7 +1195,8 @@ class JobGraph(object):
                 if soft:
                     current_parent_jobs = set()
                 else:
-                    raise Exception("Dependent job %s not found: " %
+                    raise Exception("One or more dependencies of job %s are "
+                                    "not configured to run: " %
                                     (dependent_job,))
             new_parent_jobs = current_parent_jobs - all_parent_jobs
             jobs_to_iterate |= new_parent_jobs
