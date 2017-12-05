@@ -2875,7 +2875,7 @@ class ZuulTestCase(BaseTestCase):
         for item in layout:
             if 'job' in item:
                 jobname = item['job']['name']
-                files['playbooks/%s.yaml' % jobname] = ''
+                files['playbooks/%s' % jobname] = ''
         before = self.addCommitToRepo(
             project_name, 'Pulling content from %s' % source_name,
             files)
