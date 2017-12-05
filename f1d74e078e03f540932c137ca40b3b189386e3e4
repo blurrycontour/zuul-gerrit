@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df87a7cf_9f9e78b6",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1199,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-05T22:03:55Z",
+      "side": 1,
+      "message": "We can tell which dependency is missing with current_job with something like:\nJob $dependent_job depends on $current_job which was not run.",
+      "revId": "f1d74e078e03f540932c137ca40b3b189386e3e4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
