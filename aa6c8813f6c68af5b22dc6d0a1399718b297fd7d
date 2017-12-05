@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df87a7cf_5e21f2fa",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-12-05T00:42:46Z",
+      "side": 1,
+      "message": "Should we make a consistent command_socket option and make the path default to :\n\nget_default(self.config, self.app_name, command_socket, \"/var/lib/zuul/%s.socket\" % self.app_name) ?",
+      "revId": "aa6c8813f6c68af5b22dc6d0a1399718b297fd7d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
