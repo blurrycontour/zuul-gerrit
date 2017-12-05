@@ -2256,13 +2256,13 @@ class ZuulTestCase(BaseTestCase):
                                      branch='master', tag='init')
             if 'job' in item:
                 if 'run' in item['job']:
-                    files['%s.yaml' % item['job']['run']] = ''
+                    files['%s' % item['job']['run']] = ''
                 for fn in zuul.configloader.as_list(
                         item['job'].get('pre-run', [])):
-                    files['%s.yaml' % fn] = ''
+                    files['%s' % fn] = ''
                 for fn in zuul.configloader.as_list(
                         item['job'].get('post-run', [])):
-                    files['%s.yaml' % fn] = ''
+                    files['%s' % fn] = ''
 
         root = os.path.join(self.test_root, "config")
         if not os.path.exists(root):
@@ -2875,7 +2875,7 @@ class ZuulTestCase(BaseTestCase):
         for item in layout:
             if 'job' in item:
                 jobname = item['job']['name']
-                files['playbooks/%s.yaml' % jobname] = ''
+                files['playbooks/%s' % jobname] = ''
         before = self.addCommitToRepo(
             project_name, 'Pulling content from %s' % source_name,
             files)
