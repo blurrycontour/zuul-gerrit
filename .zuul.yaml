@@ -36,6 +36,8 @@
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
+            vars:
+              use_python3: true
         - tox-cover:
             irrelevant-files:
               - zuul/cmd/migrate.py
@@ -53,6 +55,8 @@
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
+            vars:
+              use_python3: true
         - tox-pep8
         - tox-py35:
             irrelevant-files:
