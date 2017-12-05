@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df87a7cf_ead02dfa",
+        "filename": "zuul/driver/git/gitconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-12-05T14:41:49Z",
+      "side": 1,
+      "message": "nit, maybe move the sleep() in the run() while loop?",
+      "revId": "de0f69c946e3ec8235afdab48f1ee5fd92e3924c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_8a096196",
+        "filename": "zuul/driver/git/gitconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-12-05T14:41:49Z",
+      "side": 1,
+      "message": "10 seconds seems fast for a default, how about 2 hours instead?",
+      "revId": "de0f69c946e3ec8235afdab48f1ee5fd92e3924c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_8abba1c2",
+        "filename": "zuul/driver/git/gitmodel.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-12-05T14:41:49Z",
+      "side": 1,
+      "message": "Note that since zuul is py3 only, you could use \"super().__init__()\" instead",
+      "revId": "de0f69c946e3ec8235afdab48f1ee5fd92e3924c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_eacb4d50",
+        "filename": "zuul/driver/git/gitmodel.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-12-05T14:41:49Z",
+      "side": 1,
+      "message": "Same here, better use \"super().__init__(trigger)\"",
+      "revId": "de0f69c946e3ec8235afdab48f1ee5fd92e3924c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
