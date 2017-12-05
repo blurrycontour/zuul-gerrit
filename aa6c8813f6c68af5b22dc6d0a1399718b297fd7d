@@ -16,6 +16,24 @@
       "revId": "aa6c8813f6c68af5b22dc6d0a1399718b297fd7d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_19ddc36f",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-12-05T02:01:56Z",
+      "side": 1,
+      "message": "Yah, I did this in the following 2 patches, but think we can now use self.app_name.  I make the changes now.",
+      "parentUuid": "df87a7cf_5e21f2fa",
+      "revId": "aa6c8813f6c68af5b22dc6d0a1399718b297fd7d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
