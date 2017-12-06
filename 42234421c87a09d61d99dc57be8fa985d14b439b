@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df87a7cf_4c691089",
+        "filename": "doc/source/user/jobs.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-12-06T18:30:53Z",
+      "side": 1,
+      "message": "Tiny doc nit (fine for followup change) the type has changed to a dictionary. Maybe use \"A dictionary\" or \"A table\" ?",
+      "range": {
+        "startLine": 225,
+        "startChar": 6,
+        "endLine": 225,
+        "endChar": 12
+      },
+      "revId": "42234421c87a09d61d99dc57be8fa985d14b439b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
