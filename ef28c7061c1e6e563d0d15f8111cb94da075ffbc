@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df87a7cf_256e1f95",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-06T20:32:29Z",
+      "side": 1,
+      "message": "We should indicate the default here.",
+      "revId": "ef28c7061c1e6e563d0d15f8111cb94da075ffbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_4569e388",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 399,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-06T20:32:29Z",
+      "side": 1,
+      "message": "We should indicate the default here.",
+      "revId": "ef28c7061c1e6e563d0d15f8111cb94da075ffbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_856feb90",
+        "filename": "etc/zuul.conf-sample",
+        "patchSetId": 2
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-06T20:32:29Z",
+      "side": 1,
+      "message": "Let\u0027s not add this since it\u0027s not typically needed.",
+      "revId": "ef28c7061c1e6e563d0d15f8111cb94da075ffbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
