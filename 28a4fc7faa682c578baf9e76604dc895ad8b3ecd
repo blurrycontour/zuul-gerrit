@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df87a7cf_2555bfc6",
+        "filename": "etc/zuul.conf-sample",
+        "patchSetId": 3
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-06T20:32:07Z",
+      "side": 1,
+      "message": "Let\u0027s not add this since it\u0027s not typically needed.",
+      "revId": "28a4fc7faa682c578baf9e76604dc895ad8b3ecd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
