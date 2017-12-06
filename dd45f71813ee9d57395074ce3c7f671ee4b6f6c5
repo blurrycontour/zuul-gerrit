@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df87a7cf_25493fcf",
+        "filename": "zuul/driver/git/gitconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-06T20:44:49Z",
+      "side": 1,
+      "message": "Zuul generally (except in a few cases where we forgot and haven\u0027t bothered to fix them up) uses camelCase method names; it might be nice to continue that here for consistency.",
+      "revId": "dd45f71813ee9d57395074ce3c7f671ee4b6f6c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_454483b7",
+        "filename": "zuul/driver/git/gitconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-06T20:44:49Z",
+      "side": 1,
+      "message": "I had no idea you could do that without a repo.  That\u0027s awesome.",
+      "revId": "dd45f71813ee9d57395074ce3c7f671ee4b6f6c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_e514b7a2",
+        "filename": "zuul/driver/git/gitconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-06T20:44:49Z",
+      "side": 1,
+      "message": "If more than one change merges between poll intervals, we may miss a configuration updating change.  So this method (and its friends) may need to take an old ref and do a diffstat between that ref and the current branch tip.",
+      "revId": "dd45f71813ee9d57395074ce3c7f671ee4b6f6c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
