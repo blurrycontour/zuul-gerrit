@@ -16,7 +16,7 @@ import json
 import logging
 import time
 
-from kazoo.client import KazooClient, KazooState
+from kazoo.client import KazooClient, KazooRetry, KazooState
 from kazoo import exceptions as kze
 from kazoo.recipe.lock import Lock
 
@@ -90,6 +90,12 @@ class ZooKeeper(object):
     def resetLostFlag(self):
         self._became_lost = False
 
+    def interrupt(self):
+        if time.monotonic() - self._last_retry_log >= self.retry_log_rate:
+            self.log.warning("Retrying zookeeper connection")
+        self._last_retry_log = time.monotonic()
+        return self.client is None
+
     def connect(self, hosts, read_only=False, timeout=10.0):
         '''
         Establish a connection with ZooKeeper cluster.
@@ -104,8 +110,12 @@ class ZooKeeper(object):
             seconds (default: 10.0).
         '''
         if self.client is None:
+            retry = KazooRetry(max_tries=-1,
+                               delay=0.5,
+                               ignore_expire=True,
+                               interrupt=self.interrupt)
             self.client = KazooClient(hosts=hosts, read_only=read_only,
-                                      timeout=timeout)
+                                      timeout=timeout, command_retry=retry)
             self.client.add_listener(self._connection_listener)
             self.client.start()
 
@@ -151,9 +161,10 @@ class ZooKeeper(object):
         data['created_time'] = time.time()
 
         path = '%s/%s-' % (self.REQUEST_ROOT, node_request.priority)
-        path = self.client.create(path, self._dictToStr(data),
-                                  makepath=True,
-                                  sequence=True, ephemeral=True)
+        path = self.client.retry(self.client.create,
+                                 path, self._dictToStr(data),
+                                 makepath=True,
+                                 sequence=True, ephemeral=True)
         reqid = path.split("/")[-1]
         node_request.id = reqid
 
@@ -163,7 +174,8 @@ class ZooKeeper(object):
                 request_nodes = list(node_request.nodeset.getNodes())
                 for i, nodeid in enumerate(data.get('nodes', [])):
                     node_path = '%s/%s' % (self.NODE_ROOT, nodeid)
-                    node_data, node_stat = self.client.get(node_path)
+                    node_data, node_stat = self.client.retry(
+                        self.client.get, node_path)
                     node_data = self._strToDict(node_data)
                     request_nodes[i].id = nodeid
                     request_nodes[i].updateFromDict(node_data)
@@ -183,7 +195,7 @@ class ZooKeeper(object):
 
         path = '%s/%s' % (self.REQUEST_ROOT, node_request.id)
         try:
-            self.client.delete(path)
+            self.client.retry(self.client.delete, path)
         except kze.NoNodeError:
             pass
 
@@ -196,7 +208,7 @@ class ZooKeeper(object):
         :returns: True if the request exists, False otherwise.
         '''
         path = '%s/%s' % (self.REQUEST_ROOT, node_request.id)
-        if self.client.exists(path):
+        if self.client.retry(self.client.exists, path):
             return True
         return False
 
@@ -210,7 +222,8 @@ class ZooKeeper(object):
         '''
 
         path = '%s/%s' % (self.NODE_ROOT, node.id)
-        self.client.set(path, self._dictToStr(node.toDict()))
+        self.client.retry(
+            self.client.set, path, self._dictToStr(node.toDict()))
 
     def lockNode(self, node, blocking=True, timeout=None):
         '''
@@ -261,14 +274,15 @@ class ZooKeeper(object):
         '''
         identifier = " ".join(autohold_key)
         try:
-            nodes = self.client.get_children(self.NODE_ROOT)
+            nodes = self.client.retry(self.client.get_children, self.NODE_ROOT)
         except kze.NoNodeError:
             return 0
 
         count = 0
         for nodeid in nodes:
             node_path = '%s/%s' % (self.NODE_ROOT, nodeid)
-            node_data, node_stat = self.client.get(node_path)
+            node_data, node_stat = self.client.retry(
+                self.client.get, node_path)
             if not node_data:
                 self.log.warning("Node ID %s has no data", nodeid)
                 continue
