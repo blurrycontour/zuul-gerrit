@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df87a7cf_f650ef0c",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1626,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-06T22:23:20Z",
+      "side": 1,
+      "message": "This worries me a bit, why do we need this?  It seems like the test may be validating something that Zuul doesn\u0027t actually do.",
+      "revId": "82ea9ed99fa884db3135f457b3747e2174d27da4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_96572303",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 957,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-06T22:23:20Z",
+      "side": 1,
+      "message": "What does this comment mean?",
+      "revId": "82ea9ed99fa884db3135f457b3747e2174d27da4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
