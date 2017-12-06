@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "df87a7cf_1496c1f1",
+        "filename": "doc/source/user/encryption.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-12-06T10:35:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df87a7cf_3493c551",
+      "range": {
+        "startLine": 18,
+        "startChar": 2,
+        "endLine": 18,
+        "endChar": 25
+      },
+      "revId": "d80c3f181b18661fa00e2240a501c0a529146253",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df87a7cf_d499396e",
         "filename": "tools/encrypt_secret.py",
         "patchSetId": 3
@@ -36,6 +60,30 @@
       "writtenOn": "2017-12-06T10:24:39Z",
       "side": 1,
       "message": "zuul-web says pub",
+      "range": {
+        "startLine": 61,
+        "startChar": 25,
+        "endLine": 61,
+        "endChar": 28
+      },
+      "revId": "d80c3f181b18661fa00e2240a501c0a529146253",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_d49ff900",
+        "filename": "tools/encrypt_secret.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-12-06T10:35:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df87a7cf_d499396e",
       "range": {
         "startLine": 61,
         "startChar": 25,
