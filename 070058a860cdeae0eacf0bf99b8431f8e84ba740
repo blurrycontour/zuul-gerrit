@@ -22,6 +22,30 @@
       "revId": "070058a860cdeae0eacf0bf99b8431f8e84ba740",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_d037b8fe",
+        "filename": "zuul/web/static/builds.html",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-12-08T21:33:29Z",
+      "side": 1,
+      "message": "It is served tenant scoped by zuul-web [1].\n\nhttp://git.openstack.org/cgit/openstack-infra/zuul/tree/zuul/web/__init__.py?h\u003dfeature/zuulv3#n389",
+      "parentUuid": "df87a7cf_f07d1cb2",
+      "range": {
+        "startLine": 20,
+        "startChar": 33,
+        "endLine": 20,
+        "endChar": 43
+      },
+      "revId": "070058a860cdeae0eacf0bf99b8431f8e84ba740",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
