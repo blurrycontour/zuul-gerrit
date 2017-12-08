@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "df87a7cf_024c0440",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1626,
+      "author": {
+        "id": 16036
+      },
+      "writtenOn": "2017-12-08T08:32:05Z",
+      "side": 1,
+      "message": "That\u0027s a good point. I added it while I was writing the code itself, to have a reproducible behavior during testing (to get the scoping right) and then left it there - it makes sense to remove it now though.",
+      "parentUuid": "df87a7cf_f650ef0c",
+      "revId": "82ea9ed99fa884db3135f457b3747e2174d27da4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df87a7cf_96572303",
         "filename": "zuul/scheduler.py",
         "patchSetId": 10
@@ -30,6 +48,24 @@
       "writtenOn": "2017-12-06T22:23:20Z",
       "side": 1,
       "message": "What does this comment mean?",
+      "revId": "82ea9ed99fa884db3135f457b3747e2174d27da4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_e24240ab",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 957,
+      "author": {
+        "id": 16036
+      },
+      "writtenOn": "2017-12-08T08:32:05Z",
+      "side": 1,
+      "message": "There are two things to take into consideration:\n- duplicated items in the autohold_request, that is (\"a\", \"b\", \"a\") converts into (\"a\", \"b\")\n- unordered property of sets (\"a\", \"b\") \u003d\u003d (\"b\", \"a\")\n\nI was wondering if I can make any assumptions on that or just write it in a safe manner like this:\n\n  def autohold_key_base_issubset(base, request_key):\n      index \u003d 0\n      base_len \u003d len(base)\n      while index \u003c base_len:\n          if base[index] !\u003d request_key[index]:\n              return False\n          index +\u003d 1\n      return True",
+      "parentUuid": "df87a7cf_96572303",
       "revId": "82ea9ed99fa884db3135f457b3747e2174d27da4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
