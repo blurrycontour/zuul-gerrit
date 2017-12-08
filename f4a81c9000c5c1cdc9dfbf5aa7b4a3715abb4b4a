@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df87a7cf_90a7f00b",
+        "filename": "zuul/cmd/fingergw.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-12-08T20:51:55Z",
+      "side": 1,
+      "message": "Do you mind adding CommandSocket support here? We recently added it to executor, scheduler and merger.",
+      "revId": "f4a81c9000c5c1cdc9dfbf5aa7b4a3715abb4b4a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
