@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "df87a7cf_68a33701",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-12-11T18:43:08Z",
+      "side": 1,
+      "message": "An exception might be too much, maybe just an error? I\u0027m not sure how useful this info is.",
+      "parentUuid": "df87a7cf_0a9a1b62",
+      "revId": "0d1f52e4a894c37a6fd1fba46b29f30165d35f92",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df87a7cf_ea9ed752",
         "filename": "zuul/driver/github/githubconnection.py",
         "patchSetId": 4
@@ -47,6 +65,24 @@
       "writtenOn": "2017-12-06T08:52:25Z",
       "side": 1,
       "message": "Maybe we could pick only the relevant header?",
+      "revId": "0d1f52e4a894c37a6fd1fba46b29f30165d35f92",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_a8861f65",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2017-12-11T18:43:08Z",
+      "side": 1,
+      "message": "We could, but does that save much time/memory?",
+      "parentUuid": "df87a7cf_0a369b53",
       "revId": "0d1f52e4a894c37a6fd1fba46b29f30165d35f92",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
