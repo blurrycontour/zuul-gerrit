@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "df87a7cf_f4640b4c",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2558,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-11T16:27:35Z",
+      "side": 1,
+      "message": "Oh, it\u0027s right under (modulo other threads) a line that does list the change.  Those other threads won\u0027t be doing this, so at the least, you can just back up to the previous \"Collect jobs\" line.",
+      "revId": "6388897e73ab9eea78a2ca5c628f164d03fe774a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df87a7cf_141acfca",
         "filename": "zuul/model.py",
         "patchSetId": 1
