@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df87a7cf_f4164ba8",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2558,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-12-11T16:24:42Z",
+      "side": 1,
+      "message": "Should you list the change here too eg:\n\n  \"Variant %s did not match change %s\" % (repr(variant), repr(change))",
+      "revId": "6388897e73ab9eea78a2ca5c628f164d03fe774a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_141acfca",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2561,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2017-12-11T16:24:42Z",
+      "side": 1,
+      "message": "See above.",
+      "revId": "6388897e73ab9eea78a2ca5c628f164d03fe774a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
