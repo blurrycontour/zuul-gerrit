@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df87a7cf_2e3e97c0",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-12-11T20:02:38Z",
+      "side": 1,
+      "message": "permitted",
+      "range": {
+        "startLine": 165,
+        "startChar": 71,
+        "endLine": 165,
+        "endChar": 81
+      },
+      "revId": "cbc6a5475fe0829ea3e4562de1b12a924fcfe481",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
