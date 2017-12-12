@@ -62,10 +62,70 @@ angular.module('zuulJobs', [], function ($locationProvider) {
         $http.get(getSourceUrl('jobs.json', $location))
             .then(function success (result) {
               $scope.jobs = result.data
+              $scope.jobs.forEach(function (job) {
+                job.expanded = false
+                job.details = undefined
+              })
             })
+      }
+      $scope.job_fetch = function (job) {
+        if (!job.details) {
+          $http.get('jobs/' + job.name + '.json')
+              .then(function success (result) {
+                job.details = result.data
+              })
+        }
+        job.expanded = !job.expanded
       }
       $scope.jobs_fetch()
     })
+
+angular.module('zuulJob', [], function ($locationProvider) {
+  $locationProvider.html5Mode({
+    enabled: true,
+    requireBase: false
+  })
+}).controller('mainController', function ($scope, $http, $location) {
+  let queryArgs = $location.search()
+  $scope.job_name = queryArgs['job_name']
+  if (!$scope.job_name) {
+    $scope.job_name = 'base'
+  }
+  $scope.labels_color = new Map()
+  $scope.variants = undefined
+  $scope.job_fetch = function () {
+    $http.get('jobs/' + $scope.job_name + '.json')
+      .then(function success (result) {
+        $scope.variants = result.data
+        $scope.variants.forEach(function (variant) {
+          if (Object.keys(variant.variables).length === 0) {
+            variant.variables = undefined
+          } else {
+            variant.variables = JSON.stringify(
+              variant.variables, undefined, 2)
+          }
+          if (variant.nodeset.length >= 0) {
+            // Generate color based on node label
+            variant.nodeset.forEach(function (node) {
+              let hash = 0
+              for (let idx = 0; idx < node[0].length; idx++) {
+                let c = node[0].charCodeAt(idx)
+                hash = ((hash << 5) - hash) + c
+              }
+              let r = (0x800000 + (hash - 0x500000)) & 0xFF0000
+              let g = (0x005000 + (hash - 0x00a000)) & 0x00FF00
+              let b = (0x000080 + (hash - 0x50)) & 0x0000FF
+              $scope.labels_color[node[0]] = '#' + (r | g | b).toString(16)
+            })
+          }
+          if (variant.parent === 'None') {
+            variant.parent = 'base'
+          }
+        })
+      })
+  }
+  $scope.job_fetch()
+})
 
 angular.module('zuulBuilds', [], function ($locationProvider) {
   $locationProvider.html5Mode({

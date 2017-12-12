@@ -878,6 +878,29 @@ class Job(object):
 
         self.name = name
 
+    def toDict(self):
+        '''
+        Convert a Job object's attributes to a dictionary.
+        '''
+        d = {}
+        d['source_context'] = str(self.source_context)
+        d['description'] = self.description
+        d['required_projects'] = list(self.required_projects.keys())
+        d['semaphore'] = self.semaphore
+        d['variables'] = self.variables
+        d['final'] = self.final
+        d['voting'] = self.voting
+        d['timeout'] = self.timeout
+        d['attempts'] = self.attempts
+        d['roles'] = [role.target_name for role in self.roles]
+        d['post_review'] = self.post_review
+        if not self.isBase():
+            d['parent'] = str(self.parent)
+        d['nodeset'] = []
+        for node in self.nodeset.nodes.values():
+            d['nodeset'].append((node.label, node.name))
+        return d
+
     def __ne__(self, other):
         return not self.__eq__(other)
 
