@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df87a7cf_6278228f",
+        "filename": "doc/source/user/encryption.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-12-12T11:41:57Z",
+      "side": 1,
+      "message": "(nit) if iterating on this set, worth doing a fly-by fix of this to \u0027built-in\u0027. (I didn\u0027t think proposing a change just for that was worth it)",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 5
+      },
+      "revId": "3f42c532df50358f250f7757427e831e7b2f9c35",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
