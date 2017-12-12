@@ -28,6 +28,7 @@ import { getBaseHref } from './util'
 
 import BuildsComponent from './builds/builds.component'
 import NavigationComponent from './navigation/navigation.component'
+import JobComponent from './job/job.component'
 import JobsComponent from './jobs/jobs.component'
 import StatusComponent from './status/status.component'
 import StreamComponent from './stream/stream.component'
@@ -46,6 +47,7 @@ import ZuulService from './zuul/zuul.service'
     AppComponent,
     BuildsComponent,
     NavigationComponent,
+    JobComponent,
     JobsComponent,
     StatusComponent,
     StreamComponent,
@@ -54,6 +56,7 @@ import ZuulService from './zuul/zuul.service'
   entryComponents: [
     BuildsComponent,
     NavigationComponent,
+    JobComponent,
     JobsComponent,
     StatusComponent,
     StreamComponent,

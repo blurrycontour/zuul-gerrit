@@ -19,14 +19,18 @@ under the License.
       <tr>
         <th>Name</th>
         <th>Description</th>
+        <th>Context</th>
         <th>Last builds</th>
       </tr>
     </thead>
     <tbody>
       <ng-container *ngFor="let job of jobs">
         <tr>
-          <td>{{ job.name }}</td>
+          <td><a [routerLink]="['../job.html']"
+                 [queryParams]="{job_name: job.name}" target="_self">
+              {{ job.name }}</a></td>
           <td>{{ job.description }}</td>
+          <td><a (click)="jobToggleExpanded(job)">locations</a></td>
           <td><a [routerLink]="['../builds.html']"
                  [queryParams]="{job_name: job.name}" target="_self">
               builds</a></td>
