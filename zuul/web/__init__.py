@@ -157,6 +157,7 @@ class GearmanHandler(object):
             'tenant_list': self.tenant_list,
             'status_get': self.status_get,
             'job_list': self.job_list,
+            'job_get': self.job_get,
             'key_get': self.key_get,
         }
 
@@ -182,6 +183,18 @@ class GearmanHandler(object):
                                         self.cache_expiry
         resp.last_modified = self.cache_time[tenant]
         return resp
+
+    async def job_get(self, request, filt=None):
+        job_args = {
+            'tenant': request.match_info["tenant"],
+            'job': request.match_info["job_name"],
+        }
+        job = self.rpc.submitJob('zuul:job_get', job_args)
+        zuul_jobs = json.loads(job.data[0])
+        if not zuul_jobs:
+            raise web.HTTPNotFound(
+                text="Job %s doesn't exists" % job_args["job_name"])
+        return web.json_response(zuul_jobs)
 
     async def job_list(self, request, filt=None):
         tenant = request.match_info["tenant"]
@@ -299,6 +312,9 @@ class ZuulWeb(object):
         return await self.gearman_handler.processRequest(
             request, 'status_get', ChangeFilter(change))
 
+    async def _handleJobRequest(self, request):
+        return await self.gearman_handler.processRequest(request, 'job_get')
+
     async def _handleJobsRequest(self, request):
         return await self.gearman_handler.processRequest(request, 'job_list')
 
@@ -322,6 +338,7 @@ class ZuulWeb(object):
             ('GET', '/tenants', self._handleTenantsRequest),
             ('GET', '/{tenant}/status', self._handleStatusRequest),
             ('GET', '/{tenant}/jobs', self._handleJobsRequest),
+            ('GET', '/{tenant}/jobs/{job_name}', self._handleJobRequest),
             ('GET', '/{tenant}/status/change/{change}',
              self._handleStatusChangeRequest),
             ('GET', '/{tenant}/console-stream', self._handleWebsocket),
