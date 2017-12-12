@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "df87a7cf_e778c4c4",
+        "filename": "doc/source/admin/drivers/git.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2017-12-12T11:38:29Z",
+      "side": 1,
+      "message": "Yes if not configured gitmodel.py:GitEventFilter.matches will return a match.",
+      "parentUuid": "df87a7cf_cfd8777c",
+      "range": {
+        "startLine": 51,
+        "startChar": 26,
+        "endLine": 52,
+        "endChar": 38
+      },
+      "revId": "a92f69d02eebad141920daf07f59ccc404ca2648",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df87a7cf_cf34f795",
         "filename": "tests/unit/test_git_driver.py",
         "patchSetId": 8
@@ -36,6 +60,30 @@
       "writtenOn": "2017-12-08T18:56:28Z",
       "side": 1,
       "message": "I think we should have a waitUntilSettled after the sleep. Otherwise this asks for races when adding the event directly after the sleep (e.g. on a slow node with high parallel load the reconfiguration might take longer to complete).",
+      "range": {
+        "startLine": 74,
+        "startChar": 8,
+        "endLine": 74,
+        "endChar": 21
+      },
+      "revId": "a92f69d02eebad141920daf07f59ccc404ca2648",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_a21aaa6b",
+        "filename": "tests/unit/test_git_driver.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2017-12-12T11:38:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df87a7cf_cf34f795",
       "range": {
         "startLine": 74,
         "startChar": 8,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "df87a7cf_c2156e3e",
+        "filename": "tests/unit/test_git_driver.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2017-12-12T11:38:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df87a7cf_efed3bf0",
+      "range": {
+        "startLine": 112,
+        "startChar": 8,
+        "endLine": 112,
+        "endChar": 21
+      },
+      "revId": "a92f69d02eebad141920daf07f59ccc404ca2648",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df87a7cf_6f960b41",
         "filename": "tests/unit/test_git_driver.py",
         "patchSetId": 8
@@ -82,6 +154,30 @@
       "writtenOn": "2017-12-08T18:56:28Z",
       "side": 1,
       "message": "That feels a little racy. Shouldn\u0027t readint initial refs be covered by waitUntilSettled (by waiting until reconfig finished)?",
+      "range": {
+        "startLine": 125,
+        "startChar": 8,
+        "endLine": 125,
+        "endChar": 23
+      },
+      "revId": "a92f69d02eebad141920daf07f59ccc404ca2648",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_42a63e11",
+        "filename": "tests/unit/test_git_driver.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2017-12-12T11:38:29Z",
+      "side": 1,
+      "message": "I\u0027m not sure how to do that. Do you mean modifying waitUntilSettled to verify gitconnection.watcher.projects_refs has been filled then release from the wait loop ? The next PS introduces a new strategy but not sure it is enough. Let me know.",
+      "parentUuid": "df87a7cf_6f960b41",
       "range": {
         "startLine": 125,
         "startChar": 8,
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "df87a7cf_e70f6434",
+        "filename": "zuul/driver/git/gitconnection.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2017-12-12T11:38:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df87a7cf_2ffb2379",
+      "range": {
+        "startLine": 95,
+        "startChar": 54,
+        "endLine": 95,
+        "endChar": 60
+      },
+      "revId": "a92f69d02eebad141920daf07f59ccc404ca2648",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df87a7cf_0f4adfaa",
         "filename": "zuul/driver/git/gitconnection.py",
         "patchSetId": 8
@@ -140,6 +260,30 @@
     },
     {
       "key": {
+        "uuid": "df87a7cf_22077a1a",
+        "filename": "zuul/driver/git/gitconnection.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2017-12-12T11:38:29Z",
+      "side": 1,
+      "message": "That\u0027s true there is an issue regarding when the reconfiguration happen. In the next patchset I refactor that part and keep the list of tenants to reconfigure in a set. Then the reconfiguration happen only once by tenant if needed.",
+      "parentUuid": "df87a7cf_0f4adfaa",
+      "range": {
+        "startLine": 112,
+        "startChar": 28,
+        "endLine": 114,
+        "endChar": 54
+      },
+      "revId": "a92f69d02eebad141920daf07f59ccc404ca2648",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df87a7cf_cf68771e",
         "filename": "zuul/driver/git/gitconnection.py",
         "patchSetId": 8
@@ -151,6 +295,30 @@
       "writtenOn": "2017-12-08T18:56:28Z",
       "side": 1,
       "message": "This can be potentially expensive if there were multiple config changes between two polls. It might make sense to build up a list/set of tenant,project tuples and do the reconfiguration(s) on block after the loop.",
+      "range": {
+        "startLine": 115,
+        "startChar": 0,
+        "endLine": 117,
+        "endChar": 59
+      },
+      "revId": "a92f69d02eebad141920daf07f59ccc404ca2648",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_e2143246",
+        "filename": "zuul/driver/git/gitconnection.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2017-12-12T11:38:29Z",
+      "side": 1,
+      "message": "Addressed in the next patchset.",
+      "parentUuid": "df87a7cf_cf68771e",
       "range": {
         "startLine": 115,
         "startChar": 0,
