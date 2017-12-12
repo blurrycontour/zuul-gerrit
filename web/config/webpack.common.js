@@ -55,6 +55,11 @@ module.exports = {
       filename: 'builds.html'
     }),
     new HtmlWebpackPlugin({
+      title: 'Zuul Job',
+      template: 'web/config/main.ejs',
+      filename: 'job.html'
+    }),
+    new HtmlWebpackPlugin({
       title: 'Zuul Jobs',
       template: 'web/config/main.ejs',
       filename: 'jobs.html'
