@@ -39,9 +39,72 @@ angular.module('zuulJobs', []).controller(
         $http.get("jobs.json")
             .then(function success(result) {
                 $scope.jobs = result.data;
+                $scope.jobs.forEach(function(job){
+                    job.expanded = false;
+                    job.details = undefined;
+                });
             });
     }
     $scope.jobs_fetch();
+    $scope.job_fetch = function(job) {
+        if (!job.details) {
+            $http.get("jobs/" + job.name + ".json")
+                .then(function success(result) {
+                    job.details = result.data;
+                });
+        }
+        job.expanded = !job.expanded;
+    }
+});
+
+angular.module('zuulJob', [], function($locationProvider) {
+    $locationProvider.html5Mode({
+        enabled: true,
+        requireBase: false
+    });
+}).controller('mainController', function($scope, $http, $location)
+{
+    var query_args = $location.search();
+    $scope.job_name = query_args["job_name"];
+    if (!$scope.job_name) {
+        $scope.job_name = "base";
+    }
+    $scope.labels_color = new Map();
+    $scope.variants = undefined;
+    $scope.job_fetch = function() {
+        $http.get("jobs/" + $scope.job_name + ".json?full=1")
+            .then(function success(result) {
+                $scope.variants = result.data;
+                $scope.variants.forEach(function(variant){
+                    if (Object.keys(variant.variables).length === 0) {
+                        variant.variables = undefined;
+                    } else {
+                        variant.variables = JSON.stringify(
+                            variant.variables, undefined, 2);
+                    }
+                    if (variant.nodeset.length >= 0) {
+                        // Generate color based on node label
+                        variant.nodeset.forEach(function(node){
+                            var hash = 0;
+                            for (var idx = 0; idx < node[0].length; idx++) {
+                                var c = node[0].charCodeAt(idx);
+                                hash = ((hash << 5) - hash) + c;
+                                hash = hash & hash;
+                            }
+                            var r = (0x300000 + hash) & 0xFF0000;
+                            var g = (0x005000 + hash) & 0x00FF00;
+                            var b = (0x000030 + hash) & 0x0000FF;
+                            $scope.labels_color[node[0]] = '#' + (r|g|b).toString(16);
+
+                        });
+                    }
+                    if (variant.parent == "None") {
+                        variant.parent = "base";
+                    }
+                });
+            });
+    };
+    $scope.job_fetch()
 });
 
 angular.module('zuulBuilds', [], function($locationProvider) {

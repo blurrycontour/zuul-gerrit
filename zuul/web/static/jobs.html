@@ -41,14 +41,26 @@ under the License.
       <tr>
         <th>Name</th>
         <th>Description</th>
+        <th>Context</th>
         <th>Last builds</th>
       </tr>
     </thead>
     <tbody>
-      <tr ng-repeat="job in jobs">
-        <td>{{ job.name }}</td>
+      <tr ng-repeat-start="job in jobs">
+        <td><a href="job.html?job_name={{ job.name }}">{{ job.name }}</a></td>
         <td>{{ job.description }}</td>
+        <td><a ng-click="job_fetch(job)">locations</a></td>
         <td><a href="builds.html?job_name={{ job.name }}">builds</a></td>
+      </tr>
+      <tr ng-if="job.expanded" ng-repeat-end="">
+        <td colspan="3">
+          <ul class="list-group">
+            <li class="list-group-item" ng-repeat="detail in job.details">
+              <!-- TODO: make clickable link to cgit files ? -->
+              {{ detail.source_context }}
+            </li>
+          </ul>
+        </td>
       </tr>
     </tbody>
   </table>

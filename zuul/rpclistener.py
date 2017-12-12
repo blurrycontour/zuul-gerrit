@@ -59,6 +59,7 @@ class RPCListener(object):
         self.worker.registerFunction("zuul:get_job_log_stream_address")
         self.worker.registerFunction("zuul:tenant_list")
         self.worker.registerFunction("zuul:status_get")
+        self.worker.registerFunction("zuul:job_get")
         self.worker.registerFunction("zuul:job_list")
         self.worker.registerFunction("zuul:key_get")
 
@@ -286,6 +287,35 @@ class RPCListener(object):
         args = json.loads(job.arguments)
         output = self.sched.formatStatusJSON(args.get("tenant"))
         job.sendWorkComplete(output)
+
+    def handle_job_get(self, gear_job):
+        args = json.loads(gear_job.arguments)
+        tenant = self.sched.abide.tenants.get(args.get("tenant"))
+        jobs = tenant.layout.jobs.get(args.get("job"), [])
+        output = []
+        for job in jobs:
+            job_details = {"source_context": str(job.source_context)}
+            if args.get("full_details"):
+                job_details.update({
+                    "description": job.description,
+                    "required_projects": list(job.required_projects.keys()),
+                    "semaphore": job.semaphore,
+                    "variables": job.variables,
+                    "final": job.final,
+                    "voting": job.attributes["voting"],
+                    "timeout": job.timeout,
+                    "attempts": job.attempts,
+                    "roles": [role.target_name for role in job.roles],
+                    "post_review": job.post_review,
+                })
+                if not job.isBase():
+                    job_details["parent"] = str(job.parent)
+                if job.nodeset:
+                    job_details["nodeset"] = []
+                    for node in job.nodeset.nodes.values():
+                        job_details["nodeset"].append((node.label, node.name))
+            output.append(job_details)
+        gear_job.sendWorkComplete(json.dumps(output))
 
     def handle_job_list(self, job):
         args = json.loads(job.arguments)

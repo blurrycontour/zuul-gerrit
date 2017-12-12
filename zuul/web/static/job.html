@@ -1,0 +1,114 @@
+<!--
+Copyright 2017 Red Hat
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may
+not use this file except in compliance with the License. You may obtain
+a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+License for the specific language governing permissions and limitations
+under the License.
+-->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Zuul Job</title>
+    <link rel="stylesheet" href="../static/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/styles/zuul.css" />
+    <script src="../static/js/jquery.min.js"></script>
+    <script src="../static/js/angular.min.js"></script>
+    <script src="../static/javascripts/zuul.angular.js"></script>
+</head>
+<body ng-app="zuulJob" ng-controller="mainController"><div class="container-fluid">
+  <nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="../" target="_self">Zuul Dashboard</a>
+    </div>
+    <ul class="nav navbar-nav">
+      <li><a href="status.html" target="_self">Status</a></li>
+      <li><a href="jobs.html" target="_self">Jobs</a></li>
+      <li><a href="builds.html" target="_self">Builds</a></li>
+    </ul>
+  </div>
+  </nav>
+  <div class="container-fluid panel-group">
+    <div class="panel panel-info" ng-repeat="variant in variants">
+      <div class="panel-heading">{{ job_name }}: {{ variant.source_context }}</div>
+      <div class="panel panel-body">
+        <table class="table table-condensed table-bordered">
+          <tr ng-If="variant.description">
+            <td>Description</td>
+            <td style="white-space: pre;">{{ variant.description }}</td>
+          </tr>
+          <tr ng-if="variant.parent">
+            <td>Parent</td>
+            <td><a href="job.html?job_name={{ variant.parent }}" target="_self">{{ variant.parent }}</a></td>
+          </tr>
+          <tr ng-if="variant.post_review">
+            <td>Post_Review</td>
+            <td>{{ variant.post_review }}</td>
+          </tr>
+          <tr ng-if="variant.voting">
+            <td>Voting</td>
+            <td>{{ variant.voting }}</td>
+          </tr>
+          <tr ng-if="variant.final">
+            <td>Final</td>
+            <td>{{ variant.final }}</td>
+          </tr>
+          <tr ng-If="variant.timeout">
+            <td>Timeout</td>
+            <td>{{ variant.timeout }}</td>
+          </tr>
+          <tr ng-if="variant.attempts">
+            <td>Attempts</td>
+            <td>{{ variant.attempts }}</td>
+          </tr>
+          <tr ng-if="variant.required_projects.length > 0">
+            <td>Required projects</td>
+            <td>
+              <ul class="list-unstyled">
+                <li ng-repeat="project in variant.required_projects">
+                  {{ project }}
+                </li>
+              </ul>
+            </td>
+          </tr>
+          <tr ng-if="variant.semaphore">
+            <td>Semaphore</td>
+            <td>{{ variant.semaphore }}</td>
+          </tr>
+          <tr ng-if="variant.variables">
+            <td>Variables</td>
+            <td style="white-space: pre;">{{ variant.variables }}</td>
+          </tr>
+          <tr ng-if="variant.roles">
+            <td>Roles</td>
+            <td>
+              <ul class="list-unstyled">
+                <li ng-repeat="role in variant.roles">
+                  {{ role }}
+                </li>
+              </ul>
+            </td>
+          </tr>
+          <tr ng-if="variant.nodeset">
+            <td>Nodeset</td>
+            <td>
+              <ul class="list-inline"><li ng-repeat="node in variant.nodeset">
+                  <span style="margin: 5px; padding-left: 5px; padding-right: 5px; border: 1px solid #cccccc; border-radius: 10px; background: {{ labels_color[node[0]] }};">
+                    {{ node[0] }}</span>
+                  <span ng-repeat="node_name in node[1]">{{ node_name }}</span>
+              </li></ul>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div></body></html>
