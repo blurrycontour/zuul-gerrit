@@ -1,0 +1,93 @@
+<!--
+Copyright 2018 Red Hat
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may
+not use this file except in compliance with the License. You may obtain
+a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+License for the specific language governing permissions and limitations
+under the License.
+-->
+<div class="container-fluid">
+  <div class="container-fluid panel-group">
+    <div class="panel panel-info" *ngFor="let variant of variants">
+      <div class="panel-heading">{{ job_name }}: {{ variant.source_context }}</div>
+      <div class="panel panel-body">
+        <table class="table table-condensed table-bordered">
+          <tr *ngIf="variant.description">
+            <td>Description</td>
+            <td style="white-space: pre;">{{ variant.description }}</td>
+          </tr>
+          <tr *ngIf="variant.parent">
+            <td>Parent</td>
+            <td><a (click)="jobRefresh(variant.parent)">
+                {{ variant.parent }}</a></td>
+          </tr>
+          <tr *ngIf="variant.post_review">
+            <td>Post_Review</td>
+            <td>{{ variant.post_review }}</td>
+          </tr>
+          <tr *ngIf="variant.voting">
+            <td>Voting</td>
+            <td>{{ variant.voting }}</td>
+          </tr>
+          <tr *ngIf="variant.final">
+            <td>Final</td>
+            <td>{{ variant.final }}</td>
+          </tr>
+          <tr *ngIf="variant.timeout">
+            <td>Timeout</td>
+            <td>{{ variant.timeout }}</td>
+          </tr>
+          <tr *ngIf="variant.attempts">
+            <td>Attempts</td>
+            <td>{{ variant.attempts }}</td>
+          </tr>
+          <tr *ngIf="variant.required_projects">
+            <td>Required projects</td>
+            <td>
+              <ul class="list-unstyled">
+                <li *ngFor="let project of variant.required_projects">
+                  {{ project }}
+                </li>
+              </ul>
+            </td>
+          </tr>
+          <tr *ngIf="variant.semaphore">
+            <td>Semaphore</td>
+            <td>{{ variant.semaphore }}</td>
+          </tr>
+          <tr *ngIf="variant.variables">
+            <td>Variables</td>
+            <td style="white-space: pre;">{{ variant.variables }}</td>
+          </tr>
+          <tr *ngIf="variant.roles">
+            <td>Roles</td>
+            <td>
+              <ul class="list-unstyled">
+                <li *ngFor="let role of variant.roles">
+                  {{ role }}
+                </li>
+              </ul>
+            </td>
+          </tr>
+          <tr *ngIf="variant.nodeset.nodes">
+            <td>Nodeset</td>
+            <td>
+              <ul class="list-inline"><li *ngFor="let node of variant.nodeset.nodes">
+                <span [style]="getNodeLabelStyle(node)">
+                  {{ node.label }}</span>
+                <span>{{ node.name }}</span>
+              </li></ul>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

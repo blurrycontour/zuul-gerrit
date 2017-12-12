@@ -1,6 +1,8 @@
 {
   "extends": ["tslint-angular"],
+  "defaultSeverity": "error",
   "rules": {
+    "no-bitwise": false,
     "array-type": [true, "array-simple"],
     "semicolon": [true, "never"]
   }

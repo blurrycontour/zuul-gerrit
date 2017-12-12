@@ -18,12 +18,12 @@ import { NgModule, isDevMode } from '@angular/core'
 import { RouterModule, Routes } from '@angular/router'
 
 import BuildsComponent from './builds/builds.component'
+import JobComponent from './job/job.component'
 import JobsComponent from './jobs/jobs.component'
 import StatusComponent from './status/status.component'
 import StreamComponent from './stream/stream.component'
 import TenantsComponent from './tenants/tenants.component'
 
-// Have all routes go to builds.html for now
 const appRoutes: Routes = [
   {
     path: 't/:tenant/builds.html',
@@ -40,6 +40,14 @@ const appRoutes: Routes = [
   {
     path: 'status.html',
     component: StatusComponent
+  },
+  {
+    path: 't/:tenant/job.html',
+    component: JobComponent
+  },
+  {
+    path: 'job.html',
+    component: JobComponent
   },
   {
     path: 't/:tenant/jobs.html',
