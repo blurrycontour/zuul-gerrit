@@ -1,4 +1,4 @@
-// Copyright 2018 Red Hat
+// Copyright 2017 Red Hat
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may
 // not use this file except in compliance with the License. You may obtain
@@ -12,15 +12,17 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import JobDetails from './details'
-
-export default class Job {
-  expanded: boolean
-  details: JobDetails
-  dependencies: string[]
+class Node {
   name: string
+  label: string
+}
 
-  constructor() {
-    this.expanded = false
-  }
+class Nodeset {
+  nodes: Node[]
+}
+
+export default class Variant {
+  variables: Object
+  nodeset: Nodeset
+  parent: string
 }

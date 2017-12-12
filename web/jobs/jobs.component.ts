@@ -13,8 +13,10 @@
 // under the License.
 
 import { Component, OnInit } from '@angular/core'
-import { HttpClient } from '@angular/common/http'
 import { ActivatedRoute } from '@angular/router'
+import { HttpClient, HttpParams } from '@angular/common/http'
+import { Observable } from 'rxjs/Observable'
+import 'rxjs/add/operator/map'
 
 import ZuulService from '../zuul/zuul.service'
 import JobDetails from './details'
@@ -50,5 +52,14 @@ export default class JobsComponent implements OnInit {
       job.expanded = false
     }
     this.jobs = jobs
+  }
+
+  jobToggleExpanded(job: Job) {
+    if (!job.details) {
+      this.http.get<JobDetails>(
+        this.zuul.getSourceUrl('job/' + job.name))
+        .subscribe(details => {job.details = details})
+    }
+    job.expanded = !job.expanded
   }
 }
