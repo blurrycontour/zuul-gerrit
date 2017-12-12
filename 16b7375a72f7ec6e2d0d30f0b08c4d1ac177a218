@@ -1,0 +1,107 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df87a7cf_4da0af42",
+        "filename": "doc/source/admin/drivers/git.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-12-12T13:06:19Z",
+      "side": 1,
+      "message": "Unsure why this is a regex?",
+      "revId": "16b7375a72f7ec6e2d0d30f0b08c4d1ac177a218",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_8df55759",
+        "filename": "tests/unit/test_git_driver.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-12-12T13:06:19Z",
+      "side": 1,
+      "message": "If this times out no error is raised and the below tests may still pass.",
+      "range": {
+        "startLine": 131,
+        "startChar": 12,
+        "endLine": 131,
+        "endChar": 21
+      },
+      "revId": "16b7375a72f7ec6e2d0d30f0b08c4d1ac177a218",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_4debcf76",
+        "filename": "tests/unit/test_git_driver.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-12-12T13:06:19Z",
+      "side": 1,
+      "message": "do we need this sleep with the waitUntilSettled (ditto below tests)",
+      "range": {
+        "startLine": 140,
+        "startChar": 13,
+        "endLine": 140,
+        "endChar": 18
+      },
+      "revId": "16b7375a72f7ec6e2d0d30f0b08c4d1ac177a218",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_cdf6ff5d",
+        "filename": "zuul/driver/git/gitconnection.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-12-12T13:06:19Z",
+      "side": 1,
+      "message": "(nit) Some of the above duplication could be reduced",
+      "revId": "16b7375a72f7ec6e2d0d30f0b08c4d1ac177a218",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_8d9a3711",
+        "filename": "zuul/driver/git/gitconnection.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-12-12T13:06:19Z",
+      "side": 1,
+      "message": "(nit) consider using path.join or checking for existing trailing slash in self.baseurl",
+      "range": {
+        "startLine": 186,
+        "startChar": 49,
+        "endLine": 186,
+        "endChar": 52
+      },
+      "revId": "16b7375a72f7ec6e2d0d30f0b08c4d1ac177a218",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
