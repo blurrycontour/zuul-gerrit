@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df87a7cf_e2575b25",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-12-12T03:50:42Z",
+      "side": 1,
+      "message": "This is a somewhat confusing error message. I\u0027d expect something more like \"This job is protected and cannot be inherited by other projects.\"",
+      "revId": "c015637b68ffe838b62adb7d88cde9006e55d6f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_02535f3a",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1053,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2017-12-12T03:50:42Z",
+      "side": 1,
+      "message": "To reiterate, it\u0027s not just modification that is denied. It is usage at all.",
+      "revId": "c015637b68ffe838b62adb7d88cde9006e55d6f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
