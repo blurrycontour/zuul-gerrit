@@ -47,4 +47,12 @@ export default class JobsComponent implements OnInit {
     }
     this.jobs = jobs
   }
+
+  jobToggleExpanded(job: Job) {
+    if (!job.details) {
+      this.http.get<JobDetails>(getSourceUrl('jobs/' + job.name))
+        .subscribe(details => {job.details = details})
+    }
+    job.expanded = !job.expanded
+  }
 }
