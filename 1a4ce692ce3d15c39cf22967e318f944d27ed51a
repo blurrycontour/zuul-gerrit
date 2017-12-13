@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df87a7cf_ea8dd6d3",
+        "filename": "doc/source/admin/drivers/git.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-12-13T03:04:30Z",
+      "side": 1,
+      "message": "So this option is probably a little redundant. If \u0027ref\u0027 is set then we can assume we\u0027re looking for a ref-updated event. However, I don\u0027t mind if it stays",
+      "range": {
+        "startLine": 45,
+        "startChar": 30,
+        "endLine": 45,
+        "endChar": 39
+      },
+      "revId": "1a4ce692ce3d15c39cf22967e318f944d27ed51a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_6abb0672",
+        "filename": "tests/unit/test_git_driver.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-12-13T03:04:30Z",
+      "side": 1,
+      "message": "(nit) this could be an assert failure",
+      "range": {
+        "startLine": 133,
+        "startChar": 22,
+        "endLine": 133,
+        "endChar": 31
+      },
+      "revId": "1a4ce692ce3d15c39cf22967e318f944d27ed51a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
