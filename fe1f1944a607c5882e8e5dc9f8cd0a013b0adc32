@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df87a7cf_3d3f74b6",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 634,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-13T17:55:41Z",
+      "side": 1,
+      "message": "\"listens on the standard finger port\" might be better -- \"connects to\" sounds like it\u0027s outbound.",
+      "revId": "fe1f1944a607c5882e8e5dc9f8cd0a013b0adc32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
