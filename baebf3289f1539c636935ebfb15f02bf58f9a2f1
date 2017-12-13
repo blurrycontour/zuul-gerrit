@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df87a7cf_9d11e0af",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-13T18:15:50Z",
+      "side": 1,
+      "message": "We need to start representing source contexts with structured data.  How about experimenting with that here -- include the structured data for the project in the way that we do for the zuul.project variable.  But also include the branch, file, and line info.\n\nWhen this looks right, we can update zuul._inheritance_path to do the same thing.  And drop the _.\n\nAll of this is in service of getting to the point where we do something really clever like generate links in the logs that link back to this jobs page.",
+      "revId": "baebf3289f1539c636935ebfb15f02bf58f9a2f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_3d269418",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-13T18:15:50Z",
+      "side": 1,
+      "message": "Why don\u0027t we just always return the full details?",
+      "revId": "baebf3289f1539c636935ebfb15f02bf58f9a2f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_5d235806",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-13T18:15:50Z",
+      "side": 1,
+      "message": "This should also probably be structured data, especially so it can include the override-checkout info, which is critical to understanding some jobs.",
+      "revId": "baebf3289f1539c636935ebfb15f02bf58f9a2f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_fd1fccb4",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-13T18:15:50Z",
+      "side": 1,
+      "message": "Why not job.voting?",
+      "revId": "baebf3289f1539c636935ebfb15f02bf58f9a2f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_1d1dd0bc",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 308,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-13T18:15:50Z",
+      "side": 1,
+      "message": "Maybe this should be structured too?",
+      "revId": "baebf3289f1539c636935ebfb15f02bf58f9a2f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_bd770409",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-13T18:15:50Z",
+      "side": 1,
+      "message": "Not that it hurts, but why str() ?",
+      "revId": "baebf3289f1539c636935ebfb15f02bf58f9a2f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_dd7c48ed",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-13T18:15:50Z",
+      "side": 1,
+      "message": "Should we move all of this into a toDict method in model?  We\u0027ll just want to make sure it doesn\u0027t include secrets by default.",
+      "revId": "baebf3289f1539c636935ebfb15f02bf58f9a2f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
