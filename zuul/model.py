@@ -641,6 +641,7 @@ class SourceContext(object):
         self.path = path
         self.trusted = trusted
         self.implied_branch_matchers = None
+        self.implied_branches = None
 
     def __str__(self):
         return '%s/%s@%s' % (self.project, self.path, self.branch)
@@ -965,10 +966,14 @@ class Job(object):
             return None
         return m
 
-    def addImpliedBranchMatcher(self, branch):
+    def addImpliedBranchMatcher(self, branches):
         # Add a branch matcher that combines as a boolean *and* with
         # existing branch matchers, if any.
-        matchers = [change_matcher.ImpliedBranchMatcher(branch)]
+        implied_matchers = []
+        for branch in branches:
+            implied_matchers.append(
+                change_matcher.ImpliedBranchMatcher(branch))
+        matchers = [change_matcher.MatchAny(implied_matchers)]
         if self.branch_matcher:
             matchers.append(self.branch_matcher)
         self.branch_matcher = change_matcher.MatchAll(matchers)
@@ -1118,13 +1123,13 @@ class JobList(object):
         else:
             self.jobs[job.name] = [job]
 
-    def inheritFrom(self, other, implied_branch):
+    def inheritFrom(self, other, implied_branches):
         for jobname, jobs in other.jobs.items():
             joblist = self.jobs.setdefault(jobname, [])
             for job in jobs:
-                if implied_branch:
+                if implied_branches:
                     job = job.copy()
-                    job.addImpliedBranchMatcher(implied_branch)
+                    job.addImpliedBranchMatcher(implied_branches)
                 if job not in joblist:
                     joblist.append(job)
 

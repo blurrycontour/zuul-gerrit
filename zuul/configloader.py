@@ -358,6 +358,7 @@ class EncryptedPKCS1_OAEP(yaml.YAMLObject):
 class PragmaParser(object):
     pragma = {
         'implied-branch-matchers': bool,
+        'implied-branches': to_list(str),
         '_source_context': model.SourceContext,
         '_start_mark': ZuulMark,
     }
@@ -372,11 +373,14 @@ class PragmaParser(object):
             self.schema(conf)
 
         bm = conf.get('implied-branch-matchers')
-        if bm is None:
-            return
 
         source_context = conf['_source_context']
-        source_context.implied_branch_matchers = bm
+        if bm is not None:
+            source_context.implied_branch_matchers = bm
+
+        branches = conf.get('implied-branches')
+        if branches is not None:
+            source_context.implied_branches = as_list(branches)
 
 
 class NodeSetParser(object):
@@ -528,6 +532,8 @@ class JobParser(object):
         # If the user has set a pragma directive for this, use the
         # value (if unset, the value is None).
         if job.source_context.implied_branch_matchers is True:
+            if job.source_context.implied_branches is not None:
+                return job.source_context.implied_branches
             return [job.source_context.branch]
         elif job.source_context.implied_branch_matchers is False:
             return None
@@ -543,6 +549,8 @@ class JobParser(object):
         if len(branches) == 1:
             return None
 
+        if job.source_context.implied_branches is not None:
+            return job.source_context.implied_branches
         return [job.source_context.branch]
 
     @staticmethod
@@ -857,6 +865,32 @@ class ProjectParser(object):
             project[p.name] = pipeline_contents
         return vs.Schema(project)
 
+    def _getImpliedBranches(self, conf):
+        source_context = conf['_source_context']
+        # If the user has set a pragma directive for this, use the
+        # value (if unset, the value is None).
+        if source_context.implied_branch_matchers is True:
+            if source_context.implied_branches is not None:
+                return job.source_context.implied_branches
+            return [source_context.branch]
+        elif source_context.implied_branch_matchers is False:
+            return None
+
+        # If this is a trusted project, don't create implied branch
+        # matchers.
+        if source_context.trusted:
+            return None
+
+        # If this project only has one branch, don't create implied
+        # branch matchers.  This way central job repos can work.
+        branches = self.tenant.getProjectBranches(source_context.project)
+        if len(branches) == 1:
+            return None
+
+        if source_context.implied_branches is not None:
+            return job.source_context.implied_branches
+        return [source_context.branch]
+
     def fromYaml(self, conf_list):
         for conf in conf_list:
             with configuration_exceptions('project', conf):
@@ -871,7 +905,6 @@ class ProjectParser(object):
 
         configs = []
         for conf in conf_list:
-            implied_branch = None
             with configuration_exceptions('project', conf):
                 if not conf['_source_context'].trusted:
                     if project != conf['_source_context'].project:
@@ -884,17 +917,14 @@ class ProjectParser(object):
                 # one, in order.
                 project_template = self.project_template_parser.fromYaml(
                     conf, validate=False)
-                # If this project definition is in a place where it
-                # should get implied branch matchers, set it.
-                if (not conf['_source_context'].trusted):
-                    implied_branch = conf['_source_context'].branch
+                implied_branches = self._getImpliedBranches(conf)
                 for name in conf_templates:
                     if name not in self.layout.project_templates:
                         raise TemplateNotFoundError(name)
                 configs.extend([(self.layout.project_templates[name],
-                                 implied_branch)
+                                 implied_branches)
                                 for name in conf_templates])
-                configs.append((project_template, implied_branch))
+                configs.append((project_template, implied_branches))
                 # Set the following values to the first one that we
                 # find and ignore subsequent settings.
                 mode = conf.get('merge-mode')
@@ -915,13 +945,13 @@ class ProjectParser(object):
             # For every template, iterate over the job tree and replace or
             # create the jobs in the final definition as needed.
             pipeline_defined = False
-            for (template, implied_branch) in configs:
+            for (template, implied_branches) in configs:
                 if pipeline.name in template.pipelines:
                     pipeline_defined = True
                     template_pipeline = template.pipelines[pipeline.name]
                     project_pipeline.job_list.inheritFrom(
                         template_pipeline.job_list,
-                        implied_branch)
+                        implied_branches)
                     if template_pipeline.queue_name:
                         queue_name = template_pipeline.queue_name
             if queue_name:
