@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "df87a7cf_a6e29000",
+        "filename": "doc/source/admin/drivers/git.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-13T21:06:57Z",
+      "side": 1,
+      "message": "This makes it more like the other drivers, and who knows, we might add more in the future.  I lean towards keeping it for now.",
+      "revId": "1a4ce692ce3d15c39cf22967e318f944d27ed51a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df87a7cf_6abb0672",
         "filename": "tests/unit/test_git_driver.py",
         "patchSetId": 11
@@ -42,6 +59,23 @@
         "endLine": 133,
         "endChar": 31
       },
+      "revId": "1a4ce692ce3d15c39cf22967e318f944d27ed51a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_46ef04e9",
+        "filename": "zuul/driver/git/gitconnection.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-13T21:06:57Z",
+      "side": 1,
+      "message": "Rather than doing this loop here, if we submit an event to the scheduler with the right attributes (branch_updated\u003dTrue, files\u003dsomething, and updatesConfig()\u003dTrue) then the scheduler event loop will do this for us.  Unless there\u0027s a reason we have to do this here, I\u0027d prefer to leave that logic in the scheduler and not have the drivers have to (re-)implement it.\n\nIf I\u0027m following correctly, the main reason to do this here is because getChange causes a gearman job to go out and do work, and that\u0027s not something we want to do in the scheduler loop.  So instead, what if we did that before generating the events?  All the drivers have a change cache to make sure the scheduler isn\u0027t waiting on remote operations.  So if we add a change cache to the git driver, then when we generate the event call getChange to populate the cache with the change (including the file list), we should have the same behavior as the other drivers.\n\nGrep for \"_change_cache\" in the github or gerrit drivers.",
       "revId": "1a4ce692ce3d15c39cf22967e318f944d27ed51a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
