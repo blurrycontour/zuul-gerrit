@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "df87a7cf_be34f0fc",
+        "filename": "zuul/web/static/javascripts/zuul.angular.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-12-13T06:46:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df87a7cf_be3150a5",
+      "revId": "63d7f46157e411703593905060a18a3100bfaef0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df87a7cf_1e207c49",
         "filename": "zuul/web/static/job.html",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "df87a7cf_5e3924f0",
+        "filename": "zuul/web/static/job.html",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-12-13T06:46:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df87a7cf_1e207c49",
+      "revId": "63d7f46157e411703593905060a18a3100bfaef0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df87a7cf_3e1d400f",
         "filename": "zuul/web/static/jobs.html",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2017-12-13T06:15:26Z",
       "side": 1,
       "message": "inconsistent whitspacing",
+      "revId": "63d7f46157e411703593905060a18a3100bfaef0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_3e20e0b0",
+        "filename": "zuul/web/static/jobs.html",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2017-12-13T06:46:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df87a7cf_3e1d400f",
       "revId": "63d7f46157e411703593905060a18a3100bfaef0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
