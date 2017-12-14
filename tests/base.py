@@ -23,6 +23,7 @@ import hashlib
 from io import StringIO
 import json
 import logging
+import logging.handlers
 import os
 import queue
 import random
@@ -1274,6 +1275,19 @@ class FakeBuild(object):
 
 
 class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
+
+    def __init__(self, *args, **kwargs):
+        super(RecordingAnsibleJob, self).__init__(*args, **kwargs)
+        self.log_streaming_port = logging.handlers.DEFAULT_TCP_LOGGING_PORT
+
+    def startStreamer(self):
+        if self.executor_server._run_ansible:
+            super(RecordingAnsibleJob, self).startStreamer()
+
+    def stopStreamer(self):
+        if self.executor_server._run_ansible:
+            super(RecordingAnsibleJob, self).stopStreamer()
+
     def doMergeChanges(self, merger, items, repo_state):
         # Get a merger in order to update the repos involved in this job.
         commit = super(RecordingAnsibleJob, self).doMergeChanges(

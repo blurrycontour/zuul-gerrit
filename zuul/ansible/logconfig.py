@@ -188,6 +188,23 @@ class JobLoggingConfig(DictLoggingConfig):
         self._config['handlers']['jobfile']['filename'] = filename
 
 
+class StreamLoggingConfig(JobLoggingConfig):
+
+    def __init__(self, logname, job_output_file):
+        super(StreamLoggingConfig, self).__init__(
+            job_output_file=job_output_file)
+        self._config = {
+            'version': 1,
+            'incremenal': True,
+            'handlers': {
+                logname: {
+                    'handlers': ['jobfile'],
+                    'level': 'INFO',
+                }
+            }
+        }
+
+
 class ServerLoggingConfig(DictLoggingConfig):
 
     def __init__(self, config=None, server=None):
