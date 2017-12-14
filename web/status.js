@@ -1,3 +1,4 @@
+/* global jQuery, URL, DemoStatusBasic, DemoStatusOpenStack, DemoStatusTree */
 // Client script for Zuul status page
 //
 // @licstart  The following is the entire license notice for the
@@ -23,87 +24,85 @@
 // @licend  The above is the entire license notice
 // for the JavaScript code in this page.
 
-import 'bootstrap/dist/css/bootstrap.css';
-import 'jquery-visibility/jquery-visibility';
-import 'graphitejs/jquery.graphite.js';
+import 'bootstrap/dist/css/bootstrap.css'
+import 'jquery-visibility/jquery-visibility'
+import 'graphitejs/jquery.graphite.js'
 
-import './styles/zuul.css';
-import './jquery.zuul';
-
-/*exported zuul_start */
+import './styles/zuul.css'
+import './jquery.zuul'
 
 /**
  * @return The $.zuul instance
  */
-function zuul_start($) {
-    // Start the zuul app (expects default dom)
+function zuul_start ($) {
+  // Start the zuul app (expects default dom)
 
-    let $container, $indicator;
+  let $container, $indicator
 
-    let url = new URL(window.location);
-    let params = {
-        //graphite_url: 'http://graphite.openstack.org/render/'
-    };
+  let url = new URL(window.location)
+  let params = {
+    // graphite_url: 'http://graphite.openstack.org/render/'
+  }
 
-    if (url.searchParams.has('source_url')) {
-        params['source'] = url.searchParams.get('source_url') + "/" + "status.json";
-    } else if (url.searchParams.has('demo')) {
-        let demo = url.searchParams.get('demo') || 'basic';
-        if (demo == 'basic') {
-            params['source_data'] = DemoStatusBasic;
-        } else if (demo == 'openstack') {
-            params['source_data'] = DemoStatusOpenStack;
-        } else if (demo == 'tree') {
-            params['source_data'] = DemoStatusTree;
-        }
-    } else {
-        params['source'] = 'status.json';
+  if (url.searchParams.has('source_url')) {
+    params['source'] = url.searchParams.get('source_url') + '/' + 'status.json'
+  } else if (url.searchParams.has('demo')) {
+    let demo = url.searchParams.get('demo') || 'basic'
+    if (demo == 'basic') {
+      params['source_data'] = DemoStatusBasic
+    } else if (demo == 'openstack') {
+      params['source_data'] = DemoStatusOpenStack
+    } else if (demo == 'tree') {
+      params['source_data'] = DemoStatusTree
     }
+  } else {
+    params['source'] = 'status.json'
+  }
 
-    let zuul = $.zuul(params);
+  let zuul = $.zuul(params)
 
-    zuul.jq.on('update-start', function () {
-        $container.addClass('zuul-container-loading');
-        $indicator.addClass('zuul-spinner-on');
-    });
+  zuul.jq.on('update-start', function () {
+    $container.addClass('zuul-container-loading')
+    $indicator.addClass('zuul-spinner-on')
+  })
 
-    zuul.jq.on('update-end', function () {
-        $container.removeClass('zuul-container-loading');
-        setTimeout(function () {
-            $indicator.removeClass('zuul-spinner-on');
-        }, 500);
-    });
+  zuul.jq.on('update-end', function () {
+    $container.removeClass('zuul-container-loading')
+    setTimeout(function () {
+      $indicator.removeClass('zuul-spinner-on')
+    }, 500)
+  })
 
-    zuul.jq.one('update-end', function () {
-        // Do this asynchronous so that if the first update adds a
-        // message, it will not animate while we fade in the content.
-        // Instead it simply appears with the rest of the content.
-        setTimeout(function () {
-            // Fade in the content
-            $container.addClass('zuul-container-ready');
-        });
-    });
+  zuul.jq.one('update-end', function () {
+    // Do this asynchronous so that if the first update adds a
+    // message, it will not animate while we fade in the content.
+    // Instead it simply appears with the rest of the content.
+    setTimeout(function () {
+      // Fade in the content
+      $container.addClass('zuul-container-ready')
+    })
+  })
 
-    $(function ($) {
-        // DOM ready
-        $container = $('#zuul-container');
-        $indicator = $('#zuul-spinner');
-        $('#zuul_controls').append(zuul.app.control_form());
+  $(function ($) {
+    // DOM ready
+    $container = $('#zuul-container')
+    $indicator = $('#zuul-spinner')
+    $('#zuul_controls').append(zuul.app.control_form())
 
-        zuul.app.schedule();
+    zuul.app.schedule()
 
-        $(document).on({
-            'show.visibility': function () {
-                zuul.options.enabled = true;
-                zuul.app.update();
-            },
-            'hide.visibility': function () {
-                zuul.options.enabled = false;
-            }
-        });
-    });
+    $(document).on({
+      'show.visibility': function () {
+        zuul.options.enabled = true
+        zuul.app.update()
+      },
+      'hide.visibility': function () {
+        zuul.options.enabled = false
+      }
+    })
+  })
 
-    return zuul;
+  return zuul
 }
 
 if (module.hot) {
@@ -116,4 +115,4 @@ if (module.hot) {
   // })
 }
 
-zuul_start(jQuery);
+zuul_start(jQuery)

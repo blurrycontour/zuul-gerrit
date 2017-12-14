@@ -11,6 +11,20 @@ module.exports = Merge(CommonConfig, {
     contentBase: path.resolve(__dirname, './zuul/web/static'),
     publicPath: '/'
   },
+  module: {
+    rules: [
+      {
+        enforce: 'pre',
+        test: /\.js$/,
+        loader: 'standard-loader',
+        exclude: /node_modules/,
+        options: {
+          error: false,
+          parser: 'babel-eslint'
+        }
+      }
+    ]
+  },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NamedModulesPlugin(),
