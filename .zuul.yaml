@@ -67,6 +67,7 @@
         - nodejs-npm-run-lint:
             vars:
                 node_version: 8
+            success-url: 'npm/reports/bundle.html'
             files:
               - package.json
               - webpack.config.js
@@ -98,6 +99,7 @@
         - nodejs-npm-run-lint:
             vars:
                 node_version: 8
+            success-url: 'npm/reports/bundle.html'
             files:
               - package.json
               - webpack.config.js
