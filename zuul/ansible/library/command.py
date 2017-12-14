@@ -117,6 +117,8 @@ import shlex
 import os
 
 import getpass
+import logging
+import logging.handlers
 import select
 import subprocess
 import traceback
@@ -143,51 +145,36 @@ PASSWD_ARG_RE = re.compile(r'^[-]{0,2}pass[-]?(word|wd)?')
 _log_lines = []
 
 
-class Console(object):
-    def __init__(self, log_uuid):
-        self.logfile_name = LOG_STREAM_FILE.format(log_uuid=log_uuid)
-
-    def __enter__(self):
-        self.logfile = open(self.logfile_name, 'ab', buffering=0)
-        return self
-
-    def __exit__(self, etype, value, tb):
-        self.logfile.close()
-
-    def addLine(self, ln):
-        # Note this format with deliminator is "inspired" by the old
-        # Jenkins format but with microsecond resolution instead of
-        # millisecond.  It is kept so log parsing/formatting remains
-        # consistent.
-        ts = str(datetime.datetime.now()).encode('utf-8')
-        if not isinstance(ln, bytes):
-            try:
-                ln = ln.encode('utf-8')
-            except Exception:
-                ln = repr(ln).encode('utf-8') + b'\n'
-        outln = b'%s | %s' % (ts, ln)
-        self.logfile.write(outln)
+def log_line(line):
+    if isinstance(line, bytes):
+        line = line.decode('utf-8')
+    zuulLogger = logging.getLogger('zuul.executor.ansible')
+    # Note this format with deliminator is "inspired" by the old
+    # Jenkins format but with microsecond resolution instead of
+    # millisecond.  It is kept so log parsing/formatting remains
+    # consistent.
+    ts = str(datetime.datetime.now())
+    line = '{ts} {line}'.format(ts=ts, line=line.rstrip('\n'))
+    zuulLogger.info(line)
 
 
-def follow(fd, log_uuid):
+def follow(fd):
     newline_warning = False
-    with Console(log_uuid) as console:
-        while True:
-            line = fd.readline()
-            if not line:
-                break
-            _log_lines.append(line)
-            if not line.endswith(b'\n'):
-                line += b'\n'
-                newline_warning = True
-            console.addLine(line)
-        if newline_warning:
-            console.addLine('[Zuul] No trailing newline\n')
+    while True:
+        line = fd.readline()
+        if not line:
+            break
+        log_line(line)
+        _log_lines.append(line)
+        if not line.endswith(b'\n'):
+            newline_warning = True
+    if newline_warning:
+        log_line('[Zuul] No trailing newline')
 
 
 # Taken from ansible/module_utils/basic.py ... forking the method for now
 # so that we can dive in and figure out how to make appropriate hook points
-def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, executable=None, data=None, binary_data=False, path_prefix=None, cwd=None, use_unsafe_shell=False, prompt_regex=None, environ_update=None, umask=None, encoding='utf-8', errors='surrogate_or_strict'):
+def zuul_run_command(self, args, check_rc=False, close_fds=True, executable=None, data=None, binary_data=False, path_prefix=None, cwd=None, use_unsafe_shell=False, prompt_regex=None, environ_update=None, umask=None, encoding='utf-8', errors='surrogate_or_strict'):
     '''
     Execute a command, returns rc, stdout, and stderr.
 
@@ -371,7 +358,7 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
 
         # ZUUL: Replaced the excution loop with the zuul_runner run function
         cmd = subprocess.Popen(args, **kwargs)
-        t = threading.Thread(target=follow, args=(cmd.stdout, zuul_log_id))
+        t = threading.Thread(target=follow, args=(cmd.stdout,))
         t.daemon = True
         t.start()
 
@@ -382,11 +369,9 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
         # likely stuck in readline() because it spawed a child that is
         # holding stdout or stderr open.
         t.join(10)
-        with Console(zuul_log_id) as console:
-            if t.isAlive():
-                console.addLine("[Zuul] standard output/error still open "
-                                "after child exited")
-            console.addLine("[Zuul] Task exit code: %s\n" % ret)
+        if t.isAlive():
+            log_line("[Zuul] standard output/error still open "
+                     "after child exited")
 
         # ZUUL: If the console log follow thread *is* stuck in readline,
         # we can't close stdout (attempting to do so raises an
@@ -410,17 +395,16 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
         fail_json_kwargs = dict(rc=257, msg=str(e), exception=traceback.format_exc(), cmd=clean_args)
     finally:
         if t:
-            with Console(zuul_log_id) as console:
-                if t.isAlive():
-                    console.addLine("[Zuul] standard output/error still open "
-                                    "after child exited")
-                if ret is None and fail_json_kwargs:
-                    ret = fail_json_kwargs['rc']
-                elif ret is None and not fail_json_kwargs:
-                    ret = -1
-                console.addLine("[Zuul] Task exit code: %s\n" % ret)
-                if ret == -1 and not fail_json_kwargs:
-                    self.fail_json(rc=ret, msg="Something went horribly wrong during task execution")
+            if t.isAlive():
+                log_line("[Zuul] standard output/error still open "
+                         "after child exited")
+            if ret is None and fail_json_kwargs:
+                ret = fail_json_kwargs['rc']
+            elif ret is None and not fail_json_kwargs:
+                ret = -1
+            log_line("[Zuul] Task exit code: %s\n" % ret)
+            if ret == -1 and not fail_json_kwargs:
+                self.fail_json(rc=ret, msg="Something went horribly wrong during task execution")
 
         if fail_json_kwargs:
             self.fail_json(**fail_json_kwargs)
@@ -483,7 +467,6 @@ def main():
             removes = dict(type='path'),
             warn = dict(type='bool', default=True),
             environ = dict(type='dict', default=None),
-            zuul_log_id = dict(type='str'),
         )
     )
 
@@ -495,7 +478,12 @@ def main():
     removes = module.params['removes']
     warn = module.params['warn']
     environ = module.params['environ']
-    zuul_log_id = module.params['zuul_log_id']
+
+    zuulLogger = logging.getLogger('zuul.executor.ansible')
+    zuulLogger.setLevel(logging.DEBUG)
+    socketHandler = logging.handlers.SocketHandler(
+        'localhost', logging.handlers.DEFAULT_TCP_LOGGING_PORT)
+    zuulLogger.addHandler(socketHandler)
 
     if args.strip() == '':
         module.fail_json(rc=256, msg="no command given")
@@ -536,7 +524,7 @@ def main():
         args = shlex.split(args)
     startd = datetime.datetime.now()
 
-    rc, out, err = zuul_run_command(module, args, zuul_log_id, executable=executable, use_unsafe_shell=shell, encoding=None, environ_update=environ)
+    rc, out, err = zuul_run_command(module, args, executable=executable, use_unsafe_shell=shell, encoding=None, environ_update=environ)
 
     endd = datetime.datetime.now()
     delta = endd - startd
@@ -556,7 +544,6 @@ def main():
         delta    = str(delta),
         changed  = True,
         warnings = warnings,
-        zuul_log_id = zuul_log_id
     )
 
 if __name__ == '__main__':
