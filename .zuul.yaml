@@ -60,6 +60,12 @@
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
         - zuul-npm-build
+        - nodejs-npm-run-lint:
+            files:
+              - package.json
+              - webpack.config.js
+              - yarn.lock
+              - web/.*
         - zuul-stream-functional
     gate:
       jobs:
@@ -73,6 +79,12 @@
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
         - zuul-npm-build
+        - nodejs-npm-run-lint:
+            files:
+              - package.json
+              - webpack.config.js
+              - yarn.lock
+              - web/.*
         - zuul-stream-functional
     post:
       jobs:
