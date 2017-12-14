@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging.handlers
+
 from ansible.module_utils.six.moves.urllib.parse import urlparse
 from ansible.errors import AnsibleError
 
@@ -31,6 +33,20 @@ class ActionModule(normal.ActionModule):
     Our overridden version of it wraps the execution with checks to block
     undesired actions on localhost.
     '''
+
+    def __init__(self, *args, **kwargs):
+        super(ActionModule, self).__init__(*args, **kwargs)
+        remote_port = logging.handlers.DEFAULT_TCP_LOGGING_PORT
+        local_ports = self._task.args.pop('zuul_port_forwards', {})
+        local_port = local_ports.get(self._connection.host)
+        if local_port:
+            if self._connection.transport == 'ssh':
+                self._play_context.ssh_extra_args += ' -R %s:localhost:%s' % (
+                    remote_port,
+                    local_port)
+                self._task.args['zuul_log_port'] = remote_port
+            elif self._connection.transport == 'local':
+                self._task.args['zuul_log_port'] = local_port
 
     def run(self, tmp=None, task_vars=None):
         '''Overridden primary method from the base class.'''

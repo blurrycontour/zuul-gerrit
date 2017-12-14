@@ -115,8 +115,12 @@ import pipes
 import re
 import shlex
 import os
+import json
+import struct
 
 import getpass
+import logging
+import logging.handlers
 import select
 import subprocess
 import traceback
@@ -137,57 +141,60 @@ from ansible.module_utils.six import (
 from ansible.module_utils.six.moves import map, reduce
 from ansible.module_utils._text import to_native, to_bytes, to_text
 
+
+class JsonSocketHandler(logging.handlers.SocketHandler):
+
+    def makePickle(self, record):
+        """Encode the log message to send over the wire.
+
+        This doesn't really use pickle... that's just the name
+        of the method on the base class.
+        """
+        ei = record.exc_info
+        if ei:
+            # just to get traceback text into record.exc_text ...
+            dummy = self.format(record)
+        d = dict(record.__dict__)
+        # Issue #25685: delete 'message' if present: redundant with 'msg'
+        d.pop('message', None)
+
+        payload = json.dumps(d).encode('utf-8')
+        prefix = struct.pack('>L', len(payload))
+        return prefix + payload
+
+
 LOG_STREAM_FILE = '/tmp/console-{log_uuid}.log'
 PASSWD_ARG_RE = re.compile(r'^[-]{0,2}pass[-]?(word|wd)?')
 # List to save stdout log lines in as we collect them
 _log_lines = []
 
 
-class Console(object):
-    def __init__(self, log_uuid):
-        self.logfile_name = LOG_STREAM_FILE.format(log_uuid=log_uuid)
-
-    def __enter__(self):
-        self.logfile = open(self.logfile_name, 'ab', buffering=0)
-        return self
-
-    def __exit__(self, etype, value, tb):
-        self.logfile.close()
-
-    def addLine(self, ln):
-        # Note this format with deliminator is "inspired" by the old
-        # Jenkins format but with microsecond resolution instead of
-        # millisecond.  It is kept so log parsing/formatting remains
-        # consistent.
-        ts = str(datetime.datetime.now()).encode('utf-8')
-        if not isinstance(ln, bytes):
-            try:
-                ln = ln.encode('utf-8')
-            except Exception:
-                ln = repr(ln).encode('utf-8') + b'\n'
-        outln = b'%s | %s' % (ts, ln)
-        self.logfile.write(outln)
+def log_line(line):
+    if isinstance(line, bytes):
+        line = line.decode('utf-8')
+    zuulLogger = logging.getLogger('zuul.executor.ansible')
+    zuulLogger.info(
+        line.rstrip(),
+        extra=dict(ts=str(datetime.datetime.now())))
 
 
-def follow(fd, log_uuid):
+def follow(fd):
     newline_warning = False
-    with Console(log_uuid) as console:
-        while True:
-            line = fd.readline()
-            if not line:
-                break
-            _log_lines.append(line)
-            if not line.endswith(b'\n'):
-                line += b'\n'
-                newline_warning = True
-            console.addLine(line)
-        if newline_warning:
-            console.addLine('[Zuul] No trailing newline\n')
+    while True:
+        line = fd.readline()
+        if not line:
+            break
+        log_line(line)
+        _log_lines.append(line)
+        if not line.endswith(b'\n'):
+            newline_warning = True
+    if newline_warning:
+        log_line('[Zuul] No trailing newline')
 
 
 # Taken from ansible/module_utils/basic.py ... forking the method for now
 # so that we can dive in and figure out how to make appropriate hook points
-def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, executable=None, data=None, binary_data=False, path_prefix=None, cwd=None, use_unsafe_shell=False, prompt_regex=None, environ_update=None, umask=None, encoding='utf-8', errors='surrogate_or_strict'):
+def zuul_run_command(self, args, check_rc=False, close_fds=True, executable=None, data=None, binary_data=False, path_prefix=None, cwd=None, use_unsafe_shell=False, prompt_regex=None, environ_update=None, umask=None, encoding='utf-8', errors='surrogate_or_strict'):
     '''
     Execute a command, returns rc, stdout, and stderr.
 
@@ -374,7 +381,7 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
         if self.no_log:
             t = None
         else:
-            t = threading.Thread(target=follow, args=(cmd.stdout, zuul_log_id))
+            t = threading.Thread(target=follow, args=(cmd.stdout,))
             t.daemon = True
             t.start()
 
@@ -386,11 +393,9 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
         # holding stdout or stderr open.
         if t:
             t.join(10)
-            with Console(zuul_log_id) as console:
-                if t.isAlive():
-                    console.addLine("[Zuul] standard output/error still open "
-                                    "after child exited")
-                console.addLine("[Zuul] Task exit code: %s\n" % ret)
+            if t.isAlive():
+                log_line("[Zuul] standard output/error still open "
+                         "after child exited")
 
             # ZUUL: If the console log follow thread *is* stuck in readline,
             # we can't close stdout (attempting to do so raises an
@@ -401,8 +406,6 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
             # ZUUL: stdout and stderr are in the console log file
             # ZUUL: return the saved log lines so we can ship them back
             stdout = b('').join(_log_lines)
-        else:
-            stdout = b('')
         stderr = b('')
 
         rc = cmd.returncode
@@ -416,17 +419,16 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
         fail_json_kwargs = dict(rc=257, msg=str(e), exception=traceback.format_exc(), cmd=clean_args)
     finally:
         if t:
-            with Console(zuul_log_id) as console:
-                if t.isAlive():
-                    console.addLine("[Zuul] standard output/error still open "
-                                    "after child exited")
-                if ret is None and fail_json_kwargs:
-                    ret = fail_json_kwargs['rc']
-                elif ret is None and not fail_json_kwargs:
-                    ret = -1
-                console.addLine("[Zuul] Task exit code: %s\n" % ret)
-                if ret == -1 and not fail_json_kwargs:
-                    self.fail_json(rc=ret, msg="Something went horribly wrong during task execution")
+            if t.isAlive():
+                log_line("[Zuul] standard output/error still open "
+                         "after child exited")
+            if ret is None and fail_json_kwargs:
+                ret = fail_json_kwargs['rc']
+            elif ret is None and not fail_json_kwargs:
+                ret = -1
+            log_line("[Zuul] Task exit code: %s\n" % ret)
+            if ret == -1 and not fail_json_kwargs:
+                self.fail_json(rc=ret, msg="Something went horribly wrong during task execution")
 
         if fail_json_kwargs:
             self.fail_json(**fail_json_kwargs)
@@ -489,7 +491,7 @@ def main():
             removes = dict(type='path'),
             warn = dict(type='bool', default=True),
             environ = dict(type='dict', default=None),
-            zuul_log_id = dict(type='str'),
+            zuul_log_port = dict(type='int', default=None),
         )
     )
 
@@ -501,7 +503,13 @@ def main():
     removes = module.params['removes']
     warn = module.params['warn']
     environ = module.params['environ']
-    zuul_log_id = module.params['zuul_log_id']
+
+    zuul_log_port = module.params.pop('zuul_log_port')
+    if zuul_log_port is not None:
+        zuulLogger = logging.getLogger('zuul.executor.ansible')
+        zuulLogger.setLevel(logging.DEBUG)
+        socketHandler = JsonSocketHandler('localhost', zuul_log_port)
+        zuulLogger.addHandler(socketHandler)
 
     if args.strip() == '':
         module.fail_json(rc=256, msg="no command given")
@@ -542,7 +550,7 @@ def main():
         args = shlex.split(args)
     startd = datetime.datetime.now()
 
-    rc, out, err = zuul_run_command(module, args, zuul_log_id, executable=executable, use_unsafe_shell=shell, encoding=None, environ_update=environ)
+    rc, out, err = zuul_run_command(module, args, executable=executable, use_unsafe_shell=shell, encoding=None, environ_update=environ)
 
     endd = datetime.datetime.now()
     delta = endd - startd
@@ -562,7 +570,6 @@ def main():
         delta    = str(delta),
         changed  = True,
         warnings = warnings,
-        zuul_log_id = zuul_log_id
     )
 
 if __name__ == '__main__':
