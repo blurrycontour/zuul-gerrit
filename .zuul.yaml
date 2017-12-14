@@ -64,6 +64,14 @@
               - web/.*
             vars:
               javascript_content_dir: zuul/web/static
+        - nodejs-npm-run-lint:
+            vars:
+                node_version: 8
+            files:
+              - package.json
+              - webpack.config.js
+              - yarn.lock
+              - web/.*
         - zuul-stream-functional
     gate:
       jobs:
@@ -87,6 +95,14 @@
               - web/.*
             vars:
               javascript_content_dir: zuul/web/static
+        - nodejs-npm-run-lint:
+            vars:
+                node_version: 8
+            files:
+              - package.json
+              - webpack.config.js
+              - yarn.lock
+              - web/.*
         - zuul-stream-functional
     post:
       jobs:
