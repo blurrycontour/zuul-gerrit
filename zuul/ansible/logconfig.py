@@ -201,6 +201,33 @@ class JobLoggingConfig(DictLoggingConfig):
         self._config['handlers']['jobfile']['filename'] = filename
 
 
+class StreamLoggingConfig(JobLoggingConfig):
+
+    def __init__(self, logname, job_output_file):
+        self._config = {
+            'version': 1,
+            'incremenal': True,
+            'loggers': {
+                logname: {
+                    'handlers': [logname],
+                    'level': 'DEBUG',
+                }
+            },
+            'formatters': {
+                'plain': {'format': '%(message)s'},
+            },
+            'handlers': {
+                logname: {
+                    # used by executor to emit log file
+                    'class': 'logging.FileHandler',
+                    'level': 'INFO',
+                    'formatter': 'plain',
+                    'filename': job_output_file,
+                }
+            }
+        }
+
+
 class ServerLoggingConfig(DictLoggingConfig):
 
     def __init__(self, config=None, server=None):

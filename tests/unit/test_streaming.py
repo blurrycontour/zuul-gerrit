@@ -797,3 +797,59 @@ class TestStreamingZones(TestStreamingBase):
 
 class TestStreamingZonesSSL(TestStreamingZones):
     fingergw_use_ssl = True
+
+
+class TestAnsibleStreaming(tests.base.AnsibleZuulTestCase):
+
+    tenant_config_file = 'config/ansible-streamer/main.yaml'
+    log = logging.getLogger("zuul.test_streaming")
+
+    def test_ansible_streaming(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+
+        # We don't have any real synchronization for the ansible jobs, so
+        # just wait until we get our running build.
+        while not len(self.builds):
+            time.sleep(0.1)
+        build = self.builds[0]
+        self.assertEqual(build.name, 'python27')
+
+        build_dir = os.path.join(self.executor_server.jobdir_root, build.uuid)
+        while not os.path.exists(build_dir):
+            time.sleep(0.1)
+
+        # Need to wait to make sure that jobdir gets set
+        while build.jobdir is None:
+            time.sleep(0.1)
+            build = self.builds[0]
+
+        # Wait for the job to begin running and create the ansible log file.
+        # The job waits to complete until the flag file exists, so we can
+        # safely access the log here. We only open it (to force a file handle
+        # to be kept open for it after the job finishes) but wait to read the
+        # contents until the job is done.
+        ansible_log = os.path.join(build.jobdir.log_root, 'job-output.txt')
+        while not os.path.exists(ansible_log):
+            time.sleep(0.1)
+        logfile = open(ansible_log, 'r')
+        self.addCleanup(logfile.close)
+
+        # Allow the job to complete, which should close the streaming
+        # connection (and terminate the thread) as well since the thread
+        # is a child of the executor.
+        flag_file = os.path.join(build_dir, 'test_wait')
+        open(flag_file, 'w').close()
+        self.waitUntilSettled()
+
+        # Now that the job is finished, the log file has been closed by the
+        # job and deleted. However, we still have a file handle to it, so we
+        # can make sure that we read the entire contents at this point.
+        # Compact the returned lines into a single string for easy comparison.
+        file_contents = logfile.read()
+        logfile.close()
+
+        # TODO(mordred) We need to remove the special case in zuul_stream for
+        # localhost, since the log streaming receiver can work locally as well.
+        self.log.debug("\n\nFile contents: %s\n\n", file_contents)
+        self.assertIn('Log output', file_contents)
