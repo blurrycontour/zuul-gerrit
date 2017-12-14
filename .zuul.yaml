@@ -41,6 +41,10 @@
     vars:
       npm_command: build:dist
 
+- job:
+    name: nodejs-npm-lint
+    success-url: 'reports/bundle.html'
+
 - project:
     name: openstack-infra/zuul
     check:
