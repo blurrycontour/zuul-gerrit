@@ -38,17 +38,17 @@ import './jquery.zuul';
 function zuul_start($) {
     // Start the zuul app (expects default dom)
 
-    var $container, $indicator;
+    let $container, $indicator;
 
-    var url = new URL(window.location);
-    var params = {
+    let url = new URL(window.location);
+    let params = {
         //graphite_url: 'http://graphite.openstack.org/render/'
     };
 
     if (url.searchParams.has('source_url')) {
         params['source'] = url.searchParams.get('source_url') + "/" + "status.json";
     } else if (url.searchParams.has('demo')) {
-        var demo = url.searchParams.get('demo') || 'basic';
+        let demo = url.searchParams.get('demo') || 'basic';
         if (demo == 'basic') {
             params['source_data'] = DemoStatusBasic;
         } else if (demo == 'openstack') {
@@ -60,7 +60,7 @@ function zuul_start($) {
         params['source'] = 'status.json';
     }
 
-    var zuul = $.zuul(params);
+    let zuul = $.zuul(params);
 
     zuul.jq.on('update-start', function () {
         $container.addClass('zuul-container-loading');
