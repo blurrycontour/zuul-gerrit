@@ -1,3 +1,4 @@
+/* global URL, WebSocket */
 // Client script for Zuul Log Streaming
 //
 // @licstart  The following is the entire license notice for the
@@ -20,77 +21,74 @@
 // @licend  The above is the entire license notice for the JavaScript code in
 // this page.
 
-import './styles/stream.css';
+import './styles/stream.css'
 
+function escapeLog (text) {
+  const pattern = /[<>&"']/g
 
-function escapeLog(text) {
-    const pattern = /[<>&"']/g;
-
-    return text.replace(pattern, function(match) {
-        return '&#' + match.charCodeAt(0) + ';';
-    });
+  return text.replace(pattern, function (match) {
+    return '&#' + match.charCodeAt(0) + ';'
+  })
 }
 
-window.onload = function() {
+window.onload = function () {
+  let pageUpdateInMS = 250
+  let receiveBuffer = ''
+  let websocket_url = null
 
-    let pageUpdateInMS = 250;
-    let receiveBuffer = "";
-    let websocket_url = null
-
-    setInterval(function() {
-        console.log("autoScroll");
-        if (receiveBuffer != "") {
-            document.getElementById('pagecontent').innerHTML += receiveBuffer;
-            receiveBuffer = "";
-            if (document.getElementById('autoscroll').checked) {
-                window.scrollTo(0, document.body.scrollHeight);
-            }
-        }
-    }, pageUpdateInMS);
-
-    let url = new URL(window.location);
-
-    let params = {
-        uuid: url.searchParams.get('uuid')
+  setInterval(function () {
+    console.log('autoScroll')
+    if (receiveBuffer != '') {
+      document.getElementById('pagecontent').innerHTML += receiveBuffer
+      receiveBuffer = ''
+      if (document.getElementById('autoscroll').checked) {
+        window.scrollTo(0, document.body.scrollHeight)
+      }
     }
-    document.getElementById('pagetitle').innerHTML = params['uuid'];
-    if (url.searchParams.has('logfile')) {
-        params['logfile'] = url.searchParams.get('logfile');
-        let logfile_suffix = `(${params['logfile']})`;
-        document.getElementById('pagetitle').innerHTML += logfile_suffix;
-    }
-    // TODO(mordred) When running status.html in the devServer with a
-    // source_url passed in, can we get it to go ahead and apped websocket_url
-    // so that local testing is easy?
-    if (url.searchParams.has('websocket_url')) {
-        params['websocket_url'] = url.searchParams.get('websocket_url');
+  }, pageUpdateInMS)
+
+  let url = new URL(window.location)
+
+  let params = {
+    uuid: url.searchParams.get('uuid')
+  }
+  document.getElementById('pagetitle').innerHTML = params['uuid']
+  if (url.searchParams.has('logfile')) {
+    params['logfile'] = url.searchParams.get('logfile')
+    let logfile_suffix = `(${params['logfile']})`
+    document.getElementById('pagetitle').innerHTML += logfile_suffix
+  }
+  // TODO(mordred) When running status.html in the devServer with a
+  // source_url passed in, can we get it to go ahead and apped websocket_url
+  // so that local testing is easy?
+  if (url.searchParams.has('websocket_url')) {
+    params['websocket_url'] = url.searchParams.get('websocket_url')
+  } else {
+    // Websocket doesn't accept relative urls so construct an
+    // absolute one.
+    let protocol = ''
+    if (url['protocol'] == 'https:') {
+      protocol = 'wss://'
     } else {
-        // Websocket doesn't accept relative urls so construct an
-        // absolute one.
-        let protocol = '';
-        if (url['protocol'] == 'https:') {
-            protocol = 'wss://';
-        } else {
-            protocol = 'ws://';
-        }
-        let path = url['pathname'].replace(/stream.html.*$/g, '') + 'console-stream';
-        params['websocket_url'] = protocol + url['host'] + path;
+      protocol = 'ws://'
     }
-    let ws = new WebSocket(params['websocket_url']);
+    let path = url['pathname'].replace(/stream.html.*$/g, '') + 'console-stream'
+    params['websocket_url'] = protocol + url['host'] + path
+  }
+  let ws = new WebSocket(params['websocket_url'])
 
-    ws.onmessage = function(event) {
-        console.log("onmessage");
-        receiveBuffer = receiveBuffer + escapeLog(event.data);
-    };
+  ws.onmessage = function (event) {
+    console.log('onmessage')
+    receiveBuffer = receiveBuffer + escapeLog(event.data)
+  }
 
-    ws.onopen = function(event) {
-        console.log("onopen");
-        ws.send(JSON.stringify(params));
-    };
+  ws.onopen = function (event) {
+    console.log('onopen')
+    ws.send(JSON.stringify(params))
+  }
 
-    ws.onclose = function(event) {
-        console.log("onclose");
-        receiveBuffer = receiveBuffer + "\n--- END OF STREAM ---\n";
-    };
-
-};
+  ws.onclose = function (event) {
+    console.log('onclose')
+    receiveBuffer = receiveBuffer + '\n--- END OF STREAM ---\n'
+  }
+}
