@@ -57,7 +57,7 @@ class CallbackModule(CallbackBase):
         self.results = []
         self.playbook = {}
         logging_config = logconfig.load_job_config(
-            os.environ['ZUUL_JOB_LOG_CONFIG'])
+            os.environ.get('ZUUL_JOB_LOG_CONFIG', 'logging.json'))
 
         self.output_path = os.path.splitext(
             logging_config.job_output_file)[0] + '.json'

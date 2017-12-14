@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging.handlers
 
 from zuul.ansible import paths
 command = paths._import_ansible_action_plugin("command")
@@ -21,9 +22,23 @@ command = paths._import_ansible_action_plugin("command")
 class ActionModule(command.ActionModule):
 
     def run(self, tmp=None, task_vars=None):
-        # we need the zuul_log_id on shell and command tasks
-        host = paths._sanitize_filename(task_vars.get('inventory_hostname'))
         if self._task.action in ('command', 'shell'):
-            self._task.args['zuul_log_id'] = "%s-%s" % (self._task._uuid, host)
+            remote_port = logging.handlers.DEFAULT_TCP_LOGGING_PORT
+            local_ports = self._task.args.pop('zuul_port_forwards', {})
+
+            local_port = local_ports.get(
+                self._connection._play_context.remote_addr)
+            if local_port:
+                if self._connection.transport == 'ssh':
+                    ssh_extra_args = self._play_context.ssh_extra_args
+                    if not self._play_context.ssh_extra_args:
+                        ssh_extra_args = ''
+                    ssh_extra_args += ' -R %s:localhost:%s' % (
+                        remote_port,
+                        local_port)
+                    self._play_context.ssh_extra_args = ssh_extra_args
+                    self._task.args['zuul_log_port'] = remote_port
+                elif self._connection.transport == 'local':
+                    self._task.args['zuul_log_port'] = local_port
 
         return super(ActionModule, self).run(tmp, task_vars)

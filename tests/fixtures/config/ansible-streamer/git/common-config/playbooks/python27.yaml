@@ -1,0 +1,9 @@
+- hosts: all
+  tasks:
+    - debug: var=waitpath
+    - command: echo "Log output"
+
+     # Do not finish until test creates the flag file
+    - wait_for:
+        state: present
+        path: "{{waitpath}}"
