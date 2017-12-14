@@ -33,11 +33,10 @@ function escapeLog (text) {
 window.onload = function () {
   let pageUpdateInMS = 250
   let receiveBuffer = ''
-  let websocket_url = null
 
   setInterval(function () {
     console.log('autoScroll')
-    if (receiveBuffer != '') {
+    if (receiveBuffer !== '') {
       document.getElementById('pagecontent').innerHTML += receiveBuffer
       receiveBuffer = ''
       if (document.getElementById('autoscroll').checked) {
@@ -54,8 +53,8 @@ window.onload = function () {
   document.getElementById('pagetitle').innerHTML = params['uuid']
   if (url.searchParams.has('logfile')) {
     params['logfile'] = url.searchParams.get('logfile')
-    let logfile_suffix = `(${params['logfile']})`
-    document.getElementById('pagetitle').innerHTML += logfile_suffix
+    let logfileSuffix = `(${params['logfile']})`
+    document.getElementById('pagetitle').innerHTML += logfileSuffix
   }
   // TODO(mordred) When running status.html in the devServer with a
   // source_url passed in, can we get it to go ahead and apped websocket_url
@@ -66,7 +65,7 @@ window.onload = function () {
     // Websocket doesn't accept relative urls so construct an
     // absolute one.
     let protocol = ''
-    if (url['protocol'] == 'https:') {
+    if (url['protocol'] === 'https:') {
       protocol = 'wss://'
     } else {
       protocol = 'ws://'

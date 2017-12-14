@@ -33,7 +33,7 @@ import './jquery.zuul'
 /**
  * @return The $.zuul instance
  */
-function zuul_start ($) {
+function zuulStart ($) {
   // Start the zuul app (expects default dom)
 
   let $container, $indicator
@@ -47,11 +47,11 @@ function zuul_start ($) {
     params['source'] = url.searchParams.get('source_url') + '/' + 'status.json'
   } else if (url.searchParams.has('demo')) {
     let demo = url.searchParams.get('demo') || 'basic'
-    if (demo == 'basic') {
+    if (demo === 'basic') {
       params['source_data'] = DemoStatusBasic
-    } else if (demo == 'openstack') {
+    } else if (demo === 'openstack') {
       params['source_data'] = DemoStatusOpenStack
-    } else if (demo == 'tree') {
+    } else if (demo === 'tree') {
       params['source_data'] = DemoStatusTree
     }
   } else {
@@ -86,7 +86,7 @@ function zuul_start ($) {
     // DOM ready
     $container = $('#zuul-container')
     $indicator = $('#zuul-spinner')
-    $('#zuul_controls').append(zuul.app.control_form())
+    $('#zuul_controls').append(zuul.app.controlForm())
 
     zuul.app.schedule()
 
@@ -114,4 +114,4 @@ if (module.hot) {
   // })
 }
 
-zuul_start(jQuery)
+zuulStart(jQuery)

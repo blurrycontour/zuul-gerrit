@@ -24,10 +24,10 @@ import angular from 'angular'
 import './styles/zuul.css'
 import './jquery.zuul'
 
-function get_source_url (filename, $location) {
-  let query_args = $location.search()
-  if (query_args['source_url']) {
-    return query_args['source_url'] + '/' + filename
+function getSourceUrl (filename, $location) {
+  let queryArgs = $location.search()
+  if (queryArgs['source_url']) {
+    return queryArgs['source_url'] + '/' + filename
   } else {
     return filename
   }
@@ -37,7 +37,7 @@ angular.module('zuulTenants', []).controller(
     'mainController', function ($scope, $http, $location) {
       $scope.tenants = undefined
       $scope.tenants_fetch = function () {
-        $http.get(get_source_url('tenants.json', $location))
+        $http.get(getSourceUrl('tenants.json', $location))
             .then(function success (result) {
               $scope.tenants = result.data
             })
@@ -49,7 +49,7 @@ angular.module('zuulJobs', []).controller(
     'mainController', function ($scope, $http, $location) {
       $scope.jobs = undefined
       $scope.jobs_fetch = function () {
-        $http.get(get_source_url('jobs.json', $location))
+        $http.get(getSourceUrl('jobs.json', $location))
             .then(function success (result) {
               $scope.jobs = result.data
             })
@@ -64,46 +64,46 @@ angular.module('zuulBuilds', [], function ($locationProvider) {
   })
 }).controller('mainController', function ($scope, $http, $location) {
   $scope.rowClass = function (build) {
-    if (build.result == 'SUCCESS') {
+    if (build.result === 'SUCCESS') {
       return 'success'
     } else {
       return 'warning'
     }
   }
-  let query_args = $location.search()
+  let queryArgs = $location.search()
   let url = $location.url()
-  let tenant_start = url.lastIndexOf(
+  let tenantStart = url.lastIndexOf(
         '/', url.lastIndexOf('/builds.html') - 1) + 1
-  let tenant_length = url.lastIndexOf('/builds.html') - tenant_start
-  $scope.tenant = url.substr(tenant_start, tenant_length)
+  let tenantLength = url.lastIndexOf('/builds.html') - tenantStart
+  $scope.tenant = url.substr(tenantStart, tenantLength)
   $scope.builds = undefined
-  if (query_args['pipeline']) {
-    $scope.pipeline = query_args['pipeline']
+  if (queryArgs['pipeline']) {
+    $scope.pipeline = queryArgs['pipeline']
   } else { $scope.pipeline = '' }
-  if (query_args['job_name']) {
-    $scope.job_name = query_args['job_name']
+  if (queryArgs['job_name']) {
+    $scope.job_name = queryArgs['job_name']
   } else { $scope.job_name = '' }
-  if (query_args['project']) {
-    $scope.project = query_args['project']
+  if (queryArgs['project']) {
+    $scope.project = queryArgs['project']
   } else { $scope.project = '' }
   $scope.builds_fetch = function () {
-    let query_string = ''
-    if ($scope.tenant) { query_string += '&tenant=' + $scope.tenant }
-    if ($scope.pipeline) { query_string += '&pipeline=' + $scope.pipeline }
-    if ($scope.job_name) { query_string += '&job_name=' + $scope.job_name }
-    if ($scope.project) { query_string += '&project=' + $scope.project }
-    if (query_string != '') { query_string = '?' + query_string.substr(1) }
-    $http.get(get_source_url('builds.json', $location) + query_string)
+    let queryString = ''
+    if ($scope.tenant) { queryString += '&tenant=' + $scope.tenant }
+    if ($scope.pipeline) { queryString += '&pipeline=' + $scope.pipeline }
+    if ($scope.job_name) { queryString += '&job_name=' + $scope.job_name }
+    if ($scope.project) { queryString += '&project=' + $scope.project }
+    if (queryString !== '') { queryString = '?' + queryString.substr(1) }
+    $http.get(getSourceUrl('builds.json', $location) + queryString)
             .then(function success (result) {
-              for (build_pos = 0;
-                     build_pos < result.data.length;
-                     build_pos += 1) {
-                build = result.data[build_pos]
+              for (let buildPos = 0;
+                     buildPos < result.data.length;
+                     buildPos += 1) {
+                let build = result.data[buildPos]
                 if (build.node_name == null) {
                   build.node_name = 'master'
                 }
                 /* Fix incorect url for post_failure job */
-                if (build.log_url == build.job_name) {
+                if (build.log_url === build.job_name) {
                   build.log_url = undefined
                 }
               }
