@@ -24,6 +24,8 @@
     "build:dist": "webpack --env=prod",
     "build:docker": "docker run -it --rm -v $(pwd):/usr/src/app -w /usr/src/app node:alpine npm run build:dist-with-depends",
     "build:dist-with-depends": "yarn install && npm run build:dist",
+    "format": "standard --fix web/*.js",
+    "lint": "webpack -d --env=lint",
     "start": "webpack-dev-server --env=dev",
     "start:status:basic": "webpack-dev-server --env=dev --open-page='status.html?demo=basic'",
     "start:status:openstack": "webpack-dev-server --env=dev --open-page='status.html?demo=openstack'",
