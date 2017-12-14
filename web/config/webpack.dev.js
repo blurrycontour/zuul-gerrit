@@ -19,6 +19,15 @@ module.exports = Merge(CommonConfig, {
         loader: 'standard-loader',
         exclude: /node_modules/,
         options: {
+          globals: [
+            'DemoStatusBasic',
+            'DemoStatusOpenStack',
+            'DemoStatusTree',
+            'Image',
+            'URL',
+            'WebSocket',
+            'jQuery'
+          ],
           error: false,
           parser: 'babel-eslint'
         }
