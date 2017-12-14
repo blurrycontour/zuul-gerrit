@@ -22,24 +22,19 @@ from __future__ import absolute_import
 import datetime
 import logging
 import logging.config
+import logging.handlers
 import json
 import os
-import socket
-import threading
-import time
-import uuid
 
 from ansible.plugins.callback import default
 
 from zuul.ansible import logconfig
 
-LOG_STREAM_PORT = 19885
-
 
 def zuul_filter_result(result):
     """Remove keys from shell/command output.
 
-    Zuul streams stdout into the log above, so including stdout and stderr
+    Zuul streams stdout into the log, so including stdout and stderr
     in the result dict that ansible displays in the logs is duplicate
     noise. We keep stdout in the result dict so that other callback plugins
     like ARA could also have access to it. But drop them here.
@@ -60,7 +55,7 @@ def zuul_filter_result(result):
     if not stdout_lines and stdout:
         stdout_lines = stdout.split('\n')
 
-    for key in ('changed', 'cmd', 'zuul_log_id', 'invocation',
+    for key in ('changed', 'cmd', 'invocation',
                 'stderr', 'stderr_lines'):
         result.pop(key, None)
     return stdout_lines
@@ -83,8 +78,6 @@ class CallbackModule(default.CallbackModule):
         self._task = None
         self._daemon_running = False
         self._play = None
-        self._streamers = []
-        self._streamers_stop = False
         self.configure_logger()
         self._items_done = False
         self._deferred_result = None
@@ -115,57 +108,6 @@ class CallbackModule(default.CallbackModule):
             else:
                 self._display.display(msg)
 
-    def _read_log(self, host, ip, log_id, task_name, hosts):
-        self._log("[%s] Starting to log %s for task %s"
-                  % (host, log_id, task_name), job=False, executor=True)
-        while True:
-            try:
-                s = socket.create_connection((ip, LOG_STREAM_PORT))
-            except Exception:
-                self._log("[%s] Waiting on logger" % host,
-                          executor=True, debug=True)
-                time.sleep(0.1)
-                continue
-            msg = "%s\n" % log_id
-            s.send(msg.encode("utf-8"))
-            buff = s.recv(4096)
-            buffering = True
-            while buffering:
-                if b'\n' in buff:
-                    (line, buff) = buff.split(b'\n', 1)
-                    # We can potentially get binary data here. In order to
-                    # being able to handle that use the backslashreplace
-                    # error handling method. This decodes unknown utf-8
-                    # code points to escape sequences which exactly represent
-                    # the correct data without throwing a decoding exception.
-                    done = self._log_streamline(
-                        host, line.decode("utf-8", "backslashreplace"))
-                    if done:
-                        return
-                else:
-                    more = s.recv(4096)
-                    if not more:
-                        buffering = False
-                    else:
-                        buff += more
-            if buff:
-                self._log_streamline(
-                    host, buff.decode("utf-8", "backslashreplace"))
-
-    def _log_streamline(self, host, line):
-        if "[Zuul] Task exit code" in line:
-            return True
-        elif self._streamers_stop and "[Zuul] Log not found" in line:
-            return True
-        elif "[Zuul] Log not found" in line:
-            # don't output this line
-            return False
-        else:
-            ts, ln = line.split(' | ', 1)
-
-            self._log("%s | %s " % (host, ln), ts=ts)
-            return False
-
     def v2_playbook_on_start(self, playbook):
         self._playbook_name = os.path.splitext(playbook._file_name)[0]
 
@@ -193,41 +135,7 @@ class CallbackModule(default.CallbackModule):
         self._task = task
 
         if self._play.strategy != 'free':
-            task_name = self._print_task_banner(task)
-        if task.action == 'command':
-            log_id = uuid.uuid4().hex
-            task.args['zuul_log_id'] = log_id
-            play_vars = self._play._variable_manager._hostvars
-
-            hosts = self._get_task_hosts(task)
-            for host in hosts:
-                if host in ('localhost', '127.0.0.1'):
-                    # Don't try to stream from localhost
-                    continue
-                ip = play_vars[host].get(
-                    'ansible_host', play_vars[host].get(
-                        'ansible_inventory_host'))
-                if ip in ('localhost', '127.0.0.1'):
-                    # Don't try to stream from localhost
-                    continue
-                streamer = threading.Thread(
-                    target=self._read_log, args=(
-                        host, ip, log_id, task_name, hosts))
-                streamer.daemon = True
-                streamer.start()
-                self._streamers.append(streamer)
-
-    def _stop_streamers(self):
-        self._streamers_stop = True
-        while True:
-            if not self._streamers:
-                break
-            streamer = self._streamers.pop()
-            streamer.join(30)
-            if streamer.is_alive():
-                msg = "[Zuul] Log Stream did not terminate"
-                self._log(msg, job=True, executor=True)
-        self._streamers_stop = False
+            self._print_task_banner(task)
 
     def _process_result_for_localhost(self, result, is_task=True):
         result_dict = dict(result._result)
@@ -253,8 +161,6 @@ class CallbackModule(default.CallbackModule):
                     'ansible_inventory_host', 'localhost')) in localhost_names:
                 is_localhost = True
 
-        if not is_localhost and is_task:
-            self._stop_streamers()
         if result._task.action in ('command', 'shell'):
             stdout_lines = zuul_filter_result(result_dict)
             if is_localhost:

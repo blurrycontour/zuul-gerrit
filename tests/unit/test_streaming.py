@@ -16,7 +16,9 @@
 
 import aiohttp
 import asyncio
+import fixtures
 import logging
+import logging.handlers
 import json
 import os
 import os.path
@@ -66,36 +68,8 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
     def setUp(self):
         super(TestStreaming, self).setUp()
         self.host = '::'
-        self.streamer = None
-        self.stop_streamer = False
         self.streaming_data = ''
         self.test_streaming_event = threading.Event()
-
-    def stopStreamer(self):
-        self.stop_streamer = True
-
-    def startStreamer(self, port, build_uuid, root=None):
-        if not root:
-            root = tempfile.gettempdir()
-        self.streamer = zuul.lib.log_streamer.LogStreamer(self.host,
-                                                          port, root)
-        port = self.streamer.server.socket.getsockname()[1]
-        s = socket.create_connection((self.host, port))
-        self.addCleanup(s.close)
-
-        req = '%s\r\n' % build_uuid
-        s.sendall(req.encode('utf-8'))
-        self.test_streaming_event.set()
-
-        while not self.stop_streamer:
-            data = s.recv(2048)
-            if not data:
-                break
-            self.streaming_data += data.decode('utf-8')
-
-        s.shutdown(socket.SHUT_RDWR)
-        s.close()
-        self.streamer.stop()
 
     def test_streaming(self):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
@@ -111,6 +85,10 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
         build_dir = os.path.join(self.executor_server.jobdir_root, build.uuid)
         while not os.path.exists(build_dir):
             time.sleep(0.1)
+
+        # Capture the logging messages injected by the log streamer
+        log_fixture = self.useFixture(
+            fixtures.FakeLogger(name='zuul-log-stream-%s' % build.uuid))
 
         # Need to wait to make sure that jobdir gets set
         while build.jobdir is None:
@@ -128,23 +106,12 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
         logfile = open(ansible_log, 'r')
         self.addCleanup(logfile.close)
 
-        # Create a thread to stream the log. We need this to be happening
-        # before we create the flag file to tell the job to complete.
-        streamer_thread = threading.Thread(
-            target=self.startStreamer,
-            args=(0, build.uuid, self.executor_server.jobdir_root,)
-        )
-        streamer_thread.start()
-        self.addCleanup(self.stopStreamer)
-        self.test_streaming_event.wait()
-
         # Allow the job to complete, which should close the streaming
-        # connection (and terminate the thread) as well since the log file
-        # gets closed/deleted.
+        # connection (and terminate the thread) as well since the thread
+        # is a child of the executor.
         flag_file = os.path.join(build_dir, 'test_wait')
         open(flag_file, 'w').close()
         self.waitUntilSettled()
-        streamer_thread.join()
 
         # Now that the job is finished, the log file has been closed by the
         # job and deleted. However, we still have a file handle to it, so we

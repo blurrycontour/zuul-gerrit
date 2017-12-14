@@ -16,6 +16,7 @@ import collections
 import datetime
 import json
 import logging
+import logging.handlers
 import multiprocessing
 import os
 import psutil
@@ -38,6 +39,7 @@ except ImportError:
     ara_callbacks = None
 import gear
 
+from zuul.executor import stream
 import zuul.merger.merger
 import zuul.ansible.logconfig
 from zuul.lib import commandsocket
@@ -583,6 +585,10 @@ class AnsibleJob(object):
                                             '~/.ssh/id_rsa')
         self.ssh_agent = SshAgent()
 
+        # Will be set up in execute
+        self.log_streamer = None
+        self.log_streaming_port = 0
+
         self.executor_variables_file = None
 
         if self.executor_server.config.has_option('executor', 'variables'):
@@ -604,6 +610,20 @@ class AnsibleJob(object):
         if self.thread:
             self.thread.join()
 
+    def startStreamer(self):
+        # Pass port in so that port can be overridden in unit tests
+        self.log_streamer = stream.LogStreamer(
+            uuid=self.job.unique,
+            port=self.log_streaming_port,
+            logfile=self.jobdir.job_output_file)
+        # Read port back out so forwarding works
+        self.log_streaming_port = self.log_streamer.get_port()
+        self.log_streamer.start()
+
+    def stopStreamer(self):
+        if self.log_streamer:
+            self.log_streamer.join()
+
     def execute(self):
         try:
             self.ssh_agent.start()
@@ -611,6 +631,8 @@ class AnsibleJob(object):
             self.jobdir = JobDir(self.executor_server.jobdir_root,
                                  self.executor_server.keep_jobdir,
                                  str(self.job.unique))
+            self.jobdir.job_output_file
+            self.startStreamer()
             self._execute()
         except ExecutorError as e:
             result_data = json.dumps(dict(result='ERROR',
@@ -636,6 +658,7 @@ class AnsibleJob(object):
                 self.executor_server.finishJob(self.job.unique)
             except Exception:
                 self.log.exception("Error finalizing job thread:")
+            self.stopStreamer()
 
     def _execute(self):
         args = json.loads(self.job.arguments)
@@ -1278,7 +1301,10 @@ class AnsibleJob(object):
             config.write('pipelining = True\n')
             config.write('control_path_dir = %s\n' % self.jobdir.control_path)
             ssh_args = "-o ControlMaster=auto -o ControlPersist=60s " \
-                "-o UserKnownHostsFile=%s" % self.jobdir.known_hosts
+                "-o UserKnownHostsFile=%s -R %s:localhost:%s" % (
+                    self.jobdir.known_hosts,
+                    self.log_streaming_port,
+                    logging.handlers.DEFAULT_TCP_LOGGING_PORT)
             config.write('ssh_args = %s\n' % ssh_args)
 
     def _ansibleTimeout(self, msg):
