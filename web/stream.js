@@ -24,7 +24,7 @@ import './styles/stream.css';
 
 
 function escapeLog(text) {
-    var pattern = /[<>&"']/g;
+    const pattern = /[<>&"']/g;
 
     return text.replace(pattern, function(match) {
         return '&#' + match.charCodeAt(0) + ';';
@@ -33,9 +33,9 @@ function escapeLog(text) {
 
 window.onload = function() {
 
-    var pageUpdateInMS = 250;
-    var receiveBuffer = "";
-    var websocket_url = null
+    let pageUpdateInMS = 250;
+    let receiveBuffer = "";
+    let websocket_url = null
 
     setInterval(function() {
         console.log("autoScroll");
@@ -48,15 +48,15 @@ window.onload = function() {
         }
     }, pageUpdateInMS);
 
-    var url = new URL(window.location);
+    let url = new URL(window.location);
 
-    var params = {
+    let params = {
         uuid: url.searchParams.get('uuid')
     }
     document.getElementById('pagetitle').innerHTML = params['uuid'];
     if (url.searchParams.has('logfile')) {
         params['logfile'] = url.searchParams.get('logfile');
-        var logfile_suffix = "(" + params['logfile'] + ")";
+        let logfile_suffix = `(${params['logfile']})`;
         document.getElementById('pagetitle').innerHTML += logfile_suffix;
     }
     // TODO(mordred) When running status.html in the devServer with a
@@ -67,16 +67,16 @@ window.onload = function() {
     } else {
         // Websocket doesn't accept relative urls so construct an
         // absolute one.
-        var protocol = '';
+        let protocol = '';
         if (url['protocol'] == 'https:') {
             protocol = 'wss://';
         } else {
             protocol = 'ws://';
         }
-        var path = url['pathname'].replace(/stream.html.*$/g, '') + 'console-stream';
+        let path = url['pathname'].replace(/stream.html.*$/g, '') + 'console-stream';
         params['websocket_url'] = protocol + url['host'] + path;
     }
-    var ws = new WebSocket(params['websocket_url']);
+    let ws = new WebSocket(params['websocket_url']);
 
     ws.onmessage = function(event) {
         console.log("onmessage");
