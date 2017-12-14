@@ -61,6 +61,7 @@
               - playbooks/zuul-migrate/.*
         - zuul-npm-build
         - nodejs-npm-run-lint:
+            success-url: 'rpm/reports/bundle.html'
             files:
               - package.json
               - webpack.config.js
@@ -80,6 +81,7 @@
               - playbooks/zuul-migrate/.*
         - zuul-npm-build
         - nodejs-npm-run-lint:
+            success-url: 'rpm/reports/bundle.html'
             files:
               - package.json
               - webpack.config.js
