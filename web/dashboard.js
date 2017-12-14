@@ -26,7 +26,7 @@ import './jquery.zuul';
 
 
 function get_source_url(filename, $location) {
-    var query_args = $location.search();
+    let query_args = $location.search();
     if (query_args['source_url']) {
         return query_args['source_url'] + '/' + filename;
     } else {
@@ -74,11 +74,11 @@ angular.module('zuulBuilds', [], function($locationProvider) {
             return "warning";
         }
     };
-    var query_args = $location.search();
-    var url = $location.url();
-    var tenant_start = url.lastIndexOf(
+    let query_args = $location.search();
+    let url = $location.url();
+    let tenant_start = url.lastIndexOf(
         '/', url.lastIndexOf('/builds.html') - 1) + 1;
-    var tenant_length = url.lastIndexOf('/builds.html') - tenant_start;
+    let tenant_length = url.lastIndexOf('/builds.html') - tenant_start;
     $scope.tenant = url.substr(tenant_start, tenant_length);
     $scope.builds = undefined;
     if (query_args["pipeline"]) {$scope.pipeline = query_args["pipeline"];
@@ -88,7 +88,7 @@ angular.module('zuulBuilds', [], function($locationProvider) {
     if (query_args["project"]) {$scope.project = query_args["project"];
     } else {$scope.project = "";}
     $scope.builds_fetch = function() {
-        var query_string = "";
+        let query_string = "";
         if ($scope.tenant) {query_string += "&tenant="+$scope.tenant;}
         if ($scope.pipeline) {query_string += "&pipeline="+$scope.pipeline;}
         if ($scope.job_name) {query_string += "&job_name="+$scope.job_name;}
