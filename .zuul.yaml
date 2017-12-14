@@ -53,6 +53,7 @@
             vars:
               javascript_content_dir: zuul/web/static
         - nodejs-npm-run-lint:
+            success-url: 'npm/reports/bundle.html'
             files:
               - package.json
               - webpack.config.js
@@ -82,6 +83,7 @@
             vars:
               javascript_content_dir: zuul/web/static
         - nodejs-npm-run-lint:
+            success-url: 'npm/reports/bundle.html'
             files:
               - package.json
               - webpack.config.js
