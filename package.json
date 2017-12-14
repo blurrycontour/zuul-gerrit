@@ -6,6 +6,11 @@
   "repository": "https://git.openstack.org/openstack-infra/zuul",
   "author": "OpenStack Infra",
   "license": "Apache-2.0",
+  "babel": {
+    "presets": [
+      "env"
+    ]
+  },
   "dependencies": {
     "angular": "^1.5.8",
     "bootstrap": "^3.3.7",
@@ -23,12 +28,16 @@
     "start:status:basic": "webpack-dev-server --env=dev --open-page='status.html?demo=basic'",
     "start:status:openstack": "webpack-dev-server --env=dev --open-page='status.html?demo=openstack'",
     "start:status:tree": "webpack-dev-server --env=dev --open-page='status.html?demo=tree'",
-    "start:status": "webpack-dev-server --env=dev --open-page='status.html?source_url=http://zuulv3.openstack.org'",
-    "start:builds": "webpack-dev-server --env=dev --open-page='builds.html?source_url=http://zuulv3.openstack.org'",
-    "start:jobs": "webpack-dev-server --env=dev --open-page='jobs.html?source_url=http://zuulv3.openstack.org'",
+    "start:status": "webpack-dev-server --env=dev --open-page='status.html?source_url=https://zuul.openstack.org'",
+    "start:builds": "webpack-dev-server --env=dev --open-page='builds.html?source_url=https://zuul.openstack.org'",
+    "start:jobs": "webpack-dev-server --env=dev --open-page='jobs.html?source_url=https://zuul.openstack.org'",
     "start:stream": "webpack-dev-server --env=dev --open-page='stream.html'"
   },
   "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-plugin-angularjs-annotate": "^0.8.2",
+    "babel-preset-env": "^1.6.1",
     "clean-webpack-plugin": "^0.1.16",
     "css-loader": "^0.28.4",
     "file-loader": "^0.11.2",
