@@ -24,14 +24,12 @@ import logging
 import logging.config
 import json
 import os
-import socket
-import threading
-import time
 
 from ansible.plugins.callback import default
 from zuul.ansible import paths
 
 from zuul.ansible import logconfig
+from zuul.ansible import stream_receiver
 
 LOG_STREAM_PORT = 19885
 
@@ -95,7 +93,7 @@ class CallbackModule(default.CallbackModule):
         # to the log file. We're doing other things though, so we don't want
         # this.
         logging_config = logconfig.load_job_config(
-            os.environ['ZUUL_JOB_LOG_CONFIG'])
+            os.environ.get('ZUUL_JOB_LOG_CONFIG', 'logging.json'))
 
         if self._display.verbosity > 2:
             logging_config.setDebug()
@@ -114,73 +112,6 @@ class CallbackModule(default.CallbackModule):
                 self._display.vvv(msg)
             else:
                 self._display.display(msg)
-
-    def _read_log(self, host, ip, log_id, task_name, hosts):
-        self._log("[%s] Starting to log %s for task %s"
-                  % (host, log_id, task_name), job=False, executor=True)
-        while True:
-            try:
-                s = socket.create_connection((ip, LOG_STREAM_PORT), 5)
-                # Disable the socket timeout after we have successfully
-                # connected to accomodate the fact that jobs may not be writing
-                # logs continously. Without this we can easily trip the 5
-                # second timeout.
-                s.settimeout(None)
-            except socket.timeout:
-                self._log(
-                    "Timeout exception waiting for the logger. "
-                    "Please check connectivity to [%s:%s]"
-                    % (ip, LOG_STREAM_PORT), executor=True)
-                self._log_streamline(
-                    "localhost",
-                    "Timeout exception waiting for the logger. "
-                    "Please check connectivity to [%s:%s]"
-                    % (ip, LOG_STREAM_PORT))
-                return
-            except Exception:
-                self._log("[%s] Waiting on logger" % host,
-                          executor=True, debug=True)
-                time.sleep(0.1)
-                continue
-            msg = "%s\n" % log_id
-            s.send(msg.encode("utf-8"))
-            buff = s.recv(4096)
-            buffering = True
-            while buffering:
-                if b'\n' in buff:
-                    (line, buff) = buff.split(b'\n', 1)
-                    # We can potentially get binary data here. In order to
-                    # being able to handle that use the backslashreplace
-                    # error handling method. This decodes unknown utf-8
-                    # code points to escape sequences which exactly represent
-                    # the correct data without throwing a decoding exception.
-                    done = self._log_streamline(
-                        host, line.decode("utf-8", "backslashreplace"))
-                    if done:
-                        return
-                else:
-                    more = s.recv(4096)
-                    if not more:
-                        buffering = False
-                    else:
-                        buff += more
-            if buff:
-                self._log_streamline(
-                    host, buff.decode("utf-8", "backslashreplace"))
-
-    def _log_streamline(self, host, line):
-        if "[Zuul] Task exit code" in line:
-            return True
-        elif self._streamers_stop and "[Zuul] Log not found" in line:
-            return True
-        elif "[Zuul] Log not found" in line:
-            # don't output this line
-            return False
-        else:
-            ts, ln = line.split(' | ', 1)
-
-            self._log("%s | %s " % (host, ln), ts=ts)
-            return False
 
     def _log_module_failure(self, result, result_dict):
         if 'module_stdout' in result_dict and result_dict['module_stdout']:
@@ -221,41 +152,30 @@ class CallbackModule(default.CallbackModule):
         self._log("")
 
         self._task = task
+        port_forwards = {}
 
         if self._play.strategy != 'free':
-            task_name = self._print_task_banner(task)
-        else:
-            task_name = task.get_name().strip()
-
+            self._print_task_banner(task)
         if task.action in ('command', 'shell'):
             play_vars = self._play._variable_manager._hostvars
-
             hosts = self._get_task_hosts(task)
             for host, inventory_hostname in hosts:
-                if host in ('localhost', '127.0.0.1'):
-                    # Don't try to stream from localhost
-                    continue
-                ip = play_vars[host].get(
+                hostname = play_vars[host].get(
                     'ansible_host', play_vars[host].get(
-                        'ansible_inventory_host'))
-                if ip in ('localhost', '127.0.0.1'):
-                    # Don't try to stream from localhost
-                    continue
+                        'ansible_inventory_host', host))
                 if task.loop:
                     # Don't try to stream from loops
                     continue
                 if play_vars[host].get('ansible_connection') in ('kubectl', ):
                     # Don't try to stream from kubectl connection
                     continue
-
-                log_id = "%s-%s" % (
-                    task._uuid, paths._sanitize_filename(inventory_hostname))
-                streamer = threading.Thread(
-                    target=self._read_log, args=(
-                        host, ip, log_id, task_name, hosts))
+                streamer = stream_receiver.StreamReceiver(host=host)
+                port = streamer.get_port()
+                port_forwards[hostname] = port
                 streamer.daemon = True
                 streamer.start()
                 self._streamers.append(streamer)
+        task.args['zuul_port_forwards'] = port_forwards
 
     def v2_playbook_on_handler_task_start(self, task):
         self.v2_playbook_on_task_start(task, False)
@@ -266,6 +186,7 @@ class CallbackModule(default.CallbackModule):
             if not self._streamers:
                 break
             streamer = self._streamers.pop()
+            streamer.stop()
             streamer.join(30)
             if streamer.is_alive():
                 msg = "[Zuul] Log Stream did not terminate"
