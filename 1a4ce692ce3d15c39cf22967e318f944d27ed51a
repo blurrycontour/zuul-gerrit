@@ -79,6 +79,24 @@
       "revId": "1a4ce692ce3d15c39cf22967e318f944d27ed51a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_2dae3de7",
+        "filename": "zuul/driver/git/gitconnection.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2017-12-14T22:08:48Z",
+      "side": 1,
+      "message": "Make sense the code already exist in process_event_queue but the branch_* attributes were missing on the events. So I removed that block of code and let the scheduler do its work. I also added a cache that I fill by a pre-call to getChange before sending the event.",
+      "parentUuid": "df87a7cf_46ef04e9",
+      "revId": "1a4ce692ce3d15c39cf22967e318f944d27ed51a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
