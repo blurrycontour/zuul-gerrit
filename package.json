@@ -25,7 +25,7 @@
     "build:docker": "docker run -it --rm -v $(pwd):/usr/src/app -w /usr/src/app node:alpine npm run build:dist-with-depends",
     "build:dist-with-depends": "yarn install && npm run build:dist",
     "format": "standard --fix web/*.js",
-    "lint": "webpack -d --env=lint",
+    "lint": "webpack --env=lint",
     "start": "webpack-dev-server --env=dev",
     "start:status:basic": "webpack-dev-server --env=dev --open-page='status.html?demo=basic'",
     "start:status:openstack": "webpack-dev-server --env=dev --open-page='status.html?demo=openstack'",
@@ -51,6 +51,7 @@
     "style-loader": "^0.18.2",
     "url-loader": "^0.5.9",
     "webpack": "^3.3.0",
+    "webpack-bundle-analyzer": "^2.9.1",
     "webpack-dev-server": "^2.6.1",
     "webpack-merge": "^4.1.0"
   }
