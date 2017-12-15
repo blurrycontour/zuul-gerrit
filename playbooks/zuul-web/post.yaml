@@ -6,3 +6,5 @@
         mode: pull
         src: "src/{{ zuul.project.canonical_name }}/zuul/web/static/"
         verify_host: true
+  roles:
+    - fetch-javascript-tarball
