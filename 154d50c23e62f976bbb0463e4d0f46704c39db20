@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df87a7cf_213ab8e6",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-12-15T15:48:09Z",
+      "side": 1,
+      "message": "Maybe we should refactor ACCESS_TOKEN_URL and INSTALLATIONS_URL to be a base API URL that\u0027s either https://api.github.com or https://{self.server}/api/v3",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 62
+      },
+      "revId": "154d50c23e62f976bbb0463e4d0f46704c39db20",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
