@@ -546,7 +546,13 @@ class GithubConnection(BaseConnection):
 
         if ((not expiry) or (not token) or (now >= expiry)):
             headers = self._get_app_auth_headers()
-            url = ACCESS_TOKEN_URL % installation_id
+
+            if self.server != 'github.com':
+                url = 'https://%s/api/v3/installations/%s/access_tokens' % \
+                      (self.server, installation_id)
+            else:
+                url = ACCESS_TOKEN_URL % installation_id
+
             json_data = {'user_id': user_id} if user_id else None
 
             response = requests.post(url, headers=headers, json=json_data)
@@ -568,7 +574,11 @@ class GithubConnection(BaseConnection):
         if not self.app_id:
             return
 
-        url = INSTALLATIONS_URL
+        if self.server != 'github.com':
+            url = 'https://%s/api/v3/app/installations' % self.server
+        else:
+            url = INSTALLATIONS_URL
+
         headers = self._get_app_auth_headers()
         self.log.debug("Fetching installations for GitHub app")
         response = requests.get(url, headers=headers)
@@ -581,7 +591,13 @@ class GithubConnection(BaseConnection):
             token = self._get_installation_key(project=None, inst_id=inst_id)
             headers = {'Accept': PREVIEW_JSON_ACCEPT,
                        'Authorization': 'token %s' % token}
-            url = REPOS_URL
+
+            if self.server != 'github.com':
+                url = 'https://%s/api/v3/installation/repositories' % \
+                      self.server
+            else:
+                url = REPOS_URL
+
             self.log.debug("Fetching repos for install %s" % inst_id)
             response = requests.get(url, headers=headers)
             response.raise_for_status()
