@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df87a7cf_136ca934",
+        "filename": ".zuul.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2017-12-15T17:28:10Z",
+      "side": 1,
+      "message": "This uses the previous implementation of the patch meant to add the python3 support, the variable to use is \"sphinx_python\". It defaults to \"python2\" and we should be setting it to \"python3\" here.",
+      "range": {
+        "startLine": 40,
+        "startChar": 14,
+        "endLine": 40,
+        "endChar": 25
+      },
+      "revId": "be25a396d0f8ae6e4e4e4408f9be0509f9643693",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
