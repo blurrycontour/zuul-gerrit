@@ -95,3 +95,4 @@
       jobs:
         - publish-openstack-sphinx-docs-infra
         - publish-openstack-python-branch-tarball
+        - publish-openstack-javascript-content
