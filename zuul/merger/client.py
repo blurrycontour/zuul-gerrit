@@ -61,7 +61,7 @@ class MergeClient(object):
     def __init__(self, config, sched):
         self.config = config
         self.sched = sched
-        server = self.config.get('gearman', 'server')
+        server = '0.0.0.0'
         if self.config.has_option('gearman', 'port'):
             port = self.config.get('gearman', 'port')
         else:

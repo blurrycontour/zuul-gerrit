@@ -49,7 +49,7 @@ class MergeServer(object):
 
     def start(self):
         self._running = True
-        server = self.config.get('gearman', 'server')
+        server = '0.0.0.0'
         if self.config.has_option('gearman', 'port'):
             port = self.config.get('gearman', 'port')
         else:
