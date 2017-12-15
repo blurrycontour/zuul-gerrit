@@ -28,19 +28,6 @@
       - zuul/ansible/callback/.*
       - playbooks/zuul-stream/.*
 
-- job:
-    name: zuul-npm-build
-    parent: nodejs-npm
-    success-url: 'web/status.html?source_url=http://zuulv3.openstack.org'
-    post-run: playbooks/zuul-web/post.yaml
-    files:
-      - package.json
-      - webpack.config.js
-      - yarn.lock
-      - web/.*
-    vars:
-      npm_command: build:dist
-
 - project:
     name: openstack-infra/zuul
     check:
@@ -59,7 +46,15 @@
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
-        - zuul-npm-build
+        - javascript-build-content:
+            success-url: 'html/status.html?source_url=http://zuulv3.openstack.org'
+            files:
+              - package.json
+              - webpack.config.js
+              - yarn.lock
+              - web/.*
+            vars:
+              javascript_content_dir: zuul/web/static
         - nodejs-npm-run-lint:
             success-url: 'npm/reports/bundle.html'
             files:
@@ -79,7 +74,15 @@
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
-        - zuul-npm-build
+        - javascript-build-content:
+            success-url: 'html/status.html?source_url=http://zuulv3.openstack.org'
+            files:
+              - package.json
+              - webpack.config.js
+              - yarn.lock
+              - web/.*
+            vars:
+              javascript_content_dir: zuul/web/static
         - nodejs-npm-run-lint:
             success-url: 'npm/reports/bundle.html'
             files:
@@ -92,3 +95,4 @@
       jobs:
         - publish-openstack-sphinx-docs-infra
         - publish-openstack-python-branch-tarball
+        - publish-openstack-javascript-content
