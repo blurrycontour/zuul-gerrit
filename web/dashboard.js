@@ -45,7 +45,12 @@ angular.module('zuulTenants', []).controller(
       $scope.tenants_fetch()
     })
 
-angular.module('zuulJobs', []).controller(
+angular.module('zuulJobs', [], function ($locationProvider) {
+  $locationProvider.html5Mode({
+    enabled: true,
+    requireBase: false
+  })
+}).controller(
     'mainController', function ($scope, $http, $location) {
       $scope.jobs = undefined
       $scope.jobs_fetch = function () {
