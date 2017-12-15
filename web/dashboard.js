@@ -45,7 +45,12 @@ angular.module('zuulTenants', []).controller(
       $scope.tenants_fetch()
     })
 
-angular.module('zuulJobs', []).controller(
+angular.module('zuulJobs', [], function ($locationProvider) {
+  $locationProvider.html5Mode({
+    enabled: true,
+    requireBase: false
+  })
+}).controller(
     'mainController', function ($scope, $http, $location) {
       $scope.jobs = undefined
       $scope.jobs_fetch = function () {
@@ -72,10 +77,14 @@ angular.module('zuulBuilds', [], function ($locationProvider) {
   }
   let query_args = $location.search()
   let url = $location.url()
-  let tenant_start = url.lastIndexOf(
-        '/', url.lastIndexOf('/builds.html') - 1) + 1
-  let tenant_length = url.lastIndexOf('/builds.html') - tenant_start
-  $scope.tenant = url.substr(tenant_start, tenant_length)
+  if (query_args['source_url']) {
+    $scope.tenant = undefined
+  } else {
+    let tenantStart = url.lastIndexOf(
+          '/', url.lastIndexOf('/builds.html') - 1) + 1
+    let tenantLength = url.lastIndexOf('/builds.html') - tenantStart
+    $scope.tenant = url.substr(tenantStart, tenantLength)
+  }
   $scope.builds = undefined
   if (query_args['pipeline']) {
     $scope.pipeline = query_args['pipeline']
