@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const Merge = require('webpack-merge');
 const CommonConfig = require('./webpack.common.js');
+const ArchivePlugin = require('webpack-archive-plugin');
 
 module.exports = Merge(CommonConfig, {
   plugins: [
@@ -25,6 +26,13 @@ module.exports = Merge(CommonConfig, {
       },
       sourceMap: true,
       comments: false
+    }),
+    new ArchivePlugin({
+      output: path.resolve(__dirname, '../../zuul-web'),
+      format: [
+        'tar',
+      ],
+      ext: 'tgz'
     })
   ]
 })
