@@ -22,6 +22,30 @@
       "revId": "da9f7b1d0d0c07878106afff80d6fe2b444db97b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_b0be18fd",
+        "filename": "zuul/driver/git/gitconnection.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2017-12-15T13:32:05Z",
+      "side": 1,
+      "message": "I haven\u0027t figured out there was this maintainCache method called by the scheduler. So next PS implement one. However it seems the scheduler calls the connections.maintainCache method via the maintainConnectionCache method but this one is never called ... it is commented. Maybe I missed something but it appears maintainCache will be never be called.",
+      "parentUuid": "df87a7cf_e702a83e",
+      "range": {
+        "startLine": 155,
+        "startChar": 13,
+        "endLine": 155,
+        "endChar": 26
+      },
+      "revId": "da9f7b1d0d0c07878106afff80d6fe2b444db97b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
