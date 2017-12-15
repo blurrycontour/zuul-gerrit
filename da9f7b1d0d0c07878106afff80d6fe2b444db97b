@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df87a7cf_e702a83e",
+        "filename": "zuul/driver/git/gitconnection.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-12-15T11:30:52Z",
+      "side": 1,
+      "message": "This will grow indefinitely. You\u0027ll need to implement a maintainCache method on this driver (see the gerrit connection)",
+      "range": {
+        "startLine": 155,
+        "startChar": 13,
+        "endLine": 155,
+        "endChar": 26
+      },
+      "revId": "da9f7b1d0d0c07878106afff80d6fe2b444db97b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
