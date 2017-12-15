@@ -33,8 +33,6 @@ import LineAngleImage from './images/line-angle.png'
 import LineTImage from './images/line-t.png';
 
 (function ($) {
-  'use strict'
-
   function setCookie (name, value) {
     document.cookie = name + '=' + value + '; path=/'
   }
