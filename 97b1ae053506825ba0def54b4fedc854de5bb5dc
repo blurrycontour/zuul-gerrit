@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "df87a7cf_c9e68517",
+        "filename": "package.json",
+        "patchSetId": 10
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-12-16T09:47:15Z",
+      "side": 1,
+      "message": "Do we really want to specify exact dependency versions here? \n\nI\u0027m not a js expert but from my outside scope it looks to me that we have the lock file to tie the exact versions currently in use.\n\nSo specifying version ranges or minimal versions here could make upgrading of dependencies easier (like delete lock file and yarn install?)",
+      "revId": "97b1ae053506825ba0def54b4fedc854de5bb5dc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df87a7cf_deacfd36",
         "filename": "tests/unit/test_streaming.py",
         "patchSetId": 10
