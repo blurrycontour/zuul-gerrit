@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df87a7cf_0900ed66",
+        "filename": "playbooks/zuul-web/post.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-12-16T10:17:35Z",
+      "side": 1,
+      "message": "Tasks are executed after roles in ansible. To me it looks like you also expect this but I consider this a non-widespread knowledge detail about ansible which many CI users of the non-devops domain may not have.\n\nSo I would like to have one of the following:\n\n- Document this and/or move the roles above tasks to match the visual and execution flow.\n\n- Convert the task into a role which makes the execution order precice to the reader.\n\nI\u0027m fine with either way.",
+      "range": {
+        "startLine": 2,
+        "startChar": 0,
+        "endLine": 8,
+        "endChar": 25
+      },
+      "revId": "aa209e2fe1c1ff12abb7f2584a85277388df4453",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
