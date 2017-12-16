@@ -22,6 +22,30 @@
       "revId": "aa209e2fe1c1ff12abb7f2584a85277388df4453",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_8f1b9d19",
+        "filename": "playbooks/zuul-web/post.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-12-16T16:22:01Z",
+      "side": 1,
+      "message": "Very good point. I was thinking I needed to expand this into a role, since storyboard-webclient needs the same thing.",
+      "parentUuid": "df87a7cf_0900ed66",
+      "range": {
+        "startLine": 2,
+        "startChar": 0,
+        "endLine": 8,
+        "endChar": 25
+      },
+      "revId": "aa209e2fe1c1ff12abb7f2584a85277388df4453",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
