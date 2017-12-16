@@ -22,6 +22,30 @@
       "revId": "76d08bc24c2fefef9e24c77007c90fcfc796ee89",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_4fd2755e",
+        "filename": "web/config/webpack.lint.js",
+        "patchSetId": 6
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-12-16T15:57:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df87a7cf_299cd15b",
+      "range": {
+        "startLine": 32,
+        "startChar": 4,
+        "endLine": 32,
+        "endChar": 6
+      },
+      "revId": "76d08bc24c2fefef9e24c77007c90fcfc796ee89",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
