@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "df87a7cf_8f35dddc",
+        "filename": "package.json",
+        "patchSetId": 10
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-12-16T15:39:58Z",
+      "side": 1,
+      "message": "This is a great question. The caret (^) actually indicates a range.\n\nhttps://docs.npmjs.com/misc/semver#caret-ranges-123-025-004\n\nSo ^1.5.8 means \u003e\u003d1.5.8,\u003c2.0.0. It\u0027s a nice range operator because for versions beginning with 0 it only allows updates to the patch - so ^0.1.0 means \u003e\u003d0.1.0,\u003c0.2.0.",
+      "parentUuid": "df87a7cf_c9e68517",
+      "revId": "97b1ae053506825ba0def54b4fedc854de5bb5dc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df87a7cf_deacfd36",
         "filename": "tests/unit/test_streaming.py",
         "patchSetId": 10
@@ -42,6 +60,30 @@
     },
     {
       "key": {
+        "uuid": "df87a7cf_4f4d9570",
+        "filename": "tests/unit/test_streaming.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-12-16T15:39:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df87a7cf_deacfd36",
+      "range": {
+        "startLine": 210,
+        "startChar": 0,
+        "endLine": 218,
+        "endChar": 63
+      },
+      "revId": "97b1ae053506825ba0def54b4fedc854de5bb5dc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df87a7cf_693ad998",
         "filename": "web/config/webpack.common.js",
         "patchSetId": 10
@@ -53,6 +95,30 @@
       "writtenOn": "2017-12-16T09:14:50Z",
       "side": 1,
       "message": "Why is status here a different chunk than builds, jobs and tenants?",
+      "range": {
+        "startLine": 30,
+        "startChar": 16,
+        "endLine": 30,
+        "endChar": 22
+      },
+      "revId": "97b1ae053506825ba0def54b4fedc854de5bb5dc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_af454145",
+        "filename": "web/config/webpack.common.js",
+        "patchSetId": 10
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-12-16T15:39:58Z",
+      "side": 1,
+      "message": "status uses the jquery.zuul.js as its code, rather than the angular dashboard code.\n\nWe could also have webpack just emit one chunk with the javascript for status, jobs, builds, tenants and stream rather than three ... I started with separate ones so that we could see the scaffolding for such a thing. I\u0027ll add a comment ...",
+      "parentUuid": "df87a7cf_693ad998",
       "range": {
         "startLine": 30,
         "startChar": 16,
