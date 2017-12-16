@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df87a7cf_deacfd36",
+        "filename": "tests/unit/test_streaming.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-12-16T09:14:50Z",
+      "side": 1,
+      "message": "It might be good, to mention this in TESTING.rst as well.",
+      "range": {
+        "startLine": 210,
+        "startChar": 0,
+        "endLine": 218,
+        "endChar": 63
+      },
+      "revId": "97b1ae053506825ba0def54b4fedc854de5bb5dc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_693ad998",
+        "filename": "web/config/webpack.common.js",
+        "patchSetId": 10
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-12-16T09:14:50Z",
+      "side": 1,
+      "message": "Why is status here a different chunk than builds, jobs and tenants?",
+      "range": {
+        "startLine": 30,
+        "startChar": 16,
+        "endLine": 30,
+        "endChar": 22
+      },
+      "revId": "97b1ae053506825ba0def54b4fedc854de5bb5dc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
