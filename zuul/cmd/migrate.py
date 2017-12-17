@@ -304,7 +304,7 @@ class IndentedDumper(IndentedEmitter, yaml.serializer.Serializer,
 
 
 def ordered_load(stream, *args, **kwargs):
-    return yaml.load(stream=stream, *args, **kwargs)
+    return yaml.load(stream=stream, *args, **kwargs)  # nosec  one-time script
 
 
 def ordered_dump(data, stream=None, *args, **kwargs):

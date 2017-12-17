@@ -508,7 +508,7 @@ class Scheduler(threading.Thread):
         pickle_file = self._get_queue_pickle_file()
         if os.path.exists(pickle_file):
             self.log.debug("Loading queue")
-            events = pickle.load(open(pickle_file, 'rb'))
+            events = pickle.load(open(pickle_file, 'rb'))  # nosec local file
             self.log.debug("Queue length is %s" % len(events))
             for event in events:
                 self.trigger_event_queue.put(event)
