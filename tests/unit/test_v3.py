@@ -23,8 +23,6 @@ import gc
 import time
 from unittest import skip
 
-import testtools
-
 import zuul.configloader
 from zuul.lib import encryption
 from tests.base import AnsibleZuulTestCase, ZuulTestCase, FIXTURE_DIR
@@ -943,6 +941,39 @@ class TestInRepoConfig(ZuulTestCase):
                       'is already defined',
                       A.messages[0],
                       "A should have failed the check pipeline")
+
+    def test_dynamic_config_errors_not_accumulated(self):
+        """Test that requesting broken dynamic configs
+        does not appear in tenant layout error accumulator"""
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: project-test1
+
+            - project:
+                name: org/project
+                check:
+                  jobs:
+                    - non-existent-job
+            """)
+
+        in_repo_playbook = textwrap.dedent(
+            """
+            - hosts: all
+              tasks: []
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf,
+                     'playbooks/project-test2.yaml': in_repo_playbook}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        tenant = self.sched.abide.tenants.get('tenant-one')
+        self.assertEquals(
+            len(tenant.layout.loading_errors), 0,
+            "No error should have been accumulated")
+        self.assertHistory([])
 
     def test_dynamic_config_non_existing_job(self):
         """Test that requesting a non existent job fails"""
@@ -2225,19 +2256,19 @@ class TestPostPlaybooks(AnsibleZuulTestCase):
 
 
 class TestBrokenConfig(ZuulTestCase):
-    # Test that we get an appropriate syntax error if we start with a
-    # broken config.
+    # Test we can start with a broken config and get the
+    # errors at tenant level.
 
     tenant_config_file = 'config/broken/main.yaml'
 
-    def setUp(self):
-        with testtools.ExpectedException(
-                zuul.configloader.ConfigurationSyntaxError,
-                "\nZuul encountered a syntax error"):
-            super(TestBrokenConfig, self).setUp()
-
     def test_broken_config_on_startup(self):
-        pass
+        tenant = self.sched.abide.tenants.get('tenant-one')
+        self.assertEquals(
+            len(tenant.layout.loading_errors), 1,
+            "An error should have been stored")
+        self.assertIn(
+            "Zuul encountered a syntax error",
+            str(tenant.layout.loading_errors[0]))
 
 
 class TestProjectKeys(ZuulTestCase):
