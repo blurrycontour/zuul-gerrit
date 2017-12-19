@@ -22,6 +22,30 @@
       "revId": "30e7becbaa01ebef141044eb8ed96f74d1020249",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_e521e54e",
+        "filename": "requirements.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2017-12-19T18:51:18Z",
+      "side": 1,
+      "message": "paramiko\u003e\u003d2.0.1 has the deadlock fixes",
+      "parentUuid": "df87a7cf_455bf1f4",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 15
+      },
+      "revId": "30e7becbaa01ebef141044eb8ed96f74d1020249",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
