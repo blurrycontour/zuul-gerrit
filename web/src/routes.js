@@ -20,6 +20,7 @@ import BuildsPage from './pages/Builds'
 import ConfigErrorsPage from './pages/ConfigErrors'
 import TenantsPage from './pages/Tenants'
 import StreamPage from './pages/Stream'
+import SwaggerUIPage from './pages/SwaggerUI'
 
 // The Route object are created in the App component.
 // Object with a title are created in the menu.
@@ -61,6 +62,10 @@ const routes = () => [
     to: '/tenants',
     component: TenantsPage,
     globalRoute: true
+  },
+  {
+    to: '/openapi',
+    component: SwaggerUIPage,
   }
 ]
 
