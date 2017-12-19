@@ -247,7 +247,8 @@ def configuration_exceptions(stanza, conf):
                      stanza=stanza,
                      content=indent(start_mark.snippet.rstrip()),
                      start_mark=str(start_mark))
-        raise ConfigurationSyntaxError(m)
+        log = logging.getLogger("zuul.ConfigSyntaxError")
+        log.debug(m)
 
 
 class ZuulMark(object):
