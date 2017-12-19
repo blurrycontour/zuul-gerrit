@@ -129,6 +129,24 @@
     },
     {
       "key": {
+        "uuid": "df87a7cf_657955fa",
+        "filename": "tools/install-js-repos-rpm.sh",
+        "patchSetId": 15
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-12-19T19:07:52Z",
+      "side": 1,
+      "message": "I wonder if we should actually just rethink this script.\n\nOriginally we needed a script that gets node and yarn installed for CI jobs. But the npm base jobs already do that for us, so we don\u0027t need to do it in test-setup.\n\nWe\u0027re not assuming that tox python unittests will depend on node/javascript being run. If we DID, there is a pattern from storyboard we could use of using nodeenv (which is like python virtualenv)\n\nSo what we actually need is a way to help developers get set up with depends for local work - but alternately could be avoided if that human wants to install things some other way?",
+      "parentUuid": "df87a7cf_c5b14146",
+      "revId": "af246602e2990943b2216618a35700398e1b07b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df87a7cf_85d7b94b",
         "filename": "tools/install-js-tools.sh",
         "patchSetId": 15
@@ -140,6 +158,30 @@
       "writtenOn": "2017-12-19T18:45:26Z",
       "side": 1,
       "message": "The yarn repo is missing at this step (Fedora 27). I added it following https://yarnpkg.com/en/docs/install",
+      "range": {
+        "startLine": 33,
+        "startChar": 4,
+        "endLine": 33,
+        "endChar": 35
+      },
+      "revId": "af246602e2990943b2216618a35700398e1b07b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_25d90d55",
+        "filename": "tools/install-js-tools.sh",
+        "patchSetId": 15
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-12-19T19:07:52Z",
+      "side": 1,
+      "message": "Cool. I\u0027ll fix that.",
+      "parentUuid": "df87a7cf_85d7b94b",
       "range": {
         "startLine": 33,
         "startChar": 4,
@@ -239,6 +281,24 @@
     },
     {
       "key": {
+        "uuid": "df87a7cf_65d2b55e",
+        "filename": "web/README.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-12-19T19:07:52Z",
+      "side": 1,
+      "message": "Yup!",
+      "parentUuid": "df87a7cf_e5aec5e5",
+      "revId": "af246602e2990943b2216618a35700398e1b07b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df87a7cf_6a628240",
         "filename": "web/README.rst",
         "patchSetId": 15
@@ -285,6 +345,24 @@
       "writtenOn": "2017-12-19T18:41:42Z",
       "side": 1,
       "message": "Okay, I think maybe what we should do is go ahead and write a quick set of instructions for \"this is how you serve everything from zuul-web\"; and then optionally, follow that up with \"if you want a faster race car, you can serve the static directory like so\".  As it stands, I\u0027m not quite sure how to deploy using the zuul-web only approach.",
+      "revId": "af246602e2990943b2216618a35700398e1b07b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_05f649d8",
+        "filename": "web/README.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-12-19T19:07:52Z",
+      "side": 1,
+      "message": "Yup!",
+      "parentUuid": "df87a7cf_05ac09eb",
       "revId": "af246602e2990943b2216618a35700398e1b07b6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
