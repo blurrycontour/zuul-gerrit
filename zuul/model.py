@@ -2789,6 +2789,9 @@ class Tenant(object):
         # The unparsed configuration from the main zuul config for
         # this tenant.
         self.unparsed_config = None
+        # The list of errors seen when loading the tenant
+        # configuration.
+        self.loading_errors = []
         # The list of projects from which we will read full
         # configuration.
         self.config_projects = []
