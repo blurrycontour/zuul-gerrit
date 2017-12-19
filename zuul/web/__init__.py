@@ -25,6 +25,7 @@ import uvloop
 
 import aiohttp
 from aiohttp import web
+from aiohttp_swagger import setup_swagger
 
 from sqlalchemy.sql import select
 
@@ -321,19 +322,191 @@ class ZuulWeb(object):
             request)
 
     async def _handleTenantsRequest(self, request):
+        """
+        ---
+        description: The tenants list endpoint
+        produces:
+        - application/json
+        responses:
+          "200":
+            description: Return the tenant list
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    description: Tenant name
+                    type: string
+                  projects:
+                    description: Tenant project count
+                    type: integer
+        """
         return await self.gearman_handler.processRequest(request,
                                                          'tenant_list')
 
     async def _handleStatusRequest(self, request):
+        """
+        ---
+        description: The status endpoint
+        tags:
+        - tenant
+        produces:
+        - application/json
+        parameters:
+        - in: path
+          name: tenant
+          description: The tenant name
+          required: True
+          type: string
+        responses:
+          "200":
+            description: Return the pipelines
+            schema:
+              type: object
+              properties:
+                trigger_event_queue:
+                  type: integer
+                result_event_queue:
+                  type: integer
+                last_reconfigured:
+                  type: integer
+                pipelines:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+          "404":
+            description: Tenant not found
+        """
         return await self.gearman_handler.processRequest(request, 'status_get')
 
     async def _handleJobsRequest(self, request):
+        """
+        ---
+        description: The job list endpoint
+        tags:
+        - tenant
+        produces:
+        - application/json
+        parameters:
+        - in: path
+          name: tenant
+          description: The tenant name
+          required: True
+          type: string
+        responses:
+          "200":
+            description: Return the job list
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  description:
+                    type: string
+          "404":
+            description: Tenant not found
+        """
         return await self.gearman_handler.processRequest(request, 'job_list')
 
     async def _handleSqlRequest(self, request):
+        """
+        ---
+        description: The builds list endpoint
+        tags:
+        - tenant
+        produces:
+        - application/json
+        parameters:
+        - in: path
+          name: tenant
+          description: The tenant name
+          required: True
+          type: string
+        - in: query
+          name: project
+          description: A project name
+        - in: query
+          name: pipeline
+          description: A pipeline name
+        - in: query
+          name: job_name
+          description: A job name
+        responses:
+          "200":
+            description: Return the build list
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  job_name:
+                    type: string
+                  uuid:
+                    type: string
+                  result:
+                    type: string
+                  pipeline:
+                    type: string
+                  newrev:
+                    type: string
+                  ref_url:
+                    type: string
+                  project:
+                    type: string
+                  voting:
+                    type: boolean
+                  duration:
+                    type: integer
+                  change:
+                    type: integer
+                  patchset:
+                    type: integer
+                  ref:
+                    type: string
+                  start_time:
+                    type: string
+                  end_time:
+                    type: string
+                  log_url:
+                    type: string
+          "404":
+            description: Tenant not found
+        """
         return await self.sql_handler.processRequest(request)
 
     async def _handleKeyRequest(self, request):
+        """
+        ---
+        description: The project public key endpoint
+        tags:
+        - tenant
+        produces:
+        - text/plain
+        parameters:
+        - in: path
+          name: tenant
+          description: The tenant name
+          required: True
+          type: string
+        - in: path
+          name: project
+          description: The project name
+          required: True
+          type: string
+        responses:
+          "200":
+            description: The project public key
+            schema:
+              type: string
+          "404":
+            description: Tenant or project not found
+        """
         return await self.gearman_handler.processRequest(request, 'key_get')
 
     async def _handleStaticRequest(self, request):
@@ -398,6 +571,11 @@ class ZuulWeb(object):
         for method, path, handler in routes:
             app.router.add_route(method, path, handler)
         app.router.add_static('/static', STATIC_DIR)
+        setup_swagger(
+            app,
+            description="The Zuul CI REST API",
+            title="Zuul CI",
+            contact="openstack-infra@lists.openstack.org")
         handler = app.make_handler(loop=self.event_loop)
 
         # create the server
