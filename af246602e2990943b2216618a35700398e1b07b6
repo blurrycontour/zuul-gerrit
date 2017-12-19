@@ -129,6 +129,29 @@
     },
     {
       "key": {
+        "uuid": "df87a7cf_85d7b94b",
+        "filename": "tools/install-js-tools.sh",
+        "patchSetId": 15
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-12-19T18:45:26Z",
+      "side": 1,
+      "message": "The yarn repo is missing at this step (Fedora 27). I added it following https://yarnpkg.com/en/docs/install",
+      "range": {
+        "startLine": 33,
+        "startChar": 4,
+        "endLine": 33,
+        "endChar": 35
+      },
+      "revId": "af246602e2990943b2216618a35700398e1b07b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df87a7cf_aa72ca10",
         "filename": "web/README.rst",
         "patchSetId": 15
