@@ -16,6 +16,24 @@
       "revId": "7fd7a937a0107dc1e328c721a83548815ee9682d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_1e1bf7c9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-12-19T22:27:10Z",
+      "side": 1,
+      "message": "StandardJS isn\u0027t configurable.\n\nWe could alternately use eslint directly instead of standardjs with the eslint-standard ruleset, then alter the eslint rule config ... which if something in standard winds up driving us batty is totally an option. In this case though, if the JS ecosystem is excited about camelCase, it\u0027s not that hard to deal with.\n\nNeither line length nor rules about line wrapping or continuations exist, so it seems for now that they\u0027re striking a decent balance between a set of arbitrary decisions to align on and allowing flexibility in expressing more complex constructs.",
+      "parentUuid": "df87a7cf_a5175dee",
+      "revId": "7fd7a937a0107dc1e328c721a83548815ee9682d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
