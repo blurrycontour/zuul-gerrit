@@ -2565,6 +2565,7 @@ class Layout(object):
         self.nodesets = {}
         self.secrets = {}
         self.semaphores = {}
+        self.loading_errors = []
 
     def getJob(self, name):
         if name in self.jobs:
