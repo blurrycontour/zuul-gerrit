@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "df87a7cf_aa8e4ace",
+        "filename": "tests/unit/test_streaming.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-12-19T18:30:12Z",
+      "side": 1,
+      "message": "Agree. I do not want to merge this series until we\u0027ve got that ^^ solved.",
+      "parentUuid": "df87a7cf_8a67c64d",
+      "revId": "af246602e2990943b2216618a35700398e1b07b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df87a7cf_2a58fa87",
         "filename": "tools/install-js-repos-rpm.sh",
         "patchSetId": 15
@@ -30,6 +48,24 @@
       "writtenOn": "2017-12-19T18:18:03Z",
       "side": 1,
       "message": "Does this file have a license?",
+      "revId": "af246602e2990943b2216618a35700398e1b07b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_8a36e602",
+        "filename": "tools/install-js-repos-rpm.sh",
+        "patchSetId": 15
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-12-19T18:30:12Z",
+      "side": 1,
+      "message": "Excellent question! The file seems to come from https://github.com/nodesource/distributions which lists an MIT license:\n\nhttps://github.com/nodesource/distributions/blob/master/LICENSE.md\n\nSo maybe I should add that as a license header here?",
+      "parentUuid": "df87a7cf_2a58fa87",
       "revId": "af246602e2990943b2216618a35700398e1b07b6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "df87a7cf_0a8656ba",
+        "filename": "web/README.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-12-19T18:30:12Z",
+      "side": 1,
+      "message": "Yes - that\u0027s an excellent idea.",
+      "parentUuid": "df87a7cf_aa72ca10",
+      "revId": "af246602e2990943b2216618a35700398e1b07b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df87a7cf_ca6f0e26",
         "filename": "web/README.rst",
         "patchSetId": 15
@@ -64,6 +118,24 @@
       "writtenOn": "2017-12-19T18:18:03Z",
       "side": 1,
       "message": "Why are we treating each page as a new build target?  It\u0027s a single web app, so we should just have one target; and we should be able to add/remove/changes pages as needed without updating the build system.",
+      "revId": "af246602e2990943b2216618a35700398e1b07b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_ea88d2c6",
+        "filename": "web/README.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-12-19T18:30:12Z",
+      "side": 1,
+      "message": "Yup, I agree. Right now they\u0027re their own targets purely because of the need to copy/paste the source_url parameter. Once that\u0027s fixed, I think this can just be \"npm run start\"",
+      "parentUuid": "df87a7cf_ca6f0e26",
       "revId": "af246602e2990943b2216618a35700398e1b07b6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "df87a7cf_2a9b1a17",
+        "filename": "web/README.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-12-19T18:30:12Z",
+      "side": 1,
+      "message": "Yes - that is correct and should be totally possible. But since it\u0027s just static web content, if you want to stick it into an apache and do a rewrite rule, that\u0027ll work too.\n\nHowever - there is a bug in this doc. It actually just puts the content into zuul/web/static - not dist.",
+      "parentUuid": "df87a7cf_6a628240",
+      "revId": "af246602e2990943b2216618a35700398e1b07b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df87a7cf_4a5d3e77",
         "filename": "web/config/webpack.common.js",
         "patchSetId": 15
@@ -98,6 +188,24 @@
       "writtenOn": "2017-12-19T18:18:03Z",
       "side": 1,
       "message": "I also think this doesn\u0027t match the structure of the application -- it doesn\u0027t seem like we should be adding entries here for every page we have.",
+      "revId": "af246602e2990943b2216618a35700398e1b07b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_2a69daf6",
+        "filename": "web/config/webpack.common.js",
+        "patchSetId": 15
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-12-19T18:30:12Z",
+      "side": 1,
+      "message": "We can totally combine them (I\u0027ll make a patch that does that)\n\nI\u0027ve also been reading some more about best practices, and there is one that suggests making a bundle that contains all of the third-party dependency imports, since those are less likely to change as frequently and thus are more cacheable. However, I think our app is small enough at the moment that a single bundle should be more than fine.",
+      "parentUuid": "df87a7cf_4a5d3e77",
       "revId": "af246602e2990943b2216618a35700398e1b07b6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
