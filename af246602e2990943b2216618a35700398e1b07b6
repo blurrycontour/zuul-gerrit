@@ -72,6 +72,23 @@
     },
     {
       "key": {
+        "uuid": "df87a7cf_a5b43d37",
+        "filename": "tools/install-js-repos-rpm.sh",
+        "patchSetId": 15
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-19T18:41:42Z",
+      "side": 1,
+      "message": "Weirdly, I don\u0027t see an 8.x in there.  I agree this is likely at least derived from the files there (eg, setup_7.x) and likely MIT licensed.\n\nI think it might at least be a good idea to add a note here about the assumed license... and maybe open an issue on that github repo asking about a setup_8.x script -- so that then we could submit a PR adding a licnes header?",
+      "revId": "af246602e2990943b2216618a35700398e1b07b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df87a7cf_e53b25ce",
         "filename": "tools/install-js-repos-rpm.sh",
         "patchSetId": 15
@@ -89,6 +106,23 @@
         "endLine": 217,
         "endChar": 37
       },
+      "revId": "af246602e2990943b2216618a35700398e1b07b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_c5b14146",
+        "filename": "tools/install-js-repos-rpm.sh",
+        "patchSetId": 15
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-19T18:41:42Z",
+      "side": 1,
+      "message": "Oh, you mean remove the \"-y\"?  Yeah, that sounds like a good idea, though I don\u0027t know if that will make maintaining this harder if we have to update it again later.  This would be another nice thing to submit a PR about.",
       "revId": "af246602e2990943b2216618a35700398e1b07b6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -165,6 +199,23 @@
     },
     {
       "key": {
+        "uuid": "df87a7cf_e5aec5e5",
+        "filename": "web/README.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-19T18:41:42Z",
+      "side": 1,
+      "message": "Cool, do you think we can do that as a follow-on patch before merging this?",
+      "revId": "af246602e2990943b2216618a35700398e1b07b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df87a7cf_6a628240",
         "filename": "web/README.rst",
         "patchSetId": 15
@@ -194,6 +245,23 @@
       "side": 1,
       "message": "Yes - that is correct and should be totally possible. But since it\u0027s just static web content, if you want to stick it into an apache and do a rewrite rule, that\u0027ll work too.\n\nHowever - there is a bug in this doc. It actually just puts the content into zuul/web/static - not dist.",
       "parentUuid": "df87a7cf_6a628240",
+      "revId": "af246602e2990943b2216618a35700398e1b07b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_05ac09eb",
+        "filename": "web/README.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-19T18:41:42Z",
+      "side": 1,
+      "message": "Okay, I think maybe what we should do is go ahead and write a quick set of instructions for \"this is how you serve everything from zuul-web\"; and then optionally, follow that up with \"if you want a faster race car, you can serve the static directory like so\".  As it stands, I\u0027m not quite sure how to deploy using the zuul-web only approach.",
       "revId": "af246602e2990943b2216618a35700398e1b07b6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
