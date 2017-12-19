@@ -2565,6 +2565,7 @@ class Layout(object):
         self.nodesets = {}
         self.secrets = {}
         self.semaphores = {}
+        self.loading_errors = []
 
     def getJob(self, name):
         if name in self.jobs:
@@ -3003,6 +3004,7 @@ class Tenant(object):
         # Metadata about projects for this tenant
         # canonical project name -> TenantProjectConfig
         self.project_configs = {}
+        self.loading_errors = []
 
         # A mapping of project names to projects.  project_name ->
         # VALUE where VALUE is a further dictionary of
