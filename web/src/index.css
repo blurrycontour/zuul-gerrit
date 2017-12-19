@@ -135,3 +135,9 @@ p.zuulstreamline {
 div.tree-view-container ul.list-group {
   margin: 0px 0px;
 }
+
+/* OpenAPI page */
+.swagger-ui .version {
+    background-color: lightgrey;
+    color: black;
+}

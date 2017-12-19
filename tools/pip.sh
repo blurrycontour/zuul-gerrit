@@ -39,6 +39,12 @@ then
 fi
 pip install $*
 
+# Convert openapi to json
+python -c 'import json, yaml; json.dump(
+        yaml.safe_load(open("web/public/openapi.yaml")),
+        open("web/public/openapi.json", "w"))'
+
+
 # Check if we're installing zuul. If so install the managed ansible as well.
 if echo "$*" | grep -vq requirements.txt; then
     zuul-manage-ansible -v

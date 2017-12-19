@@ -13,15 +13,21 @@
 # under the License.
 """Hook for pbr to build javascript as part of tarball."""
 
+import json
 import os
 import subprocess
 
 import pbr.packaging
+import yaml
 
 _old_from_git = pbr.packaging._from_git
 
 
 def _build_javascript():
+    # Convert openapi to json for browser rendering
+    json.dump(
+        yaml.safe_load(open("web/public/openapi.yaml")),
+        open("web/public/openapi.json", "w"))
     if subprocess.call(['which', 'yarn']) != 0:
         return
     if not os.path.exists('web/node_modules/.bin/webpack'):
