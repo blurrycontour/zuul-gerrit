@@ -1,10 +1,12 @@
 pep8
 pyflakes
 flake8
+openapi-spec-validator
 
 coverage>=3.6
 sphinx>=1.5.1,<1.6
 sphinxcontrib-blockdiag>=1.1.0
+sphinxcontrib-openapi
 fixtures>=0.3.14
 python-keystoneclient>=0.4.2
 python-subunit
