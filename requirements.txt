@@ -26,4 +26,5 @@ cachecontrol
 pyjwt
 iso8601
 aiohttp
+aiohttp_swagger
 uvloop;python_version>='3.5'
