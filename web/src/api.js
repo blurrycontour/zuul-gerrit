@@ -105,6 +105,9 @@ function getStreamUrl (apiPrefix) {
 function fetchInfo () {
   return Axios.get(apiUrl + 'info')
 }
+function fetchOpenApi () {
+  return Axios.get(getHomepageUrl () + 'swagger.json')
+}
 function fetchTenants () {
   return Axios.get(apiUrl + 'tenants')
 }
@@ -140,6 +143,7 @@ export {
   fetchBuilds,
   fetchJob,
   fetchJobs,
+  fetchOpenApi,
   fetchTenants,
   fetchInfo
 }

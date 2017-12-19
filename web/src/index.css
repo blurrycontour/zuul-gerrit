@@ -126,3 +126,9 @@ p.zuulstreamline {
     margin: 0px 0px;
     line-height: 1.4;
 }
+
+/* OpenAPI page */
+.swagger-ui .version {
+    background-color: lightgrey;
+    color: black;
+}

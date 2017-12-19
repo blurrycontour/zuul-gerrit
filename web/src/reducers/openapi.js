@@ -12,28 +12,29 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import { combineReducers } from 'redux'
+import {
+  OPENAPI_FETCH_REQUEST,
+  OPENAPI_FETCH_SUCCESS,
+  OPENAPI_FETCH_FAIL,
+} from '../actions/openapi'
 
-import configErrors from './configErrors'
-import errors from './errors'
-import info from './info'
-import job from './job'
-import jobs from './jobs'
-import status from './status'
-import tenant from './tenant'
-import tenants from './tenants'
-import openapi from './openapi'
-
-const reducers = {
-  info,
-  job,
-  jobs,
-  configErrors,
-  errors,
-  status,
-  tenant,
-  tenants,
-  openapi,
+export default (state = {
+  isFetching: false,
+  openapi: null,
+}, action) => {
+  switch (action.type) {
+    case OPENAPI_FETCH_REQUEST:
+    case OPENAPI_FETCH_FAIL:
+      return {
+        isFetching: true,
+        tenant: state.openapi,
+      }
+    case OPENAPI_FETCH_SUCCESS:
+      return {
+        isFetching: false,
+        openapi: action.openapi,
+      }
+    default:
+      return state
+  }
 }
-
-export default combineReducers(reducers)
