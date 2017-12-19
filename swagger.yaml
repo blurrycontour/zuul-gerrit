@@ -1,0 +1,190 @@
+openapi: "3.0.0"
+info:
+  title: Zuul REST API
+  version: v1
+tags:
+  - name: tenant
+paths:
+  /tenants.json:
+    get:
+      tags:
+        - tenant
+      operationId: list-tenants
+      summary: List the tenants
+      responses:
+        '200':
+          description: Returns the list of tenants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      description: Tenant name
+                      type: string
+                    projects:
+                      description: Tenant project count
+                      type: integer
+  /{tenant}/status.json:
+    get:
+      tags:
+        - tenant
+      operationId: get-status
+      summary: Get tenant status
+      parameters:
+        - name: tenant
+          in: path
+          description: The tenant name
+          required: True
+      responses:
+        '200':
+          description: Returns the list of tenants
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  trigger_event_queue:
+                    type: integer
+                  result_event_queue:
+                    type: integer
+                  last_reconfigured:
+                    type: integer
+                  pipelines:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/pipelineStatus'
+        '404':
+          description: Tenant not found
+
+  /{tenant}/jobs.json:
+    get:
+      tags:
+        - tenant
+      operationId: list-jobs
+      summary: List available jobs
+      parameters:
+        - name: tenant
+          in: path
+          description: The tenant name
+          required: True
+      responses:
+        '200':
+          description: Returns the list of jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    description:
+                      type: string
+        '404':
+          description: Tenant not found
+
+  /{tenant}/builds.json:
+    get:
+      tags:
+        - tenant
+      operationId: list-builds
+      summary: List the executed builds
+      parameters:
+        - name: tenant
+          in: path
+          description: The tenant name
+          required: True
+        - in: query
+          name: project
+          description: A project name
+        - in: query
+          name: pipeline
+          description: A pipeline name
+        - in: query
+          name: job_name
+          description: A job name
+      responses:
+        '200':
+          description: Returns the list of builds
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/build'
+        '404':
+          description: Tenant not found
+
+  /{tenant}/{project}.pub:
+    get:
+      tags:
+        - tenant
+      operationId: get-project-key
+      summary: Get a project public key
+      parameters:
+        - name: tenant
+          in: path
+          description: The tenant name
+          required: True
+        - name: project
+          in: path
+          description: The project name
+          required: True
+      responses:
+        '200':
+          description: Returns the project public key
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: |
+                -----BEGIN PUBLIC KEY-----
+                MIICI...
+                -----END PUBLIC KEY-----
+        '404':
+          description: Tenant or Project not found
+
+components:
+  schemas:
+    pipelineStatus:
+      type: object
+      properties:
+        name:
+          type: string
+    build:
+      type: object
+      properties:
+        job_name:
+          type: string
+        uuid:
+          type: string
+        result:
+          type: string
+        pipeline:
+          type: string
+        newrev:
+          type: string
+        ref_url:
+          type: string
+        project:
+          type: string
+        voting:
+          type: boolean
+        duration:
+          type: integer
+        change:
+          type: integer
+        patchset:
+          type: integer
+        ref:
+          type: string
+        start_time:
+          type: string
+        end_time:
+          type: string
+        log_url:
+          type: string
