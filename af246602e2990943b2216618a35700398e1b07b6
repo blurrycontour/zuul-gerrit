@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df87a7cf_8a67c64d",
+        "filename": "tests/unit/test_streaming.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-19T18:18:03Z",
+      "side": 1,
+      "message": "It\u0027s okay to merge this, but only if there\u0027s a patch later in the series that removes this.  I haven\u0027t verified if that\u0027s the case yet.",
+      "revId": "af246602e2990943b2216618a35700398e1b07b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_2a58fa87",
+        "filename": "tools/install-js-repos-rpm.sh",
+        "patchSetId": 15
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-19T18:18:03Z",
+      "side": 1,
+      "message": "Does this file have a license?",
+      "revId": "af246602e2990943b2216618a35700398e1b07b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_aa72ca10",
+        "filename": "web/README.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-19T18:18:03Z",
+      "side": 1,
+      "message": "Can we put this in the developer docs?  docs/source/developer",
+      "revId": "af246602e2990943b2216618a35700398e1b07b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_ca6f0e26",
+        "filename": "web/README.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-19T18:18:03Z",
+      "side": 1,
+      "message": "Why are we treating each page as a new build target?  It\u0027s a single web app, so we should just have one target; and we should be able to add/remove/changes pages as needed without updating the build system.",
+      "revId": "af246602e2990943b2216618a35700398e1b07b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_6a628240",
+        "filename": "web/README.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-19T18:18:03Z",
+      "side": 1,
+      "message": "I\u0027m confused by this -- we\u0027re working toward everything being served by zuul-web, right?  If not, then we have the same awkward situation we have now, which is that you have to run zuul-web (the \"api\" server) and then map the static content into the uri space somehow.\n\nI\u0027d like this to be deployable as a self-contained application, so that if you wanted, you could just start zuul-web on port 80.  Or start it on 8000 and reverse proxy to it, with no rewrite rules or anything.",
+      "revId": "af246602e2990943b2216618a35700398e1b07b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df87a7cf_4a5d3e77",
+        "filename": "web/config/webpack.common.js",
+        "patchSetId": 15
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-19T18:18:03Z",
+      "side": 1,
+      "message": "I also think this doesn\u0027t match the structure of the application -- it doesn\u0027t seem like we should be adding entries here for every page we have.",
+      "revId": "af246602e2990943b2216618a35700398e1b07b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
