@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df87a7cf_a5175dee",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-19T18:51:18Z",
+      "side": 1,
+      "message": "Why not disable the \u0027camelcase\u0027 rule?",
+      "revId": "7fd7a937a0107dc1e328c721a83548815ee9682d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
