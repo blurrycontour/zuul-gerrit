@@ -833,9 +833,14 @@ class ProjectTemplateParser(object):
             attrs['_start_mark'] = start_mark
 
             # validate that the job is existing
-            with configuration_exceptions('project or project-template',
-                                          attrs):
-                self.layout.getJob(jobname)
+            try:
+                with configuration_exceptions('project or project-template',
+                                              attrs):
+                    self.layout.getJob(jobname)
+            except ConfigurationSyntaxError as e:
+                self.log.exception(str(e))
+                self.tenant.loading_errors.append(e)
+                continue
 
             job_list.addJob(JobParser.fromYaml(self.tenant, self.layout,
                                                attrs, project_pipeline=True,
@@ -1518,11 +1523,11 @@ class TenantParser(object):
                     branch = source_context.branch
                     if source_context.trusted:
                         incdata = TenantParser._parseConfigProjectLayout(
-                            job.files[fn], source_context)
+                            job.files[fn], source_context, tenant)
                         config_projects_config.extend(incdata)
                     else:
                         incdata = TenantParser._parseUntrustedProjectLayout(
-                            job.files[fn], source_context)
+                            job.files[fn], source_context, tenant)
                         untrusted_projects_config.extend(incdata)
                     new_project_unparsed_config[project].extend(incdata)
                     if branch in new_project_unparsed_branch_config.get(
@@ -1540,21 +1545,33 @@ class TenantParser(object):
         return config_projects_config, untrusted_projects_config
 
     @staticmethod
-    def _parseConfigProjectLayout(data, source_context):
+    def _parseConfigProjectLayout(data, source_context, tenant):
         # This is the top-level configuration for a tenant.
         config = model.UnparsedTenantConfig()
-        with early_configuration_exceptions(source_context):
-            config.extend(safe_load_yaml(data, source_context))
+        try:
+            with early_configuration_exceptions(source_context):
+                config.extend(safe_load_yaml(data, source_context))
+        except ConfigurationSyntaxError as e:
+            TenantParser.log.exception(e)
+            tenant.loading_errors.append(e)
         return config
 
     @staticmethod
-    def _parseUntrustedProjectLayout(data, source_context):
+    def _parseUntrustedProjectLayout(data, source_context, tenant):
         config = model.UnparsedTenantConfig()
-        with early_configuration_exceptions(source_context):
-            config.extend(safe_load_yaml(data, source_context))
-        if config.pipelines:
-            with configuration_exceptions('pipeline', config.pipelines[0]):
-                raise PipelineNotPermittedError()
+        try:
+            with early_configuration_exceptions(source_context):
+                config.extend(safe_load_yaml(data, source_context))
+        except ConfigurationSyntaxError as e:
+            TenantParser.log.exception(e)
+            tenant.loading_errors.append(e)
+        try:
+            if config.pipelines:
+                with configuration_exceptions('pipeline', config.pipelines[0]):
+                    raise PipelineNotPermittedError()
+        except ConfigurationSyntaxError as e:
+            TenantParser.log.exception(e)
+            tenant.loading_errors.append(e)
         return config
 
     @staticmethod
@@ -1570,7 +1587,11 @@ class TenantParser(object):
         # used by other classes.
         pragma_parser = PragmaParser()
         for config_pragma in data.pragmas:
-            pragma_parser.fromYaml(config_pragma)
+            try:
+                pragma_parser.fromYaml(config_pragma)
+            except ConfigurationSyntaxError as e:
+                TenantParser.log.exception(e)
+                tenant.loading_errors.append(e)
 
         if not skip_pipelines:
             for config_pipeline in data.pipelines:
@@ -1578,45 +1599,67 @@ class TenantParser(object):
                     tenant, config_pipeline)
                 if 'pipeline' not in classes:
                     continue
-                layout.addPipeline(PipelineParser.fromYaml(
-                    layout, connections,
-                    scheduler, config_pipeline))
+                try:
+                    layout.addPipeline(PipelineParser.fromYaml(
+                        layout, connections,
+                        scheduler, config_pipeline))
+                except ConfigurationSyntaxError as e:
+                    TenantParser.log.exception(e)
+                    tenant.loading_errors.append(e)
 
         for config_nodeset in data.nodesets:
             classes = TenantParser._getLoadClasses(tenant, config_nodeset)
             if 'nodeset' not in classes:
                 continue
-            with configuration_exceptions('nodeset', config_nodeset):
-                layout.addNodeSet(NodeSetParser.fromYaml(
-                    config_nodeset))
+            try:
+                with configuration_exceptions('nodeset', config_nodeset):
+                    layout.addNodeSet(NodeSetParser.fromYaml(
+                        config_nodeset))
+            except ConfigurationSyntaxError as e:
+                TenantParser.log.exception(e)
+                tenant.loading_errors.append(e)
 
         for config_secret in data.secrets:
             classes = TenantParser._getLoadClasses(tenant, config_secret)
             if 'secret' not in classes:
                 continue
-            layout.addSecret(SecretParser.fromYaml(layout, config_secret))
+            try:
+                layout.addSecret(SecretParser.fromYaml(layout, config_secret))
+            except ConfigurationSyntaxError as e:
+                TenantParser.log.exception(e)
+                tenant.loading_errors.append(e)
 
         for config_job in data.jobs:
             classes = TenantParser._getLoadClasses(tenant, config_job)
             if 'job' not in classes:
                 continue
-            with configuration_exceptions('job', config_job):
-                job = JobParser.fromYaml(tenant, layout, config_job)
-                added = layout.addJob(job)
-                if not added:
-                    TenantParser.log.debug(
-                        "Skipped adding job %s which shadows an existing job" %
-                        (job,))
+            try:
+                with configuration_exceptions('job', config_job):
+                    job = JobParser.fromYaml(tenant, layout, config_job)
+                    added = layout.addJob(job)
+            except ConfigurationSyntaxError as e:
+                TenantParser.log.exception(e)
+                tenant.loading_errors.append(e)
+                continue
+            if not added:
+                TenantParser.log.debug(
+                    "Skipped adding job %s which shadows an existing job" %
+                    (job,))
 
         # Now that all the jobs are loaded, verify their parents exist
         for config_job in data.jobs:
             classes = TenantParser._getLoadClasses(tenant, config_job)
             if 'job' not in classes:
                 continue
-            with configuration_exceptions('job', config_job):
-                parent = config_job.get('parent')
-                if parent:
-                    layout.getJob(parent)
+            try:
+                with configuration_exceptions('job', config_job):
+                    parent = config_job.get('parent')
+            except ConfigurationSyntaxError as e:
+                TenantParser.log.exception(e)
+                tenant.loading_errors.append(e)
+                continue
+            if parent:
+                layout.getJob(parent)
 
         if not skip_semaphores:
             for config_semaphore in data.semaphores:
@@ -1624,7 +1667,12 @@ class TenantParser(object):
                     tenant, config_semaphore)
                 if 'semaphore' not in classes:
                     continue
-                semaphore = SemaphoreParser.fromYaml(config_semaphore)
+                try:
+                    semaphore = SemaphoreParser.fromYaml(config_semaphore)
+                except ConfigurationSyntaxError as e:
+                    TenantParser.log.exception(e)
+                    tenant.loading_errors.append(e)
+                    continue
                 old_semaphore = layout.semaphores.get(semaphore.name)
                 if (old_semaphore and
                     (old_semaphore.source_context.project ==
@@ -1641,9 +1689,14 @@ class TenantParser(object):
             classes = TenantParser._getLoadClasses(tenant, config_template)
             if 'project-template' not in classes:
                 continue
-            with configuration_exceptions('project-template', config_template):
-                layout.addProjectTemplate(project_template_parser.fromYaml(
-                    config_template))
+            try:
+                with configuration_exceptions(
+                        'project-template', config_template):
+                    layout.addProjectTemplate(project_template_parser.fromYaml(
+                        config_template))
+            except ConfigurationSyntaxError as e:
+                TenantParser.log.exception(e)
+                tenant.loading_errors.append(e)
 
         project_parser = ProjectParser(tenant, layout, project_template_parser)
         for config_projects in data.projects.values():
@@ -1663,8 +1716,12 @@ class TenantParser(object):
             if not filtered_projects:
                 continue
 
-            layout.addProjectConfig(project_parser.fromYaml(
-                filtered_projects))
+            try:
+                layout.addProjectConfig(project_parser.fromYaml(
+                    filtered_projects))
+            except ConfigurationSyntaxError as e:
+                TenantParser.log.exception(e)
+                tenant.loading_errors.append(e)
 
     @staticmethod
     def _parseLayout(base, tenant, data, scheduler, connections):
@@ -1782,10 +1839,10 @@ class ConfigLoader(object):
 
                     if trusted:
                         incdata = TenantParser._parseConfigProjectLayout(
-                            data, source_context)
+                            data, source_context, tenant)
                     else:
                         incdata = TenantParser._parseUntrustedProjectLayout(
-                            data, source_context)
+                            data, source_context, tenant)
 
                     config.extend(incdata)
 

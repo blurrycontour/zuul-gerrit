@@ -1890,19 +1890,17 @@ class TestPostPlaybooks(AnsibleZuulTestCase):
 
 
 class TestBrokenConfig(ZuulTestCase):
-    # Test that we get an appropriate syntax error if we start with a
-    # broken config.
+    # Test we can start with a broken config and get the
+    # errors at tenant level.
 
     tenant_config_file = 'config/broken/main.yaml'
 
-    def setUp(self):
-        with testtools.ExpectedException(
-                zuul.configloader.ConfigurationSyntaxError,
-                "\nZuul encountered a syntax error"):
-            super(TestBrokenConfig, self).setUp()
-
     def test_broken_config_on_startup(self):
-        pass
+        tenant = self.sched.abide.tenants.get('tenant-one')
+        self.assertEquals(len(tenant.loading_errors), 1)
+        self.assertIn(
+                "Zuul encountered a syntax error",
+                str(tenant.loading_errors[0]))
 
 
 class TestProjectKeys(ZuulTestCase):
