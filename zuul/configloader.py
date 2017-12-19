@@ -833,9 +833,14 @@ class ProjectTemplateParser(object):
             attrs['_start_mark'] = start_mark
 
             # validate that the job is existing
-            with configuration_exceptions('project or project-template',
-                                          attrs):
-                self.layout.getJob(jobname)
+            try:
+                with configuration_exceptions('project or project-template',
+                                              attrs):
+                    self.layout.getJob(jobname)
+            except ConfigurationSyntaxError as e:
+                self.log.exception(str(e))
+                self.tenant.loading_errors.append(e)
+                continue
 
             job_list.addJob(JobParser.fromYaml(self.tenant, self.layout,
                                                attrs, project_pipeline=True,
