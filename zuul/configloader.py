@@ -247,7 +247,8 @@ def configuration_exceptions(stanza, conf):
                      stanza=stanza,
                      content=indent(start_mark.snippet.rstrip()),
                      start_mark=str(start_mark))
-        raise ConfigurationSyntaxError(m)
+        log = logging.getLogger("zuul.ConfigSyntaxError")
+        log.debug(m)
 
 
 class ZuulMark(object):
@@ -833,9 +834,14 @@ class ProjectTemplateParser(object):
             attrs['_start_mark'] = start_mark
 
             # validate that the job is existing
-            with configuration_exceptions('project or project-template',
-                                          attrs):
-                self.layout.getJob(jobname)
+            try:
+                with configuration_exceptions('project or project-template',
+                                              attrs):
+                    self.layout.getJob(jobname)
+            except ConfigurationSyntaxError as e:
+                self.log.exception(str(e))
+                self.tenant.loading_errors.append(e)
+                continue
 
             job_list.addJob(JobParser.fromYaml(self.tenant, self.layout,
                                                attrs, project_pipeline=True,
