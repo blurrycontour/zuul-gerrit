@@ -369,6 +369,24 @@
     },
     {
       "key": {
+        "uuid": "df87a7cf_7b2d7693",
+        "filename": "web/README.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-12-19T20:15:25Z",
+      "side": 1,
+      "message": "tl;dr:\n\n  npm run build\n  pip install .\n\nor\n\n  npm run build\n  python setup.py sdist\n\nas long as you have run a javascript build, the files are put into zuul/web/static and everything should JustWork",
+      "parentUuid": "df87a7cf_05f649d8",
+      "revId": "af246602e2990943b2216618a35700398e1b07b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df87a7cf_4a5d3e77",
         "filename": "web/config/webpack.common.js",
         "patchSetId": 15
