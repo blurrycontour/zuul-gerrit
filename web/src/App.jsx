@@ -255,6 +255,9 @@ class App extends React.Component {
                   />
               }
               <li>
+                <Link to='/openapi'>API</Link>
+              </li>
+              <li>
                 <a href='https://zuul-ci.org/docs'
                    rel='noopener noreferrer' target='_blank'>
                   Documentation
