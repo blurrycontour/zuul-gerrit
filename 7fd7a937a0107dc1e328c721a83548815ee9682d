@@ -34,6 +34,23 @@
       "revId": "7fd7a937a0107dc1e328c721a83548815ee9682d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf8cb3f7_d13443e1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-20T21:49:32Z",
+      "side": 1,
+      "message": "I would prefer the eslint option.  I think variable casing is too nitpicky and I\u0027m already being driven \"batty\" by it.  I\u0027m also worried about what other random thing it\u0027s going to force with no option to disable in the future.  I think at the very least, if we adopt a style linter (which we should not -- we should only adopt syntax checks) it should be configurable so we can opt out of any future flame-wars.",
+      "revId": "7fd7a937a0107dc1e328c721a83548815ee9682d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
