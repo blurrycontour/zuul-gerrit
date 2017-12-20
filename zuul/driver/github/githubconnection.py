@@ -24,6 +24,7 @@ import re
 
 import cachecontrol
 from cachecontrol.cache import DictCache
+from cachecontrol.heuristics import BaseHeuristic
 import iso8601
 import jwt
 import requests
@@ -431,9 +432,14 @@ class GithubConnection(BaseConnection):
         # NOTE(jamielennox): Better here would be to cache to memcache or file
         # or something external - but zuul already sucks at restarting so in
         # memory probably doesn't make this much worse.
+        class NoAgeHeuristic(BaseHeuristic):
+            def update_headers(self, response):
+                if 'cache-control' in response.headers:
+                    del response.headers['cache-control']
         self.cache_adapter = cachecontrol.CacheControlAdapter(
             DictCache(),
-            cache_etags=True)
+            cache_etags=True,
+            heuristic=NoAgeHeuristic())
 
         # The regex is based on the connection host. We do not yet support
         # cross-connection dependency gathering
