@@ -545,6 +545,14 @@ The following sections of ``zuul.conf`` are used by the executor:
       This is automatically detected correctly. But when running in environments
       where it cannot determine its hostname correctly this can be overridden
       here.
+   .. attr:: run_ansible_setup_on_start
+      :default: true
+
+      The executor runs by default the `setup` module against all nodes to check
+      end to end connectivity. If there is a failure on any node, the job result is
+      flagged as failed and is rescheduled. This behaviour is in general desirable
+      but it can be disabled in cases where `setup` will not work, like in network
+      appliances nodes.
 
 .. attr:: merger
 
