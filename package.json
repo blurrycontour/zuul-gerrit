@@ -22,18 +22,16 @@
     "build": "npm run build:dist",
     "build:dev": "webpack --env=dev",
     "build:dist": "webpack --env=prod",
+    "build:gate": "webpack --env=gate",
     "build:docker": "docker run -it --rm -v $(pwd):/usr/src/app -w /usr/src/app node:alpine npm run build:dist-with-depends",
     "build:dist-with-depends": "yarn install && npm run build:dist",
     "format": "standard --fix web/*.js",
     "lint": "webpack --env=lint",
     "start": "webpack-dev-server --env=dev",
-    "start:status:basic": "webpack-dev-server --env=dev --open-page='status.html?demo=basic'",
-    "start:status:openstack": "webpack-dev-server --env=dev --open-page='status.html?demo=openstack'",
-    "start:status:tree": "webpack-dev-server --env=dev --open-page='status.html?demo=tree'",
-    "start:status": "webpack-dev-server --env=dev --open-page='status.html?source_url=http://zuulv3.openstack.org'",
-    "start:builds": "webpack-dev-server --env=dev --open-page='builds.html?source_url=http://zuulv3.openstack.org'",
-    "start:jobs": "webpack-dev-server --env=dev --open-page='jobs.html?source_url=http://zuulv3.openstack.org'",
-    "start:stream": "webpack-dev-server --env=dev --open-page='stream.html'"
+    "start:basic": "webpack-dev-server --env=dev --open-page='status.html?demo=basic'",
+    "start:openstack": "webpack-dev-server --env=dev --open-page='status.html?demo=openstack'",
+    "start:tree": "webpack-dev-server --env=dev --open-page='status.html?demo=tree'",
+    "start:gate": "webpack-dev-server --env=gate --open-page=status.html"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",

@@ -1,0 +1,5 @@
+{
+    "api_endpoint": "http://zuulv3.openstack.org",
+    "websocket_url": "ws://zuulv3.openstack.org/console-stream",
+    "graphite_url": "http://graphite.openstack.org/render/"
+}

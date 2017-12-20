@@ -1,4 +1,4 @@
-/* global jQuery, URL, DemoStatusBasic, DemoStatusOpenStack, DemoStatusTree */
+/* global jQuery, URL, DemoStatusBasic, DemoStatusOpenStack, DemoStatusTree, BuiltinConfig */
 // Client script for Zuul status page
 //
 // @licstart  The following is the entire license notice for the
@@ -44,7 +44,9 @@ function zuulStart ($) {
     // graphite_url: 'http://graphite.openstack.org/render/'
   }
 
-  if (url.searchParams.has('source_url')) {
+  if (typeof BuiltinConfig !== 'undefined') {
+    params['source'] = BuiltinConfig.api_endpoint + '/' + 'status.json'
+  } else if (url.searchParams.has('source_url')) {
     params['source'] = url.searchParams.get('source_url') + '/' + 'status.json'
   } else if (url.searchParams.has('demo')) {
     let demo = url.searchParams.get('demo') || 'basic'
