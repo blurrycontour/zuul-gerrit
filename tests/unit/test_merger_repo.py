@@ -22,7 +22,9 @@ import git
 import testtools
 
 from zuul.merger.merger import Repo
-from tests.base import ZuulTestCase, FIXTURE_DIR
+from tests.base import ZuulTestCase, FIXTURE_DIR, simple_layout
+
+from unittest import skip
 
 
 class TestMergerRepo(ZuulTestCase):
@@ -100,3 +102,64 @@ class TestMergerRepo(ZuulTestCase):
         with testtools.ExpectedException(git.exc.GitCommandError,
                                          '.*exit code\(-9\)'):
             work_repo.update()
+
+
+class TestMergerWithAuthUrl(ZuulTestCase):
+    config_file = 'zuul-github-driver.conf'
+
+    git_url_with_auth = True
+
+    log = logging.getLogger("zuul.test.merger")
+
+    @simple_layout('layouts/merging-github.yaml', driver='github')
+    def test_changing_url(self):
+        """
+        This test checks that if getGitUrl returns different urls for the same
+        repo (which happens if an access token is part of the url) that the
+        remote urls are changed in the merger accordingly.
+        """
+
+        merger = self.executor_server.merger
+        repo = merger.getRepo('github', 'org/project')
+        first_url = repo.remote_url
+
+        repo = merger.getRepo('github', 'org/project')
+        second_url = repo.remote_url
+
+        # the urls should differ
+        self.assertNotEqual(first_url, second_url)
+
+    @simple_layout('layouts/merging-github.yaml', driver='github')
+    @skip("Disable test for debugging")
+    def test_changing_url_end_to_end(self):
+        """
+        This test checks that if getGitUrl returns different urls for the same
+        repo (which happens if an access token is part of the url) that the
+        remote urls are changed in the merger accordingly.
+        """
+
+        A = self.fake_github.openFakePullRequest('org/project', 'master',
+                                                 'PR title')
+        self.fake_github.emitEvent(A.getCommentAddedEvent('merge me'))
+        self.waitUntilSettled()
+        self.assertTrue(A.is_merged)
+
+        # get remote url of org/project in merger
+        repo = self.executor_server.merger.repos.get('github.com/org/project')
+        self.assertIsNotNone(repo)
+        git_repo = git.Repo(repo.local_path)
+        first_url = list(git_repo.remotes[0].urls)[0]
+
+        B = self.fake_github.openFakePullRequest('org/project', 'master',
+                                                 'PR title')
+        self.fake_github.emitEvent(B.getCommentAddedEvent('merge me again'))
+        self.waitUntilSettled()
+        self.assertTrue(B.is_merged)
+
+        repo = self.executor_server.merger.repos.get('github.com/org/project')
+        self.assertIsNotNone(repo)
+        git_repo = git.Repo(repo.local_path)
+        second_url = list(git_repo.remotes[0].urls)[0]
+
+        # the urls should differ
+        self.assertNotEqual(first_url, second_url)
