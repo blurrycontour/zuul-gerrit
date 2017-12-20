@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bf8cb3f7_b1edff26",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 16
+      },
+      "lineNbr": 622,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-12-20T22:01:06Z",
+      "side": 1,
+      "message": "Yup!",
+      "parentUuid": "bf8cb3f7_36e32508",
+      "revId": "731496215e6174e8981170aa3cdad3f6a9ab81ac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf8cb3f7_d6ef59e7",
         "filename": "doc/source/developer/javascript.rst",
         "patchSetId": 16
@@ -30,6 +48,24 @@
       "writtenOn": "2017-12-20T21:11:17Z",
       "side": 1,
       "message": "If we set up puppet-zuul to do this, it will dirty our git checkout.  Is that going to be okay?  (I ask this not only because it will affect us, but as a proxy for other git-based continuous deployments of zuul).",
+      "revId": "731496215e6174e8981170aa3cdad3f6a9ab81ac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf8cb3f7_915f9be4",
+        "filename": "doc/source/developer/javascript.rst",
+        "patchSetId": 16
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-12-20T22:01:06Z",
+      "side": 1,
+      "message": "It shouldn\u0027t be a problem - zuul/web/static isn\u0027t actually in git anymore (although now that you mention it I should add it to .gitignore in this patch) So if we make puppet-zuul do the equiv of:\n\n  git pull --ff-only\n  npm run build\n  pip install -e .\n\nIt should work (or if it doesn\u0027t, it\u0027s a bug - the intent is that it should work)",
+      "parentUuid": "bf8cb3f7_d6ef59e7",
       "revId": "731496215e6174e8981170aa3cdad3f6a9ab81ac",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
