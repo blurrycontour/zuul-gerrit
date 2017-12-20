@@ -23,15 +23,7 @@ import angular from 'angular'
 
 import './styles/zuul.css'
 import './jquery.zuul'
-
-function getSourceUrl (filename, $location) {
-  let queryArgs = $location.search()
-  if (queryArgs['source_url']) {
-    return queryArgs['source_url'] + '/' + filename
-  } else {
-    return filename
-  }
-}
+import { getSourceUrl } from './util'
 
 angular.module('zuulTenants', []).controller(
     'mainController', function ($scope, $http, $location) {

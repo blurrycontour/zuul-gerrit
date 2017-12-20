@@ -1,4 +1,4 @@
-/* global jQuery, URL, DemoStatusBasic, DemoStatusOpenStack, DemoStatusTree */
+/* global jQuery, URL, DemoStatusBasic, DemoStatusOpenStack, DemoStatusTree, BuiltinConfig */
 // Client script for Zuul status page
 //
 // @licstart  The following is the entire license notice for the
@@ -30,6 +30,7 @@ import 'graphitejs/jquery.graphite.js'
 
 import './styles/zuul.css'
 import './jquery.zuul'
+import { getSourceUrl } from './util'
 
 /**
  * @return The $.zuul instance
@@ -44,7 +45,9 @@ function zuulStart ($) {
     // graphite_url: 'http://graphite.openstack.org/render/'
   }
 
-  if (url.searchParams.has('source_url')) {
+  if (typeof BuiltinConfig !== 'undefined') {
+    params['source'] = BuiltinConfig.api_endpoint + '/' + 'status'
+  } else if (url.searchParams.has('source_url')) {
     params['source'] = url.searchParams.get('source_url') + '/' + 'status'
   } else if (url.searchParams.has('demo')) {
     let demo = url.searchParams.get('demo') || 'basic'
@@ -56,7 +59,7 @@ function zuulStart ($) {
       params['source_data'] = DemoStatusTree
     }
   } else {
-    params['source'] = 'status'
+    params['source'] = getSourceUrl('status')
   }
 
   let zuul = $.zuul(params)

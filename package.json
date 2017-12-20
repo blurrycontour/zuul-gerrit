@@ -26,14 +26,10 @@
     "build:dist-with-depends": "yarn install && npm run build:dist",
     "format": "eslint --fix web/*.js",
     "lint": "webpack --env=lint",
-    "start": "webpack-dev-server --env=dev",
-    "start:status:basic": "webpack-dev-server --env=dev --open-page='status.html?demo=basic'",
-    "start:status:openstack": "webpack-dev-server --env=dev --open-page='status.html?demo=openstack'",
-    "start:status:tree": "webpack-dev-server --env=dev --open-page='status.html?demo=tree'",
-    "start:status": "webpack-dev-server --env=dev --open-page='status.html?source_url=https://zuul.openstack.org'",
-    "start:builds": "webpack-dev-server --env=dev --open-page='builds.html?source_url=https://zuul.openstack.org'",
-    "start:jobs": "webpack-dev-server --env=dev --open-page='jobs.html?source_url=https://zuul.openstack.org'",
-    "start:stream": "webpack-dev-server --env=dev --open-page='stream.html'"
+    "start": "webpack-dev-server --env=dev --define ZUUL_API_URL=\"'https://zuul.openstack.org'\" --open-page='status.html'",
+    "start:basic": "webpack-dev-server --env=dev --open-page='status.html?demo=basic'",
+    "start:openstack": "webpack-dev-server --env=dev --open-page='status.html?demo=openstack'",
+    "start:tree": "webpack-dev-server --env=dev --open-page='status.html?demo=tree'"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
