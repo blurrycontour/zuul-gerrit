@@ -105,7 +105,7 @@ class TestMergerRepo(ZuulTestCase):
 class TestMergerWithAuthUrl(ZuulTestCase):
     config_file = 'zuul-github-driver.conf'
 
-    git_url_with_auth = True
+    git_url_with_auth = False
 
     @simple_layout('layouts/merging-github.yaml', driver='github')
     def test_changing_url(self):
