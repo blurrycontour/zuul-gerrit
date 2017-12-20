@@ -819,10 +819,11 @@ class AnsibleJob(object):
         # within that timeout, there is likely a network problem
         # between here and the hosts in the inventory; return them and
         # reschedule the job.
-        setup_status, setup_code = self.runAnsibleSetup(
-            self.jobdir.setup_playbook)
-        if setup_status != self.RESULT_NORMAL or setup_code != 0:
-            return result
+        if self.executor.run_ansible_setup_on_start:
+            setup_status, setup_code = self.runAnsibleSetup(
+                self.jobdir.setup_playbook)
+            if setup_status != self.RESULT_NORMAL or setup_code != 0:
+                return result
 
         pre_failed = False
         success = False
@@ -1582,6 +1583,12 @@ class ExecutorServer(object):
                                       '/var/lib/zuul/executor-git')
         self.default_username = get_default(self.config, 'executor',
                                             'default_username', 'zuul')
+        self.run_ansible_setup_on_start = get_default(
+            self.config,
+            'executor',
+            'run_ansible_setup_on_start',
+            True
+        )
         self.disk_limit_per_job = int(get_default(self.config, 'executor',
                                                   'disk_limit_per_job', 250))
         self.merge_email = get_default(self.config, 'merger', 'git_user_email')
