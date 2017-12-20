@@ -1,3 +1,4 @@
+/* global BuiltinConfig */
 // @licstart  The following is the entire license notice for the
 // JavaScript code in this page.
 //
@@ -25,11 +26,15 @@ import './styles/zuul.css'
 import './jquery.zuul'
 
 function getSourceUrl (filename, $location) {
-  let queryArgs = $location.search()
-  if (queryArgs['source_url']) {
-    return queryArgs['source_url'] + '/' + filename
+  if (typeof BuiltinConfig !== 'undefined') {
+    return BuiltinConfig.api_endpoint + '/' + filename
   } else {
-    return filename
+    let queryArgs = $location.search()
+    if (queryArgs['source_url']) {
+      return queryArgs['source_url'] + '/' + filename
+    } else {
+      return filename
+    }
   }
 }
 
