@@ -136,7 +136,7 @@ Arbitrary command line options will be passed through after a ``--`` such as:
 
 .. code-block:: bash
 
-  npm run start -- --open-file='static/status.html?source_url=http://zuul.openstack.org'
+  npm run start -- --open-file='static/status.html'
 
 That's kind of annoying though, so additional targets exist for common tasks:
 
@@ -186,12 +186,6 @@ Run console streamer.
 
 Additional run commands can be added in `package.json` in the ``scripts``
 section.
-
-.. note:: Links to console logs from the status page in start:status are not
-          currently working as they are missing the websocket_url parameter.
-          If you edit the URL to add a
-          &websocket_url=ws://zuulv3.openstack.org/console-stream
-          to the end it works as expected.
 
 Deploying
 ---------

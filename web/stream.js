@@ -1,4 +1,4 @@
-/* global URL, WebSocket */
+/* global URL, WebSocket, BuiltinConfig */
 // Client script for Zuul Log Streaming
 //
 // @licstart  The following is the entire license notice for the
@@ -57,10 +57,9 @@ window.onload = function () {
     let logfileSuffix = `(${params['logfile']})`
     document.getElementById('pagetitle').innerHTML += logfileSuffix
   }
-  // TODO(mordred) When running status.html in the devServer with a
-  // source_url passed in, can we get it to go ahead and apped websocket_url
-  // so that local testing is easy?
-  if (url.searchParams.has('websocket_url')) {
+  if (typeof BuiltinConfig !== 'undefined') {
+    params['websocket_url'] = BuiltinConfig.websocket_url
+  } else if (url.searchParams.has('websocket_url')) {
     params['websocket_url'] = url.searchParams.get('websocket_url')
   } else {
     // Websocket doesn't accept relative urls so construct an
