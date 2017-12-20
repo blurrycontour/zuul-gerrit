@@ -22,8 +22,6 @@ import threading
 import time
 import re
 
-import cachecontrol
-from cachecontrol.cache import DictCache
 import iso8601
 import jwt
 import requests
@@ -428,13 +426,6 @@ class GithubConnection(BaseConnection):
         self.installation_map = {}
         self.installation_token_cache = {}
 
-        # NOTE(jamielennox): Better here would be to cache to memcache or file
-        # or something external - but zuul already sucks at restarting so in
-        # memory probably doesn't make this much worse.
-        self.cache_adapter = cachecontrol.CacheControlAdapter(
-            DictCache(),
-            cache_etags=True)
-
         # The regex is based on the connection host. We do not yet support
         # cross-connection dependency gathering
         self.depends_on_re = re.compile(
@@ -473,9 +464,12 @@ class GithubConnection(BaseConnection):
         else:
             github = github3.GitHub()
 
-        # anything going through requests to http/s goes through cache
-        github.session.mount('http://', self.cache_adapter)
-        github.session.mount('https://', self.cache_adapter)
+        # TODO(tobiash): At this position we hooked cachecontrol into the
+        # session to do etag based caching. However it turned out to be broken
+        # and return old data. We should look into how to properly cache
+        # the requests in the future but for now we only have the possibility
+        # to do no caching.
+
         # Add properties to store project and user for logging later
         github._zuul_project = None
         github._zuul_user_id = None
