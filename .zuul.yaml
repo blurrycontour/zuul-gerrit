@@ -43,7 +43,7 @@
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
         - build-javascript-content:
-            success-url: 'npm/html/status.html?source_url=http://zuulv3.openstack.org'
+            success-url: 'npm/html/status.html'
             files:
               - package.json
               - webpack.config.js
@@ -51,6 +51,7 @@
               - web/.*
             vars:
               javascript_content_dir: zuul/web/static
+              npm_command: build:gate
         - nodejs-npm-run-lint:
             success-url: 'npm/reports/bundle.html'
             files:
@@ -73,7 +74,7 @@
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
         - build-javascript-content:
-            success-url: 'npm/html/status.html?source_url=http://zuulv3.openstack.org'
+            success-url: 'npm/html/status.html'
             files:
               - package.json
               - webpack.config.js
@@ -81,6 +82,7 @@
               - web/.*
             vars:
               javascript_content_dir: zuul/web/static
+              npm_command: build:gate
         - nodejs-npm-run-lint:
             success-url: 'npm/reports/bundle.html'
             files:
