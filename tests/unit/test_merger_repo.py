@@ -123,7 +123,7 @@ class TestMergerWithAuthUrl(ZuulTestCase):
         second_url = repo.remote_url
 
         # the urls should differ
-        self.assertNotEqual(first_url, second_url)
+        self.assertEqual(first_url, second_url)
 
     @simple_layout('layouts/merging-github.yaml', driver='github')
     def test_changing_url_end_to_end(self):
