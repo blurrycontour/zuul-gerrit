@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf8cb3f7_36e32508",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 16
+      },
+      "lineNbr": 622,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-20T21:11:17Z",
+      "side": 1,
+      "message": "So if you were to come up with some other local build process, for example, one that copied the contents of zuul/web/static int /var/lib/zuul/www and then also ran npm run build it some way that it wrote to /var/lib/zuul/www, you would set this value to /var/lib/zuul/www and zuul-web would serve things from there?",
+      "revId": "731496215e6174e8981170aa3cdad3f6a9ab81ac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf8cb3f7_d6ef59e7",
+        "filename": "doc/source/developer/javascript.rst",
+        "patchSetId": 16
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-20T21:11:17Z",
+      "side": 1,
+      "message": "If we set up puppet-zuul to do this, it will dirty our git checkout.  Is that going to be okay?  (I ask this not only because it will affect us, but as a proxy for other git-based continuous deployments of zuul).",
+      "revId": "731496215e6174e8981170aa3cdad3f6a9ab81ac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
