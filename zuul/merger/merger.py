@@ -112,8 +112,7 @@ class Repo(object):
                 config_writer.set_value('user', 'name', self.username)
             config_writer.write()
         if rewrite_url:
-            with repo.remotes.origin.config_writer as config_writer:
-                config_writer.set('url', self.remote_url)
+            self._git_set_remote_url(repo, self.remote_url)
         self._initialized = True
 
     def isInitialized(self):
@@ -153,6 +152,10 @@ class Repo(object):
                     self._ensure_cloned()
                 else:
                     raise
+
+    def _git_set_remote_url(self, repo, url):
+        with repo.remotes.origin.config_writer as config_writer:
+            config_writer.set('url', url)
 
     def createRepoObject(self):
         self._ensure_cloned()
@@ -358,6 +361,13 @@ class Repo(object):
         repo = self.createRepoObject()
         repo.delete_remote(repo.remotes[remote])
 
+    def setRemoteUrl(self, url):
+        # NOTE: the remote_url does not necessarily reflect the remote url
+        # which is currently on disk so set that regardless.
+        self.log.debug("Set remote url to %s" % url)
+        self.remote_url = url
+        self._git_set_remote_url(self.createRepoObject(), self.remote_url)
+
 
 class Merger(object):
     def __init__(self, working_root, connections, email, username,
@@ -391,6 +401,7 @@ class Merger(object):
             repo = Repo(
                 url, path, self.email, self.username, self.speed_limit,
                 self.speed_time, sshkey, cache_path, self.logger)
+            repo.setRemoteUrl(url)
 
             self.repos[key] = repo
         except Exception:
@@ -405,7 +416,9 @@ class Merger(object):
         url = source.getGitUrl(project)
         key = '/'.join([hostname, project_name])
         if key in self.repos:
-            return self.repos[key]
+            repo = self.repos[key]
+            repo.setRemoteUrl(url)
+            return repo
         sshkey = self.connections.connections.get(connection_name).\
             connection_config.get('sshkey')
         if not url:
