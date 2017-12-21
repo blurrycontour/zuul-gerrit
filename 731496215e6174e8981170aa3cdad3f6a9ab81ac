@@ -69,6 +69,29 @@
       "revId": "731496215e6174e8981170aa3cdad3f6a9ab81ac",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf8cb3f7_3b76a9da",
+        "filename": "doc/source/developer/javascript.rst",
+        "patchSetId": 16
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-12-21T04:33:28Z",
+      "side": 1,
+      "message": "(nit) this needs rewording a little",
+      "range": {
+        "startLine": 218,
+        "startChar": 41,
+        "endLine": 220,
+        "endChar": 28
+      },
+      "revId": "731496215e6174e8981170aa3cdad3f6a9ab81ac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
