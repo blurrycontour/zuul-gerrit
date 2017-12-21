@@ -13,6 +13,7 @@ testtools>=0.9.32
 sphinxcontrib-programoutput
 sphinx-autodoc-typehints
 mock
+nodeenv
 PyMySQL
 mypy
 zuul-sphinx

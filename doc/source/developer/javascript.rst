@@ -9,35 +9,10 @@ an alternate static web location, such as an Apache server.
 The web applications are managed by `yarn`_ and `webpack`_ which in turn both
 assume a functioning and recent `nodejs`_ installation.
 
-For the impatient who don't want deal with javascript toolchains
-----------------------------------------------------------------
-
-tl;dr - You have to build stuff with javascript tools.
-
-The best thing would be to get familiar with the tools, there are a lot of
-good features available. But, if you don't want to know anything about the
-Javascript toolchains a few helpers have been provided.
-
-If you have npm and docker installed and don't want to install newer nodejs
-or a bunch of javascript libraries, you can run:
-
-.. code-block:: bash
-
-  npm run build:docker
-
-If you have docker but do not have npm or nodejs installed, you can build
-the web app with:
-
-.. code-block:: bash
-
-  docker run -it --rm -v $(PWD):/usr/src/app -w /usr/src/app node:alpine \
-      npm run build:dist-with-depends
-
-Both do the same thing. Both versions will result in the built files being
-put into ``zuul/web/static``.
-
-.. note:: Because the user inside of the Docker container is root, the files
-          that it emits into zuul/web/static will be owned by root.
+.. note:: If you don't want to learn or install about javascript toolchains,
+          all of the commands mentioned should work as arguments to tox -evenv.
+          However, it's less effecient and installing the tools natively is
+          recommended. See :ref:`for-the-impatient` for further information.
 
 yarn dependency management
 --------------------------
@@ -218,6 +193,45 @@ code location will be shown.
 the downside that it is slower to update. However, since it includes the most
 complete mapping information and doesn't impact execution performance, so in
 our case we use it for both.
+
+.. _for-the-impatient:
+
+For the impatient who don't want deal with javascript toolchains
+----------------------------------------------------------------
+
+tl;dr - You ultimately have to build some stuff with javascript tools.
+
+The best thing would be to get familiar with the tools, there are a lot of
+good features available. But, if you don't want to know anything about the
+Javascript toolchains a few helpers have been provided.
+
+If you have only python installed, you can use tox:
+
+.. code-block:: bash
+
+  tox -evenv -- npm run build
+
+If you have npm and docker installed and don't want to install newer nodejs
+or yarn, you can run:
+
+.. code-block:: bash
+
+  npm run build:docker
+
+If you have docker but do not have npm or nodejs installed, you can build
+the web app with:
+
+.. code-block:: bash
+
+  docker run -it --rm -v $(PWD):/usr/src/app -w /usr/src/app node:alpine \
+      npm run build:dist-with-depends
+
+Both do the same thing. Both versions will result in the built files being
+put into ``zuul/web/static``.
+
+.. note:: Because the user inside of the Docker container is root, the files
+          that it emits into zuul/web/static will be owned by root, so it's
+          not the BEST process.
 
 .. _yarn: https://yarnpkg.com/en/
 .. _nodejs: https://nodejs.org/
