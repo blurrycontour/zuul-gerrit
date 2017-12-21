@@ -22,6 +22,30 @@
       "revId": "6ce6a7f0a69f5a203256e6a48e8fbb40933ebdb0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf8cb3f7_564fb0bc",
+        "filename": "web/config/webpack.lint.js",
+        "patchSetId": 11
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2017-12-21T19:55:01Z",
+      "side": 1,
+      "message": "This will result in reports being in the root of the source dir - which is then where the nodejs-npm-run-lint job expects it to be.",
+      "parentUuid": "bf8cb3f7_9b04957d",
+      "range": {
+        "startLine": 28,
+        "startChar": 6,
+        "endLine": 28,
+        "endChar": 20
+      },
+      "revId": "6ce6a7f0a69f5a203256e6a48e8fbb40933ebdb0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
