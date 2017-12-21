@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "bf8cb3f7_0bd3453a",
+        "filename": "TESTING.rst",
+        "patchSetId": 16
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-21T18:43:56Z",
+      "side": 1,
+      "message": "Need to run yarn install here.",
+      "revId": "731496215e6174e8981170aa3cdad3f6a9ab81ac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf8cb3f7_36e32508",
         "filename": "doc/source/admin/components.rst",
         "patchSetId": 16
@@ -31,6 +48,23 @@
       "side": 1,
       "message": "Yup!",
       "parentUuid": "bf8cb3f7_36e32508",
+      "revId": "731496215e6174e8981170aa3cdad3f6a9ab81ac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf8cb3f7_2bd88951",
+        "filename": "doc/source/developer/javascript.rst",
+        "patchSetId": 16
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2017-12-21T18:43:56Z",
+      "side": 1,
+      "message": "It might be good to put this in a code block like the rest of the steps.",
       "revId": "731496215e6174e8981170aa3cdad3f6a9ab81ac",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
