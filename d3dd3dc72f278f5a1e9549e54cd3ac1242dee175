@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf8cb3f7_303314ae",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-12-21T17:56:56Z",
+      "side": 1,
+      "message": "Is that intended or a debugging leftover?",
+      "range": {
+        "startLine": 48,
+        "startChar": 8,
+        "endLine": 48,
+        "endChar": 66
+      },
+      "revId": "d3dd3dc72f278f5a1e9549e54cd3ac1242dee175",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf8cb3f7_f0e12c00",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-12-21T17:56:56Z",
+      "side": 1,
+      "message": "Should we remove this then if it\u0027s not supported?",
+      "revId": "d3dd3dc72f278f5a1e9549e54cd3ac1242dee175",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf8cb3f7_30c1d455",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2017-12-21T17:56:56Z",
+      "side": 1,
+      "message": "Yeah, also noticed that today, probably something we should fix at some time and enable this then.",
+      "revId": "d3dd3dc72f278f5a1e9549e54cd3ac1242dee175",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
