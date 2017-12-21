@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf8cb3f7_9b04957d",
+        "filename": "web/config/webpack.lint.js",
+        "patchSetId": 11
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-12-21T03:57:53Z",
+      "side": 1,
+      "message": "When running this locally won\u0027t this create a \u0027reports\u0027 outside of the zuul directory? Shouldn\u0027t we create this somewhere safe and have the lint job move it into reports?",
+      "range": {
+        "startLine": 28,
+        "startChar": 6,
+        "endLine": 28,
+        "endChar": 20
+      },
+      "revId": "6ce6a7f0a69f5a203256e6a48e8fbb40933ebdb0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
