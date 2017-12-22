@@ -31,6 +31,7 @@
 - project:
     name: openstack-infra/zuul
     check:
+      debug: true
       jobs:
         - build-openstack-sphinx-docs:
             irrelevant-files:
