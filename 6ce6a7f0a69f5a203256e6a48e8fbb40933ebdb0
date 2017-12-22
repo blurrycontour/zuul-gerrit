@@ -46,6 +46,30 @@
       "revId": "6ce6a7f0a69f5a203256e6a48e8fbb40933ebdb0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf8cb3f7_0deef221",
+        "filename": "web/config/webpack.lint.js",
+        "patchSetId": 11
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-12-22T03:59:27Z",
+      "side": 1,
+      "message": "maybe I\u0027m confused about the the working dir, but relative to this file it appears to be one level above. Where is this script ran from?",
+      "parentUuid": "bf8cb3f7_564fb0bc",
+      "range": {
+        "startLine": 28,
+        "startChar": 6,
+        "endLine": 28,
+        "endChar": 20
+      },
+      "revId": "6ce6a7f0a69f5a203256e6a48e8fbb40933ebdb0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
