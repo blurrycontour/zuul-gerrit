@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf8cb3f7_c577533a",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1145,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2017-12-27T04:31:41Z",
+      "side": 1,
+      "message": "(nit) you could use random.sample to make the list",
+      "revId": "060167f0c0a1d60a7f1d937bf649fa21b03c2284",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
