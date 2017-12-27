@@ -19,7 +19,6 @@ import logging
 import os
 import pwd
 import sys
-import signal
 import tempfile
 
 import zuul.cmd

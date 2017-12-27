@@ -14,7 +14,6 @@
 # under the License.
 
 import logging
-import signal
 import sys
 
 import zuul.cmd
