@@ -50,6 +50,7 @@ class ConnectionRegistry(object):
         self.registerDriver(zuul.driver.sql.SQLDriver())
         self.registerDriver(zuul.driver.bubblewrap.BubblewrapDriver())
         self.registerDriver(zuul.driver.nullwrap.NullwrapDriver())
+        self.registerDriver(zuul.driver.slack.SlackDriver())
 
     def registerDriver(self, driver):
         if driver.name in self.drivers:
