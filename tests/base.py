@@ -38,6 +38,7 @@ import threading
 import traceback
 import time
 import uuid
+from unittest import mock
 import urllib
 
 import git
@@ -2086,6 +2087,11 @@ class ZuulTestCase(BaseTestCase):
             return FakeSMTP(*args, **kw)
 
         self.useFixture(fixtures.MonkeyPatch('smtplib.SMTP', FakeSMTPFactory))
+
+        self.slack_mock = mock.patch('slackclient.SlackClient').start()
+        self.slack_api_mock = mock.Mock()
+        self.slack_mock.return_value = self.slack_api_mock
+        self.slack_api_mock.api_call.return_value = {'ok': True, 'ts': '0.0'}
 
         # Register connections from the config using fakes
         self.connections = zuul.lib.connections.ConnectionRegistry()
