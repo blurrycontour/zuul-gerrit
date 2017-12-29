@@ -57,6 +57,7 @@ Zuul includes the following drivers:
    drivers/github
    drivers/git
    drivers/smtp
+   drivers/slack
    drivers/sql
    drivers/timer
    drivers/zuul
