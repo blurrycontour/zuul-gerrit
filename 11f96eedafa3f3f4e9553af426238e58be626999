@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f91af0f_84342d4c",
+        "filename": "doc/source/admin/drivers/slack.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-01-01T10:43:46Z",
+      "side": 1,
+      "message": "(nit) example pipeline",
+      "range": {
+        "startLine": 47,
+        "startChar": 5,
+        "endLine": 47,
+        "endChar": 13
+      },
+      "revId": "11f96eedafa3f3f4e9553af426238e58be626999",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f91af0f_44270514",
+        "filename": "doc/source/admin/drivers/slack.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-01-01T10:43:46Z",
+      "side": 1,
+      "message": "(nit) It\u0027s a touch confusing having this \u0027channel\u0027 support a list, but project-channels.channel does not. Could rename this to \u0027channels\u0027 or have project-channels also support a list",
+      "range": {
+        "startLine": 75,
+        "startChar": 21,
+        "endLine": 75,
+        "endChar": 25
+      },
+      "revId": "11f96eedafa3f3f4e9553af426238e58be626999",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f91af0f_84ff4d66",
+        "filename": "doc/source/admin/drivers/slack.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-01-01T10:43:46Z",
+      "side": 1,
+      "message": "(nit) whitespace",
+      "range": {
+        "startLine": 86,
+        "startChar": 0,
+        "endLine": 86,
+        "endChar": 6
+      },
+      "revId": "11f96eedafa3f3f4e9553af426238e58be626999",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f91af0f_6424890e",
+        "filename": "tests/unit/test_slack.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-01-01T10:43:46Z",
+      "side": 1,
+      "message": "pep8, missing whitespace",
+      "revId": "11f96eedafa3f3f4e9553af426238e58be626999",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
