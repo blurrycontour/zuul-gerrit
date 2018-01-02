@@ -24,6 +24,7 @@ import socket
 import sys
 import threading
 import time
+import urllib
 
 from zuul import configloader
 from zuul import model
@@ -1088,3 +1089,23 @@ class Scheduler(threading.Thread):
         for pipeline in tenant.layout.pipelines.values():
             pipelines.append(pipeline.formatStatusJSON(websocket_url))
         return json.dumps(data)
+
+    def getChangeByURL(self, url):
+        try:
+            parsed = urllib.parse.urlparse(url)
+        except ValueError:
+            return None
+        source = self.connections.getSourceByHostname(parsed.hostname)
+        if not source:
+            return None
+        self.log.debug("Found source: %s", source)
+        dep = source.getChangeByURL(url)
+        if dep:
+            self.log.debug("Found dependency: %s", dep)
+        return dep
+
+    def getChangesDependingOnURLs(self, urls):
+        changes = []
+        for source in self.connections.getSources():
+            changes.extend(source.getChangesDependingOnURLs(urls))
+        return changes

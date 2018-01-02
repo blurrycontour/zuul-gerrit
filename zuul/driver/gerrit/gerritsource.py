@@ -12,6 +12,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import re
+import urllib
 import logging
 import voluptuous as vs
 from zuul.source import BaseSource
@@ -43,6 +45,54 @@ class GerritSource(BaseSource):
 
     def getChange(self, event, refresh=False):
         return self.connection.getChange(event, refresh)
+
+    change_re = re.compile(r"/(\#\/c\/)?(\d+)[\w]*")
+    def getChangeByURL(self, url):
+        try:
+            parsed = urllib.parse.urlparse(url)
+        except ValueError:
+            return None
+        m = self.change_re.match(parsed.path)
+        if not m:
+            return None
+        try:
+            change_no = int(m.group(2))
+        except ValueError:
+            return None
+        query = "change:%s" % (change_no,)
+        results = self.connection.simpleQuery(query)
+        if not results:
+            return None
+        change = self.connection._getChange(
+            results[0]['number'], results[0]['currentPatchSet']['number'])
+        return change
+
+    def getChangesDependingOnURLs(self, urls):
+        # Strip the prefix from the query as that returns better results.
+        queries = set()
+        for url in urls:
+            try:
+                parsed = urllib.parse.urlparse(url)
+            except ValueError:
+                continue
+            scheme = parsed.scheme + '://'
+            queries.add('message:' + urllib.parse.urlunparse(parsed).replace(
+                scheme, '', 1))
+        query = '(' + ' OR '.join(queries) + ')'
+        results = self.connection.simpleQuery(query)
+        seen = set()
+        changes = []
+        for result in results:
+            for match in self.findDependencyHeaders(result['commitMessage']):
+                if match != url:
+                    continue
+                key = (result['number'], result['currentPatchSet']['number'])
+                if key in seen:
+                    continue
+                change = self.connection._getChange(
+                    result['number'], results['currentPatchSet']['number'])
+                changes.append(change)
+        return changes
 
     def getProject(self, name):
         p = self.connection.getProject(name)

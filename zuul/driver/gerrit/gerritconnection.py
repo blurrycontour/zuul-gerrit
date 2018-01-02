@@ -273,8 +273,8 @@ class GerritConnection(BaseConnection):
     driver_name = 'gerrit'
     log = logging.getLogger("zuul.GerritConnection")
     iolog = logging.getLogger("zuul.GerritConnection.io")
-    depends_on_re = re.compile(r"^Depends-On: (I[0-9a-f]{40})\s*$",
-                               re.MULTILINE | re.IGNORECASE)
+    gerrit_depends_on_re = re.compile(r"^Depends-On: (I[0-9a-f]{40})\s*$",
+                                      re.MULTILINE | re.IGNORECASE)
     replication_timeout = 300
     replication_retry_interval = 5
 
@@ -398,10 +398,10 @@ class GerritConnection(BaseConnection):
             raise
         return change
 
-    def _getDependsOnFromCommit(self, message, change):
+    def _getGerritDependsOnFromCommit(self, message, change):
         records = []
         seen = set()
-        for match in self.depends_on_re.findall(message):
+        for match in self.gerrit_depends_on_re.findall(message):
             if match in seen:
                 self.log.debug("Ignoring duplicate Depends-On: %s" %
                                (match,))
@@ -412,9 +412,31 @@ class GerritConnection(BaseConnection):
                            "to find needed changes" %
                            (change, query,))
             records.extend(self.simpleQuery(query))
-        return records
+        changes = []
+        for record in records:
+            dep_num = record['number']
+            dep_ps = record['currentPatchSet']['number']
+            self.log.debug("Updating %s: Getting commit-dependent "
+                           "change %s,%s" %
+                           (change, dep_num, dep_ps))
+            dep = self._getChange(dep_num, dep_ps, history=history)
+            if dep.open and dep not in needs_changes:
+                changes.append(dep)
+        return changes
 
-    def _getNeededByFromCommit(self, change_id, change):
+    def _getDependsOnFromCommit(self, message, change):
+        changes = self._getGerritDependsOnFromCommit(message, change)
+        for url in self.source.findDependencyHeaders(message):
+            self.log.debug("Updating %s: Getting change by url %s ",
+                           change, url)
+            change = self.sched.getChangeByURL(url)
+            if change:
+                self.log.debug("Updating %s: Found change by url %s ",
+                               change, url)
+                changes.append(change)
+        return changes
+
+    def _getGerritNeededByFromCommit(self, change_id, change):
         records = []
         seen = set()
         query = 'message:%s' % change_id
@@ -423,7 +445,7 @@ class GerritConnection(BaseConnection):
                        (change, query,))
         results = self.simpleQuery(query)
         for result in results:
-            for match in self.depends_on_re.findall(
+            for match in self.gerrit_depends_on_re.findall(
                 result['commitMessage']):
                 if match != change_id:
                     continue
@@ -436,6 +458,19 @@ class GerritConnection(BaseConnection):
                 seen.add(key)
                 records.append(result)
         return records
+
+    def _getNeededByFromCommit(self, change_id, change):
+        changes = self._getGerritNeededByFromCommit(change_id, change)
+        hostnames = set([self.server,
+                         self.canonical_hostname])
+        urls = []
+        for hostname in hostnames:
+            urls.append('http://%s/%s' % (hostname, change.number))
+            urls.append('http://%s/#/c/%s' % (hostname, change.number))
+            urls.append('https://%s/%s' % (hostname, change.number))
+            urls.append('https://%s/#/c/%s' % (hostname, change.number))
+        changes.extend(self.sched.getChangesDependingOnURLs(urls))
+        return changes
 
     def _updateChange(self, change, history=None):
 
@@ -481,6 +516,7 @@ class GerritConnection(BaseConnection):
         change.open = data['open']
         change.status = data['status']
         change.owner = data['owner']
+        change.commit_message = data['commitMessage']
 
         if change.is_merged:
             # This change is merged, so we don't need to look any further
@@ -507,16 +543,9 @@ class GerritConnection(BaseConnection):
             if (not dep.is_merged) and dep not in needs_changes:
                 needs_changes.append(dep)
 
-        for record in self._getDependsOnFromCommit(data['commitMessage'],
-                                                   change):
-            dep_num = record['number']
-            dep_ps = record['currentPatchSet']['number']
-            self.log.debug("Updating %s: Getting commit-dependent "
-                           "change %s,%s" %
-                           (change, dep_num, dep_ps))
-            dep = self._getChange(dep_num, dep_ps, history=history)
-            if dep.open and dep not in needs_changes:
-                needs_changes.append(dep)
+        needs_changes.extend(
+            self._getDependsOnFromCommit(data['commitMessage'],
+                                         change))
         change.needs_changes = needs_changes
 
         needed_by_changes = []
@@ -530,21 +559,8 @@ class GerritConnection(BaseConnection):
                 if dep.open and dep.is_current_patchset:
                     needed_by_changes.append(dep)
 
-        for record in self._getNeededByFromCommit(data['id'], change):
-            dep_num = record['number']
-            dep_ps = record['currentPatchSet']['number']
-            self.log.debug("Updating %s: Getting commit-needed change %s,%s" %
-                           (change, dep_num, dep_ps))
-            # Because a commit needed-by may be a cross-repo
-            # dependency, cause that change to refresh so that it will
-            # reference the latest patchset of its Depends-On (this
-            # change). In case the dep is already in history we already
-            # refreshed this change so refresh is not needed in this case.
-            refresh = (dep_num, dep_ps) not in history
-            dep = self._getChange(
-                dep_num, dep_ps, refresh=refresh, history=history)
-            if dep.open and dep.is_current_patchset:
-                needed_by_changes.append(dep)
+        needed_by_changes.extend(
+            self._getNeededByFromCommit(data['id'], change))
         change.needed_by_changes = needed_by_changes
 
         return change

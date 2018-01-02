@@ -13,6 +13,7 @@
 # under the License.
 
 import abc
+import re
 
 
 class BaseSource(object, metaclass=abc.ABCMeta):
@@ -76,3 +77,14 @@ class BaseSource(object, metaclass=abc.ABCMeta):
     def getRejectFilters(self, config):
         """Return a list of ChangeFilters for the scheduler to match against.
         """
+
+    depends_on_re = re.compile(r"^Depends-On: (.*?)\s*$",
+                               re.MULTILINE | re.IGNORECASE)
+    def findDependencyHeaders(self, message):
+        # Search for Depends-On headers
+        dependencies = []
+        for match in self.depends_on_re.findall(message):
+            if match in dependencies:
+                continue
+            dependencies.append(match)
+        return dependencies
