@@ -11,7 +11,9 @@
 # under the License.
 
 import logging
+import re
 import textwrap
+import urllib
 
 from zuul import exceptions
 from zuul import model
@@ -342,6 +344,32 @@ class PipelineManager(object):
         self.cancelJobs(item)
         self.dequeueItem(item)
         self.reportStats(item)
+
+    depends_on_re = re.compile(r"^Depends-On: (.*?)\s*$",
+                               re.MULTILINE | re.IGNORECASE)
+    def updateCommitDependencies(self, change):
+        # Search for Depends-On headers and find appropriate changes
+        self.log.debug("  Updating commit dependencies for %s", change)
+        dependencies = []
+        seen = set()
+        for match in self.depends_on_re.findall(change.commit_message):
+            self.log.debug("  Found Depends-on header: %s", match)
+            if match in seen:
+                continue
+            seen.add(match)
+            try:
+                url = urllib.parse.urlparse(match)
+            except ValueError:
+                continue
+            source = self.sched.connections.getSourceByHostname(url.hostname)
+            if not source:
+                continue
+            self.log.debug("  Found source: %s", source)
+            dep = source.getChangeByURL(match)
+            if dep:
+                self.log.debug("  Adding dependency: %s", dep)
+                dependencies.append(dep)
+        change.commit_needs_changes = dependencies
 
     def provisionNodes(self, item):
         jobs = item.findJobsToRequest()

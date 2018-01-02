@@ -566,7 +566,8 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
             # Query a specific changeid
             changeid = query[len('change:'):]
             l = [change.query() for change in self.changes.values()
-                 if change.data['id'] == changeid]
+                 if (change.data['id'] == changeid or
+                     change.data['number'] == changeid)]
         elif query.startswith('message:'):
             # Query the content of a commit message
             msg = query[len('message:'):].strip()

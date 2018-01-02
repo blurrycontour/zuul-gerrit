@@ -4545,6 +4545,72 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertEqual(B.data['status'], 'MERGED')
         self.assertEqual(B.reported, 0)
 
+    def test_crd_gate_url(self):
+        "Test cross-repo dependencies"
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+
+        AM2 = self.fake_gerrit.addFakeChange('org/project1', 'master', 'AM2')
+        AM1 = self.fake_gerrit.addFakeChange('org/project1', 'master', 'AM1')
+        AM2.setMerged()
+        AM1.setMerged()
+
+        BM2 = self.fake_gerrit.addFakeChange('org/project2', 'master', 'BM2')
+        BM1 = self.fake_gerrit.addFakeChange('org/project2', 'master', 'BM1')
+        BM2.setMerged()
+        BM1.setMerged()
+
+        # A -> AM1 -> AM2
+        # B -> BM1 -> BM2
+        # A Depends-On: B
+        # M2 is here to make sure it is never queried.  If it is, it
+        # means zuul is walking down the entire history of merged
+        # changes.
+
+        B.setDependsOn(BM1, 1)
+        BM1.setDependsOn(BM2, 1)
+
+        A.setDependsOn(AM1, 1)
+        AM1.setDependsOn(AM2, 1)
+
+        A.data['commitMessage'] = '%s\n\nDepends-On: https://review.example.com/2\n' % (
+            A.subject,)
+
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'NEW')
+        self.assertEqual(B.data['status'], 'NEW')
+
+        for connection in self.connections.connections.values():
+            connection.maintainCache([])
+
+        self.executor_server.hold_jobs_in_build = True
+        B.addApproval('Approved', 1)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.executor_server.release('.*-merge')
+        self.waitUntilSettled()
+        self.executor_server.release('.*-merge')
+        self.waitUntilSettled()
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(AM2.queried, 0)
+        self.assertEqual(BM2.queried, 0)
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(B.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(B.reported, 2)
+
+        changes = self.getJobFromHistory(
+            'project-merge', 'org/project1').changes
+        self.assertEqual(changes, '2,1 1,1')
+
     def test_crd_check(self):
         "Test cross-repo dependencies in independent pipelines"
 
