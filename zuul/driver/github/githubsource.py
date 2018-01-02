@@ -12,6 +12,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import re
+import urllib
 import logging
 import time
 import voluptuous as v
@@ -60,6 +62,33 @@ class GithubSource(BaseSource):
 
     def getChange(self, event, refresh=False):
         return self.connection.getChange(event, refresh)
+
+    change_re = re.compile(r"/(.*?)/(.*?)/(.*?)/pull/(\d+)[\w]*")
+    def getChangeByURL(self, url):
+        try:
+            parsed = urllib.parse.urlparse(url)
+        except ValueError:
+            return None
+        m = self.change_re.match(parsed.path)
+        if not m:
+            return None
+        org = gm.group(2)
+        proj = gm.group(3)
+        try:
+            num = int(m.group(4))
+        except ValueError:
+            return None
+        pull = self.getPull('%s/%s' % (org, proj), int(num))
+        if not pull:
+            return None
+        proj = pr.get('base').get('repo').get('full_name')
+        project = self.getProject(proj)
+        change = self.connection._getChange(project, pull,
+                                            patchset=pr.get('head').get('sha'))
+        return change
+
+    def getChangesDependingOn(self, change):
+        return self.connection.getChangesDependingOn(change)
 
     def getProject(self, name):
         p = self.connection.getProject(name)
