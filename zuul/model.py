@@ -2104,8 +2104,11 @@ class Change(Branch):
         self.url = None
         self.patchset = None
 
-        self.needs_changes = []
-        self.needed_by_changes = []
+        self.git_needs_changes = []
+        self.git_needed_by_changes = []
+
+        self.commit_needs_changes = None
+
         self.is_current_patchset = True
         self.can_merge = False
         self.is_merged = False
@@ -2113,6 +2116,7 @@ class Change(Branch):
         self.open = None
         self.status = None
         self.owner = None
+        self.commit_message = None
 
         self.source_event = None
 
@@ -2126,6 +2130,14 @@ class Change(Branch):
         if self.number == other.number and self.patchset == other.patchset:
             return True
         return False
+
+    @property
+    def needs_changes(self):
+        return self.git_needs_changes + self.commit_needs_changes
+
+    @property
+    def needed_by_changes(self):
+        return self.git_needed_by_changes
 
     def isUpdateOf(self, other):
         if ((hasattr(other, 'number') and self.number == other.number) and
