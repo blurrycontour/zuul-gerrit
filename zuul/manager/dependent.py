@@ -149,6 +149,9 @@ class DependentPipelineManager(PipelineManager):
         source = change.project.source
         # Return true if okay to proceed enqueing this change,
         # false if the change should not be enqueued.
+        if (hasattr(change, 'commit_needs_changes') and
+            (change.refresh_deps or change.commit_needs_changes is None)):
+            self.updateCommitDependencies(change)
         if not hasattr(change, 'needs_changes'):
             self.log.debug("  %s does not support dependencies" % type(change))
             return True
