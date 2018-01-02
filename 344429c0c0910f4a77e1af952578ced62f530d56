@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f91af0f_649b2472",
+        "filename": "doc/source/admin/connections.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2018-01-02T06:29:27Z",
+      "side": 1,
+      "message": "The list above is alphabetical, let\u0027s add slack earlier",
+      "revId": "344429c0c0910f4a77e1af952578ced62f530d56",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f91af0f_048fb823",
+        "filename": "doc/source/admin/drivers/slack.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2018-01-02T06:29:27Z",
+      "side": 1,
+      "message": "lowercase",
+      "range": {
+        "startLine": 90,
+        "startChar": 10,
+        "endLine": 90,
+        "endChar": 17
+      },
+      "revId": "344429c0c0910f4a77e1af952578ced62f530d56",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f91af0f_24943c37",
+        "filename": "zuul/driver/slack/slackconnection.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2018-01-02T06:29:27Z",
+      "side": 1,
+      "message": "really?",
+      "range": {
+        "startLine": 1,
+        "startChar": 12,
+        "endLine": 1,
+        "endChar": 36
+      },
+      "revId": "344429c0c0910f4a77e1af952578ced62f530d56",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
