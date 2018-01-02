@@ -1088,3 +1088,15 @@ class Scheduler(threading.Thread):
         for pipeline in tenant.layout.pipelines.values():
             pipelines.append(pipeline.formatStatusJSON(websocket_url))
         return json.dumps(data)
+
+    def onChangeUpdated(self, change):
+        rdeps = []
+        self.log.debug("Change %s has been updated, clearing dependent "
+                       "change cache", change)
+        for source in self.connections.getSources():
+            self.log.debug("  Checking source: %s", source)
+            rdeps.extend(source.getChangesDependingOn(change))
+        self.log.debug("  Following changes: %s", rdeps)
+        for rdep in rdeps:
+            rdep.refresh_deps = True
+        change.refresh_deps = True
