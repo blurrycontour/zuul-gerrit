@@ -90,7 +90,22 @@ class ZuulDriver(Driver, TriggerInterface):
         if not hasattr(change, 'needed_by_changes'):
             self.log.debug("  %s does not support dependencies" % type(change))
             return
-        for needs in change.needed_by_changes:
+
+        # This is very inefficient, especially on systems with large
+        # numbers of github installations.  This can be improved later
+        # with persistent storage of dependency information.
+        sources = set()
+        for source in self.sched.getSources():
+            sources.add(project.source)
+
+        needed_by_changes = set(change.needed_by_changes)
+        for source in sources:
+            self.log.debug("  Checking source: %s", source)
+            needed_by_changes.update(
+                source.getChangesDependingOn(change, None))
+        self.log.debug("  Following changes: %s", needed_by_changes)
+
+        for needs in needed_by_changes:
             self._createParentChangeEnqueuedEvent(needs, pipeline)
 
     def _createParentChangeEnqueuedEvent(self, change, pipeline):
