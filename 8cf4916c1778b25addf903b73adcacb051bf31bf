@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "9f91af0f_adc26332",
+        "filename": "zuul/driver/slack/slackconnection.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1297
+      },
+      "writtenOn": "2018-01-02T20:46:22Z",
+      "side": 1,
+      "message": "Might be worthwhile to run https://api.slack.com/methods/api.test right about here (ensuring basic stuff works)??",
+      "revId": "8cf4916c1778b25addf903b73adcacb051bf31bf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f91af0f_2dd17355",
         "filename": "zuul/driver/slack/slackreporter.py",
         "patchSetId": 10
