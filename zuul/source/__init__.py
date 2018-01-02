@@ -52,6 +52,50 @@ class BaseSource(object, metaclass=abc.ABCMeta):
         """Get the change representing an event."""
 
     @abc.abstractmethod
+    def getCanonicalProjectNameByURL(self, url):
+        """Get the canonical project name associated with the URL.
+
+        If the URL does not match this source's connection, return None.
+
+        Otherwise, return the canonical project name associated with the
+        change at the URL.
+
+        This method is called by Zuul in an attempt to determine what
+        source should be used to fetch a change, and may therefore be
+        passed a URL which ultimately is not associated with a project
+        assoicated with this source.  In that case, take care not to
+        erroneously associate any changes with the current source in
+        the course of satisfying this query.
+
+        Once the canonical project name for a change has been
+        determined, Zuul will use the source associated with that
+        project in the tenant config file to fetch the change.
+        """
+
+    @abc.abstractmethod
+    def getChangeByURL(self, url):
+        """Get the change corresponding to the supplied URL.
+
+        The URL may may not correspond to this source; if it doesn't,
+        or there is no change at that URL, return None.
+
+        """
+
+    @abc.abstractmethod
+    def getChangesDependingOn(self, change, projects):
+        """Return changes which depend on changes at the supplied URIs.
+
+        Search this source for changes which depend on the supplied
+        change.  Generally the Change.uris attribute should be used to
+        perform the search, as it contains a list of URLs without the
+        scheme which represent a single change
+
+        If the projects argument is None, search across all known
+        projects.  If it is supplied, the search may optionally be
+        restricted to only those projects.
+        """
+
+    @abc.abstractmethod
     def getProjectOpenChanges(self, project):
         """Get the open changes for a project."""
 

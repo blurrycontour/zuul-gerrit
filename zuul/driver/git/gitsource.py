@@ -38,6 +38,18 @@ class GitSource(BaseSource):
     def getChange(self, event, refresh=False):
         return self.connection.getChange(event, refresh)
 
+    def getCanonicalProjectNameByURL(self, url):
+        return None
+
+    def getChangeByURL(self, url):
+        return None
+
+    def getChangesDependingOn(self, change, projects):
+        return []
+
+    def getCachedChanges(self):
+        return []
+
     def getProject(self, name):
         p = self.connection.getProject(name)
         if not p:

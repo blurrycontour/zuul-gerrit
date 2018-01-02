@@ -15,6 +15,7 @@ import textwrap
 
 from zuul import exceptions
 from zuul import model
+from zuul.lib.dependson import find_dependency_headers
 
 
 class DynamicChangeQueueContextManager(object):
@@ -342,6 +343,46 @@ class PipelineManager(object):
         self.cancelJobs(item)
         self.dequeueItem(item)
         self.reportStats(item)
+
+    def updateCommitDependencies(self, change, change_queue):
+        # Search for Depends-On headers and find appropriate changes
+        self.log.debug("  Updating commit dependencies for %s", change)
+        change.refresh_deps = False
+        dependencies = []
+        seen = set()
+        tenant = self.pipeline.layout.tenant
+        for match in find_dependency_headers(change.message):
+            self.log.debug("  Found Depends-On header: %s", match)
+            if match in seen:
+                continue
+            seen.add(match)
+            # Try to determine the canonical project name for this URL
+            # so we know which source to ask for the change.
+            canonical_project_names = set()
+            for source in self.sched.connections.getSources():
+                self.log.debug(source)
+                n = source.getCanonicalProjectNameByURL(match)
+                if n:
+                    canonical_project_names.add(n)
+            if len(canonical_project_names) < 1:
+                self.log.debug("  No connection found for %s", match)
+                continue
+            # If there's more than one, it's ambiguous.
+            if len(canonical_project_names) > 1:
+                self.log.debug("  More than one canonical "
+                               "project matched %s", match)
+                continue
+            project_name = list(canonical_project_names)[0]
+            trusted, project = tenant.getProject(project_name)
+            if not project:
+                self.log.debug("  Project %s not found", project_name)
+                continue
+            self.log.debug("  Found source: %s", project.source)
+            dep = project.source.getChangeByURL(match)
+            if dep and (not dep.is_merged) and dep not in dependencies:
+                self.log.debug("  Adding dependency: %s", dep)
+                dependencies.append(dep)
+        change.commit_needs_changes = dependencies
 
     def provisionNodes(self, item):
         jobs = item.findJobsToRequest()

@@ -154,6 +154,13 @@ class ConnectionRegistry(object):
         connection = self.connections[connection_name]
         return connection.driver.getSource(connection)
 
+    def getSources(self):
+        sources = []
+        for connection in self.connections.values():
+            if hasattr(connection.driver, 'getSource'):
+                sources.append(connection.driver.getSource(connection))
+        return sources
+
     def getReporter(self, connection_name, config=None):
         connection = self.connections[connection_name]
         return connection.driver.getReporter(connection, config)
@@ -162,7 +169,7 @@ class ConnectionRegistry(object):
         connection = self.connections[connection_name]
         return connection.driver.getTrigger(connection, config)
 
-    def getSourceByHostname(self, canonical_hostname):
+    def getSourceByCanonicalHostname(self, canonical_hostname):
         for connection in self.connections.values():
             if hasattr(connection, 'canonical_hostname'):
                 if connection.canonical_hostname == canonical_hostname:
