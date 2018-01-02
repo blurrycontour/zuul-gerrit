@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f91af0f_2dd17355",
+        "filename": "zuul/driver/slack/slackreporter.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1297
+      },
+      "writtenOn": "2018-01-02T20:23:23Z",
+      "side": 1,
+      "message": "So u may want to at least handle https://api.slack.com/docs/rate-limits (just incase); tenacity now can be used to retry in the right manner for this.",
+      "revId": "8cf4916c1778b25addf903b73adcacb051bf31bf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
