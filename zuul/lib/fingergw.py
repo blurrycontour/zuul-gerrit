@@ -65,6 +65,7 @@ class RequestHandler(streamer_utils.BaseFingerRequestHandler):
         '''
         try:
             build_uuid = self.getCommand()
+            build_uuid = build_uuid.rstrip()
             port_location = self.rpc.get_job_log_stream_address(build_uuid)
 
             if not port_location:
