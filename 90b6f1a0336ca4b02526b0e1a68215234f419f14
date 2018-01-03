@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f91af0f_3640e056",
+        "filename": "doc/source/admin/drivers/slack.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-01-03T01:13:19Z",
+      "side": 1,
+      "message": "s/sens/sends",
+      "range": {
+        "startLine": 48,
+        "startChar": 53,
+        "endLine": 48,
+        "endChar": 57
+      },
+      "revId": "90b6f1a0336ca4b02526b0e1a68215234f419f14",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
