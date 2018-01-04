@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f91af0f_f65a4af1",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1663,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-01-04T20:34:04Z",
+      "side": 1,
+      "message": "This is there to validate that the parent job exists so I think this should stay within the try block. Otherwise a missing parent job still will throw a fatal exception (and due to the lack of with configuration_exceptions without information about the context).",
+      "range": {
+        "startLine": 1662,
+        "startChar": 0,
+        "endLine": 1663,
+        "endChar": 37
+      },
+      "revId": "578b4bd540080f5d74857a9955bc5051e79e330b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
