@@ -22,6 +22,29 @@
       "revId": "2389ec9a82460e66db99db44164ddfc3ecea0b26",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f91af0f_1dfed036",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1650,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2018-01-05T22:57:23Z",
+      "side": 1,
+      "message": "os.listdir doesn\u0027t prefix the search path, only the directory names -- so you need to do os.path.join(self.jobdir_root, fn)",
+      "range": {
+        "startLine": 1650,
+        "startChar": 30,
+        "endLine": 1650,
+        "endChar": 32
+      },
+      "revId": "2389ec9a82460e66db99db44164ddfc3ecea0b26",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
