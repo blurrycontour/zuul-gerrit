@@ -16,6 +16,23 @@
       "revId": "6619d64269143398cc26dec0a0a9057056fdc4dd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f91af0f_39c0917b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-01-05T16:05:26Z",
+      "side": 1,
+      "message": "I just realized something else about this -- we only need to find these changes for projects that share a change queue, so we could iterate over all the installations for all the projects in the change queue for the change we are enqueuing.  That set will probably quite often be only 0 or 1 installation.",
+      "revId": "6619d64269143398cc26dec0a0a9057056fdc4dd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
