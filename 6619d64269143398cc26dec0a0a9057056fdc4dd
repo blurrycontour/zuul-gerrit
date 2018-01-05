@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f91af0f_ce575d02",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-01-05T15:22:25Z",
+      "side": 1,
+      "message": "We should think about this more -- this method, which assumes the reverse dependency is also in github, is temporary.  It\u0027s going to be replaced with a similar method to support cross-source dependencies.\n\nIn that case, we need to ask github to search for a url in the PR message for every change that we enqueue, and that url might be on github or gerrit or something else.  So we won\u0027t have a github project context to use to get the client.  That leaves us using an unauthenticated search, or your idea of performing the search across all installations.\n\nUnauthenticated seems ideal, but has two problems: in GHE, it\u0027s likely to be rejected, and in the public github, we\u0027re limited to 10 queries per minute.  That means Zuul won\u0027t be able  to enqueue more than 10 changes in a minute (we routinely enqueue more than that at once).  Well, it can, but it won\u0027t find all of the reverse dependencies.  Maybe it\u0027s okay for this to be best-effort.\n\nIf we use an authenticated connection on the public github, we can perform 30 per minute.  That\u0027s better -- it will probably be sufficient most of the time, though we still might have to consider it best-effort.  I don\u0027t see anything in the docs that suggest that it\u0027s scoped by installation ID, so I wonder if the behavior you\u0027re seeing is due to access control in GHE.  That is to say that on the public github, we can use any installation id to return results from any public repo.  In GHE, you may not have public repos, so you only see the private ones that installation has access to?  Perhaps the public github also behaves that way, in that if we had a private repo, the installation would be able to search it and the rest of the public repos?\n\nThat doesn\u0027t really change the problem though -- we either pick one at random (which is probably okay for the public case), or we have to pick the right one in order to see the reverse dependency.\n\nHere\u0027s a third idea: in the cross-source dependency patches I\u0027m working on, what if we looked at the changes that were being enqueued ahead, and, if any of those are github changes, we use their installation ids to search, and if not, we perform the search unauthenticated (or perhaps choose one at random)?  That may give us a reasonable chance of finding the appropriate reverse dependencies -- at least it\u0027s somewhat likely that people will install the zuul app in an organization, and most cross-repo-deps will be within the organization -- especially in GHE.  That\u0027s not the case for OpenStack, where we will likely need to fall back on the unauthenticated search.  But the heuristic handles both.\n\nFinally, about the change cache -- we can\u0027t rely on it for this kind of search.  Because cross-repo dependencies often sit un-merged for an unusually long time (two teams have to review the changes and act on them), they are especially likely not to be in the cache.  We could, of course, *also* look in the change cache, but we should never expect to find anything there, so it has to augment a search strategy, not replace it.",
+      "revId": "6619d64269143398cc26dec0a0a9057056fdc4dd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
