@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f91af0f_2eca846c",
+        "filename": "requirements.txt",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2018-01-05T18:57:37Z",
+      "side": 1,
+      "message": "It looks like we might prefer 2.4.2 which has bugfixes we\u0027re interested in such as this one [1]\n\n[1]: https://github.com/ansible/ansible/commit/aa54a3510f6f14491808291a0300da609b42753d",
+      "range": {
+        "startLine": 19,
+        "startChar": 17,
+        "endLine": 19,
+        "endChar": 24
+      },
+      "revId": "34b146840b190c34cee45a8bc0a69b27477dee82",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
