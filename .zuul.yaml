@@ -28,6 +28,19 @@
       - zuul/ansible/callback/.*
       - playbooks/zuul-stream/.*
 
+- job:
+    name: zuul-tox-py35-ansible-devel
+    parent: tox-py35
+    description: |
+      Run zuul's tests against tip of ansible's devel branch
+    voting: false
+    vars:
+      zuul_work_dir: src/git.openstack.org/openstack-infra/zuul
+      tox_install_siblings: true
+    required-projects:
+      - ansible/ansible
+      - openstack-infra/zuul
+
 - project:
     name: openstack-infra/zuul
     check:
@@ -49,6 +62,7 @@
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
         - zuul-stream-functional
+        - zuul-tox-py35-ansible-devel
     gate:
       jobs:
         - build-openstack-sphinx-docs:
