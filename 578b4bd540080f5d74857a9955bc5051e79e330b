@@ -22,6 +22,30 @@
       "revId": "578b4bd540080f5d74857a9955bc5051e79e330b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f91af0f_6a6a98ee",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1663,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2018-01-08T14:57:46Z",
+      "side": 1,
+      "message": "Oh, yes I see getJob can return an exception if the job is not defined so I move it into the try/except. Thanks",
+      "parentUuid": "9f91af0f_f65a4af1",
+      "range": {
+        "startLine": 1662,
+        "startChar": 0,
+        "endLine": 1663,
+        "endChar": 37
+      },
+      "revId": "578b4bd540080f5d74857a9955bc5051e79e330b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
