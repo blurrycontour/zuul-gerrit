@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f91af0f_2c2fda8e",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1650,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2018-01-08T03:24:23Z",
+      "side": 1,
+      "message": "In zuul/cmd/executor.py\n\n  if self.config.has_option(\u0027executor\u0027, \u0027job_dir\u0027):\n  ...\n  else:\n    self.job_dir \u003d tempfile.gettempdir()\n\nthen\n\n self.executor \u003d ExecutorServer(self.config, self.connections,\n                                jobdir_root\u003dself.job_dir,\n ...\n\nso if i\u0027m reading this right, the default jobdir_root will just be the value of tempfile.tempdir (likely /tmp) and we\u0027ll wipe the whole thing out?",
+      "revId": "5411cc8474fda6bcdfa499cccb9832755c558d38",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
