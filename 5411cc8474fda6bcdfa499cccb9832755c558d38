@@ -34,6 +34,23 @@
       "revId": "5411cc8474fda6bcdfa499cccb9832755c558d38",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f91af0f_b929d8e6",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1650,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-01-08T17:12:26Z",
+      "side": 1,
+      "message": "Excellent point, let\u0027s go with Joshua\u0027s suggestion.",
+      "revId": "5411cc8474fda6bcdfa499cccb9832755c558d38",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
