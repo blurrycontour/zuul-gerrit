@@ -662,8 +662,7 @@ class GithubConnection(BaseConnection):
             change.files = self.getPushedFileNames(event)
         return change
 
-    def _getChange(self, project, number, patchset=None, refresh=False,
-                   history=None):
+    def _getChange(self, project, number, patchset=None, refresh=False)
         key = (project.name, number, patchset)
         change = self._change_cache.get(key)
         if change and not refresh:
@@ -675,7 +674,7 @@ class GithubConnection(BaseConnection):
             change.patchset = patchset
         self._change_cache[key] = change
         try:
-            self._updateChange(change, history)
+            self._updateChange(change)
         except Exception:
             if key in self._change_cache:
                 del self._change_cache[key]
@@ -713,13 +712,7 @@ class GithubConnection(BaseConnection):
         log_rate_limit(self.log, github)
         return changes
 
-    def _updateChange(self, change, history=None):
-        # If this change is already in the history, we have a cyclic
-        # dependency loop and we do not need to update again, since it
-        # was done in a previous frame.
-        if history and (change.project.name, change.number) in history:
-            return change
-
+    def _updateChange(self, change):
         self.log.info("Updating %s" % (change,))
         change.pr = self.getPull(change.project.name, change.number)
         change.ref = "refs/pull/%s/head" % change.number
@@ -735,12 +728,6 @@ class GithubConnection(BaseConnection):
         change.labels = change.pr.get('labels')
         # ensure message is at least an empty string
         change.message = change.pr.get('body') or ''
-
-        if history is None:
-            history = []
-        else:
-            history = history[:]
-        history.append((change.project.name, change.number))
 
         self.sched.onChangeUpdated(change)
 
