@@ -2036,7 +2036,7 @@ class Ref(object):
                 id(self), self.ref, self.oldrev, self.newrev)
         return rep
 
-    def equals(self, other):
+    def __eq__(self, other):
         if (self.project == other.project
             and self.ref == other.ref
             and self.newrev == other.newrev):
@@ -2124,8 +2124,10 @@ class Change(Branch):
     def __repr__(self):
         return '<Change 0x%x %s>' % (id(self), self._id())
 
-    def equals(self, other):
-        if self.number == other.number and self.patchset == other.patchset:
+    def __eq__(self, other):
+        if (self.project == other.project and
+            self.number == other.number and
+            self.patchset == other.patchset):
             return True
         return False
 

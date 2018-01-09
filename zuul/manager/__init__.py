@@ -136,14 +136,14 @@ class PipelineManager(object):
     def isChangeAlreadyInPipeline(self, change):
         # Checks live items in the pipeline
         for item in self.pipeline.getAllItems():
-            if item.live and change.equals(item.change):
+            if item.live and change == item.change:
                 return True
         return False
 
     def isChangeAlreadyInQueue(self, change, change_queue):
         # Checks any item in the specified change queue
         for item in change_queue.queue:
-            if change.equals(item.change):
+            if change == item.change:
                 return True
         return False
 
@@ -194,7 +194,7 @@ class PipelineManager(object):
 
     def getItemForChange(self, change):
         for item in self.pipeline.getAllItems():
-            if item.change.equals(change):
+            if item.change == change:
                 return item
         return None
 
@@ -220,7 +220,7 @@ class PipelineManager(object):
         for item in self.pipeline.getAllItems():
             if not item.live:
                 continue
-            if item.change.equals(change):
+            if item.change == change:
                 self.removeItem(item)
 
     def reEnqueueItem(self, item, last_head, old_item_ahead, item_ahead_valid):
