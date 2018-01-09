@@ -173,18 +173,25 @@ class ZuulDaemonApp(ZuulApp):
         self.parseArguments()
         self.readConfig()
 
-        pid_fn = self.getPidFile()
-        pid = pid_file_module.TimeoutPIDLockFile(pid_fn, 10)
-
-        if self.args.nodaemon:
-            self.run()
-        else:
+        if not self.args.nodaemon:
+            pid_fn = self.getPidFile()
+            dirname = os.path.dirname(pid_fn)
+            if not os.path.exists(dirname):
+                print("ERROR: %s does not exist for pidfile" % dirname)
+                exit()
+            elif not os.access(dirname, os.W_OK):
+                print("ERROR: %s does not have proper write permissions for "
+                      "pidfile" % dirname)
+                exit()
+            pid = pid_file_module.TimeoutPIDLockFile(pid_fn, 10)
             # Exercise the pidfile before we do anything else (including
             # logging or daemonizing)
             with daemon.DaemonContext(pidfile=pid):
                 pass
             with daemon.DaemonContext(pidfile=pid):
                 self.run()
+        else:
+            self.run()
 
     def send_command(self, cmd):
         command_socket = get_default(
