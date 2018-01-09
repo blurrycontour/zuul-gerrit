@@ -174,6 +174,14 @@ class ZuulDaemonApp(ZuulApp):
         self.readConfig()
 
         pid_fn = self.getPidFile()
+        dirname = os.path.dirname(pid_fn)
+        if not os.path.exists(dirname):
+            print("ERROR: %s does not exist for pidfile" % dirname)
+            exit()
+        elif not os.access(dirname, os.W_OK):
+            print("ERROR: %s doesn't have proper write permissions for "
+                  "pidfile" % dirname)
+            exit()
         pid = pid_file_module.TimeoutPIDLockFile(pid_fn, 10)
 
         if self.args.nodaemon:
