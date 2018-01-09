@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f91af0f_63d4f120",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 548,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-01-09T07:26:38Z",
+      "side": 1,
+      "message": "This is not in sync with the (correct) implementation. We calculate with the available memory instead with the unallocated memory. Thus also buffers and caches are considered available memory.",
+      "range": {
+        "startLine": 545,
+        "startChar": 32,
+        "endLine": 548,
+        "endChar": 46
+      },
+      "revId": "547e7906566aec3ec74519cc6b7e6bc79153fc34",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
