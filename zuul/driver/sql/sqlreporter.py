@@ -72,8 +72,15 @@ class SQLReporter(BaseReporter):
                 if build.end_time:
                     end = datetime.datetime.fromtimestamp(build.end_time)
 
+                # NOTE(tobiash): When using postgres inserted_primary_key can
+                # be a list. In this case we must extract the first value of it
+                # in order to prevent the following insert to fail.
+                buildset_id = buildset_ins_result.inserted_primary_key
+                if isinstance(buildset_id, list):
+                    buildset_id = buildset_id[0]
+
                 build_inserts.append({
-                    'buildset_id': buildset_ins_result.inserted_primary_key,
+                    'buildset_id': buildset_id,
                     'uuid': build.uuid,
                     'job_name': build.job.name,
                     'result': result,
