@@ -181,8 +181,13 @@ class ZuulDaemonApp(ZuulApp):
         else:
             # Exercise the pidfile before we do anything else (including
             # logging or daemonizing)
-            with daemon.DaemonContext(pidfile=pid):
-                pass
+            try:
+                with pid:
+                    pass
+            except Exception as e:
+                print("ERROR: Problem with pidfile (%s)" % e)
+                exit(1)
+
             with daemon.DaemonContext(pidfile=pid):
                 self.run()
 
