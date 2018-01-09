@@ -16,6 +16,24 @@
       "revId": "80fe0675e49c9f580c2ab76768e25054cf8b9c5c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f91af0f_89434a13",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-01-09T15:10:53Z",
+      "side": 1,
+      "message": "good point, I can clean that up.",
+      "parentUuid": "9f91af0f_c92e3291",
+      "revId": "80fe0675e49c9f580c2ab76768e25054cf8b9c5c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
