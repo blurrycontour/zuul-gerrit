@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f96bb07_8f71b7e3",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1089,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2018-01-11T06:36:46Z",
+      "side": 1,
+      "message": "experience tells us this is going to flood the logs fairly consistently at startup time ... that seems a bit pointless?\n\nIs this really only for \"not ready\" ... or is it a possible failure point?  if it\u0027s the former, maybe it should just sleep for a second or two, or have some sort of back-off?  if it\u0027s really an expected error, i\u0027m not quite sure \"isn\u0027t ready\" is the right message (more like \"not found\"?)",
+      "revId": "5a57b4c03bbcf0ee34f5deb0ca68e0ec3d8c470d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
