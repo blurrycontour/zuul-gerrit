@@ -16,6 +16,24 @@
       "revId": "5a57b4c03bbcf0ee34f5deb0ca68e0ec3d8c470d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f96bb07_353b14d2",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1089,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-01-11T07:36:50Z",
+      "side": 1,
+      "message": "The flood should be mitigated by the zuul-web frontend which should query the scheduler no more than once per second.\n\nThis condition may be true when the scheduler wasn\u0027t able to load a tenant (e.g. if there is a parser error in one of the tenant\u0027s project) or if the user request the status for a unknown tenant.",
+      "parentUuid": "7f96bb07_8f71b7e3",
+      "revId": "5a57b4c03bbcf0ee34f5deb0ca68e0ec3d8c470d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
