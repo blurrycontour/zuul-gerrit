@@ -646,9 +646,12 @@ class GithubConnection(BaseConnection):
         return self._github
 
     def maintainCache(self, relevant):
+        remove = set()
         for key, change in self._change_cache.items():
             if change not in relevant:
-                del self._change_cache[key]
+                remove.add(key)
+        for key in remove:
+            del self._change_cache[key]
 
     def getChange(self, event, refresh=False):
         """Get the change representing an event."""
