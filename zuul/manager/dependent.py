@@ -108,7 +108,7 @@ class DependentPipelineManager(PipelineManager):
         for source in sources:
             self.log.debug("  Checking source: %s", source)
             needed_by_changes.update(
-                source.getChangesDependingOn(change, change_queue))
+                source.getChangesDependingOn(change, change_queue.projects))
         self.log.debug("  Following changes: %s", needed_by_changes)
 
         to_enqueue = []
@@ -196,7 +196,8 @@ class DependentPipelineManager(PipelineManager):
                     self.log.debug("  Needed change is already ahead "
                                    "in the queue")
                     continue
-                if source.canMerge(needed_change, self.getSubmitAllowNeeds()):
+                if needed_change.project.source.canMerge(
+                        needed_change, self.getSubmitAllowNeeds()):
                     self.log.debug("  Change %s is needed" % needed_change)
                     if needed_change not in changes_needed:
                         changes_needed.append(needed_change)
