@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f96bb07_aa64a4ba",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1089,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2018-01-11T03:18:33Z",
+      "side": 1,
+      "message": "tenant_name ?",
+      "range": {
+        "startLine": 1089,
+        "startChar": 56,
+        "endLine": 1089,
+        "endChar": 62
+      },
+      "revId": "47a7394c54e2aa4cde07272e4a0eba77c38da77f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f96bb07_6a13fc0e",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1090,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2018-01-11T03:18:33Z",
+      "side": 1,
+      "message": "%s and tenant_name ?",
+      "range": {
+        "startLine": 1090,
+        "startChar": 49,
+        "endLine": 1090,
+        "endChar": 50
+      },
+      "revId": "47a7394c54e2aa4cde07272e4a0eba77c38da77f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
