@@ -1085,6 +1085,9 @@ class Scheduler(threading.Thread):
         pipelines = []
         data['pipelines'] = pipelines
         tenant = self.abide.tenants.get(tenant_name)
+        if not tenant:
+            self.log.warning("Tenant %s isn't loaded" % tenant)
+            return json.dumps({"message": "Tenant isn't ready"})
         for pipeline in tenant.layout.pipelines.values():
             pipelines.append(pipeline.formatStatusJSON(websocket_url))
         return json.dumps(data)
