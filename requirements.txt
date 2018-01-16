@@ -24,9 +24,3 @@ pyjwt
 iso8601
 psutil
 fb-re2>=1.0.6
-paho-mqtt
-cherrypy
-ws4py
-routes
-jsonpath-rw
-urllib3<=1.25.3  # https://github.com/urllib3/urllib3/pull/1684
