@@ -47,7 +47,7 @@
 
 - job:
     name: ignore-branch
-    branches: ^(?!featureA).*$
+    ignore-branches: ^featureA.*$
     nodeset:
       nodes:
         - name: controller

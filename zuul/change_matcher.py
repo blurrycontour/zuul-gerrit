@@ -17,7 +17,7 @@ This module defines classes used in matching changes based on job
 configuration.
 """
 
-import re
+import re2 as re
 
 
 class AbstractChangeMatcher(object):
@@ -67,6 +67,11 @@ class BranchMatcher(AbstractChangeMatcher):
         if self.regex.match(change.ref):
             return True
         return False
+
+
+class IgnoreBranchMatcher(BranchMatcher):
+    def matches(self, change):
+        return not super(IgnoreBranchMatcher, self).matches(change)
 
 
 class ImpliedBranchMatcher(AbstractChangeMatcher):
