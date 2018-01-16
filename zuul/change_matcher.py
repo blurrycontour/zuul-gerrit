@@ -17,7 +17,7 @@ This module defines classes used in matching changes based on job
 configuration.
 """
 
-import re
+import re2 as re
 
 
 class AbstractChangeMatcher(object):
