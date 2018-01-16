@@ -948,12 +948,18 @@ class Job(object):
         if changed:
             self.roles = tuple(newroles)
 
-    def setBranchMatcher(self, branches):
+    def setBranchMatcher(self, branches, ignore=False):
         # Set the branch matcher to match any of the supplied branches
         matchers = []
         for branch in branches:
-            matchers.append(change_matcher.BranchMatcher(branch))
-        self.branch_matcher = change_matcher.MatchAny(matchers)
+            if ignore:
+                matchers.append(change_matcher.IgnoreBranchMatcher(branch))
+            else:
+                matchers.append(change_matcher.BranchMatcher(branch))
+        if ignore:
+            self.branch_matcher = change_matcher.MatchAll(matchers)
+        else:
+            self.branch_matcher = change_matcher.MatchAny(matchers)
 
     def getSimpleBranchMatcher(self):
         # If the job has a simple branch matcher, return it; otherwise None.
