@@ -484,6 +484,7 @@ class JobParser(object):
                       'semaphore': str,
                       'tags': to_list(str),
                       'branches': to_list(str),
+                      'ignore-branches': to_list(str),
                       'files': to_list(str),
                       'secrets': to_list(vs.Any(secret, str)),
                       'irrelevant-files': to_list(str),
@@ -729,12 +730,16 @@ class JobParser(object):
             job.allowed_projects = frozenset(allowed)
 
         branches = None
+        ignore = False
         if ('branches' not in conf):
             branches = JobParser._getImpliedBranches(tenant, job)
         if (not branches) and ('branches' in conf):
             branches = as_list(conf['branches'])
+        if (not branches) and ('ignore-branches' in conf):
+            branches = as_list(conf['ignore-branches'])
+            ignore = True
         if branches:
-            job.setBranchMatcher(branches)
+            job.setBranchMatcher(branches, ignore)
         if 'files' in conf:
             matchers = []
             for fn in as_list(conf['files']):

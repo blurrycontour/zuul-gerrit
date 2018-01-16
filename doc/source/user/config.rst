@@ -956,6 +956,21 @@ Here is an example of two job definitions:
       See :attr:`pragma.implied-branch-matchers` for how to override
       this behavior on a per-file basis.
 
+   .. attr:: ignore-branches
+
+      This matcher is a negative compliment of **branches**. It
+      indicates that the job should run unless the branch matches
+      one of the expressions in this list.  A regular expression
+      or list of regular expressions. This will only be considered
+      if there are no explicit or implicit positive branch matchers.
+      See :attr:`job.branches` for more information on that.
+
+      .. code-block:: yaml
+
+         - job:
+             name: run-tests
+             ignore-branches: '^stable/.*'
+
    .. attr:: files
 
       This matcher indicates that the job should only run on changes
