@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f96bb07_cf0dcde8",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-01-17T17:04:36Z",
+      "side": 1,
+      "message": "this also holds true for the scheduler if you also want to mention it there",
+      "range": {
+        "startLine": 309,
+        "startChar": 16,
+        "endLine": 310,
+        "endChar": 33
+      },
+      "revId": "545e83204dee5bfefdd560fa25dbd67cc3ecd2be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f96bb07_efde893c",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 615,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-01-17T17:04:36Z",
+      "side": 1,
+      "message": "and soon be reachable by github if a github connection is configured",
+      "revId": "545e83204dee5bfefdd560fa25dbd67cc3ecd2be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
