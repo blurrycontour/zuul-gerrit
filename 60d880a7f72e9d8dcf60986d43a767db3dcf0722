@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f96bb07_a676636f",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 1148,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2018-01-17T22:01:52Z",
+      "side": 0,
+      "message": "May make sense to point out specifically that secrets can be used from jobs defined on any other branch of the project as well, since users may not consider the leakage risk between branches otherwise when making decisions on whom to trust with branch-specific approval rights.",
+      "revId": "60d880a7f72e9d8dcf60986d43a767db3dcf0722",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
