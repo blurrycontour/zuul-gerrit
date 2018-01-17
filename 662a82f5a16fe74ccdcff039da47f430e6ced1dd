@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f96bb07_8ffca570",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-01-17T17:17:30Z",
+      "side": 1,
+      "message": "Perhaps:\n\n  All hosts need to be able to connect to the host running the gearman server on the Gearman port which is TCP port 4730 by default.\n\nThen perhaps a reference to the gearman_server attr in this file and/or a note about when the scheduler forks a gearman server for you that the gearman server will be co-located with the scheduler.",
+      "revId": "662a82f5a16fe74ccdcff039da47f430e6ced1dd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f96bb07_4f477dbd",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-01-17T17:17:30Z",
+      "side": 1,
+      "message": "Maybe a note about the statsd udp port in question to match the other sections?",
+      "revId": "662a82f5a16fe74ccdcff039da47f430e6ced1dd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f96bb07_af53a16a",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-01-17T17:17:30Z",
+      "side": 1,
+      "message": "This paragraph has the info I was thinking was needed above, but my pedantic side wants the info about connections to indicate that each of the components needs to talk to the gearman server, since that\u0027s structurally what\u0027s happening, and the fact that the scheduler can fork a co-located gearman server and that we recommend doing so is good info for here?",
+      "revId": "662a82f5a16fe74ccdcff039da47f430e6ced1dd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
