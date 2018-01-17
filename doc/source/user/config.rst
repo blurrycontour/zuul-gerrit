@@ -1175,6 +1175,12 @@ If a job with secrets is unsafe to be used by other projects, the
 `allowed-projects` job attribute can be used to restrict the projects
 which can invoke that job.
 
+Secrets, like most configuration items, are globally unique, though a
+secret may be defined on multiple branches of the same project as long
+as the contents are the same.  This is to aid in branch maintenance,
+so that creating a new branch based on an existing branch will not
+immediately produce a configuration error.
+
 .. attr:: secret
 
    The following attributes must appear on a secret:
