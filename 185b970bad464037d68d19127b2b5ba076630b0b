@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f96bb07_8d67cab7",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2018-01-17T20:07:11Z",
+      "side": 0,
+      "message": "I guess the finger protocol connections are not important enough to factor into the overview diagram.",
+      "revId": "185b970bad464037d68d19127b2b5ba076630b0b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
