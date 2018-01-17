@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f96bb07_69a6f9ad",
+        "filename": "tests/unit/test_git_driver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2018-01-17T16:26:32Z",
+      "side": 1,
+      "message": "I guess you want to remove those extra debug message ?",
+      "range": {
+        "startLine": 79,
+        "startChar": 8,
+        "endLine": 79,
+        "endChar": 34
+      },
+      "revId": "ad07c8dfd2e7acf23382cb889683c9c01bd03f41",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f96bb07_894d853f",
+        "filename": "zuul/driver/git/gitconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2018-01-17T16:26:32Z",
+      "side": 1,
+      "message": "I think you can move that statement under the comment \"# This is used by the test framework\".",
+      "range": {
+        "startLine": 39,
+        "startChar": 8,
+        "endLine": 39,
+        "endChar": 29
+      },
+      "revId": "ad07c8dfd2e7acf23382cb889683c9c01bd03f41",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
