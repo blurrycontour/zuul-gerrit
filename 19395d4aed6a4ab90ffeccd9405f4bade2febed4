@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f96bb07_a5c079e2",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2932,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-01-18T17:12:20Z",
+      "side": 1,
+      "message": "nodeset",
+      "range": {
+        "startLine": 2932,
+        "startChar": 46,
+        "endLine": 2932,
+        "endChar": 52
+      },
+      "revId": "19395d4aed6a4ab90ffeccd9405f4bade2febed4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f96bb07_65b6f18c",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2934,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-01-18T17:12:20Z",
+      "side": 1,
+      "message": "nodeset",
+      "range": {
+        "startLine": 2934,
+        "startChar": 47,
+        "endLine": 2934,
+        "endChar": 53
+      },
+      "revId": "19395d4aed6a4ab90ffeccd9405f4bade2febed4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
