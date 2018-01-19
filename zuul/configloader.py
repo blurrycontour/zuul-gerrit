@@ -1208,17 +1208,22 @@ class TenantParser(object):
 
     project = vs.Any(str, project_dict)
 
+    function = {
+        'path': str,
+        'function': str
+    }
+
     group = {
         'include': to_list(classes),
         'exclude': to_list(classes),
-        vs.Required('projects'): to_list(project),
+        vs.Required('projects'): to_list(vs.Any(project, function)),
     }
 
-    project_or_group = vs.Any(project, group)
+    project_or_group_or_function = vs.Any(project, group, function)
 
     tenant_source = vs.Schema({
-        'config-projects': to_list(project_or_group),
-        'untrusted-projects': to_list(project_or_group),
+        'config-projects': to_list(project_or_group_or_function),
+        'untrusted-projects': to_list(project_or_group_or_function),
     })
 
     def validateTenantSources(self):
@@ -1260,7 +1265,7 @@ class TenantParser(object):
         unparsed_config = model.UnparsedTenantConfig()
         # tpcs is TenantProjectConfigs
         config_tpcs, untrusted_tpcs = \
-            self._loadTenantProjects(project_key_dir, conf)
+            self._loadTenantProjects(project_key_dir, conf, base)
         for tpc in config_tpcs:
             tenant.addConfigProject(tpc)
         for tpc in untrusted_tpcs:
@@ -1383,7 +1388,17 @@ class TenantParser(object):
 
         return tenant_project_config
 
-    def _getProjects(self, source, conf, current_include):
+    def _loadFromScript(self, path, func, base):
+        scope = {}
+        try:
+            exec(open(os.path.join(base, path)).read(), scope)
+            conf = scope[func]()
+        except Exception as e:
+            TenantParser.log.debug("Unable to load projects %s" % str(e))
+            conf = []
+        return conf
+
+    def _getProjects(self, source, conf, current_include, base):
         # Return a project object whether conf is a dict or a str
         projects = []
         if isinstance(conf, str):
@@ -1402,6 +1417,13 @@ class TenantParser(object):
                 sub_projects = self._getProjects(
                     source, project, current_include)
                 projects.extend(sub_projects)
+        elif len(conf.keys()) == 2 and (
+            'path' in conf and 'function' in conf):
+            _conf = self._loadFromScript(
+                conf['path'], conf['function'], base)
+            for conf in _conf:
+                projects.append(TenantParser._getProject(
+                    source, conf, current_include))
         elif len(conf.keys()) == 1:
             # A project with overrides
             projects.append(self._getProject(
@@ -1410,7 +1432,7 @@ class TenantParser(object):
             raise Exception("Unable to parse project %s", conf)
         return projects
 
-    def _loadTenantProjects(self, project_key_dir, conf_tenant):
+    def _loadTenantProjects(self, project_key_dir, conf_tenant, base):
         config_projects = []
         untrusted_projects = []
 
@@ -1423,7 +1445,8 @@ class TenantParser(object):
             current_include = default_include
             for conf_repo in conf_source.get('config-projects', []):
                 # tpcs = TenantProjectConfigs
-                tpcs = self._getProjects(source, conf_repo, current_include)
+                tpcs = self._getProjects(
+                    source, conf_repo, current_include, base)
                 for tpc in tpcs:
                     self._loadProjectKeys(
                         project_key_dir, source_name, tpc.project)
@@ -1431,8 +1454,8 @@ class TenantParser(object):
 
             current_include = frozenset(default_include - set(['pipeline']))
             for conf_repo in conf_source.get('untrusted-projects', []):
-                tpcs = self._getProjects(source, conf_repo,
-                                         current_include)
+                tpcs = self._getProjects(
+                    source, conf_repo, current_include, base)
                 for tpc in tpcs:
                     self._loadProjectKeys(
                         project_key_dir, source_name, tpc.project)

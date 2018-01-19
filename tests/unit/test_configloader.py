@@ -240,6 +240,20 @@ class TestTenantGroups4(TenantParserTestCase):
         self.assertEqual(1, len(cat_jobs))
 
 
+class TestTenantDynamic(TestTenantSimple):
+    tenant_config_file = 'config/tenant-parser/dynamic.yaml'
+
+    def test_tenant_simple(self):
+        TestTenantSimple.test_tenant_simple(self)
+
+
+class TestTenantDynamicGroups(TestTenantGroups):
+    tenant_config_file = 'config/tenant-parser/groups_dynamic.yaml'
+
+    def test_tenant_groups(self):
+        TestTenantGroups.test_tenant_groups(self)
+
+
 class TestTenantUnprotectedBranches(TenantParserTestCase):
     tenant_config_file = 'config/tenant-parser/unprotected-branches.yaml'
 
