@@ -255,6 +255,12 @@ The following sections of ``zuul.conf`` are used by the scheduler:
 
       Path to :ref:`tenant-config` file.
 
+   .. attr:: tenant_config_script
+
+      Path to a script to execute and load the tenant
+      config from. When set :attr:`scheduler.tenant_config`
+      is ignored.
+
    .. attr:: log_config
 
       Path to log config file.
