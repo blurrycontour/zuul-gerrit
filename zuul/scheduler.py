@@ -551,8 +551,8 @@ class Scheduler(threading.Thread):
             self.log.info("Full reconfiguration beginning")
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger)
-            self.unparsed_abide = loader.readConfig(
-                self.config.get('scheduler', 'tenant_config'))
+            tenant_config = self.config.get('scheduler', 'tenant_config')
+            self.unparsed_abide = loader.readConfig(tenant_config)
             abide = loader.loadConfig(
                 self.unparsed_abide,
                 self._get_project_key_dir())
