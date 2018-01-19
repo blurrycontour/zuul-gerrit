@@ -551,8 +551,18 @@ class Scheduler(threading.Thread):
             self.log.info("Full reconfiguration beginning")
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger)
-            self.unparsed_abide = loader.readConfig(
-                self.config.get('scheduler', 'tenant_config'))
+            tenant_config = self.config.get(
+                'scheduler', 'tenant_config')
+            tenant_config_script = None
+            if self.config.has_option(
+                'scheduler', 'tenant_config_script'):
+                tenant_config_script = self.config.get(
+                    'scheduler', 'tenant_config_script')
+            if tenant_config_script:
+                self.unparsed_abide = loader.readConfig(
+                    tenant_config_script, from_script=True)
+            else:
+                self.unparsed_abide = loader.readConfig(tenant_config)
             abide = loader.loadConfig(
                 self.unparsed_abide,
                 self._get_project_key_dir())
@@ -576,8 +586,15 @@ class Scheduler(threading.Thread):
             old_tenant = self.abide.tenants[event.tenant_name]
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger)
+            if self.config.has_option(
+                'scheduler', 'tenant_config_script'):
+                tenant_config = self.config.get(
+                    'scheduler', 'tenant_config_script')
+            else:
+                tenant_config = self.config.get(
+                    'scheduler', 'tenant_config'),
             abide = loader.reloadTenant(
-                self.config.get('scheduler', 'tenant_config'),
+                tenant_config,
                 self._get_project_key_dir(),
                 self.abide, old_tenant)
             tenant = abide.tenants[event.tenant_name]

@@ -1965,6 +1965,11 @@ class ZuulTestCase(BaseTestCase):
         configuration.  See also the :py:func:`simple_layout`
         decorator.
 
+    :cvar str tenant_config_script_file: This is the tenant config script
+        file (which specifies from what git repos the configuration should
+        be loaded). It is not set by default and can be specified by
+        subclasses.
+
     :cvar bool create_project_keys: Indicates whether Zuul should
         auto-generate keys for each project, or whether the test
         infrastructure should insert dummy keys to save time during
@@ -2047,10 +2052,13 @@ class ZuulTestCase(BaseTestCase):
             shutil.copy('{}.pub'.format(src_private_key_file),
                         '{}.pub'.format(self.private_key_file))
             os.chmod(self.private_key_file, 0o0600)
-        self.config.set('scheduler', 'tenant_config',
-                        os.path.join(
-                            FIXTURE_DIR,
-                            self.config.get('scheduler', 'tenant_config')))
+        for cfg_attr in ('tenant_config', 'tenant_config_script'):
+            if self.config.has_option('scheduler', cfg_attr):
+                cfg_value = self.config.get('scheduler', cfg_attr)
+                self.config.set(
+                    'scheduler', cfg_attr,
+                    os.path.join(FIXTURE_DIR, cfg_value))
+
         self.config.set('scheduler', 'state_dir', self.state_root)
         self.config.set(
             'scheduler', 'command_socket',
@@ -2216,12 +2224,19 @@ class ZuulTestCase(BaseTestCase):
                 self.config.add_section(section)
 
         if not self.setupSimpleLayout():
+            tenant_config = None
             if hasattr(self, 'tenant_config_file'):
                 self.config.set('scheduler', 'tenant_config',
                                 self.tenant_config_file)
+                tenant_config = self.tenant_config_file
+            if hasattr(self, 'tenant_config_script_file'):
+                self.config.set('scheduler', 'tenant_config_script',
+                                self.tenant_config_script_file)
+                tenant_config = self.tenant_config_script_file
+            if tenant_config:
                 git_path = os.path.join(
                     os.path.dirname(
-                        os.path.join(FIXTURE_DIR, self.tenant_config_file)),
+                        os.path.join(FIXTURE_DIR, tenant_config)),
                     'git')
                 if os.path.exists(git_path):
                     for reponame in os.listdir(git_path):
