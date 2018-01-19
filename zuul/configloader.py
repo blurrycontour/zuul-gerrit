@@ -1159,7 +1159,12 @@ class TenantParser(object):
         vs.Required('projects'): to_list(project),
     }
 
-    project_or_group = vs.Any(project, group)
+    function = {
+        'path': str,
+        'function': str
+    }
+
+    project_or_group = vs.Any(project, group, function)
 
     tenant_source = vs.Schema({
         'config-projects': to_list(project_or_group),
@@ -1363,6 +1368,16 @@ class TenantParser(object):
                 sub_projects = TenantParser._getProjects(
                     source, project, current_include)
                 projects.extend(sub_projects)
+        elif len(conf.keys()) == 2 and (
+            'path' in conf and 'function' in conf):
+            scope = {}
+            exec(open(
+                os.path.join(
+                    self.config_path_dir, conf['path'])).read(), scope)
+            _conf = scope[conf['function']]()
+            for conf in _conf:
+                projects.append(TenantParser._getProject(
+                    source, conf, current_include))
         elif len(conf.keys()) == 1:
             # A project with overrides
             projects.append(TenantParser._getProject(
@@ -1701,6 +1716,7 @@ class ConfigLoader(object):
         abide = model.Abide()
 
         config_path = self.expandConfigPath(config_path)
+        self.config_path_dir = os.path.dirname(config_path)
         with open(config_path) as config_file:
             self.log.info("Loading configuration from %s" % (config_path,))
             data = yaml.safe_load(config_file)
