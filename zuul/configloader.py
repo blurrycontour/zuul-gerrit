@@ -19,6 +19,7 @@ import logging
 import textwrap
 import io
 import re
+import subprocess
 
 import voluptuous as vs
 
@@ -1771,9 +1772,30 @@ class ConfigLoader(object):
 
     def readConfig(self, config_path):
         config_path = self.expandConfigPath(config_path)
-        with open(config_path) as config_file:
-            self.log.info("Loading configuration from %s" % (config_path,))
-            data = yaml.safe_load(config_file)
+        if (os.access(config_path, os.X_OK) and not (
+                config_path.endswith('.yaml') or
+                config_path.endswith('.yml'))):
+            self.log.info("Loading configuration from script %s" % (
+                config_path,))
+            ret = subprocess.run([config_path],
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE)
+            try:
+                ret.check_returncode()
+                data = yaml.safe_load(ret.stdout)
+            except subprocess.CalledProcessError as error:
+                self.log.error(
+                    'Tenant config script exec failed: %s (%s)' % (
+                        str(error), str(ret.stderr)))
+                self.log.error(
+                    'Tried to read the tenant configuration by calling'
+                    'the script %s because the file has the exec bit and '
+                    'does not end with .yaml or .yml.')
+                data = []
+        else:
+            with open(config_path) as config_file:
+                self.log.info("Loading configuration from %s" % (config_path,))
+                data = yaml.safe_load(config_file)
         base = os.path.dirname(os.path.realpath(config_path))
         unparsed_abide = model.UnparsedAbideConfig(base)
         unparsed_abide.extend(data)
