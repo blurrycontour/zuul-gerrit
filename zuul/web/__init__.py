@@ -328,6 +328,35 @@ class ZuulWeb(object):
     async def _handleStatusRequest(self, request):
         return await self.gearman_handler.processRequest(request, 'status_get')
 
+    def _changes_by_func(self, func, status):
+        """Filter changes by a user provided function.
+
+        In order to support arbitrary collection of subsets of changes
+        we provide a low level filtering mechanism that takes a
+        function which applies to changes. The output of this function
+        is a flattened list of those collected changes.
+        """
+        status = []
+        jsonstruct = json.loads(status)
+        for pipeline in jsonstruct['pipelines']:
+            for change_queue in pipeline['change_queues']:
+                for head in change_queue['heads']:
+                    for change in head:
+                        if func(change):
+                            status.append(copy.deepcopy(change))
+        return json.dumps(status)
+
+    def _status_for_change(self, rev, status):
+        """Return the statuses for a particular change id X,Y."""
+        def func(change):
+            return change['id'] == rev
+        return self._changes_by_func(func, status)
+
+    async def _handleStatusChangeRequest(self, request):
+        status = await self._handleStatusRequest(request)
+        change = request.match_info["change"]
+        return _status_for_change(change, status)
+
     async def _handleJobsRequest(self, request):
         return await self.gearman_handler.processRequest(request, 'job_list')
 
@@ -369,6 +398,8 @@ class ZuulWeb(object):
         routes = [
             ('GET', '/tenants.json', self._handleTenantsRequest),
             ('GET', '/{tenant}/status.json', self._handleStatusRequest),
+            ('GET', '/{tenant}/status/change/{change}',
+             self._handleStatusChangeRequest),
             ('GET', '/{tenant}/jobs.json', self._handleJobsRequest),
             ('GET', '/{tenant}/console-stream', self._handleWebsocket),
             ('GET', '/{tenant}/{project:.*}.pub', self._handleKeyRequest),
