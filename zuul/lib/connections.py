@@ -79,10 +79,14 @@ class ConnectionRegistry(object):
                 driver.reconfigure(tenant)
 
     def stop(self):
+        self.log.debug("Stopping connections")
         for connection_name, connection in self.connections.items():
+            self.log.debug("Stopping connection %s", connection_name)
             connection.onStop()
         for driver in self.drivers.values():
+            self.log.debug("Stopping driver %s", driver.name)
             driver.stop()
+        self.log.debug("Finished stopping connections")
 
     def configure(self, config, source_only=False):
         # Register connections from the config

@@ -273,15 +273,28 @@ class Scheduler(threading.Thread):
         self.stats_thread.start()
 
     def stop(self):
+        # Stop the main scheduler thread
+        self.log.debug("Stopping scheduler")
         self._stopped = True
-        self.stats_stop.set()
-        self.stopConnections()
         self.wake_event.set()
+        self.join()
+        # Stop other services
+        self.stopConnections()
+        self.log.debug("Stopping stats")
+        self.stats_stop.set()
         self.stats_thread.join()
+        self.log.debug("Stopping ZooKeeper connection")
+        self.zk.disconnect()
+        self.log.debug("Stopping WebApp")
+        self.webapp.stop()
+        self.webapp.join()
+        self.log.debug("Stopping RPC listener")
         self.rpc.stop()
         self.rpc.join()
+        self.log.debug("Stopping command socket")
         self._command_running = False
         self.command_socket.stop()
+        self.log.debug("Scheduler stopped")
 
     def runCommand(self):
         while self._command_running:
@@ -313,6 +326,9 @@ class Scheduler(threading.Thread):
 
     def setZooKeeper(self, zk):
         self.zk = zk
+
+    def setWebApp(self, webapp):
+        self.webapp = webapp
 
     def runStats(self):
         while not self.stats_stop.wait(self._stats_interval):

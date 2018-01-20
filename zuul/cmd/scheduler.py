@@ -156,6 +156,7 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         self.sched.setMerger(merger)
         self.sched.setNodepool(nodepool)
         self.sched.setZooKeeper(zookeeper)
+        self.sched.setWebApp(webapp)
 
         self.log.info('Starting scheduler')
         try:

@@ -28,7 +28,7 @@ from zuul.model import Ref, Branch
 
 
 class GitWatcher(threading.Thread):
-    log = logging.getLogger("connection.git.GitWatcher")
+    log = logging.getLogger("zuul.GitWatcher")
 
     def __init__(self, git_connection, baseurl, poll_delay):
         threading.Thread.__init__(self)
@@ -36,7 +36,7 @@ class GitWatcher(threading.Thread):
         self.git_connection = git_connection
         self.baseurl = baseurl
         self.poll_delay = poll_delay
-        self._stopped = False
+        self._stopped = threading.Event()
         self.projects_refs = self.git_connection.projects_refs
         # This is used by the test framework
         self._event_count = 0
@@ -119,21 +119,21 @@ class GitWatcher(threading.Thread):
             self.log.debug("Unexpected issue in _run loop: %s" % str(e))
 
     def run(self):
-        while not self._stopped:
+        while not self._stopped.is_set():
             if not self.git_connection.w_pause:
                 self._run()
                 # Polling wait delay
             else:
                 self.log.debug("Watcher is on pause")
-            time.sleep(self.poll_delay)
+            self._stopped.wait(self.poll_delay)
 
     def stop(self):
-        self._stopped = True
+        self._stopped.set()
 
 
 class GitConnection(BaseConnection):
     driver_name = 'git'
-    log = logging.getLogger("connection.git")
+    log = logging.getLogger("zuul.GitConnection")
 
     def __init__(self, driver, connection_name, connection_config):
         super(GitConnection, self).__init__(driver, connection_name,
