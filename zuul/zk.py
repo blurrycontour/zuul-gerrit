@@ -53,7 +53,6 @@ class ZooKeeper(object):
         Initialize the ZooKeeper object.
         '''
         self.client = None
-        self._became_lost = False
         self._last_retry_log = 0
 
     def _dictToStr(self, data):
@@ -70,30 +69,10 @@ class ZooKeeper(object):
         '''
         if state == KazooState.LOST:
             self.log.debug("ZooKeeper connection: LOST")
-            self._became_lost = True
         elif state == KazooState.SUSPENDED:
             self.log.debug("ZooKeeper connection: SUSPENDED")
         else:
             self.log.debug("ZooKeeper connection: CONNECTED")
-
-    @property
-    def connected(self):
-        return self.client.state == KazooState.CONNECTED
-
-    @property
-    def suspended(self):
-        return self.client.state == KazooState.SUSPENDED
-
-    @property
-    def lost(self):
-        return self.client.state == KazooState.LOST
-
-    @property
-    def didLoseConnection(self):
-        return self._became_lost
-
-    def resetLostFlag(self):
-        self._became_lost = False
 
     def _kazoo_callback(self):
         '''
@@ -104,7 +83,7 @@ class ZooKeeper(object):
             self.log.warning("Retrying zookeeper connection")
             self._last_retry_log = now
 
-    def connect(self, hosts, read_only=False, timeout=10.0):
+    def connect(self, hosts, read_only=False):
         '''
         Establish a connection with ZooKeeper cluster.
 
@@ -118,8 +97,14 @@ class ZooKeeper(object):
             seconds (default: 10.0).
         '''
         if self.client is None:
-            self.client = KazooClient(hosts=hosts, read_only=read_only,
-                                      timeout=timeout)
+            retry = dict(max_tries=-1,
+                         delay=0.5,
+                         ignore_expire=True,
+                         interrupt=self._kazoo_callback)
+            self.client = KazooClient(hosts=hosts,
+                                      read_only=read_only,
+                                      connection_retry=retry,
+                                      command_retry=retry)
             self.client.add_listener(self._connection_listener)
             # Manually retry initial connection attempt
             while True:
@@ -171,9 +156,10 @@ class ZooKeeper(object):
         data['created_time'] = time.time()
 
         path = '%s/%s-' % (self.REQUEST_ROOT, node_request.priority)
-        path = self.client.create(path, self._dictToStr(data),
-                                  makepath=True,
-                                  sequence=True, ephemeral=True)
+        path = self.client.retry(self.client.create,
+                                 path, self._dictToStr(data),
+                                 makepath=True,
+                                 sequence=True, ephemeral=True)
         reqid = path.split("/")[-1]
         node_request.id = reqid
 
@@ -183,7 +169,8 @@ class ZooKeeper(object):
                 request_nodes = list(node_request.nodeset.getNodes())
                 for i, nodeid in enumerate(data.get('nodes', [])):
                     node_path = '%s/%s' % (self.NODE_ROOT, nodeid)
-                    node_data, node_stat = self.client.get(node_path)
+                    node_data, node_stat = self.client.retry(
+                        self.client.get, node_path)
                     node_data = self._strToDict(node_data)
                     request_nodes[i].id = nodeid
                     request_nodes[i].updateFromDict(node_data)
@@ -203,7 +190,7 @@ class ZooKeeper(object):
 
         path = '%s/%s' % (self.REQUEST_ROOT, node_request.id)
         try:
-            self.client.delete(path)
+            self.client.retry(self.client.delete, path)
         except kze.NoNodeError:
             pass
 
@@ -216,7 +203,7 @@ class ZooKeeper(object):
         :returns: True if the request exists, False otherwise.
         '''
         path = '%s/%s' % (self.REQUEST_ROOT, node_request.id)
-        if self.client.exists(path):
+        if self.client.retry(self.client.exists, path):
             return True
         return False
 
@@ -230,7 +217,8 @@ class ZooKeeper(object):
         '''
 
         path = '%s/%s' % (self.NODE_ROOT, node.id)
-        self.client.set(path, self._dictToStr(node.toDict()))
+        self.client.retry(
+            self.client.set, path, self._dictToStr(node.toDict()))
 
     def lockNode(self, node, blocking=True, timeout=None):
         '''
@@ -281,14 +269,15 @@ class ZooKeeper(object):
         '''
         identifier = " ".join(autohold_key)
         try:
-            nodes = self.client.get_children(self.NODE_ROOT)
+            nodes = self.client.retry(self.client.get_children, self.NODE_ROOT)
         except kze.NoNodeError:
             return 0
 
         count = 0
         for nodeid in nodes:
             node_path = '%s/%s' % (self.NODE_ROOT, nodeid)
-            node_data, node_stat = self.client.get(node_path)
+            node_data, node_stat = self.client.retry(
+                self.client.get, node_path)
             if not node_data:
                 self.log.warning("Node ID %s has no data", nodeid)
                 continue

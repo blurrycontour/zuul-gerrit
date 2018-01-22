@@ -155,12 +155,6 @@ The following sections of ``zuul.conf`` are used by all Zuul components:
       A list of zookeeper hosts for Zuul to use when communicating
       with Nodepool.
 
-   .. attr:: session_timeout
-      :default: 10.0
-
-      The ZooKeeper session timeout, in seconds.
-
-
 .. _scheduler:
 
 Scheduler
