@@ -18,14 +18,25 @@ import urllib2
 import json
 import argparse
 
-parser = argparse.ArgumentParser()
-parser.add_argument('url', help='The URL of the running Zuul instance')
+description = """
+When provided with either the URL of a running Zuul instance or a status.json
+file on disk, this script provides the commands to re-enqueue changes for the
+specified tenant and pipeline.
+"""
+
+parser = argparse.ArgumentParser(description=description)
 parser.add_argument('tenant', help='The Zuul tenant')
 parser.add_argument('pipeline', help='The name of the Zuul pipeline')
+status = parser.add_mutually_exclusive_group(required=True)
+status.add_argument('--file', help='The location of a status.json file on disk')
+status.add_argument('--url', help='The URL of a running Zuul instance')
 options = parser.parse_args()
 
-data = urllib2.urlopen('%s/status.json' % options.url).read()
-data = json.loads(data)
+if options.url:
+    data = json.loads(urllib2.urlopen('%s/status.json' % options.url).read())
+else:
+    with open(options.file) as f:
+        data = json.load(f)
 
 for pipeline in data['pipelines']:
     if pipeline['name'] != options.pipeline:
