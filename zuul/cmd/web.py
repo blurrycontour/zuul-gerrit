@@ -36,14 +36,7 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
         self.web.stop()
 
     def _run(self):
-        info = zuul.model.WebInfo()
-        info.websocket_url = get_default(self.config,
-                                         'web', 'websocket_url', None)
-        info.graphite_url = get_default(self.config,
-                                        'web', 'graphite_url', None)
-        # We call this graphite_prefix in the info record because it's used
-        # to interact with graphite.
-        info.graphite_prefix = get_default(self.config, 'statsd', 'prefix')
+        info = zuul.model.WebInfo.fromConfig(self.config)
 
         params = dict()
 

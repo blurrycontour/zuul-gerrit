@@ -24,6 +24,7 @@ import urllib.parse
 import textwrap
 
 from zuul import change_matcher
+from zuul.lib.config import get_default
 
 MERGER_MERGE = 1          # "git merge"
 MERGER_MERGE_RESOLVE = 2  # "git merge -s resolve"
@@ -3102,6 +3103,16 @@ class WebInfo(object):
             graphite_url=self.graphite_url,
             graphite_prefix=self.graphite_prefix,
             capabilities=self.capabilities.copy())
+
+    @staticmethod
+    def fromConfig(config):
+        return WebInfo(
+            websocket_url=get_default(config, 'web', 'websocket_url', None),
+            graphite_url=get_default(config, 'web', 'graphite_url', None),
+            # We call this graphite_prefix in the info record because it's used
+            # to interact with graphite.
+            graphite_prefix=get_default(config, 'statsd', 'prefix'),
+        )
 
     def toDict(self):
         d = dict()
