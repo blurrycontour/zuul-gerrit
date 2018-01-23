@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "7f96bb07_b604d5c7",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 1182,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-01-23T00:28:17Z",
+      "side": 1,
+      "message": "Yes, I should clarify this to say unique within a tenant.",
+      "revId": "a17a8e7ba4f2e1f8494cc2bd8dd6f743e3e78a11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7f96bb07_0139cf3f",
         "filename": "tests/unit/test_v3.py",
         "patchSetId": 1
