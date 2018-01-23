@@ -125,7 +125,10 @@ class RPCListener(object):
         # The json.dumps() call cannot handle dict keys that are not strings
         # so we convert our key to a CSV string that the caller can parse.
         for key, value in self.sched.autohold_requests.items():
-            new_key = ','.join(key)
+            if key[-1] is None:
+                new_key = ','.join(key[:-1] + ('*', ))
+            else:
+                new_key = ','.join(key)
             req[new_key] = value
 
         job.sendWorkComplete(json.dumps(req))
@@ -159,6 +162,8 @@ class RPCListener(object):
             return
 
         params['count'] = args['count']
+
+        params['ref'] = args['ref']
 
         self.sched.autohold(**params)
         job.sendWorkComplete()
