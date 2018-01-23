@@ -1595,11 +1595,12 @@ class TestScheduler(ZuulTestCase):
 
         # The single dict key should be a CSV string value
         key = list(autohold_requests.keys())[0]
-        tenant, project, job = key.split(',')
+        tenant, project, job, ref = key.split(',')
 
         self.assertEqual('tenant-one', tenant)
         self.assertIn('org/project', project)
         self.assertEqual('project-test2', job)
+        self.assertEqual('*', ref)
 
         # Note: the value is converted from set to list by json.
         self.assertEqual([1, "reason text"], autohold_requests[key])

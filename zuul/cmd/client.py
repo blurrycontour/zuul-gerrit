@@ -56,6 +56,9 @@ class Client(zuul.cmd.ZuulApp):
         cmd_autohold.add_argument('--count',
                                   help='number of job runs (default: 1)',
                                   required=False, type=int, default=1)
+        cmd_autohold.add_argument('--ref',
+                                  help='change number to target',
+                                  required=False, default=None)
         cmd_autohold.set_defaults(func=self.autohold)
 
         cmd_autohold_list = subparsers.add_parser(
@@ -177,7 +180,8 @@ class Client(zuul.cmd.ZuulApp):
                             project=self.args.project,
                             job=self.args.job,
                             reason=self.args.reason,
-                            count=self.args.count)
+                            count=self.args.count,
+                            ref=self.args.ref)
         return r
 
     def autohold_list(self):
@@ -190,14 +194,15 @@ class Client(zuul.cmd.ZuulApp):
             return True
 
         table = prettytable.PrettyTable(
-            field_names=['Tenant', 'Project', 'Job', 'Count', 'Reason'])
+            field_names=['Tenant', 'Project', 'Job', 'Ref', 'Count', 'Reason'])
 
         for key, value in autohold_requests.items():
             # The key comes to us as a CSV string because json doesn't like
             # non-str keys.
-            tenant_name, project_name, job_name = key.split(',')
+            tenant_name, project_name, job_name, ref = key.split(',')
             count, reason = value
-            table.add_row([tenant_name, project_name, job_name, count, reason])
+            table.add_row([tenant_name, project_name, job_name,
+                           ref, count, reason])
         print(table)
         return True
 
