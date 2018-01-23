@@ -255,9 +255,10 @@ class ZooKeeper(object):
 
     def heldNodeCount(self, autohold_key):
         '''
-        Count the number of nodes being held for the given tenant/project/job.
+        Count the number of nodes being held for the given
+        tenant/project/job/ref if applicable.
 
-        :param set autohold_key: A set with the tenant/project/job names.
+        :param set autohold_key: A set with the tenant/project/job names/ref.
         '''
         identifier = " ".join(autohold_key)
         try:

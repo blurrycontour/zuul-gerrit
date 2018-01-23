@@ -56,6 +56,9 @@ class Client(zuul.cmd.ZuulApp):
         cmd_autohold.add_argument('--count',
                                   help='number of job runs (default: 1)',
                                   required=False, type=int, default=1)
+        cmd_autohold.add_argument('--ref',
+                                  help='optional ref to target',
+                                  required=False, default=None)
         cmd_autohold.set_defaults(func=self.autohold)
 
         cmd_autohold_list = subparsers.add_parser(
@@ -177,7 +180,8 @@ class Client(zuul.cmd.ZuulApp):
                             project=self.args.project,
                             job=self.args.job,
                             reason=self.args.reason,
-                            count=self.args.count)
+                            count=self.args.count,
+                            ref=self.args.ref)
         return r
 
     def autohold_list(self):
