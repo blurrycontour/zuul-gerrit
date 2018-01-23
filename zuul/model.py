@@ -3048,8 +3048,9 @@ class Capabilities(object):
     facilitate consumers knowing if functionality is available
     or not, keep track of distinct capability flags.
     """
-    def __init__(self, job_history=False):
+    def __init__(self, job_history=False, graphs=False):
         self.job_history = job_history
+        self.graphs = graphs
 
     def __repr__(self):
         return '<Capabilities 0x%x %s>' % (id(self), self._renderFlags())
@@ -3064,6 +3065,7 @@ class Capabilities(object):
     def toDict(self):
         d = dict()
         d['job_history'] = self.job_history
+        d['graphs'] = self.graphs
         return d
 
 
@@ -3071,24 +3073,41 @@ class WebInfo(object):
     """Information about the system needed by zuul-web /info."""
 
     def __init__(self, websocket_url=None, endpoint=None,
-                 capabilities=None):
+                 capabilities=None, graphite_url=None,
+                 graphite_prefix=None):
         self.capabilities = capabilities or Capabilities()
         self.websocket_url = websocket_url
+        self.graphite_url = graphite_url
+        self.graphite_prefix = graphite_prefix
         self.endpoint = endpoint
 
     def __repr__(self):
         return '<WebInfo 0x%x capabilities=%s>' % (
             id(self), str(self.capabilities))
 
+    @property
+    def graphite_url(self):
+        return self._graphite_url
+
+    @graphite_url.setter
+    def graphite_url(self, url):
+        self._graphite_url = url
+        if self._graphite_url:
+            self.capabilities.graphs = True
+
     def copy(self):
         return WebInfo(
             websocket_url=self.websocket_url,
             endpoint=self.endpoint,
+            graphite_url=self.graphite_url,
+            graphite_prefix=self.graphite_prefix,
             capabilities=self.capabilities.copy())
 
     def toDict(self):
         d = dict()
         d['websocket_url'] = self.websocket_url
+        d['graphite_url'] = self.graphite_url
+        d['graphite_prefix'] = self.graphite_prefix
         d['endpoint'] = self.endpoint
         d['capabilities'] = self.capabilities.toDict()
         return d
