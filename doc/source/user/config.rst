@@ -463,6 +463,12 @@ frozen job is built from attributes gathered from all of the
 matching variants.  In this way, exactly what is run is dependent on
 the pipeline, project, branch, and content of the item.
 
+As a special case, if there are no variants of a job's parent which
+match the branch of the change being tested, Zuul will use the
+parent's variants from the default branch of the parent's project.
+This allows a job defined in a project to be more easily inherited
+from in projects with differing branches.
+
 In addition to the job's main playbook, each job may specify one or
 more pre- and post-playbooks.  These are run, in order, before and
 after (respectively) the main playbook.  They may be used to set up
