@@ -1232,7 +1232,12 @@ class FakeBuild(object):
                 self.log.debug('%s' % e)
                 return False
             repo_messages = [c.message.strip() for c in repo.iter_commits()]
-            commit_message = '%s-1' % change.subject
+            try:
+                last = change.latest_patchset
+            except AttributeError:
+                # Triggered by fake github changes
+                last = "1"
+            commit_message = '%s-%s' % (change.subject, last)
             self.log.debug("Checking if build %s has changes; commit_message "
                            "%s; repo_messages %s" % (self, commit_message,
                                                      repo_messages))
