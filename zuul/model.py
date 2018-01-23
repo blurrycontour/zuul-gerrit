@@ -1105,8 +1105,18 @@ class Job(object):
 
         self.inheritance_path = self.inheritance_path + (repr(other),)
 
-    def changeMatches(self, change):
-        if self.branch_matcher and not self.branch_matcher.matches(change):
+    def changeMatches(self, change, override_branch=None):
+        if override_branch is None:
+            branch_change = change
+        else:
+            # If an override branch is supplied, create a very basic
+            # change (a Ref) and set its branch to the override
+            # branch.
+            branch_change = Ref(change.project)
+            branch_change.ref = override_branch
+
+        if self.branch_matcher and not self.branch_matcher.matches(
+                branch_change):
             return False
 
         if self.file_matcher and not self.file_matcher.matches(change):
@@ -2068,9 +2078,6 @@ class Ref(object):
     def isUpdateOf(self, other):
         return False
 
-    def filterJobs(self, jobs):
-        return filter(lambda job: job.changeMatches(self), jobs)
-
     def getRelatedChanges(self):
         return set()
 
@@ -2618,21 +2625,11 @@ class Layout(object):
     def addProjectConfig(self, project_config):
         self.project_configs[project_config.name] = project_config
 
-    def collectJobs(self, item, jobname, change, path=None, jobs=None,
-                    stack=None):
-        if stack is None:
-            stack = []
-        if jobs is None:
-            jobs = []
-        if path is None:
-            path = []
-        path.append(jobname)
+    def _collectJobVariants(self, item, jobname, change, path, jobs, stack,
+                            indent, fallback=None):
         matched = False
-        indent = len(path) + 1
-        item.debug("Collecting job variants for {jobname}".format(
-            jobname=jobname), indent=indent)
         for variant in self.getJobs(jobname):
-            if not variant.changeMatches(change):
+            if not variant.changeMatches(change, override_branch=fallback):
                 self.log.debug("Variant %s did not match %s", repr(variant),
                                change)
                 item.debug("Variant {variant} did not match".format(
@@ -2654,11 +2651,44 @@ class Layout(object):
                 self.collectJobs(item, parent, change, path, jobs,
                                  stack + [jobname])
             matched = True
-            jobs.append(variant)
+            if variant not in jobs:
+                jobs.append(variant)
+        return matched
+
+    def collectJobs(self, item, jobname, change, path=None, jobs=None,
+                    stack=None):
+        if stack is None:
+            stack = []
+        if jobs is None:
+            jobs = []
+        if path is None:
+            path = []
+        path.append(jobname)
+        matched = False
+        indent = len(path) + 1
+        msg = "Collecting job variants for {jobname}".format(jobname=jobname)
+        self.log.debug(msg)
+        item.debug(msg, indent=indent)
+        matched = self._collectJobVariants(item, jobname, change, path,
+                                           jobs, stack, indent)
+        if not matched and stack:
+            job = self.getJob(jobname)
+            project = job.source_context.project
+            project_config = self.project_configs.get(project.canonical_name)
+            if project_config:
+                fallback = project_config.default_branch
+                msg = ("Collecting job variants for {jobname} on "
+                       "default branch {fallback}".format(
+                           jobname=jobname, fallback=fallback))
+                self.log.debug(msg)
+                item.debug(msg, indent=indent)
+                matched = self._collectJobVariants(
+                    item, jobname, change, path, jobs, stack, indent,
+                    fallback=fallback)
         if not matched:
             self.log.debug("No matching parents for job %s and change %s",
                            jobname, change)
-            item.debug("No matching parent for {jobname}".format(
+            item.debug("No matching parents for {jobname}".format(
                 jobname=repr(jobname)), indent=indent)
             raise NoMatchingParentError()
         return jobs
