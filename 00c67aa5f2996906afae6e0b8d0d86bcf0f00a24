@@ -16,6 +16,24 @@
       "revId": "00c67aa5f2996906afae6e0b8d0d86bcf0f00a24",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f96bb07_e0c03a7f",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-01-23T14:27:38Z",
+      "side": 0,
+      "message": "To be honest I also thought about that (that part was from the original change). It might be better to not change it. If we want to change it it should be probably its own change. I\u0027ll remove that.",
+      "parentUuid": "7f96bb07_e036fae7",
+      "revId": "00c67aa5f2996906afae6e0b8d0d86bcf0f00a24",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
