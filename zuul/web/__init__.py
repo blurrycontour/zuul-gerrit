@@ -16,30 +16,20 @@
 
 
 import asyncio
-import hashlib
-import hmac
 import json
 import logging
 import os
 import time
-import urllib.parse
 import uvloop
 
 import aiohttp
 from aiohttp import web
 
-from sqlalchemy.sql import select
-
 import zuul.model
 import zuul.rpcclient
+from zuul.web.handler import StaticHandler
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
-
-
-def _sign_request(body, secret):
-    signature = 'sha1=' + hmac.new(
-        secret.encode('utf-8'), body, hashlib.sha1).hexdigest()
-    return signature
 
 
 class LogStreamingHandler(object):
@@ -159,9 +149,8 @@ class GearmanHandler(object):
     # Tenant status cache expiry
     cache_expiry = 1
 
-    def __init__(self, rpc, github_connections):
+    def __init__(self, rpc):
         self.rpc = rpc
-        self.github_connections = github_connections
         self.cache = {}
         self.cache_time = {}
         self.controllers = {
@@ -204,51 +193,6 @@ class GearmanHandler(object):
                                                   'project': project})
         return web.Response(body=job.data[0])
 
-    def _validate_signature(self, body, headers, secret):
-        try:
-            request_signature = headers['X-Hub-Signature']
-        except KeyError:
-            raise web.HTTPUnauthorized(
-                reason='X-Hub-Signature header missing.')
-
-        payload_signature = _sign_request(body, secret)
-
-        self.log.debug("Payload Signature: {0}".format(str(payload_signature)))
-        self.log.debug("Request Signature: {0}".format(str(request_signature)))
-        if not hmac.compare_digest(
-            str(payload_signature), str(request_signature)):
-            raise web.HTTPUnauthorized(
-                reason=('Request signature does not match calculated payload '
-                        'signature. Check that secret is correct.'))
-
-        return True
-
-    async def github_payload(self, post):
-        connection = post.match_info["connection"]
-        github_connection = self.github_connections.get(connection)
-        token = github_connection.connection_config.get('webhook_token')
-        headers = dict(post.headers)
-        body = await post.read()
-        self._validate_signature(body, headers, token)
-        # We cannot send the raw body through gearman, so it's easy to just
-        # encode it as json, after decoding it as utf-8
-        json_body = json.loads(body.decode('utf-8'))
-        job = self.rpc.submitJob('github:%s:payload' % connection,
-                                 {'headers': headers, 'body': json_body})
-        return web.json_response(json.loads(job.data[0]))
-
-    async def payload_post(self, post):
-        # Allow for other drivers to also accept a payload in the future,
-        # instead of hardcoding this to GitHub
-        driver = post.match_info["driver"]
-        try:
-            method = getattr(self, driver + '_payload')
-        except AttributeError as e:
-            self.log.exception("Unknown driver error:")
-            raise web.HTTPNotFound
-
-        return await method(post)
-
     async def processRequest(self, request, action):
         try:
             resp = await self.controllers[action](request)
@@ -256,93 +200,6 @@ class GearmanHandler(object):
             self.log.debug("request handling cancelled")
         except Exception as e:
             self.log.exception("exception:")
-            resp = web.json_response({'error_description': 'Internal error'},
-                                     status=500)
-        return resp
-
-
-class SqlHandler(object):
-    log = logging.getLogger("zuul.web.SqlHandler")
-    filters = ("project", "pipeline", "change", "patchset", "ref",
-               "result", "uuid", "job_name", "voting", "node_name", "newrev")
-
-    def __init__(self, connection):
-        self.connection = connection
-
-    def query(self, args):
-        build = self.connection.zuul_build_table
-        buildset = self.connection.zuul_buildset_table
-        query = select([
-            buildset.c.project,
-            buildset.c.pipeline,
-            buildset.c.change,
-            buildset.c.patchset,
-            buildset.c.ref,
-            buildset.c.newrev,
-            buildset.c.ref_url,
-            build.c.result,
-            build.c.uuid,
-            build.c.job_name,
-            build.c.voting,
-            build.c.node_name,
-            build.c.start_time,
-            build.c.end_time,
-            build.c.log_url]).select_from(build.join(buildset))
-        for table in ('build', 'buildset'):
-            for k, v in args['%s_filters' % table].items():
-                if table == 'build':
-                    column = build.c
-                else:
-                    column = buildset.c
-                query = query.where(getattr(column, k).in_(v))
-        return query.limit(args['limit']).offset(args['skip']).order_by(
-            build.c.id.desc())
-
-    def get_builds(self, args):
-        """Return a list of build"""
-        builds = []
-        with self.connection.engine.begin() as conn:
-            query = self.query(args)
-            for row in conn.execute(query):
-                build = dict(row)
-                # Convert date to iso format
-                if row.start_time:
-                    build['start_time'] = row.start_time.strftime(
-                        '%Y-%m-%dT%H:%M:%S')
-                if row.end_time:
-                    build['end_time'] = row.end_time.strftime(
-                        '%Y-%m-%dT%H:%M:%S')
-                # Compute run duration
-                if row.start_time and row.end_time:
-                    build['duration'] = (row.end_time -
-                                         row.start_time).total_seconds()
-                builds.append(build)
-        return builds
-
-    async def processRequest(self, request):
-        try:
-            args = {
-                'buildset_filters': {},
-                'build_filters': {},
-                'limit': 50,
-                'skip': 0,
-            }
-            for k, v in urllib.parse.parse_qsl(request.rel_url.query_string):
-                if k in ("tenant", "project", "pipeline", "change",
-                         "patchset", "ref", "newrev"):
-                    args['buildset_filters'].setdefault(k, []).append(v)
-                elif k in ("uuid", "job_name", "voting", "node_name",
-                           "result"):
-                    args['build_filters'].setdefault(k, []).append(v)
-                elif k in ("limit", "skip"):
-                    args[k] = int(v)
-                else:
-                    raise ValueError("Unknown parameter %s" % k)
-            data = self.get_builds(args)
-            resp = web.json_response(data)
-            resp.headers['Access-Control-Allow-Origin'] = '*'
-        except Exception as e:
-            self.log.exception("Jobs exception:")
             resp = web.json_response({'error_description': 'Internal error'},
                                      status=500)
         return resp
@@ -356,8 +213,7 @@ class ZuulWeb(object):
                  gear_server, gear_port,
                  ssl_key=None, ssl_cert=None, ssl_ca=None,
                  static_cache_expiry=3600,
-                 sql_connection=None,
-                 github_connections={},
+                 connections=None,
                  info: zuul.model.WebInfo=None):
         self.start_time = time.time()
         self.listen_address = listen_address
@@ -366,16 +222,17 @@ class ZuulWeb(object):
         self.term = None
         self.server = None
         self.static_cache_expiry = static_cache_expiry
+        self.info = info or zuul.model.WebInfo()
         # instanciate handlers
         self.rpc = zuul.rpcclient.RPCClient(gear_server, gear_port,
                                             ssl_key, ssl_cert, ssl_ca)
         self.log_streaming_handler = LogStreamingHandler(self.rpc)
-        self.gearman_handler = GearmanHandler(self.rpc, github_connections)
-        if sql_connection:
-            self.sql_handler = SqlHandler(sql_connection)
-        else:
-            self.sql_handler = None
-        self.info = info or zuul.model.WebInfo()
+        self.gearman_handler = GearmanHandler(self.rpc)
+        self._plugin_routes = []
+        connections = connections or []
+        for connection in connections:
+            self._plugin_routes.extend(
+                connection.getWebHandlers(self, self.info))
 
     async def _handleWebsocket(self, request):
         return await self.log_streaming_handler.processRequest(
@@ -415,33 +272,12 @@ class ZuulWeb(object):
     async def _handleJobsRequest(self, request):
         return await self.gearman_handler.processRequest(request, 'job_list')
 
-    async def _handleSqlRequest(self, request):
-        return await self.sql_handler.processRequest(request)
-
     async def _handleKeyRequest(self, request):
         return await self.gearman_handler.processRequest(request, 'key_get')
 
     async def _handlePayloadPost(self, post):
         return await self.gearman_handler.processRequest(post,
                                                          'payload_post')
-
-    async def _handleStaticRequest(self, request):
-        fp = None
-        if request.path.endswith("tenants.html") or request.path.endswith("/"):
-            fp = os.path.join(STATIC_DIR, "index.html")
-        elif request.path.endswith("status.html"):
-            fp = os.path.join(STATIC_DIR, "status.html")
-        elif request.path.endswith("jobs.html"):
-            fp = os.path.join(STATIC_DIR, "jobs.html")
-        elif request.path.endswith("builds.html"):
-            fp = os.path.join(STATIC_DIR, "builds.html")
-        elif request.path.endswith("stream.html"):
-            fp = os.path.join(STATIC_DIR, "stream.html")
-        headers = {}
-        if self.static_cache_expiry:
-            headers['Cache-Control'] = "public, max-age=%d" % \
-                self.static_cache_expiry
-        return web.FileResponse(fp, headers=headers)
 
     def run(self, loop=None):
         """
@@ -462,20 +298,18 @@ class ZuulWeb(object):
             ('GET', '/{tenant}/jobs.json', self._handleJobsRequest),
             ('GET', '/{tenant}/console-stream', self._handleWebsocket),
             ('GET', '/{tenant}/{project:.*}.pub', self._handleKeyRequest),
-            ('GET', '/{tenant}/status.html', self._handleStaticRequest),
-            ('GET', '/{tenant}/jobs.html', self._handleStaticRequest),
-            ('GET', '/{tenant}/stream.html', self._handleStaticRequest),
-            ('GET', '/tenants.html', self._handleStaticRequest),
-            ('POST', '/driver/{driver}/{connection}/payload',
-             self._handlePayloadPost),
-            ('GET', '/', self._handleStaticRequest),
         ]
 
-        if self.sql_handler:
-            routes.append(('GET', '/{tenant}/builds.json',
-                           self._handleSqlRequest))
-            routes.append(('GET', '/{tenant}/builds.html',
-                           self._handleStaticRequest))
+        static_routes = [
+            StaticHandler(self, '/{tenant}/status.html'),
+            StaticHandler(self, '/{tenant}/jobs.html'),
+            StaticHandler(self, '/{tenant}/stream.html'),
+            StaticHandler(self, '/tenants.html', 'index.html'),
+            StaticHandler(self, '/', 'index.html'),
+        ]
+
+        for route in static_routes + self._plugin_routes:
+            routes.append(route.method, route.path, route.handleRequest)
 
         self.log.debug("ZuulWeb starting")
         asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
