@@ -255,11 +255,15 @@ class ZooKeeper(object):
 
     def heldNodeCount(self, autohold_key):
         '''
-        Count the number of nodes being held for the given tenant/project/job.
+        Count the number of nodes being held for the given
+        tenant/project/job/ref if applicable.
 
-        :param set autohold_key: A set with the tenant/project/job names.
+        :param set autohold_key: A set with the tenant/project/job names/ref.
         '''
-        identifier = " ".join(autohold_key)
+        if autohold_key[-1] is None:
+            identifier = " ".join(autohold_key[:-1])
+        else:
+            identifier = " ".join(autohold_key)
         try:
             nodes = self.client.get_children(self.NODE_ROOT)
         except kze.NoNodeError:

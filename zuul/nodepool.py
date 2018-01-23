@@ -89,10 +89,14 @@ class Nodepool(object):
         '''
         (hold_iterations, reason) = self.sched.autohold_requests[autohold_key]
         nodes = nodeset.getNodes()
+        if autohold_key[-1] is None:
+            hold_job = " ".join(autohold_key[:-1])
+        else:
+            hold_job = " ".join(autohold_key)
 
         for node in nodes:
             node.state = model.STATE_HOLD
-            node.hold_job = " ".join(autohold_key)
+            node.hold_job = hold_job
             node.comment = reason
             self.sched.zk.storeNode(node)
 

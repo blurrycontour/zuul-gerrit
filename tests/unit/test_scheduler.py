@@ -1575,6 +1575,89 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(held_nodes, 1)
 
     @simple_layout('layouts/autohold.yaml')
+    def test_autohold_by_ref(self):
+        client = zuul.rpcclient.RPCClient('127.0.0.1',
+                                          self.gearman_server.port)
+        self.addCleanup(client.shutdown)
+
+        # Check nodepool for a held node
+        held_node = None
+        for node in self.fake_nodepool.getNodes():
+            if node['state'] == zuul.model.STATE_HOLD:
+                held_node = node
+                break
+        self.assertIsNone(held_node)
+
+        # Create 2 failing patches on the same project
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        patchsetB = B.getPatchsetCreatedEvent(1)
+        ref = patchsetB['patchSet']['revision']
+
+        r = client.autohold('tenant-one', 'org/project', 'project-test2',
+                            "reason text", 1, ref)
+        self.assertTrue(r)
+
+        # Fail A, nodes won't be held
+        self.executor_server.failJob('project-test2', A)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'NEW')
+        self.assertEqual(A.reported, 1)
+        self.assertEqual(self.history[0].result, 'FAILURE')
+
+        # Check nodepool for a held node
+        held_node = None
+        for node in self.fake_nodepool.getNodes():
+            if node['state'] == zuul.model.STATE_HOLD:
+                held_node = node
+                break
+        self.assertIsNone(held_node)
+
+        # Fail B, nodes will be held
+        self.executor_server.failJob('project-test2', B)
+        self.fake_gerrit.addEvent(patchsetB)
+        self.waitUntilSettled()
+
+        self.assertEqual(B.data['status'], 'NEW')
+        self.assertEqual(B.reported, 1)
+        # project-test2
+        self.assertEqual(self.history[1].result, 'FAILURE')
+
+        # Check nodepool for a held node
+        held_node = None
+        for node in self.fake_nodepool.getNodes():
+            if node['state'] == zuul.model.STATE_HOLD:
+                held_node = node
+                break
+        self.assertIsNotNone(held_node)
+
+        # Validate node has recorded the failed job
+        self.assertEqual(
+            held_node['hold_job'],
+            " ".join(['tenant-one',
+                      'review.example.com/org/project',
+                      'project-test2', ref])
+        )
+        self.assertEqual(held_node['comment'], "reason text")
+
+        # A following failing patchset on B should not hold any more nodes
+        B.addPatchset()
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(2))
+        self.executor_server.failJob('project-test2', B)
+        self.waitUntilSettled()
+        self.assertEqual(B.data['status'], 'NEW')
+        self.assertEqual(B.reported, 2)
+        self.assertEqual(self.history[2].result, 'FAILURE')
+
+        held_nodes = 0
+        for node in self.fake_nodepool.getNodes():
+            if node['state'] == zuul.model.STATE_HOLD:
+                held_nodes += 1
+        self.assertEqual(held_nodes, 1)
+
+    @simple_layout('layouts/autohold.yaml')
     def test_autohold_ignores_aborted_jobs(self):
         client = zuul.rpcclient.RPCClient('127.0.0.1',
                                           self.gearman_server.port)
@@ -1633,11 +1716,12 @@ class TestScheduler(ZuulTestCase):
 
         # The single dict key should be a CSV string value
         key = list(autohold_requests.keys())[0]
-        tenant, project, job = key.split(',')
+        tenant, project, job, ref = key.split(',')
 
         self.assertEqual('tenant-one', tenant)
         self.assertIn('org/project', project)
         self.assertEqual('project-test2', job)
+        self.assertEqual('*', ref)
 
         # Note: the value is converted from set to list by json.
         self.assertEqual([1, "reason text"], autohold_requests[key])
