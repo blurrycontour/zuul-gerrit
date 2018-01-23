@@ -436,13 +436,17 @@ class Scheduler(threading.Thread):
         self.last_reconfigured = int(time.time())
         # TODOv3(jeblair): reconfigure time should be per-tenant
 
-    def autohold(self, tenant_name, project_name, job_name, reason, count):
-        key = (tenant_name, project_name, job_name)
+    def autohold(self, tenant_name, project_name,
+                 job_name, reason, count, ref):
+        key = (tenant_name, project_name, job_name, ref)
         if count == 0 and key in self.autohold_requests:
             self.log.debug("Removing autohold for %s", key)
             del self.autohold_requests[key]
         else:
-            self.log.debug("Autohold requested for %s", key)
+            hold_info = (tenant_name, project_name, job_name)
+            if ref:
+                hold_info += (ref, )
+            self.log.debug("Autohold requested for %s", hold_info)
             self.autohold_requests[key] = (count, reason)
 
     def promote(self, tenant_name, pipeline_name, change_ids):
@@ -983,21 +987,31 @@ class Scheduler(threading.Thread):
             nodeset = build.nodeset
             autohold_key = (build.pipeline.layout.tenant.name,
                             build.build_set.item.change.project.canonical_name,
-                            build.job.name)
-            if (build.result == "FAILURE" and
-                autohold_key in self.autohold_requests):
+                            build.job.name, None)
+            autohold_key_commit = autohold_key[:-1] +\
+                (build.build_set.item.change.ref, )
+
+            def _hold(ns, key):
                 # We explicitly only want to hold nodes for jobs if they have
                 # failed and have an autohold request.
                 try:
-                    self.nodepool.holdNodeSet(nodeset, autohold_key)
+                    self.nodepool.holdNodeSet(ns, key)
                 except Exception:
                     self.log.exception("Unable to process autohold for %s:",
-                                       autohold_key)
-                    if autohold_key in self.autohold_requests:
+                                       key)
+                    if key in self.autohold_requests:
                         self.log.debug("Removing autohold %s due to exception",
-                                       autohold_key)
-                        del self.autohold_requests[autohold_key]
+                                       key)
+                        del self.autohold_requests[key]
 
+            # First look for a autohold request on a specific ref
+            if (build.result == "FAILURE" and
+                autohold_key_commit in self.autohold_requests):
+                _hold(nodeset, autohold_key_commit)
+            # if not found, look for a more generic autohold request
+            elif (build.result == "FAILURE" and
+                  autohold_key in self.autohold_requests):
+                _hold(nodeset, autohold_key)
             self.nodepool.returnNodeSet(nodeset)
         except Exception:
             self.log.exception("Unable to return nodeset %s" % (nodeset,))
