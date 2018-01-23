@@ -161,6 +161,32 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(self.getJobFromHistory('project-test1').node,
                          'label2')
 
+    @simple_layout('layouts/branch-deletion.yaml')
+    def test_job_branch_deletion(self):
+        "Test the correct variant of a job runs on a branch"
+        self._startMerger()
+        self.executor_server.merger_worker.unRegisterFunction("merger:merge")
+        self.executor_server.merger_worker.unRegisterFunction("merger:cat")
+        self.executor_server.merger_worker.unRegisterFunction("merger:refstate")
+        self.executor_server.merger_worker.unRegisterFunction("merger:fileschanges")
+
+        self.create_branch('org/project', 'stable')
+        A = self.fake_gerrit.addFakeChange('org/project', 'stable', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertEqual(self.getJobFromHistory('project-test2').result,
+                         'SUCCESS')
+
+        self.delete_branch('org/project', 'stable')
+        path = os.path.join(self.executor_src_root, 'review.example.com')
+        shutil.rmtree(path)
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertEqual(self.getJobFromHistory('project-test1').result,
+                         'SUCCESS')
+
     def test_parallel_changes(self):
         "Test that changes are tested in parallel and merged in series"
 
