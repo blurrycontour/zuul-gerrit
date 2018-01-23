@@ -25,6 +25,7 @@ import uvloop
 import aiohttp
 from aiohttp import web
 
+import zuul.model
 import zuul.rpcclient
 from zuul.web.handler import StaticHandler
 
@@ -212,6 +213,8 @@ class ZuulWeb(object):
                  ssl_key=None, ssl_cert=None, ssl_ca=None,
                  static_cache_expiry=3600,
                  connections=None,
+                 info=None):
+        self.start_time = time.time()
         self.listen_address = listen_address
         self.listen_port = listen_port
         self.event_loop = None
@@ -227,11 +230,36 @@ class ZuulWeb(object):
         self._plugin_routes = []  # type: List[zuul.web.handler.BaseWebHandler]
         connections = connections or []
         for connection in connections:
-            self._plugin_routes.extend(connection.getWebHandlers(self))
+            self._plugin_routes.extend(
+                connection.getWebHandlers(self, self.info))
 
     async def _handleWebsocket(self, request):
         return await self.log_streaming_handler.processRequest(
             request)
+
+    async def _handleRootInfo(self, request):
+        info = self.info.copy()
+        info.endpoint = request.url.parent
+        return self._handleInfo(info)
+
+    async def _handleTenantInfo(self, request):
+        tenant = request.match_info["tenant"]
+        info = zuul.model.TenantWebInfo(tenant, info=self.info)
+        # yarl.URL.parent on a root url returns the root url, so this is
+        # both safe and accurate for white-labeled tenants like OpenStack,
+        # zuul-web running on / and zuul-web running on a sub-url like
+        # softwarefactory-project.io
+        info.endpoint = request.url.parent.parent.parent
+        return self._handleInfo(info)
+
+    async def _handleInfo(self, info):
+        resp = web.json_response({'info': info.toDict()}, status=200)
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        if self.static_cache_expiry:
+            resp.headers['Cache-Control'] = "public, max-age=%d" % \
+                self.static_cache_expiry
+        resp.last_modified = self.start_time
+        return resp
 
     async def _handleTenantsRequest(self, request):
         return await self.gearman_handler.processRequest(request,
@@ -258,6 +286,8 @@ class ZuulWeb(object):
             is run within a separate (non-main) thread.
         """
         routes = [
+            ('GET', '/info.json', self._handleRootInfo),
+            ('GET', '/{tenant}/info.json', self._handleTenantInfo),
             ('GET', '/tenants.json', self._handleTenantsRequest),
             ('GET', '/{tenant}/status.json', self._handleStatusRequest),
             ('GET', '/{tenant}/jobs.json', self._handleJobsRequest),
