@@ -645,6 +645,10 @@ sections of ``zuul.conf`` are used by the web server:
       Base URL on which the websocket service is exposed, if different
       than the base URL of the web app.
 
+   .. attr:: graphite_url
+
+      Base URL on which a graphite is running.
+
    .. attr:: static_cache_expiry
       :default: 3600
 
