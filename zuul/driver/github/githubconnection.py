@@ -24,6 +24,7 @@ import re
 import json
 import traceback
 
+from aiohttp import web
 import cachecontrol
 from cachecontrol.cache import DictCache
 from cachecontrol.heuristics import BaseHeuristic
@@ -37,6 +38,7 @@ import github3.exceptions
 import gear
 
 from zuul.connection import BaseConnection
+from zuul.web.handler import BaseDriverWebHandler
 from zuul.lib.config import get_default
 from zuul.model import Ref, Branch, Tag, Project
 from zuul.exceptions import MergeFailure
@@ -1133,6 +1135,53 @@ class GithubConnection(BaseConnection):
                 seen.append("%s:%s" % (stuple[0], stuple[1]))
 
         return statuses
+
+    def getWebHandlers(self, zuul_web, info):
+        return [GithubWebhookHandler(self, zuul_web, 'POST', 'payload')]
+
+    def validateWebConfig(self, config, connections):
+        if 'webhook_token' not in self.connection_config:
+            raise Exception("Error reading webhook token:")
+        return True
+
+
+class GithubWebhookHandler(BaseDriverWebHandler):
+
+    def __init__(self, connection, zuul_web, method, path):
+        super(GithubWebhookHandler, self).__init__(
+            connection=connection, zuul_web=zuul_web, method=method, path=path)
+        self.token = self.connection.connection_config.get('webhook_token')
+
+    def _validate_signature(self, body, headers):
+        try:
+            request_signature = headers['X-Hub-Signature']
+        except KeyError:
+            raise web.HTTPUnauthorized(
+                reason='X-Hub-Signature header missing.')
+
+        payload_signature = _sign_request(body, self.token)
+
+        self.log.debug("Payload Signature: {0}".format(str(payload_signature)))
+        self.log.debug("Request Signature: {0}".format(str(request_signature)))
+        if not hmac.compare_digest(
+            str(payload_signature), str(request_signature)):
+            raise web.HTTPUnauthorized(
+                reason=('Request signature does not match calculated payload '
+                        'signature. Check that secret is correct.'))
+
+        return True
+
+    async def handleRequest(self, request):
+        headers = dict(request.headers)
+        body = await request.read()
+        self._validate_signature(body, headers)
+        # We cannot send the raw body through gearman, so it's easy to just
+        # encode it as json, after decoding it as utf-8
+        json_body = json.loads(body.decode('utf-8'))
+        job = self.zuul_web.rpc.submitJob(
+            'github:%s:payload' % self.connection.connection_name,
+            {'headers': headers, 'body': json_body})
+        return web.json_response(json.loads(job.data[0]))
 
 
 def _status_as_tuple(status):

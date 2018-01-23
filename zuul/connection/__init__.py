@@ -74,3 +74,33 @@ class BaseConnection(object, metaclass=abc.ABCMeta):
         This lets the user supply a list of change objects that are
         still in use.  Anything in our cache that isn't in the supplied
         list should be safe to remove from the cache."""
+
+    def getWebHandlers(self, zuul_web, info):
+        """Return a list of web handlers to register with zuul-web.
+
+        :param zuul.web.ZuulWeb zuul_web:
+            Zuul Web instance.
+        :param zuul.model.WebInfo info:
+            The WebInfo object for the Zuul Web instance. Can be used by
+            plugins to toggle API capabilities.
+        :returns: List of `zuul.lib.connections.ConnectionRegistry` objects.
+        """
+        return []
+
+    def validateWebConfig(self, config, connections):
+        """Validate config and determine whether to register web handlers.
+
+        By default this method returns False, which means this connection
+        has no web handlers to register.
+
+        If the method returns True, then its `getWebHandlers` method
+        should be called during route registration.
+
+        If there is a fatal error, the method should raise an exception.
+
+        :param config:
+           The parsed config object.
+        :param zuul.lib.connections.ConnectionRegistry connections:
+           Registry of all configured connections.
+        """
+        return False
