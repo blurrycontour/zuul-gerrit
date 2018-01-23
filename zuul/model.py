@@ -3039,3 +3039,76 @@ class TimeDataBase(object):
         td = self._getTD(build)
         td.add(elapsed, result)
         td.save()
+
+
+class Capabilities(object):
+    """The set of capabilities this Zuul installation has.
+
+    Some plugins add elements to the external API. In order to
+    facilitate consumers knowing if functionality is available
+    or not, keep track of distinct capability flags.
+    """
+    def __init__(self, job_history=False):
+        self.job_history = job_history
+
+    def __repr__(self):
+        return '<Capabilities 0x%x %s>' % (id(self), self._renderFlags())
+
+    def _renderFlags(self):
+        d = self.toDict()
+        return " ".join(['{k}={v}'.format(k=k, v=v) for (k, v) in d.items()])
+
+    def copy(self):
+        return Capabilities(**self.toDict())
+
+    def toDict(self):
+        d = dict()
+        d['job_history'] = self.job_history
+        return d
+
+
+class WebInfo(object):
+    """Information about the system needed by zuul-web /info."""
+
+    def __init__(self, websocket_url=None, endpoint=None,
+                 capabilities=None):
+        self.capabilities = capabilities or Capabilities()
+        self.websocket_url = websocket_url
+        self.endpoint = endpoint
+
+    def __repr__(self):
+        return '<WebInfo 0x%x capabilities=%s>' % (
+            id(self), str(self.capabilities))
+
+    def copy(self):
+        return WebInfo(
+            websocket_url=self.websocket_url,
+            endpoint=self.endpoint,
+            capabilities=self.capabilities.copy())
+
+    def toDict(self):
+        d = dict()
+        d['websocket_url'] = self.websocket_url
+        d['endpoint'] = self.endpoint
+        d['capabilities'] = self.capabilities.toDict()
+        return d
+
+
+class TenantWebInfo(object):
+    """Information about the system for a tenant needed by zuul-web /info."""
+
+    def __init__(self, name, info=None):
+        self.name = name
+        self.info = info or WebInfo()
+
+    def __repr__(self):
+        return '<TenantWebInfo %s capabilities=%s>' % (
+            self.name, str(self.info.capabilities))
+
+    def copy(self):
+        return TenantWebInfo(name=self.name, info=self.info.copy())
+
+    def toDict(self):
+        d = self.info.toDict()
+        d['tenant'] = self.name
+        return d
