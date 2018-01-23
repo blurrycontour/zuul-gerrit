@@ -20,6 +20,7 @@ import sys
 import threading
 
 import zuul.cmd
+import zuul.model
 import zuul.web
 
 from zuul.driver.sql import sqlconnection
@@ -35,8 +36,13 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
         self.web.stop()
 
     def _run(self):
+        info = zuul.model.WebInfo()
+        info.websocket_url = get_default(self.config,
+                                         'web', 'websocket_url', None)
+
         params = dict()
 
+        params['info'] = info
         params['listen_address'] = get_default(self.config,
                                                'web', 'listen_address',
                                                '127.0.0.1')
@@ -50,6 +56,9 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
         params['ssl_cert'] = get_default(self.config, 'gearman', 'ssl_cert')
         params['ssl_ca'] = get_default(self.config, 'gearman', 'ssl_ca')
 
+        # TODO(mordred) Update plugin interface to allow plugins to be
+        # able to register endpoints and to indicate that they provide
+        # capabilities.
         sql_conn_name = get_default(self.config, 'web',
                                     'sql_connection_name')
         sql_conn = None
@@ -73,6 +82,8 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
                 # use this sql connection by default
                 sql_conn = connections[0]
         params['sql_connection'] = sql_conn
+        if sql_conn:
+            info.capabilities.job_history = True
 
         params['github_connections'] = {}
         for conn_name, connection in self.connections.connections.items():
