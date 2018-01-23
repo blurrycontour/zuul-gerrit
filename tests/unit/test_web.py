@@ -89,7 +89,7 @@ class TestWeb(ZuulTestCase):
         self.waitUntilSettled()
 
         req = urllib.request.Request(
-            "http://localhost:%s/tenant-one/status.json" % self.port)
+            "http://localhost:%s/tenant-one/status" % self.port)
         f = urllib.request.urlopen(req)
         headers = f.info()
         self.assertIn('Content-Length', headers)

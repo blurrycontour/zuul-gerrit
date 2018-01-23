@@ -460,6 +460,14 @@ class ZuulWeb(object):
         app = web.Application()
         for method, path, handler in routes:
             app.router.add_route(method, path, handler)
+            if path.endswith('.json'):
+                # Register bare routes for json endpoints. Having both allows
+                # people to use the REST API with endpoints like
+                # /{tenant}/builds but supporting .json suffixes allows easily
+                # overriding a json endpoint with a static .json file on a
+                # web server and have the content-type headers all just work.
+                bare_path = path[:-len('.json')]
+                app.router.add_route(method, bare_path, handler)
         app.router.add_static('/static', STATIC_DIR)
         handler = app.make_handler(loop=self.event_loop)
 
