@@ -61,7 +61,7 @@ class Nodepool(object):
         if nodeset.nodes:
             self.sched.zk.submitNodeRequest(req, self._updateNodeRequest)
             # Logged after submission so that we have the request id
-            self.log.info("Submited node request %s" % (req,))
+            self.log.info("Submitted node request %s" % (req,))
             self.emitStats(req)
         else:
             self.log.info("Fulfilling empty node request %s" % (req,))
@@ -202,13 +202,26 @@ class Nodepool(object):
                           request_id, request.id)
             return
 
+        # If we didn't request nodes and the request is fulfilled then just
+        # return. We con't have to do anything in this case. Further don't even
+        # ask ZK for the request as empty requests are not put into ZK.
+        if not request.nodes and request.fulfilled:
+            return
+
         # Make sure the request still exists. It's possible it could have
         # disappeared if we lost the ZK session between when the fulfillment
         # response was added to our queue, and when we actually get around to
         # processing it. Nodepool will automatically reallocate the assigned
         # nodes in that situation.
-        if not self.sched.zk.nodeRequestExists(request):
-            self.log.info("Request %s no longer exists", request.id)
+        try:
+            if not self.sched.zk.nodeRequestExists(request):
+                self.log.info("Request %s no longer exists", request.id)
+                return
+        except Exception:
+            # If we cannot retrieve the node request from ZK we probably lost
+            # the connection and thus the ZK session. Thus do the same as above
+            # but log the exception so we have an indication about ZK problems.
+            self.log.exception("Error getting node request %s:" % request_id)
             return
 
         if request.canceled:
