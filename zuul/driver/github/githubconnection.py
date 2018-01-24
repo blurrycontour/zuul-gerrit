@@ -722,7 +722,7 @@ class GithubConnection(BaseConnection):
             # installation -- change queues aren't likely to span more
             # than one installation.
             for project in projects:
-                installation_id = self.installation_map.get(project)
+                installation_id = self.installation_map.get(project.name)
                 if installation_id not in installation_ids:
                     installation_ids.add(installation_id)
                     installation_projects.add(project)
@@ -741,7 +741,7 @@ class GithubConnection(BaseConnection):
         query = '%s type:pr is:open in:body' % pattern
         # Repeat the search for each installation id (project)
         for installation_project in installation_projects:
-            github = self.getGithubClient(installation_project)
+            github = self.getGithubClient(installation_project.name)
             for issue in github.search_issues(query=query):
                 pr = issue.issue.pull_request().as_dict()
                 if not pr.get('url'):
