@@ -2671,7 +2671,7 @@ class Layout(object):
         item.debug(msg, indent=indent)
         matched = self._collectJobVariants(item, jobname, change, path,
                                            jobs, stack, indent)
-        if not matched and stack:
+        if not matched:
             job = self.getJob(jobname)
             project = job.source_context.project
             project_config = self.project_configs.get(project.canonical_name)
