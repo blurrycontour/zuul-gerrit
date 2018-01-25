@@ -30,12 +30,45 @@ angular.module('zuulTenants', []).controller(
       $scope.tenants = undefined
       $scope.tenants_fetch = function () {
         $http.get(getSourceUrl('tenants', $location))
-            .then(function success (result) {
-              $scope.tenants = result.data
-            })
+          .then(function success (result) {
+            $scope.tenants = result.data
+          })
       }
       $scope.tenants_fetch()
     })
+
+angular.module('zuulProjects', []).controller(
+  'mainController', function ($scope, $http) {
+    $scope.projects = undefined
+    $scope.projects_fetch = function () {
+      $http.get('projects')
+        .then(function success (result) {
+          $scope.projects = result.data
+        })
+    }
+    $scope.projects_fetch()
+  })
+
+angular.module('zuulProject', [], function ($locationProvider) {
+  $locationProvider.html5Mode({
+    enabled: true,
+    requireBase: false
+  })
+}).controller('mainController', function ($scope, $http, $location) {
+  let queryArgs = $location.search()
+  $scope.project_name = queryArgs['project_name']
+  if (!$scope.project_name) {
+    $scope.project_name = 'config-projects'
+  }
+  $scope.project = undefined
+  $scope.project_fetch = function () {
+    $http.get('projects/' + $scope.project_name)
+      .then(function success (result) {
+        $scope.project = result.data
+      })
+  }
+  $scope.project_fetch()
+})
 
 angular.module('zuulJobs', [], function ($locationProvider) {
   $locationProvider.html5Mode({
