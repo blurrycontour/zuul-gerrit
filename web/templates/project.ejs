@@ -56,14 +56,22 @@ under the License.
     <div class="panel panel-info" ng-if="project.pipelines">
       <div class="panel-heading">Pipelines</div>
       <div class="panel panel-body">
-        <div ng-repeat="(pipeline_name, pipeline) in project.pipelines">
-          <h3>{{ pipeline_name }}</h3>
-          <ul class="list-group">
-            <li class="list-group-item" ng-repeat="job in pipeline.jobs">
-              <a href="job.html?job_name={{ job.name }}" target="_self">{{ job.name }}</a>
-            </li>
-          </ul>
-        </div>
+         <button type="button" class="pull-right btn-xs btn-primary btn" ng-click="toggleGraph()">
+           Toggle graph
+         </button>
+         <center>
+           <svg width="1400" height="1060" id="projectGraph" style="display: none;" />
+         </center>
+         <div id="projectTable">
+           <div ng-repeat="(pipeline_name, pipeline) in project.pipelines">
+             <h3>{{ pipeline_name }}</h3>
+             <ul class="list-group">
+               <li class="list-group-item" ng-repeat="job in pipeline.jobs">
+                 <a href="job.html?job_name={{ job.name }}" target="_self">{{ job.name }}</a>
+               </li>
+             </ul>
+           </div>
+         </div>
       </div>
     </div>
 </body></html>
