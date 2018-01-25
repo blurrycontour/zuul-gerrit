@@ -21,7 +21,9 @@ under the License.
     <link rel="stylesheet" href="../static/styles/zuul.css" />
     <script src="../static/js/jquery.min.js"></script>
     <script src="../static/js/angular.min.js"></script>
+    <script src="../static/js/d3.min.js"></script>
     <script src="../static/javascripts/zuul.angular.js"></script>
+    <script src="../static/javascripts/zuul.d3.js"></script>
 </head>
 <body ng-app="zuulJobs" ng-controller="mainController"><div class="container-fluid">
   <nav class="navbar navbar-default">
@@ -36,7 +38,13 @@ under the License.
     </ul>
   </div>
   </nav>
-  <table class="table table-hover table-condensed">
+  <button type="button" class="pull-right btn-xs btn-primary btn" ng-click="toggleGraph()">
+    Toggle graph
+  </button>
+  <center>
+    <svg width="1400" height="1060" id="jobGraph" style="display: none;" />
+  </center>
+  <table class="table table-hover table-condensed" id="jobTable">
     <thead>
       <tr>
         <th>Name</th>

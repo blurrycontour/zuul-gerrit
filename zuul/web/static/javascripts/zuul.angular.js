@@ -35,6 +35,7 @@ angular.module('zuulJobs', []).controller(
     'mainController', function($scope, $http)
 {
     $scope.jobs = undefined;
+    $scope.graph = undefined;
     $scope.jobs_fetch = function() {
         $http.get("jobs.json")
             .then(function success(result) {
@@ -54,6 +55,13 @@ angular.module('zuulJobs', []).controller(
                 });
         }
         job.expanded = !job.expanded;
+    }
+    $scope.toggleGraph = function() {
+        $("#jobTable").toggle();
+        $("#jobGraph").toggle();
+        if (!$scope.graph) {
+            $scope.graph = jobsGraph($scope.jobs);
+        }
     }
 });
 

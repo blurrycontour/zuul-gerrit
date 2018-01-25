@@ -31,6 +31,9 @@ curl -L --silent https://github.com/prestontimmons/graphitejs/archive/master.zip
 unzip -q -o jquery-graphite.zip -d $DEST_DIR/
 python2 -mrjsmin < $DEST_DIR/graphitejs-master/jquery.graphite.js > $DEST_DIR/js/jquery.graphite.min.js
 rm -Rf jquery-graphite.zip $DEST_DIR/graphitejs-master
+
+echo "Fetching d3js..."
+curl -L --silent https://d3js.org/d3.v4.min.js > $DEST_DIR/js/d3.min.js
 ```
 
 
