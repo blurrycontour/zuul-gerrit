@@ -20,6 +20,8 @@ import { RouterModule, Routes } from '@angular/router'
 import BuildsComponent from './builds/builds.component'
 import JobComponent from './job/job.component'
 import JobsComponent from './jobs/jobs.component'
+import ProjectComponent from './project/project.component'
+import ProjectsComponent from './projects/projects.component'
 import StatusComponent from './status/status.component'
 import StreamComponent from './stream/stream.component'
 import TenantsComponent from './tenants/tenants.component'
@@ -56,6 +58,22 @@ const appRoutes: Routes = [
   {
     path: 'jobs.html',
     component: JobsComponent
+  },
+  {
+    path: 't/:tenant/project.html',
+    component: ProjectComponent
+  },
+  {
+    path: 'project.html',
+    component: ProjectComponent
+  },
+  {
+    path: 't/:tenant/projects.html',
+    component: ProjectsComponent
+  },
+  {
+    path: 'projects.html',
+    component: ProjectsComponent
   },
   {
     path: 'stream.html',
