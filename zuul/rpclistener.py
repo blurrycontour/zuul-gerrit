@@ -307,8 +307,13 @@ class RPCListener(object):
                 if tenant_job.description:
                     desc = tenant_job.description.split('\n')[0]
                     break
+            parent = "base"
+            if not tenant_job.isBase():
+                if tenant_job.parent:
+                    parent = str(tenant_job.parent)
             output.append({"name": job_name,
-                           "description": desc})
+                           "description": desc,
+                           "parent": parent})
         job.sendWorkComplete(json.dumps(output))
 
     def handle_key_get(self, job):

@@ -1,4 +1,4 @@
-/* global BuiltinConfig */
+/* global jQuery, BuiltinConfig */
 // @licstart  The following is the entire license notice for the
 // JavaScript code in this page.
 //
@@ -21,6 +21,7 @@
 
 import 'bootstrap/dist/css/bootstrap.css'
 import angular from 'angular'
+import * as d3 from 'd3'
 
 import './styles/zuul.css'
 import './jquery.zuul'
@@ -36,6 +37,67 @@ function getSourceUrl (filename, $location) {
       return filename
     }
   }
+}
+
+function jobsGraph (jobs) {
+  let w = d3.select('#jobGraph').attr('width')
+  let h = d3.select('#jobGraph').attr('height')
+  let svg = d3.select('#jobGraph').append('g').attr(
+    'transform', 'translate(40,0)')
+
+  let stratify = d3.stratify()
+      .id(function (d) {
+        return d.name
+      })
+      .parentId(function (d) {
+        if (d.name === 'base') {
+          return ''
+        }
+        return d.parent
+      })
+
+  let tree = d3.cluster().size([h, w - 250])
+
+  let root = stratify(jobs)
+
+  tree(root)
+
+  svg.selectAll('.link')
+      .data(root.descendants().slice(1))
+      .enter().append('path')
+      .attr('class', 'link')
+      .attr('d', function (d) {
+        return 'M' + d.y + ',' + d.x + 'C' + (d.parent.y + 100) + ',' + d.x +
+          ' ' + (d.parent.y + 100) + ',' + d.parent.x + ' ' +
+          d.parent.y + ',' + d.parent.x
+      })
+
+  let node = svg.selectAll('.node')
+      .data(root.descendants())
+      .enter().append('g')
+      .attr('transform', function (d) {
+        return 'translate(' + d.y + ',' + d.x + ')'
+      })
+
+  node.append('circle').attr('r', 2)
+
+  node.append('svg:a')
+    .attr('xlink:href', function (d) {
+      return 'job.html?job_name=' + d.id
+    })
+    .attr('target', '_self')
+    .append('text')
+    .attr('dy', 3)
+    .attr('x', function (d) {
+      return d.children ? -8 : 8
+    })
+    .style('text-anchor', function (d) {
+      return d.children ? 'end' : 'start'
+    })
+    .text(function (d) {
+      return d.id
+    })
+  return svg
 }
 
 angular.module('zuulTenants', []).controller(
@@ -58,6 +120,7 @@ angular.module('zuulJobs', [], function ($locationProvider) {
 }).controller(
     'mainController', function ($scope, $http, $location) {
       $scope.jobs = undefined
+      $scope.graph = undefined
       $scope.jobs_fetch = function () {
         $http.get(getSourceUrl('jobs.json', $location))
             .then(function success (result) {
@@ -76,6 +139,13 @@ angular.module('zuulJobs', [], function ($locationProvider) {
               })
         }
         job.expanded = !job.expanded
+      }
+      $scope.toggleGraph = function () {
+        jQuery('#jobTable').toggle()
+        jQuery('#jobGraph').toggle()
+        if (!$scope.graph) {
+          $scope.graph = jobsGraph($scope.jobs)
+        }
       }
       $scope.jobs_fetch()
     })
