@@ -1,5 +1,5 @@
 <!--
-Copyright 2017 Red Hat
+Copyright 2018 Red Hat
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may
 not use this file except in compliance with the License. You may obtain
@@ -16,16 +16,15 @@ under the License.
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Zuul Builds</title>
+    <title>Zuul Project</title>
     <link rel="stylesheet" href="../static/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="../static/styles/zuul.css" />
     <script src="../static/js/jquery.min.js"></script>
     <script src="../static/js/angular.min.js"></script>
-    <script src="../static/js/d3.min.js"></script>
     <script src="../static/javascripts/zuul.angular.js"></script>
     <script src="../static/javascripts/zuul.d3.js"></script>
 </head>
-<body ng-app="zuulJobs" ng-controller="mainController"><div class="container-fluid">
+<body ng-app="zuulProject" ng-controller="mainController"><div class="container-fluid">
   <nav class="navbar navbar-default">
   <div class="container-fluid">
     <div class="navbar-header">
@@ -34,43 +33,42 @@ under the License.
     <ul class="nav navbar-nav">
       <li><a href="status.html" target="_self">Status</a></li>
       <li><a href="projects.html" target="_self">Projects</a></li>
-      <li class="active"><a href="jobs.html" target="_self">Jobs</a></li>
+      <li><a href="jobs.html" target="_self">Jobs</a></li>
       <li><a href="builds.html" target="_self">Builds</a></li>
     </ul>
   </div>
   </nav>
-  <button type="button" class="pull-right btn-xs btn-primary btn" ng-click="toggleGraph()">
-    Toggle graph
-  </button>
-  <center>
-    <svg width="1400" height="1060" id="jobGraph" style="display: none;" />
-  </center>
-  <table class="table table-hover table-condensed" id="jobTable">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Context</th>
-        <th>Last builds</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr ng-repeat-start="job in jobs">
-        <td><a href="job.html?job_name={{ job.name }}">{{ job.name }}</a></td>
-        <td>{{ job.description }}</td>
-        <td><a ng-click="job_fetch(job)">locations</a></td>
-        <td><a href="builds.html?job_name={{ job.name }}">builds</a></td>
-      </tr>
-      <tr ng-if="job.expanded" ng-repeat-end="">
-        <td colspan="3">
+  <div class="container-fluid panel-group">
+    <div class="panel panel-info">
+      <div class="panel-heading">Project {{ project_name }}</div>
+      <div class="panel panel-body">
+        <table class="table table-condensed table-bordered">
+          <tr>
+            <td>Canonical name</td>
+            <td>{{ project.canonical_name }}</td>
+          </tr>
+          <tr ng-if="project.default_branch">
+            <td>Default branch</td>
+            <td>{{ project.default_branch }}</td>
+          </tr>
+          <tr ng-if="project.merge_mode">
+            <td>Merge mode</td>
+            <td>{{ project.merge_mode }}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div class="panel panel-info" ng-if="project.pipelines">
+      <div class="panel-heading">Pipelines</div>
+      <div class="panel panel-body">
+        <div ng-repeat="(pipeline_name, pipeline) in project.pipelines">
+          <h3>{{ pipeline_name }}</h3>
           <ul class="list-group">
-            <li class="list-group-item" ng-repeat="detail in job.details">
-              <!-- TODO: make clickable link to cgit files ? -->
-              {{ detail.source_context }}
+            <li class="list-group-item" ng-repeat="job in pipeline.jobs">
+              <a href="job.html?job_name={{ job.name }}" target="_self">{{ job.name }}</a>
             </li>
           </ul>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div></body></html>
+        </div>
+      </div>
+    </div>
+</body></html>

@@ -159,6 +159,8 @@ class GearmanHandler(object):
             'status_get': self.status_get,
             'job_list': self.job_list,
             'job_get': self.job_get,
+            'project_list': self.project_list,
+            'project_get': self.project_get,
             'key_get': self.key_get,
         }
 
@@ -198,6 +200,25 @@ class GearmanHandler(object):
     def job_list(self, request):
         tenant = request.match_info["tenant"]
         job = self.rpc.submitJob('zuul:job_list', {'tenant': tenant})
+        resp = web.json_response(json.loads(job.data[0]))
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        return resp
+
+    def project_get(self, request):
+        job_args = {
+            'tenant': request.match_info["tenant"],
+            'project': request.match_info["project_name"],
+        }
+        job = self.rpc.submitJob('zuul:project_get', job_args)
+        project = json.loads(job.data[0])
+        if not project:
+            raise web.HTTPNotFound(
+                text="Project %s doesn't exists" % job_args["project"])
+        return web.json_response(project)
+
+    def project_list(self, request):
+        tenant = request.match_info["tenant"]
+        job = self.rpc.submitJob('zuul:project_list', {'tenant': tenant})
         resp = web.json_response(json.loads(job.data[0]))
         resp.headers['Access-Control-Allow-Origin'] = '*'
         return resp
@@ -350,6 +371,14 @@ class ZuulWeb(object):
     async def _handleJobsRequest(self, request):
         return await self.gearman_handler.processRequest(request, 'job_list')
 
+    async def _handleProjectRequest(self, request):
+        return await self.gearman_handler.processRequest(
+            request, 'project_get')
+
+    async def _handleProjectsRequest(self, request):
+        return await self.gearman_handler.processRequest(
+            request, 'project_list')
+
     async def _handleSqlRequest(self, request):
         return await self.sql_handler.processRequest(request)
 
@@ -390,6 +419,9 @@ class ZuulWeb(object):
             ('GET', '/{tenant}/status.json', self._handleStatusRequest),
             ('GET', '/{tenant}/jobs.json', self._handleJobsRequest),
             ('GET', '/{tenant}/jobs/{job_name}.json', self._handleJobRequest),
+            ('GET', '/{tenant}/projects.json', self._handleProjectsRequest),
+            ('GET', '/{tenant}/projects/{project_name:.*}.json',
+                self._handleProjectRequest),
             ('GET', '/{tenant}/console-stream', self._handleWebsocket),
             ('GET', '/{tenant}/{project:.*}.pub', self._handleKeyRequest),
             ('GET', '/{tenant}/status.html', self._handleStaticRequest),
