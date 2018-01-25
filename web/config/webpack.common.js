@@ -10,6 +10,7 @@ module.exports = {
     // frequently.
     vendor: [
       'angular',
+      'd3',
       'bootstrap/dist/css/bootstrap.css',
       'jquery-visibility/jquery-visibility',
       'graphitejs/jquery.graphite.js'
