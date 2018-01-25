@@ -57,6 +57,7 @@ angular.module('zuulProject', [], function($locationProvider) {
         $scope.project_name = "config-projects";
     }
     $scope.project = undefined;
+    $scope.graph = undefined;
     $scope.project_fetch = function() {
         $http.get("projects/" + $scope.project_name + ".json")
             .then(function success(result) {
@@ -64,7 +65,75 @@ angular.module('zuulProject', [], function($locationProvider) {
             });
     }
     $scope.project_fetch();
+    $scope.toggleGraph = function() {
+        $("#projectTable").toggle();
+        $("#projectGraph").toggle();
+        if (!$scope.graph) {
+            $scope.graph = projectGraph($scope.project);
+        }
+    }
 });
+
+function projectGraph(project) {
+    var nodes = [];
+    var links = [];
+    var tips = [];
+    ["check", "gate", "post", "release", "tag"].forEach(function(pipeline) {
+        if (project.pipelines[pipeline]) {
+            // Add pipeline and link it to previs last jobs (tips)
+            nodes.push({"id": pipeline, "group": "pipeline"});
+            tips.forEach(function(tip) {
+                links.push({"source": tip, "target": pipeline})
+            });
+            tips = [pipeline];
+            var local_jobs = [];
+            var inter_jobs = [];
+            project.pipelines[pipeline].jobs.forEach(function(job) {
+                if (job.dependencies.length == 0) {
+                    job.dependencies = tips.slice(0);
+                } else {
+                    job.dependencies.forEach(function(interJob) {
+                        inter_jobs.push(interJob);
+                    });
+                }
+                local_jobs.push(job);
+            });
+            // Find new tip and push job to flow
+            tips.length = 0;
+            local_jobs.forEach(function(job) {
+                job_name = pipeline + "-" + job.name;
+                nodes.push({"id": job_name, "group": pipeline});
+                job.dependencies.forEach(function(parent) {
+                    if (parent == pipeline) {
+                        parent_name = pipeline;
+                    } else {
+                        parent_name = pipeline + "-" + parent;
+                    }
+
+                    links.push({"source": parent_name,
+                                "target": job_name})
+                })
+                var found = false;
+                for (inter_pos = 0;
+                     inter_pos < inter_jobs.length;
+                     inter_pos += 1) {
+                    if (job.name == inter_jobs[inter_pos]) {
+                        found = true;
+                        break
+                    }
+                };
+                if (found == false) {
+                    tips.push(job_name);
+                }
+            });
+        }
+    });
+    console.log("nodes", nodes);
+    console.log("links", links);
+    renderProjectGraph(nodes, links);
+}
+
+
 
 angular.module('zuulJobs', []).controller(
     'mainController', function($scope, $http)
