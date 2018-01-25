@@ -61,6 +61,10 @@
     font: 14px sans-serif;
 }
 
+#projectGraph {
+    font: 14px sans-serif;
+}
+
 .link {
     fill: none;
     stroke: black;
