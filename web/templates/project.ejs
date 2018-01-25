@@ -1,0 +1,69 @@
+<!--
+Copyright 2018 Red Hat
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may
+not use this file except in compliance with the License. You may obtain
+a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+License for the specific language governing permissions and limitations
+under the License.
+-->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+  <title id='pagetitle'><%= htmlWebpackPlugin.options.title %></title>
+</head>
+<body ng-app="zuulProject" ng-controller="mainController"><div class="container-fluid">
+  <nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="../" target="_self">Zuul Dashboard</a>
+    </div>
+    <ul class="nav navbar-nav">
+      <li><a href="status.html" target="_self">Status</a></li>
+      <li><a href="projects.html" target="_self">Projects</a></li>
+      <li><a href="jobs.html" target="_self">Jobs</a></li>
+      <li><a href="builds.html" target="_self">Builds</a></li>
+    </ul>
+  </div>
+  </nav>
+  <div class="container-fluid panel-group">
+    <div class="panel panel-info">
+      <div class="panel-heading">Project {{ project_name }}</div>
+      <div class="panel panel-body">
+        <table class="table table-condensed table-bordered">
+          <tr>
+            <td>Canonical name</td>
+            <td>{{ project.canonical_name }}</td>
+          </tr>
+          <tr ng-if="project.default_branch">
+            <td>Default branch</td>
+            <td>{{ project.default_branch }}</td>
+          </tr>
+          <tr ng-if="project.merge_mode">
+            <td>Merge mode</td>
+            <td>{{ project.merge_mode }}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div class="panel panel-info" ng-if="project.pipelines">
+      <div class="panel-heading">Pipelines</div>
+      <div class="panel panel-body">
+        <div ng-repeat="(pipeline_name, pipeline) in project.pipelines">
+          <h3>{{ pipeline_name }}</h3>
+          <ul class="list-group">
+            <li class="list-group-item" ng-repeat="job in pipeline.jobs">
+              <a href="job.html?job_name={{ job.name }}" target="_self">{{ job.name }}</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+</body></html>
