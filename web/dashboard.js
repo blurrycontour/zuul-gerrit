@@ -1,3 +1,4 @@
+/* global jQuery */
 // @licstart  The following is the entire license notice for the
 // JavaScript code in this page.
 //
@@ -20,10 +21,72 @@
 
 import 'bootstrap/dist/css/bootstrap.css'
 import angular from 'angular'
+import * as d3 from 'd3'
 
 import './styles/zuul.css'
 import './jquery.zuul'
 import { getSourceUrl } from './util'
+
+function jobsGraph (jobs) {
+  let w = d3.select('#jobGraph').attr('width')
+  let h = d3.select('#jobGraph').attr('height')
+  let svg = d3.select('#jobGraph').append('g').attr(
+    'transform', 'translate(40,0)')
+
+  let stratify = d3.stratify()
+    .id(function (d) {
+      return d.name
+    })
+    .parentId(function (d) {
+      if (d.name === 'base') {
+        return ''
+      }
+      return d.parent
+    })
+
+  let tree = d3.cluster().size([h, w - 250])
+
+  let root = stratify(jobs)
+
+  tree(root)
+
+  svg.selectAll('.link')
+    .data(root.descendants().slice(1))
+    .enter().append('path')
+    .attr('class', 'link')
+    .attr('d', function (d) {
+      return 'M' + d.y + ',' + d.x + 'C' + (d.parent.y + 100) + ',' + d.x +
+          ' ' + (d.parent.y + 100) + ',' + d.parent.x + ' ' +
+          d.parent.y + ',' + d.parent.x
+    })
+
+  let node = svg.selectAll('.node')
+    .data(root.descendants())
+    .enter().append('g')
+    .attr('transform', function (d) {
+      return 'translate(' + d.y + ',' + d.x + ')'
+    })
+
+  node.append('circle').attr('r', 2)
+
+  node.append('svg:a')
+    .attr('xlink:href', function (d) {
+      return 'job.html?job_name=' + d.id
+    })
+    .attr('target', '_self')
+    .append('text')
+    .attr('dy', 3)
+    .attr('x', function (d) {
+      return d.children ? -8 : 8
+    })
+    .style('text-anchor', function (d) {
+      return d.children ? 'end' : 'start'
+    })
+    .text(function (d) {
+      return d.id
+    })
+  return svg
+}
 
 angular.module('zuulTenants', []).component('zuulApp', {
   template: require('./templates/tenants.html'),
@@ -94,6 +157,7 @@ angular.module('zuulJobs', [], function ($locationProvider) {
     // Capture this in a closure variable so it's in scope in the callback
     let ctrl = this
     this.jobs = undefined
+    this.graph = undefined
     this.jobs_fetch = function () {
       $http.get(getSourceUrl('jobs', $location))
         .then(function success (result) {
@@ -112,6 +176,13 @@ angular.module('zuulJobs', [], function ($locationProvider) {
           })
       }
       job.expanded = !job.expanded
+    }
+    this.toggleGraph = function () {
+      jQuery('#jobTable').toggle()
+      jQuery('#jobGraph').toggle()
+      if (!ctrl.graph) {
+        ctrl.graph = jobsGraph(ctrl.jobs)
+      }
     }
     this.jobs_fetch()
   }
