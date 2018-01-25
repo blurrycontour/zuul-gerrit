@@ -22,6 +22,7 @@ import { filter } from 'rxjs/operators'
   template: require('./navigation.component.html')
 })
 export default class NavigationComponent implements OnInit {
+  navbarRoutes = ['status', 'projects', 'jobs', 'builds']
   navbarRoutes = ['status', 'jobs', 'builds']
   showNavbar = true
   resolveEnd: Observable<ResolveEnd>
