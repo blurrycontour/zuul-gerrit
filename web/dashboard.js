@@ -100,6 +100,149 @@ function jobsGraph (jobs) {
   return svg
 }
 
+function projectGraph (project) {
+  let nodes = []
+  let links = []
+  let tips = []
+
+  let pipelines = ['check', 'gate', 'post', 'release', 'tag']
+
+  // Create nodes and links
+  pipelines.forEach(function (pipeline) {
+    if (project.pipelines[pipeline]) {
+      // Add pipeline and link it to previous last jobs (tips)
+      nodes.push({'id': pipeline, 'group': 'pipeline'})
+      tips.forEach(function (tip) {
+        links.push({'source': tip, 'target': pipeline})
+      })
+      tips = [pipeline]
+      let localJobs = []
+      let interJobs = []
+      project.pipelines[pipeline].jobs.forEach(function (job) {
+        if (job.dependencies.length === 0) {
+          job.dependencies = tips.slice(0)
+        } else {
+          job.dependencies.forEach(function (interJob) {
+            interJobs.push(interJob)
+          })
+        }
+        localJobs.push(job)
+      })
+      // Find new tip and push jobs' links
+      tips.length = 0
+      localJobs.forEach(function (job) {
+        let jobName = pipeline + '-' + job.name
+        nodes.push({'id': jobName, 'group': pipeline})
+        job.dependencies.forEach(function (parent) {
+          let parentName
+          if (parent === pipeline) {
+            parentName = pipeline
+          } else {
+            parentName = pipeline + '-' + parent
+          }
+          links.push({'source': parentName, 'target': jobName})
+        })
+        let found = false
+        let interPos
+        for (interPos = 0;
+             interPos < interJobs.length;
+             interPos += 1) {
+          if (job.name === interJobs[interPos]) {
+            found = true
+            break
+          }
+        }
+        if (found === false) {
+          tips.push(jobName)
+        }
+      })
+    }
+  })
+
+  // Render graph
+  let w = d3.select('#projectGraph').attr('width')
+  let h = d3.select('#projectGraph').attr('height')
+  let svg = d3.select('#projectGraph')
+
+  let color = d3.scaleOrdinal(d3.schemeCategory20)
+  let simulation = d3.forceSimulation()
+      .force('center', d3.forceCenter(w / 2, h / 2))
+      .force('link', d3.forceLink().distance(120).id(function (d) {
+        return d.id
+      }))
+      .force('charge', d3.forceManyBody().strength(-500))
+
+  simulation.nodes(nodes)
+  simulation.force('link').links(links)
+
+  let link = svg.selectAll('.link')
+      .data(links)
+      .enter().append('line')
+      .attr('class', 'link')
+
+  let node = svg.selectAll('.node')
+      .data(nodes)
+      .enter().append('g')
+      .attr('class', 'node')
+      .call(d3.drag()
+            .on('start', dragstarted)
+            .on('drag', dragged)
+            .on('end', dragended))
+
+  node.append('circle')
+    .attr('r', 5)
+    .attr('fill', function (d) {
+      return color(d.group)
+    })
+
+  node.append('text')
+    .attr('dx', 12)
+    .attr('dy', '.35em')
+    .text(function (d) {
+      return d.id
+    })
+
+  simulation.on('tick', function () {
+    link
+      .attr('x1', function (d) {
+        return d.source.x
+      })
+      .attr('y1', function (d) {
+        return d.source.y
+      })
+      .attr('x2', function (d) {
+        return d.target.x
+      })
+      .attr('y2', function (d) {
+        return d.target.y
+      })
+
+    node.attr('transform', function (d) {
+      return 'translate(' + d.x + ',' + d.y + ')'
+    })
+  })
+  function dragstarted (d) {
+    if (!d3.event.active) {
+      simulation.alphaTarget(0.3).restart()
+    }
+    d.fx = d.x
+    d.fy = d.y
+  }
+
+  function dragged (d) {
+    d.fx = d3.event.x
+    d.fy = d3.event.y
+  }
+
+  function dragended (d) {
+    if (!d3.event.active) {
+      simulation.alphaTarget(0)
+    }
+    d.fx = null
+    d.fy = null
+  }
+}
+
 angular.module('zuulTenants', []).controller(
     'mainController', function ($scope, $http, $location) {
       $scope.tenants = undefined
@@ -136,11 +279,19 @@ angular.module('zuulProject', [], function ($locationProvider) {
     $scope.project_name = 'config-projects'
   }
   $scope.project = undefined
+  $scope.graph = undefined
   $scope.project_fetch = function () {
     $http.get('projects/' + $scope.project_name + '.json')
       .then(function success (result) {
         $scope.project = result.data
       })
+  }
+  $scope.toggleGraph = function () {
+    jQuery('#projectTable').toggle()
+    jQuery('#projectGraph').toggle()
+    if (!$scope.graph) {
+      $scope.graph = projectGraph($scope.project)
+    }
   }
   $scope.project_fetch()
 })
