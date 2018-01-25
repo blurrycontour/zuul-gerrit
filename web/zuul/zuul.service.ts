@@ -62,7 +62,7 @@ export class ZuulService {
   public appBaseHref: string
   public info: Info
   navbarRoutes: RouteDescription[]
-  private routePages = ['status', 'jobs', 'builds']
+  private routePages = ['status', 'projects', 'jobs', 'builds']
 
   constructor(private router: Router, private http: HttpClient) {
     this.baseApiUrl = this.getBaseApiUrl()

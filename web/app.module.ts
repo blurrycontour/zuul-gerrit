@@ -32,6 +32,8 @@ import BuildsComponent from './builds/builds.component'
 import NavigationComponent from './navigation/navigation.component'
 import JobComponent from './job/job.component'
 import JobsComponent from './jobs/jobs.component'
+import ProjectComponent from './project/project.component'
+import ProjectsComponent from './projects/projects.component'
 import StatusComponent from './status/status.component'
 import StreamComponent from './stream/stream.component'
 import TenantsComponent from './tenants/tenants.component'
@@ -52,6 +54,8 @@ import ZuulService from './zuul/zuul.service'
     NavigationComponent,
     JobComponent,
     JobsComponent,
+    ProjectComponent,
+    ProjectsComponent,
     StatusComponent,
     StreamComponent,
     TenantsComponent
@@ -61,6 +65,8 @@ import ZuulService from './zuul/zuul.service'
     NavigationComponent,
     JobComponent,
     JobsComponent,
+    ProjectComponent,
+    ProjectsComponent,
     StatusComponent,
     StreamComponent,
     TenantsComponent
