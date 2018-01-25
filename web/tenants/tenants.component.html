@@ -20,6 +20,7 @@ under the License.
       <tr>
         <th>Name</th>
         <th>Status</th>
+        <th>Projects</th>
         <th>Jobs</th>
         <th>Builds</th>
         <th>Projects count</th>
@@ -30,6 +31,7 @@ under the License.
       <tr *ngFor="let tenant of tenants">
         <td>{{ tenant.name }}</td>
         <td><a [routerLink]="['/t', tenant.name, 'status.html']">status</a></td>
+        <td><a [routerLink]="['/t', tenant.name, 'projects.html']">projects</a></td>
         <td><a [routerLink]="['/t', tenant.name, 'jobs.html']">jobs</a></td>
         <td><a [routerLink]="['/t', tenant.name, 'builds.html']">builds</a></td>
         <td>{{ tenant.projects }}</td>
