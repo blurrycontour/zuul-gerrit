@@ -32,7 +32,13 @@ under the License.
     </ul>
   </div>
   </nav>
-  <table class="table table-hover table-condensed">
+  <button type="button" class="pull-right btn-xs btn-primary btn" ng-click="toggleGraph()">
+    Toggle graph
+  </button>
+  <center>
+    <svg width="1400" height="1060" id="jobGraph" style="display: none;" />
+  </center>
+  <table class="table table-hover table-condensed" id="jobTable">
     <thead>
       <tr>
         <th>Name</th>
