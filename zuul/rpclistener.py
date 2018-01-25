@@ -61,6 +61,8 @@ class RPCListener(object):
         self.worker.registerFunction("zuul:status_get")
         self.worker.registerFunction("zuul:job_get")
         self.worker.registerFunction("zuul:job_list")
+        self.worker.registerFunction("zuul:project_get")
+        self.worker.registerFunction("zuul:project_list")
         self.worker.registerFunction("zuul:key_get")
 
     def getFunctions(self):
@@ -314,6 +316,51 @@ class RPCListener(object):
             output.append({"name": job_name,
                            "description": desc,
                            "parent": parent})
+        job.sendWorkComplete(json.dumps(output))
+
+    def handle_project_get(self, gear_job):
+        args = json.loads(gear_job.arguments)
+        tenant = self.sched.abide.tenants.get(args.get("tenant"))
+        try:
+            project = list(tenant.projects[args["project"]].values())[0]
+            result = {"canonical_name": project.canonical_name}
+        except KeyError:
+            gear_job.sendWorkComplete(json.dumps({}))
+            return
+        config = tenant.layout.project_configs.get(project.canonical_name)
+        if config:
+            result["default_branch"] = config.default_branch,
+            result["merge_mode"] = config.merge_mode
+            pipelines = {}
+            for pipeline_name, pipeline_config in config.pipelines.items():
+                pipeline_jobs = []
+                for jobs in pipeline_config.job_list.jobs.values():
+                    job = jobs[0]
+                    job_deps = []
+                    for job_dep in job.dependencies:
+                        job_deps.append(job_dep)
+                    pipeline_jobs.append({
+                        'name': job.name,
+                        'dependencies': job_deps,
+                        'hold_following_changes': job.hold_following_changes,
+                        'voting': job.voting,
+                    })
+                pipelines[pipeline_name] = {
+                    "queue_name": pipeline_config.queue_name,
+                    "jobs": pipeline_jobs,
+                }
+            result["pipelines"] = pipelines
+
+        gear_job.sendWorkComplete(json.dumps(result))
+
+    def handle_project_list(self, job):
+        args = json.loads(job.arguments)
+        tenant = self.sched.abide.tenants.get(args.get("tenant"))
+        output = []
+        for project in tenant.config_projects:
+            output.append({"name": project.name, "type": "config"})
+        for project in tenant.untrusted_projects:
+            output.append({"name": project.name, "type": "untrusted"})
         job.sendWorkComplete(json.dumps(output))
 
     def handle_key_get(self, job):
