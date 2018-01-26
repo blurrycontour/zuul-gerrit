@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f93b717_633c6493",
+        "filename": "TESTING.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-01-26T01:26:26Z",
+      "side": 1,
+      "message": "Need to run yarn install here.",
+      "revId": "2af2d52264c2318b9b58fd49f5d73d6f96e562ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
