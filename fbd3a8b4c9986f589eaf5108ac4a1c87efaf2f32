@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5f93b717_f8d01ecc",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 886,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-01-26T04:53:57Z",
+      "side": 1,
+      "message": "I\u0027m not sure what is the proper way to achieve links rendering from source context. Wouldn\u0027t it be easier if the scheduler/zuul-web knews about connections url templates and render them server side? E.g to support gitweb, cgit, patchwork, pagure, github, ...",
+      "parentUuid": "5f93b717_78f3ae9f",
+      "revId": "fbd3a8b4c9986f589eaf5108ac4a1c87efaf2f32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f93b717_d83be235",
         "filename": "zuul/model.py",
         "patchSetId": 3
@@ -47,6 +65,24 @@
       "writtenOn": "2018-01-26T04:51:05Z",
       "side": 1,
       "message": "Imported comment from James: \"Why not job.voting?\"",
+      "revId": "fbd3a8b4c9986f589eaf5108ac4a1c87efaf2f32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f93b717_18d62ac7",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 892,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-01-26T04:53:57Z",
+      "side": 1,
+      "message": "Done, it was a typo.",
+      "parentUuid": "5f93b717_3879a6fb",
       "revId": "fbd3a8b4c9986f589eaf5108ac4a1c87efaf2f32",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -87,6 +123,41 @@
     },
     {
       "key": {
+        "uuid": "5f93b717_38f0c667",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 898,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-01-26T04:53:57Z",
+      "side": 1,
+      "message": "Otherwise it point at the parent Job object.",
+      "parentUuid": "5f93b717_78764e09",
+      "revId": "fbd3a8b4c9986f589eaf5108ac4a1c87efaf2f32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f93b717_78fdee38",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 901,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-01-26T04:53:57Z",
+      "side": 1,
+      "message": "Regarding the structured data comment, should the composed object also has a \"toDict\" method?",
+      "revId": "fbd3a8b4c9986f589eaf5108ac4a1c87efaf2f32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f93b717_18b70ad8",
         "filename": "zuul/rpclistener.py",
         "patchSetId": 3
@@ -104,6 +175,24 @@
     },
     {
       "key": {
+        "uuid": "5f93b717_18614a37",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-01-26T04:53:57Z",
+      "side": 1,
+      "message": "It was a minor optimization for the jobs page that only needed source_context. I dropped the parameter to skip premature optimization.",
+      "parentUuid": "5f93b717_18b70ad8",
+      "revId": "fbd3a8b4c9986f589eaf5108ac4a1c87efaf2f32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f93b717_b87db61d",
         "filename": "zuul/rpclistener.py",
         "patchSetId": 3
@@ -115,6 +204,24 @@
       "writtenOn": "2018-01-26T04:51:05Z",
       "side": 1,
       "message": "Imported comment from James: \"Should we move all of this into a toDict method in model? We\u0027ll just want to make sure it doesn\u0027t include secrets by default.\"",
+      "revId": "fbd3a8b4c9986f589eaf5108ac4a1c87efaf2f32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f93b717_784f2ebd",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-01-26T04:53:57Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "5f93b717_b87db61d",
       "revId": "fbd3a8b4c9986f589eaf5108ac4a1c87efaf2f32",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
