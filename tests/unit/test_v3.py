@@ -3318,6 +3318,51 @@ class TestProjectKeys(ZuulTestCase):
         self.assertEqual(2048, ssh_key.get_bits())
 
 
+class TestValidateAllBroken(ZuulTestCase):
+    # Test we fail while validating all tenants with one broken tenant
+
+    validate_tenants = []
+    tenant_config_file = 'config/broken/main.yaml'
+
+    def setUp(self):
+        self.assertRaises(zuul.configloader.ConfigurationSyntaxError,
+                          super().setUp)
+
+    def test_validate_all_tenants_broken(self):
+        # If we reach this point we successfully catched the config exception.
+        # There is nothing more to test here.
+        pass
+
+
+class TestValidateBroken(ZuulTestCase):
+    # Test we fail while validating a broken tenant
+
+    validate_tenants = ['tenant-broken']
+    tenant_config_file = 'config/broken/main.yaml'
+
+    def setUp(self):
+        self.assertRaises(zuul.configloader.ConfigurationSyntaxError,
+                          super().setUp)
+
+    def test_validate_tenant_broken(self):
+        # If we reach this point we successfully catched the config exception.
+        # There is nothing more to test here.
+        pass
+
+
+class TestValidateGood(ZuulTestCase):
+    # Test we don't fail while validating a good tenant in a multi tenant
+    # setup that contains a broken tenant.
+
+    validate_tenants = ['tenant-good']
+    tenant_config_file = 'config/broken/main.yaml'
+
+    def test_validate_tenant_good(self):
+        # If we reach this point we successfully validated the good tenant.
+        # There is nothing more to test here.
+        pass
+
+
 class RoleTestCase(ZuulTestCase):
     def _getRolesPaths(self, build, playbook):
         path = os.path.join(self.jobdir_root, build.uuid,
