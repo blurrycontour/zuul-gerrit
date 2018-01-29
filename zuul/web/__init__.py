@@ -168,6 +168,10 @@ class GearmanHandler(object):
             'status_get': self.status_get,
             'job_list': self.job_list,
             'key_get': self.key_get,
+            'enqueue': self.enqueue,
+            'enqueue_ref': self.enqueue_ref,
+            'autohold': self.autohold,
+            'autohold_list': self.autohold_list,
         }
 
     def setEventLoop(self, event_loop):
@@ -224,6 +228,82 @@ class GearmanHandler(object):
                                                          'project': project})
         return web.Response(body=job.data[0])
 
+    async def enqueue(self, request, result_filter=None):
+        tenant = request.match_info["tenant"]
+        project = request.match_info["project"]
+        body = await request.json()
+        trigger = body.get('trigger')
+        change = body.get('change')
+        pipeline = body.get('pipeline')
+        job = await self.asyncSubmitJob('zuul:enqueue', {'tenant': tenant,
+                                                         'pipeline': pipeline,
+                                                         'project': project,
+                                                         'trigger': trigger,
+                                                         'change': change, })
+        result = not job.failure
+        return web.json_response(result)
+
+    async def enqueue_ref(self, request, result_filter=None):
+        tenant = request.match_info["tenant"]
+        project = request.match_info["project"]
+        body = await request.json()
+        trigger = body.get('trigger')
+        ref = body.get('ref')
+        oldrev = body.get('oldrev')
+        newrev = body.get('newrev')
+        pipeline = body.get('pipeline')
+        job = await self.asyncSubmitJob('zuul:enqueue_ref',
+                                        {'tenant': tenant,
+                                         'pipeline': pipeline,
+                                         'project': project,
+                                         'trigger': trigger,
+                                         'ref': ref,
+                                         'oldrev': oldrev,
+                                         'newrev': newrev, })
+        result = not job.failure
+        return web.json_response(result)
+
+    async def autohold(self, request, result_filter=None):
+        tenant = request.match_info["tenant"]
+        project = request.match_info["project"]
+        job = request.match_info["job"]
+        body = await request.json()
+        change = body.get('change')
+        ref = body.get('ref')
+        reason = body.get('reason')
+        count = body.get('count')
+        data = {'tenant': tenant,
+                'project': project,
+                'job': job,
+                'change': change,
+                'ref': ref,
+                'reason': reason,
+                'count': count}
+        result = await self.asyncSubmitJob('zuul:autohold', data)
+        return web.json_response(not result.failure)
+
+    async def autohold_list(self, request, result_filter=None):
+        data = {}
+        job = await self.asyncSubmitJob('zuul:autohold_list', data)
+        if job.failure:
+            return web.json_response(False)
+        else:
+            payload = json.loads(job.data[0])
+            result = []
+            for autohold_request in payload:
+                key = autohold_request.keys()[0]
+                tenant, project, job, ref_filter = key.split(',')
+                count, reason = autohold_request[key]
+                result.append({'tenant': tenant,
+                               'project': project,
+                               'job': job,
+                               'ref_filter': ref_filter,
+                               'count': count,
+                               'reason': reason})
+            if result_filter:
+                result = result_filter.filterPayload(result)
+            return web.json_response(result)
+
     async def processRequest(self, request, action, result_filter=None):
         resp = None
         try:
@@ -238,10 +318,15 @@ class GearmanHandler(object):
         return resp
 
 
-class ChangeFilter(object):
+class BaseFilter(object):
     def __init__(self, desired):
         self.desired = desired
 
+    def filterPayload(self, payload):
+        raise NotImplementedError
+
+
+class ChangeFilter(BaseFilter):
     def filterPayload(self, payload):
         status = []
         for pipeline in payload['pipelines']:
@@ -256,6 +341,15 @@ class ChangeFilter(object):
         return change['id'] == self.desired
 
 
+class AutoholdFilter(BaseFilter):
+    def filterPayload(self, payload):
+        autoholds = []
+        for ah in payload:
+            if all(ah[i] == self.desired[i] for i in self.desired):
+                autoholds.append(copy.deepcopy(ah))
+        return autoholds
+
+
 class ZuulWeb(object):
 
     log = logging.getLogger("zuul.web.ZuulWeb")
@@ -266,7 +360,9 @@ class ZuulWeb(object):
                  static_cache_expiry=3600,
                  connections=None,
                  info=None,
-                 static_path=None):
+                 static_path=None,
+                 admin=False):
+        self.admin = admin
         self.start_time = time.time()
         self.listen_address = listen_address
         self.listen_port = listen_port
@@ -328,6 +424,16 @@ class ZuulWeb(object):
     async def _handleKeyRequest(self, request):
         return await self.gearman_handler.processRequest(request, 'key_get')
 
+    async def _handleAutoholdListRequest(self, request):
+        try:
+            tenant = request.match_info("tenant")
+            afilter = AutoholdFilter({'tenant': tenant})
+        except Exception:
+            afilter = None
+        return await self.gearman_handler.processRequest(request,
+                                                         'autohold_list',
+                                                         afilter)
+
     async def _handleStatic(self, request):
         # http://example.com//status.html comes in as '/status.html'
         target_path = request.match_info['path'].lstrip('/')
@@ -337,6 +443,31 @@ class ZuulWeb(object):
         if not os.path.exists(fs_path):
             return web.HTTPNotFound()
         return web.FileResponse(fs_path)
+
+    # Admin operations and routes
+    async def _handleEnqueueRequest(self, request):
+        return await self.gearman_handler.processRequest(request, 'enqueue')
+
+    async def _handleEnqueueRefRequest(self, request):
+        return await self.gearman_handler.processRequest(request,
+                                                         'enqueue_ref')
+
+    async def _handleAutoholdRequest(self, request):
+        return await self.gearman_handler.processRequest(request,
+                                                         'autohold')
+
+    def append_admin_routes(self, routes):
+        pref = '/api/admin/tenant/'
+        # TODO(mhu) can we merge the enqueue routes?
+        enqueue_route = (pref + '{tenant}/project/{project:.+?}/enqueue')
+        enqueue_ref_route = (
+            pref + '{tenant}/project/{project:.+?}/enqueue_ref')
+        autohold_route = (pref + '{tenant}/project/{project:.+?}/autohold')
+        routes += [
+            ('POST', enqueue_route, self._handleEnqueueRequest),
+            ('POST', enqueue_ref_route, self._handleEnqueueRefRequest),
+            ('POST', autohold_route, self._handleAutoholdRequest),
+        ]
 
     def run(self, loop=None):
         """
@@ -361,6 +492,10 @@ class ZuulWeb(object):
              self._handleWebsocket),
             ('GET', '/api/tenant/{tenant}/key/{project:.*}.pub',
              self._handleKeyRequest),
+            ('GET', '/api/autohold', self._handleAutoholdListRequest),
+            ('GET', '/api/tenant/{tenant}/autohold',
+             self._handleAutoholdListRequest),
+
         ]
 
         static_routes = [
@@ -374,6 +509,9 @@ class ZuulWeb(object):
         # Add fallthrough routes at the end for the static html/js files
         routes.append(('GET', '/t/{tenant}/{path:.*}', self._handleStatic))
         routes.append(('GET', '/{path:.*}', self._handleStatic))
+
+        if self.admin:
+            self.append_admin_routes(routes)
 
         self.log.debug("ZuulWeb starting")
         asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
@@ -433,5 +571,6 @@ if __name__ == "__main__":
     loop = asyncio.get_event_loop()
     loop.set_debug(True)
     z = ZuulWeb(listen_address="127.0.0.1", listen_port=9000,
-                gear_server="127.0.0.1", gear_port=4730)
+                gear_server="127.0.0.1", gear_port=4730,
+                admin=True)
     z.run(loop)
