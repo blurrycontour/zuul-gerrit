@@ -3061,7 +3061,7 @@ class TestBrokenConfig(ZuulTestCase):
 
     def test_broken_config_on_startup(self):
         # verify get the errors at tenant level.
-        tenant = self.sched.abide.tenants.get('tenant-one')
+        tenant = self.sched.abide.tenants.get('tenant-broken')
         loading_errors = tenant.layout.loading_errors
         self.assertEquals(
             len(tenant.layout.loading_errors), 2,
@@ -3098,7 +3098,7 @@ class TestBrokenConfig(ZuulTestCase):
 
     def test_dynamic_ignore(self):
         # Verify dynamic config behaviors inside a tenant broken config
-        tenant = self.sched.abide.tenants.get('tenant-one')
+        tenant = self.sched.abide.tenants.get('tenant-broken')
         # There is a configuration error
         self.assertEquals(
             len(tenant.layout.loading_errors), 2,
@@ -3130,7 +3130,7 @@ class TestBrokenConfig(ZuulTestCase):
 
     def test_dynamic_fail_unbroken(self):
         # Verify dynamic config behaviors inside a tenant broken config
-        tenant = self.sched.abide.tenants.get('tenant-one')
+        tenant = self.sched.abide.tenants.get('tenant-broken')
         # There is a configuration error
         self.assertEquals(
             len(tenant.layout.loading_errors), 2,
@@ -3164,7 +3164,7 @@ class TestBrokenConfig(ZuulTestCase):
 
     def test_dynamic_fail_broken(self):
         # Verify dynamic config behaviors inside a tenant broken config
-        tenant = self.sched.abide.tenants.get('tenant-one')
+        tenant = self.sched.abide.tenants.get('tenant-broken')
         # There is a configuration error
         self.assertEquals(
             len(tenant.layout.loading_errors), 2,
@@ -3198,7 +3198,7 @@ class TestBrokenConfig(ZuulTestCase):
 
     def test_dynamic_fix_broken(self):
         # Verify dynamic config behaviors inside a tenant broken config
-        tenant = self.sched.abide.tenants.get('tenant-one')
+        tenant = self.sched.abide.tenants.get('tenant-broken')
         # There is a configuration error
         self.assertEquals(
             len(tenant.layout.loading_errors), 2,
@@ -3230,7 +3230,7 @@ class TestBrokenConfig(ZuulTestCase):
 
     def test_dynamic_fail_cross_repo(self):
         # Verify dynamic config behaviors inside a tenant broken config
-        tenant = self.sched.abide.tenants.get('tenant-one')
+        tenant = self.sched.abide.tenants.get('tenant-broken')
         # There is a configuration error
         self.assertEquals(
             len(tenant.layout.loading_errors), 2,
@@ -3324,6 +3324,51 @@ class TestProjectKeys(ZuulTestCase):
 
         # Make sure it's the right length
         self.assertEqual(2048, ssh_key.get_bits())
+
+
+class TestValidateAllBroken(ZuulTestCase):
+    # Test we fail while validating all tenants with one broken tenant
+
+    validate_tenants = []
+    tenant_config_file = 'config/broken/main.yaml'
+
+    def setUp(self):
+        self.assertRaises(zuul.configloader.ConfigurationSyntaxError,
+                          super().setUp)
+
+    def test_validate_all_tenants_broken(self):
+        # If we reach this point we successfully catched the config exception.
+        # There is nothing more to test here.
+        pass
+
+
+class TestValidateBroken(ZuulTestCase):
+    # Test we fail while validating a broken tenant
+
+    validate_tenants = ['tenant-broken']
+    tenant_config_file = 'config/broken/main.yaml'
+
+    def setUp(self):
+        self.assertRaises(zuul.configloader.ConfigurationSyntaxError,
+                          super().setUp)
+
+    def test_validate_tenant_broken(self):
+        # If we reach this point we successfully catched the config exception.
+        # There is nothing more to test here.
+        pass
+
+
+class TestValidateGood(ZuulTestCase):
+    # Test we don't fail while validating a good tenant in a multi tenant
+    # setup that contains a broken tenant.
+
+    validate_tenants = ['tenant-good']
+    tenant_config_file = 'config/broken/main.yaml'
+
+    def test_validate_tenant_good(self):
+        # If we reach this point we successfully validated the good tenant.
+        # There is nothing more to test here.
+        pass
 
 
 class RoleTestCase(ZuulTestCase):
