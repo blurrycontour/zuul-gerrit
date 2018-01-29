@@ -72,10 +72,11 @@ class ReconfigureEvent(ManagementEvent):
 
     :arg ConfigParser config: the new configuration
     """
-    def __init__(self, config, smart=False):
+    def __init__(self, config, smart=False, check_config=False):
         super(ReconfigureEvent, self).__init__()
         self.config = config
         self.smart = smart
+        self.check_config = check_config
 
 
 class TenantReconfigureEvent(ManagementEvent):
@@ -524,9 +525,10 @@ class Scheduler(threading.Thread):
     def smartReconfigureCommandHandler(self):
         self._zuul_app.smartReconfigure()
 
-    def reconfigure(self, config, smart=False):
+    def reconfigure(self, config, smart=False, check_config=False):
         self.log.debug("Submitting reconfiguration event")
-        event = ReconfigureEvent(config, smart)
+        event = ReconfigureEvent(config, smart=smart,
+                                 check_config=check_config)
         self.management_event_queue.put(event)
         self.wake_event.set()
         self.log.debug("Waiting for reconfiguration")
@@ -703,18 +705,28 @@ class Scheduler(threading.Thread):
                 tenant_config, from_script=script)
             abide = loader.loadConfig(
                 self.unparsed_abide, self.ansible_manager)
-            for tenant in abide.tenants.values():
-                # If we're doing a smart reconfig only reconfig tenants that
-                # changed their config.
-                if event.smart:
-                    old_tenant = [x for x in old_unparsed_abide.tenants
-                                  if x['name'] == tenant.name]
-                    new_tenant = [x for x in self.unparsed_abide.tenants
-                                  if x['name'] == tenant.name]
-                    if old_tenant == new_tenant:
-                        continue
-                self._reconfigureTenant(tenant)
-            self.abide = abide
+            if not event.check_config:
+                for tenant in abide.tenants.values():
+                    # If we're doing a smart reconfig only reconfig tenants
+                    # that changed their config.
+                    if event.smart:
+                        old_tenant = [x for x in old_unparsed_abide.tenants
+                                      if x['name'] == tenant.name]
+                        new_tenant = [x for x in self.unparsed_abide.tenants
+                                      if x['name'] == tenant.name]
+                        if old_tenant == new_tenant:
+                            continue
+                    self._reconfigureTenant(tenant)
+                self.abide = abide
+            else:
+                loading_errors = []
+                for tenant in abide.tenants.values():
+                    for error in tenant.layout.loading_errors:
+                        loading_errors.append(error.__repr__())
+                if loading_errors:
+                    summary = '\n\n\n'.join(loading_errors)
+                    raise configloader.ConfigurationSyntaxError(
+                        'Configuration errors: {}'.format(summary))
         finally:
             self.layout_lock.release()
         self.log.info("Full reconfiguration complete")
