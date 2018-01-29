@@ -39,6 +39,14 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
 
     def createParser(self):
         parser = super(Scheduler, self).createParser()
+        parser.add_argument('--validate-tenants', dest='validate_tenants',
+                            metavar='TENANT', nargs='*',
+                            help='Load configuration of the listed tenants and'
+                                 ' exit afterwards, indicating success or '
+                                 'failure via the exit code. If no tenant is '
+                                 'listed, all tenants will be validated. '
+                                 'Note: this requires the gearman server and '
+                                 'will distribute work to mergers.')
         parser.add_argument('command',
                             choices=zuul.scheduler.COMMANDS,
                             nargs='?')
@@ -139,38 +147,47 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
 
         self.sched = zuul.scheduler.Scheduler(self.config)
 
-        gearman = zuul.executor.client.ExecutorClient(self.config, self.sched)
         self.sched.setZuulApp(self)
         merger = zuul.merger.client.MergeClient(self.config, self.sched)
-        nodepool = zuul.nodepool.Nodepool(self.sched)
-
-        zookeeper = zuul.zk.ZooKeeper(enable_cache=True)
-        zookeeper_hosts = get_default(self.config, 'zookeeper', 'hosts', None)
-        if not zookeeper_hosts:
-            raise Exception("The zookeeper hosts config value is required")
-        zookeeper_tls_key = get_default(self.config, 'zookeeper', 'tls_key')
-        zookeeper_tls_cert = get_default(self.config, 'zookeeper', 'tls_cert')
-        zookeeper_tls_ca = get_default(self.config, 'zookeeper', 'tls_ca')
-        zookeeper_timeout = float(get_default(self.config, 'zookeeper',
-                                              'session_timeout', 10.0))
-        zookeeper.connect(
-            zookeeper_hosts,
-            timeout=zookeeper_timeout,
-            tls_cert=zookeeper_tls_cert,
-            tls_key=zookeeper_tls_key,
-            tls_ca=zookeeper_tls_ca)
 
         self.configure_connections()
-        self.sched.setExecutor(gearman)
         self.sched.setMerger(merger)
-        self.sched.setNodepool(nodepool)
-        self.sched.setZooKeeper(zookeeper)
+
+        if self.args.validate_tenants is None:
+
+            # Only needed in full mode
+            gearman = zuul.executor.client.ExecutorClient(self.config,
+                                                          self.sched)
+            nodepool = zuul.nodepool.Nodepool(self.sched)
+
+            zookeeper = zuul.zk.ZooKeeper(enable_cache=True)
+            zookeeper_hosts = get_default(
+                self.config, 'zookeeper', 'hosts', None)
+            if not zookeeper_hosts:
+                raise Exception("The zookeeper hosts config value is required")
+            zookeeper_tls_key = get_default(self.config, 'zookeeper',
+                                            'tls_key')
+            zookeeper_tls_cert = get_default(self.config, 'zookeeper',
+                                             'tls_cert')
+            zookeeper_tls_ca = get_default(self.config, 'zookeeper', 'tls_ca')
+            zookeeper_timeout = float(get_default(self.config, 'zookeeper',
+                                                  'session_timeout', 10.0))
+
+            zookeeper.connect(zookeeper_hosts, timeout=zookeeper_timeout,
+                              tls_cert=zookeeper_tls_cert,
+                              tls_key=zookeeper_tls_key,
+                              tls_ca=zookeeper_tls_ca)
+
+            self.sched.setExecutor(gearman)
+            self.sched.setNodepool(nodepool)
+            self.sched.setZooKeeper(zookeeper)
 
         self.log.info('Starting scheduler')
         try:
             self.sched.start()
             self.sched.registerConnections(self.connections)
-            self.sched.reconfigure(self.config)
+            self.sched.reconfigure(self.config,
+                                   validate_tenants=self.args.validate_tenants)
             self.sched.wakeUp()
         except Exception:
             self.log.exception("Error starting Zuul:")
@@ -178,6 +195,10 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
             # we might be able to have a nicer way of exiting here.
             self.sched.stop()
             sys.exit(1)
+
+        if self.args.validate_tenants is not None:
+            self.sched.stop()
+            sys.exit(0)
 
         signal.signal(signal.SIGHUP, self.reconfigure_handler)
 
