@@ -23,6 +23,7 @@ import urllib
 import time
 import socket
 
+import zuul.rpcclient
 import zuul.web
 
 from tests.base import ZuulTestCase, FIXTURE_DIR
@@ -42,6 +43,8 @@ class FakeConfig(object):
 
 class BaseTestWeb(ZuulTestCase):
     tenant_config_file = 'config/single-tenant/main.yaml'
+    # override me
+    constructor = None
     config_ini_data = {}
 
     def setUp(self):
@@ -60,7 +63,7 @@ class BaseTestWeb(ZuulTestCase):
 
         self.zuul_ini_config = FakeConfig(self.config_ini_data)
         # Start the web server
-        self.web = zuul.web.ZuulWeb(
+        self.web = self.constructor(
             listen_address='127.0.0.1', listen_port=0,
             gear_server='127.0.0.1', gear_port=self.gearman_server.port,
             info=zuul.model.WebInfo.fromConfig(self.zuul_ini_config)
@@ -95,6 +98,8 @@ class BaseTestWeb(ZuulTestCase):
 
 
 class TestWeb(BaseTestWeb):
+
+    constructor = zuul.web.ZuulWeb
 
     def test_web_status(self):
         "Test that we can retrieve JSON status info"
@@ -275,6 +280,34 @@ class TestWeb(BaseTestWeb):
         f = urllib.request.urlopen(req)
         self.assertEqual(f.read(), public_pem)
 
+    def test_web_autohold_list(self):
+        """test listing autoholds through zuul-web"""
+        client = zuul.rpcclient.RPCClient('127.0.0.1',
+                                          self.gearman_server.port)
+
+        r = client.autohold('tenant-one', 'org/project', 'project-test2',
+                            "", "", "reason text", 1)
+        self.assertTrue(r)
+
+        req = urllib.request.Request(
+            "http://localhost:%s/autohold" % self.port)
+        f = urllib.request.urlopen(req)
+        autohold_requests = json.loads(f.read().decode('utf8'))
+
+        self.assertNotEqual({}, autohold_requests)
+        self.assertEqual(1, len(autohold_requests.keys()))
+        # The single dict key should be a CSV string value
+        key = list(autohold_requests.keys())[0]
+        tenant, project, job, ref_filter = key.split(',')
+
+        self.assertEqual('tenant-one', tenant)
+        self.assertIn('org/project', project)
+        self.assertEqual('project-test2', job)
+        self.assertEqual(".*", ref_filter)
+        # Note: the value is converted from set to list by json.
+        self.assertEqual([1, "reason text"], autohold_requests[key])
+        client.shutdown()
+
     def test_web_404_on_unknown_tenant(self):
         req = urllib.request.Request(
             "http://localhost:{}/non-tenant/status".format(self.port))
@@ -284,6 +317,7 @@ class TestWeb(BaseTestWeb):
 
 
 class TestInfo(BaseTestWeb):
+    constructor = zuul.web.ZuulWeb
 
     def setUp(self):
         super(TestInfo, self).setUp()
@@ -356,3 +390,96 @@ class TestGraphiteUrl(TestInfo):
             'stats_url': 'https://graphite.example.com',
         }
     }
+
+
+class TestAdminWeb(BaseTestWeb):
+
+    constructor = zuul.web.ZuulAdminWeb
+
+    def test_enqueue(self):
+        """Test that the admin web interface can enqueue a change"""
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        A.addApproval('Approved', 1)
+
+        path = "http://localhost:%s" % self.port
+        path += "/%(tenant)s/%(project)s/%(pipeline)s/enqueue"
+        enqueue_args = {'tenant': 'tenant-one',
+                        'project': 'org/project',
+                        'pipeline': 'gate', }
+        change = {'trigger': 'gerrit',
+                  'change': '1,1', }
+        req = urllib.request.Request(
+            path % enqueue_args,
+            data=json.dumps(change).encode('utf8'),
+            headers={'content-type': 'application/json'},
+            method='POST')
+        f = urllib.request.urlopen(req)
+        # The JSON returned is the same as the client's output
+        data = json.loads(f.read().decode('utf8'))
+        self.assertEqual(True, data)
+        self.waitUntilSettled()
+
+    def test_enqueue_ref(self):
+        """Test that the admin web interface can enqueue a ref"""
+        p = "review.example.com/org/project"
+        upstream = self.getUpstreamRepos([p])
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.setMerged()
+        A_commit = str(upstream[p].commit('master'))
+        self.log.debug("A commit: %s" % A_commit)
+
+        path = "http://localhost:%s" % self.port
+        path += "/%(tenant)s/%(project)s/%(pipeline)s/enqueue_ref"
+        enqueue_args = {'tenant': 'tenant-one',
+                        'project': 'org/project',
+                        'pipeline': 'post', }
+        ref = {'trigger': 'gerrit',
+               'ref': 'master',
+               'oldrev': '90f173846e3af9154517b88543ffbd1691f31366',
+               'newrev': A_commit, }
+        req = urllib.request.Request(
+            path % enqueue_args,
+            data=json.dumps(ref).encode('utf8'),
+            headers={'content-type': 'application/json'},
+            method='POST')
+        f = urllib.request.urlopen(req)
+        # The JSON returned is the same as the client's output
+        data = json.loads(f.read().decode('utf8'))
+        self.assertEqual(True, data)
+        self.waitUntilSettled()
+
+    def test_autohold(self):
+        """Test that autohold can be set through the admin web interface"""
+        path = "http://localhost:%s" % self.port
+        path += "/%(tenant)s/%(project)s/%(job)s/autohold"
+        autohold_args = {'tenant': 'tenant-one',
+                         'project': 'org/project',
+                         'job': 'project-test2', }
+        args = {"reason": "some reason",
+                "count": 1, }
+        req = urllib.request.Request(
+            path % autohold_args,
+            data=json.dumps(args).encode('utf8'),
+            headers={'content-type': 'application/json'},
+            method='POST')
+        f = urllib.request.urlopen(req)
+        # The JSON returned is the same as the client's output
+        data = json.loads(f.read().decode('utf8'))
+        self.assertEqual(True, data)
+
+        # Check result in rpc client
+        client = zuul.rpcclient.RPCClient('127.0.0.1',
+                                          self.gearman_server.port)
+        autohold_requests = client.autohold_list()
+        self.assertNotEqual({}, autohold_requests)
+        self.assertEqual(1, len(autohold_requests.keys()))
+        key = list(autohold_requests.keys())[0]
+        tenant, project, job, ref_filter = key.split(',')
+        self.assertEqual('tenant-one', tenant)
+        self.assertIn('org/project', project)
+        self.assertEqual('project-test2', job)
+        self.assertEqual(".*", ref_filter)
+        # Note: the value is converted from set to list by json.
+        self.assertEqual([1, "some reason"], autohold_requests[key])
+        client.shutdown()
