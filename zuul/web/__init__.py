@@ -157,6 +157,8 @@ class GearmanHandler(object):
             'status_get': self.status_get,
             'job_list': self.job_list,
             'key_get': self.key_get,
+            'enqueue': self.enqueue,
+            'enqueue_ref': self.enqueue_ref,
         }
 
     async def tenant_list(self, request):
@@ -191,6 +193,40 @@ class GearmanHandler(object):
                                                   'project': project})
         return web.Response(body=job.data[0])
 
+    def enqueue(self, request):
+        tenant = request.match_info["tenant"]
+        pipeline = request.match_info["pipeline"]
+        project = request.match_info["project"]
+        body = yield from request.json()
+        trigger = body.get('trigger')
+        change = body.get('change')
+        job = self.rpc.submitJob('zuul:enqueue', {'tenant': tenant,
+                                                  'pipeline': pipeline,
+                                                  'project': project,
+                                                  'trigger': trigger,
+                                                  'change': change, })
+        result = not job.failure
+        return web.json_response(result)
+
+    def enqueue_ref(self, request):
+        tenant = request.match_info["tenant"]
+        pipeline = request.match_info["pipeline"]
+        project = request.match_info["project"]
+        body = yield from request.json()
+        trigger = body.get('trigger')
+        ref = body.get('ref')
+        oldrev = body.get('oldrev')
+        newrev = body.get('newrev')
+        job = self.rpc.submitJob('zuul:enqueue', {'tenant': tenant,
+                                                  'pipeline': pipeline,
+                                                  'project': project,
+                                                  'trigger': trigger,
+                                                  'ref': ref,
+                                                  'oldrev': oldrev,
+                                                  'newrev': newrev, })
+        result = not job.failure
+        return web.json_response(result)
+
     async def processRequest(self, request, action):
         try:
             resp = await self.controllers[action](request)
@@ -203,7 +239,7 @@ class GearmanHandler(object):
         return resp
 
 
-class ZuulWeb(object):
+class BaseZuulWeb(object):
 
     log = logging.getLogger("zuul.web.ZuulWeb")
 
@@ -228,6 +264,78 @@ class ZuulWeb(object):
         for connection in connections:
             self._plugin_routes.extend(connection.getWebHandlers(self))
 
+    def stop(self):
+        if self.event_loop and self.term:
+            self.event_loop.call_soon_threadsafe(self.term.set_result, True)
+
+    def _add_static_path(self, app):
+        return
+
+    @property
+    def routes(self):
+        return self._routes()
+
+    def _routes(self):
+        return []
+
+    def run(self, loop=None):
+        """
+        Run the websocket daemon.
+
+        Because this method can be the target of a new thread, we need to
+        set the thread event loop here, rather than in __init__().
+
+        :param loop: The event loop to use. If not supplied, the default main
+            thread event loop is used. This should be supplied if ZuulWeb
+            is run within a separate (non-main) thread.
+        """
+        self.log.debug("%s starting" % self.__class__.__name__)
+        asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+        user_supplied_loop = loop is not None
+        if not loop:
+            loop = asyncio.get_event_loop()
+        asyncio.set_event_loop(loop)
+
+        self.event_loop = loop
+        self.log_streaming_handler.setEventLoop(loop)
+
+        app = web.Application()
+        for method, path, handler in self.routes:
+            app.router.add_route(method, path, handler)
+        self._add_static_path(app)
+        handler = app.make_handler(loop=self.event_loop)
+
+        # create the server
+        coro = self.event_loop.create_server(handler,
+                                             self.listen_address,
+                                             self.listen_port)
+        self.server = self.event_loop.run_until_complete(coro)
+
+        self.term = asyncio.Future()
+
+        # start the server
+        self.event_loop.run_until_complete(self.term)
+
+        # cleanup
+        self.log.debug("%s stopping" % self.__class__.__name__)
+        self.server.close()
+        self.event_loop.run_until_complete(self.server.wait_closed())
+        self.event_loop.run_until_complete(app.shutdown())
+        self.event_loop.run_until_complete(handler.shutdown(60.0))
+        self.event_loop.run_until_complete(app.cleanup())
+        self.log.debug("%s stopped" % self.__class__.__name__)
+
+        # Only run these if we are controlling the loop - they need to be
+        # run from the main thread
+        if not user_supplied_loop:
+            loop.stop()
+            loop.close()
+
+        self.rpc.shutdown()
+
+
+class ZuulWeb(BaseZuulWeb):
+
     async def _handleWebsocket(self, request):
         return await self.log_streaming_handler.processRequest(
             request)
@@ -245,17 +353,10 @@ class ZuulWeb(object):
     async def _handleKeyRequest(self, request):
         return await self.gearman_handler.processRequest(request, 'key_get')
 
-    def run(self, loop=None):
-        """
-        Run the websocket daemon.
+    def _add_static_path(self, app):
+        app.router.add_static('/static', STATIC_DIR)
 
-        Because this method can be the target of a new thread, we need to
-        set the thread event loop here, rather than in __init__().
-
-        :param loop: The event loop to use. If not supplied, the default main
-            thread event loop is used. This should be supplied if ZuulWeb
-            is run within a separate (non-main) thread.
-        """
+    def _routes(self):
         routes = [
             ('GET', '/tenants.json', self._handleTenantsRequest),
             ('GET', '/{tenant}/status.json', self._handleStatusRequest),
@@ -275,59 +376,43 @@ class ZuulWeb(object):
         for route in static_routes + self._plugin_routes:
             routes.append((route.method, route.path, route.handleRequest))
 
-        self.log.debug("ZuulWeb starting")
-        asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-        user_supplied_loop = loop is not None
-        if not loop:
-            loop = asyncio.get_event_loop()
-        asyncio.set_event_loop(loop)
+        return routes
 
-        self.event_loop = loop
-        self.log_streaming_handler.setEventLoop(loop)
 
-        app = web.Application()
-        for method, path, handler in routes:
-            app.router.add_route(method, path, handler)
-        app.router.add_static('/static', STATIC_DIR)
-        handler = app.make_handler(loop=self.event_loop)
+class ZuulAdminWeb(BaseZuulWeb):
 
-        # create the server
-        coro = self.event_loop.create_server(handler,
-                                             self.listen_address,
-                                             self.listen_port)
-        self.server = self.event_loop.run_until_complete(coro)
+    async def _handleEnqueueRequest(self, request):
+        return await self.gearman_handler.processRequest(request, 'enqueue')
 
-        self.term = asyncio.Future()
+    async def _handleEnqueueRefRequest(self, request):
+        return await self.gearman_handler.processRequest(request,
+                                                         'enqueue_ref')
 
-        # start the server
-        self.event_loop.run_until_complete(self.term)
+    def _routes(self):
+        enqueue_route = ('/{tenant}/{project}/{pipeline}/enqueue')
+        enqueue_ref_route = ('/{tenant}/{project}/{pipeline}/enqueue_ref')
+        routes = [
+            ('POST', enqueue_route, self._handleEnqueueRequest),
+            ('POST', enqueue_ref_route, self._handleEnqueueRefRequest),
+        ]
+        for route in self._plugin_routes:
+            routes.append((route.method, route.path, route.handleRequest))
 
-        # cleanup
-        self.log.debug("ZuulWeb stopping")
-        self.server.close()
-        self.event_loop.run_until_complete(self.server.wait_closed())
-        self.event_loop.run_until_complete(app.shutdown())
-        self.event_loop.run_until_complete(handler.shutdown(60.0))
-        self.event_loop.run_until_complete(app.cleanup())
-        self.log.debug("ZuulWeb stopped")
-
-        # Only run these if we are controlling the loop - they need to be
-        # run from the main thread
-        if not user_supplied_loop:
-            loop.stop()
-            loop.close()
-
-        self.rpc.shutdown()
-
-    def stop(self):
-        if self.event_loop and self.term:
-            self.event_loop.call_soon_threadsafe(self.term.set_result, True)
+        return routes
 
 
 if __name__ == "__main__":
+
+    # provide all routes under one single server
+    class DebugZuulWeb(ZuulWeb, ZuulAdminWeb):
+
+        def _routes(self):
+            routes = ZuulWeb._routes(self) + ZuulAdminWeb._routes(self)
+            return routes
+
     logging.basicConfig(level=logging.DEBUG)
     loop = asyncio.get_event_loop()
     loop.set_debug(True)
-    z = ZuulWeb(listen_address="127.0.0.1", listen_port=9000,
-                gear_server="127.0.0.1", gear_port=4730)
+    z = DebugZuulWeb(listen_address="127.0.0.1", listen_port=9000,
+                     gear_server="127.0.0.1", gear_port=4730)
     z.run(loop)
