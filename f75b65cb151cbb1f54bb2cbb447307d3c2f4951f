@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f93b717_e7e044fd",
+        "filename": "tests/unit/test_web_urls.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-01-29T12:16:38Z",
+      "side": 1,
+      "message": "Above import are not used.",
+      "revId": "f75b65cb151cbb1f54bb2cbb447307d3c2f4951f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f93b717_47f1f8cc",
+        "filename": "tests/unit/test_web_urls.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-01-29T12:16:38Z",
+      "side": 1,
+      "message": "Above 3 imports are not used too.",
+      "revId": "f75b65cb151cbb1f54bb2cbb447307d3c2f4951f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f93b717_67ec34f3",
+        "filename": "tests/unit/test_web_urls.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-01-29T12:16:38Z",
+      "side": 1,
+      "message": "Import not used too.",
+      "revId": "f75b65cb151cbb1f54bb2cbb447307d3c2f4951f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f93b717_07bd30d7",
+        "filename": "tests/unit/test_web_urls.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-01-29T12:16:38Z",
+      "side": 1,
+      "message": "I think this need https://review.openstack.org/#/c/535536/",
+      "revId": "f75b65cb151cbb1f54bb2cbb447307d3c2f4951f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f93b717_07d4501f",
+        "filename": "tests/unit/test_web_urls.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-01-29T12:16:38Z",
+      "side": 1,
+      "message": "Isn\u0027t this going to call TestWebURLs.setUp() only?",
+      "revId": "f75b65cb151cbb1f54bb2cbb447307d3c2f4951f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
