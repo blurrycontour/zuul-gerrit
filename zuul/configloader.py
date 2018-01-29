@@ -2204,12 +2204,19 @@ class ConfigLoader(object):
         unparsed_abide.extend(data)
         return unparsed_abide
 
-    def loadConfig(self, unparsed_abide, ansible_manager):
+    def loadConfig(self, unparsed_abide, ansible_manager, tenants=None):
         abide = model.Abide()
         for conf_admin_rule in unparsed_abide.admin_rules:
             admin_rule = self.admin_rule_parser.fromYaml(conf_admin_rule)
             abide.admin_rules[admin_rule.name] = admin_rule
-        for conf_tenant in unparsed_abide.tenants:
+
+        if tenants:
+            tenants_to_load = [t for t in unparsed_abide.tenants
+                               if t.get('name') in tenants]
+        else:
+            tenants_to_load = unparsed_abide.tenants
+
+        for conf_tenant in tenants_to_load:
             # When performing a full reload, do not use cached data.
             tenant = self.tenant_parser.fromYaml(
                 abide, conf_tenant, ansible_manager)
