@@ -38,6 +38,14 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
 
     def createParser(self):
         parser = super(Scheduler, self).createParser()
+        parser.add_argument('--validate-tenants', dest='validate_tenants',
+                            metavar='TENANT', nargs='*',
+                            help='Load configuration of the listed tenants and'
+                                 ' exit afterwards, indicating success or '
+                                 'failure via the exit code. If no tenant is '
+                                 'listed, all tenants will be validated. '
+                                 'Note: this requires the gearman server and '
+                                 'will distribute work to mergers.')
         parser.add_argument('command',
                             choices=zuul.scheduler.COMMANDS,
                             nargs='?')
@@ -133,25 +141,33 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
 
         self.sched = zuul.scheduler.Scheduler(self.config)
 
-        gearman = zuul.executor.client.ExecutorClient(self.config, self.sched)
         self.sched.setZuulApp(self)
         merger = zuul.merger.client.MergeClient(self.config, self.sched)
-        nodepool = zuul.nodepool.Nodepool(self.sched)
-
-        zk_client = ZooKeeperClient.fromConfig(self.config)
-        zk_client.connect()
 
         self.configure_connections(require_sql=True)
-        self.sched.setExecutor(gearman)
         self.sched.setMerger(merger)
-        self.sched.setNodepool(nodepool)
-        self.sched.setZooKeeper(zk_client)
+
+        zk_client = None
+        if self.args.validate_tenants is None:
+
+            # Only needed in full mode
+            gearman = zuul.executor.client.ExecutorClient(self.config,
+                                                          self.sched)
+            nodepool = zuul.nodepool.Nodepool(self.sched)
+
+            zk_client = ZooKeeperClient.fromConfig(self.config)
+            zk_client.connect()
+
+            self.sched.setExecutor(gearman)
+            self.sched.setNodepool(nodepool)
+            self.sched.setZooKeeper(zk_client)
 
         self.log.info('Starting scheduler')
         try:
             self.sched.start()
             self.sched.registerConnections(self.connections)
-            self.sched.reconfigure(self.config)
+            self.sched.reconfigure(self.config,
+                                   validate_tenants=self.args.validate_tenants)
             self.sched.wakeUp()
         except Exception:
             self.log.exception("Error starting Zuul:")
@@ -159,6 +175,10 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
             # we might be able to have a nicer way of exiting here.
             self.sched.stop()
             sys.exit(1)
+
+        if self.args.validate_tenants is not None:
+            self.sched.stop()
+            sys.exit(0)
 
         if self.args.nodaemon:
             signal.signal(signal.SIGTERM, self.exit_handler)

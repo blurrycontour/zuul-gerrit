@@ -4004,9 +4004,11 @@ class SchedulerTestApp:
         self.sched.setNodepool(nodepool)
         self.sched.setZooKeeper(zk_client)
 
+    def start(self, validate_tenants: list):
         self.sched.start()
-        executor_client.gearman.waitForServer()
-        self.sched.reconfigure(self.config)
+        self.sched.executor.gearman.waitForServer()
+        self.sched.reconfigure(
+            self.config, validate_tenants=validate_tenants)
         self.sched.wakeUp()
 
     def fullReconfigure(self):
@@ -4151,6 +4153,7 @@ class ZuulTestCase(BaseTestCase):
     log_console_port: int = 19885
     source_only: bool = False
     fake_sql: bool = True
+    validate_tenants = None
 
     def __getattr__(self, name):
         """Allows to access fake connections the old way, e.g., using
@@ -4327,6 +4330,9 @@ class ZuulTestCase(BaseTestCase):
         self.addCleanup(self.assertCleanShutdown)
         self.addCleanup(self.shutdown)
         self.addCleanup(self.assertFinalState)
+
+        self.scheds.execute(
+            lambda app: app.start(self.validate_tenants))
 
     def __event_queues(self, matcher) -> List[Queue]:
         sched_queues = map(lambda app: app.event_queues,
