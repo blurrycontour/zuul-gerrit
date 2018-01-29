@@ -3420,7 +3420,7 @@ class SymLink(object):
 
 class SchedulerTestApp:
     def __init__(self, log: Logger, config: ConfigParser, zk_config: str,
-                 connections: ConnectionRegistry):
+                 connections: ConnectionRegistry, validate_tenants: list):
         self.log = log
         self.config = config
         self.zk_config = zk_config
@@ -3451,7 +3451,8 @@ class SchedulerTestApp:
 
         self.sched.start()
         executor_client.gearman.waitForServer()
-        self.sched.reconfigure(self.config)
+        self.sched.reconfigure(
+            self.config, validate_tenants=validate_tenants)
         self.sched.wakeUp()
 
     def fullReconfigure(self):
@@ -3478,8 +3479,10 @@ class SchedulerTestManager:
         self.instances = []
 
     def create(self, log: Logger, config: ConfigParser, zk_config: str,
-               connections: ConnectionRegistry) -> SchedulerTestApp:
-        app = SchedulerTestApp(log, config, zk_config, connections)
+               connections: ConnectionRegistry,
+               validate_tenants: list) -> SchedulerTestApp:
+        app = SchedulerTestApp(log, config, zk_config, connections,
+                               validate_tenants)
         self.instances.append(app)
         return app
 
@@ -3586,6 +3589,7 @@ class ZuulTestCase(BaseTestCase):
     use_ssl = False
     git_url_with_auth = False
     log_console_port = 19885
+    validate_tenants = None
 
     def _startMerger(self):
         self.merge_server = zuul.merger.server.MergeServer(self.config,
@@ -3709,7 +3713,8 @@ class ZuulTestCase(BaseTestCase):
 
         self.scheds = SchedulerTestManager()
         self.scheds.create(
-            self.log, self.config, self.zk_config, self.connections)
+            self.log, self.config, self.zk_config, self.connections,
+            self.validate_tenants)
 
         if hasattr(self, 'fake_github'):
             self.additional_event_queues.append(
