@@ -31,11 +31,13 @@ import zuul.web
 from tests.base import ZuulTestCase, FIXTURE_DIR
 
 
-class TestWeb(ZuulTestCase):
+class BaseTestWeb(ZuulTestCase):
     tenant_config_file = 'config/single-tenant/main.yaml'
+    # override me
+    constructor = None
 
     def setUp(self):
-        super(TestWeb, self).setUp()
+        super(BaseTestWeb, self).setUp()
         self.executor_server.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         A.addApproval('Code-Review', 2)
@@ -46,7 +48,7 @@ class TestWeb(ZuulTestCase):
         self.waitUntilSettled()
 
         # Start the web server
-        self.web = zuul.web.ZuulWeb(
+        self.web = self.constructor(
             listen_address='127.0.0.1', listen_port=0,
             gear_server='127.0.0.1', gear_port=self.gearman_server.port)
         loop = asyncio.new_event_loop()
@@ -75,7 +77,12 @@ class TestWeb(ZuulTestCase):
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
         self.waitUntilSettled()
-        super(TestWeb, self).tearDown()
+        super(BaseTestWeb, self).tearDown()
+
+
+class TestWeb(BaseTestWeb):
+
+    constructor = zuul.web.ZuulWeb
 
     def test_web_status(self):
         "Test that we can retrieve JSON status info"
@@ -234,3 +241,61 @@ class TestWeb(ZuulTestCase):
         e = self.assertRaises(
             urllib.error.HTTPError, urllib.request.urlopen, req)
         self.assertEqual(404, e.code)
+
+
+class TestAdminWeb(BaseTestWeb):
+
+    constructor = zuul.web.ZuulAdminWeb
+
+    def test_enqueue(self):
+        """Test that the admin web interface can enqueue a change"""
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        A.addApproval('Approved', 1)
+
+        path = "http://localhost:%s" % self.port
+        path += "/%(tenant)s/%(project)s/%(pipeline)s/enqueue"
+        enqueue_args = {'tenant': 'tenant-one',
+                        'project': 'org/project',
+                        'pipeline': 'gate', }
+        change = {'trigger': 'gerrit',
+                  'change': '1,1', }
+        req = urllib.request.Request(
+            path % enqueue_args,
+            data=json.dumps(change).encode('utf8'),
+            headers={'content-type': 'application/json'},
+            method='POST')
+        f = urllib.request.urlopen(req)
+        # The JSON returned is the same as the client's output
+        data = json.loads(f.read().decode('utf8'))
+        self.assertEqual(True, data)
+        self.waitUntilSettled()
+
+    def test_enqueue_ref(self):
+        """Test that the admin web interface can enqueue a ref"""
+        p = "review.example.com/org/project"
+        upstream = self.getUpstreamRepos([p])
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.setMerged()
+        A_commit = str(upstream[p].commit('master'))
+        self.log.debug("A commit: %s" % A_commit)
+
+        path = "http://localhost:%s" % self.port
+        path += "/%(tenant)s/%(project)s/%(pipeline)s/enqueue_ref"
+        enqueue_args = {'tenant': 'tenant-one',
+                        'project': 'org/project',
+                        'pipeline': 'post', }
+        ref = {'trigger': 'gerrit',
+               'ref': 'master',
+               'oldrev': '90f173846e3af9154517b88543ffbd1691f31366',
+               'newrev': A_commit, }
+        req = urllib.request.Request(
+            path % enqueue_args,
+            data=json.dumps(ref).encode('utf8'),
+            headers={'content-type': 'application/json'},
+            method='POST')
+        f = urllib.request.urlopen(req)
+        # The JSON returned is the same as the client's output
+        data = json.loads(f.read().decode('utf8'))
+        self.assertEqual(True, data)
+        self.waitUntilSettled()
