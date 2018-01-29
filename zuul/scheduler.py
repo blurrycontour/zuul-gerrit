@@ -66,9 +66,10 @@ class ReconfigureEvent(ManagementEvent):
 
     :arg ConfigParser config: the new configuration
     """
-    def __init__(self, config):
+    def __init__(self, config, check_config=False):
         super(ReconfigureEvent, self).__init__()
         self.config = config
+        self.check_config = check_config
 
 
 class TenantReconfigureEvent(ManagementEvent):
@@ -425,9 +426,9 @@ class Scheduler(threading.Thread):
         self.management_event_queue.put(event)
         self.wake_event.set()
 
-    def reconfigure(self, config):
+    def reconfigure(self, config, check_config=False):
         self.log.debug("Submitting reconfiguration event")
-        event = ReconfigureEvent(config)
+        event = ReconfigureEvent(config, check_config)
         self.management_event_queue.put(event)
         self.wake_event.set()
         self.log.debug("Waiting for reconfiguration")
@@ -551,9 +552,10 @@ class Scheduler(threading.Thread):
                 self.config.get('scheduler', 'tenant_config'),
                 self._get_project_key_dir(),
                 self, self.merger, self.connections)
-            for tenant in abide.tenants.values():
-                self._reconfigureTenant(tenant)
-            self.abide = abide
+            if not event.check_config:
+                for tenant in abide.tenants.values():
+                    self._reconfigureTenant(tenant)
+                self.abide = abide
         finally:
             self.layout_lock.release()
         self.log.debug("Full reconfiguration complete")
