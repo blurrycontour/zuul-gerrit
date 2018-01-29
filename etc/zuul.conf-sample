@@ -35,10 +35,12 @@ trusted_ro_paths=/opt/zuul-scripts:/var/cache
 trusted_rw_paths=/opt/zuul-logs
 
 [web]
-listen_address=127.0.0.1
+listen_address=0.0.0.0
 port=9000
 static_cache_expiry=0
 ;sql_connection_name=mydatabase
+admin_listen_address=127.0.0.1
+admin_port=9009
 
 [webapp]
 listen_address=0.0.0.0

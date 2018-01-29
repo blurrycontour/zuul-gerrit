@@ -14,6 +14,7 @@
 # under the License.
 
 import asyncio
+from copy import deepcopy
 import logging
 import signal
 import sys
@@ -35,10 +36,11 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
 
     def _run(self):
         params = dict()
+        admin_params = dict()
 
         params['listen_address'] = get_default(self.config,
                                                'web', 'listen_address',
-                                               '127.0.0.1')
+                                               '0.0.0.0')
         params['listen_port'] = get_default(self.config, 'web', 'port', 9000)
         params['static_cache_expiry'] = get_default(self.config, 'web',
                                                     'static_cache_expiry',
@@ -79,6 +81,25 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
             self.log.exception("Error creating ZuulWeb:")
             sys.exit(1)
 
+        if (get_default(self.config, 'web',
+                        'admin_listen_address', None) and
+            get_default(self.config, 'web',
+                        'admin_port', None)):
+            admin_params = deepcopy(params)
+            admin_addr = get_default(self.config, 'web',
+                                     'admin_listen_address', None)
+            admin_port = get_default(self.config, 'web', 'admin_port', None)
+            admin_params['listen_address'] = admin_addr
+            admin_params['listen_port'] = admin_port
+        elif (get_default(self.config, 'web',
+                          'admin_listen_address', None) or
+              get_default(self.config, 'web',
+                          'admin_port', None)):
+            self.log.exception(
+                'Incomplete parameters: define '
+                'admin_listen_address and admin_port')
+            sys.exit(1)
+
         loop = asyncio.get_event_loop()
         signal.signal(signal.SIGUSR1, self.exit_handler)
         signal.signal(signal.SIGTERM, self.exit_handler)
@@ -89,6 +110,19 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
                                        name='web')
         self.thread.start()
 
+        if admin_params:
+            try:
+                self.admin_web = zuul.web.ZuulAdminWeb(**admin_params)
+                self.log.info('Zuul Web Admin Server starting')
+                self.admin_thread = threading.Thread(target=self.admin_web.run,
+                                                     args=(loop,),
+                                                     name='webAdmin')
+                self.admin_thread.start()
+
+            except Exception as e:
+                self.log.exception("Error creating ZuulAdminWeb:")
+                sys.exit(1)
+
         try:
             signal.pause()
         except KeyboardInterrupt:
@@ -96,6 +130,8 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
             self.exit_handler(signal.SIGINT, None)
 
         self.thread.join()
+        if admin_params:
+            self.admin_thread.join()
         loop.stop()
         loop.close()
         self.log.info("Zuul Web Server stopped")
