@@ -3181,6 +3181,7 @@ class ZuulTestCase(BaseTestCase):
     use_ssl = False
     git_url_with_auth = False
     log_console_port = 19885
+    validate_tenants = None
 
     def _startMerger(self):
         self.merge_server = zuul.merger.server.MergeServer(self.config,
@@ -3337,7 +3338,8 @@ class ZuulTestCase(BaseTestCase):
         self.addCleanup(self.shutdown)
         self.addCleanup(self.assertFinalState)
 
-        self.sched.reconfigure(self.config)
+        self.sched.reconfigure(
+            self.config, validate_tenants=self.validate_tenants)
         self.sched.resume()
 
     def fullReconfigure(self):
