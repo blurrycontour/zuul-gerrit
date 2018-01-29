@@ -34,14 +34,12 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
         self.web.stop()
 
     def _run(self):
-        info = zuul.model.WebInfo.fromConfig(self.config)
-
         params = dict()
-
+        info = zuul.model.WebInfo.fromConfig(self.config)
         params['info'] = info
         params['listen_address'] = get_default(self.config,
                                                'web', 'listen_address',
-                                               '127.0.0.1')
+                                               '0.0.0.0')
         params['listen_port'] = get_default(self.config, 'web', 'port', 9000)
         params['static_cache_expiry'] = get_default(self.config, 'web',
                                                     'static_cache_expiry',
@@ -67,41 +65,41 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
 
         try:
             self.web = zuul.web.ZuulWeb(**params)
-        except Exception as e:
-            self.log.exception("Error creating ZuulWeb:")
+        except Exception:
+            self.log.exception("Error creating %s:" % self.app_name)
             sys.exit(1)
 
         loop = asyncio.get_event_loop()
         signal.signal(signal.SIGUSR1, self.exit_handler)
         signal.signal(signal.SIGTERM, self.exit_handler)
 
-        self.log.info('Zuul Web Server starting')
+        self.log.info('%s starting' % self.app_name)
         self.thread = threading.Thread(target=self.web.run,
                                        args=(loop,),
-                                       name='web')
+                                       name=self.app_name)
         self.thread.start()
 
         try:
             signal.pause()
         except KeyboardInterrupt:
-            print("Ctrl + C: asking web server to exit nicely...\n")
+            print("Ctrl + C: asking %s to exit nicely...\n" % self.app_name)
             self.exit_handler(signal.SIGINT, None)
 
         self.thread.join()
         loop.stop()
         loop.close()
-        self.log.info("Zuul Web Server stopped")
+        self.log.info("self.app_name stopped")
 
     def run(self):
         self.setup_logging('web', 'log_config')
-        self.log = logging.getLogger("zuul.WebServer")
+        self.log = logging.getLogger("zuul.%s" % self.__class__.__name__)
 
         self.configure_connections()
 
         try:
             self._run()
         except Exception:
-            self.log.exception("Exception from WebServer:")
+            self.log.exception("Exception from %s" % self.__class__.__name__)
 
 
 def main():
