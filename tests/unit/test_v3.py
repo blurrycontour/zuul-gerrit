@@ -2515,6 +2515,34 @@ class TestProjectKeys(ZuulTestCase):
         self.assertEqual(4096, private_key.key_size)
 
 
+class TestCheckModeBroken(ZuulTestCase):
+    # Test we fail in check mode and broken config
+
+    check_config = True
+    tenant_config_file = 'config/broken/main.yaml'
+
+    def setUp(self):
+        self.assertRaises(zuul.configloader.ConfigurationSyntaxError,
+                          super().setUp)
+
+    def test_check_mode_broken(self):
+        # If we reach this point we successfully cached the config exception.
+        # There is nothing more to test here.
+        pass
+
+
+class TestCheckModeGood(ZuulTestCase):
+    # Test we fail in check mode and broken config
+
+    check_config = True
+    tenant_config_file = 'config/single-tenant/main.yaml'
+
+    def test_check_mode_good(self):
+        # If we reach this point we successfully loaded the configuration.
+        # There is nothing more to test here.
+        pass
+
+
 class RoleTestCase(ZuulTestCase):
     def _getRolesPaths(self, build, playbook):
         path = os.path.join(self.test_root, build.uuid,

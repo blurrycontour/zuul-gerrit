@@ -67,9 +67,10 @@ class ReconfigureEvent(ManagementEvent):
 
     :arg ConfigParser config: the new configuration
     """
-    def __init__(self, config):
+    def __init__(self, config, check_config=False):
         super(ReconfigureEvent, self).__init__()
         self.config = config
+        self.check_config = check_config
 
 
 class TenantReconfigureEvent(ManagementEvent):
@@ -432,9 +433,9 @@ class Scheduler(threading.Thread):
         self.management_event_queue.put(event)
         self.wake_event.set()
 
-    def reconfigure(self, config):
+    def reconfigure(self, config, check_config=False):
         self.log.debug("Submitting reconfiguration event")
-        event = ReconfigureEvent(config)
+        event = ReconfigureEvent(config, check_config)
         self.management_event_queue.put(event)
         self.wake_event.set()
         self.log.debug("Waiting for reconfiguration")
@@ -584,9 +585,19 @@ class Scheduler(threading.Thread):
             abide = loader.loadConfig(
                 self.unparsed_abide,
                 self._get_project_key_dir())
-            for tenant in abide.tenants.values():
-                self._reconfigureTenant(tenant)
-            self.abide = abide
+            if not event.check_config:
+                for tenant in abide.tenants.values():
+                    self._reconfigureTenant(tenant)
+                self.abide = abide
+            else:
+                loading_errors = []
+                for tenant in abide.tenants.values():
+                    for error in tenant.layout.loading_errors:
+                        loading_errors.append(error.__repr__())
+                if loading_errors:
+                    summary = '\n\n\n'.join(loading_errors)
+                    raise configloader.ConfigurationSyntaxError(
+                        'Configuration errors: {}'.format(summary))
         finally:
             self.layout_lock.release()
         self.log.info("Full reconfiguration complete")

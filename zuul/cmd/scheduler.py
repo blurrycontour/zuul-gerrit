@@ -40,6 +40,11 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
 
     def createParser(self):
         parser = super(Scheduler, self).createParser()
+        parser.add_argument('--check-config', dest='check_config',
+                            action='store_true', default=False,
+                            help='Load configuration and exit afterwards, '
+                                 'indicating success or failure via the exit '
+                                 'code')
         parser.add_argument('command',
                             choices=zuul.scheduler.COMMANDS,
                             nargs='?')
@@ -127,30 +132,34 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         self.log = logging.getLogger("zuul.Scheduler")
 
         self.sched = zuul.scheduler.Scheduler(self.config)
-
-        gearman = zuul.executor.client.ExecutorClient(self.config, self.sched)
         merger = zuul.merger.client.MergeClient(self.config, self.sched)
-        nodepool = zuul.nodepool.Nodepool(self.sched)
-
-        zookeeper = zuul.zk.ZooKeeper()
-        zookeeper_hosts = get_default(self.config, 'zookeeper',
-                                      'hosts', '127.0.0.1:2181')
-        zookeeper_timeout = float(get_default(self.config, 'zookeeper',
-                                              'session_timeout', 10.0))
-
-        zookeeper.connect(zookeeper_hosts, timeout=zookeeper_timeout)
 
         self.configure_connections()
-        self.sched.setExecutor(gearman)
         self.sched.setMerger(merger)
-        self.sched.setNodepool(nodepool)
-        self.sched.setZooKeeper(zookeeper)
+
+        if not self.args.check_config:
+            # Only needed in full mode
+            gearman = zuul.executor.client.ExecutorClient(self.config,
+                                                          self.sched)
+            nodepool = zuul.nodepool.Nodepool(self.sched)
+
+            zookeeper = zuul.zk.ZooKeeper()
+            zookeeper_hosts = get_default(self.config, 'zookeeper',
+                                          'hosts', '127.0.0.1:2181')
+            zookeeper_timeout = float(get_default(self.config, 'zookeeper',
+                                                  'session_timeout', 10.0))
+
+            zookeeper.connect(zookeeper_hosts, timeout=zookeeper_timeout)
+
+            self.sched.setExecutor(gearman)
+            self.sched.setNodepool(nodepool)
+            self.sched.setZooKeeper(zookeeper)
 
         self.log.info('Starting scheduler')
         try:
             self.sched.start()
             self.sched.registerConnections(self.connections)
-            self.sched.reconfigure(self.config)
+            self.sched.reconfigure(self.config, self.args.check_config)
             self.sched.resume()
         except Exception:
             self.log.exception("Error starting Zuul:")
@@ -158,6 +167,10 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
             # we might be able to have a nicer way of exiting here.
             self.sched.stop()
             sys.exit(1)
+
+        if self.args.check_config:
+            self.sched.stop()
+            sys.exit(0)
 
         signal.signal(signal.SIGHUP, self.reconfigure_handler)
 
