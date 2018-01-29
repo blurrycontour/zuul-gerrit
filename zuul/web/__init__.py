@@ -159,6 +159,8 @@ class GearmanHandler(object):
             'status_get': self.status_get,
             'job_list': self.job_list,
             'key_get': self.key_get,
+            'enqueue': self.enqueue,
+            'enqueue_ref': self.enqueue_ref,
         }
 
     def tenant_list(self, request):
@@ -192,6 +194,40 @@ class GearmanHandler(object):
         job = self.rpc.submitJob('zuul:key_get', {'tenant': tenant,
                                                   'project': project})
         return web.Response(body=job.data[0])
+
+    def enqueue(self, request):
+        tenant = request.match_info["tenant"]
+        pipeline = request.match_info["pipeline"]
+        project = request.match_info["project"]
+        body = yield from request.json()
+        trigger = body.get('trigger')
+        change = body.get('change')
+        job = self.rpc.submitJob('zuul:enqueue', {'tenant': tenant,
+                                                  'pipeline': pipeline,
+                                                  'project': project,
+                                                  'trigger': trigger,
+                                                  'change': change, })
+        result = not job.failure
+        return web.json_response(result)
+
+    def enqueue_ref(self, request):
+        tenant = request.match_info["tenant"]
+        pipeline = request.match_info["pipeline"]
+        project = request.match_info["project"]
+        body = yield from request.json()
+        trigger = body.get('trigger')
+        ref = body.get('ref')
+        oldrev = body.get('oldrev')
+        newrev = body.get('newrev')
+        job = self.rpc.submitJob('zuul:enqueue', {'tenant': tenant,
+                                                  'pipeline': pipeline,
+                                                  'project': project,
+                                                  'trigger': trigger,
+                                                  'ref': ref,
+                                                  'oldrev': oldrev,
+                                                  'newrev': newrev, })
+        result = not job.failure
+        return web.json_response(result)
 
     async def processRequest(self, request, action):
         try:
@@ -337,6 +373,13 @@ class ZuulWeb(object):
     async def _handleKeyRequest(self, request):
         return await self.gearman_handler.processRequest(request, 'key_get')
 
+    async def _handleEnqueueRequest(self, request):
+        return await self.gearman_handler.processRequest(request, 'enqueue')
+
+    async def _handleEnqueueRefRequest(self, request):
+        return await self.gearman_handler.processRequest(request,
+                                                         'enqueue_ref')
+
     async def _handleStaticRequest(self, request):
         fp = None
         if request.path.endswith("tenants.html") or request.path.endswith("/"):
@@ -366,12 +409,17 @@ class ZuulWeb(object):
             thread event loop is used. This should be supplied if ZuulWeb
             is run within a separate (non-main) thread.
         """
+        enqueue_route = ('/admin/{tenant}/{project}/{pipeline}/enqueue')
+        enqueue_ref_route = ('/admin/{tenant}/{project}/'
+                             '{pipeline}/enqueue_ref')
         routes = [
             ('GET', '/tenants.json', self._handleTenantsRequest),
             ('GET', '/{tenant}/status.json', self._handleStatusRequest),
             ('GET', '/{tenant}/jobs.json', self._handleJobsRequest),
             ('GET', '/{tenant}/console-stream', self._handleWebsocket),
             ('GET', '/{tenant}/{project:.*}.pub', self._handleKeyRequest),
+            ('POST', enqueue_route, self._handleEnqueueRequest),
+            ('POST', enqueue_ref_route, self._handleEnqueueRefRequest),
             ('GET', '/{tenant}/status.html', self._handleStaticRequest),
             ('GET', '/{tenant}/jobs.html', self._handleStaticRequest),
             ('GET', '/{tenant}/stream.html', self._handleStaticRequest),
