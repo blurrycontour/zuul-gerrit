@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f93b717_dd7cd020",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 546,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-01-30T21:05:29Z",
+      "side": 1,
+      "message": "formatted",
+      "range": {
+        "startLine": 546,
+        "startChar": 6,
+        "endLine": 546,
+        "endChar": 14
+      },
+      "revId": "32907a663ea3e6d430997fc3dcbb2dea2842b32c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f93b717_bda464a7",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1681,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-01-30T21:05:29Z",
+      "side": 1,
+      "message": "I think we rather should take these settings from an ansible var in the module and put them into the inventory instead of hot patching the code. That seems like a hack to me.",
+      "range": {
+        "startLine": 1678,
+        "startChar": 0,
+        "endLine": 1681,
+        "endChar": 63
+      },
+      "revId": "32907a663ea3e6d430997fc3dcbb2dea2842b32c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
