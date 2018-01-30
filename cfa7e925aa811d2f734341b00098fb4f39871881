@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f93b717_0e03dc74",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-01-30T23:41:22Z",
+      "side": 1,
+      "message": "This isn\u0027t really.. defaulting. This is setting it. I don\u0027t see how it could be overridden.",
+      "revId": "cfa7e925aa811d2f734341b00098fb4f39871881",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
