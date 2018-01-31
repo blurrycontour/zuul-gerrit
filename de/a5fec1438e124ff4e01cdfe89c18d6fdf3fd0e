@@ -1,0 +1,9 @@
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Code-Review+2: Jesse Keating <jkeating@j2solutions.net>
+Workflow+1: Jesse Keating <jkeating@j2solutions.net>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Wed, 31 Jan 2018 23:00:55 +0000
+Reviewed-on: https://review.openstack.org/539545
+Project: openstack-infra/zuul
+Branch: refs/heads/master
