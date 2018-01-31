@@ -1725,7 +1725,7 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual('*', ref)
 
         # Note: the value is converted from set to list by json.
-        self.assertEqual([1, "reason text"], autohold_requests[key])
+        self.assertEqual([1, "reason text", None], autohold_requests[key])
 
     @simple_layout('layouts/three-projects.yaml')
     def test_dependent_behind_dequeue(self):
