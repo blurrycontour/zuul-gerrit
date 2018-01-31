@@ -164,6 +164,7 @@ class RPCListener(object):
         params['count'] = args['count']
 
         params['ref'] = args['ref']
+        params['hold_for'] = args['hold_for']
 
         self.sched.autohold(**params)
         job.sendWorkComplete()
