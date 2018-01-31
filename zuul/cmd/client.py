@@ -59,6 +59,12 @@ class Client(zuul.cmd.ZuulApp):
         cmd_autohold.add_argument('--ref',
                                   help='specific revision to target',
                                   required=False, default=None)
+        cmd_autohold.add_argument('--hold-for',
+                                  help=('how long in seconds should the '
+                                        'node set be in HOLD status '
+                                        '(default: nodepool\'s max-hold-age '
+                                        'if set, or indefinitely)'),
+                                  required=False, default=0)
         cmd_autohold.set_defaults(func=self.autohold)
 
         cmd_autohold_list = subparsers.add_parser(
@@ -181,7 +187,8 @@ class Client(zuul.cmd.ZuulApp):
                             job=self.args.job,
                             reason=self.args.reason,
                             count=self.args.count,
-                            ref=self.args.ref)
+                            ref=self.args.ref,
+                            hold_for=self.args.hold_for)
         return r
 
     def autohold_list(self):
@@ -200,7 +207,7 @@ class Client(zuul.cmd.ZuulApp):
             # The key comes to us as a CSV string because json doesn't like
             # non-str keys.
             tenant_name, project_name, job_name, ref = key.split(',')
-            count, reason = value
+            count, reason, hold_for = value
             table.add_row([tenant_name, project_name, job_name,
                            ref, count, reason])
         print(table)
