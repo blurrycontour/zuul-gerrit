@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f93b717_ae565a29",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1979,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-01-31T10:59:45Z",
+      "side": 1,
+      "message": "I\u0027ve we\u0027re using this metric to manage load, we should log it in statsd.",
+      "revId": "1754b2caf05f40da890e12185414485416fb69ac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
