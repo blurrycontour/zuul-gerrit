@@ -482,6 +482,7 @@ class GerritConnection(BaseConnection):
         for ps in data['patchSets']:
             if ps['number'] == change.patchset:
                 change.ref = ps['ref']
+                change.commits = [ps['revision']]
                 for f in ps.get('files', []):
                     files.append(f['file'])
             if int(ps['number']) > int(max_ps):

@@ -88,6 +88,10 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(self.getJobFromHistory('project-test2').node,
                          'label1')
 
+        zuulvars = self.getJobFromHistory('project-test2').parameters['zuul']
+        self.assertEqual(1, len(zuulvars['commits']))
+        self.assertEqual(A.commits, zuulvars['commits'])
+
         for stat in self.statsd.stats:
             k, v = stat.decode('utf-8').split(':')
             self.log.debug('stat %s:%s', k, v)

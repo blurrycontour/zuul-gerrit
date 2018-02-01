@@ -2148,6 +2148,10 @@ class Change(Branch):
         # Note this omits the scheme; i.e., is hostname/path.
         self.uris = []
         self.patchset = None
+        # The commits that are part of a change. For Gerrit there will
+        # always be one commit. For Github it will contain all the
+        # commits in a PR.
+        self.commits = []
 
         # Changes that the source determined are needed due to the
         # git DAG:

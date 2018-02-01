@@ -50,8 +50,9 @@ class FakeStatus(object):
 
 
 class FakeCommit(object):
-    def __init__(self):
+    def __init__(self, sha):
         self._statuses = []
+        self.sha = sha
 
     def set_status(self, state, url, description, context, user):
         status = FakeStatus(
@@ -81,14 +82,14 @@ class FakeRepository(object):
         # default the user as 'zuul' here.
         commit = self._commits.get(sha, None)
         if commit is None:
-            commit = FakeCommit()
+            commit = FakeCommit(sha)
             self._commits[sha] = commit
         commit.set_status(state, url, description, context, user)
 
     def commit(self, sha):
         commit = self._commits.get(sha, None)
         if commit is None:
-            commit = FakeCommit()
+            commit = FakeCommit(sha)
             self._commits[sha] = commit
         return commit
 
@@ -125,6 +126,10 @@ class FakePull(object):
     def files(self):
         return [FakeFile(fn)
                 for fn in self._fake_pull_request.files]
+
+    def commits(self):
+        return [FakeCommit(fc)
+                for fc in self._fake_pull_request.commits]
 
     def as_dict(self):
         pr = self._fake_pull_request

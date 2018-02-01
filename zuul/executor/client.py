@@ -174,6 +174,8 @@ class ExecutorClient(object):
             zuul_params['change_url'] = item.change.url
         if hasattr(item.change, 'patchset'):
             zuul_params['patchset'] = str(item.change.patchset)
+        if hasattr(item.change, 'commits'):
+            zuul_params['commits'] = item.change.commits
         if (hasattr(item.change, 'oldrev') and item.change.oldrev
             and item.change.oldrev != '0' * 40):
             zuul_params['oldrev'] = item.change.oldrev

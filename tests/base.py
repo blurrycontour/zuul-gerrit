@@ -144,6 +144,7 @@ class FakeGerritChange(object):
         self.reported = 0
         self.queried = 0
         self.patchsets = []
+        self.commits = []
         self.number = number
         self.project = project
         self.branch = branch
@@ -234,6 +235,7 @@ class FakeGerritChange(object):
                      'type': 'MODIFIED'}]
         for f in files.keys():
             ps_files.append({'file': f, 'type': 'ADDED'})
+        self.commits = [c.hexsha]
         d = {'approvals': [],
              'createdOn': time.time(),
              'files': ps_files,
@@ -633,6 +635,7 @@ class FakeGithubPullRequest(object):
         self.files = []
         self.comments = []
         self.labels = []
+        self.commits = []
         self.statuses = {}
         self.reviews = []
         self.writers = []
@@ -810,6 +813,7 @@ class FakeGithubPullRequest(object):
         ref = repo.references[self._getPRReference()]
         if reset:
             self.number_of_commits = 0
+            self.commits = []
             ref.set_object('refs/tags/init')
         self.number_of_commits += 1
         repo.head.reference = ref
@@ -831,6 +835,7 @@ class FakeGithubPullRequest(object):
         repo.index.add([fn])
 
         self.head_sha = repo.index.commit(msg).hexsha
+        self.commits.append(self.head_sha)
         # Create an empty set of statuses for the given sha,
         # each sha on a PR may have a status set on it
         self.statuses[self.head_sha] = []

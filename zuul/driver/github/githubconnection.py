@@ -776,6 +776,7 @@ class GithubConnection(BaseConnection):
         change.ref = "refs/pull/%s/head" % change.number
         change.branch = change.pr.get('base').get('ref')
         change.files = change.pr.get('files')
+        change.commits = change.pr.get('commits')
         change.title = change.pr.get('title')
         change.open = change.pr.get('state') == 'open'
         change.is_merged = change.pr.get('merged')
@@ -792,6 +793,15 @@ class GithubConnection(BaseConnection):
         self.sched.onChangeUpdated(change)
 
         return change
+
+    def _pr_obj_to_dict(self, probj):
+        pr = probj.as_dict()
+        # Get the issue obj so we can get the labels (this is silly)
+        issueobj = probj.issue()
+        pr['labels'] = [l.name for l in issueobj.labels()]
+        pr['files'] = [f.filename for f in probj.files()]
+        pr['commits'] = [c.sha for c in probj.commits()]
+        return pr
 
     def getGitUrl(self, project: Project):
         if self.git_ssh_key:
@@ -870,11 +880,8 @@ class GithubConnection(BaseConnection):
             self.log.warning("Pull request #%s of %s/%s returned None!" % (
                              number, owner, proj))
             time.sleep(1)
-        # Get the issue obj so we can get the labels (this is silly)
-        issueobj = probj.issue()
-        pr = probj.as_dict()
-        pr['files'] = [f.filename for f in probj.files()]
-        pr['labels'] = [l.name for l in issueobj.labels()]
+
+        pr = self._pr_obj_to_dict(probj)
         self.log.debug('Got PR %s#%s', project_name, number)
         log_rate_limit(self.log, github)
         return pr
@@ -902,7 +909,7 @@ class GithubConnection(BaseConnection):
                 continue
             if pr.as_dict() in pulls:
                 continue
-            pulls.append(pr.as_dict())
+            pulls.append(self._pr_obj_to_dict(pr))
 
         self.log.debug('Got PR on project %s for sha %s', project, sha)
         log_rate_limit(self.log, github)

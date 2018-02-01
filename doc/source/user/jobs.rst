@@ -388,6 +388,12 @@ are available:
       E.g., `https://review.example.org/#/c/123456/` or
       `https://github.com/example/example/pull/1234`.
 
+   .. var:: commits
+
+      The list of commits included in the change.  For GitHub this
+      will contain all commits in a pull request.  For Gerrit this
+      list will have the revision of the patchset as the only item.
+
 Branch Items
 ++++++++++++
 
