@@ -1,0 +1,9 @@
+Code-Review+2: Tobias Henkel <tobias.henkel@bmw.de>
+Code-Review+2: Paul Belanger <pabelanger@redhat.com>
+Workflow+1: Paul Belanger <pabelanger@redhat.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Thu, 01 Feb 2018 20:25:05 +0000
+Reviewed-on: https://review.openstack.org/540033
+Project: openstack-infra/zuul
+Branch: refs/heads/master
