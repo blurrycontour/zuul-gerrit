@@ -22,6 +22,23 @@
       "revId": "40ca3791fbfd25cb9610b3f3ec2e4c10fdb8239a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f93b717_623cbe2e",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1981,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-02-01T15:29:24Z",
+      "side": 1,
+      "message": "Yes, however, it\u0027s a float, (eg, 5.04%) and statsd doesn\u0027t handle floats, so if we transmit it as-is, we\u0027ll lose precision.  Multiplying by 100 gives us 2 decimal points of precision.  The docs note that it is a percentage * 100.",
+      "revId": "40ca3791fbfd25cb9610b3f3ec2e4c10fdb8239a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
