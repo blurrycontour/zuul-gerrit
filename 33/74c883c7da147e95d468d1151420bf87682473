@@ -1,0 +1,9 @@
+Code-Review+2: Paul Belanger <pabelanger@redhat.com>
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Thu, 01 Feb 2018 16:05:08 +0000
+Reviewed-on: https://review.openstack.org/539976
+Project: openstack-infra/zuul
+Branch: refs/heads/master
