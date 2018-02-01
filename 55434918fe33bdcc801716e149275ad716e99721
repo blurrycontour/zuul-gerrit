@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f93b717_61cef363",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-02-01T22:15:52Z",
+      "side": 1,
+      "message": "The load and memory checks (not sure if that is landed yet) are pretty cheap. It would make sense to me to drop it even lower and maybe have it running on an event which we can set whenever the # of jobs executing changes, or some short time period passes.",
+      "revId": "55434918fe33bdcc801716e149275ad716e99721",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
