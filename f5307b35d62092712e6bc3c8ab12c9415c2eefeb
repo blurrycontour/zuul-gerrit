@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f93b717_1362f6d8",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1605,
+      "author": {
+        "id": 12988
+      },
+      "writtenOn": "2018-02-01T12:12:36Z",
+      "side": 1,
+      "message": "Hmm, could it be better to compile a list of all the held nodes and make sure that there is exactly one?  If you are worried about other test cases running simultaneously and possibly holding nodes of their own, then the current check would not be enough, either - it would falsely succeed.",
+      "revId": "f5307b35d62092712e6bc3c8ab12c9415c2eefeb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
