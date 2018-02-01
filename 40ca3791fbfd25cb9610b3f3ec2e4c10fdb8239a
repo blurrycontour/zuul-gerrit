@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f93b717_eefe8669",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1981,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-02-01T07:12:15Z",
+      "side": 1,
+      "message": "As far as I can see avail_mem_pct is already in percent so the *100 is superfluous.",
+      "range": {
+        "startLine": 1981,
+        "startChar": 34,
+        "endLine": 1981,
+        "endChar": 53
+      },
+      "revId": "40ca3791fbfd25cb9610b3f3ec2e4c10fdb8239a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
