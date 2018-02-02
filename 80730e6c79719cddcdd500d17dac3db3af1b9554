@@ -16,6 +16,24 @@
       "revId": "80730e6c79719cddcdd500d17dac3db3af1b9554",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f93b717_40f4f9f0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-02-02T20:01:25Z",
+      "side": 1,
+      "message": "This was part of the Change I adopted. I think it should be no problem to leave it with /connection/...",
+      "parentUuid": "5f93b717_00959186",
+      "revId": "80730e6c79719cddcdd500d17dac3db3af1b9554",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
