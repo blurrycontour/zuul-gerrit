@@ -39,6 +39,8 @@ def zuul_legacy_vars(zuul):
         params['BUILD_TIMEOUT'] = str(int(zuul['timeout']) * 1000)
     if 'branch' in zuul:
         params['ZUUL_BRANCH'] = zuul['branch']
+    if 'override_checkout' in zuul:
+        params['OVERRIDE_ZUUL_BRANCH'] = zuul['override_checkout']
 
     if 'change' in zuul:
         changes_str = '^'.join(
