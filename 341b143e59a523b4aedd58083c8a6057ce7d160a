@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f93b717_03f6fbd7",
+        "filename": "zuul/web/handler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-02-02T21:08:48Z",
+      "side": 1,
+      "message": "I think this breaks the sql driver as the path ends up as /connection/sql/{tenant}/...\n\nWe probably should leave routed paths as is?",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 22
+      },
+      "revId": "341b143e59a523b4aedd58083c8a6057ce7d160a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
