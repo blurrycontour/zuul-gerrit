@@ -2,6 +2,74 @@
   "comments": [
     {
       "key": {
+        "uuid": "5f93b717_037b5b27",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-02-02T21:12:58Z",
+      "side": 1,
+      "message": "I think this could just be:\n\nself.log.exception(\"Error validating config\")",
+      "revId": "341b143e59a523b4aedd58083c8a6057ce7d160a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f93b717_c3701343",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-02-02T21:12:58Z",
+      "side": 1,
+      "message": "This probably returns something other than ConnectionRegistry.",
+      "revId": "341b143e59a523b4aedd58083c8a6057ce7d160a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f93b717_6391ff46",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1144,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-02-02T21:12:58Z",
+      "side": 1,
+      "message": "The colon probably isn\u0027t necessary here.  Maybe this should be \"webhook_token not found in config\" or something?",
+      "revId": "341b143e59a523b4aedd58083c8a6057ce7d160a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f93b717_a375c733",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-02-02T21:12:58Z",
+      "side": 1,
+      "message": "I don\u0027t think WebInfo is in this change.",
+      "revId": "341b143e59a523b4aedd58083c8a6057ce7d160a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f93b717_03f6fbd7",
         "filename": "zuul/web/handler.py",
         "patchSetId": 5
