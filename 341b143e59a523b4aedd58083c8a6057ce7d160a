@@ -114,6 +114,30 @@
       "revId": "341b143e59a523b4aedd58083c8a6057ce7d160a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f93b717_c3ec93bc",
+        "filename": "zuul/web/handler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-02-02T21:17:13Z",
+      "side": 1,
+      "message": "erm\n\n    if path.startswith(\u0027/\u0027):\n        self.path \u003d path\n    else:\n        self.path \u003d \u0027/connection/{connection}/{path}\u0027.format(\n            connection\u003dself.connection.connection_name,\n            path\u003dpath)",
+      "parentUuid": "5f93b717_63081f91",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 22
+      },
+      "revId": "341b143e59a523b4aedd58083c8a6057ce7d160a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
