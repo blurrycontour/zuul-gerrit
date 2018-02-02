@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5f93b717_63dfbf0c",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-02-02T21:28:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f93b717_037b5b27",
+      "revId": "341b143e59a523b4aedd58083c8a6057ce7d160a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f93b717_c3701343",
         "filename": "zuul/connection/__init__.py",
         "patchSetId": 5
@@ -30,6 +48,24 @@
       "writtenOn": "2018-02-02T21:12:58Z",
       "side": 1,
       "message": "This probably returns something other than ConnectionRegistry.",
+      "revId": "341b143e59a523b4aedd58083c8a6057ce7d160a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f93b717_e3fbcf75",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-02-02T21:28:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f93b717_c3701343",
       "revId": "341b143e59a523b4aedd58083c8a6057ce7d160a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "5f93b717_a34627bf",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1144,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-02-02T21:28:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f93b717_6391ff46",
+      "revId": "341b143e59a523b4aedd58083c8a6057ce7d160a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f93b717_a375c733",
         "filename": "zuul/web/__init__.py",
         "patchSetId": 5
@@ -64,6 +118,24 @@
       "writtenOn": "2018-02-02T21:12:58Z",
       "side": 1,
       "message": "I don\u0027t think WebInfo is in this change.",
+      "revId": "341b143e59a523b4aedd58083c8a6057ce7d160a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f93b717_e3298fe5",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-02-02T21:28:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f93b717_a375c733",
       "revId": "341b143e59a523b4aedd58083c8a6057ce7d160a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -129,6 +201,30 @@
       "side": 1,
       "message": "erm\n\n    if path.startswith(\u0027/\u0027):\n        self.path \u003d path\n    else:\n        self.path \u003d \u0027/connection/{connection}/{path}\u0027.format(\n            connection\u003dself.connection.connection_name,\n            path\u003dpath)",
       "parentUuid": "5f93b717_63081f91",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 22
+      },
+      "revId": "341b143e59a523b4aedd58083c8a6057ce7d160a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f93b717_e3dc2fe5",
+        "filename": "zuul/web/handler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-02-02T21:28:19Z",
+      "side": 1,
+      "message": "The SqlWebHandler actually subclasse from BaseWebHandler not from this. The idea was to have a class that always did the correct/safe thing for urls that should be connection oriented and one that allowed for registering on the root level.",
+      "parentUuid": "5f93b717_c3ec93bc",
       "range": {
         "startLine": 41,
         "startChar": 0,
