@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f93b717_00959186",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-02-02T19:55:35Z",
+      "side": 1,
+      "message": "Why is this necessary?  Why can\u0027t we continue with /connection/\u003cconnection_name\u003e/payload?",
+      "revId": "80730e6c79719cddcdd500d17dac3db3af1b9554",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
