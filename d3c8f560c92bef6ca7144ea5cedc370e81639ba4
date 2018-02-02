@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f93b717_19b0acdc",
+        "filename": "doc/source/admin/tenants.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-02-02T23:21:34Z",
+      "side": 1,
+      "message": "The list items should be indented one more level for consistency.",
+      "revId": "d3c8f560c92bef6ca7144ea5cedc370e81639ba4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f93b717_39b328eb",
+        "filename": "doc/source/admin/tenants.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-02-02T23:21:34Z",
+      "side": 1,
+      "message": "Same here.",
+      "revId": "d3c8f560c92bef6ca7144ea5cedc370e81639ba4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
