@@ -16,6 +16,23 @@
       "revId": "55434918fe33bdcc801716e149275ad716e99721",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f93b717_dd71cb79",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-02-03T16:20:51Z",
+      "side": 1,
+      "message": "True -- I double checked that before lowering it here.  I kind of think the extra up-to-10-seconds will be somewhat beneficial though, as it gives us just a little bit of extra time (on average) to start generating load before getting the next job.",
+      "revId": "55434918fe33bdcc801716e149275ad716e99721",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
