@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f93b717_c0b3204d",
+        "filename": "tests/unit/test_executor.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 474,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-02-03T19:58:51Z",
+      "side": 1,
+      "message": "nit: you might want to add an assert before that to aid debugging in case we hit the timeout",
+      "range": {
+        "startLine": 474,
+        "startChar": 8,
+        "endLine": 474,
+        "endChar": 29
+      },
+      "revId": "df37ad2ce773b6c9a621a9e8be5a1c7688afec4a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
