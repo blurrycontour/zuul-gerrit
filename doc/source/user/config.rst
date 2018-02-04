@@ -33,6 +33,11 @@ undergone review.
 Configuration Loading
 ---------------------
 
+.. note::
+
+  Zuul will look for user config files with both the ``.yaml`` and ``.yml``
+  extension. The docs use ``.yaml`` for the sake of brevity.
+
 When Zuul starts, it examines all of the git repositories which are
 specified by the system administrator in :ref:`tenant-config` and
 searches for files in the root of each repository. Zuul looks first

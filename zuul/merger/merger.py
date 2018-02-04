@@ -309,9 +309,10 @@ class Repo(object):
                 if dn not in tree:
                     continue
                 for blob in tree[dn].traverse():
-                    if blob.path.endswith(".yaml"):
-                        ret[blob.path] = blob.data_stream.read().decode(
-                            'utf-8')
+                    for extension in ('.yaml', '.yml'):
+                        if blob.path.endswith(extension):
+                            ret[blob.path] = blob.data_stream.read().decode(
+                                'utf-8')
         return ret
 
     def getFilesChanges(self, branch, tosha=None):
