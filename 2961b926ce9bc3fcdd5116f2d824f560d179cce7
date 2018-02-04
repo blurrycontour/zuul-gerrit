@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_1c3ad5e6",
+        "filename": "tests/unit/test_merger_repo.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 12988
+      },
+      "writtenOn": "2018-02-04T10:07:05Z",
+      "side": 1,
+      "message": "ITYM \"then\" instead of \"that\" here.",
+      "revId": "2961b926ce9bc3fcdd5116f2d824f560d179cce7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_dc230dbe",
+        "filename": "tests/unit/test_merger_repo.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 12988
+      },
+      "writtenOn": "2018-02-04T10:07:05Z",
+      "side": 1,
+      "message": "Hm, should this test have the same docstring as the previous one?",
+      "revId": "2961b926ce9bc3fcdd5116f2d824f560d179cce7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
