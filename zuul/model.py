@@ -78,6 +78,9 @@ NODE_STATES = set([STATE_BUILDING,
                    STATE_HOLD,
                    STATE_DELETING])
 
+# List of names for zuul.yaml
+ZUUL_YAML_FILES = ['zuul.yaml', 'zuul.yml', '.zuul.yaml', '.zuul.yml']
+
 
 class NoMatchingParentError(Exception):
     """A job referenced a parent, but that parent had no variants which
@@ -2075,9 +2078,9 @@ class Ref(object):
         return set()
 
     def updatesConfig(self):
-        if 'zuul.yaml' in self.files or '.zuul.yaml' in self.files or \
-           [True for fn in self.files if fn.startswith("zuul.d/") or
-            fn.startswith(".zuul.d/")]:
+        if ((set(ZUUL_YAML_FILES) & set(self.files)) or
+            [True for fn in self.files if fn.startswith("zuul.d/") or
+             fn.startswith(".zuul.d/")]):
             return True
         return False
 

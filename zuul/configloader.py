@@ -1441,7 +1441,7 @@ class TenantParser(object):
             job = merger.getFiles(
                 project.source.connection.connection_name,
                 project.name, 'master',
-                files=['zuul.yaml', '.zuul.yaml'],
+                files=model.ZUUL_YAML_FILES,
                 dirs=['zuul.d', '.zuul.d'])
             job.source_context = model.SourceContext(project, 'master',
                                                      '', True)
@@ -1469,7 +1469,7 @@ class TenantParser(object):
                 job = merger.getFiles(
                     project.source.connection.connection_name,
                     project.name, branch,
-                    files=['zuul.yaml', '.zuul.yaml'],
+                    files=model.ZUUL_YAML_FILES,
                     dirs=['zuul.d', '.zuul.d'])
                 job.source_context = model.SourceContext(
                     project, branch, '', False)
@@ -1499,7 +1499,8 @@ class TenantParser(object):
                                    (job, job.files.keys()))
             loaded = False
             files = sorted(job.files.keys())
-            for conf_root in ['zuul.yaml', 'zuul.d', '.zuul.yaml', '.zuul.d']:
+            for conf_root in ['zuul.yaml', 'zuul.yml', 'zuul.d',
+                              '.zuul.yaml', '.zuul.yml', '.zuul.d']:
                 for fn in files:
                     fn_root = fn.split('/')[0]
                     if fn_root != conf_root or not job.files.get(fn):
@@ -1766,7 +1767,8 @@ class ConfigLoader(object):
                     fns1.append(fn)
                 if fn.startswith(".zuul.d/"):
                     fns2.append(fn)
-            fns = ["zuul.yaml"] + sorted(fns1) + [".zuul.yaml"] + sorted(fns2)
+            fns = ["zuul.yaml", "zuul.yml"] + sorted(fns1) \
+                + [".zuul.yaml", ".zuul.yml"] + sorted(fns2)
             incdata = None
             loaded = None
             for fn in fns:
