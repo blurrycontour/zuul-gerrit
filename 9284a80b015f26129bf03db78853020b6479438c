@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_22452a71",
+        "filename": "zuul/driver/mqtt/mqttconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-02-04T17:04:46Z",
+      "side": 1,
+      "message": "Possible later enhancement: using keepalive would be great here",
+      "revId": "9284a80b015f26129bf03db78853020b6479438c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
