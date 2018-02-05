@@ -1975,7 +1975,7 @@ class ExecutorServer(object):
                 starting_builds += 1
         max_starting_builds = max(
             self.max_starting_builds - len(self.job_workers),
-            1)
+            4)
         if self.accepting_work:
             # Don't unregister if we don't have any active jobs.
             if load_avg > self.max_load_avg:
