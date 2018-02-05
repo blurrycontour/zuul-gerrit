@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_517a7424",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1445,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-02-05T13:25:08Z",
+      "side": 1,
+      "message": "perhaps the directories should be defined in model too?",
+      "revId": "17b54377e59699bd4b5e1ba230538d08eb4de0f4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_f176203f",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1502,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-02-05T13:25:08Z",
+      "side": 1,
+      "message": "then you could join the two dicts here",
+      "revId": "17b54377e59699bd4b5e1ba230538d08eb4de0f4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_d12f64f4",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1771,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-02-05T13:25:08Z",
+      "side": 1,
+      "message": "This is a little more awkward to centralise so probably isn\u0027t worth it (but I can think of a few ways if we cared)",
+      "revId": "17b54377e59699bd4b5e1ba230538d08eb4de0f4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
