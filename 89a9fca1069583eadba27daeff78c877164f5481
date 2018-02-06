@@ -16,6 +16,24 @@
       "revId": "89a9fca1069583eadba27daeff78c877164f5481",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_660b148e",
+        "filename": "tools/github-debugging.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-02-06T15:21:12Z",
+      "side": 1,
+      "message": "Yes, that\u0027s intended. This whole script is intented as a template so you can do developing or debugging specific stuff using the real connection.\nFor this you can just comment in/out the method you want to use at that time.",
+      "parentUuid": "3fa0c359_66c1d454",
+      "revId": "89a9fca1069583eadba27daeff78c877164f5481",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
