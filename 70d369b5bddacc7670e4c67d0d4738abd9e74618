@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_63fd3b39",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1039,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-02-06T23:36:41Z",
+      "side": 1,
+      "message": "Rather than checking request.cancelled here could you do:\n\n  if not ready:\n      return\n\nThen drop the if ready below? that slightly short circuits the handling so that we don\u0027t do extra work until we have a fulfilled request?",
+      "revId": "70d369b5bddacc7670e4c67d0d4738abd9e74618",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
