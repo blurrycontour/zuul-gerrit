@@ -2162,13 +2162,16 @@ class Change(Branch):
     """A proposed new state for a Project."""
     def __init__(self, project):
         super(Change, self).__init__(project)
-        self.number = None
         # The gitweb url for browsing the change
         self.url = None
         # URIs for this change which may appear in depends-on headers.
         # Note this omits the scheme; i.e., is hostname/path.
         self.uris = []
-        self.patchset = None
+
+        # The change number and patchset have to be internally forced to int
+        # and are thus handled as properties.
+        self._number = None
+        self._patchset = None
 
         # Changes that the source determined are needed due to the
         # git DAG:
@@ -2229,6 +2232,22 @@ class Change(Branch):
              int(self.patchset) > int(other.patchset))):
             return True
         return False
+
+    @property
+    def number(self):
+        return self._number
+
+    @number.setter
+    def number(self, value):
+        self._number = str(value)
+
+    @property
+    def patchset(self):
+        return self._patchset
+
+    @patchset.setter
+    def patchset(self, value):
+        self._patchset = str(value)
 
     def getRelatedChanges(self):
         related = set()
