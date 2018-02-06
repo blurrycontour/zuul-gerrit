@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_66c1d454",
+        "filename": "tools/github-debugging.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-02-06T15:13:47Z",
+      "side": 1,
+      "message": "Was commenting this out intentional? It doesn\u0027t seem to be usable without commenting. Seems like it could be an argument to the script. In fact the complexity of using this script is such, I think it might make sense to make it an entry point and not just something we stuff in tools.",
+      "revId": "89a9fca1069583eadba27daeff78c877164f5481",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
