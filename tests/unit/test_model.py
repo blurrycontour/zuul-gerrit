@@ -33,6 +33,31 @@ class Dummy(object):
             setattr(self, k, v)
 
 
+class TestChange(BaseTestCase):
+
+    def test_changes_initialized_with_strings_or_integers_are_equals(self):
+        a = model.Change(None)
+        a.number = 42
+        a.patchset = 1
+
+        b = model.Change(None)
+        b.number = '42'
+        b.patchset = '1'
+
+        self.assertTrue(a.equals(b))
+
+    def test_changes_updateOf(self):
+        a = model.Change(None)
+        a.number = 42
+        a.patchset = 1
+
+        b = model.Change(None)
+        b.number = '42'
+        b.patchset = '2'
+
+        self.assertTrue(b.isUpdateOf(a))
+
+
 class TestJob(BaseTestCase):
     def setUp(self):
         super(TestJob, self).setUp()
