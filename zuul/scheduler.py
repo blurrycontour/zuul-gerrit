@@ -1035,7 +1035,7 @@ class Scheduler(threading.Thread):
         request_id = event.request_id
         build_set = request.build_set
 
-        self.nodepool.acceptNodes(request, request_id)
+        ready = self.nodepool.acceptNodes(request, request_id)
         if request.canceled:
             return
 
@@ -1051,7 +1051,8 @@ class Scheduler(threading.Thread):
             if request.fulfilled:
                 self.nodepool.returnNodeSet(request.nodeset)
             return
-        pipeline.manager.onNodesProvisioned(event)
+        if ready:
+            pipeline.manager.onNodesProvisioned(event)
 
     def formatStatusJSON(self, tenant_name):
         # TODOv3(jeblair): use tenants
