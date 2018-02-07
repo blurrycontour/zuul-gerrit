@@ -246,7 +246,7 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
             args = to_bytes(args, errors='surrogate_or_strict')
         elif PY3:
             args = to_text(args, errors='surrogateescape')
-        args = shlex.split(args)
+        args = shlex.split(args, comments=True)
     else:
         msg = "Argument 'args' to run_command must be list or string"
         self.fail_json(rc=257, cmd=args, msg=msg)
@@ -311,7 +311,7 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
         if isinstance(args, binary_type):
             to_clean_args = to_text(args)
     if isinstance(args, (text_type, binary_type)):
-        to_clean_args = shlex.split(to_clean_args)
+        to_clean_args = shlex.split(to_clean_args, comments=True)
 
     clean_args = []
     is_passwd = False
@@ -539,7 +539,7 @@ def main():
         warnings = check_command(args)
 
     if not shell:
-        args = shlex.split(args)
+        args = shlex.split(args, comments=True)
     startd = datetime.datetime.now()
 
     rc, out, err = zuul_run_command(module, args, zuul_log_id, executable=executable, use_unsafe_shell=shell, encoding=None, environ_update=environ)
