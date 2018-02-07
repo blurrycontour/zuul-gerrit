@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_cdac648e",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 867,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-02-07T16:51:46Z",
+      "side": 1,
+      "message": "I think you want to put a getPlayTimeout call on the inside of this loop, so that the sequential pre playbooks accumulate.",
+      "revId": "c99d42b43f9a1e2baba143c4987cc6c39b78d93c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
