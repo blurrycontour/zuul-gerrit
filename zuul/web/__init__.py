@@ -160,6 +160,7 @@ class GearmanHandler(object):
             'job_get': self.job_get,
             'project_list': self.project_list,
             'project_get': self.project_get,
+            'pipeline_list': self.pipeline_list,
             'key_get': self.key_get,
         }
 
@@ -222,6 +223,12 @@ class GearmanHandler(object):
         job = self.rpc.submitJob('zuul:project_list', {'tenant': tenant})
         resp = web.json_response(json.loads(job.data[0]))
         resp.headers['Access-Control-Allow-Origin'] = '*'
+        return resp
+
+    async def pipeline_list(self, request, result_filter=None):
+        tenant = request.match_info["tenant"]
+        job = self.rpc.submitJob('zuul:pipeline_list', {'tenant': tenant})
+        resp = web.json_response(json.loads(job.data[0]))
         return resp
 
     async def key_get(self, request, result_filter=None):
@@ -347,6 +354,10 @@ class ZuulWeb(object):
         return await self.gearman_handler.processRequest(
             request, 'project_list')
 
+    async def _handlePipelinesRequest(self, request):
+        return await self.gearman_handler.processRequest(
+            request, 'pipeline_list')
+
     async def _handleKeyRequest(self, request):
         return await self.gearman_handler.processRequest(request, 'key_get')
 
@@ -373,6 +384,7 @@ class ZuulWeb(object):
             ('GET', '/{tenant}/projects', self._handleProjectsRequest),
             ('GET', '/{tenant}/projects/{project_name:.*}',
              self._handleProjectRequest),
+            ('GET', '/{tenant}/pipelines', self._handlePipelinesRequest),
             ('GET', '/{tenant}/console-stream', self._handleWebsocket),
             ('GET', '/{tenant}/{project:.*}.pub', self._handleKeyRequest),
         ]
