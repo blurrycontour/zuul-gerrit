@@ -259,6 +259,16 @@ class TestWeb(BaseTestWeb):
         self.assertEqual(1, len(data), data)
         self.assertEqual("org/project1", data[0]['project'], data)
 
+    def test_web_pipeline_list(self):
+        # can we fetch the list of projects
+        data = self.get_url('api/tenant/tenant-one/pipelines').json()
+
+        self.assertEqual([
+            {'name': 'check'},
+            {'name': 'gate'},
+            {'name': 'post'}
+        ], data)
+
     def test_web_keys(self):
         with open(os.path.join(FIXTURE_DIR, 'public.pem'), 'rb') as f:
             public_pem = f.read()
