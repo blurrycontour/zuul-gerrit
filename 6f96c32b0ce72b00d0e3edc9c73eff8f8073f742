@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_6d03d074",
+        "filename": "doc/source/admin/monitoring.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-02-07T16:54:26Z",
+      "side": 1,
+      "message": "This sentence reads weird, I think you can just strike \"is that\".",
+      "revId": "6f96c32b0ce72b00d0e3edc9c73eff8f8073f742",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
