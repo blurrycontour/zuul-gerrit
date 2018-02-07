@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3fa0c359_6593f1a4",
+        "filename": "tests/fixtures/config/tenant-parser/groups4.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2018-02-07T11:12:42Z",
+      "side": 1,
+      "message": "Next PS should fix the indentation. Your proposal is even better than an explicit exclude list as some classes can be added in the future. I changed the test to use \"include: []\"",
+      "parentUuid": "5f93b717_1c52fe3b",
+      "revId": "5e9c7d7620d14c71b66ea73fdce0094058cc8481",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f93b717_bc442a75",
         "filename": "tests/fixtures/config/tenant-parser/groups4.yaml",
         "patchSetId": 1
