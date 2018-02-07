@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_705de3e7",
+        "filename": "tests/unit/test_streaming.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-02-07T17:12:42Z",
+      "side": 1,
+      "message": "What does this fixture represent?",
+      "revId": "5fdce5f73133c31abd7705106e83cd1df3638466",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_505a27f3",
+        "filename": "zuul/executor/stream.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-02-07T17:12:42Z",
+      "side": 1,
+      "message": "How does a unix domain socket help?  (Also, holy cow, openssh can forward unix domain sockets!)",
+      "revId": "5fdce5f73133c31abd7705106e83cd1df3638466",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
