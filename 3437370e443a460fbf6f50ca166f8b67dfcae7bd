@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_0de7ac14",
+        "filename": "zuul/ansible/library/command.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-02-07T16:49:30Z",
+      "side": 1,
+      "message": "This code is upstream ansible.",
+      "revId": "3437370e443a460fbf6f50ca166f8b67dfcae7bd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
