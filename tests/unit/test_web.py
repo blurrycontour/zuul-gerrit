@@ -312,6 +312,16 @@ class TestWeb(BaseTestWeb):
                 'voting': True
             }], data)
 
+    def test_web_pipeline_list(self):
+        # can we fetch the list of projects
+        data = self.get_url('tenant-one/pipelines').json()
+
+        self.assertEqual([
+            {'name': 'check'},
+            {'name': 'gate'},
+            {'name': 'post'}
+        ], data)
+
     def test_web_project_list(self):
         # can we fetch the list of projects
         data = self.get_url('tenant-one/projects').json()
