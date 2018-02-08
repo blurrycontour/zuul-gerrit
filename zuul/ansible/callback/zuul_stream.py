@@ -140,6 +140,8 @@ class CallbackModule(default.CallbackModule):
                     # the correct data without throwing a decoding exception.
                     done = self._log_streamline(
                         host, line.decode("utf-8", "backslashreplace"))
+                    self._log("[ZD %s] %s" % (host, line.decode(
+                        "utf-8", "backslashreplace")))
                     if done:
                         return
                 else:
@@ -149,6 +151,8 @@ class CallbackModule(default.CallbackModule):
                     else:
                         buff += more
             if buff:
+                self._log("[ZD LAST %s] %s" % (host, line.decode(
+                    "utf-8", "backslashreplace")))
                 self._log_streamline(
                     host, buff.decode("utf-8", "backslashreplace"))
 
@@ -322,6 +326,8 @@ class CallbackModule(default.CallbackModule):
             self._print_task_banner(result._task)
 
         result_dict = dict(result._result)
+
+        self._log_message(result, msg="[ZUUL DEBUG]: %s" % result_dict)
 
         self._clean_results(result_dict, result._task.action)
         if '_zuul_nolog_return' in result_dict:
