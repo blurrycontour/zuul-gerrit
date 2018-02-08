@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_f3148b50",
+        "filename": "zuul/ansible/library/command.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 407,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-02-08T08:05:41Z",
+      "side": 1,
+      "message": "This is failing with \"TypeError: argument must be an int, or have a fileno() method.\".",
+      "revId": "f622a0b48ff5a3ae653318ebe364f0dc515a81f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
