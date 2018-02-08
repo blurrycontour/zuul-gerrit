@@ -385,9 +385,6 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
 
         # ZUUL: Replaced the execution loop with the zuul_runner run function
 
-        with Console(zuul_log_id) as console:
-            console.addLine("[Zuul] Running Popen %s with kwargs %s" % (args, kwargs))
-
         cmd = subprocess.Popen(args, **kwargs)
         if self.no_log:
             t = None
