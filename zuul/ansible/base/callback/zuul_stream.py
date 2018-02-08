@@ -170,8 +170,7 @@ class CallbackModule(default.CallbackModule):
                     # Don't try to stream from kubectl connection
                     continue
                 streamer = stream_receiver.StreamReceiver(host=host)
-                port = streamer.get_port()
-                port_forwards[hostname] = port
+                port_forwards[hostname] = streamer.get_path()
                 streamer.daemon = True
                 streamer.start()
                 self._streamers.append(streamer)

@@ -33,20 +33,20 @@ class ActionModule(normal.ActionModule):
     Our overridden version of it wraps the execution with checks to block
     undesired actions on localhost.
     '''
-
     def __init__(self, *args, **kwargs):
         super(ActionModule, self).__init__(*args, **kwargs)
-        remote_port = logging.handlers.DEFAULT_TCP_LOGGING_PORT
-        local_ports = self._task.args.pop('zuul_port_forwards', {})
-        local_port = local_ports.get(self._connection.host)
-        if local_port:
+        # TODO(mordred) This should be based on remote tmp dir.
+        remote_path = '/tmp/zuul-stream.sock'
+        local_paths = self._task.args.pop('zuul_port_forwards', {})
+        local_path = local_paths.get(self._connection.host)
+        if local_path:
             if self._connection.transport == 'ssh':
-                self._play_context.ssh_extra_args += ' -R %s:localhost:%s' % (
-                    remote_port,
-                    local_port)
-                self._task.args['zuul_log_port'] = remote_port
+                self._play_context.ssh_extra_args += ' -R %s:%s' % (
+                    remote_path,
+                    local_path)
+                self._task.args['zuul_log_path'] = remote_path
             elif self._connection.transport == 'local':
-                self._task.args['zuul_log_port'] = local_port
+                self._task.args['zuul_log_path'] = local_path
 
     def run(self, tmp=None, task_vars=None):
         '''Overridden primary method from the base class.'''
