@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3fa0c359_8a513e65",
+        "filename": "tests/unit/test_streaming.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-02-08T17:31:27Z",
+      "side": 1,
+      "message": "It was here to try to grab the messages sent to the logger.",
+      "parentUuid": "3fa0c359_705de3e7",
+      "revId": "5fdce5f73133c31abd7705106e83cd1df3638466",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa0c359_505a27f3",
         "filename": "zuul/executor/stream.py",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2018-02-07T17:12:42Z",
       "side": 1,
       "message": "How does a unix domain socket help?  (Also, holy cow, openssh can forward unix domain sockets!)",
+      "revId": "5fdce5f73133c31abd7705106e83cd1df3638466",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_8afffe32",
+        "filename": "zuul/executor/stream.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-02-08T17:31:27Z",
+      "side": 1,
+      "message": "Right?\n\nForwarding a unix domain socket would at least get us a bit of obscurity, since I\u0027d imagine we\u0027d forward it into the remote tmp dir. That way, rather than always logging to port 4090 on the remote host (which would be pretty wide-open to anybody sending packets to) the filename and directory would be different per run. Still probably want to consume json instead though.\n\nThat said - unix domain socket would also get us less conflict with the remote machine - we would not have to open *any* ports, so we\u0027d be conflicting with test env less.",
+      "parentUuid": "3fa0c359_505a27f3",
       "revId": "5fdce5f73133c31abd7705106e83cd1df3638466",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
