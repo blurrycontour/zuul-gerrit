@@ -16,6 +16,24 @@
       "revId": "f622a0b48ff5a3ae653318ebe364f0dc515a81f6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_0ef790f7",
+        "filename": "zuul/ansible/library/command.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 407,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-02-08T08:18:46Z",
+      "side": 1,
+      "message": "Thanks",
+      "parentUuid": "3fa0c359_f3148b50",
+      "revId": "f622a0b48ff5a3ae653318ebe364f0dc515a81f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
