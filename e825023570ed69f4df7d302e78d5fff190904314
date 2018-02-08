@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3fa0c359_80f4bdd0",
+        "filename": "zuul/driver/github/githubsource.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 16036
+      },
+      "writtenOn": "2018-02-08T18:32:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa0c359_f40d9c37",
+      "revId": "e825023570ed69f4df7d302e78d5fff190904314",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa0c359_94121858",
         "filename": "zuul/scheduler.py",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "3fa0c359_206e0995",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 996,
+      "author": {
+        "id": 16036
+      },
+      "writtenOn": "2018-02-08T18:32:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa0c359_94121858",
+      "revId": "e825023570ed69f4df7d302e78d5fff190904314",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa0c359_22a44a08",
         "filename": "zuul/scheduler.py",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2018-02-04T14:40:57Z",
       "side": 1,
       "message": "This whole autohold handling is pretty complex now. So I would prefer to move that into its own method.",
+      "revId": "e825023570ed69f4df7d302e78d5fff190904314",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_60741169",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1045,
+      "author": {
+        "id": 16036
+      },
+      "writtenOn": "2018-02-08T18:32:02Z",
+      "side": 1,
+      "message": "Done\n\nI\u0027ve also made two small changes: inverted `if autohold_key_base_issubset` to remove unneeded indentation, and removed early break (`if candidate_scope \u003d\u003d Scope.REF`) - it makes the code flow cleaner, and the only difference is, in case of multiple holds for the same ref, different request being fulfilled.",
+      "parentUuid": "3fa0c359_22a44a08",
       "revId": "e825023570ed69f4df7d302e78d5fff190904314",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
