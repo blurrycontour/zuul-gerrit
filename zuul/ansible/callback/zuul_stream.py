@@ -323,6 +323,9 @@ class CallbackModule(default.CallbackModule):
 
         result_dict = dict(result._result)
 
+        self._log_message(result, msg="[ZUUL DEBUG]: Task %s" % self._task)
+        self._log_message(result, msg="[ZUUL DEBUG]: %s" % result_dict)
+
         self._clean_results(result_dict, result._task.action)
         if '_zuul_nolog_return' in result_dict:
             # We have a custom zuul module that doesn't want the parameters
