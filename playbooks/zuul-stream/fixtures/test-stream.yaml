@@ -2,6 +2,9 @@
   hosts: node
   tasks:
 
+    - name: Print more binary data
+      command: echo -e 'This is binary \x80 data'
+
     - name: Run setup
       setup:
       register: setupvar
