@@ -24,9 +24,6 @@
       - playbooks/zuul-stream/post-ara.yaml
     required-projects:
       - openstack/ara
-    files:
-      - zuul/ansible/callback/.*
-      - playbooks/zuul-stream/.*
 
 - project:
     check:

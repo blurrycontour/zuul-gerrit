@@ -15,6 +15,10 @@
         ZUUL_JOB_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
         ARA_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
 
+    - name: Print job output for debugging
+      shell: |
+        cat job-output.txt
+
     - name: Validate output - setupvar
       shell: |
         egrep "^.*\| node1 \|\s+\"setupvar\": {" job-output.txt
