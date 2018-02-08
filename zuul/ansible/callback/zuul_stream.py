@@ -149,8 +149,7 @@ class CallbackModule(default.CallbackModule):
                     'ansible_host', play_vars[host].get(
                         'ansible_inventory_host', host))
                 streamer = stream_receiver.StreamReceiver(host=host)
-                port = streamer.get_port()
-                port_forwards[hostname] = port
+                port_forwards[hostname] = streamer.get_path()
                 streamer.daemon = True
                 streamer.start()
                 self._streamers.append(streamer)
