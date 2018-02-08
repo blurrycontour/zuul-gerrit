@@ -17,6 +17,7 @@ import datetime
 import logging
 import io
 import json
+import os
 import socketserver
 import struct
 import threading
@@ -55,15 +56,18 @@ class LogRecordStreamHandler(socketserver.StreamRequestHandler):
             log.handle(record)
 
 
-class LogRecordSocketReceiver(socketserver.ThreadingTCPServer):
+class LogRecordSocketReceiver(socketserver.ThreadingUnixStreamServer):
     """
     Simple TCP socket-based logging receiver suitable for testing.
     """
 
-    def __init__(self, host, port):
+    def __init__(self, host):
         self.host = host
-        socketserver.ThreadingTCPServer.__init__(
-            self, ('localhost', port), LogRecordStreamHandler)
+        self.path = os.path.join(
+            os.path.abspath(os.path.curdir),
+            '{host}.sock'.format(host=host))
+        socketserver.ThreadingUnixStreamServer.__init__(
+            self, self.path, LogRecordStreamHandler)
 
 
 class StreamReceiver(threading.Thread):
@@ -71,10 +75,10 @@ class StreamReceiver(threading.Thread):
     def __init__(self, host=None, port=0):
         super(StreamReceiver, self).__init__(
             name='zuul-stream-{host}'.format(host=host))
-        self.server = LogRecordSocketReceiver(host=host, port=port)
+        self.server = LogRecordSocketReceiver(host=host)
 
-    def get_port(self):
-        return self.server.socket.getsockname()[1]
+    def get_path(self):
+        return self.server.path
 
     def run(self):
         self.server.serve_forever()
@@ -82,3 +86,4 @@ class StreamReceiver(threading.Thread):
     def stop(self):
         self.server.shutdown()
         self.server.server_close()
+        os.unlink(self.server.path)

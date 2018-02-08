@@ -114,6 +114,7 @@ import glob
 import pipes
 import re
 import shlex
+import socket
 import os
 import json
 import struct
@@ -144,6 +145,13 @@ from ansible.module_utils._text import to_native, to_bytes, to_text
 
 class JsonSocketHandler(logging.handlers.SocketHandler):
 
+    def __init__(self, host, port):
+        super(JsonSocketHandler, self).__init__(host, port)
+        if port is None:
+            self.address = host
+        else:
+            self.address = (host, port)
+
     def makePickle(self, record):
         """Encode the log message to send over the wire.
 
@@ -162,6 +170,24 @@ class JsonSocketHandler(logging.handlers.SocketHandler):
         prefix = struct.pack('>L', len(payload))
         return prefix + payload
 
+    def makeSocket(self, timeout=1):
+        """
+        A factory method which allows subclasses to define the precise
+        type of socket they want.
+
+        This is the version from python3, shich supports unix sockets.
+        """
+        if self.port is not None:
+            result = socket.create_connection(self.address, timeout=timeout)
+        else:
+            result = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            result.settimeout(timeout)
+            try:
+                result.connect(self.address)
+            except OSError:
+                result.close()  # Issue 19182
+                raise
+        return result
 
 LOG_STREAM_FILE = '/tmp/console-{log_uuid}.log'
 PASSWD_ARG_RE = re.compile(r'^[-]{0,2}pass[-]?(word|wd)?')
@@ -491,7 +517,7 @@ def main():
             removes = dict(type='path'),
             warn = dict(type='bool', default=True),
             environ = dict(type='dict', default=None),
-            zuul_log_port = dict(type='int', default=None),
+            zuul_log_path = dict(type='str', default=None),
         )
     )
 
@@ -504,11 +530,12 @@ def main():
     warn = module.params['warn']
     environ = module.params['environ']
 
-    zuul_log_port = module.params.pop('zuul_log_port')
-    if zuul_log_port is not None:
+    zuul_log_path = module.params.pop('zuul_log_path')
+    if zuul_log_path:
         zuulLogger = logging.getLogger('zuul.executor.ansible')
         zuulLogger.setLevel(logging.DEBUG)
-        socketHandler = JsonSocketHandler('localhost', zuul_log_port)
+        # SocketHandler uses host with no port to mean 'use unix socket'
+        socketHandler = JsonSocketHandler(host=zuul_log_path, port=None)
         zuulLogger.addHandler(socketHandler)
 
     if args.strip() == '':
