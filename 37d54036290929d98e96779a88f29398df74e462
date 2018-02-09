@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_2aa326b4",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1059,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-02-09T18:21:36Z",
+      "side": 1,
+      "message": "What do you think about moving this whole autohold part into a _handleAutohold method? We could do something like this:\n\n  if build.result \u003d\u003d \u0027FAILURE\u0027:\n      self._handleAutoHold(build)\n\nThat way we can check first for a failed build and don\u0027t have to pay the iteration over the autohold requests for all builds. Further this would make reading this method easier.",
+      "range": {
+        "startLine": 1049,
+        "startChar": 0,
+        "endLine": 1059,
+        "endChar": 64
+      },
+      "revId": "37d54036290929d98e96779a88f29398df74e462",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
