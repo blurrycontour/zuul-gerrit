@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_653dd8db",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-02-10T08:43:32Z",
+      "side": 1,
+      "message": "Nit:\nNodepool and zuul support defining the username in the nodepool config per image. I think we should use that as a best practice (expecially when using upstream cloud images with different distros).\n\nOff topic:\nI\u0027d even vote for deprecating the default_username as the username to use is an essential information that should be tied to an image in any case. What do you think about that?",
+      "revId": "57d9cabb2742112829335266cd16ae2b3c31c510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_058ad4bd",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 384,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-02-10T08:43:32Z",
+      "side": 1,
+      "message": "You probably also want \u0027Repository administration: read\u0027\n\nI think this is needed for two things:\n*  the gate to work when it gets the reviews and it needs to get the users of the reviews when it creates the merge message.\n* retrieve branch protection settings",
+      "revId": "57d9cabb2742112829335266cd16ae2b3c31c510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_c57dccb2",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 442,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-02-10T08:43:32Z",
+      "side": 1,
+      "message": "For github you probably want to exclude unprotected branches otherwise it\u0027s too easy to break the zuul config.",
+      "revId": "57d9cabb2742112829335266cd16ae2b3c31c510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
