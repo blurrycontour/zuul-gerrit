@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_c82f193d",
+        "filename": "tools/encrypt_secret.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-02-11T18:47:36Z",
+      "side": 1,
+      "message": "can we print this to stderr? since the program has significant output to stdout, I\u0027d hate for this warning to prevent somebody who knows what they\u0027re doing from getting their job done. ;)",
+      "revId": "ffbe6e68e45043023dc08ccb9fdec34177abbe16",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
