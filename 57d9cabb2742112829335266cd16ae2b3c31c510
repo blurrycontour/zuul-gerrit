@@ -2,6 +2,278 @@
   "comments": [
     {
       "key": {
+        "uuid": "3fa0c359_a8ce4db1",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-02-11T18:42:23Z",
+      "side": 1,
+      "message": "Why don\u0027t we install these with git and redhat-lsb-core? We\u0027ll need all of them on every install.",
+      "revId": "57d9cabb2742112829335266cd16ae2b3c31c510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_48c78997",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-02-11T18:42:23Z",
+      "side": 1,
+      "message": "This should be a system user with a homedir in /var/lib.",
+      "revId": "57d9cabb2742112829335266cd16ae2b3c31c510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_68c4c591",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-02-11T18:42:23Z",
+      "side": 1,
+      "message": "And this one too.",
+      "revId": "57d9cabb2742112829335266cd16ae2b3c31c510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_08bd0101",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-02-11T18:42:23Z",
+      "side": 1,
+      "message": "Might be worth a note why this one is separate. I\u0027d have expected requirements.txt to be enough.",
+      "revId": "57d9cabb2742112829335266cd16ae2b3c31c510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_28ba3d09",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-02-11T18:42:23Z",
+      "side": 1,
+      "message": "Future TODO: recommend reading up on myid and ZK clustering.",
+      "revId": "57d9cabb2742112829335266cd16ae2b3c31c510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_c83879a1",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-02-11T18:42:23Z",
+      "side": 1,
+      "message": "I think we might want to align with our OpenStack Client friends and recommend a clouds.yaml. Can we re-word this, mauybe:\n\n  Before starting on this, you need to have OpenStack credentials available, either in your environment as OS_ variables, or as a clouds.yaml.\n\nAnd make some links to those two choices.",
+      "revId": "57d9cabb2742112829335266cd16ae2b3c31c510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_e83d358f",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-02-11T18:42:23Z",
+      "side": 1,
+      "message": "**************   ?  Seems like a sub heading.",
+      "revId": "57d9cabb2742112829335266cd16ae2b3c31c510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_883ef188",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-02-11T18:42:23Z",
+      "side": 1,
+      "message": "s/used for/installed when/",
+      "revId": "57d9cabb2742112829335266cd16ae2b3c31c510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_a843ad12",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-02-11T18:42:23Z",
+      "side": 1,
+      "message": "There needs to be some warning about project and user ownership. The keypair belongs to the user, so maybe recommend that it\u0027s created as the user nodepool will use so that it doesn\u0027t get deleted when some other user is deleted from the project.",
+      "revId": "57d9cabb2742112829335266cd16ae2b3c31c510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_484c6941",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-02-11T18:42:23Z",
+      "side": 1,
+      "message": "Why shade? Why not just have them use openstack client?\n\n  ssh-keygen -t rsa -b 2048 -f nodepool_rsa\n  openstack keypair create --public-key nodepool_rsa.pub nodepool",
+      "revId": "57d9cabb2742112829335266cd16ae2b3c31c510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_6849252f",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-02-11T18:42:23Z",
+      "side": 1,
+      "message": "If not using secure.yaml, need to mind perms:  umask 0066 should be used to ensure the file comes out 0600. Also don\u0027t create predictable filenames in /tmp. Suggest just putting it in the user\u0027s homedir, which will be safe from the problems of multi-user /tmp (in case somebody is running these instructions on a shared server)",
+      "revId": "57d9cabb2742112829335266cd16ae2b3c31c510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_0852e1de",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-02-11T18:42:23Z",
+      "side": 1,
+      "message": "Recommend secure.yaml?",
+      "revId": "57d9cabb2742112829335266cd16ae2b3c31c510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_284f9d34",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-02-11T18:42:23Z",
+      "side": 1,
+      "message": "I suggest ~nodepool instead of /home. A dilligent sysadmin will want system users with homedirs not in /home. Also some systems have structure under /home.",
+      "revId": "57d9cabb2742112829335266cd16ae2b3c31c510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_c86159ab",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-02-11T18:42:23Z",
+      "side": 1,
+      "message": "I don\u0027t recommend using \u0027quota\u0027 here. The quota may be higher or lower than max-servers. This is nodepool\u0027s limit.",
+      "revId": "57d9cabb2742112829335266cd16ae2b3c31c510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_e86695c1",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-02-11T18:42:23Z",
+      "side": 1,
+      "message": "While the pub key is in fact in PEM format, can I suggest we stick to the usual SSH norm which is calling this ${key_name} and the public key ${key_name}.pub  ?",
+      "revId": "57d9cabb2742112829335266cd16ae2b3c31c510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_8857d1ca",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-02-11T18:42:23Z",
+      "side": 1,
+      "message": "Above we told them to put it in /var/lib/zuul/.ssh",
+      "revId": "57d9cabb2742112829335266cd16ae2b3c31c510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa0c359_653dd8db",
         "filename": "doc/source/admin/zuul-from-scratch.rst",
         "patchSetId": 2
@@ -30,6 +302,57 @@
       "writtenOn": "2018-02-10T15:26:59Z",
       "side": 1,
       "message": "Sounds good.",
+      "revId": "57d9cabb2742112829335266cd16ae2b3c31c510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_a85c0ded",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-02-11T18:42:23Z",
+      "side": 1,
+      "message": "This is a kind of scary thing to suggest by default. Maybe just a warning about the fact that it exposes zuul-web to whatever traffic might arrive on its port?",
+      "revId": "57d9cabb2742112829335266cd16ae2b3c31c510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_48754963",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-02-11T18:42:23Z",
+      "side": 1,
+      "message": "Maybe we should just include this in the python package so it can be easily installed. --\u003e Future ideas",
+      "revId": "57d9cabb2742112829335266cd16ae2b3c31c510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_6872857d",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-02-11T18:42:23Z",
+      "side": 1,
+      "message": "Is this for zuul-jobs? Should we have them add it to the tenant config we created above?",
       "revId": "57d9cabb2742112829335266cd16ae2b3c31c510",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -70,6 +393,23 @@
     },
     {
       "key": {
+        "uuid": "3fa0c359_086bc184",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 400,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-02-11T18:42:23Z",
+      "side": 1,
+      "message": "TODO: look into whether the github API can be used to do this. If so, create a cmdline entrypoint that just creates the app using the user\u0027s creds (the same way hub.github.com works) and spits out the connection section.",
+      "revId": "57d9cabb2742112829335266cd16ae2b3c31c510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa0c359_c57dccb2",
         "filename": "doc/source/admin/zuul-from-scratch.rst",
         "patchSetId": 2
@@ -98,6 +438,23 @@
       "writtenOn": "2018-02-10T15:26:59Z",
       "side": 1,
       "message": "I agree that\u0027s generally a good idea, but if we do it in this doc, we\u0027d also have to go over setting up protected branches and the config would be more complex.  I think we should keep it simple and assume they\u0027re following these instructions and so they won\u0027t have any extra branches.",
+      "revId": "57d9cabb2742112829335266cd16ae2b3c31c510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_2868fd84",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 442,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-02-11T18:42:23Z",
+      "side": 1,
+      "message": "It might actually make sense to make zuul ignore unprotected branches in trusted projects by default, with a flag available to enable the wrong thing if users need to.",
       "revId": "57d9cabb2742112829335266cd16ae2b3c31c510",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
