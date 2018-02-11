@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_28a79da9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-02-11T19:22:44Z",
+      "side": 1,
+      "message": "This description excites me. Not the least because I do have tests where I reboot nodes and having the streaming continue to function after that naturally would be.. nice. :)",
+      "revId": "2d613b0b6d446c8b0df54f82eacbfe4de7355dd1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
