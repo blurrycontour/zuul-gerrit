@@ -58,6 +58,18 @@ class RPCClient(object):
                 'count': count}
         return not self.submitJob('zuul:autohold', data).failure
 
+    def autohold_delete(
+        self, tenant, project, job, change, ref, reason, count, noop):
+        data = {'tenant': tenant,
+                'project': project,
+                'job': job,
+                'change': change,
+                'ref': ref,
+                'reason': reason,
+                'count': count,
+                'noop': noop}
+        return not self.submitJob('zuul:autohold_delete', data).failure
+
     def autohold_list(self):
         data = {}
         job = self.submitJob('zuul:autohold_list', data)

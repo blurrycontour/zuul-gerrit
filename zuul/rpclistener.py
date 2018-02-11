@@ -51,6 +51,7 @@ class RPCListener(object):
 
     def register(self):
         self.worker.registerFunction("zuul:autohold")
+        self.worker.registerFunction("zuul:autohold_delete")
         self.worker.registerFunction("zuul:autohold_list")
         self.worker.registerFunction("zuul:enqueue")
         self.worker.registerFunction("zuul:enqueue_ref")
@@ -118,6 +119,34 @@ class RPCListener(object):
                 return
             except Exception:
                 self.log.exception("Exception while getting job")
+
+    def handle_autohold_delete(self, job):
+        req = {}
+        deletes = []
+        for key, value in self.sched.authold_requests.items():
+            matches = set()
+            needs = set()
+            for attr in (
+                'tenant',
+                'project',
+                'job',
+                'change',
+                'ref',
+                'reason',
+                'count',
+            ):
+                if getattr(job, attr):
+                    needs.add(attr)
+                    if getattr(job, attr) == getattr(value, attr):
+                        matches.add(attr)
+            if needs == matches:
+                if not value.noop:
+                    deletes += key
+                new_key = ','.join(key)
+                req[new_key] = value
+        for delkey in deletes:
+            del self.sched.autohold_requests[delkey]
+        return req
 
     def handle_autohold_list(self, job):
         req = {}
