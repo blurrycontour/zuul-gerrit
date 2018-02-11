@@ -43,25 +43,35 @@ class Client(zuul.cmd.ZuulApp):
                                            description='valid commands',
                                            help='additional help')
 
+        def _add_autohold_args(subcmd):
+            subcmd.add_argument('--tenant', help='tenant name',
+                                      required=True)
+            subcmd.add_argument('--project', help='project name',
+                                      required=True)
+            subcmd.add_argument('--job', help='job name',
+                                      required=True)
+            subcmd.add_argument('--change',
+                                      help='specific change to hold nodes for',
+                                      required=False, default='')
+            subcmd.add_argument('--ref', help='git ref to hold nodes for',
+                                      required=False, default='')
+            subcmd.add_argument('--reason', help='reason for the hold',
+                                      required=True)
+            subcmd.add_argument('--count',
+                                      help='number of job runs (default: 1)',
+                                      required=False, type=int, default=1)
         cmd_autohold = subparsers.add_parser(
             'autohold', help='hold nodes for failed job')
-        cmd_autohold.add_argument('--tenant', help='tenant name',
-                                  required=True)
-        cmd_autohold.add_argument('--project', help='project name',
-                                  required=True)
-        cmd_autohold.add_argument('--job', help='job name',
-                                  required=True)
-        cmd_autohold.add_argument('--change',
-                                  help='specific change to hold nodes for',
-                                  required=False, default='')
-        cmd_autohold.add_argument('--ref', help='git ref to hold nodes for',
-                                  required=False, default='')
-        cmd_autohold.add_argument('--reason', help='reason for the hold',
-                                  required=True)
-        cmd_autohold.add_argument('--count',
-                                  help='number of job runs (default: 1)',
-                                  required=False, type=int, default=1)
+        _add_autohold_args(cmd_autohold)
         cmd_autohold.set_defaults(func=self.autohold)
+
+        cmd_autohold_delete = subparsers.add_parser(
+            'autohold-delete',
+            help='deletes any existing autoholds that match these args')
+        _add_autohold_args(cmd_autohold_delete)
+        cmd_autohold_delete.add_argument('--noop', help='skip delete step',
+                                         default=False, action='store_true')
+        cmd_autohold_delete.set_defaults(func=self.autohold_delete)
 
         cmd_autohold_list = subparsers.add_parser(
             'autohold-list', help='list autohold requests')
@@ -188,14 +198,35 @@ class Client(zuul.cmd.ZuulApp):
                             change=self.args.change,
                             ref=self.args.ref,
                             reason=self.args.reason,
-                            count=self.args.count)
+                            count=self.args.count,
+                            delete=self.args.delete)
         return r
+
+    def autohold_delete(self):
+        client = zuul.rpcclient.RPCClient(
+            self.server, self.port, self.ssl_key, self.ssl_cert, self.ssl_ca)
+        if self.args.change and self.args.ref:
+            print("Change and ref can't be both used for the same request")
+            return False
+
+        r = client.autohold_delete(tenant=self.args.tenant,
+                            project=self.args.project,
+                            job=self.args.job,
+                            change=self.args.change,
+                            ref=self.args.ref,
+                            reason=self.args.reason,
+                            count=self.args.count,
+                            delete=self.args.delete,
+                            noop=self.args.delete)
+        self.autohold_list_print(r)
 
     def autohold_list(self):
         client = zuul.rpcclient.RPCClient(
             self.server, self.port, self.ssl_key, self.ssl_cert, self.ssl_ca)
         autohold_requests = client.autohold_list()
+        self.autohold_list_print(autohold_requests)
 
+    def autohold_list_print(autohold_requests):
         if len(autohold_requests.keys()) == 0:
             print("No autohold requests found")
             return True

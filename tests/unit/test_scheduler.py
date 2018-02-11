@@ -1501,6 +1501,53 @@ class TestScheduler(ZuulTestCase):
                          'FAILURE')
 
     @simple_layout('layouts/autohold.yaml')
+    def test_autohold_delete(self):
+        client = zuul.rpcclient.RPCClient('127.0.0.1',
+                                          self.gearman_server.port)
+        self.addCleanup(client.shutdown)
+        autohold_args = ('tenant-one', 'org/project', 'project-test2',
+                         "", "", "reason text", 1)
+        r = client.autohold(*autohold_args)
+        self.assertTrue(r)
+
+        # List them
+        l = list(client.autohold_list().values())
+        self.assertEqual(len(l), 1)
+
+        noop_args = list(autohold_args) + [True]  # add noop
+
+        # If we change any delete arg, we should delete none
+        for arg in range(0, len(autohold_args)):
+            new_args = list(noop_args)
+            new_args[arg] = 'xxxxxxxxx'
+            self.assertEqual(
+                [], list(client.autohold_delete(*new_args).values()))
+
+        # If we omit any delete arg, we should delete still
+        for arg in range(0, len(autohold_args)):
+            new_args = list(noop_args)
+            new_args[arg] = None
+            self.assertEqual(
+                l, list(client.autohold_delete(*new_args).values()))
+
+        r = client.autohold_delete(*noop_args)
+        # Should return all to-delete
+        self.assertEqual(l, r)
+
+        # However, all should still be there because noop==True
+        l2 = list(client.autohold_list().values())
+        self.assertEqual(l, l2)
+
+        # Now with noop=False
+        del_args = list(autohold_args) + [False]
+        r = client.autohold_delete(del_args)
+        self.assertEqual(l, r)
+
+        # Now it should be gone.
+        l3 = list(client.autohold_list().values())
+        self.assertEqual([], l3)
+
+    @simple_layout('layouts/autohold.yaml')
     def test_autohold(self):
         client = zuul.rpcclient.RPCClient('127.0.0.1',
                                           self.gearman_server.port)
