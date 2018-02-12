@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3fa0c359_ff44f075",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2018-02-12T21:59:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa0c359_9fd4ccea",
+      "revId": "bfa32b46d85d8c6af3f57d0c1cc9b3413164884c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa0c359_3f09f894",
         "filename": "zuul/nodepool.py",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2018-02-12T21:31:32Z",
       "side": 1,
       "message": "I don\u0027t think we need the _keys check.  If nodepool doesn\u0027t support it, there\u0027s no reason for us to set it.  If it does support it, it should be set already.",
+      "revId": "bfa32b46d85d8c6af3f57d0c1cc9b3413164884c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_7f7f80aa",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2018-02-12T21:59:12Z",
+      "side": 1,
+      "message": "The tests failed without this due to the key missing, despite being present in the model and the nodepool change in the depends-on. Am I missing something here ?",
+      "parentUuid": "3fa0c359_3f09f894",
       "revId": "bfa32b46d85d8c6af3f57d0c1cc9b3413164884c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
