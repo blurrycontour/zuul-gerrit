@@ -580,6 +580,23 @@
     },
     {
       "key": {
+        "uuid": "3fa0c359_ee7c4873",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-02-12T19:00:31Z",
+      "side": 1,
+      "message": "I believe pip3 install for fedora-27 recently changed this to:\n\n/usr/local/bin/nodepool-launcher",
+      "revId": "57d9cabb2742112829335266cd16ae2b3c31c510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa0c359_48754963",
         "filename": "doc/source/admin/zuul-from-scratch.rst",
         "patchSetId": 2
