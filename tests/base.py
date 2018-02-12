@@ -1652,7 +1652,8 @@ class FakeNodepool(object):
                     updated_time=now,
                     image_id=None,
                     host_keys=["fake-key1", "fake-key2"],
-                    executor='fake-nodepool')
+                    executor='fake-nodepool',
+                    hold_expiration=None)
         if 'fakeuser' in node_type:
             data['username'] = 'fakeuser'
         if 'windows' in node_type:
