@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_feb95978",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 868,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-02-12T17:29:00Z",
+      "side": 1,
+      "message": "It\u0027s not technically a \"play\". I\u0027m not actually certain what it is called. \"job phase\" ? Plays are things inside individual playbooks though, so that\u0027s not the right word. #WordsAreHard",
+      "revId": "bd418d60f982e889bfb06211224dbbb89280a21b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
