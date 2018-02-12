@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_bf80a8f6",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-02-12T21:25:40Z",
+      "side": 1,
+      "message": "What\u0027s the purpose of --noop?",
+      "revId": "20afa2b94a1d7a7aff176da41dd05d98bba62a2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
