@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_9fd4ccea",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-02-12T21:31:32Z",
+      "side": 1,
+      "message": "\"hold-for\" is ambiguous (for example, it may suggest the hold should be used by some program or assigned to some person, or it may be mistaken for \u0027reason\u0027).  How about something like \u0027hold-expiration\u0027 instead?",
+      "revId": "bfa32b46d85d8c6af3f57d0c1cc9b3413164884c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_3f09f894",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-02-12T21:31:32Z",
+      "side": 1,
+      "message": "I don\u0027t think we need the _keys check.  If nodepool doesn\u0027t support it, there\u0027s no reason for us to set it.  If it does support it, it should be set already.",
+      "revId": "bfa32b46d85d8c6af3f57d0c1cc9b3413164884c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
