@@ -1,4 +1,4 @@
-# Copyright 2012 Hewlett-Packard Development Company, L.P.
+<# Copyright 2012 Hewlett-Packard Development Company, L.P.
 # Copyright 2013 OpenStack Foundation
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -172,6 +172,7 @@ class RPCListener(object):
             return
 
         params['count'] = args['count']
+        params['hold_for'] = args['hold_for']
 
         self.sched.autohold(**params)
         job.sendWorkComplete()
