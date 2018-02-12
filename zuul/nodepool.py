@@ -87,13 +87,20 @@ class Nodepool(object):
         :param set autohold_key: A set with the tenant/project/job names
             associated with the given NodeSet.
         '''
-        (hold_iterations, reason) = self.sched.autohold_requests[autohold_key]
+        (hold_iterations,
+         reason,
+         hold_for) = self.sched.autohold_requests[autohold_key]
         nodes = nodeset.getNodes()
 
         for node in nodes:
             node.state = model.STATE_HOLD
             node.hold_job = " ".join(autohold_key)
             node.comment = reason
+            if hold_for:
+                node.hold_for = hold_for
+                # ensure 'hold_for' gets correctly serialized
+                if 'hold_for' not in node._keys:
+                    node._keys.append('hold_for')
             self.sched.zk.storeNode(node)
 
         # We remove the autohold when the number of nodes in hold
