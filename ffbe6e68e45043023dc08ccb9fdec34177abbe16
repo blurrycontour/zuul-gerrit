@@ -16,6 +16,24 @@
       "revId": "ffbe6e68e45043023dc08ccb9fdec34177abbe16",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_d7efb01b",
+        "filename": "tools/encrypt_secret.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-02-12T06:48:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa0c359_c82f193d",
+      "revId": "ffbe6e68e45043023dc08ccb9fdec34177abbe16",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
