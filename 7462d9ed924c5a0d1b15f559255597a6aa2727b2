@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_f06896f5",
+        "filename": "zuul/web/static/javascripts/jquery.zuul.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-02-13T07:39:01Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this be _blank as stated in the commit message? While _new will probably work it seems that this is actually not a valid context name according to the spec [1].\n\n[1] http://w3c.github.io/html/browsers.html#browsing-context-names",
+      "range": {
+        "startLine": 291,
+        "startChar": 74,
+        "endLine": 291,
+        "endChar": 78
+      },
+      "revId": "7462d9ed924c5a0d1b15f559255597a6aa2727b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
