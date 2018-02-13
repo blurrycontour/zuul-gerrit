@@ -22,6 +22,30 @@
       "revId": "7462d9ed924c5a0d1b15f559255597a6aa2727b2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_8b7c8772",
+        "filename": "zuul/web/static/javascripts/jquery.zuul.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2018-02-13T07:48:06Z",
+      "side": 1,
+      "message": "thanks!  yeah i was researching which was the one to use these days and must have got all mixed up :)",
+      "parentUuid": "3fa0c359_f06896f5",
+      "range": {
+        "startLine": 291,
+        "startChar": 74,
+        "endLine": 291,
+        "endChar": 78
+      },
+      "revId": "7462d9ed924c5a0d1b15f559255597a6aa2727b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
