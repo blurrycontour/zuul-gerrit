@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_9c584131",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 357,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-02-13T15:53:41Z",
+      "side": 1,
+      "message": "handleStatusRequest operates on the request and puts the status.json into the response.  We need to create new low-level functions on the gearman handler to just return the data structure without doing that, so we can craft our own response.",
+      "revId": "0969888f9a63cde6e99f298a4c0229ba0f6eba0c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
