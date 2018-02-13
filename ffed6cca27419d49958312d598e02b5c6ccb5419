@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_48dbd04d",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-02-13T20:40:41Z",
+      "side": 1,
+      "message": "+1 This seems important.  It looks like right now empty node requests fail the check below and so end up getting \"re-submitted\" to zk, where they are fulfilled.  This restores the intended operation.",
+      "revId": "ffed6cca27419d49958312d598e02b5c6ccb5419",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_68decc3e",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-02-13T20:40:41Z",
+      "side": 1,
+      "message": "-1 I\u0027m afraid in this case we\u0027re going to get stuck -- there isn\u0027t anything that will resubmit the request at this point.  Is this any different than if we didn\u0027t catch the exception?\n\nMaybe we should either try to be more robust (delete the request so that zuul tries to submit a new request?) or just mark the request as failed?",
+      "revId": "ffed6cca27419d49958312d598e02b5c6ccb5419",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
