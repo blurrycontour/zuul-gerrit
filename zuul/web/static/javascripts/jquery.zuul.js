@@ -288,7 +288,7 @@
                     var github_id = change_id.match(/^([0-9]+),([0-9a-f]{40})$/);
                     if (github_id) {
                         $change_link.append(
-                            $('<a />').attr('href', change.url).append(
+                            $('<a />').attr({'href': change.url, target: "_blank"}).append(
                                 $('<abbr />')
                                     .attr('title', change_id)
                                     .text('#' + github_id[1])
@@ -297,7 +297,7 @@
                     } else if (/^[0-9a-f]{40}$/.test(change_id)) {
                         var change_id_short = change_id.slice(0, 7);
                         $change_link.append(
-                            $('<a />').attr('href', change.url).append(
+                            $('<a />').attr({href: change.url, target: "_blank"}).append(
                                 $('<abbr />')
                                     .attr('title', change_id)
                                     .text(change_id_short)
@@ -306,7 +306,7 @@
                     }
                     else {
                         $change_link.append(
-                            $('<a />').attr('href', change.url).text(change_id)
+                            $('<a />').attr({'href': change.url, target: "_blank"}).text(change_id)
                         );
                     }
                 }
