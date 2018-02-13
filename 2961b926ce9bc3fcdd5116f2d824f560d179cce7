@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "3fa0c359_bc073dca",
+        "filename": "tests/unit/test_merger_repo.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-02-13T16:01:01Z",
+      "side": 1,
+      "message": "Almost both test the same thing. One directly the merge and one in an end-to-end test.",
+      "parentUuid": "3fa0c359_dc230dbe",
+      "revId": "2961b926ce9bc3fcdd5116f2d824f560d179cce7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa0c359_3124b65d",
         "filename": "zuul/merger/merger.py",
         "patchSetId": 3
