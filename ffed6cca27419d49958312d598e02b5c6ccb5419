@@ -69,6 +69,23 @@
       "revId": "ffed6cca27419d49958312d598e02b5c6ccb5419",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_46ebad11",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-02-14T15:17:35Z",
+      "side": 1,
+      "message": "I think I\u0027d stick with \u0027fail the request in 2\u0027 for now -- we don\u0027t have a lot of retry handling for the case where the connection is currently failed.  I think in Dublin we should talk about what our overall strategy should be.  So maybe let\u0027s defer retry handling until then.\n\n(That\u0027s just my suggestion to avoid extra work -- if you wanted to add the retry here now, I wouldn\u0027t object.)",
+      "revId": "ffed6cca27419d49958312d598e02b5c6ccb5419",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
