@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_109e3454",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2018-02-14T17:23:58Z",
+      "side": 1,
+      "message": "typo in this commit (too late now) but this is cleanup, not reset. The code is fine.",
+      "range": {
+        "startLine": 11,
+        "startChar": 24,
+        "endLine": 11,
+        "endChar": 29
+      },
+      "revId": "1267144b1956b956e511127fc5d9a07bc081d954",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
