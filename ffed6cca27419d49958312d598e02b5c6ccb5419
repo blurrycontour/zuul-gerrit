@@ -33,6 +33,24 @@
       "revId": "ffed6cca27419d49958312d598e02b5c6ccb5419",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_f4994ac3",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-02-14T09:22:32Z",
+      "side": 1,
+      "message": "Ah I see. If we\u0027re doing that this method won\u0027t ever be called again for this node request and we\u0027re stuck in the same way as before. So I agree that we should try to be more robust and fail the request if we still fail. So maybe we should do\n\n1. add retries in zk.nodeRequestExists\n2. in case of exception (exception means problem with zk connection in this case) try to delete the node request and resubmit one\n\nI\u0027m not sure about 2. because if we repeatedly fail to get the node request we have a serious problem with the zk connection and 2. will probably even fail to create the node request. Maybe we should just fail the request in 2.\n\nThe problem was initially caused by a high IO latency problem in my zk (that is solved now within my zk installation) which caused us to loose the session. So I think this would be solved with the retries then.",
+      "parentUuid": "3fa0c359_68decc3e",
+      "revId": "ffed6cca27419d49958312d598e02b5c6ccb5419",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
