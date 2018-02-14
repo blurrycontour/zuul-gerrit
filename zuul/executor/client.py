@@ -205,10 +205,16 @@ class ExecutorClient(object):
         for node in nodeset.getNodes():
             n = node.toDict()
             n.update(dict(name=node.name, label=node.label))
+            n['vars'] = job.host_variables.get(node.name, {})
             nodes.append(n)
         params['nodes'] = nodes
-        params['groups'] = [group.toDict() for group in nodeset.getGroups()]
-        params['vars'] = copy.deepcopy(job.variables)
+        groups = []
+        for group in for group in nodeset.getGroups():
+            g = group.toDict()
+            g['vars'] = job.group_variables.get(group.name, {})
+            groups.append(g)
+        params['groups'] = groups
+        params['vars'] = job.variables
         params['zuul'] = zuul_params
         projects = set()
         required_projects = set()

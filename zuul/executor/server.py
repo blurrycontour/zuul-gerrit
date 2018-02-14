@@ -534,10 +534,7 @@ def make_inventory_dict(nodes, groups, all_vars):
     for group in groups:
         group_hosts = {}
         for node_name in group['nodes']:
-            # children is a dict with None as values because we don't have
-            # and per-group variables. If we did, None would be a dict
-            # with the per-group variables
-            group_hosts[node_name] = None
+            group_hosts[node_name] = group['vars']
         inventory[group['name']] = {'hosts': group_hosts}
 
     return inventory
@@ -961,7 +958,8 @@ class AnsibleJob(object):
             # TODO(jeblair): Move this notice to the docs.
             ip = node.get('interface_ip')
             port = node.get('connection_port', node.get('ssh_port', 22))
-            host_vars = dict(
+            host_vars = copy.deepcopy(node['vars'])
+            host_vars.update(dict(
                 ansible_host=ip,
                 ansible_user=self.executor_server.default_username,
                 ansible_port=port,
@@ -974,7 +972,7 @@ class AnsibleJob(object):
                     interface_ip=node.get('interface_ip'),
                     public_ipv4=node.get('public_ipv4'),
                     private_ipv4=node.get('private_ipv4'),
-                    public_ipv6=node.get('public_ipv6')))
+                    public_ipv6=node.get('public_ipv6'))))
 
             username = node.get('username')
             if username:
