@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3fa0c359_8f30f357",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-02-14T10:23:52Z",
+      "side": 1,
+      "message": "I think this should be its own change so I\u0027ve split out this into https://review.openstack.org/544236",
+      "parentUuid": "3fa0c359_48dbd04d",
+      "revId": "ffed6cca27419d49958312d598e02b5c6ccb5419",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa0c359_68decc3e",
         "filename": "zuul/nodepool.py",
         "patchSetId": 4
