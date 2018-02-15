@@ -717,10 +717,12 @@ class AnsibleJob(object):
             # checked out
             p = args['zuul']['projects'][project['canonical_name']]
             p['checkout'] = selected
-        # Delete the origin remote from each repo we set up since
-        # it will not be valid within the jobs.
-        for repo in repos.values():
-            repo.deleteRemote('origin')
+
+        # Set the URL of the origin remote for each repo to the
+        # canonical name. This allows tools to use the remote to
+        # determine which commits are part of the current change.
+        for name, repo in repos.items():
+            repo.setRemoteUrl(name)
 
         # This prepares each playbook and the roles needed for each.
         self.preparePlaybooks(args)
