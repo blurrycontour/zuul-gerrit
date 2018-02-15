@@ -1,0 +1,10 @@
+Code-Review+2: Tobias Henkel <tobias.henkel@bmw.de>
+Code-Review+1: Paul Belanger <pabelanger@redhat.com>
+Code-Review+2: Clint 'SpamapS' Byrum <clint@fewbar.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Thu, 15 Feb 2018 16:39:32 +0000
+Reviewed-on: https://review.openstack.org/542518
+Project: openstack-infra/zuul
+Branch: refs/heads/master
