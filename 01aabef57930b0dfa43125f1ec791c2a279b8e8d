@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_55c49992",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1921
+      },
+      "writtenOn": "2018-02-15T10:29:58Z",
+      "side": 1,
+      "message": "This looks great, thank you!",
+      "revId": "01aabef57930b0dfa43125f1ec791c2a279b8e8d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
