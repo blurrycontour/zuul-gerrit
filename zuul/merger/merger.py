@@ -241,15 +241,18 @@ class Repo(object):
 
     def setRefs(self, refs):
         repo = self.createRepoObject()
-        current_refs = {}
-        for ref in repo.refs:
-            current_refs[ref.path] = ref
-        unseen = set(current_refs.keys())
         for path, hexsha in refs.items():
             self.setRef(path, hexsha, repo)
-            unseen.discard(path)
-        for path in unseen:
-            self.deleteRef(path, repo)
+
+    def setRemoteRef(self, branch, rev):
+        repo = self.createRepoObject()
+        try:
+            origin_ref = repo.remotes.origin.refs[branch]
+        except IndexError:
+            self.log.warning("No remote ref found for branch %s", branch)
+            return
+        self.log.debug("Updating remote reference %s to %s", origin_ref, rev)
+        origin_ref.commit = rev
 
     def deleteRef(self, path, repo=None):
         if repo is None:
@@ -532,6 +535,12 @@ class Merger(object):
                                 repo_state, recent)
         else:
             self.log.debug("Found base commit %s for %s" % (base, key,))
+
+        # Set origin branch to the rev of the current (speculative) base.
+        # This allows tools to determine the commits that are part of a change
+        # by looking at origin/master..master.
+        repo.setRemoteRef(item['branch'], base)
+
         # Merge the change
         commit = self._mergeChange(item, base)
         if not commit:
