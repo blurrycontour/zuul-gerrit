@@ -1,0 +1,10 @@
+Code-Review+2: Paul Belanger <pabelanger@redhat.com>
+Code-Review+2: Tobias Henkel <tobias.henkel@bmw.de>
+Code-Review+1: David Moreau Simard <dmsimard@redhat.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Fri, 16 Feb 2018 21:27:19 +0000
+Reviewed-on: https://review.openstack.org/544562
+Project: openstack-infra/zuul
+Branch: refs/heads/master
