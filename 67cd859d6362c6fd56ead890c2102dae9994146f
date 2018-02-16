@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_dcff5432",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 607,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2018-02-16T15:10:29Z",
+      "side": 1,
+      "message": "Should there be a common function to handle this kind of verification in both configloader and executor/server ?\nThe list of reserved \"words\" could be a constant or something, ex:\n\n\n    def check_varnames(var):\n        if var in RESERVED_NAMES:\n          raise Exception(\"Naming variables or secrets %s is not allowed\" % var)",
+      "range": {
+        "startLine": 605,
+        "startChar": 0,
+        "endLine": 607,
+        "endChar": 51
+      },
+      "revId": "67cd859d6362c6fd56ead890c2102dae9994146f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
