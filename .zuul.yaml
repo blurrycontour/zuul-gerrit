@@ -39,7 +39,7 @@
     post-run: playbooks/tox/post.yaml
     vars:
       node_version: 8
-      npm_command: run build
+      npm_command: build
 
 - project:
     check:

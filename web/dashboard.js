@@ -46,15 +46,15 @@ function jobsGraph (jobs) {
     'transform', 'translate(40,0)')
 
   let stratify = d3.stratify()
-      .id(function (d) {
-        return d.name
-      })
-      .parentId(function (d) {
-        if (d.name === 'base') {
-          return ''
-        }
-        return d.parent
-      })
+    .id(function (d) {
+      return d.name
+    })
+    .parentId(function (d) {
+      if (d.name === 'base') {
+        return ''
+      }
+      return d.parent
+    })
 
   let tree = d3.cluster().size([h, w - 250])
 
@@ -63,21 +63,21 @@ function jobsGraph (jobs) {
   tree(root)
 
   svg.selectAll('.link')
-      .data(root.descendants().slice(1))
-      .enter().append('path')
-      .attr('class', 'link')
-      .attr('d', function (d) {
-        return 'M' + d.y + ',' + d.x + 'C' + (d.parent.y + 100) + ',' + d.x +
+    .data(root.descendants().slice(1))
+    .enter().append('path')
+    .attr('class', 'link')
+    .attr('d', function (d) {
+      return 'M' + d.y + ',' + d.x + 'C' + (d.parent.y + 100) + ',' + d.x +
           ' ' + (d.parent.y + 100) + ',' + d.parent.x + ' ' +
           d.parent.y + ',' + d.parent.x
-      })
+    })
 
   let node = svg.selectAll('.node')
-      .data(root.descendants())
-      .enter().append('g')
-      .attr('transform', function (d) {
-        return 'translate(' + d.y + ',' + d.x + ')'
-      })
+    .data(root.descendants())
+    .enter().append('g')
+    .attr('transform', function (d) {
+      return 'translate(' + d.y + ',' + d.x + ')'
+    })
 
   node.append('circle').attr('r', 2)
 
@@ -145,8 +145,8 @@ function projectGraph (project) {
         let found = false
         let interPos
         for (interPos = 0;
-             interPos < interJobs.length;
-             interPos += 1) {
+          interPos < interJobs.length;
+          interPos += 1) {
           if (job.name === interJobs[interPos]) {
             found = true
             break
@@ -166,28 +166,28 @@ function projectGraph (project) {
 
   let color = d3.scaleOrdinal(d3.schemeCategory20)
   let simulation = d3.forceSimulation()
-      .force('center', d3.forceCenter(w / 2, h / 2))
-      .force('link', d3.forceLink().distance(120).id(function (d) {
-        return d.id
-      }))
-      .force('charge', d3.forceManyBody().strength(-500))
+    .force('center', d3.forceCenter(w / 2, h / 2))
+    .force('link', d3.forceLink().distance(120).id(function (d) {
+      return d.id
+    }))
+    .force('charge', d3.forceManyBody().strength(-500))
 
   simulation.nodes(nodes)
   simulation.force('link').links(links)
 
   let link = svg.selectAll('.link')
-      .data(links)
-      .enter().append('line')
-      .attr('class', 'link')
+    .data(links)
+    .enter().append('line')
+    .attr('class', 'link')
 
   let node = svg.selectAll('.node')
-      .data(nodes)
-      .enter().append('g')
-      .attr('class', 'node')
-      .call(d3.drag()
-            .on('start', dragstarted)
-            .on('drag', dragged)
-            .on('end', dragended))
+    .data(nodes)
+    .enter().append('g')
+    .attr('class', 'node')
+    .call(d3.drag()
+      .on('start', dragstarted)
+      .on('drag', dragged)
+      .on('end', dragended))
 
   node.append('circle')
     .attr('r', 5)
@@ -244,16 +244,16 @@ function projectGraph (project) {
 }
 
 angular.module('zuulTenants', []).controller(
-    'mainController', function ($scope, $http, $location) {
-      $scope.tenants = undefined
-      $scope.tenants_fetch = function () {
-        $http.get(getSourceUrl('tenants', $location))
-          .then(function success (result) {
-            $scope.tenants = result.data
-          })
-      }
-      $scope.tenants_fetch()
-    })
+  'mainController', function ($scope, $http, $location) {
+    $scope.tenants = undefined
+    $scope.tenants_fetch = function () {
+      $http.get(getSourceUrl('tenants', $location))
+        .then(function success (result) {
+          $scope.tenants = result.data
+        })
+    }
+    $scope.tenants_fetch()
+  })
 
 angular.module('zuulProjects', []).controller(
   'mainController', function ($scope, $http) {
@@ -302,37 +302,37 @@ angular.module('zuulJobs', [], function ($locationProvider) {
     requireBase: false
   })
 }).controller(
-    'mainController', function ($scope, $http, $location) {
-      $scope.jobs = undefined
-      $scope.graph = undefined
-      $scope.jobs_fetch = function () {
-        $http.get(getSourceUrl('jobs', $location))
-            .then(function success (result) {
-              $scope.jobs = result.data
-              $scope.jobs.forEach(function (job) {
-                job.expanded = false
-                job.details = undefined
-              })
-            })
+  'mainController', function ($scope, $http, $location) {
+    $scope.jobs = undefined
+    $scope.graph = undefined
+    $scope.jobs_fetch = function () {
+      $http.get(getSourceUrl('jobs', $location))
+        .then(function success (result) {
+          $scope.jobs = result.data
+          $scope.jobs.forEach(function (job) {
+            job.expanded = false
+            job.details = undefined
+          })
+        })
+    }
+    $scope.job_fetch = function (job) {
+      if (!job.details) {
+        $http.get('jobs/' + job.name)
+          .then(function success (result) {
+            job.details = result.data
+          })
       }
-      $scope.job_fetch = function (job) {
-        if (!job.details) {
-          $http.get('jobs/' + job.name)
-              .then(function success (result) {
-                job.details = result.data
-              })
-        }
-        job.expanded = !job.expanded
+      job.expanded = !job.expanded
+    }
+    $scope.toggleGraph = function () {
+      jQuery('#jobTable').toggle()
+      jQuery('#jobGraph').toggle()
+      if (!$scope.graph) {
+        $scope.graph = jobsGraph($scope.jobs)
       }
-      $scope.toggleGraph = function () {
-        jQuery('#jobTable').toggle()
-        jQuery('#jobGraph').toggle()
-        if (!$scope.graph) {
-          $scope.graph = jobsGraph($scope.jobs)
-        }
-      }
-      $scope.jobs_fetch()
-    })
+    }
+    $scope.jobs_fetch()
+  })
 
 angular.module('zuulJob', [], function ($locationProvider) {
   $locationProvider.html5Mode({
@@ -399,10 +399,10 @@ angular.module('zuulBuilds', [], function ($locationProvider) {
   if (queryArgs['source_url']) {
     $scope.tenant = undefined
   } else {
-    let tenantStart = url.lastIndexOf(
+    let tenant_start = url.lastIndexOf(
       '/', url.lastIndexOf('/builds.html') - 1) + 1
-    let tenantLength = url.lastIndexOf('/builds.html') - tenantStart
-    $scope.tenant = url.substr(tenantStart, tenantLength)
+    let tenant_length = url.lastIndexOf('/builds.html') - tenant_start
+    $scope.tenant = url.substr(tenant_start, tenant_length)
   }
   $scope.builds = undefined
   if (queryArgs['pipeline']) {
@@ -422,21 +422,21 @@ angular.module('zuulBuilds', [], function ($locationProvider) {
     if ($scope.project) { queryString += '&project=' + $scope.project }
     if (queryString !== '') { queryString = '?' + queryString.substr(1) }
     $http.get(getSourceUrl('builds', $location) + queryString)
-            .then(function success (result) {
-              for (let buildPos = 0;
-                     buildPos < result.data.length;
-                     buildPos += 1) {
-                let build = result.data[buildPos]
-                if (build.node_name == null) {
-                  build.node_name = 'master'
-                }
-                /* Fix incorect url for post_failure job */
-                if (build.log_url === build.job_name) {
-                  build.log_url = undefined
-                }
-              }
-              $scope.builds = result.data
-            })
+      .then(function success (result) {
+        for (let buildPos = 0;
+          buildPos < result.data.length;
+          buildPos += 1) {
+          let build = result.data[buildPos]
+          if (build.node_name == null) {
+            build.node_name = 'master'
+          }
+          /* Fix incorect url for post_failure job */
+          if (build.log_url === build.job_name) {
+            build.log_url = undefined
+          }
+        }
+        $scope.builds = result.data
+      })
   }
   $scope.builds_fetch()
 })
