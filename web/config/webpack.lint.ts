@@ -12,6 +12,14 @@ const config: webpack.Configuration = WebpackMerge(CommonConfig, {
     rules: [
       {
         enforce: 'pre',
+        test: /\.ts$/,
+        use: [
+          'tslint-loader'
+        ],
+        exclude: /node_modules/,
+      },
+      {
+        enforce: 'pre',
         test: /\.js$/,
         use: [
           'babel-loader',
