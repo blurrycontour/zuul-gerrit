@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_09d571e5",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1748,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-02-17T01:18:30Z",
+      "side": 1,
+      "message": "These three args were not removed like there were in reloadConfig which causes line 580 in scheduler.py to have a sad.",
+      "range": {
+        "startLine": 1747,
+        "startChar": 57,
+        "endLine": 1748,
+        "endChar": 40
+      },
+      "revId": "3d812699fc025802977f983ede6dbc1845a3ac03",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
