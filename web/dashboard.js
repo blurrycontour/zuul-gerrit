@@ -26,16 +26,16 @@ import './jquery.zuul'
 import { getSourceUrl } from './util'
 
 angular.module('zuulTenants', []).controller(
-    'mainController', function ($scope, $http, $location) {
-      $scope.tenants = undefined
-      $scope.tenants_fetch = function () {
-        $http.get(getSourceUrl('tenants', $location))
-          .then(function success (result) {
-            $scope.tenants = result.data
-          })
-      }
-      $scope.tenants_fetch()
-    })
+  'mainController', function ($scope, $http, $location) {
+    $scope.tenants = undefined
+    $scope.tenants_fetch = function () {
+      $http.get(getSourceUrl('tenants', $location))
+        .then(function success (result) {
+          $scope.tenants = result.data
+        })
+    }
+    $scope.tenants_fetch()
+  })
 
 angular.module('zuulProjects', []).controller(
   'mainController', function ($scope, $http) {
@@ -76,29 +76,29 @@ angular.module('zuulJobs', [], function ($locationProvider) {
     requireBase: false
   })
 }).controller(
-    'mainController', function ($scope, $http, $location) {
-      $scope.jobs = undefined
-      $scope.jobs_fetch = function () {
-        $http.get(getSourceUrl('jobs', $location))
-            .then(function success (result) {
-              $scope.jobs = result.data
-              $scope.jobs.forEach(function (job) {
-                job.expanded = false
-                job.details = undefined
-              })
-            })
+  'mainController', function ($scope, $http, $location) {
+    $scope.jobs = undefined
+    $scope.jobs_fetch = function () {
+      $http.get(getSourceUrl('jobs', $location))
+        .then(function success (result) {
+          $scope.jobs = result.data
+          $scope.jobs.forEach(function (job) {
+            job.expanded = false
+            job.details = undefined
+          })
+        })
+    }
+    $scope.job_fetch = function (job) {
+      if (!job.details) {
+        $http.get('jobs/' + job.name)
+          .then(function success (result) {
+            job.details = result.data
+          })
       }
-      $scope.job_fetch = function (job) {
-        if (!job.details) {
-          $http.get('jobs/' + job.name)
-              .then(function success (result) {
-                job.details = result.data
-              })
-        }
-        job.expanded = !job.expanded
-      }
-      $scope.jobs_fetch()
-    })
+      job.expanded = !job.expanded
+    }
+    $scope.jobs_fetch()
+  })
 
 angular.module('zuulJob', [], function ($locationProvider) {
   $locationProvider.html5Mode({
@@ -165,10 +165,10 @@ angular.module('zuulBuilds', [], function ($locationProvider) {
   if (queryArgs['source_url']) {
     $scope.tenant = undefined
   } else {
-    let tenantStart = url.lastIndexOf(
+    let tenant_start = url.lastIndexOf(
       '/', url.lastIndexOf('/builds.html') - 1) + 1
-    let tenantLength = url.lastIndexOf('/builds.html') - tenantStart
-    $scope.tenant = url.substr(tenantStart, tenantLength)
+    let tenant_length = url.lastIndexOf('/builds.html') - tenant_start
+    $scope.tenant = url.substr(tenant_start, tenant_length)
   }
   $scope.builds = undefined
   if (queryArgs['pipeline']) {
@@ -188,21 +188,21 @@ angular.module('zuulBuilds', [], function ($locationProvider) {
     if ($scope.project) { queryString += '&project=' + $scope.project }
     if (queryString !== '') { queryString = '?' + queryString.substr(1) }
     $http.get(getSourceUrl('builds', $location) + queryString)
-            .then(function success (result) {
-              for (let buildPos = 0;
-                     buildPos < result.data.length;
-                     buildPos += 1) {
-                let build = result.data[buildPos]
-                if (build.node_name == null) {
-                  build.node_name = 'master'
-                }
-                /* Fix incorect url for post_failure job */
-                if (build.log_url === build.job_name) {
-                  build.log_url = undefined
-                }
-              }
-              $scope.builds = result.data
-            })
+      .then(function success (result) {
+        for (let buildPos = 0;
+          buildPos < result.data.length;
+          buildPos += 1) {
+          let build = result.data[buildPos]
+          if (build.node_name == null) {
+            build.node_name = 'master'
+          }
+          /* Fix incorect url for post_failure job */
+          if (build.log_url === build.job_name) {
+            build.log_url = undefined
+          }
+        }
+        $scope.builds = result.data
+      })
   }
   $scope.builds_fetch()
 })
