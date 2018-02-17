@@ -8,6 +8,14 @@
     "lib": [ "es2015", "dom" ],
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "allowJs": true
-  }
+    "allowJs": false
+  },
+  "awesomeTypescriptLoaderOptions": {
+    "useBable": true,
+    "useCache": true
+  },
+  "include": [
+    "webpack.config.ts",
+    "web/**/*.ts"
+  ]
 }
