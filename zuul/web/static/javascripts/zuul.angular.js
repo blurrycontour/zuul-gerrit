@@ -23,7 +23,7 @@ angular.module('zuulTenants', []).controller(
 {
     $scope.tenants = undefined;
     $scope.tenants_fetch = function() {
-        $http.get("tenants.json")
+        $http.get("tenants")
             .then(function success(result) {
                 $scope.tenants = result.data;
             });
