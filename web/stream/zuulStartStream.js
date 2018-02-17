@@ -1,9 +1,6 @@
 /* global URL, WebSocket, BuiltinConfig */
 // Client script for Zuul Log Streaming
 //
-// @licstart  The following is the entire license notice for the
-// JavaScript code in this page.
-//
 // Copyright 2017 BMW Car IT GmbH
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -17,12 +14,6 @@
 // WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 // License for the specific language governing permissions and limitations
 // under the License.
-//
-// @licend  The above is the entire license notice for the JavaScript code in
-// this page.
-
-import angular from 'angular'
-import './styles/stream.css'
 
 function escapeLog (text) {
   const pattern = /[<>&"']/g
@@ -92,8 +83,4 @@ function zuulStartStream () {
   }
 }
 
-angular.module('zuulStream', []).controller(
-  'mainController', function ($scope, $http) {
-    window.onload = zuulStartStream()
-  }
-)
+export default zuulStartStream

@@ -1,8 +1,3 @@
-// Main library entrypoint
-//
-// @licstart  The following is the entire license notice for the
-// JavaScript code in this page.
-//
 // Copyright 2018 Red Hat, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -16,10 +11,16 @@
 // WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 // License for the specific language governing permissions and limitations
 // under the License.
-//
-// @licend  The above is the entire license notice
-// for the JavaScript code in this page.
 
-import './status'
-import './stream'
-import './dashboard'
+import { Component, OnInit } from '@angular/core'
+
+import zuulStartStream from './zuulStartStream'
+
+@Component({
+  template: require('./stream.component.html')
+})
+export default class StreamComponent implements OnInit {
+  ngOnInit() {
+    zuulStartStream()
+  }
+}
