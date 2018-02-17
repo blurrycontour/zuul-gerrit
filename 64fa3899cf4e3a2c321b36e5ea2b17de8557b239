@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_c965491f",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 1754,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-02-17T01:37:00Z",
+      "side": 1,
+      "message": "This is no longer an arg to tenant_parser.fromYaml()",
+      "range": {
+        "startLine": 1754,
+        "startChar": 35,
+        "endLine": 1754,
+        "endChar": 41
+      },
+      "revId": "64fa3899cf4e3a2c321b36e5ea2b17de8557b239",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
