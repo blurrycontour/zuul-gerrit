@@ -624,7 +624,7 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(queue[0].name, b'executor:execute')
         job_args = json.loads(queue[0].arguments.decode('utf8'))
         self.assertEqual(job_args['job'], 'project-merge')
-        self.assertEqual(job_args['items'][0]['number'], '%d' % A.number)
+        self.assertEqual(job_args['items'][0]['number'], A.number)
 
         self.gearman_server.release('.*-merge')
         self.waitUntilSettled()
@@ -1009,8 +1009,8 @@ class TestScheduler(ZuulTestCase):
         # it easier for users to create events for testing.
         event = zuul.model.TriggerEvent()
         event.trigger_name = 'gerrit'
-        event.change_number = '1'
-        event.patch_number = '2'
+        event.change_number = 1
+        event.patch_number = 2
 
         a = source.getChange(event)
         mgr = tenant.layout.pipelines['gate'].manager
@@ -2010,16 +2010,16 @@ class TestScheduler(ZuulTestCase):
         items = check_pipeline.getAllItems()
         self.assertEqual(len(items), 3)
 
-        self.assertEqual(items[0].change.number, '1')
-        self.assertEqual(items[0].change.patchset, '1')
+        self.assertEqual(items[0].change.number, 1)
+        self.assertEqual(items[0].change.patchset, 1)
         self.assertFalse(items[0].live)
 
-        self.assertEqual(items[1].change.number, '2')
-        self.assertEqual(items[1].change.patchset, '1')
+        self.assertEqual(items[1].change.number, 2)
+        self.assertEqual(items[1].change.patchset, 1)
         self.assertTrue(items[1].live)
 
-        self.assertEqual(items[2].change.number, '1')
-        self.assertEqual(items[2].change.patchset, '1')
+        self.assertEqual(items[2].change.number, 1)
+        self.assertEqual(items[2].change.patchset, 1)
         self.assertTrue(items[2].live)
 
         # Add a new patchset to A
@@ -2032,16 +2032,16 @@ class TestScheduler(ZuulTestCase):
         items = check_pipeline.getAllItems()
         self.assertEqual(len(items), 3)
 
-        self.assertEqual(items[0].change.number, '1')
-        self.assertEqual(items[0].change.patchset, '1')
+        self.assertEqual(items[0].change.number, 1)
+        self.assertEqual(items[0].change.patchset, 1)
         self.assertFalse(items[0].live)
 
-        self.assertEqual(items[1].change.number, '2')
-        self.assertEqual(items[1].change.patchset, '1')
+        self.assertEqual(items[1].change.number, 2)
+        self.assertEqual(items[1].change.patchset, 1)
         self.assertTrue(items[1].live)
 
-        self.assertEqual(items[2].change.number, '1')
-        self.assertEqual(items[2].change.patchset, '2')
+        self.assertEqual(items[2].change.number, 1)
+        self.assertEqual(items[2].change.patchset, 2)
         self.assertTrue(items[2].live)
 
         # Add a new patchset to B
@@ -2054,16 +2054,16 @@ class TestScheduler(ZuulTestCase):
         items = check_pipeline.getAllItems()
         self.assertEqual(len(items), 3)
 
-        self.assertEqual(items[0].change.number, '1')
-        self.assertEqual(items[0].change.patchset, '2')
+        self.assertEqual(items[0].change.number, 1)
+        self.assertEqual(items[0].change.patchset, 2)
         self.assertTrue(items[0].live)
 
-        self.assertEqual(items[1].change.number, '1')
-        self.assertEqual(items[1].change.patchset, '1')
+        self.assertEqual(items[1].change.number, 1)
+        self.assertEqual(items[1].change.patchset, 1)
         self.assertFalse(items[1].live)
 
-        self.assertEqual(items[2].change.number, '2')
-        self.assertEqual(items[2].change.patchset, '2')
+        self.assertEqual(items[2].change.number, 2)
+        self.assertEqual(items[2].change.patchset, 2)
         self.assertTrue(items[2].live)
 
         self.builds[0].release()
@@ -2130,13 +2130,13 @@ class TestScheduler(ZuulTestCase):
         items = check_pipeline.getAllItems()
         self.assertEqual(len(items), 3)
 
-        self.assertEqual(items[0].change.number, '1')
+        self.assertEqual(items[0].change.number, 1)
         self.assertFalse(items[0].live)
 
-        self.assertEqual(items[1].change.number, '2')
+        self.assertEqual(items[1].change.number, 2)
         self.assertTrue(items[1].live)
 
-        self.assertEqual(items[2].change.number, '1')
+        self.assertEqual(items[2].change.number, 1)
         self.assertTrue(items[2].live)
 
         # Abandon A
@@ -2148,10 +2148,10 @@ class TestScheduler(ZuulTestCase):
         items = check_pipeline.getAllItems()
         self.assertEqual(len(items), 2)
 
-        self.assertEqual(items[0].change.number, '1')
+        self.assertEqual(items[0].change.number, 1)
         self.assertFalse(items[0].live)
 
-        self.assertEqual(items[1].change.number, '2')
+        self.assertEqual(items[1].change.number, 2)
         self.assertTrue(items[1].live)
 
         self.executor_server.hold_jobs_in_build = False
@@ -5399,8 +5399,8 @@ class TestSemaphore(ZuulTestCase):
         self.assertEqual(len(semaphore), 1)
 
         items = check_pipeline.getAllItems()
-        self.assertEqual(items[0].change.number, '1')
-        self.assertEqual(items[0].change.patchset, '2')
+        self.assertEqual(items[0].change.number, 1)
+        self.assertEqual(items[0].change.patchset, 2)
         self.assertTrue(items[0].live)
 
         self.executor_server.hold_jobs_in_build = False

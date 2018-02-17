@@ -1052,8 +1052,8 @@ class TestInRepoConfig(ZuulTestCase):
         self.waitUntilSettled()
 
         items = check_pipeline.getAllItems()
-        self.assertEqual(items[0].change.number, '1')
-        self.assertEqual(items[0].change.patchset, '1')
+        self.assertEqual(items[0].change.number, 1)
+        self.assertEqual(items[0].change.patchset, 1)
         self.assertTrue(items[0].live)
 
         in_repo_conf = textwrap.dedent(
@@ -1082,8 +1082,8 @@ class TestInRepoConfig(ZuulTestCase):
         self.waitUntilSettled()
 
         items = check_pipeline.getAllItems()
-        self.assertEqual(items[0].change.number, '1')
-        self.assertEqual(items[0].change.patchset, '2')
+        self.assertEqual(items[0].change.number, 1)
+        self.assertEqual(items[0].change.patchset, 2)
         self.assertTrue(items[0].live)
 
         self.executor_server.hold_jobs_in_build = False
@@ -1952,8 +1952,8 @@ class TestInRepoJoin(ZuulTestCase):
         self.waitUntilSettled()
 
         items = gate_pipeline.getAllItems()
-        self.assertEqual(items[0].change.number, '1')
-        self.assertEqual(items[0].change.patchset, '1')
+        self.assertEqual(items[0].change.number, 1)
+        self.assertEqual(items[0].change.patchset, 1)
         self.assertTrue(items[0].live)
 
         self.executor_server.hold_jobs_in_build = False
