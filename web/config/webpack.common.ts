@@ -1,6 +1,7 @@
 import * as path from 'path'
 import * as webpack from 'webpack'
 import * as HtmlWebpackPlugin from 'html-webpack-plugin'
+import { CheckerPlugin } from 'awesome-typescript-loader'
 
 // Workaround issue in the published typescript definition of
 // webpack.Options.SplitChunksOptions in @types/webpack. The published
@@ -17,7 +18,7 @@ interface Configuration extends webpack.Configuration {
 
 const config: Configuration = {
   entry: {
-    main: './web/main.js',
+    main: './web/main.ts',
   },
   resolve: {
     extensions: [ '.tsx', '.ts', '.js' ]
@@ -38,13 +39,14 @@ const config: Configuration = {
       cacheGroups: {
         commons: {
           test: /node_modules/,
-          name: "vendor",
-          chunks: "all"
+          name: 'vendor',
+          chunks: 'all'
         }
       }
     }
   },
   plugins: [
+    new CheckerPlugin(),
     new webpack.ProvidePlugin({
         $: 'jquery/dist/jquery',
         jQuery: 'jquery/dist/jquery',
@@ -54,32 +56,39 @@ const config: Configuration = {
     // output file.
     new HtmlWebpackPlugin({
       title: 'Zuul Status',
-      template: 'web/templates/status.ejs',
+      template: 'web/config/main.ejs',
       filename: 'status.html'
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Builds',
-      template: 'web/templates/builds.ejs',
+      template: 'web/config/main.ejs',
       filename: 'builds.html'
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Jobs',
-      template: 'web/templates/jobs.ejs',
+      template: 'web/config/main.ejs',
       filename: 'jobs.html'
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Tenants',
-      template: 'web/templates/tenants.ejs',
+      template: 'web/config/main.ejs',
       filename: 'tenants.html'
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Console Stream',
-      template: 'web/templates/stream.ejs',
+      template: 'web/config/main.ejs',
       filename: 'stream.html'
     })
   ],
   module: {
     rules: [
+      {
+        test: /\.ts$/,
+        exclude: /node_modules/,
+        use: [
+          'awesome-typescript-loader'
+        ]
+      },
       {
         test: /\.js$/,
         exclude: /node_modules/,
@@ -103,7 +112,7 @@ const config: Configuration = {
       {
         test: /\.woff(2)?(\?v=\d+\.\d+\.\d+)?$/,
         use: {
-          loader: "url-loader",
+          loader: 'url-loader',
           options: {
             limit: 10000,
             mimetype: 'application/font-woff'
@@ -113,7 +122,7 @@ const config: Configuration = {
       {
         test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
         use: {
-          loader: "url-loader",
+          loader: 'url-loader',
           options: {
             limit: 10000,
             mimetype: 'application/octet-stream'
@@ -127,7 +136,7 @@ const config: Configuration = {
       {
         test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
         use: {
-          loader: "url-loader",
+          loader: 'url-loader',
           options: {
             limit: 10000,
             mimetype: 'image/svg+xml'
@@ -136,7 +145,7 @@ const config: Configuration = {
       },
       {
         test: /\.html$/,
-        use: ['raw-loader'],
+        use: ['html-loader'],
         exclude: /node_modules/
       }
     ]
