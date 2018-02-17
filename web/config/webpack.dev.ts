@@ -11,19 +11,6 @@ const config: webpack.Configuration = WebpackMerge(CommonConfig, {
     contentBase: path.resolve(__dirname, './zuul/web/static'),
     publicPath: '/'
   },
-  module: {
-    rules: [
-      {
-        enforce: 'pre',
-        test: /\.js$/,
-        use: [
-          'babel-loader',
-          'eslint-loader'
-        ],
-        exclude: /node_modules/,
-      }
-    ]
-  },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
     // We only need to bundle the demo files when we're running locally
