@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_eaeb500f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-02-17T17:38:06Z",
+      "side": 1,
+      "message": "We have a test for that now!",
+      "revId": "01b82f15e3fb2ed49bdc1c158c3c86c858641dff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_8af2cc05",
+        "filename": "tests/unit/test_web_urls.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-02-17T17:38:06Z",
+      "side": 1,
+      "message": "oops, this should be TestSuburl",
+      "revId": "01b82f15e3fb2ed49bdc1c158c3c86c858641dff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
