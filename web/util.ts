@@ -1,7 +1,3 @@
-/* global ZUUL_API_URL */
-// @licstart  The following is the entire license notice for the
-// JavaScript code in this page.
-//
 // Copyright 2017 Red Hat
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -15,29 +11,17 @@
 // WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 // License for the specific language governing permissions and limitations
 // under the License.
-//
-// @licend  The above is the entire license notice
-// for the JavaScript code in this page.
-
-// TODO(mordred) This is a temporary hack until we're on @angular/router
-function extractTenant (url) {
-  if (url.includes('/t/')) {
-    // This is a multi-tenant deploy, find the tenant
-    const tenantStart = url.lastIndexOf('/t/') + 3
-    const tenantEnd = url.indexOf('/', tenantStart)
-    return url.slice(tenantStart, tenantEnd)
-  } else {
-    return null
-  }
-}
 
 // TODO(mordred) This should be encapsulated in an Angular Service singleton
 // that fetches the other things from the info endpoint.
-export function getSourceUrl (filename, $location) {
+
+declare var ZUUL_API_URL: string
+declare var ZUUL_BASE_HREF: string
+
+function getSourceUrl (filename: string, tenant?: string): string {
   if (typeof ZUUL_API_URL !== 'undefined') {
     return `${ZUUL_API_URL}/api/${filename}`
   } else {
-    let tenant = extractTenant($location.url())
     if (tenant) {
       // Multi-tenant deploy. This is at t/a-tenant/x.html. api path is at
       // api/tenant/a-tenant/x, so should be at ../../api/tenant/a-tenant/x
@@ -47,5 +31,14 @@ export function getSourceUrl (filename, $location) {
       // api/x, so should be at api/x
       return `api/${filename}`
     }
+  }
+}
+export default getSourceUrl
+
+export function getBaseHref (): string {
+  if (typeof ZUUL_BASE_HREF !== 'undefined') {
+    return ZUUL_BASE_HREF
+  } else {
+    return '/'
   }
 }
