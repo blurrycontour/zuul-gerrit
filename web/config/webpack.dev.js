@@ -26,6 +26,8 @@ module.exports = Merge(CommonConfig, {
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
+    // For development, NamedModulesPlugin keeps the vendor bundle from
+    // changing needlessly. HashedModuleIdsPlugin is for production.
     new webpack.NamedModulesPlugin(),
     // We only need to bundle the demo files when we're running locally
     new webpack.ProvidePlugin({
