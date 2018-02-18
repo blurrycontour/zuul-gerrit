@@ -16,6 +16,24 @@
       "revId": "ecf3b78eb6af985ed5c90c8a38738d65ebb6ce1a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_2f3aa3e6",
+        "filename": "web/config/webpack.common.js",
+        "patchSetId": 10
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-02-18T17:14:36Z",
+      "side": 1,
+      "message": "Yes - and I think we actually should- there\u0027s another webpack plugin that can actually help extract common less-frequently changing things too.",
+      "parentUuid": "3fa0c359_ef759bcd",
+      "revId": "ecf3b78eb6af985ed5c90c8a38738d65ebb6ce1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
