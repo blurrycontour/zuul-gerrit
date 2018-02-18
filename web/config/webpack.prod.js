@@ -15,7 +15,13 @@ module.exports = Merge(CommonConfig, {
         'NODE_ENV': JSON.stringify('production')
       }
     }),
+    // For development, NamedModulesPlugin keeps the vendor bundle from
+    // changing needlessly. HashedModuleIdsPlugin is for production.
+    new webpack.HashedModuleIdsPlugin(),
     new webpack.optimize.UglifyJsPlugin({
+      warningsFilter: function(filename) {
+        return ! /node_modules/.test(filename);
+      },
       beautify: false,
       mangle: {
         screw_ie8: true,

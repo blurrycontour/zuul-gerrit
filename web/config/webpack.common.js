@@ -4,16 +4,20 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
-  // This splits the output into three different files, which may not be
-  // what we want long term. Just emitting one file is likely a better choice,
-  // but it's three here so that we have the complex thing.
   entry: {
-    'dashboard': './web/dashboard.js',
-    'status': './web/status.js',
-    'stream': './web/stream.js'
+    main: './web/main.js',
+    // Tell webpack to extract 3rd party depdenencies which change less
+    // frequently.
+    vendor: [
+      'angular',
+      'd3',
+      'bootstrap/dist/css/bootstrap.css',
+      'jquery-visibility/jquery-visibility',
+      'graphitejs/jquery.graphite.js'
+    ]
   },
   output: {
-    filename: '[name].bundle.js',
+    filename: '[name].[chunkhash].js',
     // path.resolve(__dirname winds up relative to the config dir
     path: path.resolve(__dirname, '../../zuul/web/static'),
     publicPath: ''
@@ -27,56 +31,54 @@ module.exports = {
         $: 'jquery/dist/jquery',
         jQuery: 'jquery/dist/jquery',
     }),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendor',
+    }),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'manifest',
+    }),
     new CleanWebpackPlugin(
         ['zuul/web/static'], { root: path.resolve(__dirname, '../..')}),
     // Each of the entries below lists a specific 'chunk' which is one of the
     // entry items from above. We can collapse this to just do one single
     // output file.
     new HtmlWebpackPlugin({
-      chunks: ['status'],
       filename: 'status.html',
       template: 'web/templates/status.ejs',
       title: 'Zuul Status'
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Builds',
-      chunks: ['dashboard'],
       template: 'web/templates/builds.ejs',
       filename: 'builds.html'
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Job',
-      chunks: ['dashboard'],
       template: 'web/templates/job.ejs',
       filename: 'job.html'
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Jobs',
-      chunks: ['dashboard'],
       template: 'web/templates/jobs.ejs',
       filename: 'jobs.html'
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Project',
-      chunks: ['dashboard'],
       template: 'web/templates/project.ejs',
       filename: 'project.html'
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Projects',
-      chunks: ['dashboard'],
       template: 'web/templates/projects.ejs',
       filename: 'projects.html'
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Tenants',
-      chunks: ['dashboard'],
       template: 'web/templates/index.ejs',
       filename: 'index.html'
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Console Stream',
-      chunks: ['stream'],
       template: 'web/templates/stream.ejs',
       filename: 'stream.html'
     })

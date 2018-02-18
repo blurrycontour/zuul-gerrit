@@ -21,7 +21,7 @@ module.exports = Merge(CommonConfig, {
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.NamedModulesPlugin(),
+    new webpack.HashedModuleIdsPlugin(),
     new BundleAnalyzerPlugin({
       analyzerMode: 'static',
       reportFilename: '../../../reports/bundle.html',
