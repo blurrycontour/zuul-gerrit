@@ -16,6 +16,24 @@
       "revId": "9db66082d33116fe54b970ae2aa0b61a5241a106",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_ac1c6fc1",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-02-19T16:50:48Z",
+      "side": 1,
+      "message": "https://review.openstack.org/#/c/545879",
+      "parentUuid": "3fa0c359_cccf7b7d",
+      "revId": "9db66082d33116fe54b970ae2aa0b61a5241a106",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
