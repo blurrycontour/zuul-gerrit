@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_cd9d4467",
+        "filename": "web/config/webpack.common.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-02-19T04:35:44Z",
+      "side": 1,
+      "message": "According to https://github.com/webpack/webpack/issues/1363#issuecomment-135010251, this need to be \u0027[name].[hash]-[id].js\u0027",
+      "revId": "d267aff5b34c0c80c6caecb3886971a9d1fecda4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
