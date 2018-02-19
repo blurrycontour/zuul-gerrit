@@ -27,6 +27,7 @@
 import 'bootstrap/dist/css/bootstrap.css'
 import 'jquery-visibility/jquery-visibility'
 import 'graphitejs/jquery.graphite.js'
+import angular from 'angular'
 
 import './styles/zuul.css'
 import './jquery.zuul'
@@ -117,4 +118,8 @@ if (module.hot) {
   // })
 }
 
-zuulStart(jQuery)
+angular.module('zuulStatus', []).controller(
+  'mainController', function ($scope, $http) {
+    zuulStart(jQuery)
+  }
+)
