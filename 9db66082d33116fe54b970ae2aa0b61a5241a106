@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_cccf7b7d",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-02-19T16:35:55Z",
+      "side": 1,
+      "message": "nit: parsing a display text for the user doesn\u0027t feel very robust. Maybe we want to add a field which is meant for machine reading.",
+      "revId": "9db66082d33116fe54b970ae2aa0b61a5241a106",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
