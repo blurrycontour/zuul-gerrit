@@ -21,6 +21,7 @@
 // @licend  The above is the entire license notice for the JavaScript code in
 // this page.
 
+import angular from 'angular'
 import './styles/stream.css'
 
 function escapeLog (text) {
@@ -31,14 +32,14 @@ function escapeLog (text) {
   })
 }
 
-window.onload = function () {
+function zuulStartStream () {
   let pageUpdateInMS = 250
   let receiveBuffer = ''
 
   setInterval(function () {
     console.log('autoScroll')
     if (receiveBuffer !== '') {
-      document.getElementById('pagecontent').innerHTML += receiveBuffer
+      document.getElementById('zuulstreamcontent').innerHTML += receiveBuffer
       receiveBuffer = ''
       if (document.getElementById('autoscroll').checked) {
         window.scrollTo(0, document.body.scrollHeight)
@@ -90,3 +91,9 @@ window.onload = function () {
     receiveBuffer = receiveBuffer + '\n--- END OF STREAM ---\n'
   }
 }
+
+angular.module('zuulStream', []).controller(
+  'mainController', function ($scope, $http) {
+    window.onload = zuulStartStream()
+  }
+)
