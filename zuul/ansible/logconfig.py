@@ -20,6 +20,9 @@ import os
 
 import yaml
 
+from zuul.ansible.library.command import JsonSocketHandler
+
+
 _DEFAULT_JOB_LOGGING_CONFIG = {
     'version': 1,
     'formatters': {
@@ -179,6 +182,15 @@ class JobLoggingConfig(DictLoggingConfig):
         # Set the level for zuul.executor.ansible to DEBUG
         self._config['loggers']['zuul.executor.ansible']['level'] = 'DEBUG'
 
+    def setJobFileSocket(self, path):
+        # Replace the jobfile handler with a json stream handler
+        #socketHandler = JsonSocketHandler(host=path, port=None)
+        self._config['handlers']['jobfile'] = {
+            'class': 'zuul.ansible.library.command.JsonSocketHandler',
+            'host': path,
+            'port': None
+            }
+
     @property
     def job_output_file(self) -> str:
         return self._config['handlers']['jobfile']['filename']
@@ -193,7 +205,7 @@ class StreamLoggingConfig(JobLoggingConfig):
     def __init__(self, logname, job_output_file):
         self._config = {
             'version': 1,
-            'incremenal': True,
+            'incremental': True,
             'loggers': {
                 logname: {
                     'handlers': [logname],
