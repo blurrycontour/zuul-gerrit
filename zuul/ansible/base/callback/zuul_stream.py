@@ -29,7 +29,6 @@ from ansible.plugins.callback import default
 from zuul.ansible import paths
 
 from zuul.ansible import logconfig
-from zuul.ansible import stream_receiver
 
 LOG_STREAM_PORT = 19885
 
@@ -58,7 +57,7 @@ def zuul_filter_result(result):
     if not stdout_lines and stdout:
         stdout_lines = stdout.split('\n')
 
-    for key in ('changed', 'cmd', 'zuul_log_id', 'invocation',
+    for key in ('changed', 'cmd', 'zuul_log_socket', 'invocation',
                 'stderr', 'stderr_lines'):
         result.pop(key, None)
     return stdout_lines
@@ -81,8 +80,6 @@ class CallbackModule(default.CallbackModule):
         self._task = None
         self._daemon_running = False
         self._play = None
-        self._streamers = []
-        self._streamers_stop = False
         self.configure_logger()
         self._items_done = False
         self._deferred_result = None
@@ -94,6 +91,7 @@ class CallbackModule(default.CallbackModule):
         # this.
         logging_config = logconfig.load_job_config(
             os.environ.get('ZUUL_JOB_LOG_CONFIG', 'logging.json'))
+        logging_config.setJobFileSocket(os.environ.get('ZUUL_JOB_LOG_SOCKET'))
 
         if self._display.verbosity > 2:
             logging_config.setDebug()
@@ -152,45 +150,14 @@ class CallbackModule(default.CallbackModule):
         self._log("")
 
         self._task = task
-        port_forwards = {}
 
         if self._play.strategy != 'free':
             self._print_task_banner(task)
-        if task.action in ('command', 'shell'):
-            play_vars = self._play._variable_manager._hostvars
-            hosts = self._get_task_hosts(task)
-            for host, inventory_hostname in hosts:
-                hostname = play_vars[host].get(
-                    'ansible_host', play_vars[host].get(
-                        'ansible_inventory_host', host))
-                if task.loop:
-                    # Don't try to stream from loops
-                    continue
-                if play_vars[host].get('ansible_connection') in ('kubectl', ):
-                    # Don't try to stream from kubectl connection
-                    continue
-                streamer = stream_receiver.StreamReceiver(host=host)
-                port_forwards[hostname] = streamer.get_path()
-                streamer.daemon = True
-                streamer.start()
-                self._streamers.append(streamer)
-        task.args['zuul_port_forwards'] = port_forwards
+        task.args['zuul_log_socket'] = os.environ.get('ZUUL_JOB_LOG_SOCKET')
+        task.args['zuul_log_host'] = task._host.get_name()
 
     def v2_playbook_on_handler_task_start(self, task):
         self.v2_playbook_on_task_start(task, False)
-
-    def _stop_streamers(self):
-        self._streamers_stop = True
-        while True:
-            if not self._streamers:
-                break
-            streamer = self._streamers.pop()
-            streamer.stop()
-            streamer.join(30)
-            if streamer.is_alive():
-                msg = "[Zuul] Log Stream did not terminate"
-                self._log(msg, job=True, executor=True)
-        self._streamers_stop = False
 
     def _process_result_for_localhost(self, result, is_task=True):
         result_dict = dict(result._result)
@@ -216,8 +183,6 @@ class CallbackModule(default.CallbackModule):
                     'ansible_inventory_host', 'localhost')) in localhost_names:
                 is_localhost = True
 
-        if not is_localhost and is_task:
-            self._stop_streamers()
         if result._task.action in ('command', 'shell',
                                    'win_command', 'win_shell'):
             stdout_lines = zuul_filter_result(result_dict)

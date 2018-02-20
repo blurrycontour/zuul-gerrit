@@ -50,6 +50,7 @@ from zuul.executor.sensors.hdd import HDDSensor
 from zuul.executor.sensors.pause import PauseSensor
 from zuul.executor.sensors.startingbuilds import StartingBuildsSensor
 from zuul.executor.sensors.ram import RAMSensor
+import zuul.ansible.stream_receiver
 from zuul.lib import commandsocket
 
 BUFFER_LINES_FOR_SYNTAX = 200
@@ -341,6 +342,7 @@ class JobDir(object):
         # root
         #   ansible (mounted in bwrap read-only)
         #     logging.json
+        #     logging.sock
         #     inventory.yaml
         #     extra_vars.yaml
         #   .ansible (mounted in bwrap read-write)
@@ -420,6 +422,7 @@ class JobDir(object):
         self.setup_inventory = os.path.join(self.ansible_root,
                                             'setup-inventory.yaml')
         self.logging_json = os.path.join(self.ansible_root, 'logging.json')
+        self.logging_sock = os.path.join(self.ansible_root, 'logging.sock')
         self.playbooks = []  # The list of candidate playbooks
         self.pre_playbooks = []
         self.post_playbooks = []
@@ -706,7 +709,7 @@ class AnsibleJob(object):
             'executor',
             'winrm_read_timeout_sec')
         self.ssh_agent = SshAgent()
-
+        self.log_receiver = None
         self.executor_variables_file = None
 
         self.cpu_times = {'user': 0, 'system': 0,
@@ -777,6 +780,12 @@ class AnsibleJob(object):
         if self.thread:
             self.thread.join()
 
+    def startLogReceiver(self):
+        self.log_receiver = zuul.ansible.stream_receiver.StreamReceiver(
+            self.job.unique, self.jobdir.logging_sock,
+            self.jobdir.logging_json)
+        self.log_receiver.start()
+
     def execute(self):
         try:
             self.time_starting_build = time.monotonic()
@@ -787,6 +796,8 @@ class AnsibleJob(object):
             self.jobdir = JobDir(self.executor_server.jobdir_root,
                                  self.executor_server.keep_jobdir,
                                  str(self.job.unique))
+            self.writeLoggingConfig()
+            self.startLogReceiver()
             self._execute()
         except ExecutorError as e:
             result_data = json.dumps(dict(result='ERROR',
@@ -808,6 +819,11 @@ class AnsibleJob(object):
                     self.ssh_agent.stop()
                 except Exception:
                     self.log.exception("Error stopping SSH agent:")
+            if self.log_receiver:
+                try:
+                    self.log_receiver.terminate()
+                except Exception:
+                    self.log.exception("Error stopping log receiver:")
             try:
                 self.executor_server.finishJob(self.job.unique)
             except Exception:
@@ -928,7 +944,6 @@ class AnsibleJob(object):
         self.preparePlaybooks(args)
 
         self.prepareAnsibleFiles(args)
-        self.writeLoggingConfig()
 
         data = {
             # TODO(mordred) worker_name is needed as a unique name for the
@@ -1844,6 +1859,7 @@ class AnsibleJob(object):
         if ara_callbacks:
             env_copy['ARA_LOG_CONFIG'] = self.jobdir.logging_json
         env_copy['ZUUL_JOB_LOG_CONFIG'] = self.jobdir.logging_json
+        env_copy['ZUUL_JOB_LOG_SOCKET'] = self.jobdir.logging_sock
         env_copy['ZUUL_JOBDIR'] = self.jobdir.root
         env_copy['TMP'] = self.jobdir.local_tmp
         pythonpath = env_copy.get('PYTHONPATH')

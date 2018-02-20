@@ -13,8 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging.handlers
-
 from ansible.module_utils.six.moves.urllib.parse import urlparse
 from ansible.errors import AnsibleError
 
@@ -37,8 +35,7 @@ class ActionModule(normal.ActionModule):
         super(ActionModule, self).__init__(*args, **kwargs)
         # TODO(mordred) This should be based on remote tmp dir.
         remote_path = '/tmp/zuul-stream.sock'
-        local_paths = self._task.args.pop('zuul_port_forwards', {})
-        local_path = local_paths.get(self._connection.host)
+        local_path = self._task.args.pop('zuul_log_socket', {})
         if local_path:
             if self._connection.transport == 'ssh':
                 self._play_context.ssh_extra_args += ' -R %s:%s' % (
