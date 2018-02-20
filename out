@@ -1,0 +1,996 @@
+Tests running...
+2018-03-19 16:04:02,847 zuul.test                        DEBUG    Installing test keys for project common-config at /tmp/tmpf2lzro20/zuul-test/lib/keys/gerrit/common-config.pem
+2018-03-19 16:04:02,847 zuul.test                        DEBUG    Installing test keys for project org/project at /tmp/tmpf2lzro20/zuul-test/lib/keys/gerrit/org/project.pem
+2018-03-19 16:04:02,848 zuul.test                        INFO     Gearman server on port 39641
+2018-03-19 16:04:02,848 zuul.RPCClient                   DEBUG    Connecting to gearman at 127.0.0.1:39641
+2018-03-19 16:04:02,848 zuul.RPCClient                   DEBUG    Waiting for gearman
+2018-03-19 16:04:02,849 gear.Connection.b'unknown'       INFO     Disconnected from 127.0.0.1 port 39641
+2018-03-19 16:04:02,849 gear.Connection.b'unknown'       INFO     Connected to 127.0.0.1 port 39641
+2018-03-19 16:04:02,849 gear.Server                      INFO     Accepted connection <gear.ServerConnection 0x7f210deb2e80 name: None host: 127.0.0.1 port: 44192>
+2018-03-19 16:04:02,859 apscheduler.scheduler            INFO     Scheduler started
+2018-03-19 16:04:02,859 apscheduler.scheduler            DEBUG    Looking for jobs to run
+2018-03-19 16:04:02,859 apscheduler.scheduler            DEBUG    No jobs; waiting until a job is added
+2018-03-19 16:04:02,860 zuul.test.FakeGerritConnection   DEBUG    Starting Gerrit Connection/Watchers
+2018-03-19 16:04:02,871 gear.Connection.b'Zuul Executor Merger' INFO     Disconnected from 127.0.0.1 port 39641
+2018-03-19 16:04:02,871 gear.Connection.b'Zuul Executor Merger' INFO     Connected to 127.0.0.1 port 39641
+2018-03-19 16:04:02,871 gear.Connection.b'Zuul Executor Merger' INFO     Sending packet to <gear.Connection 0x7f210deb2438 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210deb2160 type: SET_CLIENT_ID id: b'Zuul Executor Merger'>
+2018-03-19 16:04:02,872 zuul.ExecutorServer              DEBUG    Waiting for server
+2018-03-19 16:04:02,872 gear.Server                      INFO     Accepted connection <gear.ServerConnection 0x7f210deb2128 name: None host: 127.0.0.1 port: 44194>
+2018-03-19 16:04:02,872 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2128 name: None host: 127.0.0.1 port: 44194>: <gear.Packet 0x7f210df0add8 type: SET_CLIENT_ID id: b'Zuul Executor Merger'>
+2018-03-19 16:04:02,872 gear.Connection.b'Zuul Executor Server' INFO     Disconnected from 127.0.0.1 port 39641
+2018-03-19 16:04:02,872 gear.Connection.b'Zuul Executor Server' INFO     Connected to 127.0.0.1 port 39641
+2018-03-19 16:04:02,873 gear.Connection.b'Zuul Executor Server' INFO     Sending packet to <gear.Connection 0x7f210df0ad30 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210df0add8 type: SET_CLIENT_ID id: b'Zuul Executor Server'>
+2018-03-19 16:04:02,873 gear.Server                      INFO     Accepted connection <gear.ServerConnection 0x7f210deb2160 name: None host: 127.0.0.1 port: 44196>
+2018-03-19 16:04:02,873 zuul.ExecutorServer              DEBUG    Registering
+2018-03-19 16:04:02,873 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2160 name: None host: 127.0.0.1 port: 44196>: <gear.Packet 0x7f210df0a2b0 type: SET_CLIENT_ID id: b'Zuul Executor Server'>
+2018-03-19 16:04:02,873 gear.Connection.b'Zuul Executor Server' INFO     Sending packet to <gear.Connection 0x7f210df0ad30 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210df0ab38 type: CAN_DO function: b'executor:execute'>
+2018-03-19 16:04:02,873 gear.Connection.b'Zuul Executor Server' INFO     Sending packet to <gear.Connection 0x7f210df0ad30 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210df0ab38 type: GRAB_JOB_UNIQ>
+2018-03-19 16:04:02,873 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2160 name: b'Zuul Executor Server' host: 127.0.0.1 port: 44196>: <gear.Packet 0x7f210df0af28 type: CAN_DO function: b'executor:execute'>
+2018-03-19 16:04:02,873 gear.Connection.b'Zuul Executor Server' INFO     Sending packet to <gear.Connection 0x7f210df0ad30 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210df0aa58 type: CAN_DO function: b'executor:stop:wilddog'>
+2018-03-19 16:04:02,873 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2160 name: b'Zuul Executor Server' host: 127.0.0.1 port: 44196>: <gear.Packet 0x7f210df0ae10 type: GRAB_JOB_UNIQ>
+2018-03-19 16:04:02,873 gear.Connection.b'Zuul Executor Merger' INFO     Sending packet to <gear.Connection 0x7f210deb2438 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210df0a2b0 type: CAN_DO function: b'merger:merge'>
+2018-03-19 16:04:02,873 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2160 name: b'Zuul Executor Server' host: 127.0.0.1 port: 44196>: <gear.Packet 0x7f210df0abe0 type: CAN_DO function: b'executor:stop:wilddog'>
+2018-03-19 16:04:02,873 gear.Worker.b'Zuul Executor Server' INFO     Received packet from <gear.Connection 0x7f210df0ad30 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210df0aac8 type: NO_JOB>
+2018-03-19 16:04:02,873 gear.Connection.b'Zuul Executor Merger' INFO     Sending packet to <gear.Connection 0x7f210deb2438 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210df0ae80 type: CAN_DO function: b'merger:cat'>
+2018-03-19 16:04:02,874 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2128 name: b'Zuul Executor Merger' host: 127.0.0.1 port: 44194>: <gear.Packet 0x7f210df0abe0 type: CAN_DO function: b'merger:merge'>
+2018-03-19 16:04:02,874 gear.Connection.b'Zuul Executor Merger' INFO     Sending packet to <gear.Connection 0x7f210deb2438 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210df0ae48 type: CAN_DO function: b'merger:refstate'>
+2018-03-19 16:04:02,874 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2128 name: b'Zuul Executor Merger' host: 127.0.0.1 port: 44194>: <gear.Packet 0x7f210df0ae10 type: CAN_DO function: b'merger:cat'>
+2018-03-19 16:04:02,874 gear.Connection.b'Zuul Executor Merger' INFO     Sending packet to <gear.Connection 0x7f210deb2438 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210df0a358 type: CAN_DO function: b'merger:fileschanges'>
+2018-03-19 16:04:02,874 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2128 name: b'Zuul Executor Merger' host: 127.0.0.1 port: 44194>: <gear.Packet 0x7f210df0abe0 type: CAN_DO function: b'merger:refstate'>
+2018-03-19 16:04:02,874 zuul.ExecutorServer              DEBUG    Starting command processor
+2018-03-19 16:04:02,874 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2128 name: b'Zuul Executor Merger' host: 127.0.0.1 port: 44194>: <gear.Packet 0x7f210df0a8d0 type: CAN_DO function: b'merger:fileschanges'>
+2018-03-19 16:04:02,874 zuul.ExecutorServer              DEBUG    Starting worker
+2018-03-19 16:04:02,874 zuul.ExecutorServer              DEBUG    Starting merger listener
+2018-03-19 16:04:02,875 gear.Connection.b'Zuul Executor Merger' INFO     Sending packet to <gear.Connection 0x7f210deb2438 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210de8d6a0 type: GRAB_JOB_UNIQ>
+2018-03-19 16:04:02,875 zuul.ExecutorServer              DEBUG    Starting executor listener
+2018-03-19 16:04:02,875 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2128 name: b'Zuul Executor Merger' host: 127.0.0.1 port: 44194>: <gear.Packet 0x7f210de8d9b0 type: GRAB_JOB_UNIQ>
+2018-03-19 16:04:02,875 gear.Connection.b'Zuul Executor Server' INFO     Sending packet to <gear.Connection 0x7f210df0ad30 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210de8deb8 type: GRAB_JOB_UNIQ>
+2018-03-19 16:04:02,877 gear.Connection.b'Zuul Executor Client' INFO     Disconnected from 127.0.0.1 port 39641
+2018-03-19 16:04:02,877 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2160 name: b'Zuul Executor Server' host: 127.0.0.1 port: 44196>: <gear.Packet 0x7f210de8deb8 type: GRAB_JOB_UNIQ>
+2018-03-19 16:04:02,877 gear.Worker.b'Zuul Executor Merger' INFO     Received packet from <gear.Connection 0x7f210deb2438 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210c23eeb8 type: NO_JOB>
+2018-03-19 16:04:02,878 gear.Connection.b'Zuul Executor Merger' INFO     Sending packet to <gear.Connection 0x7f210deb2438 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210c23eef0 type: PRE_SLEEP>
+2018-03-19 16:04:02,877 gear.Connection.b'Zuul Executor Client' INFO     Connected to 127.0.0.1 port 39641
+2018-03-19 16:04:02,878 gear.Server                      INFO     Accepted connection <gear.ServerConnection 0x7f210de8de48 name: None host: 127.0.0.1 port: 44198>
+2018-03-19 16:04:02,878 gear.Worker.b'Zuul Executor Server' INFO     Received packet from <gear.Connection 0x7f210df0ad30 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210c23eba8 type: NO_JOB>
+2018-03-19 16:04:02,877 zuul.MergeClient                 DEBUG    Connecting to gearman at 127.0.0.1:39641
+2018-03-19 16:04:02,878 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2128 name: b'Zuul Executor Merger' host: 127.0.0.1 port: 44194>: <gear.Packet 0x7f210c23ee80 type: PRE_SLEEP>
+2018-03-19 16:04:02,878 gear.Connection.b'Zuul Executor Server' INFO     Sending packet to <gear.Connection 0x7f210df0ad30 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210df0aac8 type: PRE_SLEEP>
+2018-03-19 16:04:02,879 zuul.MergeClient                 DEBUG    Waiting for gearman
+2018-03-19 16:04:02,879 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2160 name: b'Zuul Executor Server' host: 127.0.0.1 port: 44196>: <gear.Packet 0x7f210c250128 type: PRE_SLEEP>
+2018-03-19 16:04:02,879 gear.Connection.b'Zuul Merge Client' INFO     Disconnected from 127.0.0.1 port 39641
+2018-03-19 16:04:02,879 gear.Connection.b'Zuul Merge Client' INFO     Connected to 127.0.0.1 port 39641
+2018-03-19 16:04:02,879 gear.Server                      INFO     Accepted connection <gear.ServerConnection 0x7f210de8d898 name: None host: 127.0.0.1 port: 44200>
+2018-03-19 16:04:02,884 zuul.zk.ZooKeeper                DEBUG    ZooKeeper connection: CONNECTED
+2018-03-19 16:04:02,895 zuul.Scheduler                   DEBUG    Statsd enabled
+2018-03-19 16:04:02,895 zuul.Scheduler                   DEBUG    Run handler sleeping
+2018-03-19 16:04:02,895 zuul.Scheduler                   DEBUG    Starting command processor
+2018-03-19 16:04:02,899 zuul.RPCListener                 DEBUG    Waiting for server
+2018-03-19 16:04:02,899 gear.Connection.b'Zuul RPC Listener' INFO     Disconnected from 127.0.0.1 port 39641
+2018-03-19 16:04:02,900 gear.Connection.b'Zuul RPC Listener' INFO     Connected to 127.0.0.1 port 39641
+2018-03-19 16:04:02,900 gear.Connection.b'Zuul RPC Listener' INFO     Sending packet to <gear.Connection 0x7f210c1e05f8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210c1e06a0 type: SET_CLIENT_ID id: b'Zuul RPC Listener'>
+2018-03-19 16:04:02,900 zuul.RPCListener                 DEBUG    Registering
+2018-03-19 16:04:02,901 gear.Connection.b'Zuul RPC Listener' INFO     Sending packet to <gear.Connection 0x7f210c1e05f8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210c1e06a0 type: CAN_DO function: b'zuul:autohold'>
+2018-03-19 16:04:02,901 gear.Connection.b'Zuul RPC Listener' INFO     Sending packet to <gear.Connection 0x7f210c1e05f8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210c1e0748 type: CAN_DO function: b'zuul:autohold_list'>
+2018-03-19 16:04:02,902 gear.Server                      INFO     Accepted connection <gear.ServerConnection 0x7f210c1e0828 name: None host: 127.0.0.1 port: 44206>
+2018-03-19 16:04:02,902 gear.Connection.b'Zuul RPC Listener' INFO     Sending packet to <gear.Connection 0x7f210c1e05f8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210c1e07b8 type: CAN_DO function: b'zuul:enqueue'>
+2018-03-19 16:04:02,903 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210c1e0828 name: None host: 127.0.0.1 port: 44206>: <gear.Packet 0x7f210c1e0898 type: SET_CLIENT_ID id: b'Zuul RPC Listener'>
+2018-03-19 16:04:02,903 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210c1e0828 name: b'Zuul RPC Listener' host: 127.0.0.1 port: 44206>: <gear.Packet 0x7f210c1e0780 type: CAN_DO function: b'zuul:autohold'>
+2018-03-19 16:04:02,904 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210c1e0828 name: b'Zuul RPC Listener' host: 127.0.0.1 port: 44206>: <gear.Packet 0x7f210c1e0940 type: CAN_DO function: b'zuul:autohold_list'>
+2018-03-19 16:04:02,904 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210c1e0828 name: b'Zuul RPC Listener' host: 127.0.0.1 port: 44206>: <gear.Packet 0x7f210c1e0780 type: CAN_DO function: b'zuul:enqueue'>
+2018-03-19 16:04:02,905 gear.Connection.b'Zuul RPC Listener' INFO     Sending packet to <gear.Connection 0x7f210c1e05f8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210c1e08d0 type: CAN_DO function: b'zuul:enqueue_ref'>
+2018-03-19 16:04:02,905 gear.Connection.b'Zuul RPC Listener' INFO     Sending packet to <gear.Connection 0x7f210c1e05f8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210c1e0710 type: CAN_DO function: b'zuul:promote'>
+2018-03-19 16:04:02,906 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210c1e0828 name: b'Zuul RPC Listener' host: 127.0.0.1 port: 44206>: <gear.Packet 0x7f210c1e09b0 type: CAN_DO function: b'zuul:enqueue_ref'>
+2018-03-19 16:04:02,906 gear.Connection.b'Zuul RPC Listener' INFO     Sending packet to <gear.Connection 0x7f210c1e05f8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210c1e0908 type: CAN_DO function: b'zuul:get_running_jobs'>
+2018-03-19 16:04:02,907 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210c1e0828 name: b'Zuul RPC Listener' host: 127.0.0.1 port: 44206>: <gear.Packet 0x7f210c1e0a58 type: CAN_DO function: b'zuul:promote'>
+2018-03-19 16:04:02,907 gear.Connection.b'Zuul RPC Listener' INFO     Sending packet to <gear.Connection 0x7f210c1e05f8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210c1e09e8 type: CAN_DO function: b'zuul:get_job_log_stream_address'>
+2018-03-19 16:04:02,907 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210c1e0828 name: b'Zuul RPC Listener' host: 127.0.0.1 port: 44206>: <gear.Packet 0x7f210c1e0ac8 type: CAN_DO function: b'zuul:get_running_jobs'>
+2018-03-19 16:04:02,908 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210c1e0828 name: b'Zuul RPC Listener' host: 127.0.0.1 port: 44206>: <gear.Packet 0x7f210c1e0a58 type: CAN_DO function: b'zuul:get_job_log_stream_address'>
+2018-03-19 16:04:02,908 gear.Connection.b'Zuul RPC Listener' INFO     Sending packet to <gear.Connection 0x7f210c1e05f8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210c1e09b0 type: CAN_DO function: b'zuul:tenant_list'>
+2018-03-19 16:04:02,909 gear.Connection.b'Zuul RPC Listener' INFO     Sending packet to <gear.Connection 0x7f210c1e05f8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210c1e0940 type: CAN_DO function: b'zuul:status_get'>
+2018-03-19 16:04:02,909 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210c1e0828 name: b'Zuul RPC Listener' host: 127.0.0.1 port: 44206>: <gear.Packet 0x7f210c1e0b70 type: CAN_DO function: b'zuul:tenant_list'>
+2018-03-19 16:04:02,909 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210c1e0828 name: b'Zuul RPC Listener' host: 127.0.0.1 port: 44206>: <gear.Packet 0x7f210c1e0ba8 type: CAN_DO function: b'zuul:status_get'>
+2018-03-19 16:04:02,910 gear.Connection.b'Zuul RPC Listener' INFO     Sending packet to <gear.Connection 0x7f210c1e05f8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210c1e0a58 type: CAN_DO function: b'zuul:job_list'>
+2018-03-19 16:04:02,910 gear.Connection.b'Zuul RPC Listener' INFO     Sending packet to <gear.Connection 0x7f210c1e05f8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210c1e0b00 type: CAN_DO function: b'zuul:key_get'>
+2018-03-19 16:04:02,911 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210c1e0828 name: b'Zuul RPC Listener' host: 127.0.0.1 port: 44206>: <gear.Packet 0x7f210c1e0be0 type: CAN_DO function: b'zuul:job_list'>
+2018-03-19 16:04:02,911 zuul.RPCListener                 DEBUG    Starting RPC listener
+2018-03-19 16:04:02,912 gear.Connection.b'Zuul RPC Listener' INFO     Sending packet to <gear.Connection 0x7f210c1e05f8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210c1e0cf8 type: GRAB_JOB_UNIQ>
+2018-03-19 16:04:02,913 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210c1e0828 name: b'Zuul RPC Listener' host: 127.0.0.1 port: 44206>: <gear.Packet 0x7f210c1e0da0 type: CAN_DO function: b'zuul:key_get'>
+2018-03-19 16:04:02,913 zuul.Scheduler                   DEBUG    Submitting reconfiguration event
+2018-03-19 16:04:02,914 zuul.Scheduler                   DEBUG    Waiting for reconfiguration
+2018-03-19 16:04:02,914 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210c1e0828 name: b'Zuul RPC Listener' host: 127.0.0.1 port: 44206>: <gear.Packet 0x7f210c1e0eb8 type: GRAB_JOB_UNIQ>
+2018-03-19 16:04:02,915 gear.Worker.b'Zuul RPC Listener' INFO     Received packet from <gear.Connection 0x7f210c1e05f8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210c1e0cf8 type: NO_JOB>
+2018-03-19 16:04:02,915 gear.Connection.b'Zuul RPC Listener' INFO     Sending packet to <gear.Connection 0x7f210c1e05f8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210c1e0c18 type: PRE_SLEEP>
+2018-03-19 16:04:02,915 zuul.Scheduler                   DEBUG    Run handler awake
+2018-03-19 16:04:02,916 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210c1e0828 name: b'Zuul RPC Listener' host: 127.0.0.1 port: 44206>: <gear.Packet 0x7f210c1e0da0 type: PRE_SLEEP>
+2018-03-19 16:04:02,916 zuul.Scheduler                   DEBUG    Fetching management event
+2018-03-19 16:04:02,917 zuul.Scheduler                   DEBUG    Processing management event <zuul.scheduler.ReconfigureEvent object at 0x7f210c1e0c50>
+2018-03-19 16:04:02,917 zuul.Scheduler                   DEBUG    Full reconfiguration beginning
+2018-03-19 16:04:02,918 zuul.ConfigLoader                INFO     Loading configuration from /home/shrews/Devel/git/openstack-infra/zuul/tests/fixtures/config/data-return/main.yaml
+2018-03-19 16:04:02,980 zuul.MergeClient                 DEBUG    Submitting job <gear.Job 0x7f2111fc5978 handle: None name: merger:cat unique: 41bbff3e1bc24f44ad7b0c9c407a07c4> with data {'dirs': ['zuul.d', '.zuul.d'], 'files': ['zuul.yaml', '.zuul.yaml'], 'connection': 'gerrit', 'project': 'common-config', 'branch': 'master'}
+2018-03-19 16:04:02,980 gear.Connection.b'Zuul Merge Client' INFO     Sending packet to <gear.Connection 0x7f210de8deb8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111fc5160 type: SUBMIT_JOB_HIGH function: b'merger:cat' unique: b'41bbff3e1bc24f44ad7b0c9c407a07c4'>
+2018-03-19 16:04:02,980 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210de8d898 name: None host: 127.0.0.1 port: 44200>: <gear.Packet 0x7f2111fc5080 type: SUBMIT_JOB_HIGH function: b'merger:cat' unique: b'41bbff3e1bc24f44ad7b0c9c407a07c4'>
+2018-03-19 16:04:02,981 gear.Client.b'Zuul Merge Client' INFO     Received packet from <gear.Connection 0x7f210de8deb8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111fc5898 type: JOB_CREATED handle: b'H:127.0.0.1:1'>
+2018-03-19 16:04:02,981 zuul.MergeClient                 DEBUG    Submitting job <gear.Job 0x7f2111fc5160 handle: None name: merger:cat unique: 42995daad6ec465caef3f8b5cfd201c9> with data {'dirs': ['zuul.d', '.zuul.d'], 'files': ['zuul.yaml', '.zuul.yaml'], 'connection': 'gerrit', 'project': 'org/project', 'branch': 'master'}
+2018-03-19 16:04:02,981 gear.Connection.b'Zuul Merge Client' INFO     Sending packet to <gear.Connection 0x7f210de8deb8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111fc50b8 type: SUBMIT_JOB_HIGH function: b'merger:cat' unique: b'42995daad6ec465caef3f8b5cfd201c9'>
+2018-03-19 16:04:02,981 gear.Worker.b'Zuul Executor Merger' INFO     Received packet from <gear.Connection 0x7f210deb2438 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111fc5518 type: NOOP>
+2018-03-19 16:04:02,981 gear.Connection.b'Zuul Executor Merger' INFO     Sending packet to <gear.Connection 0x7f210deb2438 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210c23eeb8 type: GRAB_JOB_UNIQ>
+2018-03-19 16:04:02,981 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210de8d898 name: None host: 127.0.0.1 port: 44200>: <gear.Packet 0x7f2111fc5630 type: SUBMIT_JOB_HIGH function: b'merger:cat' unique: b'42995daad6ec465caef3f8b5cfd201c9'>
+2018-03-19 16:04:02,981 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2128 name: b'Zuul Executor Merger' host: 127.0.0.1 port: 44194>: <gear.Packet 0x7f2111fc5630 type: GRAB_JOB_UNIQ>
+2018-03-19 16:04:02,981 gear.Client.b'Zuul Merge Client' INFO     Received packet from <gear.Connection 0x7f210de8deb8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111fc5e48 type: JOB_CREATED handle: b'H:127.0.0.1:2'>
+2018-03-19 16:04:02,981 gear.Worker.b'Zuul Executor Merger' INFO     Received packet from <gear.Connection 0x7f210deb2438 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111fc5198 type: JOB_ASSIGN_UNIQ handle: b'H:127.0.0.1:1' function: b'merger:cat' unique: b'41bbff3e1bc24f44ad7b0c9c407a07c4'>
+2018-03-19 16:04:02,982 zuul.TenantParser                DEBUG    Waiting for cat job <gear.Job 0x7f2111fc5978 handle: b'H:127.0.0.1:1' name: merger:cat unique: 41bbff3e1bc24f44ad7b0c9c407a07c4>
+2018-03-19 16:04:02,982 zuul.ExecutorServer              DEBUG    Got cat job: 41bbff3e1bc24f44ad7b0c9c407a07c4
+2018-03-19 16:04:02,982 zuul.ExecutorServer              INFO     Updating repo gerrit/common-config
+2018-03-19 16:04:02,982 zuul.Repo                        DEBUG    Cloning from file:///tmp/tmpf2lzro20/zuul-test/upstream/common-config to /tmp/tmpf2lzro20/zuul-test/executor-git/review.example.com/common-config
+2018-03-19 16:04:03,048 zuul.Merger                      INFO     Updating local repository gerrit/common-config
+2018-03-19 16:04:03,049 zuul.Repo                        DEBUG    Resetting repository /tmp/tmpf2lzro20/zuul-test/executor-git/review.example.com/common-config
+2018-03-19 16:04:03,050 zuul.Repo                        DEBUG    Updating repository /tmp/tmpf2lzro20/zuul-test/executor-git/review.example.com/common-config
+2018-03-19 16:04:03,125 zuul.Repo                        DEBUG    Reset to master
+2018-03-19 16:04:03,156 zuul.ExecutorServer              DEBUG    Finished updating repo gerrit/common-config
+2018-03-19 16:04:03,188 gear.Connection.b'Zuul Executor Merger' INFO     Sending packet to <gear.Connection 0x7f210deb2438 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111fc5898 type: WORK_COMPLETE handle: b'H:127.0.0.1:1'>
+2018-03-19 16:04:03,189 gear.Connection.b'Zuul Executor Merger' INFO     Sending packet to <gear.Connection 0x7f210deb2438 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111fc52b0 type: GRAB_JOB_UNIQ>
+2018-03-19 16:04:03,190 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2128 name: b'Zuul Executor Merger' host: 127.0.0.1 port: 44194>: <gear.Packet 0x7f2111fc54a8 type: WORK_COMPLETE handle: b'H:127.0.0.1:1'>
+2018-03-19 16:04:03,191 gear.Client.b'Zuul Merge Client' INFO     Received packet from <gear.Connection 0x7f210de8deb8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111fc54a8 type: WORK_COMPLETE handle: b'H:127.0.0.1:1'>
+2018-03-19 16:04:03,191 zuul.MergeClient                 INFO     Merge <gear.Job 0x7f2111fc5978 handle: b'H:127.0.0.1:1' name: merger:cat unique: 41bbff3e1bc24f44ad7b0c9c407a07c4> complete, merged: False, updated: True, commit: None
+2018-03-19 16:04:03,192 zuul.TenantParser                DEBUG    Cat job <gear.Job 0x7f2111fc5978 handle: b'H:127.0.0.1:1' name: merger:cat unique: 41bbff3e1bc24f44ad7b0c9c407a07c4> got files dict_keys(['.zuul.yaml', 'zuul.yaml'])
+2018-03-19 16:04:03,192 zuul.TenantParser                INFO     Loading configuration from common-config/zuul.yaml@master
+2018-03-19 16:04:03,213 zuul.TenantParser                DEBUG    Waiting for cat job <gear.Job 0x7f2111fc5160 handle: b'H:127.0.0.1:2' name: merger:cat unique: 42995daad6ec465caef3f8b5cfd201c9>
+2018-03-19 16:04:03,234 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2128 name: b'Zuul Executor Merger' host: 127.0.0.1 port: 44194>: <gear.Packet 0x7f21113dd240 type: GRAB_JOB_UNIQ>
+2018-03-19 16:04:03,235 gear.Worker.b'Zuul Executor Merger' INFO     Received packet from <gear.Connection 0x7f210deb2438 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f21113dd240 type: JOB_ASSIGN_UNIQ handle: b'H:127.0.0.1:2' function: b'merger:cat' unique: b'42995daad6ec465caef3f8b5cfd201c9'>
+2018-03-19 16:04:03,235 zuul.ExecutorServer              DEBUG    Got cat job: 42995daad6ec465caef3f8b5cfd201c9
+2018-03-19 16:04:03,236 zuul.ExecutorServer              INFO     Updating repo gerrit/org/project
+2018-03-19 16:04:03,237 zuul.Repo                        DEBUG    Cloning from file:///tmp/tmpf2lzro20/zuul-test/upstream/org/project to /tmp/tmpf2lzro20/zuul-test/executor-git/review.example.com/org/project
+2018-03-19 16:04:03,309 zuul.Merger                      INFO     Updating local repository gerrit/org/project
+2018-03-19 16:04:03,310 zuul.Repo                        DEBUG    Resetting repository /tmp/tmpf2lzro20/zuul-test/executor-git/review.example.com/org/project
+2018-03-19 16:04:03,312 zuul.Repo                        DEBUG    Updating repository /tmp/tmpf2lzro20/zuul-test/executor-git/review.example.com/org/project
+2018-03-19 16:04:03,379 zuul.Repo                        DEBUG    Reset to master
+2018-03-19 16:04:03,398 zuul.ExecutorServer              DEBUG    Finished updating repo gerrit/org/project
+2018-03-19 16:04:03,420 gear.Connection.b'Zuul Executor Merger' INFO     Sending packet to <gear.Connection 0x7f210deb2438 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111fd06a0 type: WORK_COMPLETE handle: b'H:127.0.0.1:2'>
+2018-03-19 16:04:03,421 gear.Connection.b'Zuul Executor Merger' INFO     Sending packet to <gear.Connection 0x7f210deb2438 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210ee9e630 type: GRAB_JOB_UNIQ>
+2018-03-19 16:04:03,422 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2128 name: b'Zuul Executor Merger' host: 127.0.0.1 port: 44194>: <gear.Packet 0x7f210ee9e630 type: WORK_COMPLETE handle: b'H:127.0.0.1:2'>
+2018-03-19 16:04:03,422 gear.Client.b'Zuul Merge Client' INFO     Received packet from <gear.Connection 0x7f210de8deb8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111fd0828 type: WORK_COMPLETE handle: b'H:127.0.0.1:2'>
+2018-03-19 16:04:03,423 zuul.MergeClient                 INFO     Merge <gear.Job 0x7f2111fc5160 handle: b'H:127.0.0.1:2' name: merger:cat unique: 42995daad6ec465caef3f8b5cfd201c9> complete, merged: False, updated: True, commit: None
+2018-03-19 16:04:03,423 zuul.TenantParser                DEBUG    Cat job <gear.Job 0x7f2111fc5160 handle: b'H:127.0.0.1:2' name: merger:cat unique: 42995daad6ec465caef3f8b5cfd201c9> got files dict_keys(['.zuul.yaml', 'zuul.yaml'])
+2018-03-19 16:04:03,424 zuul.TenantParser                DEBUG    Created layout id 07be7d5e993f408689827501161c609d
+2018-03-19 16:04:03,442 zuul.Pipeline.tenant-one.check   INFO     Configured Pipeline Manager check
+2018-03-19 16:04:03,442 zuul.Pipeline.tenant-one.check   INFO       Requirements:
+2018-03-19 16:04:03,442 zuul.Pipeline.tenant-one.check   INFO       Events:
+2018-03-19 16:04:03,443 zuul.Pipeline.tenant-one.check   INFO         <GerritEventFilter types: patchset-created ignore_deletes: True>
+2018-03-19 16:04:03,443 zuul.Pipeline.tenant-one.check   INFO       Projects:
+2018-03-19 16:04:03,443 zuul.Pipeline.tenant-one.check   INFO         review.example.com/org/project
+2018-03-19 16:04:03,443 zuul.Pipeline.tenant-one.check   INFO           <Job data-return branches: None source: common-config/zuul.yaml@master#32> 
+2018-03-19 16:04:03,443 zuul.Pipeline.tenant-one.check   INFO           <Job data-return-relative branches: None source: common-config/zuul.yaml@master#32> 
+2018-03-19 16:04:03,443 zuul.Pipeline.tenant-one.check   INFO           <Job child branches: None source: common-config/zuul.yaml@master#32> 
+2018-03-19 16:04:03,444 zuul.Pipeline.tenant-one.check   INFO       On start:
+2018-03-19 16:04:03,444 zuul.Pipeline.tenant-one.check   INFO         []
+2018-03-19 16:04:03,444 zuul.Pipeline.tenant-one.check   INFO       On success:
+2018-03-19 16:04:03,444 zuul.Pipeline.tenant-one.check   INFO         [<zuul.driver.gerrit.gerritreporter.GerritReporter object at 0x7f2111f7c2e8>]
+2018-03-19 16:04:03,444 zuul.Pipeline.tenant-one.check   INFO       On failure:
+2018-03-19 16:04:03,444 zuul.Pipeline.tenant-one.check   INFO         [<zuul.driver.gerrit.gerritreporter.GerritReporter object at 0x7f2111f7c320>]
+2018-03-19 16:04:03,444 zuul.Pipeline.tenant-one.check   INFO       On merge-failure:
+2018-03-19 16:04:03,445 zuul.Pipeline.tenant-one.check   INFO         [<zuul.driver.gerrit.gerritreporter.GerritReporter object at 0x7f2111f7c320>]
+2018-03-19 16:04:03,445 zuul.Pipeline.tenant-one.check   INFO       When disabled:
+2018-03-19 16:04:03,445 zuul.Pipeline.tenant-one.check   INFO         []
+2018-03-19 16:04:03,445 zuul.Scheduler                   DEBUG    Full reconfiguration complete
+2018-03-19 16:04:03,446 zuul.Pipeline.tenant-one.check   DEBUG    Starting queue processor: check
+2018-03-19 16:04:03,446 zuul.Pipeline.tenant-one.check   DEBUG    Finished queue processor: check (changed: False)
+2018-03-19 16:04:03,446 zuul.Scheduler                   DEBUG    Run handler sleeping
+2018-03-19 16:04:03,447 zuul.Scheduler                   DEBUG    Reconfiguration complete
+2018-03-19 16:04:03,447 zuul.Scheduler                   DEBUG    No queue file found
+2018-03-19 16:04:03,447 zuul.Scheduler                   DEBUG    Resuming queue processing
+2018-03-19 16:04:03,448 zuul.Scheduler                   DEBUG    Run handler awake
+2018-03-19 16:04:03,448 zuul.Pipeline.tenant-one.check   DEBUG    Starting queue processor: check
+2018-03-19 16:04:03,448 zuul.Pipeline.tenant-one.check   DEBUG    Finished queue processor: check (changed: False)
+2018-03-19 16:04:03,448 zuul.Scheduler                   DEBUG    Run handler sleeping
+2018-03-19 16:04:03,465 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2128 name: b'Zuul Executor Merger' host: 127.0.0.1 port: 44194>: <gear.Packet 0x7f2111f969b0 type: GRAB_JOB_UNIQ>
+2018-03-19 16:04:03,467 gear.Worker.b'Zuul Executor Merger' INFO     Received packet from <gear.Connection 0x7f210deb2438 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111f969b0 type: NO_JOB>
+2018-03-19 16:04:03,467 gear.Connection.b'Zuul Executor Merger' INFO     Sending packet to <gear.Connection 0x7f210deb2438 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f21113dd240 type: PRE_SLEEP>
+2018-03-19 16:04:03,467 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2128 name: b'Zuul Executor Merger' host: 127.0.0.1 port: 44194>: <gear.Packet 0x7f2111f969e8 type: PRE_SLEEP>
+2018-03-19 16:04:03,527 zuul.test                        DEBUG    Waiting until settled...
+2018-03-19 16:04:03,528 zuul.test.FakeGerritConnection   INFO     Updating <Change 0x7f2111f90c88 1,1>
+2018-03-19 16:04:03,529 zuul.test.FakeGerritConnection   DEBUG    Updating <Change 0x7f2111f90c88 1,1>: Running query message:Idb8db1b49730a4c5e6294979b11324dba0b5d540 to find changes needed-by
+2018-03-19 16:04:03,529 zuul.test.FakeGerritConnection   DEBUG    simpleQuery: message:Idb8db1b49730a4c5e6294979b11324dba0b5d540
+2018-03-19 16:04:03,529 zuul.Scheduler                   DEBUG    Change <Change 0x7f2111f90c88 1,1> has been updated, clearing dependent change caches
+2018-03-19 16:04:03,530 zuul.test.FakeGerritConnection   DEBUG    Scheduling event from gerrit: <GerritTriggerEvent patchset-created review.example.com/org/project master 1,1>
+2018-03-19 16:04:03,532 zuul.Scheduler                   DEBUG    Run handler awake
+2018-03-19 16:04:03,532 zuul.Scheduler                   DEBUG    Fetching trigger event
+2018-03-19 16:04:03,532 zuul.Scheduler                   DEBUG    Processing trigger event <GerritTriggerEvent patchset-created review.example.com/org/project master 1,1>
+2018-03-19 16:04:03,533 zuul.Pipeline.tenant-one.check   DEBUG    Event <GerritTriggerEvent patchset-created review.example.com/org/project master 1,1> for change <Change 0x7f2111f90c88 1,1> matched <GerritEventFilter types: patchset-created ignore_deletes: True> in pipeline <IndependentPipelineManager check>
+2018-03-19 16:04:03,533 zuul.Pipeline.tenant-one.check   DEBUG    Considering adding change <Change 0x7f2111f90c88 1,1>
+2018-03-19 16:04:03,533 zuul.Pipeline.tenant-one.check   DEBUG    Dynamically created queue <ChangeQueue check: org/project>
+2018-03-19 16:04:03,534 zuul.Pipeline.tenant-one.check   DEBUG    Checking for changes needed by <Change 0x7f2111f90c88 1,1>:
+2018-03-19 16:04:03,534 zuul.Pipeline.tenant-one.check   DEBUG      Updating commit dependencies for <Change 0x7f2111f90c88 1,1>
+2018-03-19 16:04:03,534 zuul.Pipeline.tenant-one.check   DEBUG      No changes needed
+2018-03-19 16:04:03,534 zuul.Pipeline.tenant-one.check   INFO     Adding change <Change 0x7f2111f90c88 1,1> to queue <ChangeQueue check: org/project> in <Pipeline check>
+2018-03-19 16:04:03,535 zuul.ZuulTrigger                 DEBUG    onChangeEnqueued set()
+2018-03-19 16:04:03,536 zuul.Pipeline.tenant-one.check   DEBUG    Starting queue processor: check
+2018-03-19 16:04:03,536 zuul.Pipeline.tenant-one.check   DEBUG    Checking for changes needed by <Change 0x7f2111f90c88 1,1>:
+2018-03-19 16:04:03,536 zuul.Pipeline.tenant-one.check   DEBUG      No changes needed
+2018-03-19 16:04:03,536 zuul.Pipeline.tenant-one.check   DEBUG    Scheduling merge for item <QueueItem 0x7f2111f96780 for <Change 0x7f2111f90c88 1,1> in check> (files: ['zuul.yaml', '.zuul.yaml'], dirs: ['zuul.d', '.zuul.d'])
+2018-03-19 16:04:03,537 zuul.MergeClient                 DEBUG    Submitting job <gear.Job 0x7f2111f96ef0 handle: None name: merger:merge unique: 07cf0a57bad045cbab76c83b626e98fb> with data {'dirs': ['zuul.d', '.zuul.d'], 'repo_state': None, 'files': ['zuul.yaml', '.zuul.yaml'], 'items': [{'merge_mode': 2, 'newrev': None, 'ref': 'refs/changes/1/1/1', 'branch': 'master', 'number': '1', 'buildset_uuid': '85becd7c74aa477d8563d348ef16f9c8', 'oldrev': None, 'connection': 'gerrit', 'patchset': '1', 'project': 'org/project'}]}
+2018-03-19 16:04:03,537 gear.Connection.b'Zuul Merge Client' INFO     Sending packet to <gear.Connection 0x7f210de8deb8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111f98358 type: SUBMIT_JOB function: b'merger:merge' unique: b'07cf0a57bad045cbab76c83b626e98fb'>
+2018-03-19 16:04:03,538 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210de8d898 name: None host: 127.0.0.1 port: 44200>: <gear.Packet 0x7f2111f984e0 type: SUBMIT_JOB function: b'merger:merge' unique: b'07cf0a57bad045cbab76c83b626e98fb'>
+2018-03-19 16:04:03,539 gear.Worker.b'Zuul Executor Merger' INFO     Received packet from <gear.Connection 0x7f210deb2438 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111f984e0 type: NOOP>
+2018-03-19 16:04:03,539 gear.Connection.b'Zuul Executor Merger' INFO     Sending packet to <gear.Connection 0x7f210deb2438 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111f969b0 type: GRAB_JOB_UNIQ>
+2018-03-19 16:04:03,539 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2128 name: b'Zuul Executor Merger' host: 127.0.0.1 port: 44194>: <gear.Packet 0x7f2111f98630 type: GRAB_JOB_UNIQ>
+2018-03-19 16:04:03,540 gear.Client.b'Zuul Merge Client' INFO     Received packet from <gear.Connection 0x7f210de8deb8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111f969b0 type: JOB_CREATED handle: b'H:127.0.0.1:3'>
+2018-03-19 16:04:03,540 gear.Worker.b'Zuul Executor Merger' INFO     Received packet from <gear.Connection 0x7f210deb2438 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111fd0828 type: JOB_ASSIGN_UNIQ handle: b'H:127.0.0.1:3' function: b'merger:merge' unique: b'07cf0a57bad045cbab76c83b626e98fb'>
+2018-03-19 16:04:03,541 zuul.ExecutorServer              DEBUG    Got merge job: 07cf0a57bad045cbab76c83b626e98fb
+2018-03-19 16:04:03,541 zuul.Merger                      DEBUG    Merging for change 1,1
+2018-03-19 16:04:03,541 zuul.Merger                      DEBUG    Processing ref refs/changes/1/1/1 for project gerrit/org/project / master uuid 85becd7c74aa477d8563d348ef16f9c8
+2018-03-19 16:04:03,542 zuul.Merger                      DEBUG    No base commit found for ('gerrit', 'org/project', 'master')
+2018-03-19 16:04:03,542 zuul.Repo                        DEBUG    Resetting repository /tmp/tmpf2lzro20/zuul-test/executor-git/review.example.com/org/project
+2018-03-19 16:04:03,542 zuul.Pipeline.tenant-one.check   DEBUG    Finished queue processor: check (changed: False)
+2018-03-19 16:04:03,542 zuul.Scheduler                   DEBUG    Run handler sleeping
+2018-03-19 16:04:03,543 zuul.test                        DEBUG    <gear.Job 0x7f2111f98128 handle: b'H:127.0.0.1:3' name: b'merger:merge' unique: b'07cf0a57bad045cbab76c83b626e98fb'> is not waiting
+2018-03-19 16:04:03,544 zuul.Repo                        DEBUG    Updating repository /tmp/tmpf2lzro20/zuul-test/executor-git/review.example.com/org/project
+2018-03-19 16:04:03,629 zuul.Repo                        DEBUG    Reset to master
+2018-03-19 16:04:03,644 zuul.test                        DEBUG    <gear.Job 0x7f2111f98128 handle: b'H:127.0.0.1:3' name: b'merger:merge' unique: b'07cf0a57bad045cbab76c83b626e98fb'> is not waiting
+2018-03-19 16:04:03,673 zuul.Repo                        DEBUG    Checking out e79672ebae06a41242c4bfbda7a3fee10312410c
+2018-03-19 16:04:03,692 zuul.Repo                        DEBUG    Merging refs/changes/1/1/1 with args ['-s', 'resolve', 'FETCH_HEAD']
+2018-03-19 16:04:03,707 gear.Connection.b'Zuul Executor Merger' INFO     Sending packet to <gear.Connection 0x7f210deb2438 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111fc5f60 type: WORK_COMPLETE handle: b'H:127.0.0.1:3'>
+2018-03-19 16:04:03,707 gear.Connection.b'Zuul Executor Merger' INFO     Sending packet to <gear.Connection 0x7f210deb2438 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210c256eb8 type: GRAB_JOB_UNIQ>
+2018-03-19 16:04:03,707 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2128 name: b'Zuul Executor Merger' host: 127.0.0.1 port: 44194>: <gear.Packet 0x7f210c256eb8 type: WORK_COMPLETE handle: b'H:127.0.0.1:3'>
+2018-03-19 16:04:03,707 gear.Client.b'Zuul Merge Client' INFO     Received packet from <gear.Connection 0x7f210de8deb8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210c256eb8 type: WORK_COMPLETE handle: b'H:127.0.0.1:3'>
+2018-03-19 16:04:03,708 zuul.MergeClient                 INFO     Merge <gear.Job 0x7f2111f96ef0 handle: b'H:127.0.0.1:3' name: merger:merge unique: 07cf0a57bad045cbab76c83b626e98fb> complete, merged: True, updated: False, commit: 2625d9ee80b6e5f592da80d19d89584bb5684484
+2018-03-19 16:04:03,708 zuul.Scheduler                   DEBUG    Run handler awake
+2018-03-19 16:04:03,708 zuul.Scheduler                   DEBUG    Fetching result event
+2018-03-19 16:04:03,708 zuul.Scheduler                   DEBUG    Processing result event <zuul.scheduler.MergeCompletedEvent object at 0x7f2111f98400>
+2018-03-19 16:04:03,708 zuul.Pipeline.tenant-one.check   DEBUG    Starting queue processor: check
+2018-03-19 16:04:03,708 zuul.Pipeline.tenant-one.check   DEBUG    Checking for changes needed by <Change 0x7f2111f90c88 1,1>:
+2018-03-19 16:04:03,708 zuul.Pipeline.tenant-one.check   DEBUG      No changes needed
+2018-03-19 16:04:03,708 zuul.Pipeline.tenant-one.check   DEBUG    Freezing job graph for <QueueItem 0x7f2111f96780 for <Change 0x7f2111f90c88 1,1> in check>
+2018-03-19 16:04:03,708 zuul.layout                      DEBUG    Collecting jobs data-return for <Change 0x7f2111f90c88 1,1>
+2018-03-19 16:04:03,708 zuul.layout                      DEBUG    Collecting job variants for data-return
+2018-03-19 16:04:03,708 zuul.layout                      DEBUG    Variant <Job data-return branches: None source: common-config/zuul.yaml@master#19> matched <Change 0x7f2111f90c88 1,1>
+2018-03-19 16:04:03,708 zuul.layout                      DEBUG    Collecting job variants for base
+2018-03-19 16:04:03,708 zuul.layout                      DEBUG    Variant <Job base branches: None source: common-config/zuul.yaml@master#15> matched <Change 0x7f2111f90c88 1,1>
+2018-03-19 16:04:03,709 zuul.layout                      DEBUG    Pipeline variant <Job data-return branches: None source: common-config/zuul.yaml@master#32> matched <Change 0x7f2111f90c88 1,1>
+2018-03-19 16:04:03,709 zuul.layout                      DEBUG    Collecting jobs data-return-relative for <Change 0x7f2111f90c88 1,1>
+2018-03-19 16:04:03,709 zuul.layout                      DEBUG    Collecting job variants for data-return-relative
+2018-03-19 16:04:03,709 zuul.layout                      DEBUG    Variant <Job data-return-relative branches: None source: common-config/zuul.yaml@master#23> matched <Change 0x7f2111f90c88 1,1>
+2018-03-19 16:04:03,709 zuul.layout                      DEBUG    Collecting job variants for base
+2018-03-19 16:04:03,709 zuul.layout                      DEBUG    Variant <Job base branches: None source: common-config/zuul.yaml@master#15> matched <Change 0x7f2111f90c88 1,1>
+2018-03-19 16:04:03,709 zuul.layout                      DEBUG    Pipeline variant <Job data-return-relative branches: None source: common-config/zuul.yaml@master#32> matched <Change 0x7f2111f90c88 1,1>
+2018-03-19 16:04:03,709 zuul.layout                      DEBUG    Collecting jobs child for <Change 0x7f2111f90c88 1,1>
+2018-03-19 16:04:03,709 zuul.layout                      DEBUG    Collecting job variants for child
+2018-03-19 16:04:03,709 zuul.layout                      DEBUG    Variant <Job child branches: None source: common-config/zuul.yaml@master#28> matched <Change 0x7f2111f90c88 1,1>
+2018-03-19 16:04:03,709 zuul.layout                      DEBUG    Collecting job variants for base
+2018-03-19 16:04:03,709 zuul.layout                      DEBUG    Variant <Job base branches: None source: common-config/zuul.yaml@master#15> matched <Change 0x7f2111f90c88 1,1>
+2018-03-19 16:04:03,710 zuul.layout                      DEBUG    Pipeline variant <Job child branches: None source: common-config/zuul.yaml@master#32> matched <Change 0x7f2111f90c88 1,1>
+2018-03-19 16:04:03,710 zuul.Pipeline.tenant-one.check   DEBUG    Requesting nodes for change <Change 0x7f2111f90c88 1,1>
+2018-03-19 16:04:03,710 zuul.nodepool                    INFO     Fulfilling empty node request <NodeRequest None <NodeSet OrderedDict()OrderedDict()>>
+2018-03-19 16:04:03,710 zuul.Pipeline.tenant-one.check   DEBUG    Adding node request <NodeRequest None <NodeSet OrderedDict()OrderedDict()>> for job data-return to item <QueueItem 0x7f2111f96780 for <Change 0x7f2111f90c88 1,1> in check>
+2018-03-19 16:04:03,710 zuul.nodepool                    INFO     Fulfilling empty node request <NodeRequest None <NodeSet OrderedDict()OrderedDict()>>
+2018-03-19 16:04:03,710 zuul.Pipeline.tenant-one.check   DEBUG    Adding node request <NodeRequest None <NodeSet OrderedDict()OrderedDict()>> for job data-return-relative to item <QueueItem 0x7f2111f96780 for <Change 0x7f2111f90c88 1,1> in check>
+2018-03-19 16:04:03,710 zuul.Pipeline.tenant-one.check   DEBUG    Queue org/project status is now:
+ Project org/project change 1,1 based on None
+  data-return: None
+  data-return-relative: None
+  child: None
+
+2018-03-19 16:04:03,710 zuul.Pipeline.tenant-one.check   DEBUG    Finished queue processor: check (changed: True)
+2018-03-19 16:04:03,710 zuul.Pipeline.tenant-one.check   DEBUG    Starting queue processor: check
+2018-03-19 16:04:03,710 zuul.Pipeline.tenant-one.check   DEBUG    Checking for changes needed by <Change 0x7f2111f90c88 1,1>:
+2018-03-19 16:04:03,710 zuul.Pipeline.tenant-one.check   DEBUG      No changes needed
+2018-03-19 16:04:03,710 zuul.Pipeline.tenant-one.check   DEBUG    Finished queue processor: check (changed: False)
+2018-03-19 16:04:03,710 zuul.Scheduler                   DEBUG    Run handler sleeping
+2018-03-19 16:04:03,710 zuul.Scheduler                   DEBUG    Run handler awake
+2018-03-19 16:04:03,710 zuul.Scheduler                   DEBUG    Fetching result event
+2018-03-19 16:04:03,710 zuul.Scheduler                   DEBUG    Processing result event <zuul.scheduler.NodesProvisionedEvent object at 0x7f2111f96160>
+2018-03-19 16:04:03,710 zuul.nodepool                    INFO     Accepting node request <NodeRequest None <NodeSet OrderedDict()OrderedDict()>>
+2018-03-19 16:04:03,711 zuul.nodepool                    INFO     Request None no longer exists
+2018-03-19 16:04:03,711 zuul.Pipeline.tenant-one.check   INFO     Completed node request <NodeRequest None <NodeSet OrderedDict()OrderedDict()>> for job data-return of item <QueueItem 0x7f2111f96780 for <Change 0x7f2111f90c88 1,1> in check> with nodes <NodeSet OrderedDict()OrderedDict()>
+2018-03-19 16:04:03,711 zuul.Scheduler                   DEBUG    Fetching result event
+2018-03-19 16:04:03,711 zuul.Scheduler                   DEBUG    Processing result event <zuul.scheduler.NodesProvisionedEvent object at 0x7f2111f96240>
+2018-03-19 16:04:03,711 zuul.nodepool                    INFO     Accepting node request <NodeRequest None <NodeSet OrderedDict()OrderedDict()>>
+2018-03-19 16:04:03,712 zuul.nodepool                    INFO     Request None no longer exists
+2018-03-19 16:04:03,712 zuul.Pipeline.tenant-one.check   INFO     Completed node request <NodeRequest None <NodeSet OrderedDict()OrderedDict()>> for job data-return-relative of item <QueueItem 0x7f2111f96780 for <Change 0x7f2111f90c88 1,1> in check> with nodes <NodeSet OrderedDict()OrderedDict()>
+2018-03-19 16:04:03,712 zuul.Pipeline.tenant-one.check   DEBUG    Starting queue processor: check
+2018-03-19 16:04:03,712 zuul.Pipeline.tenant-one.check   DEBUG    Checking for changes needed by <Change 0x7f2111f90c88 1,1>:
+2018-03-19 16:04:03,712 zuul.Pipeline.tenant-one.check   DEBUG      No changes needed
+2018-03-19 16:04:03,712 zuul.Pipeline.tenant-one.check   DEBUG    Executing jobs for change <Change 0x7f2111f90c88 1,1>
+2018-03-19 16:04:03,712 zuul.Pipeline.tenant-one.check   DEBUG    Found job data-return for change <Change 0x7f2111f90c88 1,1>
+2018-03-19 16:04:03,712 zuul.nodepool                    INFO     Setting nodeset <NodeSet OrderedDict()OrderedDict()> in use
+2018-03-19 16:04:03,712 zuul.ExecutorClient              INFO     Execute job data-return (uuid: 11596eb9dfd24e1faf44657cda2caa2b) on nodes <NodeSet OrderedDict()OrderedDict()> for change <Change 0x7f2111f90c88 1,1> with dependent changes [{'change': '1', 'project': {'short_name': 'project', 'name': 'org/project', 'canonical_hostname': 'review.example.com', 'src_dir': 'src/review.example.com/org/project', 'canonical_name': 'review.example.com/org/project'}, 'change_url': 'https://review.example.com/1', 'patchset': '1', 'branch': 'master'}]
+2018-03-19 16:04:03,712 gear.Connection.b'Zuul Executor Client' INFO     Sending packet to <gear.Connection 0x7f210de8d7b8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111f96470 type: SUBMIT_JOB function: b'executor:execute' unique: b'11596eb9dfd24e1faf44657cda2caa2b'>
+2018-03-19 16:04:03,712 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210de8de48 name: None host: 127.0.0.1 port: 44198>: <gear.Packet 0x7f2111f96a90 type: SUBMIT_JOB function: b'executor:execute' unique: b'11596eb9dfd24e1faf44657cda2caa2b'>
+2018-03-19 16:04:03,712 gear.Client.b'Zuul Executor Client' INFO     Received packet from <gear.Connection 0x7f210de8d7b8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111f96a58 type: JOB_CREATED handle: b'H:127.0.0.1:4'>
+2018-03-19 16:04:03,713 zuul.ExecutorClient              DEBUG    Received handle b'H:127.0.0.1:4' for <Build 11596eb9dfd24e1faf44657cda2caa2b of data-return on <Worker Unknown>>
+2018-03-19 16:04:03,713 zuul.Pipeline.tenant-one.check   DEBUG    Adding build <Build 11596eb9dfd24e1faf44657cda2caa2b of data-return on <Worker Unknown>> of job data-return to item <QueueItem 0x7f2111f96780 for <Change 0x7f2111f90c88 1,1> in check>
+2018-03-19 16:04:03,713 gear.Worker.b'Zuul Executor Server' INFO     Received packet from <gear.Connection 0x7f210df0ad30 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111f96470 type: NOOP>
+2018-03-19 16:04:03,713 zuul.Pipeline.tenant-one.check   DEBUG    Found job data-return-relative for change <Change 0x7f2111f90c88 1,1>
+2018-03-19 16:04:03,713 gear.Connection.b'Zuul Executor Server' INFO     Sending packet to <gear.Connection 0x7f210df0ad30 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210c23eba8 type: GRAB_JOB_UNIQ>
+2018-03-19 16:04:03,713 zuul.nodepool                    INFO     Setting nodeset <NodeSet OrderedDict()OrderedDict()> in use
+2018-03-19 16:04:03,713 zuul.ExecutorClient              INFO     Execute job data-return-relative (uuid: 014b8d97229047acbe8f7b7ea4ed97ee) on nodes <NodeSet OrderedDict()OrderedDict()> for change <Change 0x7f2111f90c88 1,1> with dependent changes [{'change': '1', 'project': {'short_name': 'project', 'name': 'org/project', 'canonical_hostname': 'review.example.com', 'src_dir': 'src/review.example.com/org/project', 'canonical_name': 'review.example.com/org/project'}, 'change_url': 'https://review.example.com/1', 'patchset': '1', 'branch': 'master'}]
+2018-03-19 16:04:03,713 gear.Connection.b'Zuul Executor Client' INFO     Sending packet to <gear.Connection 0x7f210de8d7b8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111f2a908 type: SUBMIT_JOB function: b'executor:execute' unique: b'014b8d97229047acbe8f7b7ea4ed97ee'>
+2018-03-19 16:04:03,713 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2160 name: b'Zuul Executor Server' host: 127.0.0.1 port: 44196>: <gear.Packet 0x7f2111f967b8 type: GRAB_JOB_UNIQ>
+2018-03-19 16:04:03,713 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210de8de48 name: None host: 127.0.0.1 port: 44198>: <gear.Packet 0x7f2111f96a90 type: SUBMIT_JOB function: b'executor:execute' unique: b'014b8d97229047acbe8f7b7ea4ed97ee'>
+2018-03-19 16:04:03,713 gear.Worker.b'Zuul Executor Server' INFO     Received packet from <gear.Connection 0x7f210df0ad30 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111f2a160 type: JOB_ASSIGN_UNIQ handle: b'H:127.0.0.1:4' function: b'executor:execute' unique: b'11596eb9dfd24e1faf44657cda2caa2b'>
+2018-03-19 16:04:03,714 gear.Client.b'Zuul Executor Client' INFO     Received packet from <gear.Connection 0x7f210de8d7b8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111f96a90 type: JOB_CREATED handle: b'H:127.0.0.1:5'>
+2018-03-19 16:04:03,714 zuul.ExecutorServer              DEBUG    Got execute job: 11596eb9dfd24e1faf44657cda2caa2b
+2018-03-19 16:04:03,714 zuul.ExecutorClient              DEBUG    Received handle b'H:127.0.0.1:5' for <Build 014b8d97229047acbe8f7b7ea4ed97ee of data-return-relative on <Worker Unknown>>
+2018-03-19 16:04:03,714 zuul.Pipeline.tenant-one.check   DEBUG    Adding build <Build 014b8d97229047acbe8f7b7ea4ed97ee of data-return-relative on <Worker Unknown>> of job data-return-relative to item <QueueItem 0x7f2111f96780 for <Change 0x7f2111f90c88 1,1> in check>
+2018-03-19 16:04:03,714 zuul.Pipeline.tenant-one.check   DEBUG    Finished queue processor: check (changed: False)
+2018-03-19 16:04:03,714 zuul.Scheduler                   DEBUG    Run handler sleeping
+2018-03-19 16:04:03,715 gear.Connection.b'Zuul Executor Server' INFO     Sending packet to <gear.Connection 0x7f210df0ad30 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111f2afd0 type: GRAB_JOB_UNIQ>
+2018-03-19 16:04:03,716 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2160 name: b'Zuul Executor Server' host: 127.0.0.1 port: 44196>: <gear.Packet 0x7f2111f366a0 type: GRAB_JOB_UNIQ>
+2018-03-19 16:04:03,716 gear.Worker.b'Zuul Executor Server' INFO     Received packet from <gear.Connection 0x7f210df0ad30 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111f366a0 type: JOB_ASSIGN_UNIQ handle: b'H:127.0.0.1:5' function: b'executor:execute' unique: b'014b8d97229047acbe8f7b7ea4ed97ee'>
+2018-03-19 16:04:03,716 zuul.ExecutorServer              DEBUG    Got execute job: 014b8d97229047acbe8f7b7ea4ed97ee
+2018-03-19 16:04:03,719 gear.Connection.b'Zuul Executor Server' INFO     Sending packet to <gear.Connection 0x7f210df0ad30 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111f36f60 type: GRAB_JOB_UNIQ>
+2018-03-19 16:04:03,719 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2160 name: b'Zuul Executor Server' host: 127.0.0.1 port: 44196>: <gear.Packet 0x7f2111f36f60 type: GRAB_JOB_UNIQ>
+2018-03-19 16:04:03,719 zuul.ExecutorServer              INFO     Started SSH Agent, {'SSH_AUTH_SOCK': '/tmp/ssh-lxLJBiO2RMbp/agent.10121', 'SSH_AGENT_PID': '10123'}
+2018-03-19 16:04:03,719 gear.Worker.b'Zuul Executor Server' INFO     Received packet from <gear.Connection 0x7f210df0ad30 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111f36e48 type: NO_JOB>
+2018-03-19 16:04:03,719 zuul.ExecutorServer              DEBUG    Adding SSH Key /tmp/tmpf2lzro20/zuul-test/test_id_rsa
+2018-03-19 16:04:03,719 gear.Connection.b'Zuul Executor Server' INFO     Sending packet to <gear.Connection 0x7f210df0ad30 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111f366a0 type: PRE_SLEEP>
+2018-03-19 16:04:03,721 zuul.ExecutorServer              INFO     Started SSH Agent, {'SSH_AUTH_SOCK': '/tmp/ssh-t2uJadMSVjbT/agent.10124', 'SSH_AGENT_PID': '10125'}
+2018-03-19 16:04:03,721 zuul.ExecutorServer              DEBUG    Adding SSH Key /tmp/tmpf2lzro20/zuul-test/test_id_rsa
+2018-03-19 16:04:03,722 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2160 name: b'Zuul Executor Server' host: 127.0.0.1 port: 44196>: <gear.Packet 0x7f2111f3da20 type: PRE_SLEEP>
+2018-03-19 16:04:03,723 zuul.ExecutorServer              INFO     Added SSH Key /tmp/tmpf2lzro20/zuul-test/test_id_rsa
+2018-03-19 16:04:03,723 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Writing logging config for job /tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/work/logs/job-output.txt /tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/ansible/logging.json
+2018-03-19 16:04:03,725 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Beginning job executor:execute for ref refs/changes/1/1/1
+2018-03-19 16:04:03,725 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Job root: /tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b
+2018-03-19 16:04:03,725 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Updating project {'name': 'org/project', 'override_branch': None, 'default_branch': 'master', 'override_checkout': None, 'connection': 'gerrit', 'canonical_name': 'review.example.com/org/project'}
+2018-03-19 16:04:03,725 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Updating playbook or role common-config
+2018-03-19 16:04:03,725 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Updating playbook or role common-config
+2018-03-19 16:04:03,725 zuul.ExecutorServer              INFO     Updating repo gerrit/org/project
+2018-03-19 16:04:03,726 zuul.Merger                      INFO     Updating local repository gerrit/org/project
+2018-03-19 16:04:03,726 zuul.Repo                        DEBUG    Resetting repository /tmp/tmpf2lzro20/zuul-test/executor-git/review.example.com/org/project
+2018-03-19 16:04:03,726 zuul.ExecutorServer              INFO     Added SSH Key /tmp/tmpf2lzro20/zuul-test/test_id_rsa
+2018-03-19 16:04:03,727 zuul.Repo                        DEBUG    Updating repository /tmp/tmpf2lzro20/zuul-test/executor-git/review.example.com/org/project
+2018-03-19 16:04:03,729 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Writing logging config for job /tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/work/logs/job-output.txt /tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/ansible/logging.json
+2018-03-19 16:04:03,731 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Beginning job executor:execute for ref refs/changes/1/1/1
+2018-03-19 16:04:03,732 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Job root: /tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee
+2018-03-19 16:04:03,732 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Updating project {'name': 'org/project', 'override_branch': None, 'default_branch': 'master', 'override_checkout': None, 'connection': 'gerrit', 'canonical_name': 'review.example.com/org/project'}
+2018-03-19 16:04:03,732 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Updating playbook or role common-config
+2018-03-19 16:04:03,732 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Updating playbook or role common-config
+2018-03-19 16:04:03,749 zuul.Repo                        DEBUG    Reset to master
+2018-03-19 16:04:03,754 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2128 name: b'Zuul Executor Merger' host: 127.0.0.1 port: 44194>: <gear.Packet 0x7f2111f98710 type: GRAB_JOB_UNIQ>
+2018-03-19 16:04:03,754 gear.Worker.b'Zuul Executor Merger' INFO     Received packet from <gear.Connection 0x7f210deb2438 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111f98f60 type: NO_JOB>
+2018-03-19 16:04:03,754 gear.Connection.b'Zuul Executor Merger' INFO     Sending packet to <gear.Connection 0x7f210deb2438 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111fd0828 type: PRE_SLEEP>
+2018-03-19 16:04:03,755 zuul.ExecutorServer              DEBUG    Finished updating repo gerrit/org/project
+2018-03-19 16:04:03,755 zuul.ExecutorServer              INFO     Updating repo gerrit/common-config
+2018-03-19 16:04:03,755 zuul.Merger                      INFO     Updating local repository gerrit/common-config
+2018-03-19 16:04:03,755 zuul.Repo                        DEBUG    Resetting repository /tmp/tmpf2lzro20/zuul-test/executor-git/review.example.com/common-config
+2018-03-19 16:04:03,755 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2128 name: b'Zuul Executor Merger' host: 127.0.0.1 port: 44194>: <gear.Packet 0x7f2111f3d1d0 type: PRE_SLEEP>
+2018-03-19 16:04:03,756 zuul.Repo                        DEBUG    Updating repository /tmp/tmpf2lzro20/zuul-test/executor-git/review.example.com/common-config
+2018-03-19 16:04:03,773 zuul.Repo                        DEBUG    Reset to master
+2018-03-19 16:04:03,778 zuul.ExecutorServer              DEBUG    Finished updating repo gerrit/common-config
+2018-03-19 16:04:03,778 zuul.ExecutorServer              INFO     Updating repo gerrit/org/project
+2018-03-19 16:04:03,778 zuul.Merger                      INFO     Updating local repository gerrit/org/project
+2018-03-19 16:04:03,778 zuul.Repo                        DEBUG    Resetting repository /tmp/tmpf2lzro20/zuul-test/executor-git/review.example.com/org/project
+2018-03-19 16:04:03,779 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Git updates complete
+2018-03-19 16:04:03,779 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Cloning gerrit/org/project
+2018-03-19 16:04:03,779 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Cloning from file:///tmp/tmpf2lzro20/zuul-test/upstream/org/project to /tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/work/src/review.example.com/org/project
+2018-03-19 16:04:03,780 zuul.Repo                        DEBUG    Updating repository /tmp/tmpf2lzro20/zuul-test/executor-git/review.example.com/org/project
+2018-03-19 16:04:03,793 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Merging for change 1,1
+2018-03-19 16:04:03,793 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Processing ref refs/changes/1/1/1 for project gerrit/org/project / master uuid 85becd7c74aa477d8563d348ef16f9c8
+2018-03-19 16:04:03,794 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] No base commit found for ('gerrit', 'org/project', 'master')
+2018-03-19 16:04:03,794 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Resetting repository /tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/work/src/review.example.com/org/project
+2018-03-19 16:04:03,794 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Updating repository /tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/work/src/review.example.com/org/project
+2018-03-19 16:04:03,801 zuul.Repo                        DEBUG    Reset to master
+2018-03-19 16:04:03,808 zuul.ExecutorServer              DEBUG    Finished updating repo gerrit/org/project
+2018-03-19 16:04:03,809 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Git updates complete
+2018-03-19 16:04:03,809 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Cloning gerrit/org/project
+2018-03-19 16:04:03,809 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Cloning from file:///tmp/tmpf2lzro20/zuul-test/upstream/org/project to /tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/work/src/review.example.com/org/project
+2018-03-19 16:04:03,811 zuul.test                        DEBUG    <Build 11596eb9dfd24e1faf44657cda2caa2b of data-return on <Worker Unknown>> has not reported start
+2018-03-19 16:04:03,815 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Reset to master
+2018-03-19 16:04:03,823 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Restore repo state for project gerrit/org/project
+2018-03-19 16:04:03,823 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Merging for change 1,1
+2018-03-19 16:04:03,823 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Processing ref refs/changes/1/1/1 for project gerrit/org/project / master uuid 85becd7c74aa477d8563d348ef16f9c8
+2018-03-19 16:04:03,823 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] No base commit found for ('gerrit', 'org/project', 'master')
+2018-03-19 16:04:03,823 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Resetting repository /tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/work/src/review.example.com/org/project
+2018-03-19 16:04:03,824 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Updating repository /tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/work/src/review.example.com/org/project
+2018-03-19 16:04:03,825 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Create reference refs/heads/master at e79672ebae06a41242c4bfbda7a3fee10312410c in /tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/work/src/review.example.com/org/project
+2018-03-19 16:04:03,829 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Create reference refs/tags/init at e79672ebae06a41242c4bfbda7a3fee10312410c in /tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/work/src/review.example.com/org/project
+2018-03-19 16:04:03,830 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Delete reference refs/remotes/origin/HEAD
+2018-03-19 16:04:03,830 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Delete reference refs/remotes/origin/master
+2018-03-19 16:04:03,841 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Checking out e79672ebae06a41242c4bfbda7a3fee10312410c
+2018-03-19 16:04:03,846 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Reset to master
+2018-03-19 16:04:03,852 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Restore repo state for project gerrit/org/project
+2018-03-19 16:04:03,854 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Create reference refs/heads/master at e79672ebae06a41242c4bfbda7a3fee10312410c in /tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/work/src/review.example.com/org/project
+2018-03-19 16:04:03,857 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Create reference refs/tags/init at e79672ebae06a41242c4bfbda7a3fee10312410c in /tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/work/src/review.example.com/org/project
+2018-03-19 16:04:03,857 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Delete reference refs/remotes/origin/HEAD
+2018-03-19 16:04:03,857 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Delete reference refs/remotes/origin/master
+2018-03-19 16:04:03,860 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Merging refs/changes/1/1/1 with args ['-s', 'resolve', 'FETCH_HEAD']
+2018-03-19 16:04:03,868 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Checking out e79672ebae06a41242c4bfbda7a3fee10312410c
+2018-03-19 16:04:03,870 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Create reference refs/heads/master at 2625d9ee80b6e5f592da80d19d89584bb5684484 in /tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/work/src/review.example.com/org/project
+2018-03-19 16:04:03,878 zuul.AnsibleJob                  INFO     [build: 11596eb9dfd24e1faf44657cda2caa2b] Checking out org/project zuul branch master
+2018-03-19 16:04:03,879 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Checking out master
+2018-03-19 16:04:03,891 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Merging refs/changes/1/1/1 with args ['-s', 'resolve', 'FETCH_HEAD']
+2018-03-19 16:04:03,893 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Prepare playbook repo for common-config
+2018-03-19 16:04:03,893 zuul.AnsibleJob                  INFO     [build: 11596eb9dfd24e1faf44657cda2caa2b] Checking out gerrit/common-config branch master
+2018-03-19 16:04:03,893 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Cloning from file:///tmp/tmpf2lzro20/zuul-test/upstream/common-config to /tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/trusted/project_0/review.example.com/common-config
+2018-03-19 16:04:03,899 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Create reference refs/heads/master at 2625d9ee80b6e5f592da80d19d89584bb5684484 in /tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/work/src/review.example.com/org/project
+2018-03-19 16:04:03,906 zuul.AnsibleJob                  INFO     [build: 014b8d97229047acbe8f7b7ea4ed97ee] Checking out org/project zuul branch master
+2018-03-19 16:04:03,907 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Checking out master
+2018-03-19 16:04:03,909 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Checking out master
+2018-03-19 16:04:03,912 zuul.test                        DEBUG    <Build 11596eb9dfd24e1faf44657cda2caa2b of data-return on <Worker Unknown>> has not reported start
+2018-03-19 16:04:03,914 gear.Server                      INFO     Received admin request <gear.AdminRequest 0x7f2111fd0780 command: b'status'>
+2018-03-19 16:04:03,920 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Prepare zuul role for {'type': 'zuul', 'connection': 'gerrit', 'project': 'common-config', 'implicit': True, 'target_name': 'common-config'}
+2018-03-19 16:04:03,921 zuul.AnsibleJob                  INFO     [build: 11596eb9dfd24e1faf44657cda2caa2b] Implicit role not found in /tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/ansible/playbook_0/role_0/common-config
+2018-03-19 16:04:03,921 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] hostlist
+2018-03-19 16:04:03,925 gear.Connection.b'Zuul Executor Server' INFO     Sending packet to <gear.Connection 0x7f210df0ad30 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111f2ad30 type: WORK_DATA handle: b'H:127.0.0.1:4'>
+2018-03-19 16:04:03,925 gear.Connection.b'Zuul Executor Server' INFO     Sending packet to <gear.Connection 0x7f210df0ad30 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111f2ad30 type: WORK_STATUS handle: b'H:127.0.0.1:4'>
+2018-03-19 16:04:03,925 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible command: ANSIBLE_CONFIG=/tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/ansible/setup_playbook/ansible.cfg ansible '*' -v -m setup -i /tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/ansible/setup-inventory.yaml -a 'gather_subset=!all'
+2018-03-19 16:04:03,927 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Prepare playbook repo for common-config
+2018-03-19 16:04:03,927 zuul.AnsibleJob                  INFO     [build: 014b8d97229047acbe8f7b7ea4ed97ee] Checking out gerrit/common-config branch master
+2018-03-19 16:04:03,927 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Cloning from file:///tmp/tmpf2lzro20/zuul-test/upstream/common-config to /tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/trusted/project_0/review.example.com/common-config
+2018-03-19 16:04:03,929 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2160 name: b'Zuul Executor Server' host: 127.0.0.1 port: 44196>: <gear.Packet 0x7f2111f50208 type: WORK_DATA handle: b'H:127.0.0.1:4'>
+2018-03-19 16:04:03,930 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2160 name: b'Zuul Executor Server' host: 127.0.0.1 port: 44196>: <gear.Packet 0x7f2111f2add8 type: WORK_STATUS handle: b'H:127.0.0.1:4'>
+2018-03-19 16:04:03,930 gear.Client.b'Zuul Executor Client' INFO     Received packet from <gear.Connection 0x7f210de8d7b8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111f2add8 type: WORK_DATA handle: b'H:127.0.0.1:4'>
+2018-03-19 16:04:03,930 zuul.ExecutorClient              DEBUG    Build <gear.Job 0x7f2111f96080 handle: b'H:127.0.0.1:4' name: executor:execute unique: 11596eb9dfd24e1faf44657cda2caa2b> update {'worker_name': 'wilddog', 'worker_hostname': 'wilddog', 'worker_log_port': 7900, 'url': 'finger://wilddog/11596eb9dfd24e1faf44657cda2caa2b'}
+2018-03-19 16:04:03,930 zuul.ExecutorClient              INFO     Build <gear.Job 0x7f2111f96080 handle: b'H:127.0.0.1:4' name: executor:execute unique: 11596eb9dfd24e1faf44657cda2caa2b> started
+2018-03-19 16:04:03,930 gear.Client.b'Zuul Executor Client' INFO     Received packet from <gear.Connection 0x7f210de8d7b8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111fd03c8 type: WORK_STATUS handle: b'H:127.0.0.1:4'>
+2018-03-19 16:04:03,931 zuul.Scheduler                   DEBUG    Run handler awake
+2018-03-19 16:04:03,931 zuul.ExecutorClient              DEBUG    Build <gear.Job 0x7f2111f96080 handle: b'H:127.0.0.1:4' name: executor:execute unique: 11596eb9dfd24e1faf44657cda2caa2b> update {'worker_name': 'wilddog', 'worker_hostname': 'wilddog', 'worker_log_port': 7900, 'url': 'finger://wilddog/11596eb9dfd24e1faf44657cda2caa2b'}
+2018-03-19 16:04:03,931 zuul.Scheduler                   DEBUG    Fetching result event
+2018-03-19 16:04:03,931 zuul.Scheduler                   DEBUG    Processing result event <zuul.scheduler.BuildStartedEvent object at 0x7f2111fd0b38>
+2018-03-19 16:04:03,932 zuul.Pipeline.tenant-one.check   DEBUG    Build <Build 11596eb9dfd24e1faf44657cda2caa2b of data-return on <Worker wilddog>> started
+2018-03-19 16:04:03,932 zuul.Pipeline.tenant-one.check   DEBUG    Starting queue processor: check
+2018-03-19 16:04:03,932 zuul.Pipeline.tenant-one.check   DEBUG    Checking for changes needed by <Change 0x7f2111f90c88 1,1>:
+2018-03-19 16:04:03,932 zuul.Pipeline.tenant-one.check   DEBUG      No changes needed
+2018-03-19 16:04:03,932 zuul.Pipeline.tenant-one.check   DEBUG    Finished queue processor: check (changed: False)
+2018-03-19 16:04:03,932 zuul.Scheduler                   DEBUG    Run handler sleeping
+2018-03-19 16:04:03,932 zuul.test                        DEBUG    <FakeBuild check:data-return 1,1> is running
+2018-03-19 16:04:03,940 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Checking out master
+2018-03-19 16:04:03,949 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Prepare zuul role for {'type': 'zuul', 'connection': 'gerrit', 'project': 'common-config', 'implicit': True, 'target_name': 'common-config'}
+2018-03-19 16:04:03,950 zuul.AnsibleJob                  INFO     [build: 014b8d97229047acbe8f7b7ea4ed97ee] Implicit role not found in /tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/ansible/playbook_0/role_0/common-config
+2018-03-19 16:04:03,950 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] hostlist
+2018-03-19 16:04:03,953 gear.Connection.b'Zuul Executor Server' INFO     Sending packet to <gear.Connection 0x7f210df0ad30 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111f36c50 type: WORK_DATA handle: b'H:127.0.0.1:5'>
+2018-03-19 16:04:03,953 gear.Connection.b'Zuul Executor Server' INFO     Sending packet to <gear.Connection 0x7f210df0ad30 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111f36c50 type: WORK_STATUS handle: b'H:127.0.0.1:5'>
+2018-03-19 16:04:03,954 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible command: ANSIBLE_CONFIG=/tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/ansible/setup_playbook/ansible.cfg ansible '*' -v -m setup -i /tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/ansible/setup-inventory.yaml -a 'gather_subset=!all'
+2018-03-19 16:04:03,955 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2160 name: b'Zuul Executor Server' host: 127.0.0.1 port: 44196>: <gear.Packet 0x7f2111f98278 type: WORK_DATA handle: b'H:127.0.0.1:5'>
+2018-03-19 16:04:03,955 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2160 name: b'Zuul Executor Server' host: 127.0.0.1 port: 44196>: <gear.Packet 0x7f2111f42828 type: WORK_STATUS handle: b'H:127.0.0.1:5'>
+2018-03-19 16:04:03,956 gear.Client.b'Zuul Executor Client' INFO     Received packet from <gear.Connection 0x7f210de8d7b8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111f42550 type: WORK_DATA handle: b'H:127.0.0.1:5'>
+2018-03-19 16:04:03,956 zuul.ExecutorClient              DEBUG    Build <gear.Job 0x7f2111f2a0f0 handle: b'H:127.0.0.1:5' name: executor:execute unique: 014b8d97229047acbe8f7b7ea4ed97ee> update {'worker_name': 'wilddog', 'worker_hostname': 'wilddog', 'worker_log_port': 7900, 'url': 'finger://wilddog/014b8d97229047acbe8f7b7ea4ed97ee'}
+2018-03-19 16:04:03,956 zuul.ExecutorClient              INFO     Build <gear.Job 0x7f2111f2a0f0 handle: b'H:127.0.0.1:5' name: executor:execute unique: 014b8d97229047acbe8f7b7ea4ed97ee> started
+2018-03-19 16:04:03,956 gear.Client.b'Zuul Executor Client' INFO     Received packet from <gear.Connection 0x7f210de8d7b8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111f42d68 type: WORK_STATUS handle: b'H:127.0.0.1:5'>
+2018-03-19 16:04:03,956 zuul.ExecutorClient              DEBUG    Build <gear.Job 0x7f2111f2a0f0 handle: b'H:127.0.0.1:5' name: executor:execute unique: 014b8d97229047acbe8f7b7ea4ed97ee> update {'worker_name': 'wilddog', 'worker_hostname': 'wilddog', 'worker_log_port': 7900, 'url': 'finger://wilddog/014b8d97229047acbe8f7b7ea4ed97ee'}
+2018-03-19 16:04:03,956 zuul.Scheduler                   DEBUG    Run handler awake
+2018-03-19 16:04:03,956 zuul.Scheduler                   DEBUG    Fetching result event
+2018-03-19 16:04:03,956 zuul.Scheduler                   DEBUG    Processing result event <zuul.scheduler.BuildStartedEvent object at 0x7f2111f42a20>
+2018-03-19 16:04:03,957 zuul.Pipeline.tenant-one.check   DEBUG    Build <Build 014b8d97229047acbe8f7b7ea4ed97ee of data-return-relative on <Worker wilddog>> started
+2018-03-19 16:04:03,957 zuul.Pipeline.tenant-one.check   DEBUG    Starting queue processor: check
+2018-03-19 16:04:03,957 zuul.Pipeline.tenant-one.check   DEBUG    Checking for changes needed by <Change 0x7f2111f90c88 1,1>:
+2018-03-19 16:04:03,957 zuul.Pipeline.tenant-one.check   DEBUG      No changes needed
+2018-03-19 16:04:03,957 zuul.Pipeline.tenant-one.check   DEBUG    Finished queue processor: check (changed: False)
+2018-03-19 16:04:03,957 zuul.Scheduler                   DEBUG    Run handler sleeping
+2018-03-19 16:04:03,957 zuul.test                        DEBUG    <FakeBuild check:data-return 1,1> is running
+2018-03-19 16:04:03,958 gear.Worker.b'Zuul RPC Listener' INFO     Received admin data <gear.AdminRequest 0x7f2111f2ae10 command: b'status'>
+2018-03-19 16:04:04,057 zuul.test                        DEBUG    <FakeBuild check:data-return 1,1> is running
+2018-03-19 16:04:04,100 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'Using /tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/ansible/setup_playbook/ansible.cfg as config file'
+2018-03-19 16:04:04,126 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'Using /tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/ansible/setup_playbook/ansible.cfg as config file'
+2018-03-19 16:04:04,158 zuul.test                        DEBUG    <FakeBuild check:data-return 1,1> is running
+2018-03-19 16:04:04,258 zuul.test                        DEBUG    <FakeBuild check:data-return 1,1> is running
+2018-03-19 16:04:04,358 zuul.test                        DEBUG    <FakeBuild check:data-return 1,1> is running
+2018-03-19 16:04:04,438 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'localhost | SUCCESS => {'
+2018-03-19 16:04:04,438 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'    "ansible_facts": {'
+2018-03-19 16:04:04,438 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_apparmor": {'
+2018-03-19 16:04:04,438 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "status": "enabled"'
+2018-03-19 16:04:04,438 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        },'
+2018-03-19 16:04:04,438 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_architecture": "x86_64",'
+2018-03-19 16:04:04,438 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_cmdline": {'
+2018-03-19 16:04:04,438 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "BOOT_IMAGE": "/boot/vmlinuz-4.13.0-37-generic.efi.signed",'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "i915.alpha_support": "1",'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "quiet": true,'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "ro": true,'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "root": "UUID=c5d39682-0f14-474a-b6e1-5a51b4a404c9",'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "splash": true,'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "vt.handoff": "7"'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        },'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_date_time": {'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "date": "2018-03-19",'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "day": "19",'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "epoch": "1521489844",'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "hour": "16",'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "iso8601": "2018-03-19T20:04:04Z",'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "iso8601_basic": "20180319T160404424445",'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "iso8601_basic_short": "20180319T160404",'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "iso8601_micro": "2018-03-19T20:04:04.424495Z",'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "minute": "04",'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "month": "03",'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "second": "04",'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "time": "16:04:04",'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "tz": "EDT",'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "tz_offset": "-0400",'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "weekday": "Monday",'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "weekday_number": "1",'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "weeknumber": "12",'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "year": "2018"'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        },'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_distribution": "Ubuntu",'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_distribution_major_version": "16",'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_distribution_release": "xenial",'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_distribution_version": "16.04",'
+2018-03-19 16:04:04,439 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_dns": {'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "nameservers": ['
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'                "127.0.1.1"'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            ]'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        },'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_domain": "",'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_effective_group_id": 1000,'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_effective_user_id": 1000,'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_env": {'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "ANSIBLE_CONFIG": "/tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/ansible/setup_playbook/ansible.cfg",'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "CLUTTER_IM_MODULE": "xim",'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "COMPIZ_BIN_PATH": "/usr/bin/",'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "COMPIZ_CONFIG_PROFILE": "ubuntu",'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "DBUS_SESSION_BUS_ADDRESS": "unix:abstract=/tmp/dbus-weBiwIdvcY",'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "DEFAULTS_PATH": "/usr/share/gconf/ubuntu.default.path",'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "DESKTOP_SESSION": "ubuntu",'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "DISPLAY": ":0",'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "GDMSESSION": "ubuntu",'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "GDM_LANG": "en_US",'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "GNOME_DESKTOP_SESSION_ID": "this-is-deprecated",'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "GNOME_KEYRING_CONTROL": "",'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "GNOME_KEYRING_PID": "",'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "GPG_AGENT_INFO": "/home/shrews/.gnupg/S.gpg-agent:0:1",'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "GTK2_MODULES": "overlay-scrollbar",'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "GTK_IM_MODULE": "ibus",'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "GTK_MODULES": "gail:atk-bridge:unity-gtk-module",'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "HOME": "/tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/work",'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "IM_CONFIG_PHASE": "1",'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "INSTANCE": "",'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "JOB": "unity-settings-daemon",'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "LANG": "en_US.UTF-8",'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "LANGUAGE": "en_US",'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "LESSCLOSE": "/usr/bin/lesspipe %s %s",'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "LESSOPEN": "| /usr/bin/lesspipe %s",'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "LIBVIRT_DEFAULT_URI": "qemu:///system",'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "LOGNAME": "shrews",'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "LS_COLORS": "rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "MANDATORY_PATH": "/usr/share/gconf/ubuntu.mandatory.path",'
+2018-03-19 16:04:04,440 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "OLDPWD": "/home/shrews",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "PATH": ".tox/py35/bin:/home/shrews/Devel/git/openstack-infra/zuul/.tox/py35/bin:/home/shrews/bin:/home/shrews/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "PS1": "(py35) \\\\[\\\\e]0;\\\\u@\\\\h: \\\\w\\\\a\\\\]${debian_chroot:+($debian_chroot)}\\\\[\\\\033[01;32m\\\\]\\\\u@\\\\h\\\\[\\\\033[00m\\\\]:\\\\[\\\\033[01;34m\\\\]\\\\w\\\\[\\\\033[00m\\\\]\\\\$ ",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "PWD": "/tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/work",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "PYTHONPATH": "/tmp/tmpf2lzro20/zuul-test/executor-lib/ansible",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "QT4_IM_MODULE": "xim",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "QT_ACCESSIBILITY": "1",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "QT_IM_MODULE": "ibus",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "QT_LINUX_ACCESSIBILITY_ALWAYS_ON": "1",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "QT_QPA_PLATFORMTHEME": "appmenu-qt5",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "SESSION": "ubuntu",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "SESSIONTYPE": "gnome-session",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "SESSION_MANAGER": "local/wilddog:@/tmp/.ICE-unix/2005,unix/wilddog:/tmp/.ICE-unix/2005",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "SHELL": "/bin/bash",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "SHLVL": "1",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "SSH_AGENT_PID": "10123",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "SSH_AUTH_SOCK": "/tmp/ssh-lxLJBiO2RMbp/agent.10121",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "TERM": "xterm-256color",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "UNITY_DEFAULT_PROFILE": "unity",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "UNITY_HAS_3D_SUPPORT": "true",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "UPSTART_EVENTS": "xsession started",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "UPSTART_INSTANCE": "",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "UPSTART_JOB": "unity7",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "UPSTART_SESSION": "unix:abstract=/com/ubuntu/upstart-session/1000/1442",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "USER": "shrews",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "VIRTUAL_ENV": "/home/shrews/Devel/git/openstack-infra/zuul/.tox/py35",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "VTE_VERSION": "4205",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "WINDOWID": "67202478",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "XAUTHORITY": "/home/shrews/.Xauthority",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "XDG_CONFIG_DIRS": "/etc/xdg/xdg-ubuntu:/usr/share/upstart/xdg:/etc/xdg",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "XDG_CURRENT_DESKTOP": "Unity",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "XDG_DATA_DIRS": "/usr/share/ubuntu:/usr/share/gnome:/usr/local/share:/usr/share:/var/lib/snapd/desktop:/var/lib/snapd/desktop",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "XDG_GREETER_DATA_DIR": "/var/lib/lightdm-data/shrews",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "XDG_MENU_PREFIX": "gnome-",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "XDG_RUNTIME_DIR": "/run/user/1000",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "XDG_SEAT": "seat0",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "XDG_SEAT_PATH": "/org/freedesktop/DisplayManager/Seat0",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "XDG_SESSION_DESKTOP": "ubuntu",'
+2018-03-19 16:04:04,441 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "XDG_SESSION_ID": "c2",'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "XDG_SESSION_PATH": "/org/freedesktop/DisplayManager/Session0",'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "XDG_SESSION_TYPE": "x11",'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "XDG_VTNR": "7",'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "XMODIFIERS": "@im=ibus",'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "ZUUL_JOBDIR": "/tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b",'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "ZUUL_JOB_LOG_CONFIG": "/tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/ansible/logging.json",'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "ZUUL_JOB_LOG_SOCKET": "/tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/ansible/logging.sock",'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "_": "/usr/local/bin/ttrun"'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        },'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_fips": false,'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_fqdn": "wilddog",'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_gather_subset": [],'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_hostname": "wilddog",'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_kernel": "4.13.0-37-generic",'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_lsb": {'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "codename": "xenial",'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "description": "Ubuntu 16.04.4 LTS",'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "id": "Ubuntu",'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "major_release": "16",'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "release": "16.04"'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        },'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_machine": "x86_64",'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_machine_id": "d0d09081cc47058d17e992cc78f3a276",'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_nodename": "wilddog",'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_os_family": "Debian",'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_pkg_mgr": "apt",'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_python": {'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "executable": "/usr/bin/python",'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "has_sslcontext": true,'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "type": "CPython",'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "version": {'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'                "major": 2,'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'                "micro": 12,'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'                "minor": 7,'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'                "releaselevel": "final",'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'                "serial": 0'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            },'
+2018-03-19 16:04:04,442 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            "version_info": ['
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'                2,'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'                7,'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'                12,'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'                "final",'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'                0'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            ]'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        },'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_python_version": "2.7.12",'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_real_group_id": 1000,'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_real_user_id": 1000,'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_selinux": false,'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_service_mgr": "systemd",'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_ssh_host_key_dsa_public": "AAAAB3NzaC1kc3MAAACBAIbv299/gx6XJFvGZMR1672ymI28qKRQ0QZ4fz4ozYUcdtIxd2Z4UWqBuy8ic+uk6gCM9DC1NR9KTu7pqcDWPKg4qZLgiFIXMTLY3qJo/1MATfpRfCLmsWfuKR9Nmj9X4X2xxt8Wgn8/Lf2SftbJDmofdmUcJnLWP/I21szQ0cD/AAAAFQDPg3KuLEgu5FZdi8Sg+/TE5QClMQAAAIEAgOwHrBgy6P9B7e+3ghyB9uzoaUwZV8Q4t/MYEKhp/2VPkJ8OcJplHKZAJVqkBD2+ILDpR/rSvKFezG5Up+kxWLXQAmRH59HuBxP0xfxeDH3or+r+Eml5uqM+J65vaJenKy/5i1cKT5EilthkhnqEODci29XYUH2ZouUAZwZijd4AAACAGtcKSqiylhgLzkf9D6uz6nEnOx9sEkEKE9mYzjOXtiRd4zEIAwH7JyvpWI2RpfebHa+l7luzKZHGCtX9AAy11c4oCcwjgneb81t4ypiT1yP4h+hNqdYVnrSCvfb1LGGFFkaQqTusv6NgyqfOEIoQRTvnpQ0/yhFSL04VorKK7wM=",'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_ssh_host_key_ecdsa_public": "AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJCqde9t2mNHH6W6AQnPS8CQpFBnu6B28cOhalg1EqDpSRk6ygMsuuls8AsMS4ToL9bqzhvEDmLsi4rWHQ50tR4=",'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_ssh_host_key_ed25519_public": "AAAAC3NzaC1lZDI1NTE5AAAAIAiRD+wgoheytbdic4z1G8qg9jLjocKK29/6eoSREEa6",'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_ssh_host_key_rsa_public": "AAAAB3NzaC1yc2EAAAADAQABAAABAQCelNoP989qRdg3qgduCWnu4+FtWt6XInGgAaSD3t+X+vX2mCaUzOyg+jpbKHyQNyQkE0n3Lb6Y+XoLA6l81DR10V68vgSTPnRinxsxh1bep9xySpb1dNHsFnMLYzrgJyV8uoOiYqsBnJeaX3GMtO2wvzxw8KhKtfV/QAKSM2iWLjBY4dg6cQojdF9QfyG/BC3dfEfaupWV3YlQ+l4/Mvvb3Sr0IC3tDAVXz5pa9dyFWJguwUbX5yCgDXoY3jg7B4mscg8DSrJDZIK+QsXFHudYU1Zx9O3D5oloz7lvU0cNuFIcHqagh4uiSL5eD6tyhs76Dr1hSVJpWFDrQvalUIYv",'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_system": "Linux",'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_system_capabilities": ['
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'            ""'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        ],'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_system_capabilities_enforced": "True",'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_user_dir": "/home/shrews",'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_user_gecos": "David Shrewsbury,,,",'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_user_gid": 1000,'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_user_id": "shrews",'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_user_shell": "/bin/bash",'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_user_uid": 1000,'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_userspace_architecture": "x86_64",'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "ansible_userspace_bits": "64",'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'        "module_setup": true'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'    },'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'    "changed": false'
+2018-03-19 16:04:04,443 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'}'
+2018-03-19 16:04:04,458 zuul.test                        DEBUG    <FakeBuild check:data-return 1,1> is running
+2018-03-19 16:04:04,459 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'localhost | SUCCESS => {'
+2018-03-19 16:04:04,459 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'    "ansible_facts": {'
+2018-03-19 16:04:04,459 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_apparmor": {'
+2018-03-19 16:04:04,459 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "status": "enabled"'
+2018-03-19 16:04:04,459 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        },'
+2018-03-19 16:04:04,459 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_architecture": "x86_64",'
+2018-03-19 16:04:04,459 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_cmdline": {'
+2018-03-19 16:04:04,459 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "BOOT_IMAGE": "/boot/vmlinuz-4.13.0-37-generic.efi.signed",'
+2018-03-19 16:04:04,459 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "i915.alpha_support": "1",'
+2018-03-19 16:04:04,459 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "quiet": true,'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "ro": true,'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "root": "UUID=c5d39682-0f14-474a-b6e1-5a51b4a404c9",'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "splash": true,'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "vt.handoff": "7"'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        },'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_date_time": {'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "date": "2018-03-19",'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "day": "19",'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "epoch": "1521489844",'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "hour": "16",'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "iso8601": "2018-03-19T20:04:04Z",'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "iso8601_basic": "20180319T160404446795",'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "iso8601_basic_short": "20180319T160404",'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "iso8601_micro": "2018-03-19T20:04:04.446848Z",'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "minute": "04",'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "month": "03",'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "second": "04",'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "time": "16:04:04",'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "tz": "EDT",'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "tz_offset": "-0400",'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "weekday": "Monday",'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "weekday_number": "1",'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "weeknumber": "12",'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "year": "2018"'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        },'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_distribution": "Ubuntu",'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_distribution_major_version": "16",'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_distribution_release": "xenial",'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_distribution_version": "16.04",'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_dns": {'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "nameservers": ['
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'                "127.0.1.1"'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            ]'
+2018-03-19 16:04:04,460 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        },'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_domain": "",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_effective_group_id": 1000,'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_effective_user_id": 1000,'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_env": {'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "ANSIBLE_CONFIG": "/tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/ansible/setup_playbook/ansible.cfg",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "CLUTTER_IM_MODULE": "xim",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "COMPIZ_BIN_PATH": "/usr/bin/",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "COMPIZ_CONFIG_PROFILE": "ubuntu",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "DBUS_SESSION_BUS_ADDRESS": "unix:abstract=/tmp/dbus-weBiwIdvcY",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "DEFAULTS_PATH": "/usr/share/gconf/ubuntu.default.path",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "DESKTOP_SESSION": "ubuntu",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "DISPLAY": ":0",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "GDMSESSION": "ubuntu",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "GDM_LANG": "en_US",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "GNOME_DESKTOP_SESSION_ID": "this-is-deprecated",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "GNOME_KEYRING_CONTROL": "",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "GNOME_KEYRING_PID": "",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "GPG_AGENT_INFO": "/home/shrews/.gnupg/S.gpg-agent:0:1",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "GTK2_MODULES": "overlay-scrollbar",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "GTK_IM_MODULE": "ibus",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "GTK_MODULES": "gail:atk-bridge:unity-gtk-module",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "HOME": "/tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/work",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "IM_CONFIG_PHASE": "1",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "INSTANCE": "",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "JOB": "unity-settings-daemon",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "LANG": "en_US.UTF-8",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "LANGUAGE": "en_US",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "LESSCLOSE": "/usr/bin/lesspipe %s %s",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "LESSOPEN": "| /usr/bin/lesspipe %s",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "LIBVIRT_DEFAULT_URI": "qemu:///system",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "LOGNAME": "shrews",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "LS_COLORS": "rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "MANDATORY_PATH": "/usr/share/gconf/ubuntu.mandatory.path",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "OLDPWD": "/home/shrews",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "PATH": ".tox/py35/bin:/home/shrews/Devel/git/openstack-infra/zuul/.tox/py35/bin:/home/shrews/bin:/home/shrews/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "PS1": "(py35) \\\\[\\\\e]0;\\\\u@\\\\h: \\\\w\\\\a\\\\]${debian_chroot:+($debian_chroot)}\\\\[\\\\033[01;32m\\\\]\\\\u@\\\\h\\\\[\\\\033[00m\\\\]:\\\\[\\\\033[01;34m\\\\]\\\\w\\\\[\\\\033[00m\\\\]\\\\$ ",'
+2018-03-19 16:04:04,461 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "PWD": "/tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/work",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "PYTHONPATH": "/tmp/tmpf2lzro20/zuul-test/executor-lib/ansible",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "QT4_IM_MODULE": "xim",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "QT_ACCESSIBILITY": "1",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "QT_IM_MODULE": "ibus",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "QT_LINUX_ACCESSIBILITY_ALWAYS_ON": "1",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "QT_QPA_PLATFORMTHEME": "appmenu-qt5",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "SESSION": "ubuntu",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "SESSIONTYPE": "gnome-session",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "SESSION_MANAGER": "local/wilddog:@/tmp/.ICE-unix/2005,unix/wilddog:/tmp/.ICE-unix/2005",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "SHELL": "/bin/bash",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "SHLVL": "1",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "SSH_AGENT_PID": "10125",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "SSH_AUTH_SOCK": "/tmp/ssh-t2uJadMSVjbT/agent.10124",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "TERM": "xterm-256color",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "UNITY_DEFAULT_PROFILE": "unity",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "UNITY_HAS_3D_SUPPORT": "true",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "UPSTART_EVENTS": "xsession started",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "UPSTART_INSTANCE": "",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "UPSTART_JOB": "unity7",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "UPSTART_SESSION": "unix:abstract=/com/ubuntu/upstart-session/1000/1442",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "USER": "shrews",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "VIRTUAL_ENV": "/home/shrews/Devel/git/openstack-infra/zuul/.tox/py35",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "VTE_VERSION": "4205",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "WINDOWID": "67202478",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "XAUTHORITY": "/home/shrews/.Xauthority",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "XDG_CONFIG_DIRS": "/etc/xdg/xdg-ubuntu:/usr/share/upstart/xdg:/etc/xdg",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "XDG_CURRENT_DESKTOP": "Unity",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "XDG_DATA_DIRS": "/usr/share/ubuntu:/usr/share/gnome:/usr/local/share:/usr/share:/var/lib/snapd/desktop:/var/lib/snapd/desktop",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "XDG_GREETER_DATA_DIR": "/var/lib/lightdm-data/shrews",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "XDG_MENU_PREFIX": "gnome-",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "XDG_RUNTIME_DIR": "/run/user/1000",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "XDG_SEAT": "seat0",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "XDG_SEAT_PATH": "/org/freedesktop/DisplayManager/Seat0",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "XDG_SESSION_DESKTOP": "ubuntu",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "XDG_SESSION_ID": "c2",'
+2018-03-19 16:04:04,462 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "XDG_SESSION_PATH": "/org/freedesktop/DisplayManager/Session0",'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "XDG_SESSION_TYPE": "x11",'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "XDG_VTNR": "7",'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "XMODIFIERS": "@im=ibus",'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "ZUUL_JOBDIR": "/tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee",'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "ZUUL_JOB_LOG_CONFIG": "/tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/ansible/logging.json",'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "ZUUL_JOB_LOG_SOCKET": "/tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/ansible/logging.sock",'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "_": "/usr/local/bin/ttrun"'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        },'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_fips": false,'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_fqdn": "wilddog",'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_gather_subset": [],'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_hostname": "wilddog",'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_kernel": "4.13.0-37-generic",'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_lsb": {'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "codename": "xenial",'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "description": "Ubuntu 16.04.4 LTS",'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "id": "Ubuntu",'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "major_release": "16",'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "release": "16.04"'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        },'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_machine": "x86_64",'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_machine_id": "d0d09081cc47058d17e992cc78f3a276",'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_nodename": "wilddog",'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_os_family": "Debian",'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_pkg_mgr": "apt",'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_python": {'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "executable": "/usr/bin/python",'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "has_sslcontext": true,'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "type": "CPython",'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "version": {'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'                "major": 2,'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'                "micro": 12,'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'                "minor": 7,'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'                "releaselevel": "final",'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'                "serial": 0'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            },'
+2018-03-19 16:04:04,463 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            "version_info": ['
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'                2,'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'                7,'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'                12,'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'                "final",'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'                0'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            ]'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        },'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_python_version": "2.7.12",'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_real_group_id": 1000,'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_real_user_id": 1000,'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_selinux": false,'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_service_mgr": "systemd",'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_ssh_host_key_dsa_public": "AAAAB3NzaC1kc3MAAACBAIbv299/gx6XJFvGZMR1672ymI28qKRQ0QZ4fz4ozYUcdtIxd2Z4UWqBuy8ic+uk6gCM9DC1NR9KTu7pqcDWPKg4qZLgiFIXMTLY3qJo/1MATfpRfCLmsWfuKR9Nmj9X4X2xxt8Wgn8/Lf2SftbJDmofdmUcJnLWP/I21szQ0cD/AAAAFQDPg3KuLEgu5FZdi8Sg+/TE5QClMQAAAIEAgOwHrBgy6P9B7e+3ghyB9uzoaUwZV8Q4t/MYEKhp/2VPkJ8OcJplHKZAJVqkBD2+ILDpR/rSvKFezG5Up+kxWLXQAmRH59HuBxP0xfxeDH3or+r+Eml5uqM+J65vaJenKy/5i1cKT5EilthkhnqEODci29XYUH2ZouUAZwZijd4AAACAGtcKSqiylhgLzkf9D6uz6nEnOx9sEkEKE9mYzjOXtiRd4zEIAwH7JyvpWI2RpfebHa+l7luzKZHGCtX9AAy11c4oCcwjgneb81t4ypiT1yP4h+hNqdYVnrSCvfb1LGGFFkaQqTusv6NgyqfOEIoQRTvnpQ0/yhFSL04VorKK7wM=",'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_ssh_host_key_ecdsa_public": "AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJCqde9t2mNHH6W6AQnPS8CQpFBnu6B28cOhalg1EqDpSRk6ygMsuuls8AsMS4ToL9bqzhvEDmLsi4rWHQ50tR4=",'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_ssh_host_key_ed25519_public": "AAAAC3NzaC1lZDI1NTE5AAAAIAiRD+wgoheytbdic4z1G8qg9jLjocKK29/6eoSREEa6",'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_ssh_host_key_rsa_public": "AAAAB3NzaC1yc2EAAAADAQABAAABAQCelNoP989qRdg3qgduCWnu4+FtWt6XInGgAaSD3t+X+vX2mCaUzOyg+jpbKHyQNyQkE0n3Lb6Y+XoLA6l81DR10V68vgSTPnRinxsxh1bep9xySpb1dNHsFnMLYzrgJyV8uoOiYqsBnJeaX3GMtO2wvzxw8KhKtfV/QAKSM2iWLjBY4dg6cQojdF9QfyG/BC3dfEfaupWV3YlQ+l4/Mvvb3Sr0IC3tDAVXz5pa9dyFWJguwUbX5yCgDXoY3jg7B4mscg8DSrJDZIK+QsXFHudYU1Zx9O3D5oloz7lvU0cNuFIcHqagh4uiSL5eD6tyhs76Dr1hSVJpWFDrQvalUIYv",'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_system": "Linux",'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_system_capabilities": ['
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'            ""'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        ],'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_system_capabilities_enforced": "True",'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_user_dir": "/home/shrews",'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_user_gecos": "David Shrewsbury,,,",'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_user_gid": 1000,'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_user_id": "shrews",'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_user_shell": "/bin/bash",'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_user_uid": 1000,'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_userspace_architecture": "x86_64",'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "ansible_userspace_bits": "64",'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'        "module_setup": true'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'    },'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'    "changed": false'
+2018-03-19 16:04:04,464 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'}'
+2018-03-19 16:04:04,479 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output terminated
+2018-03-19 16:04:04,479 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible exit code: 0
+2018-03-19 16:04:04,479 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Stopped watchdog
+2018-03-19 16:04:04,479 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Stopped disk job killer
+2018-03-19 16:04:04,479 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible complete, result RESULT_NORMAL code 0
+2018-03-19 16:04:04,480 zuul.BubblewrapExecutionContext  DEBUG    Bubblewrap command: bwrap --dir /tmp --tmpfs /tmp --dir /var --dir /var/tmp --dir /run/user/1000 --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /sbin /sbin --ro-bind /etc/resolv.conf /etc/resolv.conf --ro-bind /etc/hosts /etc/hosts --ro-bind /tmp/ssh-lxLJBiO2RMbp/agent.10121 /tmp/ssh-lxLJBiO2RMbp/agent.10121 --bind /tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/work /tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/work --proc /proc --dev /dev --chdir /tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/work --unshare-all --share-net --die-with-parent --uid 1000 --gid 1000 --file 29 /etc/passwd --file 55 /etc/group --ro-bind /lib64 /lib64 --ro-bind /etc/nsswitch.conf /etc/nsswitch.conf --ro-bind /etc/alternatives /etc/alternatives --ro-bind /home/shrews/Devel/git/openstack-infra/zuul/.tox/py35 /home/shrews/Devel/git/openstack-infra/zuul/.tox/py35 --ro-bind /tmp/tmpf2lzro20/zuul-test/executor-lib/ansible /tmp/tmpf2lzro20/zuul-test/executor-lib/ansible --ro-bind /tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/ansible /tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/ansible --ro-bind /tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/trusted /tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/trusted --ro-bind /tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/ansible/playbook_0 /tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/ansible/playbook_0 --bind /tmp/tmpf2lzro20/zuul-test /tmp/tmpf2lzro20/zuul-test --bind /tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/.ansible /tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/.ansible
+2018-03-19 16:04:04,480 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible command: ANSIBLE_CONFIG=/tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/ansible/playbook_0/ansible.cfg ansible-playbook -v /tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/trusted/project_0/review.example.com/common-config/playbooks/data-return.yaml -e zuul_execution_phase=run -e zuul_execution_trusted=True -e zuul_execution_canonical_name_and_path=review.example.com/common-config/playbooks/data-return.yaml -e zuul_execution_branch=master
+2018-03-19 16:04:04,498 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output terminated
+2018-03-19 16:04:04,498 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible exit code: 0
+2018-03-19 16:04:04,498 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Stopped watchdog
+2018-03-19 16:04:04,498 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Stopped disk job killer
+2018-03-19 16:04:04,498 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible complete, result RESULT_NORMAL code 0
+2018-03-19 16:04:04,499 zuul.BubblewrapExecutionContext  DEBUG    Bubblewrap command: bwrap --dir /tmp --tmpfs /tmp --dir /var --dir /var/tmp --dir /run/user/1000 --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /sbin /sbin --ro-bind /etc/resolv.conf /etc/resolv.conf --ro-bind /etc/hosts /etc/hosts --ro-bind /tmp/ssh-t2uJadMSVjbT/agent.10124 /tmp/ssh-t2uJadMSVjbT/agent.10124 --bind /tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/work /tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/work --proc /proc --dev /dev --chdir /tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/work --unshare-all --share-net --die-with-parent --uid 1000 --gid 1000 --file 29 /etc/passwd --file 52 /etc/group --ro-bind /lib64 /lib64 --ro-bind /etc/nsswitch.conf /etc/nsswitch.conf --ro-bind /etc/alternatives /etc/alternatives --ro-bind /home/shrews/Devel/git/openstack-infra/zuul/.tox/py35 /home/shrews/Devel/git/openstack-infra/zuul/.tox/py35 --ro-bind /tmp/tmpf2lzro20/zuul-test/executor-lib/ansible /tmp/tmpf2lzro20/zuul-test/executor-lib/ansible --ro-bind /tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/ansible /tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/ansible --ro-bind /tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/trusted /tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/trusted --ro-bind /tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/ansible/playbook_0 /tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/ansible/playbook_0 --bind /tmp/tmpf2lzro20/zuul-test /tmp/tmpf2lzro20/zuul-test --bind /tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/.ansible /tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/.ansible
+2018-03-19 16:04:04,499 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible command: ANSIBLE_CONFIG=/tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/ansible/playbook_0/ansible.cfg ansible-playbook -v /tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/trusted/project_0/review.example.com/common-config/playbooks/data-return-relative.yaml -e zuul_execution_phase=run -e zuul_execution_trusted=True -e zuul_execution_canonical_name_and_path=review.example.com/common-config/playbooks/data-return-relative.yaml -e zuul_execution_branch=master
+2018-03-19 16:04:04,559 zuul.test                        DEBUG    <FakeBuild check:data-return 1,1> is running
+2018-03-19 16:04:04,659 zuul.test                        DEBUG    <FakeBuild check:data-return 1,1> is running
+2018-03-19 16:04:04,745 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'Using /tmp/tmpf2lzro20/zuul-test/11596eb9dfd24e1faf44657cda2caa2b/ansible/playbook_0/ansible.cfg as config file'
+2018-03-19 16:04:04,749 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'Using /tmp/tmpf2lzro20/zuul-test/014b8d97229047acbe8f7b7ea4ed97ee/ansible/playbook_0/ansible.cfg as config file'
+2018-03-19 16:04:04,760 zuul.test                        DEBUG    <FakeBuild check:data-return 1,1> is running
+2018-03-19 16:04:04,860 zuul.test                        DEBUG    <FakeBuild check:data-return 1,1> is running
+2018-03-19 16:04:04,869 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b' [WARNING]: Failure using method (v2_playbook_on_task_start) in callback plugin'
+2018-03-19 16:04:04,869 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b'(<ansible.plugins.callback.zuul_stream.CallbackModule object at'
+2018-03-19 16:04:04,869 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output: b"0x7f6fa16436d8>): 'Task' object has no attribute '_host'"
+2018-03-19 16:04:04,876 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b' [WARNING]: Failure using method (v2_playbook_on_task_start) in callback plugin'
+2018-03-19 16:04:04,876 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b'(<ansible.plugins.callback.zuul_stream.CallbackModule object at'
+2018-03-19 16:04:04,876 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output: b"0x7fdfca96fa90>): 'Task' object has no attribute '_host'"
+2018-03-19 16:04:04,958 gear.Server                      INFO     Received admin request <gear.AdminRequest 0x7f2111f42f98 command: b'status'>
+2018-03-19 16:04:04,959 gear.Worker.b'Zuul RPC Listener' INFO     Received admin data <gear.AdminRequest 0x7f2111f42cc0 command: b'status'>
+2018-03-19 16:04:04,960 zuul.test                        DEBUG    <FakeBuild check:data-return 1,1> is running
+2018-03-19 16:04:05,004 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible output terminated
+2018-03-19 16:04:05,004 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible exit code: 2
+2018-03-19 16:04:05,004 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Stopped disk job killer
+2018-03-19 16:04:05,004 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Ansible complete, result RESULT_NORMAL code 2
+2018-03-19 16:04:05,005 zuul.AnsibleJob                  DEBUG    [build: 11596eb9dfd24e1faf44657cda2caa2b] Sending result: {"data": {}, "result": "FAILURE"}
+2018-03-19 16:04:05,005 gear.Connection.b'Zuul Executor Server' INFO     Sending packet to <gear.Connection 0x7f210df0ad30 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111f98208 type: WORK_COMPLETE handle: b'H:127.0.0.1:4'>
+2018-03-19 16:04:05,005 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2160 name: b'Zuul Executor Server' host: 127.0.0.1 port: 44196>: <gear.Packet 0x7f2111f36d30 type: WORK_COMPLETE handle: b'H:127.0.0.1:4'>
+2018-03-19 16:04:05,005 gear.Client.b'Zuul Executor Client' INFO     Received packet from <gear.Connection 0x7f210de8d7b8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111f989e8 type: WORK_COMPLETE handle: b'H:127.0.0.1:4'>
+2018-03-19 16:04:05,005 zuul.ExecutorClient              INFO     Build <gear.Job 0x7f2111f96080 handle: b'H:127.0.0.1:4' name: executor:execute unique: 11596eb9dfd24e1faf44657cda2caa2b> complete, result FAILURE
+2018-03-19 16:04:05,005 zuul.Scheduler                   DEBUG    Run handler awake
+2018-03-19 16:04:05,006 zuul.Scheduler                   DEBUG    Fetching result event
+2018-03-19 16:04:05,006 zuul.Scheduler                   DEBUG    Processing result event <zuul.scheduler.BuildCompletedEvent object at 0x7f2111f737f0>
+2018-03-19 16:04:05,006 zuul.nodepool                    INFO     Returning nodeset <NodeSet OrderedDict()OrderedDict()>
+2018-03-19 16:04:05,006 zuul.Pipeline.tenant-one.check   DEBUG    Build <Build 11596eb9dfd24e1faf44657cda2caa2b of data-return on <Worker wilddog>> of <Change 0x7f2111f90c88 1,1> completed
+2018-03-19 16:04:05,006 zuul.Pipeline.tenant-one.check   DEBUG    Item <QueueItem 0x7f2111f96780 for <Change 0x7f2111f90c88 1,1> in check> status is now:
+ Project org/project change 1,1 based on None
+  data-return: FAILURE
+  data-return-relative: None
+  child: SKIPPED
+
+2018-03-19 16:04:05,006 zuul.Pipeline.tenant-one.check   DEBUG    Starting queue processor: check
+2018-03-19 16:04:05,006 zuul.Pipeline.tenant-one.check   DEBUG    Checking for changes needed by <Change 0x7f2111f90c88 1,1>:
+2018-03-19 16:04:05,006 zuul.Pipeline.tenant-one.check   DEBUG      No changes needed
+2018-03-19 16:04:05,006 zuul.Pipeline.tenant-one.check   DEBUG    <QueueItem 0x7f2111f96780 for <Change 0x7f2111f90c88 1,1> in check> is a failing item because ['at least one job failed']
+2018-03-19 16:04:05,007 zuul.Pipeline.tenant-one.check   DEBUG    Finished queue processor: check (changed: False)
+2018-03-19 16:04:05,007 zuul.Scheduler                   DEBUG    Run handler sleeping
+2018-03-19 16:04:05,007 zuul.test                        DEBUG    <FakeBuild check:data-return-relative 1,1> is running
+2018-03-19 16:04:05,009 zuul.ExecutorServer              DEBUG    Sent SIGTERM to SSH Agent, {'SSH_AUTH_SOCK': '/tmp/ssh-lxLJBiO2RMbp/agent.10121', 'SSH_AGENT_PID': '10123'}
+2018-03-19 16:04:05,020 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible output terminated
+2018-03-19 16:04:05,020 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible exit code: 2
+2018-03-19 16:04:05,020 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Stopped disk job killer
+2018-03-19 16:04:05,020 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Ansible complete, result RESULT_NORMAL code 2
+2018-03-19 16:04:05,021 zuul.AnsibleJob                  DEBUG    [build: 014b8d97229047acbe8f7b7ea4ed97ee] Sending result: {"data": {}, "result": "FAILURE"}
+2018-03-19 16:04:05,021 gear.Connection.b'Zuul Executor Server' INFO     Sending packet to <gear.Connection 0x7f210df0ad30 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111fcce80 type: WORK_COMPLETE handle: b'H:127.0.0.1:5'>
+2018-03-19 16:04:05,021 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2160 name: b'Zuul Executor Server' host: 127.0.0.1 port: 44196>: <gear.Packet 0x7f2111fcce80 type: WORK_COMPLETE handle: b'H:127.0.0.1:5'>
+2018-03-19 16:04:05,021 gear.Client.b'Zuul Executor Client' INFO     Received packet from <gear.Connection 0x7f210de8d7b8 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f2111fcce80 type: WORK_COMPLETE handle: b'H:127.0.0.1:5'>
+2018-03-19 16:04:05,021 zuul.ExecutorClient              INFO     Build <gear.Job 0x7f2111f2a0f0 handle: b'H:127.0.0.1:5' name: executor:execute unique: 014b8d97229047acbe8f7b7ea4ed97ee> complete, result FAILURE
+2018-03-19 16:04:05,021 zuul.Scheduler                   DEBUG    Run handler awake
+2018-03-19 16:04:05,021 zuul.Scheduler                   DEBUG    Fetching result event
+2018-03-19 16:04:05,021 zuul.Scheduler                   DEBUG    Processing result event <zuul.scheduler.BuildCompletedEvent object at 0x7f2111f90f98>
+2018-03-19 16:04:05,022 zuul.nodepool                    INFO     Returning nodeset <NodeSet OrderedDict()OrderedDict()>
+2018-03-19 16:04:05,022 zuul.Pipeline.tenant-one.check   DEBUG    Build <Build 014b8d97229047acbe8f7b7ea4ed97ee of data-return-relative on <Worker wilddog>> of <Change 0x7f2111f90c88 1,1> completed
+2018-03-19 16:04:05,022 zuul.Pipeline.tenant-one.check   DEBUG    Item <QueueItem 0x7f2111f96780 for <Change 0x7f2111f90c88 1,1> in check> status is now:
+ Project org/project change 1,1 based on None
+  data-return: FAILURE
+  data-return-relative: FAILURE
+  child: SKIPPED
+
+2018-03-19 16:04:05,022 zuul.Pipeline.tenant-one.check   DEBUG    Starting queue processor: check
+2018-03-19 16:04:05,022 zuul.Pipeline.tenant-one.check   DEBUG    Checking for changes needed by <Change 0x7f2111f90c88 1,1>:
+2018-03-19 16:04:05,022 zuul.Pipeline.tenant-one.check   DEBUG      No changes needed
+2018-03-19 16:04:05,022 zuul.Pipeline.tenant-one.check   DEBUG    Reporting change <Change 0x7f2111f90c88 1,1>
+2018-03-19 16:04:05,022 zuul.Pipeline.tenant-one.check   INFO     Reporting item <QueueItem 0x7f2111f96780 for <Change 0x7f2111f90c88 1,1> in check>, actions: [<zuul.driver.gerrit.gerritreporter.GerritReporter object at 0x7f2111f7c320>]
+2018-03-19 16:04:05,022 zuul.GerritReporter              DEBUG    Report change <Change 0x7f2111f90c88 1,1>, params {'Verified': -1}, message: Build failed.
+
+- data-return finger://wilddog/11596eb9dfd24e1faf44657cda2caa2b : FAILURE in 1s
+- data-return-relative finger://wilddog/014b8d97229047acbe8f7b7ea4ed97ee : FAILURE in 1s
+- child child : SKIPPED
+
+2018-03-19 16:04:05,027 zuul.Pipeline.tenant-one.check   DEBUG    Removing change <Change 0x7f2111f90c88 1,1> from queue
+2018-03-19 16:04:05,028 zuul.Pipeline.tenant-one.check   DEBUG    <QueueItem 0x7f2111f96780 for <Change 0x7f2111f90c88 1,1> in check> is a failing item because ['at least one job failed']
+2018-03-19 16:04:05,028 zuul.Pipeline.tenant-one.check   DEBUG    Finished queue processor: check (changed: True)
+2018-03-19 16:04:05,028 zuul.Pipeline.tenant-one.check   DEBUG    Starting queue processor: check
+2018-03-19 16:04:05,028 zuul.Pipeline.tenant-one.check   DEBUG    Finished queue processor: check (changed: False)
+2018-03-19 16:04:05,028 zuul.Scheduler                   DEBUG    Run handler sleeping
+2018-03-19 16:04:05,028 zuul.test                        DEBUG    014b8d97229047acbe8f7b7ea4ed97ee is not finalized
+2018-03-19 16:04:05,028 zuul.ExecutorServer              DEBUG    Sent SIGTERM to SSH Agent, {'SSH_AUTH_SOCK': '/tmp/ssh-t2uJadMSVjbT/agent.10124', 'SSH_AGENT_PID': '10125'}
+2018-03-19 16:04:05,128 zuul.test                        DEBUG    ...settled.
+2018-03-19 16:04:05,129 zuul.test                        ERROR    Completed build: <Completed build, result: FAILURE name: data-return uuid: 11596eb9dfd24e1faf44657cda2caa2b changes: 1,1 ref: refs/changes/1/1/1>
+2018-03-19 16:04:05,129 zuul.test                        ERROR    Completed build: <Completed build, result: FAILURE name: data-return-relative uuid: 014b8d97229047acbe8f7b7ea4ed97ee changes: 1,1 ref: refs/changes/1/1/1>
+2018-03-19 16:04:05,129 zuul.test                        ERROR    No completed builds
+2018-03-19 16:04:05,134 zuul.test                        DEBUG    Assert final state
+2018-03-19 16:04:05,175 zuul.test                        DEBUG    Shutting down after tests
+2018-03-19 16:04:05,175 zuul.ExecutorServer              DEBUG    Releasing build None (0)
+2018-03-19 16:04:05,175 zuul.ExecutorServer              DEBUG    Done releasing builds None (0)
+2018-03-19 16:04:05,175 zuul.ExecutorClient              DEBUG    Stopping
+2018-03-19 16:04:05,176 gear.Connection.b'Zuul Executor Client' INFO     Disconnected from 127.0.0.1 port 39641
+2018-03-19 16:04:05,176 zuul.ExecutorClient              DEBUG    Stopped
+2018-03-19 16:04:05,176 gear.Server                      INFO     Marking <gear.ServerConnection 0x7f210de8de48 name: None host: 127.0.0.1 port: 44198> as disconnected
+2018-03-19 16:04:05,176 gear.Connection.b'Zuul Merge Client' INFO     Disconnected from 127.0.0.1 port 39641
+2018-03-19 16:04:05,177 gear.Server                      INFO     Marking <gear.ServerConnection 0x7f210de8d898 name: None host: 127.0.0.1 port: 44200> as disconnected
+2018-03-19 16:04:05,177 zuul.ExecutorServer              DEBUG    Stopping
+2018-03-19 16:04:05,177 gear.Connection.b'Zuul Executor Merger' INFO     Sending packet to <gear.Connection 0x7f210deb2438 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210c256eb8 type: RESET_ABILITIES>
+2018-03-19 16:04:05,177 gear.Connection.b'Zuul Executor Server' INFO     Sending packet to <gear.Connection 0x7f210df0ad30 host: 127.0.0.1 port: 39641>: <gear.Packet 0x7f210df0a3c8 type: RESET_ABILITIES>
+2018-03-19 16:04:05,177 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2128 name: b'Zuul Executor Merger' host: 127.0.0.1 port: 44194>: <gear.Packet 0x7f210df0ae80 type: RESET_ABILITIES>
+2018-03-19 16:04:05,177 gear.Server                      INFO     Received packet from <gear.ServerConnection 0x7f210deb2160 name: b'Zuul Executor Server' host: 127.0.0.1 port: 44196>: <gear.Packet 0x7f210df0ad68 type: RESET_ABILITIES>
+2018-03-19 16:04:05,178 zuul.CommandSocket               DEBUG    Accepted socket connection <socket.socket fd=28, family=AddressFamily.AF_UNIX, type=SocketKind.SOCK_STREAM, proto=0, laddr=/tmp/tmpf2lzro20/zuul-test/executor.socket>
+2018-03-19 16:04:05,178 zuul.CommandSocket               DEBUG    Received b'_stop' from socket
+2018-03-19 16:04:05,178 gear.Connection.b'Zuul Executor Merger' INFO     Disconnected from 127.0.0.1 port 39641
+2018-03-19 16:04:05,178 gear.Server                      INFO     Marking <gear.ServerConnection 0x7f210deb2128 name: b'Zuul Executor Merger' host: 127.0.0.1 port: 44194> as disconnected
+2018-03-19 16:04:05,179 gear.Server                      INFO     Marking <gear.ServerConnection 0x7f210deb2160 name: b'Zuul Executor Server' host: 127.0.0.1 port: 44196> as disconnected
+2018-03-19 16:04:05,179 gear.Connection.b'Zuul Executor Server' INFO     Disconnected from 127.0.0.1 port 39641
+2018-03-19 16:04:05,179 zuul.ExecutorServer              DEBUG    Stopped
+2018-03-19 16:04:05,179 zuul.test.FakeGerritConnection   DEBUG    Stopping Gerrit Connection/Watchers
+2018-03-19 16:04:05,179 apscheduler.scheduler            INFO     Scheduler has been shut down
+2018-03-19 16:04:05,179 apscheduler.scheduler            DEBUG    Looking for jobs to run
+2018-03-19 16:04:05,179 apscheduler.scheduler            DEBUG    No jobs; waiting until a job is added
+2018-03-19 16:04:05,180 zuul.RPCListener                 DEBUG    Stopping
+2018-03-19 16:04:05,180 zuul.Scheduler                   DEBUG    Run handler stopping
+2018-03-19 16:04:05,180 gear.Connection.b'Zuul RPC Listener' INFO     Disconnected from 127.0.0.1 port 39641
+2018-03-19 16:04:05,180 gear.Server                      INFO     Marking <gear.ServerConnection 0x7f210c1e0828 name: b'Zuul RPC Listener' host: 127.0.0.1 port: 44206> as disconnected
+2018-03-19 16:04:05,180 zuul.RPCListener                 DEBUG    Stopped
+2018-03-19 16:04:05,180 zuul.CommandSocket               DEBUG    Accepted socket connection <socket.socket fd=45, family=AddressFamily.AF_UNIX, type=SocketKind.SOCK_STREAM, proto=0, laddr=/tmp/tmpf2lzro20/zuul-test/scheduler.socket>
+2018-03-19 16:04:05,180 zuul.CommandSocket               DEBUG    Received b'_stop' from socket
+2018-03-19 16:04:05,180 gear.Server                      INFO     Marking <gear.ServerConnection 0x7f210deb2e80 name: None host: 127.0.0.1 port: 44192> as disconnected
+2018-03-19 16:04:05,180 gear.Connection.b'unknown'       INFO     Disconnected from 127.0.0.1 port 39641
+2018-03-19 16:04:05,283 zuul.zk.ZooKeeper                DEBUG    ZooKeeper connection: LOST
+2018-03-19 16:04:05,283 zuul.test                        DEBUG    Build history:
+2018-03-19 16:04:05,284 zuul.test                        DEBUG    <Completed build, result: FAILURE name: data-return uuid: 11596eb9dfd24e1faf44657cda2caa2b changes: 1,1 ref: refs/changes/1/1/1>
+2018-03-19 16:04:05,284 zuul.test                        DEBUG    <Completed build, result: FAILURE name: data-return-relative uuid: 014b8d97229047acbe8f7b7ea4ed97ee changes: 1,1 ref: refs/changes/1/1/1>
+======================================================================
+FAIL: tests.unit.test_v3.TestDataReturn.test_data_return
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/shrews/Devel/git/openstack-infra/zuul/tests/unit/test_v3.py", line 2312, in test_data_return
+    ], ordered=False)
+  File "/home/shrews/Devel/git/openstack-infra/zuul/tests/base.py", line 2676, in assertHistory
+    self.assertEqual(len(self.history), len(history))
+  File "/home/shrews/Devel/git/openstack-infra/zuul/.tox/py35/lib/python3.5/site-packages/testtools/testcase.py", line 411, in assertEqual
+    self.assertThat(observed, matcher, message)
+  File "/home/shrews/Devel/git/openstack-infra/zuul/.tox/py35/lib/python3.5/site-packages/testtools/testcase.py", line 498, in assertThat
+    raise mismatch_error
+testtools.matchers._impl.MismatchError: 2 != 3
+
+Ran 1 test in 2.551s
+FAILED (failures=1)
