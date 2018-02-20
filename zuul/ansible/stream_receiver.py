@@ -20,8 +20,9 @@ import json
 import os
 import socketserver
 import struct
-import threading
+import multiprocessing
 
+from zuul.ansible import logconfig
 
 class LogRecordStreamHandler(socketserver.StreamRequestHandler):
     """Handler for a streaming logging request.
@@ -49,8 +50,12 @@ class LogRecordStreamHandler(socketserver.StreamRequestHandler):
             if obj['levelno'] is None:
                 continue
             record = logging.makeLogRecord(obj)
-            record.msg = '%s | %s | %s' % (
-                record.ts, self.server.host, record.msg)
+            if record.host:
+                record.msg = '%s | %s | %s' % (
+                    record.ts, record.host, record.msg)
+            else:
+                record.msg = '%s | %s' % (
+                    record.ts, record.msg)
             # TODO(mordred) Deal with ts= in the extras as well as adding
             # self.server.host to the front of the line.
             log.handle(record)
@@ -61,29 +66,26 @@ class LogRecordSocketReceiver(socketserver.ThreadingUnixStreamServer):
     Simple TCP socket-based logging receiver suitable for testing.
     """
 
-    def __init__(self, host):
-        self.host = host
-        self.path = os.path.join(
-            os.path.abspath(os.path.curdir),
-            '{host}.sock'.format(host=host))
+    def __init__(self, path):
+        self.path = path
         socketserver.ThreadingUnixStreamServer.__init__(
             self, self.path, LogRecordStreamHandler)
 
 
-class StreamReceiver(threading.Thread):
+class StreamReceiver(multiprocessing.Process):
 
-    def __init__(self, host=None, port=0):
+    def __init__(self, build, path, config):
         super(StreamReceiver, self).__init__(
-            name='zuul-stream-{host}'.format(host=host))
-        self.server = LogRecordSocketReceiver(host=host)
+            name='zuul-stream-{build}'.format(build=build))
+        self.path = path
+        self.config = config
+        self.server = None
 
     def get_path(self):
-        return self.server.path
+        return self.path
 
     def run(self):
+        logging_config = logconfig.load_job_config(self.config)
+        logging_config.apply()
+        self.server = LogRecordSocketReceiver(path)
         self.server.serve_forever()
-
-    def stop(self):
-        self.server.shutdown()
-        self.server.server_close()
-        os.unlink(self.server.path)

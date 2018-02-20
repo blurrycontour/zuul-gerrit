@@ -145,12 +145,16 @@ from ansible.module_utils._text import to_native, to_bytes, to_text
 
 class JsonSocketHandler(logging.handlers.SocketHandler):
 
-    def __init__(self, host, port):
+    def __init__(self, host, port, hostname=None):
+        # host and port are the address of the remote receiver,
+        # hostname is the address of this host, to identify it in
+        # multiplexed logs
         super(JsonSocketHandler, self).__init__(host, port)
         if port is None:
             self.address = host
         else:
             self.address = (host, port)
+        self.hostname = hostname
 
     def makePickle(self, record):
         """Encode the log message to send over the wire.
@@ -165,7 +169,7 @@ class JsonSocketHandler(logging.handlers.SocketHandler):
         d = dict(record.__dict__)
         # Issue #25685: delete 'message' if present: redundant with 'msg'
         d.pop('message', None)
-
+        d['host'] = self.hostname
         payload = json.dumps(d).encode('utf-8')
         prefix = struct.pack('>L', len(payload))
         return prefix + payload
@@ -518,6 +522,7 @@ def main():
             warn = dict(type='bool', default=True),
             environ = dict(type='dict', default=None),
             zuul_log_path = dict(type='str', default=None),
+            zuul_log_host = dict(type='str', default=None),
         )
     )
 
@@ -531,11 +536,13 @@ def main():
     environ = module.params['environ']
 
     zuul_log_path = module.params.pop('zuul_log_path')
+    zuul_log_host = module.params.pop('zuul_log_host')
     if zuul_log_path:
         zuulLogger = logging.getLogger('zuul.executor.ansible')
         zuulLogger.setLevel(logging.DEBUG)
         # SocketHandler uses host with no port to mean 'use unix socket'
-        socketHandler = JsonSocketHandler(host=zuul_log_path, port=None)
+        socketHandler = JsonSocketHandler(host=zuul_log_path, port=None,
+                                          hostname=zuul_log_host)
         zuulLogger.addHandler(socketHandler)
 
     if args.strip() == '':
