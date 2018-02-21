@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_d884ead5",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 292,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-02-21T04:59:50Z",
+      "side": 1,
+      "message": "Here.",
+      "revId": "65b52233ae26da5479e01fcb31349900e2e1d8be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_786d9630",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-02-21T04:59:50Z",
+      "side": 1,
+      "message": "These are global, right?  So we should be able to put them in the ansible directory above.",
+      "revId": "65b52233ae26da5479e01fcb31349900e2e1d8be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_986ae217",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1122,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-02-21T04:59:50Z",
+      "side": 1,
+      "message": "And if we put it in the ansible dir, we would write them when we write the inventory file.",
+      "revId": "65b52233ae26da5479e01fcb31349900e2e1d8be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
