@@ -263,6 +263,7 @@ class JobDirPlaybook(object):
         self.roles = []
         self.roles_path = []
         self.ansible_config = os.path.join(self.root, 'ansible.cfg')
+        self.extra_vars = os.path.join(self.root, 'extra_vars.yaml')
         self.project_link = os.path.join(self.root, 'project')
         self.secrets_root = os.path.join(self.root, 'secrets')
         os.makedirs(self.secrets_root)
@@ -295,6 +296,7 @@ class JobDir(object):
         #     fact-cache/localhost
         #     cp
         #   playbook_0 (mounted in bwrap for each playbook read-only)
+        #     extra_vars.yaml
         #     secrets.yaml
         #     project -> ../trusted/project_0/...
         #     role_0 -> ../trusted/project_0/...
@@ -1115,6 +1117,10 @@ class AnsibleJob(object):
             jobdir_playbook.secrets_content = yaml.safe_dump(
                 secrets, default_flow_style=False)
 
+        with open(jobdir_playbook.extra_vars, 'w') as extra_vars:
+            extra_vars.write(
+                yaml.safe_dump(args['extra_vars'], default_flow_style=False))
+
         self.writeAnsibleConfig(jobdir_playbook)
 
     def checkoutTrustedProject(self, project, branch):
@@ -1577,6 +1583,10 @@ class AnsibleJob(object):
             verbose = '-v'
 
         cmd = ['ansible-playbook', verbose, playbook.path]
+        # NOTE(pabelanger): Order for multiple playbooks is important, with
+        # this setup, extra-vars take priority over secrets, with the same
+        # variable name.
+        cmd.extend(['-e', '@' + playbook.extra_vars])
         if playbook.secrets_content:
             cmd.extend(['-e', '@' + playbook.secrets])
 

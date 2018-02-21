@@ -115,6 +115,8 @@
       vartest_job: vartest_job
       vartest_secret: vartest_job
       vartest_site: vartest_job
+    extra-vars:
+      extravar_foo: bar
     secrets:
       - vartest_site
       - vartest_secret
