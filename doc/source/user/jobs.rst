@@ -82,6 +82,8 @@ order of precedence is:
 
 * Site-wide variables
 
+* Job extra variables
+
 * Secrets
 
 * Job variables
@@ -93,6 +95,11 @@ override its value, and similarly, secrets override job variables of
 the same name which override data returned from parent jobs.  Each of
 the sources is described below.
 
+Extra Variables
+~~~~~~~~~~~~~~~
+
+Any extra variables in the job definition (using the :attr: `job.extra-vars`
+attribute) are available to Ansible but not added into the inventory file.
 
 Job Variables
 ~~~~~~~~~~~~~
