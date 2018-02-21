@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_360aac78",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 725,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-02-21T20:33:47Z",
+      "side": 1,
+      "message": "I\u0027d prefer some really bogus url (e.g. file:///dev/null) which instantaneously returns a clear error in case the user tries to do things like fetch/push with the remote. Using the name could potentially lead to relative path collisions with other repos in the workspace.",
+      "range": {
+        "startLine": 725,
+        "startChar": 30,
+        "endLine": 725,
+        "endChar": 34
+      },
+      "revId": "36239a7e1cc415272a5e0340cab9143fa63b2b85",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
