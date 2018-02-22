@@ -4,7 +4,7 @@
 # not use this file except in compliance with the License. You may obtain
 # a copy of the License at
 #
-#      http://www.apache.org/licenses/LICENSE-2.0
+#      https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
@@ -325,7 +325,7 @@ class TestGithubDriver(ZuulTestCase):
         # We should only have one status for the head sha
         self.assertEqual(1, len(statuses))
         check_status = statuses[0]
-        check_url = ('http://zuul.example.com/status/#%s,%s' %
+        check_url = ('https://zuul.example.com/status/#%s,%s' %
                      (A.number, A.head_sha))
         self.assertEqual('tenant-one/check', check_status['context'])
         self.assertEqual('check status: pending',
@@ -341,7 +341,7 @@ class TestGithubDriver(ZuulTestCase):
         statuses = self.fake_github.getCommitStatuses(project, A.head_sha)
         self.assertEqual(2, len(statuses))
         check_status = statuses[0]
-        check_url = ('http://zuul.example.com/status/#%s,%s' %
+        check_url = ('https://zuul.example.com/status/#%s,%s' %
                      (A.number, A.head_sha))
         self.assertEqual('tenant-one/check', check_status['context'])
         self.assertEqual('check status: success',
@@ -376,7 +376,7 @@ class TestGithubDriver(ZuulTestCase):
         self.assertEqual('success', report_status['state'])
         self.assertEqual(2, len(A.comments))
 
-        base = 'http://logs.example.com/tenant-one/reporting/%s/%s/' % (
+        base = 'https://logs.example.com/tenant-one/reporting/%s/%s/' % (
             A.project, A.number)
 
         # Deconstructing the URL because we don't save the BuildSet UUID
@@ -521,7 +521,7 @@ class TestGithubDriver(ZuulTestCase):
         # We should only have one status for the head sha
         self.assertEqual(1, len(statuses))
         check_status = statuses[0]
-        check_url = ('http://zuul.example.com/status/#%s,%s' %
+        check_url = ('https://zuul.example.com/status/#%s,%s' %
                      (A.number, A.head_sha))
         self.assertEqual('tenant-one/check', check_status['context'])
         self.assertEqual('check status: pending', check_status['description'])
@@ -536,7 +536,7 @@ class TestGithubDriver(ZuulTestCase):
         statuses = self.fake_github.getCommitStatuses(project, A.head_sha)
         self.assertEqual(2, len(statuses))
         check_status = statuses[0]
-        check_url = ('http://zuul.example.com/status/#%s,%s' %
+        check_url = ('https://zuul.example.com/status/#%s,%s' %
                      (A.number, A.head_sha))
         self.assertEqual('tenant-one/check', check_status['context'])
         self.assertEqual('success', check_status['state'])

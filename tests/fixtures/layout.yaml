@@ -27,7 +27,7 @@ pipelines:
 
   - name: gate
     manager: dependent
-    failure-message: Build failed.  For information on how to proceed, see http://wiki.example.org/Test_Failures
+    failure-message: Build failed.  For information on how to proceed, see https://wiki.example.org/Test_Failures
     source:
       gerrit
     trigger:
@@ -88,7 +88,7 @@ pipelines:
 
   - name: conflict
     manager: dependent
-    failure-message: Build failed.  For information on how to proceed, see http://wiki.example.org/Test_Failures
+    failure-message: Build failed.  For information on how to proceed, see https://wiki.example.org/Test_Failures
     source:
       gerrit
     trigger:

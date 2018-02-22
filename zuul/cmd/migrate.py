@@ -6,7 +6,7 @@
 # not use this file except in compliance with the License. You may obtain
 # a copy of the License at
 #
-#      http://www.apache.org/licenses/LICENSE-2.0
+#      https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
@@ -221,7 +221,7 @@ def normalize_project_expansions():
 
 
 # from :
-# http://stackoverflow.com/questions/8640959/how-can-i-control-what-scalar-form-pyyaml-uses-for-my-data  flake8: noqa
+# https://stackoverflow.com/questions/8640959/how-can-i-control-what-scalar-form-pyyaml-uses-for-my-data  flake8: noqa
 def should_use_block(value):
     for c in u"\u000a\u000d\u001c\u001d\u001e\u0085\u2028\u2029":
         if c in value:
@@ -640,7 +640,7 @@ class Job:
         #
         # Then there is a success-pattern in layout.yaml that looks like:
         #
-        #     http://{url}/{log_path}/doc/build/html/
+        #     https://{url}/{log_path}/doc/build/html/
         #
         # Which gets reports. There are many variations on that URL. So rather
         # than needing to figure out varying success-urls to report in v3,

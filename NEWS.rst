@@ -55,4 +55,4 @@ Since 1.3.0:
   specifies the URL of the git repositories that should be used by
   workers when fetching Zuul refs and is passed to the workers as the
   ZUUL_URL parameter.  It should probably be set to
-  "http://zuul-host-name/p/".
+  "https://zuul-host-name/p/".

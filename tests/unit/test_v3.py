@@ -6,7 +6,7 @@
 # not use this file except in compliance with the License. You may obtain
 # a copy of the License at
 #
-#      http://www.apache.org/licenses/LICENSE-2.0
+#      https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
@@ -2458,10 +2458,10 @@ class TestDataReturn(AnsibleZuulTestCase):
             dict(name='data-return-relative', result='SUCCESS', changes='1,1'),
             dict(name='child', result='SUCCESS', changes='1,1'),
         ], ordered=False)
-        self.assertIn('- data-return http://example.com/test/log/url/',
+        self.assertIn('- data-return https://example.com/test/log/url/',
                       A.messages[-1])
         self.assertIn('- data-return-relative '
-                      'http://example.com/test/log/url/docs/index.html',
+                      'https://example.com/test/log/url/docs/index.html',
                       A.messages[-1])
 
 

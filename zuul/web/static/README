@@ -14,7 +14,7 @@ echo "Fetching angular..."
 curl -L --silent https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js > $DEST_DIR/js/angular.min.js
 
 echo "Fetching jquery..."
-curl -L --silent http://code.jquery.com/jquery.min.js > $DEST_DIR/js/jquery.min.js
+curl -L --silent https://code.jquery.com/jquery.min.js > $DEST_DIR/js/jquery.min.js
 
 echo "Fetching jquery-visibility..."
 curl -L --silent https://raw.githubusercontent.com/mathiasbynens/jquery-visibility/master/jquery-visibility.js > $DEST_DIR/js/jquery-visibility.js
@@ -53,8 +53,8 @@ Here is an example apache vhost configuration:
   ProxyPassMatch /(.*)/console-stream ws://localhost:9000/$1/console-stream nocanon retry=0
 
   # Then only the json calls are sent to the zuul-web endpoints
-  ProxyPassMatch ^/(.*.json)$ http://localhost:9000/$1 nocanon retry=0
-  ProxyPassReverse / http://localhost:9000/
+  ProxyPassMatch ^/(.*.json)$ https://localhost:9000/$1 nocanon retry=0
+  ProxyPassReverse / https://localhost:9000/
 </VirtualHost>
 
 Then copy the zuul/web/static/ files and external requirements to

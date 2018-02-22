@@ -5,7 +5,7 @@ mkdir -p $DEST_DIR
 echo "Destination: $DEST_DIR"
 
 echo "Fetching jquery.min.js..."
-curl -L --silent http://code.jquery.com/jquery.min.js > $DEST_DIR/jquery.min.js
+curl -L --silent https://code.jquery.com/jquery.min.js > $DEST_DIR/jquery.min.js
 
 echo "Fetching jquery-visibility.min.js..."
 curl -L --silent https://raw.githubusercontent.com/mathiasbynens/jquery-visibility/master/jquery-visibility.js > $DEST_DIR/jquery-visibility.js

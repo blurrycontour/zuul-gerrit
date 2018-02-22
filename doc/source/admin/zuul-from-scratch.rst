@@ -367,7 +367,7 @@ Create a `GitHub application
 * Set Setup URL to your setup documentation, when users install the application
   they are redirected to this url
 * Set Webhook URL to
-  ``http://<IP ADDRESS>/connection/github/payload``.
+  ``https://<IP ADDRESS>/connection/github/payload``.
 * Create a Webhook secret, and record it for later use
 * Set permissions:
 

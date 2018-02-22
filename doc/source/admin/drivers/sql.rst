@@ -25,7 +25,7 @@ The connection options for the SQL driver are:
 
       Database connection information in the form of a URI understood
       by SQLAlchemy.  See `The SQLAlchemy manual
-      <http://docs.sqlalchemy.org/en/rel_1_0/core/engines.html#database-urls>`_
+      <https://docs.sqlalchemy.org/en/rel_1_0/core/engines.html#database-urls>`_
       for more information.
 
       The driver will automatically set up the database creating and managing
@@ -40,7 +40,7 @@ The connection options for the SQL driver are:
       :default: 1
 
       Tune the pool_recycle value. See `The SQLAlchemy manual on pooling
-      <http://docs.sqlalchemy.org/en/latest/core/pooling.html#setting-pool-recycle>`_
+      <https://docs.sqlalchemy.org/en/latest/core/pooling.html#setting-pool-recycle>`_
       for more information.
 
    .. attr:: table_prefix

@@ -7,7 +7,7 @@
 # not use this file except in compliance with the License. You may obtain
 # a copy of the License at
 #
-#      http://www.apache.org/licenses/LICENSE-2.0
+#      https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
@@ -105,7 +105,7 @@ class TestWeb(BaseTestWeb):
         self.waitUntilSettled()
 
         req = urllib.request.Request(
-            "http://localhost:%s/tenant-one/status" % self.port)
+            "https://localhost:%s/tenant-one/status" % self.port)
         f = urllib.request.urlopen(req)
         headers = f.info()
         self.assertIn('Content-Length', headers)
@@ -197,13 +197,13 @@ class TestWeb(BaseTestWeb):
     def test_web_bad_url(self):
         # do we 404 correctly
         req = urllib.request.Request(
-            "http://localhost:%s/status/foo" % self.port)
+            "https://localhost:%s/status/foo" % self.port)
         self.assertRaises(urllib.error.HTTPError, urllib.request.urlopen, req)
 
     def test_web_find_change(self):
         # can we filter by change id
         req = urllib.request.Request(
-            "http://localhost:%s/tenant-one/status/change/1,1" % self.port)
+            "https://localhost:%s/tenant-one/status/change/1,1" % self.port)
         f = urllib.request.urlopen(req)
         data = json.loads(f.read().decode('utf8'))
 
@@ -211,7 +211,7 @@ class TestWeb(BaseTestWeb):
         self.assertEqual("org/project", data[0]['project'])
 
         req = urllib.request.Request(
-            "http://localhost:%s/tenant-one/status/change/2,1" % self.port)
+            "https://localhost:%s/tenant-one/status/change/2,1" % self.port)
         f = urllib.request.urlopen(req)
         data = json.loads(f.read().decode('utf8'))
 
@@ -223,14 +223,14 @@ class TestWeb(BaseTestWeb):
             public_pem = f.read()
 
         req = urllib.request.Request(
-            "http://localhost:%s/tenant-one/org/project.pub" %
+            "https://localhost:%s/tenant-one/org/project.pub" %
             self.port)
         f = urllib.request.urlopen(req)
         self.assertEqual(f.read(), public_pem)
 
     def test_web_404_on_unknown_tenant(self):
         req = urllib.request.Request(
-            "http://localhost:{}/non-tenant/status".format(self.port))
+            "https://localhost:{}/non-tenant/status".format(self.port))
         e = self.assertRaises(
             urllib.error.HTTPError, urllib.request.urlopen, req)
         self.assertEqual(404, e.code)
@@ -248,13 +248,13 @@ class TestInfo(BaseTestWeb):
 
     def test_info(self):
         req = urllib.request.Request(
-            "http://localhost:%s/info" % self.port)
+            "https://localhost:%s/info" % self.port)
         f = urllib.request.urlopen(req)
         info = json.loads(f.read().decode('utf8'))
         self.assertEqual(
             info, {
                 "info": {
-                    "endpoint": "http://localhost:%s" % self.port,
+                    "endpoint": "https://localhost:%s" % self.port,
                     "capabilities": {
                         "job_history": False
                     },
@@ -269,13 +269,13 @@ class TestInfo(BaseTestWeb):
 
     def test_tenant_info(self):
         req = urllib.request.Request(
-            "http://localhost:%s/tenant-one/info" % self.port)
+            "https://localhost:%s/tenant-one/info" % self.port)
         f = urllib.request.urlopen(req)
         info = json.loads(f.read().decode('utf8'))
         self.assertEqual(
             info, {
                 "info": {
-                    "endpoint": "http://localhost:%s" % self.port,
+                    "endpoint": "https://localhost:%s" % self.port,
                     "tenant": "tenant-one",
                     "capabilities": {
                         "job_history": False

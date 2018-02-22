@@ -11,7 +11,7 @@ Detailed information on testing can be found here: https://wiki.openstack.org/wi
 *Install pip*::
 
   [apt-get | yum] install python-pip
-More information on pip here: http://www.pip-installer.org/en/latest/
+More information on pip here: https://www.pip-installer.org/en/latest/
 
 *Use pip to install tox*::
 
@@ -36,7 +36,7 @@ Run The Tests
 Note: completing this command may take a long time (depends on system resources)
 also, you might not see any output until tox is complete.
 
-Information about tox can be found here: http://testrun.org/tox/latest/
+Information about tox can be found here: https://testrun.org/tox/latest/
 
 
 Run The Tests in One Environment

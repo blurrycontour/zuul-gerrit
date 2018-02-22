@@ -7,7 +7,7 @@
 # not use this file except in compliance with the License. You may obtain
 # a copy of the License at
 #
-#      http://www.apache.org/licenses/LICENSE-2.0
+#      https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
@@ -938,7 +938,7 @@ class FakeGithubPullRequest(object):
             'sha': self.head_sha,
             'name': self.project,
             'description': 'Test results for %s: %s' % (self.head_sha, state),
-            'target_url': 'http://zuul/%s' % self.head_sha,
+            'target_url': 'https://zuul/%s' % self.head_sha,
             'branches': [],
             'context': context,
             'sender': {
@@ -1025,7 +1025,7 @@ class FakeGithubConnection(githubconnection.GithubConnection):
 
         if use_zuulweb:
             req = urllib.request.Request(
-                'http://127.0.0.1:%s/connection/%s/payload'
+                'https://127.0.0.1:%s/connection/%s/payload'
                 % (self.zuul_web_port, self.connection_name),
                 data=payload, headers=headers)
             return urllib.request.urlopen(req)

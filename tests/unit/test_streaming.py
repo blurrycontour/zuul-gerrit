@@ -6,7 +6,7 @@
 # not use this file except in compliance with the License. You may obtain
 # a copy of the License at
 #
-#      http://www.apache.org/licenses/LICENSE-2.0
+#      https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
@@ -159,7 +159,7 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
 
     def runWSClient(self, build_uuid, event):
         async def client(loop, build_uuid, event):
-            uri = 'http://[::1]:9000/tenant-one/console-stream'
+            uri = 'https://[::1]:9000/tenant-one/console-stream'
             try:
                 session = aiohttp.ClientSession(loop=loop)
                 async with session.ws_connect(uri) as ws:

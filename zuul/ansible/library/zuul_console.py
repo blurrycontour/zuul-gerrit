@@ -13,7 +13,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this software.  If not, see <http://www.gnu.org/licenses/>.
+# along with this software.  If not, see <https://www.gnu.org/licenses/>.
 
 import glob
 import os
@@ -31,7 +31,7 @@ LOG_STREAM_PORT = 19885
 def daemonize():
     # A really basic daemonize method that should work well enough for
     # now in this circumstance. Based on the public domain code at:
-    # http://web.archive.org/web/20131017130434/http://www.jejik.com/articles/2007/02/a_simple_unix_linux_daemon_in_python/
+    # https://web.archive.org/web/20131017130434/https://www.jejik.com/articles/2007/02/a_simple_unix_linux_daemon_in_python/
 
     pid = os.fork()
     if pid > 0:

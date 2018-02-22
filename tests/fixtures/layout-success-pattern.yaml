@@ -10,9 +10,9 @@ pipelines:
 
 jobs:
   - name: docs-draft-test
-    success-pattern: http://docs-draft.example.org/{build.parameters[LOG_PATH]}/publish-docs/
+    success-pattern: https://docs-draft.example.org/{build.parameters[LOG_PATH]}/publish-docs/
   - name: docs-draft-test2
-    success-pattern: http://docs-draft.example.org/{NOPE}/{build.parameters[BAD]}/publish-docs/
+    success-pattern: https://docs-draft.example.org/{NOPE}/{build.parameters[BAD]}/publish-docs/
 
 projects:
   - name: org/docs
