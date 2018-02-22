@@ -1051,6 +1051,8 @@ class Scheduler(threading.Thread):
         except Exception:
             self.log.exception("Unable to process autohold for %s:",
                                autohold_key)
+            self.log.debug("Unable to process autohold for build %s",
+                           build)
             if autohold_key in self.autohold_requests:
                 self.log.debug("Removing autohold %s due to exception",
                                autohold_key)
