@@ -36,7 +36,7 @@ extensions = [
     'zuul.sphinx.zuul',
 ]
 #extensions = ['sphinx.ext.intersphinx']
-#intersphinx_mapping = {'python': ('http://docs.python.org/2.7', None)}
+#intersphinx_mapping = {'python': ('https://docs.python.org/2.7', None)}
 
 primary_domain = 'zuuldoc'
 

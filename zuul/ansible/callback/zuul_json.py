@@ -12,7 +12,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
+# along with Ansible.  If not, see <https://www.gnu.org/licenses/>.
 
 # Copy of github.com/ansible/ansible/lib/ansible/plugins/callback/json.py
 # We need to run as a secondary callback not a stdout and we need to control

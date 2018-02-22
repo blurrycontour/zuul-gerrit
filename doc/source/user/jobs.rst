@@ -562,7 +562,7 @@ To set the log URL for a build, use *zuul_return* to set the
     - zuul_return:
         data:
           zuul:
-            log_url: http://logs.example.com/path/to/build/logs
+            log_url: https://logs.example.com/path/to/build/logs
 
 Any values other than those in the ``zuul`` hierarchy will be supplied
 as Ansible variables to child jobs.  These variables have less

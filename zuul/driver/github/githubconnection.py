@@ -4,7 +4,7 @@
 # not use this file except in compliance with the License. You may obtain
 # a copy of the License at
 #
-#      http://www.apache.org/licenses/LICENSE-2.0
+#      https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
@@ -475,8 +475,8 @@ class GithubConnection(BaseConnection):
         # the cache-control header containing max-age. This way we force
         # cachecontrol to only rely on the etag headers.
         #
-        # http://cachecontrol.readthedocs.io/en/latest/etags.html
-        # http://cachecontrol.readthedocs.io/en/latest/custom_heuristics.html
+        # https://cachecontrol.readthedocs.io/en/latest/etags.html
+        # https://cachecontrol.readthedocs.io/en/latest/custom_heuristics.html
         class NoAgeHeuristic(BaseHeuristic):
             def update_headers(self, response):
                 if 'cache-control' in response.headers:
@@ -529,7 +529,7 @@ class GithubConnection(BaseConnection):
             github = github3.GitHub()
 
         # anything going through requests to http/s goes through cache
-        github.session.mount('http://', self.cache_adapter)
+        github.session.mount('https://', self.cache_adapter)
         github.session.mount('https://', self.cache_adapter)
         # Add properties to store project and user for logging later
         github._zuul_project = None

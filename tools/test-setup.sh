@@ -39,10 +39,10 @@ mysql -u $DB_USER -p$DB_PW -h 127.0.0.1 -e "
 
 # TODO(pabelanger): Move this into bindep after we figure out how to enable our
 # PPA.
-# NOTE(pabelanger): Avoid hitting http://keyserver.ubuntu.com
+# NOTE(pabelanger): Avoid hitting https://keyserver.ubuntu.com
 sudo apt-key add $TOOLSDIR/018D05F5.gpg
 LSBDISTCODENAME=$(lsb_release -cs)
-echo "deb http://ppa.launchpad.net/openstack-ci-core/bubblewrap/ubuntu $LSBDISTCODENAME main" | \
+echo "deb https://ppa.launchpad.net/openstack-ci-core/bubblewrap/ubuntu $LSBDISTCODENAME main" | \
     sudo tee /etc/apt/sources.list.d/openstack-ci-core-ubuntu-bubblewrap-xenial.list
 sudo apt-get update
 sudo apt-get --assume-yes install bubblewrap

@@ -48,7 +48,7 @@ companion program, Nodepool.  The intent is for Zuul to become more
 generally useful outside of the OpenStack community.  This is the best
 way to get started with this effort:
 
-1) Read the Zuul v3 spec: http://specs.openstack.org/openstack-infra/infra-specs/specs/zuulv3.html
+1) Read the Zuul v3 spec: https://specs.openstack.org/openstack-infra/infra-specs/specs/zuulv3.html
 
    We use specification documents like this to describe large efforts
    where we want to make sure that all the participants are in
@@ -61,14 +61,14 @@ way to get started with this effort:
    most work is simply done with patches (and revised if necessary in
    code review).
 
-2) Read the Nodepool build-workers spec: http://specs.openstack.org/openstack-infra/infra-specs/specs/nodepool-zookeeper-workers.html
+2) Read the Nodepool build-workers spec: https://specs.openstack.org/openstack-infra/infra-specs/specs/nodepool-zookeeper-workers.html
 
 3) Review any proposed updates to these specs: https://review.openstack.org/#/q/status:open+project:openstack-infra/infra-specs+topic:zuulv3
 
    Some of the information in the specs may be effectively superceded
    by changes here, which are still undergoing review.
 
-4) Read developer documentation on the internal data model and testing: http://docs.openstack.org/infra/zuul/developer.html
+4) Read developer documentation on the internal data model and testing: https://docs.openstack.org/infra/zuul/developer.html
 
    The general philosophy for Zuul tests is to perform functional
    testing of either the individual component or the entire end-to-end

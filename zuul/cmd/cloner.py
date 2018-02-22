@@ -7,7 +7,7 @@
 # not use this file except in compliance with the License. You may obtain
 # a copy of the License at
 #
-#      http://www.apache.org/licenses/LICENSE-2.0
+#      https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
@@ -115,7 +115,7 @@ class Cloner(zuul.cmd.ZuulApp):
             logging.basicConfig(level=logging.INFO)
 
         if color:
-            # Color codes http://www.tldp.org/HOWTO/Bash-Prompt-HOWTO/x329.html
+            # Color codes https://www.tldp.org/HOWTO/Bash-Prompt-HOWTO/x329.html
             logging.addLevelName(  # cyan
                 logging.DEBUG, "\033[36m%s\033[0m" %
                 logging.getLevelName(logging.DEBUG))
