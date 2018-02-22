@@ -22,6 +22,30 @@
       "revId": "879e2f9d023dbbf39cd258f56446bbcad72124e4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_7c1ec35f",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2018-02-22T13:42:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa0c359_71e6ecb2",
+      "range": {
+        "startLine": 398,
+        "startChar": 8,
+        "endLine": 398,
+        "endChar": 50
+      },
+      "revId": "879e2f9d023dbbf39cd258f56446bbcad72124e4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
