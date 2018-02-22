@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_0bb5fb31",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-02-22T11:33:05Z",
+      "side": 1,
+      "message": "What\u0027s the reason of changing setRefs? I don\u0027t see the place where the new changes use this. Further the cleanup of unlisted paths should not be removed as this can have unwanted side effects. If this method really needs to be changed we need a switch to skip the cleanup.",
+      "range": {
+        "startLine": 242,
+        "startChar": 0,
+        "endLine": 245,
+        "endChar": 43
+      },
+      "revId": "7406b97ff6827c07e49a1beaea6ee80bc8764e11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
