@@ -22,6 +22,30 @@
       "revId": "7406b97ff6827c07e49a1beaea6ee80bc8764e11",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_cb8f1321",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2018-02-22T11:46:37Z",
+      "side": 1,
+      "message": "Otherwise it will delete all remote refs via mergeChanges() -\u003e _mergeItem() -\u003e _restoreRepoState() -\u003e setRefs() -\u003e setRef()\n\nI think I can improve this to only keep the related remotes.",
+      "parentUuid": "3fa0c359_0bb5fb31",
+      "range": {
+        "startLine": 242,
+        "startChar": 0,
+        "endLine": 245,
+        "endChar": 43
+      },
+      "revId": "7406b97ff6827c07e49a1beaea6ee80bc8764e11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
