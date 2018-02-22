@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_71e6ecb2",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-02-22T13:32:44Z",
+      "side": 1,
+      "message": "nit: you might want to explain what is meant by execution context",
+      "range": {
+        "startLine": 398,
+        "startChar": 8,
+        "endLine": 398,
+        "endChar": 50
+      },
+      "revId": "879e2f9d023dbbf39cd258f56446bbcad72124e4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
