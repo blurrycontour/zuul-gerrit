@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import copy
 from zuul.lib.config import get_default
 
 
@@ -22,9 +23,48 @@ def get_statsd_config(config):
     return (statsd_host, statsd_port, statsd_prefix)
 
 
-def get_statsd(config):
+def normalize_statsd_name(name):
+    name = name.replace('.', '_')
+    name = name.replace(':', '_')
+    return name
+
+
+def get_statsd(config, extra_keys=None):
     (statsd_host, statsd_port, statsd_prefix) = get_statsd_config(config)
     if statsd_host is None:
         return None
     import statsd
-    return statsd.StatsClient(statsd_host, statsd_port, statsd_prefix)
+
+    class CustomStatsClient(statsd.StatsClient):
+
+        def __init__(self, host, port, prefix, extra=None):
+            self.extra_keys = copy.copy(extra) or {}
+
+            for key in self.extra_keys:
+                value = normalize_statsd_name(self.extra_keys[key])
+                self.extra_keys[key] = value
+
+            super().__init__(host, port, prefix)
+
+        def _format_stat(self, name, **keys):
+            # we need to normalize all keys which go into the metric name
+            for key in keys.keys():
+                normalized_value = normalize_statsd_name(keys[key])
+                keys[key] = normalized_value
+
+            formatted = name.format(keys)
+            if self.extra_keys:
+                formatted = formatted.format(self.extra_keys)
+
+            return formatted
+
+        def gauge(self, stat, value, rate=1, delta=False, **format_keys):
+            stat = self._format_stat(stat, **format_keys)
+            super().gauge(stat, value, rate, delta)
+
+        def incr(self, stat, count=1, rate=1, **format_keys):
+            stat = self._format_stat(stat, **format_keys)
+            super().incr(stat, count, rate)
+
+    return CustomStatsClient(
+        statsd_host, statsd_port, statsd_prefix, extra_keys)
