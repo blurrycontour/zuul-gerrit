@@ -16,6 +16,24 @@
       "revId": "6ef1d61c25263f6ffd70658ad053316cd572c0ba",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_2a00d101",
+        "filename": "tools/test-logs.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2018-02-23T16:34:22Z",
+      "side": 1,
+      "message": "Intentional because this script can be used to test that as well (but I left functional out so the defaults are not changed)",
+      "parentUuid": "3fa0c359_b0c6f248",
+      "revId": "6ef1d61c25263f6ffd70658ad053316cd572c0ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
