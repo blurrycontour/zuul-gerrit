@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_2ab1b144",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1785,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-02-23T16:00:24Z",
+      "side": 1,
+      "message": "This might be even use the error loglevel as a valid tenant config is mandatory for the zuul operation.",
+      "range": {
+        "startLine": 1785,
+        "startChar": 25,
+        "endLine": 1785,
+        "endChar": 32
+      },
+      "revId": "02c561cf729d632c3229d696105cf5b466e5df3c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
