@@ -69,6 +69,24 @@
       "revId": "bfa32b46d85d8c6af3f57d0c1cc9b3413164884c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_aaeaa170",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-02-23T16:25:44Z",
+      "side": 1,
+      "message": "Within the tests there is no real nodepool running but a fake nodepool.\n\nYou might need to add this key here: https://git.openstack.org/cgit/openstack-infra/zuul/tree/tests/base.py#n1636",
+      "parentUuid": "3fa0c359_7f7f80aa",
+      "revId": "bfa32b46d85d8c6af3f57d0c1cc9b3413164884c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
