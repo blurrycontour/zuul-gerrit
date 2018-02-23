@@ -28,3 +28,9 @@ def get_statsd(config):
         return None
     import statsd
     return statsd.StatsClient(statsd_host, statsd_port, statsd_prefix)
+
+
+def normalize_statsd_name(name):
+    name = name.replace('.', '_')
+    name = name.replace(':', '_')
+    return name
