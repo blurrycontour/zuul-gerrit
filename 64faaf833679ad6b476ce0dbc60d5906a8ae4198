@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_f3bdfdd7",
+        "filename": ".zuul.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-02-23T20:38:46Z",
+      "side": 1,
+      "message": "nit: do you think it would be a good practice to also add the zuul.yaml here? Then the job would also run on zuul.yaml changes which potentially modify this job.",
+      "revId": "64faaf833679ad6b476ce0dbc60d5906a8ae4198",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
