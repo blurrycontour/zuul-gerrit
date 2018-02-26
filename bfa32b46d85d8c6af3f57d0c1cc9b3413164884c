@@ -87,6 +87,24 @@
       "revId": "bfa32b46d85d8c6af3f57d0c1cc9b3413164884c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_6ea24db0",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2018-02-26T13:21:12Z",
+      "side": 1,
+      "message": "Done\n\nThanks for pointing that out!",
+      "parentUuid": "3fa0c359_aaeaa170",
+      "revId": "bfa32b46d85d8c6af3f57d0c1cc9b3413164884c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
