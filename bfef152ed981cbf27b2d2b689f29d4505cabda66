@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa0c359_c351fada",
+        "filename": "yarn.lock",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-02-26T12:18:46Z",
+      "side": 1,
+      "message": "or review... ;)",
+      "revId": "bfef152ed981cbf27b2d2b689f29d4505cabda66",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_430c0aeb",
+        "filename": "zuul/_setup_hook.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-02-26T12:18:46Z",
+      "side": 1,
+      "message": "will this update the javascript stuff when doing pip install -U?",
+      "range": {
+        "startLine": 29,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 59
+      },
+      "revId": "bfef152ed981cbf27b2d2b689f29d4505cabda66",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa0c359_832f723d",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 3244,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-02-26T12:18:46Z",
+      "side": 1,
+      "message": "should that be endpoint?",
+      "range": {
+        "startLine": 3244,
+        "startChar": 12,
+        "endLine": 3244,
+        "endChar": 20
+      },
+      "revId": "bfef152ed981cbf27b2d2b689f29d4505cabda66",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
