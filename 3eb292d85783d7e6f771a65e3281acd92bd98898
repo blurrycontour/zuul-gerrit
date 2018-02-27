@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f9dbf25_610492c7",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1786,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-02-27T12:06:04Z",
+      "side": 1,
+      "message": "Should we also test that once the expiration has passed that the node is released?",
+      "revId": "3eb292d85783d7e6f771a65e3281acd92bd98898",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
