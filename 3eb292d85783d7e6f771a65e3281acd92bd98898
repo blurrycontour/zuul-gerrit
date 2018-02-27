@@ -16,6 +16,24 @@
       "revId": "3eb292d85783d7e6f771a65e3281acd92bd98898",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f9dbf25_c4efb4ae",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1786,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2018-02-27T12:52:24Z",
+      "side": 1,
+      "message": "The release mechanism is handled by Nodepool: http://git.openstack.org/cgit/openstack-infra/nodepool/tree/nodepool/launcher.py#n542\n\nI think it\u0027s enough to make sure the node object has the expected property, especially since the fake Nodepool doesn\u0027t mimic this mechanism.",
+      "parentUuid": "1f9dbf25_610492c7",
+      "revId": "3eb292d85783d7e6f771a65e3281acd92bd98898",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
