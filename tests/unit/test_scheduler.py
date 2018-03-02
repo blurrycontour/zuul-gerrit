@@ -621,7 +621,7 @@ class TestScheduler(ZuulTestCase):
         queue = self.gearman_server.getQueue()
         self.assertEqual(len(self.builds), 0)
         self.assertEqual(len(queue), 1)
-        self.assertEqual(queue[0].name, b'executor:execute')
+        self.assertIn(queue[0].name, b'executor:execute')
         job_args = json.loads(queue[0].arguments.decode('utf8'))
         self.assertEqual(job_args['job'], 'project-merge')
         self.assertEqual(job_args['items'][0]['number'], '%d' % A.number)
