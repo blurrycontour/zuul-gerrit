@@ -121,6 +121,7 @@ class ExecutorClient(object):
         ssl_ca = get_default(self.config, 'gearman', 'ssl_ca')
         self.gearman = ZuulGearmanClient(self)
         self.gearman.addServer(server, port, ssl_key, ssl_cert, ssl_ca)
+        self.zone = get_default(self.config, 'executor', 'zone', 'default')
 
         self.cleanup_thread = GearmanCleanup(self)
         self.cleanup_thread.start()
@@ -274,7 +275,8 @@ class ExecutorClient(object):
             self.sched.onBuildCompleted(build, 'SUCCESS', {})
             return build
 
-        gearman_job = gear.TextJob('executor:execute', json.dumps(params),
+        gearman_job = gear.TextJob(('executor:execute:%s' % self.zone),
+                                   json.dumps(params),
                                    unique=uuid)
         build.__gearman_job = gearman_job
         build.__gearman_worker = None
