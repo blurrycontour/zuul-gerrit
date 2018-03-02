@@ -277,3 +277,31 @@ class WrapperInterface(object, metaclass=abc.ABCMeta):
 
         """
         pass
+
+
+class SensorInterface(object, metaclass=abc.ABCMeta):
+    """The load sensor interface to be implemented by a driver
+
+    A driver which provides load indicators for managing the load
+    on an executor.
+
+    """
+
+    @abc.abstractmethod
+    def isOk(self):
+        """Report if current load is ok for accepting new jobs.
+
+        :returns: Bool, str: True if we can accept new jobs, otherwise False
+                  and a string for the log
+        :rtype: Bool, str
+        """
+        pass
+
+    @abc.abstractmethod
+    def reportStats(self, statsd, base_key):
+        """Report statistics to statsd
+
+        :param statsd: the statsd object to use for reporting
+        :param base_key: the base key to use for reporting
+        """
+        pass
