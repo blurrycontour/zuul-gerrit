@@ -133,6 +133,31 @@ class ExecutorClient(object):
         self.gearman.shutdown()
         self.log.debug("Stopped")
 
+    # TODO(pabelanger): This is copypasta from rpclistner, refactor to be
+    # shared.
+    def getFunctions(self):
+        functions = {}
+        for connection in self.gearman.active_connections:
+            try:
+                req = gear.StatusAdminRequest()
+                connection.sendAdminRequest(req, timeout=300)
+            except Exception:
+                self.log.exception("Exception while listing functions")
+                self.gearman._lostConnection(connection)
+                continue
+            for line in req.response.decode('utf8').split('\n'):
+                parts = [x.strip() for x in line.split('\t')]
+                if len(parts) < 4:
+                    continue
+                # parts[0] - function name
+                # parts[1] - total jobs queued (including building)
+                # parts[2] - jobs building
+                # parts[3] - workers registered
+                data = functions.setdefault(parts[0], [0, 0, 0])
+                for i in range(3):
+                    data[i] += int(parts[i + 1])
+        return functions
+
     def execute(self, job, item, pipeline, dependent_changes=[],
                 merger_items=[]):
         tenant = pipeline.tenant
@@ -306,8 +331,20 @@ class ExecutorClient(object):
             self.sched.onBuildCompleted(build, 'SUCCESS', {}, [])
             return build
 
-        gearman_job = gear.TextJob('executor:execute', json_dumps(params),
-                                   unique=uuid)
+        functions = self.getFunctions()
+        function_name = 'executor:execute'
+        # NOTE(pabelanger): This makes a large assumption, that all nodes in
+        # the list have the same provider and region.
+        _fname = '%s:%s:%s' % (
+            function_name,
+            nodes[0]['provider'],
+            nodes[0]['region'])
+        if _fname in functions.keys():
+            function_name = _fname
+
+        gearman_job = gear.TextJob(
+            function_name, json_dumps(params), unique=uuid)
+
         build.__gearman_job = gearman_job
         build.__gearman_worker = None
         self.builds[uuid] = build
