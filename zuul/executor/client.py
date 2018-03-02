@@ -121,6 +121,7 @@ class ExecutorClient(object):
         ssl_ca = get_default(self.config, 'gearman', 'ssl_ca')
         self.gearman = ZuulGearmanClient(self)
         self.gearman.addServer(server, port, ssl_key, ssl_cert, ssl_ca)
+        self.zone = get_default(self.config, 'executor', 'zone', 'default')
 
         self.cleanup_thread = GearmanCleanup(self)
         self.cleanup_thread.start()
