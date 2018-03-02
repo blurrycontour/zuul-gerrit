@@ -2053,6 +2053,8 @@ class ExecutorServer(object):
         self.merger = self._getMerger(self.merge_root, None)
         self.update_queue = DeduplicateQueue()
 
+        self.zone = get_default(self.config, 'executor', 'zone', 'default')
+
         command_socket = get_default(
             self.config, 'executor', 'command_socket',
             '/var/lib/zuul/executor.socket')
@@ -2177,7 +2179,8 @@ class ExecutorServer(object):
     def register_work(self):
         if self._running:
             self.accepting_work = True
-            self.executor_worker.registerFunction("executor:execute")
+            self.executor_worker.registerFunction("executor:execute:%s" %
+                                                  self.zone)
             # TODO(jeblair): Update geard to send a noop after
             # registering for a job which is in the queue, then remove
             # this API violation.
@@ -2185,7 +2188,8 @@ class ExecutorServer(object):
 
     def unregister_work(self):
         self.accepting_work = False
-        self.executor_worker.unRegisterFunction("executor:execute")
+        self.executor_worker.unRegisterFunction("executor:execute:%s" %
+                                                self.zone)
 
     def stop(self):
         self.log.debug("Stopping")
@@ -2362,8 +2366,9 @@ class ExecutorServer(object):
             if not self._running:
                 job.sendWorkFail()
                 return
-            if job.name == 'executor:execute':
-                self.log.debug("Got execute job: %s" % job.unique)
+            if job.name == ('executor:execute:%s' % self.zone):
+                self.log.debug("Got execute:%s job: %s" %
+                               (self.zone, job.unique))
                 self.executeJob(job)
             elif job.name.startswith('executor:resume'):
                 self.log.debug("Got resume job: %s" % job.unique)
