@@ -65,6 +65,44 @@ class TestSchedulerSSL(SSLZuulTestCase):
                          'label1')
 
 
+class TestSchedulerZone(ZuulTestCase):
+    tenant_config_file = 'config/single-tenant/main.yaml'
+
+    def setup_config(self):
+        super(TestSchedulerZone, self).setup_config()
+        self.config.set('executor', 'zone', 'test-provider')
+
+    def test_jobs_executed(self):
+        "Test that if a change at the head fails, queued jobs are canceled"
+        self.gearman_server.hold_jobs_in_queue = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        queue = self.gearman_server.getQueue()
+        self.assertEqual(len(self.builds), 0)
+        self.assertEqual(len(queue), 1)
+        self.assertEqual(b'executor:execute:test-provider', queue[0].name)
+
+        self.gearman_server.hold_jobs_in_queue = False
+        self.gearman_server.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(self.getJobFromHistory('project-merge').result,
+                         'SUCCESS')
+        self.assertEqual(self.getJobFromHistory('project-test1').result,
+                         'SUCCESS')
+        self.assertEqual(self.getJobFromHistory('project-test2').result,
+                         'SUCCESS')
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(self.getJobFromHistory('project-test1').node,
+                         'label1')
+        self.assertEqual(self.getJobFromHistory('project-test2').node,
+                         'label1')
+
+
 class TestScheduler(ZuulTestCase):
     tenant_config_file = 'config/single-tenant/main.yaml'
 
@@ -641,7 +679,7 @@ class TestScheduler(ZuulTestCase):
         queue = self.gearman_server.getQueue()
         self.assertEqual(len(self.builds), 0)
         self.assertEqual(len(queue), 1)
-        self.assertEqual(queue[0].name, b'executor:execute')
+        self.assertIn(b'executor:execute', queue[0].name)
         job_args = json.loads(queue[0].arguments.decode('utf8'))
         self.assertEqual(job_args['job'], 'project-merge')
         self.assertEqual(job_args['items'][0]['number'], '%d' % A.number)
