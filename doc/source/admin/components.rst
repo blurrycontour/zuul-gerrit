@@ -611,6 +611,15 @@ The following sections of ``zuul.conf`` are used by the executor:
       where it cannot determine its hostname correctly this can be overridden
       here.
 
+   .. attr:: zone
+      :default: None
+
+      This allows for zuul executors to be grouped into zones. As an example,
+      it is possible for nodepool nodes to exist in a cloud with out public
+      accessable IP address. By adding an executor to a zone, and running it
+      with in said cloud, nodepool nodes could be configured to use private
+      ip addresses.
+
 .. attr:: merger
 
    .. attr:: git_user_email

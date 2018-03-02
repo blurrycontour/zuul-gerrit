@@ -382,7 +382,7 @@ class Scheduler(threading.Thread):
         merge_queue = 0
         merge_running = 0
         for (name, (queued, running, registered)) in functions.items():
-            if name == 'executor:execute':
+            if name.startswith('executor:execute'):
                 executors_accepting = registered
                 execute_queue = queued - running
                 execute_running = running
