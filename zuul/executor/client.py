@@ -22,6 +22,7 @@ from uuid import uuid4
 
 import zuul.model
 from zuul.lib.config import get_default
+from zuul.lib.gear_utils import getGearmanFunctions
 from zuul.lib.jsonutil import json_dumps
 from zuul.model import Build
 
@@ -306,8 +307,20 @@ class ExecutorClient(object):
             self.sched.onBuildCompleted(build, 'SUCCESS', {}, [])
             return build
 
-        gearman_job = gear.TextJob('executor:execute', json_dumps(params),
-                                   unique=uuid)
+        functions = getGearmanFunctions(self.gearman)
+        function_name = 'executor:execute'
+        if nodes:
+            # NOTE(pabelanger): This makes a large assumption, that all nodes
+            # in the list have the same provider name.
+            _fname = '%s:%s' % (
+                function_name,
+                nodes[0]['provider'])
+            if _fname in functions.keys():
+                function_name = _fname
+
+        gearman_job = gear.TextJob(
+            function_name, json_dumps(params), unique=uuid)
+
         build.__gearman_job = gearman_job
         build.__gearman_worker = None
         self.builds[uuid] = build
