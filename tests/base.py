@@ -1792,6 +1792,41 @@ class MySQLSchemaFixture(fixtures.Fixture):
         cur.execute("flush privileges")
 
 
+class PostgresqlSchemaFixture(fixtures.Fixture):
+    def setUp(self):
+        super(PostgresqlSchemaFixture, self).setUp()
+
+        random_bits = ''.join(random.choice(string.ascii_lowercase +
+                                            string.ascii_uppercase)
+                              for x in range(8))
+        self.name = '%s_%s' % (random_bits, os.getpid())
+        self.passwd = uuid.uuid4().hex
+        db = pymysql.connect(host="localhost",
+                             user="openstack_citest",
+                             passwd="openstack_citest",
+                             db="openstack_citest")
+        cur = db.cursor()
+        cur.execute("create user %s with password '%s'" % (
+            self.name, self.passwd))
+        cur.execute("create database %s OWNER %s TEMPLATE template0 "
+                    "ENCODING 'UTF8'" % (self.name, self.name))
+
+        self.dburi = 'postgresql://%s:%s@localhost/%s' % (self.name,
+                                                          self.passwd,
+                                                          self.name)
+        self.addDetail('dburi', testtools.content.text_content(self.dburi))
+        self.addCleanup(self.cleanup)
+
+    def cleanup(self):
+        db = pymysql.connect(host="localhost",
+                             user="openstack_citest",
+                             passwd="openstack_citest",
+                             db="openstack_citest")
+        cur = db.cursor()
+        cur.execute("drop database %s" % self.name)
+        cur.execute("drop user %s" % self.name)
+
+
 class BaseTestCase(testtools.TestCase):
     log = logging.getLogger("zuul.test")
     wait_timeout = 30

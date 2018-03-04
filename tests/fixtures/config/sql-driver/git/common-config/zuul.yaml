@@ -11,8 +11,8 @@
     failure:
       gerrit:
         Verified: -1
-      resultsdb: null
-      resultsdb_failures: null
+      resultsdb_mysql: null
+      resultsdb_mysql_failures: null
 
 - job:
     name: base
