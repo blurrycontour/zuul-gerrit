@@ -62,10 +62,8 @@ class TestSQLConnection(ZuulDBTestCase):
     tenant_config_file = 'config/sql-driver/main.yaml'
     expected_table_prefix = ''
 
-    def test_sql_tables_created(self):
-        "Test the tables for storing results are created properly"
-
-        connection = self.connections.connections['resultsdb']
+    def _sql_tables_created(self, connection_name):
+        connection = self.connections.connections[connection_name]
         insp = sa.engine.reflection.Inspector(connection.engine)
 
         table_prefix = connection.table_prefix
@@ -77,6 +75,11 @@ class TestSQLConnection(ZuulDBTestCase):
         self.assertEqual(14, len(insp.get_columns(buildset_table)))
         self.assertEqual(10, len(insp.get_columns(build_table)))
 
+    def test_sql_tables_created(self):
+        "Test the tables for storing results are created properly"
+        self._sql_tables_created('resultsdb_mysql')
+        self._sql_tables_created('resultsdb_postgresql')
+
     def test_sql_results(self):
         "Test results are entered into an sql table"
         self.executor_server.hold_jobs_in_build = True
@@ -84,7 +87,7 @@ class TestSQLConnection(ZuulDBTestCase):
         tenant = self.sched.abide.tenants.get('tenant-one')
         reporter = _get_reporter_from_connection_name(
             tenant.layout.pipelines['check'].success_actions,
-            'resultsdb'
+            'resultsdb_mysql'
         )
 
         # Add a success result
@@ -103,7 +106,7 @@ class TestSQLConnection(ZuulDBTestCase):
         self.orderedRelease()
         self.waitUntilSettled()
 
-        conn = self.connections.connections['resultsdb'].engine.connect()
+        conn = self.connections.connections['resultsdb_mysql'].engine.connect()
         result = conn.execute(
             sa.sql.select([reporter.connection.zuul_buildset_table]))
 
@@ -181,45 +184,50 @@ class TestSQLConnection(ZuulDBTestCase):
         tenant = self.sched.abide.tenants.get('tenant-one')
         reporter1 = _get_reporter_from_connection_name(
             tenant.layout.pipelines['check'].success_actions,
-            'resultsdb'
+            'resultsdb_mysql'
         )
 
-        conn = self.connections.connections['resultsdb'].engine.connect()
-        buildsets_resultsdb = conn.execute(sa.sql.select(
+        conn = self.connections.connections['resultsdb_mysql'].engine.connect()
+        buildsets_resultsdb_mysql = conn.execute(sa.sql.select(
             [reporter1.connection.zuul_buildset_table])).fetchall()
         # Should have been 2 buildset reported to the resultsdb (both success
         # and failure report)
-        self.assertEqual(2, len(buildsets_resultsdb))
+        self.assertEqual(2, len(buildsets_resultsdb_mysql))
 
         # The first one should have passed
-        self.assertEqual('check', buildsets_resultsdb[0]['pipeline'])
-        self.assertEqual('org/project', buildsets_resultsdb[0]['project'])
-        self.assertEqual(1, buildsets_resultsdb[0]['change'])
-        self.assertEqual('1', buildsets_resultsdb[0]['patchset'])
-        self.assertEqual('SUCCESS', buildsets_resultsdb[0]['result'])
-        self.assertEqual('Build succeeded.', buildsets_resultsdb[0]['message'])
+        self.assertEqual('check', buildsets_resultsdb_mysql[0]['pipeline'])
+        self.assertEqual(
+            'org/project', buildsets_resultsdb_mysql[0]['project'])
+        self.assertEqual(1, buildsets_resultsdb_mysql[0]['change'])
+        self.assertEqual('1', buildsets_resultsdb_mysql[0]['patchset'])
+        self.assertEqual('SUCCESS', buildsets_resultsdb_mysql[0]['result'])
+        self.assertEqual(
+            'Build succeeded.', buildsets_resultsdb_mysql[0]['message'])
 
-        # Grab the sa tables for resultsdb_failures
+        # Grab the sa tables for resultsdb_mysql_failures
         reporter2 = _get_reporter_from_connection_name(
             tenant.layout.pipelines['check'].failure_actions,
-            'resultsdb_failures'
+            'resultsdb_mysql_failures'
         )
 
-        conn = self.connections.connections['resultsdb_failures'].\
+        conn = self.connections.connections['resultsdb_mysql_failures'].\
             engine.connect()
-        buildsets_resultsdb_failures = conn.execute(sa.sql.select(
+        buildsets_resultsdb_mysql_failures = conn.execute(sa.sql.select(
             [reporter2.connection.zuul_buildset_table])).fetchall()
         # The failure db should only have 1 buildset failed
-        self.assertEqual(1, len(buildsets_resultsdb_failures))
+        self.assertEqual(1, len(buildsets_resultsdb_mysql_failures))
 
-        self.assertEqual('check', buildsets_resultsdb_failures[0]['pipeline'])
         self.assertEqual(
-            'org/project', buildsets_resultsdb_failures[0]['project'])
-        self.assertEqual(2, buildsets_resultsdb_failures[0]['change'])
-        self.assertEqual('1', buildsets_resultsdb_failures[0]['patchset'])
-        self.assertEqual('FAILURE', buildsets_resultsdb_failures[0]['result'])
+            'check', buildsets_resultsdb_mysql_failures[0]['pipeline'])
         self.assertEqual(
-            'Build failed.', buildsets_resultsdb_failures[0]['message'])
+            'org/project', buildsets_resultsdb_mysql_failures[0]['project'])
+        self.assertEqual(2, buildsets_resultsdb_mysql_failures[0]['change'])
+        self.assertEqual(
+            '1', buildsets_resultsdb_mysql_failures[0]['patchset'])
+        self.assertEqual(
+            'FAILURE', buildsets_resultsdb_mysql_failures[0]['result'])
+        self.assertEqual(
+            'Build failed.', buildsets_resultsdb_mysql_failures[0]['message'])
 
 
 class TestSQLConnectionPrefix(TestSQLConnection):
