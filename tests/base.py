@@ -46,6 +46,8 @@ import fixtures
 import kazoo.client
 import kazoo.exceptions
 import pymysql
+import psycopg2
+import psycopg2.extensions
 import testtools
 import testtools.content
 import testtools.content_type
@@ -1792,6 +1794,48 @@ class MySQLSchemaFixture(fixtures.Fixture):
         cur.execute("flush privileges")
 
 
+class PostgresqlSchemaFixture(fixtures.Fixture):
+    def setUp(self):
+        super(PostgresqlSchemaFixture, self).setUp()
+
+        random_bits = ''.join(random.choice(string.ascii_lowercase +
+                                            string.ascii_uppercase)
+                              for x in range(8))
+        self.name = '%s_%s' % (random_bits, os.getpid())
+        self.passwd = uuid.uuid4().hex
+        db = psycopg2.connect(host="localhost",
+                              user="openstack_citest",
+                              password="openstack_citest",
+                              database="openstack_citest")
+        db.autocommit = True
+        cur = db.cursor()
+        cur.execute("create role %s with login unencrypted password '%s';" % (
+            self.name, self.passwd))
+        cur.execute("create database %s OWNER %s TEMPLATE template0 "
+                    "ENCODING 'UTF8';" % (self.name, self.name))
+
+        self.dburi = 'postgresql://%s:%s@localhost/%s' % (self.name,
+                                                          self.passwd,
+                                                          self.name)
+
+        db2 = psycopg2.connect(host="localhost",
+                               user=self.name,
+                               password=self.passwd,
+                               database=self.name)
+
+        self.addDetail('dburi', testtools.content.text_content(self.dburi))
+        self.addCleanup(self.cleanup)
+
+    def cleanup(self):
+        db = pymysql.connect(host="localhost",
+                             user="openstack_citest",
+                             password="openstack_citest",
+                             database="openstack_citest")
+        cur = db.cursor()
+        cur.execute("drop database %s" % self.name)
+        cur.execute("drop user %s" % self.name)
+
+
 class BaseTestCase(testtools.TestCase):
     log = logging.getLogger("zuul.test")
     wait_timeout = 30
@@ -2962,8 +3006,13 @@ class ZuulDBTestCase(ZuulTestCase):
                 continue
 
             if self.config.get(section_name, 'driver') == 'sql':
-                f = MySQLSchemaFixture()
-                self.useFixture(f)
                 if (self.config.get(section_name, 'dburi') ==
                     '$MYSQL_FIXTURE_DBURI$'):
+                    f = MySQLSchemaFixture()
+                    self.useFixture(f)
+                    self.config.set(section_name, 'dburi', f.dburi)
+                elif (self.config.get(section_name, 'dburi') ==
+                      '$POSTGRESQL_FIXTURE_DBURI$'):
+                    f = PostgresqlSchemaFixture()
+                    self.useFixture(f)
                     self.config.set(section_name, 'dburi', f.dburi)
