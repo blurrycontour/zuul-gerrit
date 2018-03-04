@@ -11,5 +11,6 @@ sphinxcontrib-programoutput
 sphinx-autodoc-typehints
 mock
 PyMySQL
+psycopg2-binary
 mypy
 zuul-sphinx
