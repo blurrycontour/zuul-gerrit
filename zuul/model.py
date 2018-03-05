@@ -870,6 +870,7 @@ class Job(object):
             inheritance_path=(),
             parent_data=None,
             description=None,
+            variant_description=None,
             protected_origin=None,
         )
 
