@@ -1577,6 +1577,10 @@ class AnsibleJob(object):
             verbose = '-v'
 
         cmd = ['ansible-playbook', verbose, playbook.path]
+
+        # Make variables returned from previous playbooks using zuul_return
+        # available to other playbooks that are part of the same job.
+        cmd.extend(['-e@%s' % self.jobdir.result_data_file])
         if playbook.secrets_content:
             cmd.extend(['-e', '@' + playbook.secrets])
 
