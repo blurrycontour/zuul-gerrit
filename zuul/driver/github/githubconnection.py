@@ -650,16 +650,34 @@ class GithubConnection(BaseConnection):
             headers = {'Accept': PREVIEW_JSON_ACCEPT,
                        'Authorization': 'token %s' % token}
 
-            url = '%s/installation/repositories' % self.base_url
+            url = '%s/installation/repositories?per_page=100' % self.base_url
+            while url:
+                self.log.debug("Fetching repos for install %s" % inst_id)
+                response = requests.get(url, headers=headers)
+                response.raise_for_status()
+                repos = response.json()
 
-            self.log.debug("Fetching repos for install %s" % inst_id)
-            response = requests.get(url, headers=headers)
-            response.raise_for_status()
-            repos = response.json()
+                for repo in repos.get('repositories'):
+                    project_name = repo.get('full_name')
+                    self.installation_map[project_name] = inst_id
 
-            for repo in repos.get('repositories'):
-                project_name = repo.get('full_name')
-                self.installation_map[project_name] = inst_id
+                # check if we need to do further paged calls
+                link_header = response.headers.get('Link')
+                url = None
+                if link_header:
+                    # The link header is of the form [1] (one line):
+                    # <https://api.github.com/resource?page=2>; rel="next",
+                    # <https://api.github.com/resource?page=5>; rel="last"
+                    #
+                    # As long as we have a link with rel=next we need to do
+                    # further calls.
+                    # [1]: https://developer.github.com/v3/apps/installations/
+                    links = link_header.split(',')
+                    for entry in links:
+                        link, rel = entry.strip().split(';')
+                        if 'next' in rel:
+                            url = link.replace('<', '').replace('>', '')
+                            break
 
     def addEvent(self, data, event=None):
         return self.event_queue.put((time.time(), data, event))
