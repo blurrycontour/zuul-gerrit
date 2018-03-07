@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df7087c5_fc460522",
+        "filename": "doc/source/admin/tenants.rst",
+        "patchSetId": 16
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-03-07T00:01:03Z",
+      "side": 1,
+      "message": "(nit) suggest new paragraph",
+      "revId": "2bd1eb836fd95df7746a5cd0294e11a1ae4a079d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
