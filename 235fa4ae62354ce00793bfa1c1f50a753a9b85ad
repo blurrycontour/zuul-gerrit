@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df7087c5_acd60e4f",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 680,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-03-07T12:16:53Z",
+      "side": 1,
+      "message": "Actually, requests parses link headers for you already (thef format is from RFC5988), so you can replace all of this with:\n\n  url \u003d response.links.get(\u0027next\u0027, {}).get(\u0027uri\u0027)\n\nor if that\u0027s too compact:\n\n  url \u003d None\n  if \u0027next\u0027 in response.links:\n    url \u003d response.links[\u0027next\u0027][\u0027uri\u0027]",
+      "range": {
+        "startLine": 664,
+        "startChar": 16,
+        "endLine": 680,
+        "endChar": 33
+      },
+      "revId": "235fa4ae62354ce00793bfa1c1f50a753a9b85ad",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
