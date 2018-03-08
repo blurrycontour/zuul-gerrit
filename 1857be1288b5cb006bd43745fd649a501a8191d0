@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df7087c5_1da4e156",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-03-08T19:42:28Z",
+      "side": 1,
+      "message": "That looks awkward. Does tenant.getProject(args[\"project\"]) not work?",
+      "range": {
+        "startLine": 333,
+        "startChar": 22,
+        "endLine": 333,
+        "endChar": 72
+      },
+      "revId": "1857be1288b5cb006bd43745fd649a501a8191d0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
