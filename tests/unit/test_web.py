@@ -341,6 +341,151 @@ class TestWeb(BaseTestWeb):
                 'voting': True
             }], data)
 
+    def test_web_project_list(self):
+        # can we fetch the list of projects
+        data = self.get_url('api/tenant/tenant-one/projects').json()
+
+        self.assertEqual([
+            {'name': 'common-config', 'type': 'config'},
+            {'name': 'org/project', 'type': 'untrusted'},
+            {'name': 'org/project1', 'type': 'untrusted'},
+            {'name': 'org/project2', 'type': 'untrusted'}
+        ], data)
+
+    def test_web_project_get(self):
+        # can we fetch project details
+        data = self.get_url(
+            'api/tenant/tenant-one/project/org/project1').json()
+
+        cname = 'review.example.com/common-config'
+        jobs = [[{'abstract': False,
+                  'attempts': 3,
+                  'branches': [],
+                  'description': None,
+                  'files': [],
+                  'final': False,
+                  'implied_branch': None,
+                  'irrelevant_files': [],
+                  'name': 'project-merge',
+                  'nodeset': {'groups': [], 'name': '', 'nodes': []},
+                  'parent': 'base',
+                  'post_review': None,
+                  'protected': None,
+                  'required_projects': [],
+                  'roles': [],
+                  'semaphore': None,
+                  'source_context': {
+                      'branch': 'master',
+                      'path': 'zuul.yaml',
+                      'project': {
+                          'canonical_name': 'review.example.com/common-config',
+                          'connection_name': 'gerrit',
+                          'name': 'common-config'},
+                      'trusted': True},
+                  'timeout': None,
+                  'variables': {},
+                  'variant_description': '',
+                  'voting': True}],
+                [{'abstract': False,
+                  'attempts': 3,
+                  'branches': [],
+                  'description': None,
+                  'files': [],
+                  'final': False,
+                  'implied_branch': None,
+                  'irrelevant_files': [],
+                  'name': 'project-test1',
+                  'nodeset': {'groups': [], 'name': '', 'nodes': []},
+                  'parent': 'base',
+                  'post_review': None,
+                  'protected': None,
+                  'required_projects': [],
+                  'roles': [],
+                  'semaphore': None,
+                  'source_context': {'branch': 'master',
+                                     'path': 'zuul.yaml',
+                                     'project': {'canonical_name': cname,
+                                                 'connection_name': 'gerrit',
+                                                 'name': 'common-config'},
+                                     'trusted': True},
+                  'timeout': None,
+                  'variables': {},
+                  'variant_description': '',
+                  'voting': True}],
+                [{'abstract': False,
+                  'attempts': 3,
+                  'branches': [],
+                  'description': None,
+                  'files': [],
+                  'final': False,
+                  'implied_branch': None,
+                  'irrelevant_files': [],
+                  'name': 'project-test2',
+                  'nodeset': {'groups': [], 'name': '', 'nodes': []},
+                  'parent': 'base',
+                  'post_review': None,
+                  'protected': None,
+                  'required_projects': [],
+                  'roles': [],
+                  'semaphore': None,
+                  'source_context': {'branch': 'master',
+                                     'path': 'zuul.yaml',
+                                     'project': {'canonical_name': cname,
+                                                 'connection_name': 'gerrit',
+                                                 'name': 'common-config'},
+                                     'trusted': True},
+                  'timeout': None,
+                  'variables': {},
+                  'variant_description': '',
+                  'voting': True}],
+                [{'abstract': False,
+                  'attempts': 3,
+                  'branches': [],
+                  'description': None,
+                  'files': [],
+                  'final': False,
+                  'implied_branch': None,
+                  'irrelevant_files': [],
+                  'name': 'project1-project2-integration',
+                  'nodeset': {'groups': [], 'name': '', 'nodes': []},
+                  'parent': 'base',
+                  'post_review': None,
+                  'protected': None,
+                  'required_projects': [],
+                  'roles': [],
+                  'semaphore': None,
+                  'source_context': {'branch': 'master',
+                                     'path': 'zuul.yaml',
+                                     'project': {'canonical_name': cname,
+                                                 'connection_name': 'gerrit',
+                                                 'name': 'common-config'},
+                                     'trusted': True},
+                  'timeout': None,
+                  'variables': {},
+                  'variant_description': '',
+                  'voting': True}]]
+
+        self.assertEqual(
+            {
+                'canonical_name': 'review.example.com/org/project1',
+                'connection_name': 'gerrit',
+                'name': 'org/project1',
+                'configs': [{
+                    'templates': [],
+                    'default_branch': 'master',
+                    'merge_mode': 'merge-resolve',
+                    'pipelines': [{
+                        'name': 'check',
+                        'queue_name': None,
+                        'jobs': jobs,
+                    }, {
+                        'name': 'gate',
+                        'queue_name': 'integrated',
+                        'jobs': jobs,
+                    }]
+                }]
+            }, data)
+
     def test_web_keys(self):
         with open(os.path.join(FIXTURE_DIR, 'public.pem'), 'rb') as f:
             public_pem = f.read()
