@@ -471,6 +471,9 @@ class Node(ConfigObject):
 
     def toDict(self):
         d = {}
+        d['name'] = self.name[0]
+        d['aliases'] = self.name[1:]
+        d['label'] = self.label
         d['state'] = self.state
         d['hold_job'] = self.hold_job
         d['comment'] = self.comment
@@ -545,6 +548,18 @@ class NodeSet(ConfigObject):
             return False
         return (self.name == other.name and
                 self.nodes == other.nodes)
+
+    def toDict(self):
+        d = {}
+        d['name'] = self.name
+        d['source_context'] = self.source_context
+        d['nodes'] = []
+        for node in self.nodes.values():
+            d['nodes'].append(node.toDict())
+        d['groups'] = []
+        for group in self.groups.values():
+            d['groups'].append(group.toDict())
+        return d
 
     def copy(self):
         n = NodeSet(self.name)
@@ -969,6 +984,35 @@ class Job(ConfigObject):
         self.attributes.update(self.other_attributes)
 
         self.name = name
+        # Convenience properties
+        self._branches = []
+        self._implied_branch = None
+
+    def toDict(self):
+        '''
+        Convert a Job object's attributes to a dictionary.
+        '''
+        d = {}
+        d['branches'] = self._branches
+        d['variant_description'] = self.variant_description
+        d['implied_branch'] = self._implied_branch
+        d['source_context'] = str(self.source_context)
+        d['description'] = self.description
+        d['required_projects'] = list(self.required_projects.keys())
+        d['semaphore'] = self.semaphore
+        d['variables'] = dict(self.variables)
+        d['final'] = self.final
+        d['abstract'] = self.abstract
+        d['protected'] = self.protected
+        d['voting'] = self.voting
+        d['timeout'] = self.timeout
+        d['attempts'] = self.attempts
+        d['roles'] = [role.target_name for role in self.roles]
+        d['post_review'] = self.post_review
+        if not self.isBase():
+            d['parent'] = str(self.parent)
+        d['nodeset'] = self.nodeset.toDict()
+        return d
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -1084,7 +1128,9 @@ class Job(ConfigObject):
     def setBranchMatcher(self, branches):
         # Set the branch matcher to match any of the supplied branches
         matchers = []
+        self._branches = []
         for branch in branches:
+            self._branches.append(branch)
             matchers.append(change_matcher.BranchMatcher(branch))
         self.branch_matcher = change_matcher.MatchAny(matchers)
 
@@ -1105,6 +1151,7 @@ class Job(ConfigObject):
     def addImpliedBranchMatcher(self, branch):
         # Add a branch matcher that combines as a boolean *and* with
         # existing branch matchers, if any.
+        self._implied_branch = branch
         matchers = [change_matcher.ImpliedBranchMatcher(branch)]
         if self.branch_matcher:
             matchers.append(self.branch_matcher)
@@ -1158,6 +1205,8 @@ class Job(ConfigObject):
 
     def copy(self):
         job = Job(self.name)
+        job._branches = self._branches
+        job._implied_branch = self._implied_branch
         for k in self.attributes:
             v = self._get(k)
             if v is not None:
