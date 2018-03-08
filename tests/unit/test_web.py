@@ -257,6 +257,71 @@ class TestWeb(BaseTestWeb):
         self.assertEqual(1, len(data), data)
         self.assertEqual("org/project1", data[0]['project'], data)
 
+    def test_web_find_job(self):
+        # can we fetch the variants for a single job
+        data = self.get_url('api/tenant/tenant-one/job/project-test1').json()
+
+        self.assertEqual([
+            {
+                'abstract': False,
+                'attempts': 4,
+                'branches': [],
+                'description': None,
+                'final': False,
+                'implied_branch': None,
+                'nodeset': {
+                    'groups': [],
+                    'name': '',
+                    'nodes': [{'comment': None,
+                               'hold_job': None,
+                               'label': 'label1',
+                               'name': 'controller',
+                               'aliases': [],
+                               'state': 'unknown'}],
+                    'source_context': None
+                },
+                'parent': 'None',
+                'post_review': None,
+                'protected': None,
+                'required_projects': [],
+                'roles': ['common-config'],
+                'semaphore': None,
+                'source_context': 'common-config/zuul.yaml@master',
+                'timeout': None,
+                'variables': {},
+                'variant_description': '',
+                'voting': True
+            }, {
+                'abstract': False,
+                'attempts': 3,
+                'branches': ['stable'],
+                'description': None,
+                'final': False,
+                'implied_branch': None,
+                'nodeset': {
+                    'groups': [],
+                    'name': '',
+                    'nodes': [{'comment': None,
+                               'hold_job': None,
+                               'label': 'label2',
+                               'name': 'controller',
+                               'aliases': [],
+                               'state': 'unknown'}],
+                    'source_context': None
+                },
+                'parent': 'None',
+                'post_review': None,
+                'protected': None,
+                'required_projects': [],
+                'roles': ['common-config'],
+                'semaphore': None,
+                'source_context': 'common-config/zuul.yaml@master',
+                'timeout': None,
+                'variables': {},
+                'variant_description': 'stable',
+                'voting': True
+            }], data)
+
     def test_web_keys(self):
         with open(os.path.join(FIXTURE_DIR, 'public.pem'), 'rb') as f:
             public_pem = f.read()
