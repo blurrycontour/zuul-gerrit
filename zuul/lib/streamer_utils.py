@@ -71,9 +71,14 @@ class CustomThreadingTCPServer(socketserver.ThreadingTCPServer):
     Custom version that allows us to drop privileges after port binding.
     '''
 
-    address_family = socket.AF_INET6
-
     def __init__(self, *args, **kwargs):
+        # NOTE(pabelanger): Set up address_family for socketserver based on the
+        # fingergw.listen_address setting in zuul.conf.
+        # param truple args[0]: The address and port to bind to for
+        # socketserver.
+        server_address = args[0]
+        addrinfo = socket.getaddrinfo(server_address[0], server_address[1])[0]
+        self.address_family = addrinfo[0]
         self.user = kwargs.pop('user', None)
         self.pid_file = kwargs.pop('pid_file', None)
         socketserver.ThreadingTCPServer.__init__(self, *args, **kwargs)
