@@ -60,6 +60,7 @@ class RPCListener(object):
         self.worker.registerFunction("zuul:tenant_list")
         self.worker.registerFunction("zuul:tenant_sql_connection")
         self.worker.registerFunction("zuul:status_get")
+        self.worker.registerFunction("zuul:job_get")
         self.worker.registerFunction("zuul:job_list")
         self.worker.registerFunction("zuul:key_get")
         self.worker.registerFunction("zuul:config_errors_list")
@@ -336,6 +337,18 @@ class RPCListener(object):
         args = json.loads(job.arguments)
         output = self.sched.formatStatusJSON(args.get("tenant"))
         job.sendWorkComplete(output)
+
+    def handle_job_get(self, gear_job):
+        args = json.loads(gear_job.arguments)
+        tenant = self.sched.abide.tenants.get(args.get("tenant"))
+        if not tenant:
+            gear_job.sendWorkComplete(json.dumps(None))
+            return
+        jobs = tenant.layout.jobs.get(args.get("job"), [])
+        output = []
+        for job in jobs:
+            output.append(job.toDict(tenant))
+        gear_job.sendWorkComplete(json.dumps(output))
 
     def handle_job_list(self, job):
         args = json.loads(job.arguments)
