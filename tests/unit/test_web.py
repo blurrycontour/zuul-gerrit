@@ -312,6 +312,72 @@ class TestWeb(BaseTestWeb):
                 'voting': True
             }], data)
 
+    def test_web_project_list(self):
+        # can we fetch the list of projects
+        data = self.get_url('tenant-one/projects').json()
+
+        self.assertEqual([
+            {'name': 'common-config', 'type': 'config'},
+            {'name': 'org/project', 'type': 'untrusted'},
+            {'name': 'org/project1', 'type': 'untrusted'},
+            {'name': 'org/project2', 'type': 'untrusted'}
+        ], data)
+
+    def test_web_project_get(self):
+        # can we fetch project details
+        data = self.get_url('tenant-one/projects/org/project1').json()
+
+        self.assertEqual(
+            {
+                'canonical_name': 'review.example.com/org/project1',
+                'default_branch': ['master'],
+                'merge_mode': 2,
+                'pipelines': [
+                    {
+                        'name': 'check',
+                        'queue_name': None,
+                        'jobs': [
+                            {'dependencies': [],
+                             'hold_following_changes': False,
+                             'name': 'project-merge',
+                             'voting': True},
+                            {'dependencies': ['project-merge'],
+                             'hold_following_changes': False,
+                             'name': 'project-test1',
+                             'voting': True},
+                            {'dependencies': ['project-merge'],
+                             'hold_following_changes': False,
+                             'name': 'project-test2',
+                             'voting': True},
+                            {'dependencies': ['project-merge'],
+                             'hold_following_changes': False,
+                             'name': 'project1-project2-integration',
+                             'voting': True}
+                        ]
+                    }, {
+                        'name': 'gate',
+                        'queue_name': 'integrated',
+                        'jobs': [
+                            {'dependencies': [],
+                             'hold_following_changes': False,
+                             'name': 'project-merge',
+                             'voting': True},
+                            {'dependencies': ['project-merge'],
+                             'hold_following_changes': False,
+                             'name': 'project-test1',
+                             'voting': True},
+                            {'dependencies': ['project-merge'],
+                             'hold_following_changes': False,
+                             'name': 'project-test2',
+                             'voting': True},
+                            {'dependencies': ['project-merge'],
+                             'hold_following_changes': False,
+                             'name': 'project1-project2-integration',
+                             'voting': True}]
+                    }
+                ]
+            }, data)
+
     def test_web_keys(self):
         with open(os.path.join(FIXTURE_DIR, 'public.pem'), 'rb') as f:
             public_pem = f.read()
