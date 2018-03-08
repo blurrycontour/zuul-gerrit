@@ -2590,6 +2590,11 @@ class ProjectPipelineConfig(ConfigObject):
             self.debug = other.debug
         self.job_list.inheritFrom(other.job_list)
 
+    def toDict(self):
+        d = {}
+        d['queue_name'] = self.queue_name
+        return d
+
 
 class ProjectConfig(ConfigObject):
     # Represents a project configuration
@@ -2625,6 +2630,14 @@ class ProjectConfig(ConfigObject):
         if self.branch_matcher and not self.branch_matcher.matches(change):
             return False
         return True
+
+    def toDict(self):
+        d = {}
+        d['default_branch'] = self.default_branch
+        d['merge_mode'] = list(filter(lambda x: x[1] == self.merge_mode,
+                                      MERGER_MAP.items()))[0][0]
+        d['templates'] = self.templates
+        return d
 
 
 class ProjectMetadata(object):
