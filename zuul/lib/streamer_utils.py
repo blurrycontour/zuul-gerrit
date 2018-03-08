@@ -71,9 +71,10 @@ class CustomThreadingTCPServer(socketserver.ThreadingTCPServer):
     Custom version that allows us to drop privileges after port binding.
     '''
 
-    address_family = socket.AF_INET6
-
     def __init__(self, *args, **kwargs):
+        # NOTE(pabelanger) THIS IS UGLY! There must be a cleaner way.
+        addrinfo = socket.getaddrinfo(args[0][0], args[0][1])[0]
+        self.address_family = addrinfo[0]
         self.user = kwargs.pop('user', None)
         self.pid_file = kwargs.pop('pid_file', None)
         socketserver.ThreadingTCPServer.__init__(self, *args, **kwargs)
