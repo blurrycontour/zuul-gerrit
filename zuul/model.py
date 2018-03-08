@@ -413,6 +413,13 @@ class Project(object):
     def getSafeAttributes(self):
         return Attributes(name=self.name)
 
+    def toDict(self):
+        d = {}
+        d['name'] = self.name
+        d['connection_name'] = self.connection_name
+        d['canonical_name'] = self.canonical_name
+        return d
+
 
 class Node(ConfigObject):
     """A single node for use by a job.
@@ -469,8 +476,13 @@ class Node(ConfigObject):
                 self.label == other.label and
                 self.id == other.id)
 
-    def toDict(self):
+    def toDict(self, internal_attributes=False):
         d = {}
+        if internal_attributes:
+            # These attributes are only useful for the rpc serialization
+            d['name'] = self.name[0]
+            d['aliases'] = self.name[1:]
+            d['label'] = self.label
         d['state'] = self.state
         d['hold_job'] = self.hold_job
         d['comment'] = self.comment
@@ -545,6 +557,17 @@ class NodeSet(ConfigObject):
             return False
         return (self.name == other.name and
                 self.nodes == other.nodes)
+
+    def toDict(self):
+        d = {}
+        d['name'] = self.name
+        d['nodes'] = []
+        for node in self.nodes.values():
+            d['nodes'].append(node.toDict(internal_attributes=True))
+        d['groups'] = []
+        for group in self.groups.values():
+            d['groups'].append(group.toDict())
+        return d
 
     def copy(self):
         n = NodeSet(self.name)
@@ -714,6 +737,14 @@ class SourceContext(ConfigObject):
 
     def __deepcopy__(self, memo):
         return self.copy()
+
+    def toDict(self):
+        d = {}
+        d['project'] = self.project.toDict()
+        d['branch'] = self.branch
+        d['path'] = self.path
+        d['trusted'] = self.trusted
+        return d
 
     def copy(self):
         return self.__class__(self.project, self.branch, self.path,
@@ -959,6 +990,10 @@ class Job(ConfigObject):
             description=None,
             variant_description=None,
             protected_origin=None,
+            _branches=(),
+            _implied_branch=None,
+            _files=(),
+            _irrelevant_files=(),
         )
 
         self.inheritable_attributes = {}
@@ -969,6 +1004,41 @@ class Job(ConfigObject):
         self.attributes.update(self.other_attributes)
 
         self.name = name
+
+    def toDict(self, default_parent):
+        '''
+        Convert a Job object's attributes to a dictionary.
+        '''
+        d = {}
+        d['name'] = self.name
+        d['branches'] = self._branches
+        d['files'] = self._files
+        d['irrelevant_files'] = self._irrelevant_files
+        d['variant_description'] = self.variant_description
+        d['implied_branch'] = self._implied_branch
+        d['source_context'] = self.source_context.toDict()
+        d['description'] = self.description
+        d['required_projects'] = list(map(lambda x: x.toDict(),
+                                          self.required_projects))
+        d['semaphore'] = self.semaphore
+        # variables is a proxymapping that needs to be casted to bare dict.
+        d['variables'] = dict(self.variables)
+        d['final'] = self.final
+        d['abstract'] = self.abstract
+        d['protected'] = self.protected
+        d['voting'] = self.voting
+        d['timeout'] = self.timeout
+        d['attempts'] = self.attempts
+        d['roles'] = list(map(lambda x: x.toDict(), self.roles))
+        d['post_review'] = self.post_review
+        if self.isBase():
+            d['parent'] = None
+        elif self.parent:
+            d['parent'] = self.parent
+        else:
+            d['parent'] = default_parent
+        d['nodeset'] = self.nodeset.toDict()
+        return d
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -1083,10 +1153,27 @@ class Job(ConfigObject):
 
     def setBranchMatcher(self, branches):
         # Set the branch matcher to match any of the supplied branches
+        self._branches = branches
         matchers = []
         for branch in branches:
             matchers.append(change_matcher.BranchMatcher(branch))
         self.branch_matcher = change_matcher.MatchAny(matchers)
+
+    def setFileMatcher(self, files):
+        # Set the file matcher to match any of the change files
+        self._files = files
+        matchers = []
+        for fn in files:
+            matchers.append(change_matcher.FileMatcher(fn))
+        self.file_matcher = change_matcher.MatchAny(matchers)
+
+    def setIrrelevantFileMatcher(self, irrelevant_files):
+        # Set the irrelevant file matcher to match any of the change files
+        self._irrelevant_files = irrelevant_files
+        matchers = []
+        for fn in irrelevant_files:
+            matchers.append(change_matcher.FileMatcher(fn))
+        self.irrelevant_file_matcher = change_matcher.MatchAllFiles(matchers)
 
     def getSimpleBranchMatcher(self):
         # If the job has a simple branch matcher, return it; otherwise None.
@@ -1105,6 +1192,7 @@ class Job(ConfigObject):
     def addImpliedBranchMatcher(self, branch):
         # Add a branch matcher that combines as a boolean *and* with
         # existing branch matchers, if any.
+        self._implied_branch = branch
         matchers = [change_matcher.ImpliedBranchMatcher(branch)]
         if self.branch_matcher:
             matchers.append(self.branch_matcher)
