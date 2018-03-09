@@ -119,8 +119,9 @@ if (module.hot) {
   // })
 }
 
-angular.module('zuulStatus', []).controller(
-  'mainController', function ($scope, $http) {
+angular.module('zuulStatus', []).component('zuulApp', {
+  template: require('./templates/status.html'),
+  controller: function ($http) {
     zuulStart(jQuery)
   }
-)
+})
