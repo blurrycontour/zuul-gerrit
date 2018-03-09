@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <!--
 Copyright 2017 Red Hat
 
@@ -14,12 +13,7 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations
 under the License.
 -->
-<html>
-<head>
-  <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
-  <title id='pagetitle'><%= htmlWebpackPlugin.options.title %></title>
-</head>
-<body ng-app="zuulBuilds" ng-controller="mainController"><div class="container-fluid">
+<div class="container-fluid">
   <nav class="navbar navbar-default">
   <div class="container-fluid">
     <div class="navbar-header">
@@ -32,13 +26,13 @@ under the License.
       <li class="active"><a href="builds.html" target="_self">Builds</a></li>
     </ul>
   <span style="float: right; margin-top: 7px;">
-    <form ng-submit="builds_fetch()">
+    <form ng-submit="$ctrl.builds_fetch()">
       <label>Pipeline:</label>
-      <input name="pipeline" ng-model="pipeline" />
+      <input name="pipeline" ng-model="$ctrl.pipeline" />
       <label>Job:</label>
-      <input name="job_name" ng-model="job_name" />
+      <input name="job_name" ng-model="$ctrl.job_name" />
       <label>Project:</label>
-      <input name="project" ng-model="project" />
+      <input name="project" ng-model="$ctrl.project" />
       <input type="submit" value="Refresh" />
     </form>
   </span>
@@ -58,7 +52,7 @@ under the License.
       </tr>
     </thead>
     <tbody>
-      <tr ng-repeat="build in builds" ng-class="rowClass(build)">
+      <tr ng-repeat="build in $ctrl.builds" ng-class="$ctrl.rowClass(build)">
         <td>{{ build.job_name }}</td>
         <td>{{ build.project }}</td>
         <td>{{ build.pipeline }}</td>
@@ -70,4 +64,4 @@ under the License.
       </tr>
     </tbody>
   </table>
-</div></body></html>
+</div>

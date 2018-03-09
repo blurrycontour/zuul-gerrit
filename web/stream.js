@@ -92,8 +92,9 @@ function zuulStartStream () {
   }
 }
 
-angular.module('zuulStream', []).controller(
-  'mainController', function ($scope, $http) {
+angular.module('zuulStream', []).component('zuulApp', {
+  template: require('./templates/stream.html'),
+  controller: function ($http) {
     window.onload = zuulStartStream()
   }
-)
+})
