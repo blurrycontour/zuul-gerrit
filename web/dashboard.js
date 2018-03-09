@@ -29,12 +29,10 @@ angular.module('zuulTenants', []).component('zuulApp', {
   template: require('./templates/tenants.html'),
   controller: function ($scope, $http, $location) {
     $scope.tenants = undefined
-    // Capture this in a closure variable so it's in scope in the callback
-    let ctrl = this
     $scope.tenants_fetch = function () {
       $http.get(getSourceUrl('tenants', $location))
-        .then(function success (result) {
-          ctrl.tenants = result.data
+        .then(result => {
+          this.tenants = result.data
         })
     }
     $scope.tenants_fetch()
@@ -45,12 +43,10 @@ angular.module('zuulProjects', []).component('zuulApp', {
   template: require('./templates/projects.html'),
   controller: function ($http) {
     this.projects = undefined
-    // Capture this in a closure variable so it's in scope in the callback
-    let ctrl = this
     this.projects_fetch = function () {
       $http.get(getSourceUrl('projects'))
-        .then(function success (result) {
-          ctrl.projects = result.data
+        .then(result => {
+          this.projects = result.data
         })
     }
     this.projects_fetch()
@@ -71,12 +67,10 @@ angular.module('zuulProject', [], function ($locationProvider) {
       this.project_name = 'config-projects'
     }
     this.project = undefined
-    // Capture this in a closure variable so it's in scope in the callback
-    let ctrl = this
     this.project_fetch = function () {
       $http.get(getSourceUrl('projects/' + ctrl.project_name))
-        .then(function success (result) {
-          ctrl.project = result.data
+        .then(result => {
+          this.project = result.data
         })
     }
     this.project_fetch()
@@ -91,13 +85,11 @@ angular.module('zuulJobs', [], function ($locationProvider) {
 }).component('zuulApp', {
   template: require('./templates/jobs.html'),
   controller: function ($http, $location) {
-    // Capture this in a closure variable so it's in scope in the callback
-    let ctrl = this
     this.jobs = undefined
     this.jobs_fetch = function () {
       $http.get(getSourceUrl('jobs', $location))
-        .then(function success (result) {
-          ctrl.jobs = result.data
+        .then(result => {
+          this.jobs = result.data
           for (let job of ctrl.jobs) {
             job.expanded = false
             job.details = undefined
@@ -107,7 +99,7 @@ angular.module('zuulJobs', [], function ($locationProvider) {
     this.job_fetch = function (job) {
       if (!job.details) {
         $http.get(getSourceUrl('jobs/' + job.name))
-          .then(function success (result) {
+          .then(result => {
             job.details = result.data
           })
       }
@@ -132,13 +124,11 @@ angular.module('zuulJob', [], function ($locationProvider) {
     }
     this.labels_color = new Map()
     this.variants = undefined
-    // Capture this in a closure variable so it's in scope in the callback
-    let ctrl = this
     this.job_fetch = function () {
       $http.get(getSourceUrl('jobs/' + this.job_name))
-        .then(function success (result) {
-          ctrl.variants = result.data
-          for (let variant of ctrl.variants) {
+        .then(result => {
+          this.variants = result.data
+          for (let variant of this.variants) {
             if (Object.keys(variant.variables).length === 0) {
               variant.variables = undefined
             } else {
@@ -156,7 +146,7 @@ angular.module('zuulJob', [], function ($locationProvider) {
                 let r = (0x800000 + (hash - 0x500000)) & 0xFF0000
                 let g = (0x005000 + (hash - 0x00a000)) & 0x00FF00
                 let b = (0x000080 + (hash - 0x50)) & 0x0000FF
-                ctrl.labels_color[node[0]] = '#' + (r | g | b).toString(16)
+                this.labels_color[node[0]] = '#' + (r | g | b).toString(16)
               }
             }
             if (variant.parent === 'None') {
@@ -212,10 +202,8 @@ angular.module('zuulBuilds', [], function ($locationProvider) {
       if (this.project) { queryString += '&project=' + this.project }
       if (queryString !== '') { queryString = '?' + queryString.substr(1) }
       let remoteLocation = getSourceUrl('builds', $location) + queryString
-      // Capture this in a closure variable so it's in scope in the callback
-      let ctrl = this
       $http.get(remoteLocation)
-        .then(function success (result) {
+        .then(result => {
           for (let build of result.data) {
             if (!build.node_name) {
               build.node_name = 'master'
@@ -225,7 +213,7 @@ angular.module('zuulBuilds', [], function ($locationProvider) {
               build.log_url = undefined
             }
           }
-          ctrl.builds = result.data
+          this.builds = result.data
         })
     }
     this.builds_fetch()
