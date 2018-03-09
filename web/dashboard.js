@@ -25,49 +25,62 @@ import './styles/zuul.css'
 import './jquery.zuul'
 import { getSourceUrl } from './util'
 
-angular.module('zuulTenants', []).controller(
-  'mainController', function ($scope, $http, $location) {
+angular.module('zuulTenants', []).component('zuulApp', {
+  template: require('./templates/tenants.html'),
+  controller: function ($scope, $http, $location) {
     $scope.tenants = undefined
+    // Capture this in a closure variable so it's in scope in the callback
+    let ctrl = this
     $scope.tenants_fetch = function () {
       $http.get(getSourceUrl('tenants', $location))
         .then(function success (result) {
-          $scope.tenants = result.data
+          ctrl.tenants = result.data
         })
     }
     $scope.tenants_fetch()
-  })
+  }
+})
 
-angular.module('zuulProjects', []).controller(
-  'mainController', function ($scope, $http) {
-    $scope.projects = undefined
-    $scope.projects_fetch = function () {
+angular.module('zuulProjects', []).component('zuulApp', {
+  template: require('./templates/projects.html'),
+  controller: function ($http) {
+    this.projects = undefined
+    // Capture this in a closure variable so it's in scope in the callback
+    let ctrl = this
+    this.projects_fetch = function () {
       $http.get(getSourceUrl('projects'))
         .then(function success (result) {
-          $scope.projects = result.data
+          ctrl.projects = result.data
         })
     }
-    $scope.projects_fetch()
-  })
+    this.projects_fetch()
+  }
+})
 
 angular.module('zuulProject', [], function ($locationProvider) {
   $locationProvider.html5Mode({
     enabled: true,
     requireBase: false
   })
-}).controller('mainController', function ($scope, $http, $location) {
-  let queryArgs = $location.search()
-  $scope.project_name = queryArgs['project_name']
-  if (!$scope.project_name) {
-    $scope.project_name = 'config-projects'
+}).component('zuulApp', {
+  template: require('./templates/project.html'),
+  controller: function ($http, $location) {
+    let queryArgs = $location.search()
+    this.project_name = queryArgs['project_name']
+    if (!this.project_name) {
+      this.project_name = 'config-projects'
+    }
+    this.project = undefined
+    // Capture this in a closure variable so it's in scope in the callback
+    let ctrl = this
+    this.project_fetch = function () {
+      $http.get(getSourceUrl('projects/' + ctrl.project_name))
+        .then(function success (result) {
+          ctrl.project = result.data
+        })
+    }
+    this.project_fetch()
   }
-  $scope.project = undefined
-  $scope.project_fetch = function () {
-    $http.get(getSourceUrl('projects/' + $scope.project_name))
-      .then(function success (result) {
-        $scope.project = result.data
-      })
-  }
-  $scope.project_fetch()
 })
 
 angular.module('zuulJobs', [], function ($locationProvider) {
@@ -75,28 +88,33 @@ angular.module('zuulJobs', [], function ($locationProvider) {
     enabled: true,
     requireBase: false
   })
-}).controller('mainController', function ($scope, $http, $location) {
-  $scope.jobs = undefined
-  $scope.jobs_fetch = function () {
-    $http.get(getSourceUrl('jobs', $location))
-      .then(function success (result) {
-        $scope.jobs = result.data
-        $scope.jobs.forEach(function (job) {
-          job.expanded = false
-          job.details = undefined
-        })
-      })
-  }
-  $scope.job_fetch = function (job) {
-    if (!job.details) {
-      $http.get(getSourceUrl('jobs/' + job.name))
+}).component('zuulApp', {
+  template: require('./templates/jobs.html'),
+  controller: function ($http, $location) {
+    // Capture this in a closure variable so it's in scope in the callback
+    let ctrl = this
+    this.jobs = undefined
+    this.jobs_fetch = function () {
+      $http.get(getSourceUrl('jobs', $location))
         .then(function success (result) {
-          job.details = result.data
+          ctrl.jobs = result.data
+          for (let job of ctrl.jobs) {
+            job.expanded = false
+            job.details = undefined
+          }
         })
     }
-    job.expanded = !job.expanded
+    this.job_fetch = function (job) {
+      if (!job.details) {
+        $http.get(getSourceUrl('jobs/' + job.name))
+          .then(function success (result) {
+            job.details = result.data
+          })
+      }
+      job.expanded = !job.expanded
+    }
+    this.jobs_fetch()
   }
-  $scope.jobs_fetch()
 })
 
 angular.module('zuulJob', [], function ($locationProvider) {
@@ -104,46 +122,51 @@ angular.module('zuulJob', [], function ($locationProvider) {
     enabled: true,
     requireBase: false
   })
-}).controller('mainController', function ($scope, $http, $location) {
-  let queryArgs = $location.search()
-  $scope.job_name = queryArgs['job_name']
-  if (!$scope.job_name) {
-    $scope.job_name = 'base'
-  }
-  $scope.labels_color = new Map()
-  $scope.variants = undefined
-  $scope.job_fetch = function () {
-    $http.get(getSourceUrl('jobs/' + $scope.job_name))
-      .then(function success (result) {
-        $scope.variants = result.data
-        $scope.variants.forEach(function (variant) {
-          if (Object.keys(variant.variables).length === 0) {
-            variant.variables = undefined
-          } else {
-            variant.variables = JSON.stringify(
-              variant.variables, undefined, 2)
-          }
-          if (variant.nodeset.length >= 0) {
-            // Generate color based on node label
-            variant.nodeset.forEach(function (node) {
-              let hash = 0
-              for (let idx = 0; idx < node[0].length; idx++) {
-                let c = node[0].charCodeAt(idx)
-                hash = ((hash << 5) - hash) + c
+}).component('zuulApp', {
+  template: require('./templates/job.html'),
+  controller: function ($http, $location) {
+    let queryArgs = $location.search()
+    this.job_name = queryArgs['job_name']
+    if (!this.job_name) {
+      this.job_name = 'base'
+    }
+    this.labels_color = new Map()
+    this.variants = undefined
+    // Capture this in a closure variable so it's in scope in the callback
+    let ctrl = this
+    this.job_fetch = function () {
+      $http.get(getSourceUrl('jobs/' + this.job_name))
+        .then(function success (result) {
+          ctrl.variants = result.data
+          for (let variant of ctrl.variants) {
+            if (Object.keys(variant.variables).length === 0) {
+              variant.variables = undefined
+            } else {
+              variant.variables = JSON.stringify(
+                variant.variables, undefined, 2)
+            }
+            if (variant.nodeset.length >= 0) {
+              // Generate color based on node label
+              for (let node of variant.nodeset) {
+                let hash = 0
+                for (let idx = 0; idx < node[0].length; idx++) {
+                  let c = node[0].charCodeAt(idx)
+                  hash = ((hash << 5) - hash) + c
+                }
+                let r = (0x800000 + (hash - 0x500000)) & 0xFF0000
+                let g = (0x005000 + (hash - 0x00a000)) & 0x00FF00
+                let b = (0x000080 + (hash - 0x50)) & 0x0000FF
+                ctrl.labels_color[node[0]] = '#' + (r | g | b).toString(16)
               }
-              let r = (0x800000 + (hash - 0x500000)) & 0xFF0000
-              let g = (0x005000 + (hash - 0x00a000)) & 0x00FF00
-              let b = (0x000080 + (hash - 0x50)) & 0x0000FF
-              $scope.labels_color[node[0]] = '#' + (r | g | b).toString(16)
-            })
-          }
-          if (variant.parent === 'None') {
-            variant.parent = 'base'
+            }
+            if (variant.parent === 'None') {
+              variant.parent = 'base'
+            }
           }
         })
-      })
+    }
+    this.job_fetch()
   }
-  $scope.job_fetch()
 })
 
 angular.module('zuulBuilds', [], function ($locationProvider) {
@@ -151,57 +174,60 @@ angular.module('zuulBuilds', [], function ($locationProvider) {
     enabled: true,
     requireBase: false
   })
-}).controller('mainController', function ($scope, $http, $location) {
-  $scope.rowClass = function (build) {
-    if (build.result === 'SUCCESS') {
-      return 'success'
-    } else {
-      return 'warning'
+}).component('zuulApp', {
+  template: require('./templates/builds.html'),
+  controller: function ($http, $location) {
+    this.rowClass = function (build) {
+      if (build.result === 'SUCCESS') {
+        return 'success'
+      } else {
+        return 'warning'
+      }
     }
-  }
-  let queryArgs = $location.search()
-  let url = $location.url()
-  if (queryArgs['source_url']) {
-    $scope.tenant = undefined
-  } else {
-    let tenantStart = url.lastIndexOf(
-      '/', url.lastIndexOf('/builds.html') - 1) + 1
-    let tenantLength = url.lastIndexOf('/builds.html') - tenantStart
-    $scope.tenant = url.substr(tenantStart, tenantLength)
-  }
-  $scope.builds = undefined
-  if (queryArgs['pipeline']) {
-    $scope.pipeline = queryArgs['pipeline']
-  } else { $scope.pipeline = '' }
-  if (queryArgs['job_name']) {
-    $scope.job_name = queryArgs['job_name']
-  } else { $scope.job_name = '' }
-  if (queryArgs['project']) {
-    $scope.project = queryArgs['project']
-  } else { $scope.project = '' }
-  $scope.builds_fetch = function () {
-    let queryString = ''
-    if ($scope.tenant) { queryString += '&tenant=' + $scope.tenant }
-    if ($scope.pipeline) { queryString += '&pipeline=' + $scope.pipeline }
-    if ($scope.job_name) { queryString += '&job_name=' + $scope.job_name }
-    if ($scope.project) { queryString += '&project=' + $scope.project }
-    if (queryString !== '') { queryString = '?' + queryString.substr(1) }
-    $http.get(getSourceUrl('builds', $location) + queryString)
-      .then(function success (result) {
-        for (let buildPos = 0;
-          buildPos < result.data.length;
-          buildPos += 1) {
-          let build = result.data[buildPos]
-          if (build.node_name == null) {
-            build.node_name = 'master'
+    let queryArgs = $location.search()
+    let url = $location.url()
+    if (queryArgs['source_url']) {
+      this.tenant = undefined
+    } else {
+      let tenantStart = url.lastIndexOf(
+        '/', url.lastIndexOf('/builds.html') - 1) + 1
+      let tenantLength = url.lastIndexOf('/builds.html') - tenantStart
+      this.tenant = url.substr(tenantStart, tenantLength)
+    }
+    this.builds = undefined
+    if (queryArgs['pipeline']) {
+      this.pipeline = queryArgs['pipeline']
+    } else { this.pipeline = '' }
+    if (queryArgs['job_name']) {
+      this.job_name = queryArgs['job_name']
+    } else { this.job_name = '' }
+    if (queryArgs['project']) {
+      this.project = queryArgs['project']
+    } else { this.project = '' }
+    this.builds_fetch = function () {
+      let queryString = ''
+      if (this.tenant) { queryString += '&tenant=' + this.tenant }
+      if (this.pipeline) { queryString += '&pipeline=' + this.pipeline }
+      if (this.job_name) { queryString += '&job_name=' + this.job_name }
+      if (this.project) { queryString += '&project=' + this.project }
+      if (queryString !== '') { queryString = '?' + queryString.substr(1) }
+      let remoteLocation = getSourceUrl('builds', $location) + queryString
+      // Capture this in a closure variable so it's in scope in the callback
+      let ctrl = this
+      $http.get(remoteLocation)
+        .then(function success (result) {
+          for (let build of result.data) {
+            if (!build.node_name) {
+              build.node_name = 'master'
+            }
+            /* Fix incorect url for post_failure job */
+            if (build.log_url === build.job_name) {
+              build.log_url = undefined
+            }
           }
-          /* Fix incorect url for post_failure job */
-          if (build.log_url === build.job_name) {
-            build.log_url = undefined
-          }
-        }
-        $scope.builds = result.data
-      })
+          ctrl.builds = result.data
+        })
+    }
+    this.builds_fetch()
   }
-  $scope.builds_fetch()
 })
