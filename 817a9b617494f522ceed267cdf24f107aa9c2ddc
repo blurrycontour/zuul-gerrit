@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df7087c5_32577805",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-03-09T21:12:35Z",
+      "side": 1,
+      "message": "Unless we plan to add more data to these dicts maybe we should just return a list of pipeline names? Will be slightly simpler to consume I expect.",
+      "revId": "817a9b617494f522ceed267cdf24f107aa9c2ddc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df7087c5_525a2c2a",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-03-09T21:12:35Z",
+      "side": 1,
+      "message": "Realizing that we go from json to python data structures back to json_response which I assume converts again back to json. Maybe we should do more of a straight pass through?",
+      "revId": "817a9b617494f522ceed267cdf24f107aa9c2ddc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
