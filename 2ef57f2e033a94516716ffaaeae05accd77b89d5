@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df7087c5_f91d6a73",
+        "filename": "web/templates/project.ejs",
+        "patchSetId": 18
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-03-09T17:57:18Z",
+      "side": 1,
+      "message": "something in the indentation seems to be broken. maybe a missing closing div",
+      "range": {
+        "startLine": 68,
+        "startChar": 0,
+        "endLine": 69,
+        "endChar": 14
+      },
+      "revId": "2ef57f2e033a94516716ffaaeae05accd77b89d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df7087c5_79095a2f",
+        "filename": "web/templates/projects.ejs",
+        "patchSetId": 18
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-03-09T17:57:18Z",
+      "side": 1,
+      "message": "the table doesn\u0027t seem to be in a div",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 50,
+        "endChar": 6
+      },
+      "revId": "2ef57f2e033a94516716ffaaeae05accd77b89d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
