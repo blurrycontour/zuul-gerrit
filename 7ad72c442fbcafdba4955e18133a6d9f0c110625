@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df7087c5_1464a5e3",
+        "filename": "web/templates/stream.html",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-03-09T18:04:15Z",
+      "side": 1,
+      "message": "superfluous div",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 6
+      },
+      "revId": "7ad72c442fbcafdba4955e18133a6d9f0c110625",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
