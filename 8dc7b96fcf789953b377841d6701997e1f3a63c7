@@ -107,6 +107,24 @@
     },
     {
       "key": {
+        "uuid": "df7087c5_19e7fe42",
+        "filename": "tests/remote/test_remote_action_modules.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-03-09T17:18:26Z",
+      "side": 1,
+      "message": "As it turns out we really need to use a non-localhost ip as otherwise the localhost checks will fail the copy-cood case...",
+      "parentUuid": "df7087c5_7e65c0e0",
+      "revId": "8dc7b96fcf789953b377841d6701997e1f3a63c7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df7087c5_239ad16d",
         "filename": "tests/remote/test_remote_action_modules.py",
         "patchSetId": 5
