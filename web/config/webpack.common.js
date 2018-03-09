@@ -42,43 +42,51 @@ module.exports = {
     // entry items from above. We can collapse this to just do one single
     // output file.
     new HtmlWebpackPlugin({
-      filename: 'status.html',
-      template: 'web/templates/status.ejs',
-      title: 'Zuul Status'
+      title: 'Zuul Status',
+      app: 'zuulStatus',
+      template: 'web/main.ejs',
+      filename: 'status.html'
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Builds',
-      template: 'web/templates/builds.ejs',
+      app: 'zuulBuilds',
+      template: 'web/main.ejs',
       filename: 'builds.html'
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Job',
-      template: 'web/templates/job.ejs',
+      app: 'zuulJob',
+      template: 'web/main.ejs',
       filename: 'job.html'
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Jobs',
-      template: 'web/templates/jobs.ejs',
+      app: 'zuulJobs',
+      template: 'web/main.ejs',
       filename: 'jobs.html'
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Project',
-      template: 'web/templates/project.ejs',
+      app: 'zuulProject',
+      template: 'web/main.ejs',
       filename: 'project.html'
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Projects',
-      template: 'web/templates/projects.ejs',
+      app: 'zuulProjects',
+      template: 'web/main.ejs',
       filename: 'projects.html'
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Tenants',
-      template: 'web/templates/tenants.ejs',
+      app: 'zuulTenants',
+      template: 'web/main.ejs',
       filename: 'tenants.html'
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Console Stream',
-      template: 'web/templates/stream.ejs',
+      app: 'zuulStream',
+      template: 'web/main.ejs',
       filename: 'stream.html'
     })
   ],
@@ -140,7 +148,7 @@ module.exports = {
       },
       {
         test: /\.html$/,
-        use: ['raw-loader'],
+        use: ['html-loader'],
         exclude: /node_modules/
       },
       {
