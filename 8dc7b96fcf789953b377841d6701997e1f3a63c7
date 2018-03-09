@@ -1,0 +1,95 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df7087c5_432825e1",
+        "filename": "tests/fixtures/config/remote-action-modules/git/org_project/playbooks/copy-bad.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-03-09T16:16:44Z",
+      "side": 1,
+      "message": "Rather than copying a real file that you shouldn\u0027t have access to maybe copy a file that shouldn\u0027t exist at all? That way you don\u0027t accidentally leak someone\u0027s passwd file.",
+      "revId": "8dc7b96fcf789953b377841d6701997e1f3a63c7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df7087c5_633a0935",
+        "filename": "tests/fixtures/config/remote-action-modules/git/org_project/playbooks/copy-good.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-03-09T16:16:44Z",
+      "side": 1,
+      "message": "Should this be file-to-copy which seems to be added to this fixture for copying?",
+      "revId": "8dc7b96fcf789953b377841d6701997e1f3a63c7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df7087c5_a3ea61a9",
+        "filename": "tests/remote/test_remote_action_modules.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-03-09T16:16:44Z",
+      "side": 1,
+      "message": "Maybe use 127.0.0.1 instead then this can run without the zuul var too? It should still execute ssh properly.",
+      "revId": "8dc7b96fcf789953b377841d6701997e1f3a63c7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df7087c5_239ad16d",
+        "filename": "tests/remote/test_remote_action_modules.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-03-09T16:16:44Z",
+      "side": 1,
+      "message": "We should probably avoid keeping this flag set to true long term as it will pollute test nodes that live long term.",
+      "range": {
+        "startLine": 33,
+        "startChar": 8,
+        "endLine": 33,
+        "endChar": 47
+      },
+      "revId": "8dc7b96fcf789953b377841d6701997e1f3a63c7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df7087c5_23c1712f",
+        "filename": "tests/remote/test_remote_action_modules.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-03-09T16:16:44Z",
+      "side": 1,
+      "message": "Nit but if you do .format(job_name\u003djob_name) then you can replace all the %s\u0027s and use {job_name} instead. I think it reads slightly better as you don\u0027t have to count %s\u0027s for the same content.",
+      "revId": "8dc7b96fcf789953b377841d6701997e1f3a63c7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
