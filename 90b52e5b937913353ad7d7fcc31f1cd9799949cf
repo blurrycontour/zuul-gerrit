@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df7087c5_d4286d87",
+        "filename": "web/templates/job.ejs",
+        "patchSetId": 18
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-03-09T17:59:22Z",
+      "side": 1,
+      "message": "one extra closing div?",
+      "range": {
+        "startLine": 110,
+        "startChar": 0,
+        "endLine": 110,
+        "endChar": 6
+      },
+      "revId": "90b52e5b937913353ad7d7fcc31f1cd9799949cf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df7087c5_543c5dc7",
+        "filename": "web/templates/jobs.ejs",
+        "patchSetId": 18
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-03-09T17:59:22Z",
+      "side": 1,
+      "message": "the table doesn\u0027t seem to be in a div",
+      "range": {
+        "startLine": 65,
+        "startChar": 0,
+        "endLine": 65,
+        "endChar": 6
+      },
+      "revId": "90b52e5b937913353ad7d7fcc31f1cd9799949cf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
