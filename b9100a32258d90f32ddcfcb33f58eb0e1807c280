@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df7087c5_d4d2ad5c",
+        "filename": "tests/fixtures/config/remote-action-modules/git/org_project/playbooks/copy-bad.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-03-09T18:08:43Z",
+      "side": 1,
+      "message": "Ya I think this is probably a better choice, though on my system it is /usr/bin/sh :/ Maybe /etc/resolv.conf is a better choice? Less potentially leaked personal info if run locally but should be everywhere.",
+      "revId": "b9100a32258d90f32ddcfcb33f58eb0e1807c280",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df7087c5_f487b160",
+        "filename": "tests/remote/test_remote_action_modules.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-03-09T18:08:43Z",
+      "side": 1,
+      "message": "Maybe only keep it on failures if the intent is to help debugging? As someone that tries to run the tests locally (and maybe I shouldn\u0027t be running this one locally?) I am careful to clean up tests that \"leak\" after each run.",
+      "revId": "b9100a32258d90f32ddcfcb33f58eb0e1807c280",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
