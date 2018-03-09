@@ -1,0 +1,10 @@
+Code-Review+1: Mohammed Naser <mnaser@vexxhost.com>
+Code-Review+2: Tobias Henkel <tobias.henkel@bmw.de>
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Fri, 09 Mar 2018 18:02:52 +0000
+Reviewed-on: https://review.openstack.org/551338
+Project: openstack-infra/zuul
+Branch: refs/heads/master
