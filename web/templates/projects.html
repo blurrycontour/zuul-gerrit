@@ -13,13 +13,7 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations
 under the License.
 -->
-<!DOCTYPE html>
-<html>
-<head>
-  <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
-  <title id='pagetitle'><%= htmlWebpackPlugin.options.title %></title>
-</head>
-<body ng-app="zuulProjects" ng-controller="mainController"><div class="container-fluid">
+<div class="container-fluid">
   <nav class="navbar navbar-default">
   <div class="container-fluid">
     <div class="navbar-header">
@@ -41,10 +35,10 @@ under the License.
       </tr>
     </thead>
     <tbody>
-      <tr ng-repeat="project in projects">
+      <tr ng-repeat="project in $ctrl.projects">
         <td><a href="project.html?project_name={{ project.name }}">{{ project.name }}</a></td>
         <td>{{ project.type }}</td>
       </tr>
     </tbody>
   </table>
-</div></body></html>
+</div>

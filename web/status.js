@@ -24,7 +24,6 @@
 // @licend  The above is the entire license notice
 // for the JavaScript code in this page.
 
-import 'bootstrap/dist/css/bootstrap.css'
 import 'jquery-visibility/jquery-visibility'
 import 'graphitejs/jquery.graphite.js'
 import angular from 'angular'
@@ -119,8 +118,9 @@ if (module.hot) {
   // })
 }
 
-angular.module('zuulStatus', []).controller(
-  'mainController', function ($scope, $http) {
+angular.module('zuulStatus', []).component('zuulApp', {
+  template: require('./templates/status.html'),
+  controller: function ($http) {
     zuulStart(jQuery)
   }
-)
+})
