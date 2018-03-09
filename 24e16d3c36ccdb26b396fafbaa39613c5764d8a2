@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df7087c5_4f5a832a",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-03-09T20:02:28Z",
+      "side": 1,
+      "message": "Tiny nit. I think this \u0027s\u0027 is not required. Should be Job foo does not exist.",
+      "range": {
+        "startLine": 196,
+        "startChar": 42,
+        "endLine": 196,
+        "endChar": 43
+      },
+      "revId": "24e16d3c36ccdb26b396fafbaa39613c5764d8a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
