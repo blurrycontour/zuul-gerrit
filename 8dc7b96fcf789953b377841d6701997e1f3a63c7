@@ -172,6 +172,30 @@
     },
     {
       "key": {
+        "uuid": "df7087c5_d92e6642",
+        "filename": "tests/remote/test_remote_action_modules.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-03-09T17:20:56Z",
+      "side": 1,
+      "message": "We also need to re-add that as otherwise we won\u0027t get any feedback what went wrong in case the test failed.",
+      "parentUuid": "df7087c5_c331950d",
+      "range": {
+        "startLine": 33,
+        "startChar": 8,
+        "endLine": 33,
+        "endChar": 47
+      },
+      "revId": "8dc7b96fcf789953b377841d6701997e1f3a63c7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df7087c5_23c1712f",
         "filename": "tests/remote/test_remote_action_modules.py",
         "patchSetId": 5
