@@ -7,6 +7,7 @@ module.exports = {
   entry: {
     main: './web/main.ts',
     status: './web/status.ts',
+    builds: './web/builds.ts',
     stream: './web/stream.ts',
   },
   resolve: {
@@ -55,7 +56,8 @@ module.exports = {
       title: 'Zuul Builds',
       app: 'zuulBuilds',
       template: 'web/main.ejs',
-      filename: 'builds.html'
+      filename: 'builds.html',
+      chunks: ['builds', 'vendor', 'runtime~builds']
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Job',
