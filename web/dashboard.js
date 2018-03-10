@@ -18,7 +18,6 @@
 // @licend  The above is the entire license notice
 // for the JavaScript code in this page.
 
-import 'bootstrap/dist/css/bootstrap.css'
 import angular from 'angular'
 
 import './styles/zuul.css'
