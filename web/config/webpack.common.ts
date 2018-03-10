@@ -1,9 +1,27 @@
-const path = require('path');
-const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+import * as path from 'path'
+import * as webpack from 'webpack'
+import * as HtmlWebpackPlugin from 'html-webpack-plugin'
 
-module.exports = {
-  entry: './web/main.js',
+// Workaround issue in the published typescript definition of
+// webpack.Options.SplitChunksOptions in @types/webpack. The published
+// definition says:
+//   cacheGroups?: false | string | ((...args: any[]) => any) | RegExp | CacheGroupsOptions
+// but what webpack ACTUALLY wants, rather than a CacheGroupsOptions is a
+// Map<string, CacheGroupsOptions>.
+// A PR has been submitted upstream:
+//    https://github.com/DefinitelyTyped/DefinitelyTyped/pull/24221
+// For now, just extend with any
+interface Configuration extends webpack.Configuration {
+  optimization?: any
+}
+
+const config: Configuration = {
+  entry: {
+    main: './web/main.ts',
+  },
+  resolve: {
+    extensions: [ '.tsx', '.ts', '.js' ]
+  },
   output: {
     filename: '[name].js',
     // path.resolve(__dirname winds up relative to the config dir
@@ -36,55 +54,54 @@ module.exports = {
     // output file.
     new HtmlWebpackPlugin({
       title: 'Zuul Status',
-      app: 'zuulStatus',
-      template: 'web/main.ejs',
-      filename: 'status.html'
+      template: 'web/config/main.ejs',
+      filename: 'status.html',
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Builds',
-      app: 'zuulBuilds',
-      template: 'web/main.ejs',
-      filename: 'builds.html'
+      template: 'web/config/main.ejs',
+      filename: 'builds.html',
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Job',
-      app: 'zuulJob',
-      template: 'web/main.ejs',
-      filename: 'job.html'
+      template: 'web/config/main.ejs',
+      filename: 'job.html',
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Jobs',
-      app: 'zuulJobs',
-      template: 'web/main.ejs',
-      filename: 'jobs.html'
+      template: 'web/config/main.ejs',
+      filename: 'jobs.html',
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Project',
-      app: 'zuulProject',
-      template: 'web/main.ejs',
-      filename: 'project.html'
+      template: 'web/config/main.ejs',
+      filename: 'project.html',
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Projects',
-      app: 'zuulProjects',
-      template: 'web/main.ejs',
-      filename: 'projects.html'
+      template: 'web/config/main.ejs',
+      filename: 'projects.html',
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Tenants',
-      app: 'zuulTenants',
-      template: 'web/main.ejs',
-      filename: 'tenants.html'
+      template: 'web/config/main.ejs',
+      filename: 'tenants.html',
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Console Stream',
-      app: 'zuulStream',
-      template: 'web/main.ejs',
-      filename: 'stream.html'
+      template: 'web/config/main.ejs',
+      filename: 'stream.html',
     })
   ],
   module: {
     rules: [
+      {
+        test: /\.ts$/,
+        exclude: /node_modules/,
+        use: [
+          'babel-loader', 'ts-loader'
+        ]
+      },
       {
         test: /\.js$/,
         exclude: /node_modules/,
@@ -146,4 +163,6 @@ module.exports = {
       }
     ]
   }
-};
+}
+
+export default config
