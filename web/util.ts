@@ -1,9 +1,7 @@
-// Main library entrypoint
-//
 // @licstart  The following is the entire license notice for the
 // JavaScript code in this page.
 //
-// Copyright 2018 Red Hat, Inc.
+// Copyright 2017 Red Hat
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may
 // not use this file except in compliance with the License. You may obtain
@@ -20,6 +18,15 @@
 // @licend  The above is the entire license notice
 // for the JavaScript code in this page.
 
-import './status'
-import './stream'
-import './dashboard'
+// TODO(mordred) This should be encapsulated in an Angular Service singleton
+// that fetches the other things from the info endpoint.
+
+declare var ZUUL_API_URL: string;
+
+export function getSourceUrl (filename, $location) {
+  if (typeof ZUUL_API_URL !== 'undefined') {
+    return ZUUL_API_URL + '/' + filename
+  } else {
+    return filename
+  }
+}
