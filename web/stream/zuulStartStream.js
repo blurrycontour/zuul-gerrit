@@ -21,9 +21,6 @@
 // @licend  The above is the entire license notice for the JavaScript code in
 // this page.
 
-import angular from 'angular'
-import './styles/stream.css'
-
 function escapeLog (text) {
   const pattern = /[<>&"']/g
 
@@ -92,9 +89,4 @@ function zuulStartStream () {
   }
 }
 
-angular.module('zuulStream', []).component('zuulApp', {
-  template: require('./templates/stream.html'),
-  controller: function ($http) {
-    window.onload = zuulStartStream()
-  }
-})
+export default zuulStartStream

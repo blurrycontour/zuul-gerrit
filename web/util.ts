@@ -1,4 +1,3 @@
-/* global ZUUL_API_URL */
 // @licstart  The following is the entire license notice for the
 // JavaScript code in this page.
 //
@@ -21,10 +20,22 @@
 
 // TODO(mordred) This should be encapsulated in an Angular Service singleton
 // that fetches the other things from the info endpoint.
-export function getSourceUrl (filename, $location) {
+
+declare var ZUUL_API_URL: string
+declare var ZUUL_BASE_HREF: string
+
+export default function getSourceUrl (filename: string): string {
   if (typeof ZUUL_API_URL !== 'undefined') {
     return ZUUL_API_URL + '/' + filename
   } else {
     return filename
+  }
+}
+
+export function getBaseHref (): string {
+  if (typeof ZUUL_BASE_HREF !== 'undefined') {
+    return ZUUL_BASE_HREF
+  } else {
+    return '/'
   }
 }
