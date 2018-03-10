@@ -21,14 +21,14 @@
 import angular from 'angular'
 
 import './styles/zuul.css'
-import { getSourceUrl } from './util'
+import getSourceUrl from './util'
 
 angular.module('zuulTenants', []).component('zuulApp', {
   template: require('./templates/tenants.html'),
   controller: function ($scope, $http, $location) {
     $scope.tenants = undefined
     $scope.tenants_fetch = function () {
-      $http.get(getSourceUrl('tenants', $location))
+      $http.get(getSourceUrl('tenants'))
         .then(result => {
           this.tenants = result.data
         })
@@ -85,7 +85,7 @@ angular.module('zuulJobs', [], function ($locationProvider) {
   controller: function ($http, $location) {
     this.jobs = undefined
     this.jobs_fetch = function () {
-      $http.get(getSourceUrl('jobs', $location))
+      $http.get(getSourceUrl('jobs'))
         .then(result => {
           this.jobs = result.data
           for (let job of this.jobs) {
@@ -199,7 +199,7 @@ angular.module('zuulBuilds', [], function ($locationProvider) {
       if (this.job_name) { queryString += '&job_name=' + this.job_name }
       if (this.project) { queryString += '&project=' + this.project }
       if (queryString !== '') { queryString = '?' + queryString.substr(1) }
-      let remoteLocation = getSourceUrl('builds', $location) + queryString
+      let remoteLocation = getSourceUrl('builds') + queryString
       $http.get(remoteLocation)
         .then(result => {
           for (let build of result.data) {
