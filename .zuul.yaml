@@ -69,7 +69,7 @@
             success-url: 'npm/html/status.html'
             files:
               - package.json
-              - webpack.config.js
+              - webpack.config.ts
               - yarn.lock
               - web/.*
             vars:
@@ -81,7 +81,7 @@
             success-url: 'npm/reports/bundle.html'
             files:
               - package.json
-              - webpack.config.js
+              - webpack.config.ts
               - yarn.lock
               - web/.*
         - zuul-stream-functional
@@ -105,9 +105,10 @@
             success-url: 'npm/html/status.html'
             files:
               - package.json
-              - webpack.config.js
-              - yarn.lock
+              - tsconfig.json
               - web/.*
+              - webpack.config.ts
+              - yarn.lock
             vars:
               javascript_content_dir: zuul/web/static
               npm_command: build:dist -- --define ZUUL_API_URL="'https://zuul.openstack.org'"
@@ -117,9 +118,10 @@
             success-url: 'npm/reports/bundle.html'
             files:
               - package.json
-              - webpack.config.js
-              - yarn.lock
+              - tsconfig.json
               - web/.*
+              - webpack.config.ts
+              - yarn.lock
         - zuul-stream-functional
         - zuul-tox-remote
     post:

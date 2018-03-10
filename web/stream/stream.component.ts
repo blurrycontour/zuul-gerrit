@@ -1,8 +1,7 @@
-/* global ZUUL_API_URL */
 // @licstart  The following is the entire license notice for the
 // JavaScript code in this page.
 //
-// Copyright 2017 Red Hat
+// Copyright 2018 Red Hat, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may
 // not use this file except in compliance with the License. You may obtain
@@ -19,12 +18,15 @@
 // @licend  The above is the entire license notice
 // for the JavaScript code in this page.
 
-// TODO(mordred) This should be encapsulated in an Angular Service singleton
-// that fetches the other things from the info endpoint.
-export function getSourceUrl (filename, $location) {
-  if (typeof ZUUL_API_URL !== 'undefined') {
-    return ZUUL_API_URL + '/' + filename
-  } else {
-    return filename
+import { Component, OnInit } from '@angular/core'
+
+import zuulStartStream from './zuulStartStream'
+
+@Component({
+  template: require('./stream.html')
+})
+export default class StreamComponent implements OnInit {
+  ngOnInit() {
+    zuulStartStream()
   }
 }

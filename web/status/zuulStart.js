@@ -1,4 +1,4 @@
-/* global jQuery, URL, DemoStatusBasic, DemoStatusOpenStack, DemoStatusTree, BuiltinConfig */
+/* global URL, DemoStatusBasic, DemoStatusOpenStack, DemoStatusTree, BuiltinConfig */
 // Client script for Zuul status page
 //
 // @licstart  The following is the entire license notice for the
@@ -26,11 +26,11 @@
 
 import 'jquery-visibility/jquery-visibility'
 import 'graphitejs/jquery.graphite.js'
-import angular from 'angular'
 
-import './styles/zuul.css'
 import './jquery.zuul'
-import { getSourceUrl } from './util'
+
+/* TODO(mordred) Convert getSourceUrl to a service and remove this import */
+import getSourceUrl from '../util'
 
 /**
  * @return The $.zuul instance
@@ -108,19 +108,4 @@ function zuulStart ($) {
   return zuul
 }
 
-if (module.hot) {
-  // This doesn't fully work with our jquery plugin because $.zuul is already
-  // instantiated. Leaving it here to show where a hook can happen if we can
-  // figure out a way to live update it. When it's not there, an update to
-  // jquery.zuul.js triggers a page reload.
-  // module.hot.accept('./jquery.zuul', function() {
-  //   console.log('Accepting the updated module!');
-  // })
-}
-
-angular.module('zuulStatus', []).component('zuulApp', {
-  template: require('./templates/status.html'),
-  controller: function ($http) {
-    zuulStart(jQuery)
-  }
-})
+export default zuulStart
