@@ -18,11 +18,6 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import RedImage from '../images/red.png'
-import GreyImage from '../images/grey.png'
-import GreenImage from '../images/green.png'
-import BlackImage from '../images/black.png'
-import LineImage from '../images/line.png'
 import LineAngleImage from '../images/line-angle.png'
 import LineTImage from '../images/line-t.png';
 
@@ -388,17 +383,16 @@ import LineTImage from '../images/line-t.png';
       },
 
       change_status_icon: function (change) {
-        let iconFile = GreenImage
+        let iconGlyph = 'glyphicon-ok-circle'
         let iconTitle = 'Succeeding'
 
         if (change.active !== true) {
           // Grey icon
-          iconFile = GreyImage
-          iconTitle = 'Waiting until closer to head of queue to' +
-                        ' start jobs'
+          iconGlyph = 'glyphicon-asterisk'
+          iconTitle = 'Waiting until closer to head of queue to start jobs'
         } else if (change.live !== true) {
           // Grey icon
-          iconFile = GreyImage
+          iconGlyph = 'glyphicon-refresh'
           iconTitle = 'Dependent change required for testing'
         } else if (change.failing_reasons &&
                          change.failing_reasons.length > 0) {
@@ -406,17 +400,17 @@ import LineTImage from '../images/line-t.png';
           iconTitle = 'Failing because ' + reason
           if (reason.match(/merge conflict/)) {
             // Black icon
-            iconFile = BlackImage
+            iconGlyph = 'glyphicon-ban-circle'
           } else {
             // Red icon
-            iconFile = RedImage
+            iconGlyph = 'glyphicon-remove-circle'
           }
         }
 
-        let $icon = $('<img />')
-          .attr('src', iconFile)
+        let $icon = $('<span />')
+          .addClass('zuul-build-status glyphicon')
+          .addClass(iconGlyph)
           .attr('title', iconTitle)
-          .css('margin-top', '-6px')
 
         return $icon
       },
@@ -426,18 +420,10 @@ import LineTImage from '../images/line-t.png';
 
         for (let i = 0; i < changeQueue._tree_columns; i++) {
           let $treeCell = $('<td />')
-            .css('height', '100%')
-            .css('padding', '0 0 10px 0')
-            .css('margin', '0')
-            .css('width', '16px')
-            .css('min-width', '16px')
-            .css('overflow', 'hidden')
-            .css('vertical-align', 'top')
+            .addClass('zuul-change-row')
 
           if (i < change._tree.length && change._tree[i] !== null) {
-            $treeCell.css('background-image',
-              'url(' + LineImage + ')')
-              .css('background-repeat', 'repeat-y')
+            $treeCell.addClass('zuul-change-row-line')
           }
 
           if (i === change._tree_index) {
