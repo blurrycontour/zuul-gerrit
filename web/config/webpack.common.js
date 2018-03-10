@@ -4,17 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
-  entry: {
-    main: './web/main.js',
-    // Tell webpack to extract 3rd party depdenencies which change less
-    // frequently.
-    vendor: [
-      'angular',
-      'bootstrap/dist/css/bootstrap.css',
-      'jquery-visibility/jquery-visibility',
-      'graphitejs/jquery.graphite.js'
-    ]
-  },
+  entry: './web/main.js',
   output: {
     filename: '[name].js',
     // path.resolve(__dirname winds up relative to the config dir
@@ -25,16 +15,22 @@ module.exports = {
   // expensive to build for prod. Debugging without the full source-map sucks,
   // so define it here in common.
   devtool: 'source-map',
+  optimization: {
+    runtimeChunk: true,
+    splitChunks: {
+      cacheGroups: {
+        commons: {
+          test: /node_modules/,
+          name: "vendor",
+          chunks: "all"
+        }
+      }
+    }
+  },
   plugins: [
     new webpack.ProvidePlugin({
         $: 'jquery/dist/jquery',
         jQuery: 'jquery/dist/jquery',
-    }),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor',
-    }),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'manifest',
     }),
     new CleanWebpackPlugin(
         ['zuul/web/static'], { root: path.resolve(__dirname, '../..')}),
