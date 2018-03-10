@@ -14,16 +14,7 @@ License for the specific language governing permissions and limitations
 under the License.
 -->
 <div class="container-fluid">
-  <nav class="navbar navbar-default">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <a class="navbar-brand">Zuul Dashboard</a>
-    </div>
-    <ul class="nav navbar-nav">
-      <li class="active"><a href=".">Tenants</a></li>
-    </ul>
-  </div>
-  </nav>
+  <!-- TODO(mordred) Make navigation smarter to handle tenants list -->
   <table class="table table-hover table-condensed">
     <thead>
       <tr>
@@ -36,11 +27,11 @@ under the License.
       </tr>
     </thead>
     <tbody>
-      <tr ng-repeat="tenant in tenants">
+      <tr *ngFor="let tenant of tenants">
         <td>{{ tenant.name }}</td>
-        <td><a href="{{ tenant.name }}/status.html">status</a></td>
-        <td><a href="{{ tenant.name }}/jobs.html">jobs</a></td>
-        <td><a href="{{ tenant.name }}/builds.html">builds</a></td>
+        <td><a routerLink="{{ tenant.name }}/status.html">status</a></td>
+        <td><a routerLink="{{ tenant.name }}/jobs.html">jobs</a></td>
+        <td><a routerLink="{{ tenant.name }}/builds.html">builds</a></td>
         <td>{{ tenant.projects }}</td>
         <td>{{ tenant.queue }}</td>
       </tr>

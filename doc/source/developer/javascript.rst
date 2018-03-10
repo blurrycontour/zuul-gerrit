@@ -100,10 +100,10 @@ appropriate javascript and CSS to get going.
 We need to modify the html generated for each of our pages, so there are
 templates in ``web/templates``.
 
-The main `webpack`_ config file is ``webpack.config.js``. In the Zuul tree that
+The main `webpack`_ config file is ``webpack.config.ts``. In the Zuul tree that
 file is a stub file that includes either a dev or a prod environment from
-``web/config/webpack.dev.js`` or ``web/config/webpack.prod.js``. Most of the
-important bits are in ``web/config/webpack.common.js``.
+``web/config/webpack.dev.ts`` or ``web/config/webpack.prod.ts``. Most of the
+important bits are in ``web/config/webpack.common.ts``.
 
 Development
 -----------
