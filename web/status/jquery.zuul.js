@@ -24,13 +24,13 @@
 // @licend  The above is the entire license notice
 // for the JavaScript code in this page.
 
-import RedImage from './images/red.png'
-import GreyImage from './images/grey.png'
-import GreenImage from './images/green.png'
-import BlackImage from './images/black.png'
-import LineImage from './images/line.png'
-import LineAngleImage from './images/line-angle.png'
-import LineTImage from './images/line-t.png';
+import RedImage from '../images/red.png'
+import GreyImage from '../images/grey.png'
+import GreenImage from '../images/green.png'
+import BlackImage from '../images/black.png'
+import LineImage from '../images/line.png'
+import LineAngleImage from '../images/line-angle.png'
+import LineTImage from '../images/line-t.png';
 
 (function ($) {
   function setCookie (name, value) {

@@ -4,7 +4,14 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
-  entry: './web/main.js',
+  entry: {
+    main: './web/main.ts',
+    status: './web/status.ts',
+    stream: './web/stream.ts',
+  },
+  resolve: {
+    extensions: [ '.tsx', '.ts', '.js' ]
+  },
   output: {
     filename: '[name].js',
     // path.resolve(__dirname winds up relative to the config dir
@@ -41,7 +48,8 @@ module.exports = {
       title: 'Zuul Status',
       app: 'zuulStatus',
       template: 'web/main.ejs',
-      filename: 'status.html'
+      filename: 'status.html',
+      chunks: ['status', 'vendor', 'runtime~status']
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Builds',
@@ -83,11 +91,19 @@ module.exports = {
       title: 'Zuul Console Stream',
       app: 'zuulStream',
       template: 'web/main.ejs',
-      filename: 'stream.html'
+      filename: 'stream.html',
+      chunks: ['stream', 'vendor', 'runtime~stream']
     })
   ],
   module: {
     rules: [
+      {
+        test: /\.ts$/,
+        exclude: /node_modules/,
+        use: [
+          'babel-loader', 'ts-loader'
+        ]
+      },
       {
         test: /\.js$/,
         exclude: /node_modules/,

@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "outDir": "./zuul/web/static/",
+    "noImplicitAny": false,
+    "target": "es6",
+    "jsx": "react",
+    "allowJs": true
+  }
+}
