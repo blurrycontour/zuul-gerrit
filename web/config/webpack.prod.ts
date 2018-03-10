@@ -1,10 +1,11 @@
-const path = require('path');
-const webpack = require('webpack');
-const Merge = require('webpack-merge');
-const CommonConfig = require('./webpack.common.js');
-const ArchivePlugin = require('webpack-archive-plugin');
+import * as path from 'path'
+import * as webpack from 'webpack'
+import * as WebpackMerge from 'webpack-merge'
+import * as ArchivePlugin from 'webpack-archive-plugin'
 
-module.exports = Merge(CommonConfig, {
+import * as CommonConfig from './webpack.common'
+
+const config: webpack.Configuration = WebpackMerge(CommonConfig, {
   mode: 'production',
   output: {
     filename: '[name].[chunkhash].js',
@@ -33,3 +34,5 @@ module.exports = Merge(CommonConfig, {
     })
   ]
 })
+
+export default config
