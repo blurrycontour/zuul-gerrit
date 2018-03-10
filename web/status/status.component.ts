@@ -1,5 +1,3 @@
-// Main library entrypoint
-//
 // @licstart  The following is the entire license notice for the
 // JavaScript code in this page.
 //
@@ -20,6 +18,15 @@
 // @licend  The above is the entire license notice
 // for the JavaScript code in this page.
 
-import './status'
-import './stream'
-import './dashboard'
+import { Component, OnInit } from '@angular/core';
+
+import zuulStart from './zuulStart'
+
+@Component({
+  template: require('./status.html')
+})
+export default class StatusComponent implements OnInit {
+  ngOnInit() {
+    zuulStart(jQuery)
+  }
+}

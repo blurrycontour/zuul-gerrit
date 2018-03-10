@@ -14,47 +14,37 @@ License for the specific language governing permissions and limitations
 under the License.
 -->
 <div class="container-fluid">
-  <nav class="navbar navbar-default">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <a class="navbar-brand" href="../" target="_self">Zuul Dashboard</a>
-    </div>
-    <ul class="nav navbar-nav">
-      <li><a href="status.html" target="_self">Status</a></li>
-      <li><a href="projects.html" target="_self">Projects</a></li>
-      <li><a href="jobs.html" target="_self">Jobs</a></li>
-      <li><a href="builds.html" target="_self">Builds</a></li>
-    </ul>
-  </div>
-  </nav>
   <div class="container-fluid panel-group">
     <div class="panel panel-info">
-      <div class="panel-heading">Project {{ $ctrl.project_name }}</div>
+      <div class="panel-heading">Project {{ project_name }}</div>
       <div class="panel panel-body">
         <table class="table table-condensed table-bordered">
           <tr>
             <td>Canonical name</td>
-            <td>{{ $ctrl.project.canonical_name }}</td>
+            <td>{{ project.canonical_name }}</td>
           </tr>
           <tr ng-if="project.default_branch">
             <td>Default branch</td>
-            <td>{{ $ctrl.project.default_branch }}</td>
+            <td>{{ project.default_branch }}</td>
           </tr>
           <tr ng-if="project.merge_mode">
             <td>Merge mode</td>
-            <td>{{ $ctrl.project.merge_mode }}</td>
+            <td>{{ project.merge_mode }}</td>
           </tr>
         </table>
       </div>
     </div>
-    <div class="panel panel-info" ng-if="$ctrl.project.pipelines">
+    <div class="panel panel-info" *ngIf="project.pipelines">
       <div class="panel-heading">Pipelines</div>
       <div class="panel panel-body">
-        <div ng-repeat="(pipeline_name, pipeline) in $ctrl.project.pipelines">
-          <h3>{{ pipeline_name }}</h3>
+        <div *ngFor="let pipeline of project.pipelines">
+          <h3>{{ pipeline[0] }}</h3>
           <ul class="list-group">
-            <li class="list-group-item" ng-repeat="job in pipeline.jobs">
-              <a href="job.html?job_name={{ job.name }}" target="_self">{{ job.name }}</a>
+            <li class="list-group-item" *ngFor="let job of pipeline[1].jobs">
+              <!-- TODO(mordred)
+                  Update this to routerLink once job is converted -->
+              <a href="job.html?job_name={{ job.name }}" target="_self">
+                  {{ job.name }}</a>
             </li>
           </ul>
         </div>

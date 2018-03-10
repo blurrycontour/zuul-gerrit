@@ -16,14 +16,14 @@ under the License.
 -->
 <html>
 <head>
+  <!-- TODO(mordred)
+      This will not work with sub-url schemes. We need to fetch
+      config data and use that to set this.
+  -->
+  <base href="/">
   <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
   <title id='pagetitle'><%= htmlWebpackPlugin.options.title %></title>
 </head>
-<body ng-app="<%= htmlWebpackPlugin.options.app %>">
-  <!--
-    zuul-app will be replaced with the template contents associated with
-    the zuulApp component associated with the module matching the app name
-    given in ng-app
-  -->
-  <zuul-app></zuul-app>
+<body>
+  <zuul-dashboard></zuul-dashboard>
 </body></html>
