@@ -23,7 +23,7 @@
 
 declare var ZUUL_API_URL: string;
 
-export function getSourceUrl (filename, $location) {
+export default function getSourceUrl (filename: string): string {
   if (typeof ZUUL_API_URL !== 'undefined') {
     return ZUUL_API_URL + '/' + filename
   } else {
