@@ -8,6 +8,25 @@
     float: right;
 }
 
+.zuul-change-row {
+    height: 100%;
+    padding: 0 0 10px 0;
+    margin: 0;
+    width: 16px;
+    min-width: 16px;
+    overflow: hidden;
+    vertical-align: top;
+}
+
+.zuul-build-status {
+    margin-top: -6px;
+}
+
+.zuul-change-row-line {
+    background-image: url('../images/line.png');
+    background-repeat: 'repeat-y';
+}
+
 .zuul-job-result {
     float: right;
     width: 70px;
@@ -57,4 +76,19 @@
 .zuul-patchset-header {
     font-size: small;
     padding: 8px 12px;
+}
+
+.glyphicon-ok-circle {
+    background: white;
+    color: green;
+}
+
+.glyphicon-refresh, .glyphicon-asterisk {
+    background: white;
+    color: grey;
+}
+
+.glyphicon-remove-circle {
+    background: white;
+    color: red;
 }
