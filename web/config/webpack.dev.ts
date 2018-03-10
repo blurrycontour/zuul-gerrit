@@ -1,10 +1,9 @@
-const path = require('path');
-const webpack = require('webpack');
-const Merge = require('webpack-merge');
-const CommonConfig = require('./webpack.common.js');
+import * as path from 'path'
+import * as webpack from 'webpack'
+import * as WebpackMerge from 'webpack-merge'
+import * as CommonConfig from './webpack.common'
 
-module.exports = Merge(CommonConfig, {
-  mode: 'development',
+const config: webpack.Configuration = WebpackMerge(CommonConfig, {
   // Enable Hot Module Replacement for devServer
   devServer: {
     hot: true,
@@ -27,10 +26,13 @@ module.exports = Merge(CommonConfig, {
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
     // We only need to bundle the demo files when we're running locally
+    // The paths are relative to the file that they're being injected in to.
     new webpack.ProvidePlugin({
-        DemoStatusBasic: './status-basic.json',
-        DemoStatusOpenStack: './status-openstack.json',
-        DemoStatusTree: './status-tree.json'
+        DemoStatusBasic: '../config/status-basic.json',
+        DemoStatusOpenStack: '../config/status-openstack.json',
+        DemoStatusTree: '../config/status-tree.json'
     }),
   ]
 })
+
+export default config
