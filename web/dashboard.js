@@ -21,7 +21,6 @@
 import angular from 'angular'
 
 import './styles/zuul.css'
-import './jquery.zuul'
 import { getSourceUrl } from './util'
 
 angular.module('zuulTenants', []).component('zuulApp', {
