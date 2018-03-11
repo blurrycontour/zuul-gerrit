@@ -33,6 +33,24 @@
       "revId": "11b131bf73163b1f5c63816eabde3f8e9a0d5d64",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df7087c5_675d23e8",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-03-11T03:00:25Z",
+      "side": 1,
+      "message": "Good point, though tenant path segment is likely hard-coded at the proxy level, e.g. you probably want a gateway/fqdn per tenants.",
+      "parentUuid": "df7087c5_efe6f716",
+      "revId": "11b131bf73163b1f5c63816eabde3f8e9a0d5d64",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
