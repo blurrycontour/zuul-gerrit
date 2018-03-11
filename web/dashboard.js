@@ -23,20 +23,6 @@ import angular from 'angular'
 import './styles/zuul.css'
 import getSourceUrl from './util'
 
-angular.module('zuulTenants', []).component('zuulApp', {
-  template: require('./templates/tenants.html'),
-  controller: function ($scope, $http, $location) {
-    $scope.tenants = undefined
-    $scope.tenants_fetch = function () {
-      $http.get(getSourceUrl('tenants'))
-        .then(result => {
-          this.tenants = result.data
-        })
-    }
-    $scope.tenants_fetch()
-  }
-})
-
 angular.module('zuulProjects', []).component('zuulApp', {
   template: require('./templates/projects.html'),
   controller: function ($http) {
