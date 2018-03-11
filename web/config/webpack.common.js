@@ -52,56 +52,56 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'Zuul Status',
       app: 'zuulStatus',
-      template: 'web/main.ejs',
+      template: 'web/config/main.ejs',
       filename: 'status.html',
       chunks: ['status', 'vendor', 'runtime~status']
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Builds',
       app: 'zuulBuilds',
-      template: 'web/main.ejs',
+      template: 'web/config/main.ejs',
       filename: 'builds.html',
       chunks: ['builds', 'vendor', 'runtime~builds']
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Job',
       app: 'zuulJob',
-      template: 'web/main.ejs',
+      template: 'web/config/main.ejs',
       filename: 'job.html',
       chunks: ['job', 'vendor', 'runtime~job']
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Jobs',
       app: 'zuulJobs',
-      template: 'web/main.ejs',
+      template: 'web/config/main.ejs',
       filename: 'jobs.html',
       chunks: ['jobs', 'vendor', 'runtime~jobs']
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Project',
       app: 'zuulProject',
-      template: 'web/main.ejs',
+      template: 'web/config/main.ejs',
       filename: 'project.html',
       chunks: ['project', 'vendor', 'runtime~project']
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Projects',
       app: 'zuulProjects',
-      template: 'web/main.ejs',
+      template: 'web/config/main.ejs',
       filename: 'projects.html',
       chunks: ['projects', 'vendor', 'runtime~projects']
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Tenants',
       app: 'zuulTenants',
-      template: 'web/main.ejs',
+      template: 'web/config/main.ejs',
       filename: 'tenants.html',
       chunks: ['tenants', 'vendor', 'runtime~tenants']
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Console Stream',
       app: 'zuulStream',
-      template: 'web/main.ejs',
+      template: 'web/config/main.ejs',
       filename: 'stream.html',
       chunks: ['stream', 'vendor', 'runtime~stream']
     })
