@@ -1,9 +1,24 @@
-const path = require('path');
-const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
+import * as path from 'path'
+import * as webpack from 'webpack'
+import * as HtmlWebpackPlugin from 'html-webpack-plugin'
+import * as CleanWebpackPlugin from 'clean-webpack-plugin'
 
-module.exports = {
+// Workaround issue in the published typescript definition of
+// webpack.Options.SplitChunksOptions in @types/webpack. The published
+// definition says:
+//   cacheGroups?: false | string | ((...args: any[]) => any) | RegExp | CacheGroupsOptions;
+// but what webpack ACTUALLY wants, rather than a CacheGroupsOptions is a
+// Map<string, CacheGroupsOptions>.
+// A PR has been submitted upstream:
+//    https://github.com/DefinitelyTyped/DefinitelyTyped/pull/24221
+// For now, just extend with any
+interface Configuration extends webpack.Configuration {
+  optimization?: any
+}
+
+const config: Configuration = {
+  // Default to development, the prod config will override
+  mode: 'development',
   entry: {
     status: './web/status.ts',
     builds: './web/builds.ts',
@@ -176,4 +191,6 @@ module.exports = {
       }
     ]
   }
-};
+}
+
+export default config
