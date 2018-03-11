@@ -1,10 +1,9 @@
-const path = require('path');
-const webpack = require('webpack');
-const Merge = require('webpack-merge');
-const CommonConfig = require('./webpack.common.js');
+import * as path from 'path'
+import * as webpack from 'webpack'
+import * as WebpackMerge from 'webpack-merge'
+import * as CommonConfig from './webpack.common'
 
-module.exports = Merge(CommonConfig, {
-  mode: 'development',
+const config: webpack.Configuration = WebpackMerge(CommonConfig, {
   // Enable Hot Module Replacement for devServer
   devServer: {
     hot: true,
@@ -35,3 +34,5 @@ module.exports = Merge(CommonConfig, {
     }),
   ]
 })
+
+export default config
