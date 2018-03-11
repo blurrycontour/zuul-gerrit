@@ -19,44 +19,39 @@
 // for the JavaScript code in this page.
 
 import getSourceUrl from '../util'
+import { IJob } from '../jobs/jobs.controller'
 
-export interface IJob {
-  expanded: boolean
-  details: any
-  name: string
+interface IPipeline {
+  jobs: Array<IJob>
 }
 
-export default class JobsController {
+interface IProjectDetail {
+  project_name: string
+  canonical_name: string
+  default_branch: string
+  merge_mode: string
+  pipelines: Array<[string, IPipeline]>
+}
+
+export default class ProjectController {
 
   $http: ng.IHttpService
-  jobs: Array<IJob>
+  project_name: string
+  project: IProjectDetail
 
-  constructor($http: ng.IHttpService) {
-    this.$http = $http
-    this.jobsFetch()
-  }
-
-  jobsFetch(): void {
-      this.$http.get(getSourceUrl('jobs'))
-        .then(result => this.injestJobs(result))
-  }
-
-  injestJobs(result): void {
-    let jobs = <Array<IJob>>result.data
-    for (let job of jobs) {
-      job.expanded = false
-      job.details = undefined
+  constructor($http: ng.IHttpService, $location: ng.ILocationService) {
+    let queryArgs = $location.search()
+    this.project_name = queryArgs['project_name']
+    if (!this.project_name) {
+      this.project_name = 'config-projects'
     }
-    this.jobs = jobs
+    this.projectFetch()
   }
 
-  jobToggleExpanded(job: IJob) {
-    if (!job.details) {
-      this.$http.get(getSourceUrl('jobs/' + job.name))
-        .then(result => {
-          job.details = result.data
-        })
-    }
-    job.expanded = !job.expanded
+  projectFetch(): void {
+    this.$http.get(getSourceUrl('projects/' + this.project_name))
+      .then(result => {
+        this.project = <IProjectDetail>result.data
+      })
   }
 }

@@ -1,9 +1,7 @@
-// Main library entrypoint
-//
 // @licstart  The following is the entire license notice for the
 // JavaScript code in this page.
 //
-// Copyright 2018 Red Hat, Inc.
+// Copyright 2017 Red Hat
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may
 // not use this file except in compliance with the License. You may obtain
@@ -20,5 +18,27 @@
 // @licend  The above is the entire license notice
 // for the JavaScript code in this page.
 
-import './stream'
-import './dashboard'
+import getSourceUrl from '../util'
+
+interface IProject {
+  name: string
+  type: string
+}
+
+export default class ProjectsController {
+
+  $http: ng.IHttpService
+  projects: Array<IProject>
+
+  constructor($http: ng.IHttpService) {
+    this.$http = $http
+    this.projectsFetch()
+  }
+
+  projectsFetch(): void {
+    this.$http.get(getSourceUrl('projects'))
+      .then(result => {
+        this.projects = <Array<IProject>>result.data
+      })
+  }
+}
