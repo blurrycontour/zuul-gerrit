@@ -9,6 +9,7 @@ module.exports = {
     status: './web/status.ts',
     builds: './web/builds.ts',
     stream: './web/stream.ts',
+    job: './web/job.ts'
   },
   resolve: {
     extensions: [ '.tsx', '.ts', '.js' ]
@@ -63,7 +64,8 @@ module.exports = {
       title: 'Zuul Job',
       app: 'zuulJob',
       template: 'web/main.ejs',
-      filename: 'job.html'
+      filename: 'job.html',
+      chunks: ['job', 'vendor', 'runtime~job']
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Jobs',
