@@ -5,13 +5,14 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
   entry: {
-    main: './web/main.ts',
     status: './web/status.ts',
     builds: './web/builds.ts',
     stream: './web/stream.ts',
     job: './web/job.ts',
     jobs: './web/jobs.ts',
-    tenants: './web/tenants.ts'
+    tenants: './web/tenants.ts',
+    project: './web/project.ts',
+    projects: './web/projects.ts'
   },
   resolve: {
     extensions: [ '.tsx', '.ts', '.js' ]
@@ -80,13 +81,15 @@ module.exports = {
       title: 'Zuul Project',
       app: 'zuulProject',
       template: 'web/main.ejs',
-      filename: 'project.html'
+      filename: 'project.html',
+      chunks: ['project', 'vendor', 'runtime~project']
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Projects',
       app: 'zuulProjects',
       template: 'web/main.ejs',
-      filename: 'projects.html'
+      filename: 'projects.html',
+      chunks: ['projects', 'vendor', 'runtime~projects']
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Tenants',
