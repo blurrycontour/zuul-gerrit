@@ -10,7 +10,8 @@ module.exports = {
     builds: './web/builds.ts',
     stream: './web/stream.ts',
     job: './web/job.ts',
-    jobs: './web/jobs.ts'
+    jobs: './web/jobs.ts',
+    tenants: './web/tenants.ts'
   },
   resolve: {
     extensions: [ '.tsx', '.ts', '.js' ]
@@ -91,7 +92,8 @@ module.exports = {
       title: 'Zuul Tenants',
       app: 'zuulTenants',
       template: 'web/main.ejs',
-      filename: 'tenants.html'
+      filename: 'tenants.html',
+      chunks: ['tenants', 'vendor', 'runtime~tenants']
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Console Stream',
