@@ -74,35 +74,3 @@ angular.module('zuulProject', [], function ($locationProvider) {
     this.project_fetch()
   }
 })
-
-angular.module('zuulJobs', [], function ($locationProvider) {
-  $locationProvider.html5Mode({
-    enabled: true,
-    requireBase: false
-  })
-}).component('zuulApp', {
-  template: require('./templates/jobs.html'),
-  controller: function ($http, $location) {
-    this.jobs = undefined
-    this.jobs_fetch = function () {
-      $http.get(getSourceUrl('jobs'))
-        .then(result => {
-          this.jobs = result.data
-          for (let job of this.jobs) {
-            job.expanded = false
-            job.details = undefined
-          }
-        })
-    }
-    this.job_fetch = function (job) {
-      if (!job.details) {
-        $http.get(getSourceUrl('jobs/' + job.name))
-          .then(result => {
-            job.details = result.data
-          })
-      }
-      job.expanded = !job.expanded
-    }
-    this.jobs_fetch()
-  }
-})
