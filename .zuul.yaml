@@ -59,7 +59,7 @@
             success-url: 'npm/html/status.html'
             files:
               - package.json
-              - webpack.config.js
+              - webpack.config.ts
               - yarn.lock
               - web/.*
             vars:
@@ -71,7 +71,7 @@
             success-url: 'npm/reports/bundle.html'
             files:
               - package.json
-              - webpack.config.js
+              - webpack.config.ts
               - yarn.lock
               - web/.*
         - zuul-stream-functional
@@ -96,7 +96,7 @@
               - package.json
               - tsconfig.json
               - web/.*
-              - webpack.config.js
+              - webpack.config.ts
               - yarn.lock
             vars:
               javascript_content_dir: zuul/web/static
@@ -109,7 +109,7 @@
               - package.json
               - tsconfig.json
               - web/.*
-              - webpack.config.js
+              - webpack.config.ts
               - yarn.lock
         - zuul-stream-functional
     post:
