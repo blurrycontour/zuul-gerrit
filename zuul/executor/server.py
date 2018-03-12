@@ -1186,14 +1186,14 @@ class AnsibleJob(object):
             # out the branch tip into a dedicated space.
             path = self.checkoutTrustedProject(project, 'master')
 
-        # The name of the symlink is the requested name of the role
+        # The name of the link is the requested name of the role
         # (which may be the repo name or may be something else; this
         # can come into play if this is a bare role).
         link = os.path.join(root, name)
         link = os.path.realpath(link)
         if not link.startswith(os.path.realpath(root)):
             raise ExecutorError("Invalid role name %s", name)
-        os.symlink(path, link)
+        os.link(path, link)
 
         try:
             role_path = self.findRole(link, trusted=jobdir_playbook.trusted)
