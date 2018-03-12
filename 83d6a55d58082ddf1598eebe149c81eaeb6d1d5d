@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df7087c5_ed62563e",
+        "filename": "zuul/ansible/paths.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-03-12T20:24:25Z",
+      "side": 1,
+      "message": "remove the leading \u0027/\u0027",
+      "revId": "83d6a55d58082ddf1598eebe149c81eaeb6d1d5d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df7087c5_0d66aa52",
+        "filename": "zuul/ansible/paths.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-03-12T20:24:25Z",
+      "side": 1,
+      "message": "and add a :",
+      "revId": "83d6a55d58082ddf1598eebe149c81eaeb6d1d5d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
