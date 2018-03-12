@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "df7087c5_712aae90",
+        "filename": "tests/remote/test_remote_action_modules.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-03-12T14:40:49Z",
+      "side": 1,
+      "message": "That\u0027s not that easy as in the config file we can only mount path to path and not path to /opt (the playbooks rely on a fixed path)",
+      "parentUuid": "df7087c5_d1461a7d",
+      "revId": "95a44e50f6da60db348af63400a983f0a4ceccd9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df7087c5_f149de8a",
         "filename": "tests/remote/test_remote_action_modules.py",
         "patchSetId": 14
@@ -30,6 +48,24 @@
       "writtenOn": "2018-03-12T14:38:33Z",
       "side": 1,
       "message": "This is not necessary -- the jobdir is *inside* of a tempdir that gets removed at the end of the test.",
+      "revId": "95a44e50f6da60db348af63400a983f0a4ceccd9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df7087c5_14000001",
+        "filename": "tests/remote/test_remote_action_modules.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-03-12T14:40:49Z",
+      "side": 1,
+      "message": "Ah, so I can just set the keep to true again",
+      "parentUuid": "df7087c5_f149de8a",
       "revId": "95a44e50f6da60db348af63400a983f0a4ceccd9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
