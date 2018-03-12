@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "df7087c5_9a50c0d6",
+        "filename": "tests/fixtures/config/remote-action-modules/git/org_project/playbooks/copy-bad.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-03-12T10:20:54Z",
+      "side": 1,
+      "message": "I have another idea, let me try something",
+      "parentUuid": "df7087c5_d4d2ad5c",
+      "revId": "b9100a32258d90f32ddcfcb33f58eb0e1807c280",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df7087c5_f487b160",
         "filename": "tests/remote/test_remote_action_modules.py",
         "patchSetId": 8
