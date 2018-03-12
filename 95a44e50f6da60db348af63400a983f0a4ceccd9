@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df7087c5_d1461a7d",
+        "filename": "tests/remote/test_remote_action_modules.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-03-12T14:38:33Z",
+      "side": 1,
+      "message": "It probably would be cleaner to do this as a configuration file modification.",
+      "revId": "95a44e50f6da60db348af63400a983f0a4ceccd9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df7087c5_f149de8a",
+        "filename": "tests/remote/test_remote_action_modules.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-03-12T14:38:33Z",
+      "side": 1,
+      "message": "This is not necessary -- the jobdir is *inside* of a tempdir that gets removed at the end of the test.",
+      "revId": "95a44e50f6da60db348af63400a983f0a4ceccd9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
