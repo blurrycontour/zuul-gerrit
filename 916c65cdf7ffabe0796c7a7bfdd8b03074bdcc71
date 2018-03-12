@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df7087c5_031e7b6f",
+        "filename": "tests/fixtures/config/remote-action-modules/git/org_project/playbooks/roles/assemble-test/tasks/main.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-03-12T21:56:41Z",
+      "side": 1,
+      "message": "Won\u0027t this prevent assemble from doing its job in all cases since none of the filenames we are using in the test match resolv.conf?",
+      "revId": "916c65cdf7ffabe0796c7a7bfdd8b03074bdcc71",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
