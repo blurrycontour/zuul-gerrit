@@ -16,6 +16,29 @@
       "revId": "2d613b0b6d446c8b0df54f82eacbfe4de7355dd1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df7087c5_a17f47de",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-03-14T20:16:40Z",
+      "side": 1,
+      "message": "This might be a dumb question, especially since we\u0027ve been using this for a while now, but are we certain these are the right keys?\n\nIf I run \"ansible localhost -m setup\", I can find a \u0027ansible_hostname\u0027 variable in the output, but not a \"ansible_host\". And I can find *no* reference to \u0027ansible_inventory_host\u0027 anywhere in Ansible source code, although their docs do reference a \"inventory_host\" hostvar (http://docs.ansible.com/ansible/latest/playbooks_variables.html#magic-variables-and-how-to-access-information-about-other-hosts).",
+      "range": {
+        "startLine": 149,
+        "startChar": 0,
+        "endLine": 150,
+        "endChar": 56
+      },
+      "revId": "2d613b0b6d446c8b0df54f82eacbfe4de7355dd1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
