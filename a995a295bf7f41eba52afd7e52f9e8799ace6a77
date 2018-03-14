@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df7087c5_a428cb96",
+        "filename": "tests/fixtures/config/remote-zuul-json/git/common-config/roles/common-copy/files/common-file",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-03-14T06:13:50Z",
+      "side": 1,
+      "message": "This file doesn\u0027t seem to belong to this test.",
+      "revId": "a995a295bf7f41eba52afd7e52f9e8799ace6a77",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df7087c5_441bef7f",
+        "filename": "tests/fixtures/config/remote-zuul-json/git/common-config/roles/common-copy/tasks/main.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-03-14T06:13:50Z",
+      "side": 1,
+      "message": "This file doesn\u0027t seem to belong to this test.",
+      "revId": "a995a295bf7f41eba52afd7e52f9e8799ace6a77",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
