@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df7087c5_f9742538",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-03-14T12:03:01Z",
+      "side": 1,
+      "message": "nit: the rest of the codebase uses lowercase \u0027utf-8\u0027",
+      "range": {
+        "startLine": 169,
+        "startChar": 26,
+        "endLine": 169,
+        "endChar": 31
+      },
+      "revId": "1cf860389ada211db2d1b1b2ba08ee658f247ef4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
