@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df7087c5_c1e11b9d",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 645,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-03-14T20:25:21Z",
+      "side": 1,
+      "message": "Something for discussion: you removed the name check for zuul and nodepool from here and defer to the validation per job. This incurs a semantic chang. If a secret named zuul is defined but not referenced this is currently an error but won\u0027t be catched with this change anymore.\n\nIs this an unintended side effect or are we ok with this?",
+      "revId": "efb9574d17991e01c0445a2e68c1f2e1e398f80b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
