@@ -7,4 +7,4 @@
     check:
       jobs:
         - test-job:
-            branches: ^(?!stable)
+            irrelevant-branches: ^stable

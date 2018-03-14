@@ -69,6 +69,11 @@ class BranchMatcher(AbstractChangeMatcher):
         return False
 
 
+class IrrelevantBranchMatcher(BranchMatcher):
+    def matches(self, change):
+        return not super(IrrelevantBranchMatcher, self).matches(change)
+
+
 class ImpliedBranchMatcher(AbstractChangeMatcher):
     """
     A branch matcher that only considers branch refs, and always
