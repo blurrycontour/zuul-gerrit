@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df7087c5_e82be991",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 1052,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-03-14T15:44:42Z",
+      "side": 1,
+      "message": "double dash here",
+      "revId": "99ad74ce28a02f6fa4a623f9d16d365666e6eb57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df7087c5_08297d99",
+        "filename": "tests/fixtures/layouts/matcher-test.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-03-14T15:44:42Z",
+      "side": 1,
+      "message": "irrelevant",
+      "revId": "99ad74ce28a02f6fa4a623f9d16d365666e6eb57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
