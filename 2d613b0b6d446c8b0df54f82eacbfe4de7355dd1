@@ -39,6 +39,30 @@
       "revId": "2d613b0b6d446c8b0df54f82eacbfe4de7355dd1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df7087c5_f123d0a5",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-03-14T20:36:12Z",
+      "side": 1,
+      "message": "I guess it\u0027s actually \"inventory_hostname\" that their docs reference, but I can\u0027t find that in any sample output that I\u0027ve tried, either.",
+      "parentUuid": "df7087c5_a17f47de",
+      "range": {
+        "startLine": 149,
+        "startChar": 0,
+        "endLine": 150,
+        "endChar": 56
+      },
+      "revId": "2d613b0b6d446c8b0df54f82eacbfe4de7355dd1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
