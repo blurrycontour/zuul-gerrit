@@ -207,9 +207,12 @@ class GearmanHandler(object):
 
     async def project_get(self, request, result_filter=None):
         job_args = {
-            'tenant': request.match_info["tenant"],
             'project': request.match_info["project_name"],
         }
+        try:
+            job_args['tenant'] = request.match_info["tenant"]
+        except KeyError:
+            pass
         job = self.rpc.submitJob('zuul:project_get', job_args)
         project = json.loads(job.data[0])
         if not project:
@@ -218,8 +221,12 @@ class GearmanHandler(object):
         return web.json_response(project)
 
     async def project_list(self, request, result_filter=None):
-        tenant = request.match_info["tenant"]
-        job = self.rpc.submitJob('zuul:project_list', {'tenant': tenant})
+        job_args = {}
+        try:
+            job_args['tenant'] = request.match_info["tenant"]
+        except KeyError:
+            pass
+        job = self.rpc.submitJob('zuul:project_list', job_args)
         resp = web.json_response(json.loads(job.data[0]))
         resp.headers['Access-Control-Allow-Origin'] = '*'
         return resp
@@ -365,6 +372,9 @@ class ZuulWeb(object):
              self._handleStatusChangeRequest),
             ('GET', '/{tenant}/projects', self._handleProjectsRequest),
             ('GET', '/{tenant}/projects/{project_name:.*}',
+             self._handleProjectRequest),
+            ('GET', '/projects', self._handleProjectsRequest),
+            ('GET', '/projects/{project_name:.*}',
              self._handleProjectRequest),
             ('GET', '/{tenant}/console-stream', self._handleWebsocket),
             ('GET', '/{tenant}/{project:.*}.pub', self._handleKeyRequest),

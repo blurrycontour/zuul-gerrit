@@ -326,13 +326,11 @@ class RPCListener(object):
                            "description": desc})
         job.sendWorkComplete(json.dumps(output))
 
-    def handle_project_get(self, gear_job):
-        args = json.loads(gear_job.arguments)
-        tenant = self.sched.abide.tenants.get(args["tenant"])
-        trusted, project = tenant.getProject(args["project"])
+    def _handle_project_get_per_tenant(self, tenant_name, project_name):
+        tenant = self.sched.abide.tenants.get(tenant_name)
+        trusted, project = tenant.getProject(project_name)
         if not project:
-            gear_job.sendWorkComplete(json.dumps({}))
-            return
+            return {}
         result = {"canonical_name": project.canonical_name}
         config = tenant.layout.project_configs.get(project.canonical_name)
         if config:
@@ -357,17 +355,59 @@ class RPCListener(object):
                     "jobs": pipeline_jobs,
                 }
             result["pipelines"] = pipelines
+        if any([p.name == project_name for p in tenant.config_projects]):
+            result["type"] = "config"
+        elif any([p.name == project_name for p in tenant.untrusted_projects]):
+            result["type"] = "untrusted"
+        return result
 
+    def handle_project_get(self, gear_job):
+        args = json.loads(gear_job.arguments)
+        tenant_name = args.get("tenant")
+        project_name = args.get("project")
+        result = []
+        if tenant_name:
+            result = self._handle_project_get_per_tenant(tenant_name,
+                                                         project_name)
+        else:
+            for tenant in self.sched.abide.tenants.keys():
+                project_info = self._handle_project_get_per_tenant(
+                    tenant, project_name)
+                if project_info:
+                    result.append({'tenant': tenant,
+                                   'project': project_info})
         gear_job.sendWorkComplete(json.dumps(result))
 
-    def handle_project_list(self, job):
-        args = json.loads(job.arguments)
-        tenant = self.sched.abide.tenants.get(args.get("tenant"))
+    def _handle_project_list_per_tenant(self, job, tenant_name):
+        tenant = self.sched.abide.tenants.get(tenant_name)
+        if not tenant:
+            return []
         output = []
         for project in tenant.config_projects:
             output.append({"name": project.name, "type": "config"})
         for project in tenant.untrusted_projects:
             output.append({"name": project.name, "type": "untrusted"})
+        return output
+
+    def handle_project_list(self, job):
+        args = json.loads(job.arguments)
+        tenant_name = args.get("tenant")
+        if tenant_name:
+            tenants = [tenant_name, ]
+        else:
+            tenants = self.sched.abide.tenants.keys()
+        output = []
+        projects = {}
+        for tenant in tenants:
+            o = self._handle_project_list_per_tenant(job, tenant)
+            for proj in o:
+                temp_list = projects.get(proj['name'], [])
+                temp_list.append({'type': proj['type'],
+                                  'name': tenant})
+                projects[proj['name']] = temp_list
+        for project in projects:
+            output.append({'name': project,
+                           'tenants': projects[project]})
         job.sendWorkComplete(json.dumps(
             sorted(output, key=lambda project: project["name"])))
 
