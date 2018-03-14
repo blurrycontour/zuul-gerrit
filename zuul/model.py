@@ -1411,13 +1411,19 @@ class Job(ConfigObject):
         # Return the raw branch list that match this job
         return self._branches
 
-    def setBranchMatcher(self, branches):
+    def setBranchMatcher(self, branches, irrelevant=False):
         # Set the branch matcher to match any of the supplied branches
         self._branches = branches
         matchers = []
         for branch in branches:
-            matchers.append(change_matcher.BranchMatcher(branch))
-        self.branch_matcher = change_matcher.MatchAny(matchers)
+            if irrelevant:
+                matchers.append(change_matcher.IrrelevantBranchMatcher(branch))
+            else:
+                matchers.append(change_matcher.BranchMatcher(branch))
+        if irrelevant:
+            self.branch_matcher = change_matcher.MatchAll(matchers)
+        else:
+            self.branch_matcher = change_matcher.MatchAny(matchers)
 
     def setFileMatcher(self, files):
         # Set the file matcher to match any of the change files

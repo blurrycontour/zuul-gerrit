@@ -595,6 +595,7 @@ class JobParser(object):
                       'semaphore': vs.Any(semaphore, str),
                       'tags': to_list(str),
                       'branches': to_list(str),
+                      'irrelevant-branches': to_list(str),
                       'files': to_list(str),
                       'secrets': to_list(vs.Any(secret, str)),
                       'irrelevant-files': to_list(str),
@@ -896,12 +897,16 @@ class JobParser(object):
             job.allowed_projects = frozenset(allowed)
 
         branches = None
+        irrelevant = False
         if 'branches' in conf:
             branches = as_list(conf['branches'])
         elif not project_pipeline:
             branches = self.pcontext.getImpliedBranches(job.source_context)
+        if (not branches) and ('irrelevant-branches' in conf):
+            branches = as_list(conf['irrelevant-branches'])
+            irrelevant = True
         if branches:
-            job.setBranchMatcher(branches)
+            job.setBranchMatcher(branches, irrelevant)
         if 'files' in conf:
             job.setFileMatcher(as_list(conf['files']))
         if 'irrelevant-files' in conf:
