@@ -16,6 +16,23 @@
       "revId": "efb9574d17991e01c0445a2e68c1f2e1e398f80b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df7087c5_e17a1fb8",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 645,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-03-14T20:28:52Z",
+      "side": 1,
+      "message": "This is still within the job parser (so I moved it from when the job is parsed to right after the job is parsed).  So it\u0027s not a substantive change.",
+      "revId": "efb9574d17991e01c0445a2e68c1f2e1e398f80b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
