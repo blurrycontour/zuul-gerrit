@@ -366,6 +366,9 @@ class ZuulWeb(object):
             ('GET', '/{tenant}/projects', self._handleProjectsRequest),
             ('GET', '/{tenant}/projects/{project_name:.*}',
              self._handleProjectRequest),
+            ('GET', '/projects', self._handleProjectsRequest),
+            ('GET', '/projects/{project_name:.*}',
+             self._handleProjectRequest),
             ('GET', '/{tenant}/console-stream', self._handleWebsocket),
             ('GET', '/{tenant}/{project:.*}.pub', self._handleKeyRequest),
         ]
