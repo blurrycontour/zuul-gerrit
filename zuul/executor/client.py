@@ -201,8 +201,8 @@ class ExecutorClient(object):
             for role in d['roles']:
                 if role['type'] != 'zuul':
                     continue
-                project_config = item.layout.project_configs.get(
-                    role['project_canonical_name'], None)
+                project_config = item.layout.getProjectConfig(
+                    role['project_canonical_name'])
                 if project_config:
                     role['project_default_branch'] = \
                         project_config.default_branch
@@ -236,8 +236,8 @@ class ExecutorClient(object):
 
         def make_project_dict(project, override_branch=None,
                               override_checkout=None):
-            project_config = item.layout.project_configs.get(
-                project.canonical_name, None)
+            project_config = item.layout.getProjectConfig(
+                project.canonical_name)
             if project_config:
                 project_default_branch = project_config.default_branch
             else:
