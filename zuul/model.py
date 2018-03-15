@@ -1118,14 +1118,14 @@ class Job(object):
             self.addRoles(other.roles)
 
         if other._get('run') is not None:
-            other_run = self.freezePlaybooks(other.run, layout)
-            self.run = other_run
+            self.run = other.run
+        self.run = self.freezePlaybooks(self.run, layout)
         if other._get('pre_run') is not None:
-            other_pre_run = self.freezePlaybooks(other.pre_run, layout)
-            self.pre_run = self.pre_run + other_pre_run
+            self.pre_run = self.pre_run + other.pre_run
+        self.pre_run = self.freezePlaybooks(self.pre_run, layout)
         if other._get('post_run') is not None:
-            other_post_run = self.freezePlaybooks(other.post_run, layout)
-            self.post_run = other_post_run + self.post_run
+            self.post_run = other.post_run + self.post_run
+        self.post_run = self.freezePlaybooks(self.post_run, layout)
         self.updateVariables(other.variables, other.host_variables,
                              other.group_variables)
         if other._get('required_projects') is not None:
