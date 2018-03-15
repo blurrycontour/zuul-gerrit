@@ -1,17 +1,23 @@
 - job:
     name: untrusted-secrets
+    pre-run: playbooks/untrusted-pre.yaml
     run: playbooks/untrusted-secrets.yaml
+    post-run: playbooks/untrusted-post.yaml
     secrets:
       - untrusted-secret
 
 - job:
     name: trusted-secrets-untrusted-child
+    pre-run: playbooks/untrusted-child-pre.yaml
     run: playbooks/trusted-secrets-untrusted-child.yaml
+    post-run: playbooks/untrusted-child-post.yaml
     parent: trusted-secrets
 
 - job:
     name: untrusted-secrets-untrusted-child
+    pre-run: playbooks/untrusted-child-pre.yaml
     run: playbooks/untrusted-secrets-untrusted-child.yaml
+    post-run: playbooks/untrusted-child-post.yaml
     parent: untrusted-secrets
 
 - project:

@@ -2911,29 +2911,35 @@ class TestSecretInheritance(ZuulTestCase):
             self._getSecrets('trusted-secrets', 'playbooks'),
             [{'trusted-secret': secret}])
         self.assertEqual(
-            self._getSecrets('trusted-secrets', 'pre_playbooks'), [])
+            self._getSecrets('trusted-secrets', 'pre_playbooks'),
+            [{'trusted-secret': secret}])
         self.assertEqual(
-            self._getSecrets('trusted-secrets', 'post_playbooks'), [])
+            self._getSecrets('trusted-secrets', 'post_playbooks'),
+            [{'trusted-secret': secret}])
 
         self.assertEqual(
             self._getSecrets('trusted-secrets-trusted-child',
                              'playbooks'), [{}])
         self.assertEqual(
             self._getSecrets('trusted-secrets-trusted-child',
-                             'pre_playbooks'), [])
+                             'pre_playbooks'),
+            [{'trusted-secret': secret}, {}])
         self.assertEqual(
             self._getSecrets('trusted-secrets-trusted-child',
-                             'post_playbooks'), [])
+                             'post_playbooks'),
+            [{}, {'trusted-secret': secret}])
 
         self.assertEqual(
             self._getSecrets('trusted-secrets-untrusted-child',
                              'playbooks'), [{}])
         self.assertEqual(
             self._getSecrets('trusted-secrets-untrusted-child',
-                             'pre_playbooks'), [])
+                             'pre_playbooks'),
+            [{'trusted-secret': secret}, {}])
         self.assertEqual(
             self._getSecrets('trusted-secrets-untrusted-child',
-                             'post_playbooks'), [])
+                             'post_playbooks'),
+            [{}, {'trusted-secret': secret}])
 
     def _checkUntrustedSecrets(self):
         secret = {'longpassword': 'test-passwordtest-password',
@@ -2943,29 +2949,35 @@ class TestSecretInheritance(ZuulTestCase):
             self._getSecrets('untrusted-secrets', 'playbooks'),
             [{'untrusted-secret': secret}])
         self.assertEqual(
-            self._getSecrets('untrusted-secrets', 'pre_playbooks'), [])
+            self._getSecrets('untrusted-secrets', 'pre_playbooks'),
+            [{'untrusted-secret': secret}])
         self.assertEqual(
-            self._getSecrets('untrusted-secrets', 'post_playbooks'), [])
+            self._getSecrets('untrusted-secrets', 'post_playbooks'),
+            [{'untrusted-secret': secret}])
 
         self.assertEqual(
             self._getSecrets('untrusted-secrets-trusted-child',
                              'playbooks'), [{}])
         self.assertEqual(
             self._getSecrets('untrusted-secrets-trusted-child',
-                             'pre_playbooks'), [])
+                             'pre_playbooks'),
+            [{'untrusted-secret': secret}, {}])
         self.assertEqual(
             self._getSecrets('untrusted-secrets-trusted-child',
-                             'post_playbooks'), [])
+                             'post_playbooks'),
+            [{}, {'untrusted-secret': secret}])
 
         self.assertEqual(
             self._getSecrets('untrusted-secrets-untrusted-child',
                              'playbooks'), [{}])
         self.assertEqual(
             self._getSecrets('untrusted-secrets-untrusted-child',
-                             'pre_playbooks'), [])
+                             'pre_playbooks'),
+            [{'untrusted-secret': secret}, {}])
         self.assertEqual(
             self._getSecrets('untrusted-secrets-untrusted-child',
-                             'post_playbooks'), [])
+                             'post_playbooks'),
+            [{}, {'untrusted-secret': secret}])
 
     def test_trusted_secret_inheritance_check(self):
         A = self.fake_gerrit.addFakeChange('common-config', 'master', 'A')
