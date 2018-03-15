@@ -18,14 +18,15 @@
 // @licend  The above is the entire license notice
 // for the JavaScript code in this page.
 
+import { Component, OnInit } from '@angular/core'
+
 import zuulStartStream from './zuulStartStream'
 
-const template = require('./stream.html')
-const streamComponent = {
-  template: template,
-  controller: function () {
+@Component({
+  template: require('./stream.html')
+})
+export default class StreamComponent implements OnInit {
+  ngOnInit() {
     zuulStartStream()
   }
 }
-
-export default streamComponent

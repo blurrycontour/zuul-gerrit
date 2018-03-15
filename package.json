@@ -12,11 +12,22 @@
     ]
   },
   "dependencies": {
+    "@angular/common": "^5.2.5",
+    "@angular/compiler": "^5.2.5",
+    "@angular/core": "^5.2.5",
+    "@angular/forms": "^5.2.5",
+    "@angular/platform-browser": "^5.2.5",
+    "@angular/platform-browser-dynamic": "^5.2.5",
+    "@angular/router": "^5.2.9",
     "angular": "^1.5.8",
     "bootstrap": "3.1.1",
+    "core-js": "^2.5.3",
     "graphitejs": "https://github.com/prestontimmons/graphitejs/archive/master.tar.gz",
     "jquery": "^1.11.1",
-    "jquery-visibility": "https://github.com/mathiasbynens/jquery-visibility/archive/master.tar.gz"
+    "jquery-visibility": "https://github.com/mathiasbynens/jquery-visibility/archive/master.tar.gz",
+    "reflect-metadata": "^0.1.12",
+    "rxjs": "^5.5.6",
+    "zone.js": "^0.8.20"
   },
   "scripts": {
     "build": "npm run build:dist",

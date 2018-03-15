@@ -27,7 +27,6 @@
 import 'jquery-visibility/jquery-visibility'
 import 'graphitejs/jquery.graphite.js'
 
-import '../styles/zuul.css'
 import './jquery.zuul'
 
 /* TODO(mordred) Convert getSourceUrl to a service and remove this import */

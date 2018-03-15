@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <!--
 Copyright 2017 Red Hat
 
@@ -14,16 +13,16 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations
 under the License.
 -->
-<html>
-<head>
-  <!-- TODO(mordred)
-      This will not work with sub-url schemes. We need to fetch
-      config data and use that to set this.
-  -->
-  <base href="/">
-  <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
-  <title id='pagetitle'><%= htmlWebpackPlugin.options.title %></title>
-</head>
-<body>
-  <zuul-dashboard></zuul-dashboard>
-</body></html>
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+      <div class="navbar-header">
+          <a class="navbar-brand" href="../" target="_self">Zuul Dashboard</a>
+      </div>
+      <ul class="nav navbar-nav">
+          <li><a routerLink="/status.html" target="_self">Status</a></li>
+          <li><a routerLink="/projects.html" target="_self">Projects</a></li>
+          <li><a routerLink="/jobs.html" target="_self">Jobs</a></li>
+          <li><a routerLink="/builds.html" target="_self">Builds</a></li>
+      </ul>
+  </div>
+</nav>

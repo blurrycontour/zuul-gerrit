@@ -18,14 +18,15 @@
 // @licend  The above is the entire license notice
 // for the JavaScript code in this page.
 
+import { Component, OnInit } from '@angular/core';
+
 import zuulStart from './zuulStart'
 
-const template = require('./status.html')
-const statusComponent = {
-  template: template,
-  controller: function ($http: ng.IHttpService) {
+@Component({
+  template: require('./status.html')
+})
+export default class StatusComponent implements OnInit {
+  ngOnInit() {
     zuulStart(jQuery)
   }
 }
-
-export default statusComponent

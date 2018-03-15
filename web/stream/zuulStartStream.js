@@ -21,8 +21,6 @@
 // @licend  The above is the entire license notice for the JavaScript code in
 // this page.
 
-import '../styles/stream.css'
-
 function escapeLog (text) {
   const pattern = /[<>&"']/g
 

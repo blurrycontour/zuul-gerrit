@@ -1,4 +1,4 @@
-// Entrypoint for Zuul status page
+// Main dashboard component
 //
 // @licstart  The following is the entire license notice for the
 // JavaScript code in this page.
@@ -20,8 +20,15 @@
 // @licend  The above is the entire license notice
 // for the JavaScript code in this page.
 
-import * as angular from 'angular'
+import { Component } from '@angular/core';
 
-import statusComponent from './status/status.component.ts'
-
-angular.module('zuulStatus', []).component('zuulApp', statusComponent)
+@Component({
+    selector: 'zuul-dashboard',
+    template: `
+    <div class="container-fluid">
+      <navigation></navigation>
+      <router-outlet></router-outlet>
+    </div>
+    `
+})
+export class AppComponent {}

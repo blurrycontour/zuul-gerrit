@@ -20,9 +20,7 @@ const config: Configuration = {
   // Default to development, the prod config will override
   mode: 'development',
   entry: {
-    status: './web/status.ts',
-    builds: './web/builds.ts',
-    stream: './web/stream.ts',
+    main: './web/main.ts',
     job: './web/job.ts',
     jobs: './web/jobs.ts',
     tenants: './web/tenants.ts',
@@ -69,47 +67,47 @@ const config: Configuration = {
       app: 'zuulStatus',
       template: 'web/config/main.ejs',
       filename: 'status.html',
-      chunks: ['status', 'vendor', 'runtime~status']
+      chunks: ['main', 'vendor', 'runtime~main']
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Builds',
       app: 'zuulBuilds',
       template: 'web/config/main.ejs',
       filename: 'builds.html',
-      chunks: ['builds', 'vendor', 'runtime~builds']
+      chunks: ['main', 'vendor', 'runtime~main']
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Job',
       app: 'zuulJob',
-      template: 'web/config/main.ejs',
+      template: 'web/config/main.ajs.ejs',
       filename: 'job.html',
       chunks: ['job', 'vendor', 'runtime~job']
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Jobs',
       app: 'zuulJobs',
-      template: 'web/config/main.ejs',
+      template: 'web/config/main.ajs.ejs',
       filename: 'jobs.html',
       chunks: ['jobs', 'vendor', 'runtime~jobs']
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Project',
       app: 'zuulProject',
-      template: 'web/config/main.ejs',
+      template: 'web/config/main.ajs.ejs',
       filename: 'project.html',
       chunks: ['project', 'vendor', 'runtime~project']
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Projects',
       app: 'zuulProjects',
-      template: 'web/config/main.ejs',
+      template: 'web/config/main.ajs.ejs',
       filename: 'projects.html',
       chunks: ['projects', 'vendor', 'runtime~projects']
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Tenants',
       app: 'zuulTenants',
-      template: 'web/config/main.ejs',
+      template: 'web/config/main.ajs.ejs',
       filename: 'tenants.html',
       chunks: ['tenants', 'vendor', 'runtime~tenants']
     }),
@@ -118,7 +116,7 @@ const config: Configuration = {
       app: 'zuulStream',
       template: 'web/config/main.ejs',
       filename: 'stream.html',
-      chunks: ['stream', 'vendor', 'runtime~stream']
+      chunks: ['main', 'vendor', 'runtime~main']
     })
   ],
   module: {

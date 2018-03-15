@@ -1,9 +1,7 @@
-// Entrypoint for Zuul builds page
-//
 // @licstart  The following is the entire license notice for the
 // JavaScript code in this page.
 //
-// Copyright 2018 Red Hat, Inc
+// Copyright 2018 Red Hat, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may
 // not use this file except in compliance with the License. You may obtain
@@ -20,15 +18,10 @@
 // @licend  The above is the entire license notice
 // for the JavaScript code in this page.
 
-import * as angular from 'angular'
+import { Component } from '@angular/core'
 
-import './styles/zuul.css'
-
-import buildsComponent from './builds/builds.component.ts'
-
-angular.module('zuulBuilds', [], function ($locationProvider) {
-  $locationProvider.html5Mode({
-    enabled: true,
-    requireBase: false
-  })
-}).component('zuulApp', buildsComponent)
+@Component({
+    selector: 'navigation',
+    template: require('./navigation.html')
+})
+export default class NavigationComponent { }
