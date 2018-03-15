@@ -816,29 +816,32 @@ class ProjectTemplateParser(object):
         self.log = logging.getLogger("zuul.ProjectTemplateParser")
         self.pcontext = pcontext
         self.schema = self.getSchema()
+        self.not_pipelines = ['name', 'description', 'templates',
+                              'merge-mode', 'default-branch',
+                              '_source_context', '_start_mark']
 
     def getSchema(self):
-        project_template = {
-            vs.Required('name'): str,
+        job = {str: vs.Any(str, JobParser.job_attributes)}
+        job_list = [vs.Any(str, job)]
+
+        pipeline_contents = {
+            'queue': str,
+            'debug': bool,
+            'jobs': job_list
+        }
+
+        project = {
+            'name': str,
             'description': str,
-            'merge-mode': vs.Any(
-                'merge', 'merge-resolve',
-                'cherry-pick'),
+            'merge-mode': vs.Any('merge', 'merge-resolve',
+                                 'cherry-pick'),
+            'default-branch': str,
+            str: pipeline_contents,
             '_source_context': model.SourceContext,
             '_start_mark': ZuulMark,
         }
 
-        job = {str: vs.Any(str, JobParser.job_attributes)}
-        job_list = [vs.Any(str, job)]
-        pipeline_contents = {
-            'queue': str,
-            'debug': bool,
-            'jobs': job_list,
-        }
-
-        for p in self.pcontext.layout.pipelines.values():
-            project_template[p.name] = pipeline_contents
-        return vs.Schema(project_template)
+        return vs.Schema(project)
 
     def fromYaml(self, conf, validate=True):
         if validate:
@@ -847,12 +850,11 @@ class ProjectTemplateParser(object):
         source_context = conf['_source_context']
         project_template = model.ProjectConfig(conf['name'], source_context)
         start_mark = conf['_start_mark']
-        for pipeline in self.pcontext.layout.pipelines.values():
-            conf_pipeline = conf.get(pipeline.name)
-            if not conf_pipeline:
+        for pipeline_name, conf_pipeline in conf.items():
+            if pipeline_name in self.not_pipelines:
                 continue
             project_pipeline = model.ProjectPipelineConfig()
-            project_template.pipelines[pipeline.name] = project_pipeline
+            project_template.pipelines[pipeline_name] = project_pipeline
             project_pipeline.queue_name = conf_pipeline.get('queue')
             project_pipeline.debug = conf_pipeline.get('debug')
             self.parseJobList(
@@ -883,8 +885,20 @@ class ProjectParser(object):
         self.log = logging.getLogger("zuul.ProjectParser")
         self.pcontext = pcontext
         self.schema = self.getSchema()
+        self.not_pipelines = ['name', 'description', 'templates',
+                              'merge-mode', 'default-branch',
+                              '_source_context', '_start_mark']
 
     def getSchema(self):
+        job = {str: vs.Any(str, JobParser.job_attributes)}
+        job_list = [vs.Any(str, job)]
+
+        pipeline_contents = {
+            'queue': str,
+            'debug': bool,
+            'jobs': job_list
+        }
+
         project = {
             'name': str,
             'description': str,
@@ -892,20 +906,11 @@ class ProjectParser(object):
             'merge-mode': vs.Any('merge', 'merge-resolve',
                                  'cherry-pick'),
             'default-branch': str,
+            str: pipeline_contents,
             '_source_context': model.SourceContext,
             '_start_mark': ZuulMark,
         }
 
-        job = {str: vs.Any(str, JobParser.job_attributes)}
-        job_list = [vs.Any(str, job)]
-        pipeline_contents = {
-            'queue': str,
-            'debug': bool,
-            'jobs': job_list
-        }
-
-        for p in self.pcontext.layout.pipelines.values():
-            project[p.name] = pipeline_contents
         return vs.Schema(project)
 
     def fromYaml(self, conf_list):
@@ -921,6 +926,7 @@ class ProjectParser(object):
             project_config = model.ProjectConfig(project.canonical_name)
 
         configs = []
+        pipeline_names = set()
         for conf in conf_list:
             implied_branch = None
             with configuration_exceptions('project', conf):
@@ -946,6 +952,8 @@ class ProjectParser(object):
                                  implied_branch)
                                 for name in conf_templates])
                 configs.append((project_template, implied_branch))
+                for pc, br in configs:
+                    pipeline_names.update(set(pc.pipelines.keys()))
                 # Set the following values to the first one that we
                 # find and ignore subsequent settings.
                 mode = conf.get('merge-mode')
@@ -960,7 +968,7 @@ class ProjectParser(object):
             project_config.merge_mode = model.MERGER_MAP['merge-resolve']
         if project_config.default_branch is None:
             project_config.default_branch = 'master'
-        for pipeline in self.pcontext.layout.pipelines.values():
+        for pipeline_name in pipeline_names:
             project_pipeline = model.ProjectPipelineConfig()
             queue_name = None
             debug = False
@@ -968,9 +976,9 @@ class ProjectParser(object):
             # create the jobs in the final definition as needed.
             pipeline_defined = False
             for (template, implied_branch) in configs:
-                if pipeline.name in template.pipelines:
+                if pipeline_name in template.pipelines:
                     pipeline_defined = True
-                    template_pipeline = template.pipelines[pipeline.name]
+                    template_pipeline = template.pipelines[pipeline_name]
                     project_pipeline.job_list.inheritFrom(
                         template_pipeline.job_list,
                         implied_branch)
@@ -983,7 +991,7 @@ class ProjectParser(object):
             if debug:
                 project_pipeline.debug = True
             if pipeline_defined:
-                project_config.pipelines[pipeline.name] = project_pipeline
+                project_config.pipelines[pipeline_name] = project_pipeline
         return project_config
 
 
