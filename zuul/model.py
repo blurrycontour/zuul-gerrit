@@ -1581,7 +1581,7 @@ class BuildSet(object):
             layout = self.item.pipeline.layout
         if layout:
             project = self.item.change.project
-            project_config = layout.project_configs.get(
+            project_config = layout.getProjectConfig(
                 project.canonical_name)
             if project_config:
                 return project_config.merge_mode
@@ -1641,8 +1641,7 @@ class QueueItem(object):
         self.current_build_set.result = result
 
     def debug(self, msg, indent=0):
-        ppc = self.layout.getProjectPipelineConfig(self.change.project,
-                                                   self.pipeline)
+        ppc = self.layout.getProjectPipelineConfig(self)
         if not ppc.debug:
             return
         if indent:
@@ -2394,15 +2393,6 @@ class RefFilter(BaseFilter):
         return True
 
 
-class ProjectPipelineConfig(object):
-    # Represents a project cofiguration in the context of a pipeline
-    def __init__(self):
-        self.job_list = JobList()
-        self.queue_name = None
-        self.debug = False
-        self.merge_mode = None
-
-
 class TenantProjectConfig(object):
     """A project in the context of a tenant.
 
@@ -2421,6 +2411,40 @@ class TenantProjectConfig(object):
         self.exclude_unprotected_branches = None
 
 
+class ProjectPipelineConfig(object):
+    # Represents a project cofiguration in the context of a pipeline
+    def __init__(self):
+        self.job_list = JobList()
+        self.queue_name = None
+        self.debug = False
+        self.branch_matcher = None
+
+    def update(self, other):
+        if not isinstance(other, ProjectPipelineConfig):
+            raise Exception("Unable to update from %s" % (other,))
+        if self.queue_name is None:
+            self.queue_name = other.queue_name
+        if self.debug is None:
+            self.debug = other.debug
+        # TODO: joblist.inheritfrom
+
+    def changeMatches(self, change, override_branch=None):
+        if override_branch is None:
+            branch_change = change
+        else:
+            # If an override branch is supplied, create a very basic
+            # change (a Ref) and set its branch to the override
+            # branch.
+            branch_change = Ref(change.project)
+            branch_change.ref = override_branch
+
+        if self.branch_matcher and not self.branch_matcher.matches(
+                branch_change):
+            return False
+
+        return True
+
+
 class ProjectConfig(object):
     # Represents a project configuration
     def __init__(self, name, source_context=None):
@@ -2432,7 +2456,6 @@ class ProjectConfig(object):
         # The default branch for the project (usually master).
         self.default_branch = None
         self.pipelines = {}
-        self.private_key_file = None
 
 
 class ConfigItemNotListError(Exception):
@@ -2761,8 +2784,51 @@ class Layout(object):
         else:
             self.project_templates[project_template.name] = project_template
 
+    def getProjectTemplate(self, name):
+        pt = self.project_templates.get(name, None)
+        if pt is None:
+            raise Exception("Project template %s not found" % name)
+        return pt
+
     def addProjectConfig(self, project_config):
-        self.project_configs[project_config.name] = project_config
+        if project_config.name in self.project_configs:
+            self.project_configs.append(project_config)
+        else:
+            self.project_configs[project_config.name] = [project_config]
+
+    def getProjectConfig(self, name):
+        if name in self.project_configs:
+            return self.project_configs[name][0]
+        raise None
+
+    def getProjectConfigs(self, name):
+        return self.project_configs.get(name, [])
+
+    def getProjectPipelineConfig(self, item):
+        # Create a project-pipeline config for the given item, taking
+        # its branch (if any) into consideration.  If the project does
+        # not participate in the pipeline at all (in this branch),
+        # return None.
+        ppc = ProjectPipelineConfig()
+        project_in_pipeline = False
+        for pc in self.getProjectConfigs(project.canonical_name):
+            for template_name in pc.templates:
+                template = self.getProjectTemplate(template_name)
+                if not template.changeMatches(item.change):
+                    continue
+                template_ppc = template.pipelines.get(item.pipeline.name)
+                if template_ppc:
+                    project_in_pipeline = True
+                    # TODO: implied branch here
+                    ppc.update(template_ppc)
+            project_ppc = pc.pipelines.get(item.pipeline.name)
+            if project_ppc:
+                project_in_pipeline = True
+                # TODO: implied branch here
+                ppc.update(project_ppc)
+        if project_in_pipeline:
+            return ppc
+        return None
 
     def _updateOverrideCheckouts(self, override_checkouts, job):
         # Update the values in an override_checkouts dict with those
@@ -2938,18 +3004,10 @@ class Layout(object):
         # NOTE(pabelanger): It is possible for a foreign project not to have a
         # configured pipeline, if so return an empty JobGraph.
         ret = JobGraph()
-        ppc = self.getProjectPipelineConfig(item.change.project,
-                                            item.pipeline)
+        ppc = self.getProjectPipelineConfig(item)
         if ppc:
             self._createJobGraph(item, ppc.job_list, ret)
         return ret
-
-    def getProjectPipelineConfig(self, project, pipeline):
-        project_config = self.project_configs.get(
-            project.canonical_name, None)
-        if not project_config:
-            return None
-        return project_config.pipelines.get(pipeline.name, None)
 
 
 class Semaphore(object):
