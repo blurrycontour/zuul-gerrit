@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df7087c5_a6fc3470",
+        "filename": "web/templates/tenants.html",
+        "patchSetId": 5
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-03-15T04:04:54Z",
+      "side": 1,
+      "message": "This needs ctrl.tenants",
+      "revId": "d5a52b77cf56c18332387bf6b66746a8209107a5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
