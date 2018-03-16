@@ -1,0 +1,10 @@
+Code-Review+1: Nguyen Hung Phuong <phuongnh@vn.fujitsu.com>
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Code-Review+2: Clark Boylan <cboylan@sapwetik.org>
+Workflow+1: Clark Boylan <cboylan@sapwetik.org>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Fri, 16 Mar 2018 20:11:50 +0000
+Reviewed-on: https://review.openstack.org/537432
+Project: openstack-infra/zuul
+Branch: refs/heads/master
