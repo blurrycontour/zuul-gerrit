@@ -18,11 +18,56 @@
 // @licend  The above is the entire license notice
 // for the JavaScript code in this page.
 
-import JobsController from './jobs.controller'
+import { Component, OnInit } from '@angular/core'
+import { HttpClient } from '@angular/common/http'
 
-const jobsComponent = {
-  template: require('./jobs.html'),
-  controller: JobsController
+import getSourceUrl from '../util'
+
+export class JobDetails {
+  source_context: string
 }
 
-export default jobsComponent
+export class Job {
+  expanded: boolean
+  details: JobDetails
+  name: string
+
+  constructor() {
+    this.expanded = false
+  }
+}
+
+@Component({
+  template: require('./jobs.html')
+})
+export default class JobsComponent implements OnInit {
+
+  jobs: Array<Job>
+
+  constructor(private http: HttpClient) {}
+
+  ngOnInit() {
+    this.jobsFetch()
+  }
+
+  jobsFetch(): void {
+    console.log("blert")
+    this.http.get<Array<Job>>(getSourceUrl('jobs')).subscribe(
+      jobs => this.injestJobs(jobs))
+  }
+
+  injestJobs(jobs: Array<Job>): void {
+    for (let job of jobs) {
+      job.expanded = false
+    }
+    this.jobs = jobs
+  }
+
+  jobToggleExpanded(job: Job) {
+    if (!job.details) {
+      this.http.get<JobDetails>(getSourceUrl('jobs/' + job.name))
+        .subscribe(details => {job.details = details})
+    }
+    job.expanded = !job.expanded
+  }
+}

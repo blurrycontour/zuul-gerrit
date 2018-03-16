@@ -23,7 +23,7 @@ import { ActivatedRoute }     from '@angular/router'
 import { HttpClient } from '@angular/common/http'
 
 import getSourceUrl from '../util'
-import { Job } from '../jobs/jobs.controller'
+import { Job } from '../jobs/jobs.component'
 
 class Pipeline {
   jobs: Array<Job>

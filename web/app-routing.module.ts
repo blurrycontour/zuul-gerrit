@@ -24,6 +24,8 @@ import { NgModule } from '@angular/core'
 import { RouterModule, Routes } from '@angular/router'
 
 import BuildsComponent from './builds/builds.component'
+import JobComponent from './job/job.component'
+import JobsComponent from './jobs/jobs.component'
 import ProjectComponent from './project/project.component'
 import ProjectsComponent from './projects/projects.component'
 import StatusComponent from './status/status.component'
@@ -46,6 +48,22 @@ const appRoutes: Routes = [
   {
     path: 'status.html',
     component: StatusComponent
+  },
+  {
+    path: ':tenant/job.html',
+    component: JobComponent
+  },
+  {
+    path: 'job.html',
+    component: JobComponent
+  },
+  {
+    path: ':tenant/jobs.html',
+    component: JobsComponent
+  },
+  {
+    path: 'jobs.html',
+    component: JobsComponent
   },
   {
     path: ':tenant/project.html',
