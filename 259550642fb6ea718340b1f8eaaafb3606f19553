@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df7087c5_bdb89010",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-03-16T15:49:02Z",
+      "side": 1,
+      "message": "I think we need to return True here (see comment at top of function).",
+      "revId": "259550642fb6ea718340b1f8eaaafb3606f19553",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
