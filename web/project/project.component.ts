@@ -18,11 +18,45 @@
 // @licend  The above is the entire license notice
 // for the JavaScript code in this page.
 
-import ProjectController from './project.controller'
+import { Component, OnInit } from '@angular/core'
+import { ActivatedRoute }     from '@angular/router'
+import { HttpClient } from '@angular/common/http'
 
-const projectComponent = {
-  template: require('./project.html'),
-  controller: ProjectController
+import getSourceUrl from '../util'
+import { Job } from '../jobs/jobs.controller'
+
+class Pipeline {
+  jobs: Array<Job>
 }
 
-export default projectComponent
+class ProjectDetail {
+  project_name: string
+  canonical_name: string
+  default_branch: string
+  merge_mode: string
+  pipelines: Array<[string, Pipeline]>
+}
+
+@Component({
+  template: require('./project.html')
+})
+export default class ProjectComponent implements OnInit {
+
+  project_name: string
+  project: ProjectDetail
+
+  constructor(private http: HttpClient, private route: ActivatedRoute) {}
+
+  ngOnInit() {
+    this.project_name = this.route.snapshot.queryParamMap.get('project_name')
+    if (!this.project_name) {
+      this.project_name = 'config-projects'
+    }
+    this.projectFetch()
+  }
+
+  projectFetch(): void {
+    this.http.get<ProjectDetail>(getSourceUrl('projects/' + this.project_name))
+      .subscribe(project => { this.project = project })
+  }
+}

@@ -24,8 +24,6 @@ const config: Configuration = {
     job: './web/job.ts',
     jobs: './web/jobs.ts',
     tenants: './web/tenants.ts',
-    project: './web/project.ts',
-    projects: './web/projects.ts'
   },
   resolve: {
     extensions: [ '.tsx', '.ts', '.js' ]
@@ -93,16 +91,16 @@ const config: Configuration = {
     new HtmlWebpackPlugin({
       title: 'Zuul Project',
       app: 'zuulProject',
-      template: 'web/config/main.ajs.ejs',
+      template: 'web/config/main.ejs',
       filename: 'project.html',
-      chunks: ['project', 'vendor', 'runtime~project']
+      chunks: ['main', 'vendor', 'runtime~main']
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Projects',
       app: 'zuulProjects',
-      template: 'web/config/main.ajs.ejs',
+      template: 'web/config/main.ejs',
       filename: 'projects.html',
-      chunks: ['projects', 'vendor', 'runtime~projects']
+      chunks: ['main', 'vendor', 'runtime~main']
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Tenants',

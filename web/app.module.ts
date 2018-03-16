@@ -32,6 +32,8 @@ import { AppComponent } from './app.component'
 
 import BuildsComponent from './builds/builds.component'
 import NavigationComponent from './navigation/navigation.component'
+import ProjectComponent from './project/project.component'
+import ProjectsComponent from './projects/projects.component'
 import StatusComponent from './status/status.component'
 import StreamComponent from './stream/stream.component'
 
@@ -47,12 +49,16 @@ import StreamComponent from './stream/stream.component'
     AppComponent,
     BuildsComponent,
     NavigationComponent,
+    ProjectComponent,
+    ProjectsComponent,
     StatusComponent,
     StreamComponent
   ],
   entryComponents: [
     BuildsComponent,
     NavigationComponent,
+    ProjectComponent,
+    ProjectsComponent,
     StatusComponent,
     StreamComponent
   ],

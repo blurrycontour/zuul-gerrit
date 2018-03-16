@@ -20,7 +20,7 @@
 
 import getSourceUrl from '../util'
 
-export interface IJob {
+export class Job {
   expanded: boolean
   details: any
   name: string
@@ -29,7 +29,7 @@ export interface IJob {
 export default class JobsController {
 
   $http: ng.IHttpService
-  jobs: Array<IJob>
+  jobs: Array<Job>
 
   constructor($http: ng.IHttpService) {
     this.$http = $http
@@ -42,7 +42,7 @@ export default class JobsController {
   }
 
   injestJobs(result): void {
-    let jobs = <Array<IJob>>result.data
+    let jobs = <Array<Job>>result.data
     for (let job of jobs) {
       job.expanded = false
       job.details = undefined
@@ -50,7 +50,7 @@ export default class JobsController {
     this.jobs = jobs
   }
 
-  jobToggleExpanded(job: IJob) {
+  jobToggleExpanded(job: Job) {
     if (!job.details) {
       this.$http.get(getSourceUrl('jobs/' + job.name))
         .then(result => {

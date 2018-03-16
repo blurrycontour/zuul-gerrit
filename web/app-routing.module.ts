@@ -24,6 +24,8 @@ import { NgModule } from '@angular/core'
 import { RouterModule, Routes } from '@angular/router'
 
 import BuildsComponent from './builds/builds.component'
+import ProjectComponent from './project/project.component'
+import ProjectsComponent from './projects/projects.component'
 import StatusComponent from './status/status.component'
 import StreamComponent from './stream/stream.component'
 
@@ -44,6 +46,22 @@ const appRoutes: Routes = [
   {
     path: 'status.html',
     component: StatusComponent
+  },
+  {
+    path: ':tenant/project.html',
+    component: ProjectComponent
+  },
+  {
+    path: 'project.html',
+    component: ProjectComponent
+  },
+  {
+    path: ':tenant/projects.html',
+    component: ProjectsComponent
+  },
+  {
+    path: 'projects.html',
+    component: ProjectsComponent
   },
   {
     path: 'stream.html',

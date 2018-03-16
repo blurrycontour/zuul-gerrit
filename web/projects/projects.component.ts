@@ -18,11 +18,32 @@
 // @licend  The above is the entire license notice
 // for the JavaScript code in this page.
 
-import ProjectsController from './projects.controller'
+import { Component, OnInit } from '@angular/core'
+import { ActivatedRoute }     from '@angular/router'
+import { HttpClient, HttpParams } from '@angular/common/http'
 
-const projectsComponent = {
-  template: require('./projects.html'),
-  controller: ProjectsController
+import getSourceUrl from '../util'
+
+class Project {
+  name: string
+  type: string
 }
 
-export default projectsComponent
+@Component({
+  template: require('./projects.html')
+})
+export default class ProjectsComponent implements OnInit {
+
+  projects: Array<Project>
+
+  constructor(private http: HttpClient) {}
+
+  ngOnInit() {
+    this.projectsFetch()
+  }
+
+  projectsFetch(): void {
+    this.http.get<Array<Project>>(getSourceUrl('projects'))
+      .subscribe(projects => { this.projects = projects})
+  }
+}
