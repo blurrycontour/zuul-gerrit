@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df7087c5_2e23e4a8",
+        "filename": "zuul/ansible/logconfig.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-03-16T17:18:27Z",
+      "side": 1,
+      "message": "This isn\u0027t actually used anywhere that I can find in this or following reviews.",
+      "range": {
+        "startLine": 191,
+        "startChar": 6,
+        "endLine": 191,
+        "endChar": 25
+      },
+      "revId": "61cbed331676d321589c61a57a88703ad3ab1251",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
