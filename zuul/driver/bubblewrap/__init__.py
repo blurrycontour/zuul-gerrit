@@ -213,6 +213,8 @@ class BubblewrapDriver(Driver, WrapperInterface):
                      '/etc/nsswitch.conf',
                      '/etc/lsb-release.d',
                      '/etc/alternatives',
+                     '/etc/ssl/certs',
+                     '/usr/share/ca-certificates',
                      ]:
             if os.path.exists(path):
                 bwrap_command.extend(['--ro-bind', path, path])
