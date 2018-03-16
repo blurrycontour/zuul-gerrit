@@ -50,13 +50,14 @@ class BaseTestWeb(ZuulTestCase):
             "Static web assets are missing, be sure to run 'npm run build'")
         super(BaseTestWeb, self).setUp()
         self.executor_server.hold_jobs_in_build = True
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addApproval('Code-Review', 2)
-        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
-        B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
-        B.addApproval('Code-Review', 2)
-        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
-        self.waitUntilSettled()
+        if self.tenant_config_file == 'config/single-tenant/main.yaml':
+            A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+            A.addApproval('Code-Review', 2)
+            self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+            B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
+            B.addApproval('Code-Review', 2)
+            self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+            self.waitUntilSettled()
 
         self.zuul_ini_config = FakeConfig(self.config_ini_data)
         # Start the web server
@@ -335,6 +336,22 @@ class TestInfo(BaseTestWeb):
                     "websocket_url": self.websocket_url,
                 }
             })
+
+
+class TestInfoConfigBroken(BaseTestWeb):
+
+    tenant_config_file = 'config/broken/main.yaml'
+
+    def test_tenant_info_broken_config(self):
+        req = urllib.request.Request(
+            "http://localhost:%s/tenant-one/info" % self.port)
+        f = urllib.request.urlopen(req)
+        info = json.loads(f.read().decode('utf8'))
+        self.assertIn(
+            "Zuul encountered a syntax error while",
+            info["info"]["loading_errors"][0])
+        self.assertEqual(
+            len(info["info"]["loading_errors"]), 1)
 
 
 class TestWebSocketInfo(TestInfo):
