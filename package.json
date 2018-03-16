@@ -19,7 +19,6 @@
     "@angular/platform-browser": "^5.2.5",
     "@angular/platform-browser-dynamic": "^5.2.5",
     "@angular/router": "^5.2.9",
-    "angular": "^1.5.8",
     "bootstrap": "3.1.1",
     "core-js": "^2.5.3",
     "graphitejs": "https://github.com/prestontimmons/graphitejs/archive/master.tar.gz",

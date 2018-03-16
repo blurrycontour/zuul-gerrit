@@ -30,6 +30,7 @@ import ProjectComponent from './project/project.component'
 import ProjectsComponent from './projects/projects.component'
 import StatusComponent from './status/status.component'
 import StreamComponent from './stream/stream.component'
+import TenantsComponent from './tenants/tenants.component'
 
 // Have all routes go to builds.html for now
 const appRoutes: Routes = [
@@ -88,6 +89,10 @@ const appRoutes: Routes = [
   {
     path: ':tenant/stream.html',
     component: StreamComponent
+  },
+  {
+    path: 'tenants.html',
+    component: TenantsComponent
   },
   {
     path: '**',

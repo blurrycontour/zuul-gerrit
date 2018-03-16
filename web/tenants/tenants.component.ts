@@ -18,11 +18,31 @@
 // @licend  The above is the entire license notice
 // for the JavaScript code in this page.
 
-import TenantsController from './tenants.controller'
+import { Component, OnInit } from '@angular/core'
+import { HttpClient } from '@angular/common/http'
 
-const tenantsComponent = {
-  template: require('./tenants.html'),
-  controller: TenantsController
+import getSourceUrl from '../util'
+
+class Tenant {
+  name: string
+  projects: number
 }
 
-export default tenantsComponent
+@Component({
+  template: require('./tenants.html')
+})
+export default class TenantsComponent implements OnInit {
+
+  tenants: Array<Tenant>
+
+  constructor(private http: HttpClient) {}
+
+  ngOnInit() {
+    this.tenantsFetch()
+  }
+
+  tenantsFetch(): void {
+    this.http.get<Array<Tenant>>(getSourceUrl('tenants'))
+      .subscribe(tenants => { this.tenants = tenants })
+  }
+}

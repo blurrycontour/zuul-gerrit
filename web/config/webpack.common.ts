@@ -21,7 +21,6 @@ const config: Configuration = {
   mode: 'development',
   entry: {
     main: './web/main.ts',
-    tenants: './web/tenants.ts',
   },
   resolve: {
     extensions: [ '.tsx', '.ts', '.js' ]
@@ -60,59 +59,43 @@ const config: Configuration = {
     // output file.
     new HtmlWebpackPlugin({
       title: 'Zuul Status',
-      app: 'zuulStatus',
       template: 'web/config/main.ejs',
       filename: 'status.html',
-      chunks: ['main', 'vendor', 'runtime~main']
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Builds',
-      app: 'zuulBuilds',
       template: 'web/config/main.ejs',
       filename: 'builds.html',
-      chunks: ['main', 'vendor', 'runtime~main']
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Job',
-      app: 'zuulJob',
       template: 'web/config/main.ejs',
       filename: 'job.html',
-      chunks: ['main', 'vendor', 'runtime~main']
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Jobs',
-      app: 'zuulJobs',
       template: 'web/config/main.ejs',
       filename: 'jobs.html',
-      chunks: ['main', 'vendor', 'runtime~main']
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Project',
-      app: 'zuulProject',
       template: 'web/config/main.ejs',
       filename: 'project.html',
-      chunks: ['main', 'vendor', 'runtime~main']
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Projects',
-      app: 'zuulProjects',
       template: 'web/config/main.ejs',
       filename: 'projects.html',
-      chunks: ['main', 'vendor', 'runtime~main']
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Tenants',
-      app: 'zuulTenants',
-      template: 'web/config/main.ajs.ejs',
+      template: 'web/config/main.ejs',
       filename: 'tenants.html',
-      chunks: ['tenants', 'vendor', 'runtime~tenants']
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Console Stream',
-      app: 'zuulStream',
       template: 'web/config/main.ejs',
       filename: 'stream.html',
-      chunks: ['main', 'vendor', 'runtime~main']
     })
   ],
   module: {

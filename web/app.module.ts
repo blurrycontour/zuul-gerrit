@@ -38,7 +38,7 @@ import ProjectComponent from './project/project.component'
 import ProjectsComponent from './projects/projects.component'
 import StatusComponent from './status/status.component'
 import StreamComponent from './stream/stream.component'
-
+import TenantsComponent from './tenants/tenants.component'
 
 @NgModule({
   imports: [
@@ -56,7 +56,8 @@ import StreamComponent from './stream/stream.component'
     ProjectComponent,
     ProjectsComponent,
     StatusComponent,
-    StreamComponent
+    StreamComponent,
+    TenantsComponent
   ],
   entryComponents: [
     BuildsComponent,
@@ -66,7 +67,8 @@ import StreamComponent from './stream/stream.component'
     ProjectComponent,
     ProjectsComponent,
     StatusComponent,
-    StreamComponent
+    StreamComponent,
+    TenantsComponent
   ],
   bootstrap: [
     AppComponent
