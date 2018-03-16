@@ -3257,6 +3257,7 @@ class WebInfo(object):
         self.stats_type = stats_type
         self.stats_url = stats_url
         self.tenant = None
+        self.loading_errors = None
         self.websocket_url = websocket_url
 
     def __repr__(self):
@@ -3294,4 +3295,6 @@ class WebInfo(object):
         d['stats'] = stats
         if self.tenant:
             d['tenant'] = self.tenant
+            if self.loading_errors:
+                d['loading_errors'] = self.loading_errors
         return d
