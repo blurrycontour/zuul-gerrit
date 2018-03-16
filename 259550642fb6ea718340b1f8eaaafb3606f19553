@@ -16,6 +16,24 @@
       "revId": "259550642fb6ea718340b1f8eaaafb3606f19553",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df7087c5_5d30549f",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-03-16T15:53:36Z",
+      "side": 1,
+      "message": "oh, you\u0027re right",
+      "parentUuid": "df7087c5_bdb89010",
+      "revId": "259550642fb6ea718340b1f8eaaafb3606f19553",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
