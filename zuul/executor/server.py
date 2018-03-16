@@ -330,7 +330,6 @@ class JobDir(object):
         # by ansible for temporary files which are path checked in untrusted
         # jobs.
         self.local_tmp = os.path.join(self.work_root, 'tmp')
-        os.makedirs(self.local_tmp)
         self.ansible_root = os.path.join(self.root, 'ansible')
         os.makedirs(self.ansible_root)
         self.trusted_root = os.path.join(self.root, 'trusted')
@@ -1351,7 +1350,6 @@ class AnsibleJob(object):
             env_copy['ARA_LOG_CONFIG'] = self.jobdir.logging_json
         env_copy['ZUUL_JOB_LOG_CONFIG'] = self.jobdir.logging_json
         env_copy['ZUUL_JOBDIR'] = self.jobdir.root
-        env_copy['TMPDIR'] = self.jobdir.local_tmp
         pythonpath = env_copy.get('PYTHONPATH')
         if pythonpath:
             pythonpath = [pythonpath]
