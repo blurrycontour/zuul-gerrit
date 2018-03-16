@@ -158,6 +158,7 @@ class GearmanHandler(object):
             'status_get': self.status_get,
             'job_list': self.job_list,
             'key_get': self.key_get,
+            'loading_errors_list': self.loading_errors_list,
         }
 
     async def tenant_list(self, request, result_filter=None):
@@ -187,6 +188,14 @@ class GearmanHandler(object):
         tenant = request.match_info["tenant"]
         job = self.rpc.submitJob('zuul:job_list', {'tenant': tenant})
         resp = web.json_response(json.loads(job.data[0]))
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        return resp
+
+    async def loading_errors_list(self, request, result_filter=None):
+        tenant = request.match_info["tenant"]
+        job = self.rpc.submitJob(
+            'zuul:loading_errors_list', {'tenant': tenant})
+        resp = web.Response(body=job.data[0])
         resp.headers['Access-Control-Allow-Origin'] = '*'
         return resp
 
@@ -295,6 +304,10 @@ class ZuulWeb(object):
     async def _handleJobsRequest(self, request):
         return await self.gearman_handler.processRequest(request, 'job_list')
 
+    async def _handleLoadingErrorsRequest(self, request):
+        return await self.gearman_handler.processRequest(
+            request, 'loading_errors_list')
+
     async def _handleKeyRequest(self, request):
         return await self.gearman_handler.processRequest(request, 'key_get')
 
@@ -325,6 +338,8 @@ class ZuulWeb(object):
             ('GET', '/tenants', self._handleTenantsRequest),
             ('GET', '/{tenant}/status', self._handleStatusRequest),
             ('GET', '/{tenant}/jobs', self._handleJobsRequest),
+            ('GET', '/{tenant}/loading_errors',
+             self._handleLoadingErrorsRequest),
             ('GET', '/{tenant}/status/change/{change}',
              self._handleStatusChangeRequest),
             ('GET', '/{tenant}/console-stream', self._handleWebsocket),
