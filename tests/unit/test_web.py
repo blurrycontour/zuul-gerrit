@@ -54,7 +54,8 @@ class BaseTestWeb(ZuulTestCase):
             ZuulWebFixture(
                 self.gearman_server.port,
                 self.config,
-                info=zuul.model.WebInfo.fromConfig(self.zuul_ini_config)))
+                info=zuul.model.WebInfo.fromConfig(self.zuul_ini_config),
+                zk_hosts=self.zk_config))
 
         self.executor_server.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
@@ -256,6 +257,10 @@ class TestWeb(BaseTestWeb):
 
         self.assertEqual(1, len(data), data)
         self.assertEqual("org/project1", data[0]['project'], data)
+
+    def test_web_labels(self):
+        data = self.get_url('api/tenant/tenant-one/labels').json()
+        self.assertEqual(data, [])
 
     def test_web_find_job(self):
         # can we fetch the variants for a single job
