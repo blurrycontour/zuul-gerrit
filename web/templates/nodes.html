@@ -1,5 +1,5 @@
 <!--
-Copyright 2017 Red Hat
+Copyright 2018 Red Hat
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may
 not use this file except in compliance with the License. You may obtain
@@ -22,9 +22,9 @@ under the License.
     <ul class="nav navbar-nav">
       <li><a href="status.html" target="_self">Status</a></li>
       <li><a href="projects.html" target="_self">Projects</a></li>
-      <li class="active"><a href="jobs.html" target="_self">Jobs</a></li>
+      <li><a href="jobs.html" target="_self">Jobs</a></li>
       <li><a href="labels.html" target="_self">Labels</a></li>
-      <li><a href="nodes.html" target="_self">Nodes Status</a></li>
+      <li class="active"><a href="nodes.html" target="_self">Nodes Status</a></li>
       <li><a href="builds.html" target="_self">Builds</a></li>
     </ul>
   </div>
@@ -32,30 +32,24 @@ under the License.
   <table class="table table-hover table-condensed">
     <thead>
       <tr>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Context</th>
-        <th>Last builds</th>
+        <th>ID</th>
+        <th>Label</th>
+        <th>Connection</th>
+        <th>Server ID</th>
+        <th>Provider</th>
+        <th>State</th>
+        <th>Comment</th>
       </tr>
     </thead>
     <tbody>
-      <tr ng-repeat-start="job in $ctrl.jobs">
-        <td><a href="job.html?job_name={{ job.name }}" target="_self">
-            {{ job.name }}</a></td>
-        <td>{{ job.description }}</td>
-        <td><a ng-click="$ctrl.job_fetch(job)">locations</a></td>
-        <td><a href="builds.html?job_name={{ job.name }}" target="_self">
-            builds</a></td>
-      </tr>
-      <tr ng-if="job.expanded" ng-repeat-end="">
-        <td colspan="3">
-          <ul class="list-group">
-            <li class="list-group-item" ng-repeat="detail in job.details">
-              <!-- TODO: make clickable link to cgit files ? -->
-              {{ detail.source_context }}
-            </li>
-          </ul>
-        </td>
+      <tr ng-repeat="node in $ctrl.nodes">
+        <td>{{ node.id }}</td>
+        <td>{{ node.type }}</td>
+        <td>{{ node.connection_type }}</td>
+        <td>{{ node.external_id }}</td>
+        <td>{{ node.provider }}</td>
+        <td>{{ node.state }}</td>
+        <td>{{ node.comment }}</td>
       </tr>
     </tbody>
   </table>

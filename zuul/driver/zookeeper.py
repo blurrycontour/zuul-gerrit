@@ -53,6 +53,7 @@ class ZookeeperConnection(BaseConnection):
             ZookeeperWebHandler(self, zuul_web, 'GET', '/{tenant}/labels'),
             ZookeeperWebHandler(self, zuul_web, 'GET', '/{tenant}/nodes'),
             StaticHandler(zuul_web, '/{tenant}/labels.html'),
+            StaticHandler(zuul_web, '/{tenant}/nodes.html'),
         ]
 
 
