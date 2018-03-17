@@ -2069,38 +2069,31 @@ class BaseTestCase(testtools.TestCase):
                                       '%(levelname)-8s %(message)s')
         handler.setFormatter(formatter)
 
-        logger = logging.getLogger()
-        logger.setLevel(logging.DEBUG)
-        logger.addHandler(handler)
+        root_logger = logging.getLogger()
+        root_logger.setLevel(logging.INFO)
+        root_logger.addHandler(handler)
+        self.addCleanup(root_logger.removeHandler, handler)
 
-        # Make sure we don't carry old handlers around in process state
-        # which slows down test runs
-        self.addCleanup(logger.removeHandler, handler)
+        default_log_levels = {
+            'git.cmd': logging.INFO,
+            'gear': logging.WARNING,
+            'kazoo.client': logging.INFO,
+            'zuul': logging.DEBUG,
+        }
+
+        # Override log levels for specific libraries from OS_LOG_DEFAULTS.
+        log_defaults_from_env = os.environ.get('OS_LOG_DEFAULTS')
+        if log_defaults_from_env:
+            for entry in log_defaults_from_env.split(','):
+                log_name, log_level = entry.split('=')
+                default_log_levels[log_name] = log_level
+
+        for log_name, log_level in default_log_levels.items():
+            logger = logging.getLogger(log_name)
+            logger.setLevel(log_level)
+
         self.addCleanup(handler.close)
         self.addCleanup(handler.flush)
-
-        # NOTE(notmorgan): Extract logging overrides for specific
-        # libraries from the OS_LOG_DEFAULTS env and create loggers
-        # for each. This is used to limit the output during test runs
-        # from libraries that zuul depends on such as gear.
-        log_defaults_from_env = os.environ.get(
-            'OS_LOG_DEFAULTS',
-            'git.cmd=INFO,kazoo.client=WARNING,gear=INFO')
-
-        if log_defaults_from_env:
-            for default in log_defaults_from_env.split(','):
-                try:
-                    name, level_str = default.split('=', 1)
-                    level = getattr(logging, level_str, logging.DEBUG)
-                    logger = logging.getLogger(name)
-                    logger.setLevel(level)
-                    logger.addHandler(handler)
-                    logger.propagate = False
-                except ValueError:
-                    # NOTE(notmorgan): Invalid format of the log default,
-                    # skip and don't try and apply a logger for the
-                    # specified module
-                    pass
 
 
 class SymLink(object):
