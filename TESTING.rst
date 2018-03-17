@@ -108,6 +108,14 @@ You can compare the output of that to::
 
   python -m testtools.run discover --list
 
+Override default log levels
+---------------------------
+
+The default log levels during test can be overridden by specifying the
+OS_LOG_DEFAULTS environment variable like this::
+
+  OS_LOG_DEFAULTS="gear=INFO,kazoo.client=DEBUG" tox -e py35
+
 Need More Info?
 ---------------
 
