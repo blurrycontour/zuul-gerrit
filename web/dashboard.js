@@ -108,6 +108,27 @@ angular.module('zuulJobs', [], function ($locationProvider) {
   }
 })
 
+angular.module('zuulLabels', [], function ($locationProvider) {
+  $locationProvider.html5Mode({
+    enabled: true,
+    requireBase: false
+  })
+}).component('zuulApp', {
+  template: require('./templates/labels.html'),
+  controller: function ($http, $location) {
+    // Capture this in a closure variable so it's in scope in the callback
+    let ctrl = this
+    this.labels = undefined
+    this.labels_fetch = function () {
+      $http.get(getSourceUrl('labels', $location))
+        .then(function success (result) {
+          ctrl.labels = result.data
+        })
+    }
+    this.labels_fetch()
+  }
+})
+
 angular.module('zuulJob', [], function ($locationProvider) {
   $locationProvider.html5Mode({
     enabled: true,

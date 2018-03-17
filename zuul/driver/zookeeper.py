@@ -21,7 +21,7 @@ import zuul.zk
 from zuul.lib.config import get_default
 from zuul.driver import Driver, ConnectionInterface
 from zuul.connection import BaseConnection
-from zuul.web.handler import BaseWebHandler
+from zuul.web.handler import BaseWebHandler, StaticHandler
 
 
 class ZookeeperDriver(Driver, ConnectionInterface):
@@ -51,6 +51,7 @@ class ZookeeperConnection(BaseConnection):
         self.zk.connect(**self.zk_args)
         return [
             ZookeeperWebHandler(self, zuul_web, 'GET', '/{tenant}/labels'),
+            StaticHandler(zuul_web, '/{tenant}/labels.html'),
         ]
 
 

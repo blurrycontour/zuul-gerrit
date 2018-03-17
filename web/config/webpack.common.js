@@ -78,6 +78,12 @@ module.exports = {
       filename: 'projects.html'
     }),
     new HtmlWebpackPlugin({
+      title: 'Zuul Labels',
+      app: 'zuulLabels',
+      template: 'web/main.ejs',
+      filename: 'labels.html'
+    }),
+    new HtmlWebpackPlugin({
       title: 'Zuul Tenants',
       app: 'zuulTenants',
       template: 'web/main.ejs',
