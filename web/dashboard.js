@@ -54,6 +54,23 @@ angular.module('zuulJobs', [], function ($locationProvider) {
       $scope.jobs_fetch()
     })
 
+angular.module('zuulLabels', [], function ($locationProvider) {
+  $locationProvider.html5Mode({
+    enabled: true,
+    requireBase: false
+  })
+}).controller(
+    'mainController', function ($scope, $http, $location) {
+      $scope.labels = undefined
+      $scope.labels_fetch = function () {
+        $http.get(getSourceUrl('labels', $location))
+            .then(function success (result) {
+              $scope.labels = result.data
+            })
+      }
+      $scope.labels_fetch()
+    })
+
 angular.module('zuulBuilds', [], function ($locationProvider) {
   $locationProvider.html5Mode({
     enabled: true,

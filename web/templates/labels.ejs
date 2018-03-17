@@ -19,7 +19,7 @@ under the License.
   <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
   <title id='pagetitle'><%= htmlWebpackPlugin.options.title %></title>
 </head>
-<body ng-app="zuulJobs" ng-controller="mainController"><div class="container-fluid">
+<body ng-app="zuulLabels" ng-controller="mainController"><div class="container-fluid">
   <nav class="navbar navbar-default">
   <div class="container-fluid">
     <div class="navbar-header">
@@ -27,8 +27,8 @@ under the License.
     </div>
     <ul class="nav navbar-nav">
       <li><a href="status.html" target="_self">Status</a></li>
-      <li class="active"><a href="jobs.html" target="_self">Jobs</a></li>
-      <li><a href="labels.html" target="_self">Labels</a></li>
+      <li><a href="jobs.html" target="_self">Jobs</a></li>
+      <li class="active"><a href="labels.html" target="_self">Labels</a></li>
       <li><a href="builds.html" target="_self">Builds</a></li>
     </ul>
   </div>
@@ -37,15 +37,11 @@ under the License.
     <thead>
       <tr>
         <th>Name</th>
-        <th>Description</th>
-        <th>Last builds</th>
       </tr>
     </thead>
     <tbody>
-      <tr ng-repeat="job in jobs">
-        <td>{{ job.name }}</td>
-        <td>{{ job.description }}</td>
-        <td><a href="builds.html?job_name={{ job.name }}">builds</a></td>
+      <tr ng-repeat="label in labels">
+        <td>{{ label.name }}</td>
       </tr>
     </tbody>
   </table>
