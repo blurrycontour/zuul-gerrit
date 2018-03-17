@@ -25,6 +25,7 @@ import zuul.driver.timer
 import zuul.driver.sql
 import zuul.driver.bubblewrap
 import zuul.driver.nullwrap
+import zuul.driver.zookeeper
 from zuul.connection import BaseConnection
 from zuul.driver import SourceInterface
 
@@ -51,6 +52,7 @@ class ConnectionRegistry(object):
         self.registerDriver(zuul.driver.sql.SQLDriver())
         self.registerDriver(zuul.driver.bubblewrap.BubblewrapDriver())
         self.registerDriver(zuul.driver.nullwrap.NullwrapDriver())
+        self.registerDriver(zuul.driver.zookeeper.ZookeeperDriver())
 
     def registerDriver(self, driver):
         if driver.name in self.drivers:
@@ -141,6 +143,10 @@ class ConnectionRegistry(object):
                 if not hasattr(driver, 'getConnection'):
                     connections[driver.name] = DefaultConnection(
                         driver, driver.name, {})
+                elif driver.name == "zookeeper":
+                    connections["zookeeper"] = \
+                        zuul.driver.zookeeper.ZookeeperConnection(
+                            driver, driver.name, config)
 
         self.connections = connections
 
