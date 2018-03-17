@@ -80,7 +80,8 @@ class BaseTestWeb(ZuulTestCase):
             if self.web.server is None:
                 continue
             self.port = self.web.server.sockets[0].getsockname()[1]
-            print(self.host, self.port)
+            self.log.debug(
+                "Zuul Web running on http://%s:%s", self.host, self.port)
             try:
                 with socket.create_connection((self.host, self.port)):
                     break
