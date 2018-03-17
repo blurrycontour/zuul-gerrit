@@ -262,6 +262,18 @@ class TestWeb(BaseTestWeb):
         data = self.get_url('api/tenant/tenant-one/labels').json()
         self.assertEqual(data, [])
 
+    def test_web_nodes(self):
+        data = self.get_url('api/tenant/tenant-one/nodes').json()
+        self.assertEqual(data[0], {
+            'comment': None,
+            'connection_type': None,
+            'external_id': None,
+            'id': '0000000001',
+            'provider': 'test-provider',
+            'state': 'in-use',
+            'type': 'label1'
+        })
+
     def test_web_find_job(self):
         # can we fetch the variants for a single job
         data = self.get_url('api/tenant/tenant-one/job/project-test1').json()
