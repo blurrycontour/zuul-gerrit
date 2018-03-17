@@ -51,6 +51,7 @@ class ZookeeperConnection(BaseConnection):
         self.zk.connect(**self.zk_args)
         return [
             ZookeeperWebHandler(self, zuul_web, 'GET', '/{tenant}/labels'),
+            ZookeeperWebHandler(self, zuul_web, 'GET', '/{tenant}/nodes'),
             StaticHandler(zuul_web, '/{tenant}/labels.html'),
         ]
 
@@ -65,10 +66,23 @@ class ZookeeperWebHandler(BaseWebHandler):
                 labels.add(label)
         return [{'name': label} for label in sorted(labels)]
 
+    def getNodes(self, tenant):
+        nodes = []
+        for node in self.connection.zk.nodeIterator():
+            node_data = {}
+            for key in ("id", "type", "connection_type", "external_id",
+                        "provider", "state", "comment"):
+                node_data[key] = node.get(key)
+            nodes.append(node_data)
+        return nodes
+
     async def handleRequest(self, request):
         try:
             tenant = request.match_info["tenant"]
-            data = self.getLabels(tenant)
+            if request.url.path.split('/')[-1] == "nodes":
+                data = self.getNodes(tenant)
+            else:
+                data = self.getLabels(tenant)
             resp = web.json_response(data)
             resp.headers['Access-Control-Allow-Origin'] = '*'
         except Exception as e:
