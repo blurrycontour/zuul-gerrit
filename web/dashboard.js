@@ -228,14 +228,6 @@ angular.module('zuulBuilds', [], function ($locationProvider) {
     }
     let queryArgs = $location.search()
     let url = $location.url()
-    if (queryArgs['source_url']) {
-      this.tenant = undefined
-    } else {
-      let tenantStart = url.lastIndexOf(
-        '/', url.lastIndexOf('/builds.html') - 1) + 1
-      let tenantLength = url.lastIndexOf('/builds.html') - tenantStart
-      this.tenant = url.substr(tenantStart, tenantLength)
-    }
     this.builds = undefined
     if (queryArgs['pipeline']) {
       this.pipeline = queryArgs['pipeline']
@@ -248,7 +240,6 @@ angular.module('zuulBuilds', [], function ($locationProvider) {
     } else { this.project = '' }
     this.builds_fetch = function () {
       let queryString = ''
-      if (this.tenant) { queryString += '&tenant=' + this.tenant }
       if (this.pipeline) { queryString += '&pipeline=' + this.pipeline }
       if (this.job_name) { queryString += '&job_name=' + this.job_name }
       if (this.project) { queryString += '&project=' + this.project }
