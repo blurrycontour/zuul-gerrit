@@ -223,8 +223,9 @@ class SqlWebHandler(BaseWebHandler):
                 'limit': 50,
                 'skip': 0,
             }
+            args['buildset_filters']['tenant'] = request.match_info["tenant"]
             for k, v in urllib.parse.parse_qsl(request.rel_url.query_string):
-                if k in ("tenant", "project", "pipeline", "change", "branch",
+                if k in ("project", "pipeline", "change", "branch",
                          "patchset", "ref", "newrev"):
                     args['buildset_filters'].setdefault(k, []).append(v)
                 elif k in ("uuid", "job_name", "voting", "node_name",
