@@ -1894,7 +1894,7 @@ class QueueItem(object):
             self.log.exception("Error while parsing url for job %s:"
                                % (job,))
         if not url:
-            url = default_url or build.url or job.name
+            url = default_url or build.url or None
         return (result, url)
 
     def formatJSON(self, websocket_url=None):
