@@ -2280,7 +2280,7 @@ class RoleTestCase(ZuulTestCase):
             for line in f:
                 if line.startswith('roles_path'):
                     roles_paths.append(line)
-        print(roles_paths)
+        self.log.info(roles_paths)
         if content:
             self.assertEqual(len(roles_paths), 1,
                              "Should have one roles_path line in %s" %
@@ -3391,8 +3391,8 @@ class TestJobOutput(AnsibleZuulTestCase):
                          j[0]['plays'][0]['tasks'][0]
                          ['hosts']['localhost']['stdout'])
 
-        print(self._get_file(self.history[0],
-                             'work/logs/job-output.txt'))
+        self.log.info(self._get_file(self.history[0],
+                                     'work/logs/job-output.txt'))
         self.assertIn(token,
                       self._get_file(self.history[0],
                                      'work/logs/job-output.txt'))

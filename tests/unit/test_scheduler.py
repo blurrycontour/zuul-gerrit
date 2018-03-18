@@ -5002,8 +5002,9 @@ class TestSchedulerTemplatedProject(ZuulTestCase):
 
         self.assertEqual(self.getJobFromHistory('project-test1').result,
                          'SUCCESS')
-        print(self.getJobFromHistory('project-test1').
-              parameters['zuul']['_inheritance_path'])
+        self.log.info(
+            self.getJobFromHistory('project-test1').
+            parameters['zuul']['_inheritance_path'])
 
     def test_implied_branch_matchers(self):
         # This tests that there is an implied branch matcher when a
@@ -5022,8 +5023,9 @@ class TestSchedulerTemplatedProject(ZuulTestCase):
 
         self.assertEqual(self.getJobFromHistory('project-test1').result,
                          'SUCCESS')
-        print(self.getJobFromHistory('project-test1').
-              parameters['zuul']['_inheritance_path'])
+        self.log.info(
+            self.getJobFromHistory('project-test1').
+            parameters['zuul']['_inheritance_path'])
 
 
 class TestSchedulerSuccessURL(ZuulTestCase):
