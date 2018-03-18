@@ -53,15 +53,6 @@ export default class BuildsComponent implements OnInit {
 
     const remoteLocation = getSourceUrl('builds', this.tenant)
     this.http.get<Build[]>(remoteLocation, {params: params})
-      .subscribe(builds => {
-        for (const build of builds) {
-          /* Fix incorect url for post_failure job */
-          /* TODO(mordred) Maybe let's fix this server side? */
-          if (build.log_url === build.job_name) {
-            build.log_url = undefined
-          }
-        }
-        this.builds = builds
-      })
+      .subscribe(builds => { this.builds = builds })
   }
 }
