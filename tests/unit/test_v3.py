@@ -2377,7 +2377,7 @@ class TestRoles(RoleTestCase):
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
         self.assertIn(
-            '- project-test project-test : ERROR Unable to find role',
+            '- project-test None : ERROR Unable to find role',
             A.messages[-1])
 
 

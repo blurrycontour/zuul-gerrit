@@ -4663,9 +4663,9 @@ For CI problems and help debugging, contact ci@example.org"""
 
         self.assertEqual(A.data['status'], 'NEW')
         self.assertEqual(A.reported, 2)
-        self.assertIn('project-merge : NODE_FAILURE', A.messages[1])
-        self.assertIn('project-test1 : SKIPPED', A.messages[1])
-        self.assertIn('project-test2 : SKIPPED', A.messages[1])
+        self.assertIn('project-merge None : NODE_FAILURE', A.messages[1])
+        self.assertIn('project-test1 None : SKIPPED', A.messages[1])
+        self.assertIn('project-test2 None : SKIPPED', A.messages[1])
 
     def test_nodepool_priority(self):
         "Test that nodes are requested at the correct priority"
