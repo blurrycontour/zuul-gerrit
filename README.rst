@@ -38,6 +38,11 @@ To clone the latest code, use `git clone git://git.openstack.org/openstack-infra
 
 Bugs are handled at: https://storyboard.openstack.org/#!/project/679
 
+Suspected security vulnerabilities are most appreciated if first
+reported privately following any of the supported mechanisms
+described at
+https://docs.openstack.org/infra/zuul/user/vulnerabilities.html
+
 Code reviews are handled by gerrit at https://review.openstack.org
 
 After creating a Gerrit account, use `git review` to submit patches.
