@@ -71,6 +71,14 @@ class DuplicateNodeError(Exception):
         super(DuplicateNodeError, self).__init__(message)
 
 
+class UnknownLabel(Exception):
+    def __init__(self, label):
+        message = textwrap.dedent("""\
+        Unknown label named "{label}".""")
+        message = textwrap.fill(message.format(label=label))
+        super(UnknownLabel, self).__init__(message)
+
+
 class MaxTimeoutError(Exception):
     def __init__(self, job, tenant):
         message = textwrap.dedent("""\
@@ -444,7 +452,12 @@ class NodeSetParser(object):
         ns.start_mark = conf.get('_start_mark')
         node_names = set()
         group_names = set()
+        allowed_labels = self.pcontext.tenant.allowed_labels
         for conf_node in as_list(conf['nodes']):
+            if allowed_labels:
+                if not [True for allowed_label in allowed_labels if
+                        re.match(allowed_label, conf_node['label'])]:
+                    raise UnknownLabel(label=conf_node['label'])
             for name in as_list(conf_node['name']):
                 if name in node_names:
                     raise DuplicateNodeError(name, conf_node['name'])
@@ -1265,6 +1278,7 @@ class TenantParser(object):
                   'max-job-timeout': int,
                   'source': self.validateTenantSources(),
                   'exclude-unprotected-branches': bool,
+                  'allowed-labels': to_list(str),
                   'default-parent': str,
                   }
         return vs.Schema(tenant)
@@ -1279,6 +1293,7 @@ class TenantParser(object):
         if conf.get('exclude-unprotected-branches') is not None:
             tenant.exclude_unprotected_branches = \
                 conf['exclude-unprotected-branches']
+        tenant.allowed_labels = conf.get('allowed-labels')
         tenant.default_base_job = conf.get('default-parent', 'base')
 
         tenant.unparsed_config = conf

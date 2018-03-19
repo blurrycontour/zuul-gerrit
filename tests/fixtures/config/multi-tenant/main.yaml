@@ -1,6 +1,8 @@
 - tenant:
     name: tenant-one
     max-job-timeout: 1800
+    allowed-labels:
+      - tenant-one-.*
     source:
       gerrit:
         config-projects:
