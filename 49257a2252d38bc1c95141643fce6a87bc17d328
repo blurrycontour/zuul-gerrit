@@ -76,6 +76,30 @@
     },
     {
       "key": {
+        "uuid": "df7087c5_d2174151",
+        "filename": "zuul/ansible/logconfig.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-03-19T20:55:19Z",
+      "side": 1,
+      "message": "I\u0027m trying to fix the tests. This was a thing that was breaking. Leaving it in until I have the tests passing.",
+      "parentUuid": "df7087c5_122cd997",
+      "range": {
+        "startLine": 187,
+        "startChar": 8,
+        "endLine": 187,
+        "endChar": 64
+      },
+      "revId": "49257a2252d38bc1c95141643fce6a87bc17d328",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df7087c5_7720a7b1",
         "filename": "zuul/ansible/stream_receiver.py",
         "patchSetId": 5
