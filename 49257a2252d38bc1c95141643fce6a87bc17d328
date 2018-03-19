@@ -1,0 +1,101 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df7087c5_3249dd5f",
+        "filename": "zuul/ansible/library/command.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-03-19T20:18:57Z",
+      "side": 1,
+      "message": "Minor nit, maybe call it d[\u0027hostname\u0027] so that it lines up with the hostname object here?",
+      "revId": "49257a2252d38bc1c95141643fce6a87bc17d328",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df7087c5_127a9987",
+        "filename": "zuul/ansible/library/command.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 539,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-03-19T20:18:57Z",
+      "side": 1,
+      "message": "Maybe use hostname instead of host here too? just for consistency of tracing and avoiding confusion with the host parameter.",
+      "revId": "49257a2252d38bc1c95141643fce6a87bc17d328",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df7087c5_723af5cd",
+        "filename": "zuul/ansible/logconfig.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-03-19T20:18:57Z",
+      "side": 1,
+      "message": "If the below commented out code is removed I think this import is no longer needed?",
+      "revId": "49257a2252d38bc1c95141643fce6a87bc17d328",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df7087c5_122cd997",
+        "filename": "zuul/ansible/logconfig.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-03-19T20:18:57Z",
+      "side": 1,
+      "message": "This can probably be removed?",
+      "range": {
+        "startLine": 187,
+        "startChar": 8,
+        "endLine": 187,
+        "endChar": 64
+      },
+      "revId": "49257a2252d38bc1c95141643fce6a87bc17d328",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df7087c5_7720a7b1",
+        "filename": "zuul/ansible/stream_receiver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-03-19T20:18:57Z",
+      "side": 1,
+      "message": "Minor nit, this is now a unix socket based logging receiver.",
+      "range": {
+        "startLine": 63,
+        "startChar": 11,
+        "endLine": 63,
+        "endChar": 14
+      },
+      "revId": "49257a2252d38bc1c95141643fce6a87bc17d328",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
