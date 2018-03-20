@@ -22,6 +22,53 @@
       "revId": "68e02466ce13a5dbc01ada10b2704701544717dd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df7087c5_a12a66e4",
+        "filename": ".stestr.conf",
+        "patchSetId": 3
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-03-20T13:39:22Z",
+      "side": 1,
+      "message": "They are handled explicitly in tox.ini invocations. This is the same as how we had the .testr.conf file - by default operate on unit tests - require other tests to be explicit.",
+      "parentUuid": "df7087c5_db9d0c0b",
+      "range": {
+        "startLine": 2,
+        "startChar": 16,
+        "endLine": 2,
+        "endChar": 20
+      },
+      "revId": "68e02466ce13a5dbc01ada10b2704701544717dd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df7087c5_e147febb",
+        "filename": "tox.ini",
+        "patchSetId": 3
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-03-20T13:39:22Z",
+      "side": 1,
+      "message": "here\u0027s an example of running other tests",
+      "range": {
+        "startLine": 56,
+        "startChar": 38,
+        "endLine": 56,
+        "endChar": 66
+      },
+      "revId": "68e02466ce13a5dbc01ada10b2704701544717dd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }

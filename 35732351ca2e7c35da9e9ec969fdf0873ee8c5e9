@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df7087c5_8137224e",
+        "filename": ".testr.conf",
+        "patchSetId": 3
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-03-20T13:39:22Z",
+      "side": 0,
+      "message": "this is the old setting",
+      "range": {
+        "startLine": 2,
+        "startChar": 220,
+        "endLine": 2,
+        "endChar": 249
+      },
+      "revId": "35732351ca2e7c35da9e9ec969fdf0873ee8c5e9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
