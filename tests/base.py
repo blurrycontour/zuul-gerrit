@@ -3535,7 +3535,11 @@ class ZuulTestCase(BaseTestCase):
         return True
 
     def areAllMergeJobsWaiting(self):
-        for client_job in list(self.merge_client.jobs):
+        for job in list(self.merge_client.jobs):
+            if not job._job_running:
+                self.log.debug("%s has not been submitted yet" % job)
+                return False
+            client_job = job.gearman_job
             if not client_job.handle:
                 self.log.debug("%s has no handle" % client_job)
                 return False
