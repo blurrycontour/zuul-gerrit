@@ -33,40 +33,81 @@ def getJobData(job):
 
 
 class MergeGearmanClient(gear.Client):
-    def __init__(self, merge_client):
-        super(MergeGearmanClient, self).__init__('Zuul Merge Client')
-        self.__merge_client = merge_client
-
     def handleWorkComplete(self, packet):
         job = super(MergeGearmanClient, self).handleWorkComplete(packet)
-        self.__merge_client.onBuildCompleted(job)
+        job.merge_job.finish_attempt(success=True)
         return job
 
     def handleWorkFail(self, packet):
-        job = super(MergeGearmanClient, self).handleWorkFail(packet)
-        self.__merge_client.onBuildCompleted(job)
+        job = super(MergeGearmanClient, self).handleWorkComplete(packet)
+        job.merge_job.finish_attempt(success=False)
         return job
 
     def handleWorkException(self, packet):
-        job = super(MergeGearmanClient, self).handleWorkException(packet)
-        self.__merge_client.onBuildCompleted(job)
+        job = super(MergeGearmanClient, self).handleWorkComplete(packet)
+        job.merge_job.finish_attempt(success=False)
         return job
 
-    def handleDisconnect(self, job):
-        job = super(MergeGearmanClient, self).handleDisconnect(job)
-        self.__merge_client.onBuildCompleted(job)
+    def handleDisconnect(self, packet):
+        job = super(MergeGearmanClient, self).handleWorkComplete(packet)
+        job.merge_job.finish_attempt(success=False)
+        return job
 
 
-class MergeJob(gear.TextJob):
-    def __init__(self, *args, **kw):
-        super(MergeJob, self).__init__(*args, **kw)
-        self.__event = threading.Event()
+class MergeJob(object):
+    """A job that can be waited upon until complete or all
+    retries exhausted"""
+    MAX_ATTEMPTS = 3
+
+    def __init__(self, merge_client, job_name, data, build_set,
+                 precedence=zuul.model.PRECEDENCE_NORMAL):
+        self.merge_client = merge_client
+        self.job_name = job_name
+        self.job_data = data
+        self.build_set = build_set
+        self.precedence = precedence
+        self.timeout = 300
+        self.__wait_event = threading.Event()
+        self._attempts = 0
+        self._job_running = False
+
+    def start_attempt(self):
+        if self._job_running:
+            raise Exception("MergeJob attempt already running")
+        self._attempts += 1
+        uuid = str(uuid4().hex)
+        self.gearman_job = gear.TextJob(
+            self.job_name,
+            json.dumps(self.job_data),
+            unique=uuid
+        )
+        self.gearman_job.merge_job = self
+        self.merge_client.gearman.submitJob(
+            self.gearman_job,
+            precedence=self.precedence,
+            timeout=self.timeout
+        )
+        self._job_running = True
+
+    def finish_attempt(self, success):
+        """Called when gearman is finished with the job for whatever
+        reason including failures and execptions.
+
+        :arg bool success: Whether or not the job finished successfully"""
+        if not self._job_running:
+            raise Exception("Not expecting a job to finish")
+        self._job_running = False
+        if not success:
+            if self._attempts <= self.MAX_ATTEMPTS:
+                self.start_attempt()
+                return
+        self.merge_client.onBuildCompleted(self)
 
     def setComplete(self):
-        self.__event.set()
+        self.__wait_event.set()
 
     def wait(self, timeout=300):
-        return self.__event.wait(timeout)
+        return self.__wait_event.wait(timeout)
 
 
 class MergeClient(object):
@@ -81,7 +122,7 @@ class MergeClient(object):
         ssl_cert = get_default(self.config, 'gearman', 'ssl_cert')
         ssl_ca = get_default(self.config, 'gearman', 'ssl_ca')
         self.log.debug("Connecting to gearman at %s:%s" % (server, port))
-        self.gearman = MergeGearmanClient(self)
+        self.gearman = MergeGearmanClient()
         self.gearman.addServer(server, port, ssl_key, ssl_cert, ssl_ca)
         self.log.debug("Waiting for gearman")
         self.gearman.waitForServer()
@@ -95,17 +136,11 @@ class MergeClient(object):
             return True
         return False
 
-    def submitJob(self, name, data, build_set,
-                  precedence=zuul.model.PRECEDENCE_NORMAL):
-        uuid = str(uuid4().hex)
-        job = MergeJob(name,
-                       json.dumps(data),
-                       unique=uuid)
-        job.build_set = build_set
-        self.log.debug("Submitting job %s with data %s" % (job, data))
+    def startJob(self, name, data, build_set,
+                 precedence=zuul.model.PRECEDENCE_NORMAL):
+        job = MergeJob(self, name, data, build_set, precedence)
         self.jobs.add(job)
-        self.gearman.submitJob(job, precedence=precedence,
-                               timeout=300)
+        job.start_attempt()
         return job
 
     def mergeChanges(self, items, build_set, files=None, dirs=None,
@@ -114,12 +149,12 @@ class MergeClient(object):
                     files=files,
                     dirs=dirs,
                     repo_state=repo_state)
-        self.submitJob('merger:merge', data, build_set, precedence)
+        return self.startJob('merger:merge', data, build_set, precedence)
 
     def getRepoState(self, items, build_set,
                      precedence=zuul.model.PRECEDENCE_NORMAL):
         data = dict(items=items)
-        self.submitJob('merger:refstate', data, build_set, precedence)
+        return self.startJob('merger:refstate', data, build_set, precedence)
 
     def getFiles(self, connection_name, project_name, branch, files, dirs=[],
                  precedence=zuul.model.PRECEDENCE_HIGH):
@@ -128,7 +163,7 @@ class MergeClient(object):
                     branch=branch,
                     files=files,
                     dirs=dirs)
-        job = self.submitJob('merger:cat', data, None, precedence)
+        job = self.startJob('merger:cat', data, None, precedence)
         return job
 
     def getFilesChanges(self, connection_name, project_name, branch,
@@ -137,11 +172,11 @@ class MergeClient(object):
                     project=project_name,
                     branch=branch,
                     tosha=tosha)
-        job = self.submitJob('merger:fileschanges', data, None, precedence)
+        job = self.startJob('merger:fileschanges', data, None, precedence)
         return job
 
     def onBuildCompleted(self, job):
-        data = getJobData(job)
+        data = getJobData(job.gearman_job)
         merged = data.get('merged', False)
         job.updated = data.get('updated', False)
         commit = data.get('commit')
