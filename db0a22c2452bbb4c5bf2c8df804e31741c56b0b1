@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df7087c5_e32074b3",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-03-20T00:52:35Z",
+      "side": 1,
+      "message": "Perhaps using assertIn would make update easier, though this is good documentation material too.",
+      "revId": "db0a22c2452bbb4c5bf2c8df804e31741c56b0b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
