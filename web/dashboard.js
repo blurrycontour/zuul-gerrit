@@ -96,6 +96,16 @@ angular.module('zuulJobs', [], function ($locationProvider) {
     }
     job.expanded = !job.expanded
   }
+  $scope.info_fetch = function () {
+    $scope.loading_errors = undefined
+    $http.get(getSourceUrl('info', $location))
+      .then(function success (result) {
+        if (result.data.info.hasOwnProperty('loading_errors')) {
+          $scope.loading_errors = result.data.info.loading_errors
+        }
+      })
+  }
+  $scope.info_fetch()
   $scope.jobs_fetch()
 })
 

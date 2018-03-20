@@ -33,6 +33,16 @@ under the License.
     </ul>
   </div>
   </nav>
+  <div ng-if="loading_errors" class="alert alert-warning" role="alert">
+    <p><strong>This alert is displayed because some configuration errors have
+      been detected.</strong><a href="#" ng-click="showErrors = ! showErrors">
+        Show configuration errors.</a></p>
+    <table ng-show="showErrors" class="table table-condensed">
+      <tr ng-repeat="error in loading_errors">
+        <td><p>{{ error }}</p></td>
+      </tr>
+    </table>
+  </div>
   <table class="table table-hover table-condensed">
     <thead>
       <tr>
