@@ -2170,6 +2170,29 @@ class TestPrePlaybooks(AnsibleZuulTestCase):
     tenant_config_file = 'config/pre-playbook/main.yaml'
 
     def test_pre_playbook_fail(self):
+        self._pre_playbook_fail()
+
+    def test_pre_playbook_fail_autohold(self):
+
+        client = zuul.rpcclient.RPCClient('127.0.0.1',
+                                          self.gearman_server.port)
+        self.addCleanup(client.shutdown)
+        r = client.autohold('tenant-one', 'org/project', 'python27',
+                            "", "", "reason text", 1)
+        self.assertTrue(r)
+
+        self._pre_playbook_fail()
+
+        # TODO(pabelanger): Why doesn't this work?
+        # Check nodepool for a held node
+        held_node = None
+        for node in self.fake_nodepool.getNodes():
+            if node['state'] == zuul.model.STATE_HOLD:
+                held_node = node
+                break
+        self.assertIsNotNone(held_node)
+
+    def _pre_playbook_fail(self):
         # Test that we run the post playbooks (but not the actual
         # playbook) when a pre-playbook fails.
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
