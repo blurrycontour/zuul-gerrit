@@ -158,6 +158,7 @@ class GearmanHandler(object):
             'status_get': self.status_get,
             'job_list': self.job_list,
             'job_get': self.job_get,
+            'job_start': self.job_start,
             'project_list': self.project_list,
             'project_get': self.project_get,
             'pipeline_list': self.pipeline_list,
@@ -205,6 +206,21 @@ class GearmanHandler(object):
         resp = web.json_response(json.loads(job.data[0]))
         resp.headers['Access-Control-Allow-Origin'] = '*'
         return resp
+
+    async def job_start(self, request, result_filter=None):
+        job_args = {
+            'tenant': request.match_info["tenant"],
+            'job': request.match_info["job_name"],
+        }
+        try:
+            post_args = await request.json()
+            if "tenant" in post_args or "job" in post_args:
+                return web.HTTPNotFound()
+            job_args.update(post_args)
+        except json.decoder.JSONDecodeError:
+            pass
+        self.rpc.submitJob('zuul:job_start', job_args)
+        return web.Response()
 
     async def project_get(self, request, result_filter=None):
         job_args = {
@@ -339,6 +355,9 @@ class ZuulWeb(object):
     async def _handleJobsRequest(self, request):
         return await self.gearman_handler.processRequest(request, 'job_list')
 
+    async def _handleJobStart(self, request):
+        return await self.gearman_handler.processRequest(request, 'job_start')
+
     async def _handleProjectRequest(self, request):
         return await self.gearman_handler.processRequest(
             request, 'project_get')
@@ -382,6 +401,7 @@ class ZuulWeb(object):
             ('GET', '/{tenant}/status', self._handleStatusRequest),
             ('GET', '/{tenant}/jobs', self._handleJobsRequest),
             ('GET', '/{tenant}/jobs/{job_name}', self._handleJobRequest),
+            ('POST', '/{tenant}/jobs/{job_name}', self._handleJobStart),
             ('GET', '/{tenant}/status/change/{change}',
              self._handleStatusChangeRequest),
             ('GET', '/{tenant}/projects', self._handleProjectsRequest),

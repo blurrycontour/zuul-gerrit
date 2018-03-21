@@ -61,6 +61,7 @@ class RPCListener(object):
         self.worker.registerFunction("zuul:status_get")
         self.worker.registerFunction("zuul:job_get")
         self.worker.registerFunction("zuul:job_list")
+        self.worker.registerFunction("zuul:job_start")
         self.worker.registerFunction("zuul:project_get")
         self.worker.registerFunction("zuul:project_list")
         self.worker.registerFunction("zuul:pipeline_list")
@@ -350,6 +351,11 @@ class RPCListener(object):
             output.append({"name": job_name,
                            "description": desc})
         job.sendWorkComplete(json.dumps(output))
+
+    def handle_job_start(self, job):
+        args = json.loads(job.arguments)
+        tenant = self.sched.abide.tenants.get(args.get("tenant"))
+        self.sched.connections.drivers["web"].onEvent(tenant, args)
 
     def handle_project_get(self, gear_job):
         args = json.loads(gear_job.arguments)
