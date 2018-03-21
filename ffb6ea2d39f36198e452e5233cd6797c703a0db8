@@ -22,6 +22,30 @@
       "revId": "ffb6ea2d39f36198e452e5233cd6797c703a0db8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df7087c5_9f551253",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1044,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-03-21T19:17:06Z",
+      "side": 1,
+      "message": "yah, noticed that too. fixed",
+      "parentUuid": "df7087c5_df82aac8",
+      "range": {
+        "startLine": 1044,
+        "startChar": 17,
+        "endLine": 1044,
+        "endChar": 30
+      },
+      "revId": "ffb6ea2d39f36198e452e5233cd6797c703a0db8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
