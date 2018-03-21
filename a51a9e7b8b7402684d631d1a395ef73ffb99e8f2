@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df7087c5_09fec337",
+        "filename": "tests/remote/test_remote_zuul_stream.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-03-21T06:18:26Z",
+      "side": 1,
+      "message": "Maybe we want to check the ordering here too. We could use a similar approach like assertHistory used in the scheduler tests.",
+      "range": {
+        "startLine": 88,
+        "startChar": 0,
+        "endLine": 106,
+        "endChar": 67
+      },
+      "revId": "a51a9e7b8b7402684d631d1a395ef73ffb99e8f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
