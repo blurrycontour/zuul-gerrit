@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df7087c5_e9401c0a",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1045,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2018-03-21T17:29:42Z",
+      "side": 1,
+      "message": "Would POST_FAILURE need to be explicitly mentioned here as well ?",
+      "revId": "d9b1cc41fc34519ae3b4783707460db15bc3f047",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
