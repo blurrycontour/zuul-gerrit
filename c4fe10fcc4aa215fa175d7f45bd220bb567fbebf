@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df7087c5_32d23436",
+        "filename": "doc/source/_static/0x97ae496fc02dec9fc353b2e748f9961143495829.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-03-21T07:11:15Z",
+      "side": 1,
+      "message": "That looks expired",
+      "range": {
+        "startLine": 1,
+        "startChar": 52,
+        "endLine": 1,
+        "endChar": 62
+      },
+      "revId": "c4fe10fcc4aa215fa175d7f45bd220bb567fbebf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df7087c5_ad02506e",
+        "filename": "doc/source/user/vulnerabilities.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-03-21T07:11:15Z",
+      "side": 1,
+      "message": "Who else should be listed here?",
+      "range": {
+        "startLine": 56,
+        "startChar": 3,
+        "endLine": 56,
+        "endChar": 41
+      },
+      "revId": "c4fe10fcc4aa215fa175d7f45bd220bb567fbebf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
