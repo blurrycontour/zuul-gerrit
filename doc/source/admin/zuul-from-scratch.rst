@@ -201,6 +201,7 @@ further restrict public access.
 
    [web]
    listen_address=0.0.0.0
+   port=80
 
    [scheduler]
    tenant_config=/etc/zuul/main.yaml
