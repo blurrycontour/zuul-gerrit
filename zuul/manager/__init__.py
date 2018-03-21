@@ -808,7 +808,8 @@ class PipelineManager(object):
         layout = (item.layout or self.pipeline.layout)
 
         project_in_pipeline = True
-        if not layout.getProjectPipelineConfig(item.change.project,
+        if item.change.type != "direct" and \
+           not layout.getProjectPipelineConfig(item.change.project,
                                                self.pipeline):
             self.log.debug("Project %s not in pipeline %s for change %s" % (
                 item.change.project, self.pipeline, item.change))

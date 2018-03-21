@@ -1476,7 +1476,11 @@ class BuildSet(object):
         # until jobs start.
         if not self.uuid:
             self.uuid = uuid4().hex
-        if self.dependent_changes is None:
+        if self.item.change.type == "direct":
+            self.commit = "fake"
+            self.dependent_changes = []
+            self.merger_items = []
+        elif self.dependent_changes is None:
             items = [self.item]
             next_item = self.item.item_ahead
             while next_item:
@@ -1619,7 +1623,7 @@ class QueueItem(object):
     def debug(self, msg, indent=0):
         ppc = self.layout.getProjectPipelineConfig(self.change.project,
                                                    self.pipeline)
-        if not ppc.debug:
+        if not ppc or not ppc.debug:
             return
         if indent:
             indent = '  ' * indent
@@ -2191,6 +2195,7 @@ class Branch(Ref):
     def __init__(self, project):
         super(Branch, self).__init__(project)
         self.branch = None
+        self.type = None
 
     def toDict(self):
         # Render to a dict to use in passing json to the executor
@@ -2914,10 +2919,13 @@ class Layout(object):
         # NOTE(pabelanger): It is possible for a foreign project not to have a
         # configured pipeline, if so return an empty JobGraph.
         ret = JobGraph()
-        ppc = self.getProjectPipelineConfig(item.change.project,
-                                            item.pipeline)
-        if ppc:
-            self._createJobGraph(item, ppc.job_list, ret)
+        if item.jobs:
+            self._createJobGraph(item, item.jobs, ret)
+        else:
+            ppc = self.getProjectPipelineConfig(item.change.project,
+                                                item.pipeline)
+            if ppc:
+                self._createJobGraph(item, ppc.job_list, ret)
         return ret
 
     def getProjectPipelineConfig(self, project, pipeline):
