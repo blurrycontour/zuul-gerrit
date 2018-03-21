@@ -1,3 +1,4 @@
+/* global jQuery */
 // @licstart  The following is the entire license notice for the
 // JavaScript code in this page.
 //
@@ -131,6 +132,7 @@ angular.module('zuulJob', [], function ($locationProvider) {
             if (Object.keys(variant.variables).length === 0) {
               variant.variables = undefined
             } else {
+              variant.variables_dict = variant.variables
               variant.variables = JSON.stringify(
                 variant.variables, undefined, 2)
             }
@@ -155,6 +157,41 @@ angular.module('zuulJob', [], function ($locationProvider) {
         })
     }
     this.job_fetch()
+
+    this.addVar = function () {
+      jQuery('#buildVars').append(
+        '<div class="form-group">' +
+           '<input type="text" id="varName">: ' +
+           '<input type="text" id="varValue"></div>')
+    }
+    this.runBuild = function () {
+      let params = {}
+      // Fetch default parameters
+      if (jQuery('#project').val()) {
+        params['project'] = jQuery('#project').val()
+      }
+      if (jQuery('#hold').val()) {
+        params['hold'] = true
+      }
+      // Fetch job variables
+      let variables = {}
+      jQuery('#buildVars').each(function () {
+        let varName
+        let varValue
+        if (jQuery(this).find('#varName')) {
+          varName = jQuery(this).find('#varName').val()
+          varValue = jQuery(this).find('#varValue').val()
+        } else {
+          varName = jQuery(this).find('input').attr('id')
+          varValue = jQuery(this).find('input').val()
+        }
+        variables[varName] = varValue
+      })
+      if (variables.length > 0) {
+        params['variables'] = variables
+      }
+      $http.post(getSourceUrl('jobs/' + this.job_name), JSON.stringify(params))
+    }
   }
 })
 
