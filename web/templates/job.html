@@ -29,7 +29,13 @@ under the License.
   </nav>
   <div class="container-fluid panel-group">
     <div class="panel panel-info" ng-repeat="variant in $ctrl.variants">
-      <div class="panel-heading">{{ job_name }}: {{ variant.source_context }}</div>
+      <div class="panel-heading">{{ job_name }}: {{ variant.source_context }}
+        <span class="pull-right">
+          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#buildForm">
+            Build
+          </button>
+        </span>
+      </div>
       <div class="panel panel-body">
         <table class="table table-condensed table-bordered">
           <tr ng-If="variant.description">
@@ -99,6 +105,40 @@ under the License.
             </td>
           </tr>
         </table>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="buildForm" tabindex="-1" role="dialog" aria-labelledby="buildFormLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="buildFormLabel">Parameters</h5>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label>Run on this project (optional):</label>
+            <input type="text" id="project">
+          </div>
+          <div id="buildVars">
+            <div class="form-group" ng-repeat="key in $ctrl.variants[0].variables">
+              <label>{{ key }}:</label>
+              <input type="text" id="{{ key }}">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Put node on hold:</label>
+            <input type="checkbox" id="hold">
+          </div>
+          <button type="button" class="btn btn-info" ng-click="$ctrl.addVar()">
+            Add parameter
+          </button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="$ctrl.runBuild()">Build</button>
       </div>
     </div>
   </div>

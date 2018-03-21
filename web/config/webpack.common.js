@@ -11,6 +11,7 @@ module.exports = {
     vendor: [
       'angular',
       'bootstrap/dist/css/bootstrap.css',
+      'bootstrap/dist/js/bootstrap.js',
       'jquery-visibility/jquery-visibility',
       'graphitejs/jquery.graphite.js'
     ]
@@ -29,6 +30,7 @@ module.exports = {
     new webpack.ProvidePlugin({
         $: 'jquery/dist/jquery',
         jQuery: 'jquery/dist/jquery',
+        bootstrap: 'bootstrap/dist/js/bootstrap',
     }),
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',

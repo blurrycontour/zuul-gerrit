@@ -891,16 +891,19 @@ class Scheduler(threading.Thread):
             full_project_name = ('/'.join([event.project_hostname,
                                            event.project_name]))
             for tenant in self.abide.tenants.values():
-                (trusted, project) = tenant.getProject(full_project_name)
-                if project is None:
-                    continue
-                try:
-                    change = project.source.getChange(event)
-                except exceptions.ChangeNotFound as e:
-                    self.log.debug("Unable to get change %s from "
-                                   "source %s",
-                                   e.change, project.source)
-                    continue
+                if event.type == "direct":
+                    change = event.change
+                else:
+                    (trusted, project) = tenant.getProject(full_project_name)
+                    if project is None:
+                        continue
+                    try:
+                        change = project.source.getChange(event)
+                    except exceptions.ChangeNotFound as e:
+                        self.log.debug("Unable to get change %s from "
+                                       "source %s",
+                                       e.change, project.source)
+                        continue
                 if ((event.branch_updated and
                      hasattr(change, 'files') and
                      change.updatesConfig()) or
