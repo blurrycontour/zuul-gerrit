@@ -1,4 +1,6 @@
 /* global ZUUL_API_URL */
+/* global ZUUL_ADMIN_API_URL */
+
 // @licstart  The following is the entire license notice for the
 // JavaScript code in this page.
 //
@@ -21,10 +23,20 @@
 
 // TODO(mordred) This should be encapsulated in an Angular Service singleton
 // that fetches the other things from the info endpoint.
-export function getSourceUrl (filename, $location) {
+function getSourceUrl (filename, $location) {
   if (typeof ZUUL_API_URL !== 'undefined') {
     return ZUUL_API_URL + '/' + filename
   } else {
     return filename
   }
 }
+
+function getAdminSourceUrl (filename, $location) {
+  if (typeof ZUUL_ADMIN_API_URL !== 'undefined') {
+    return ZUUL_ADMIN_API_URL + '/' + filename
+  } else {
+    return '/admin/' + filename
+  }
+}
+
+export { getSourceUrl, getAdminSourceUrl }

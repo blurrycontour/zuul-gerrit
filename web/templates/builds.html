@@ -13,6 +13,7 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations
 under the License.
 -->
+
 <div class="container-fluid">
   <nav class="navbar navbar-default">
   <div class="container-fluid">
@@ -38,6 +39,13 @@ under the License.
   </span>
   </div>
   </nav>
+  <div>
+      <div id="alertModal" class="modal">
+        <div class="modal-content">
+          <span class="close">&times;</span>
+          <div id="alertContent"></div>
+        </div>
+      </div>
   <table class="table table-hover table-condensed">
     <thead>
       <tr>
@@ -49,6 +57,7 @@ under the License.
         <th>Log url</th>
         <th>Start time</th>
         <th>Result</th>
+        <th>Re-enqueue</th>
       </tr>
     </thead>
     <tbody>
@@ -61,7 +70,10 @@ under the License.
         <td><a ng-if="build.log_url" href="{{ build.log_url }}" target="_self">logs</a></td>
         <td>{{ build.start_time }}</td>
         <td>{{ build.result }}</td>
+        <td><button class="button button-block" ng-click="$ctrl.reenqueue(build)" title="Rebuild job for this change on project {{ build. project }} in pipeline {{ build.pipeline }}. Note that *every* job defined for this pipeline and this project will be rebuilt as well.">
+            <span style="margin:auto; display:table;" class="glyphicon glyphicon-repeat"></button></td>
       </tr>
     </tbody>
   </table>
+  </div>
 </div>

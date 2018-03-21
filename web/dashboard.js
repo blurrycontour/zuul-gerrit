@@ -22,7 +22,7 @@ import angular from 'angular'
 
 import './styles/zuul.css'
 import './jquery.zuul'
-import { getSourceUrl } from './util'
+import { getSourceUrl, getAdminSourceUrl } from './util'
 
 angular.module('zuulTenants', []).component('zuulApp', {
   template: require('./templates/tenants.html'),
@@ -59,7 +59,7 @@ angular.module('zuulProject', [], function ($locationProvider) {
   })
 }).component('zuulApp', {
   template: require('./templates/project.html'),
-  controller: function ($http, $location) {
+  controller: function ($http, $location, $window) {
     let queryArgs = $location.search()
     this.project_name = queryArgs['project_name']
     if (!this.project_name) {
@@ -165,7 +165,7 @@ angular.module('zuulBuilds', [], function ($locationProvider) {
   })
 }).component('zuulApp', {
   template: require('./templates/builds.html'),
-  controller: function ($http, $location) {
+  controller: function ($http, $location, $window, $document) {
     this.rowClass = function (build) {
       if (build.result === 'SUCCESS') {
         return 'success'
@@ -214,6 +214,63 @@ angular.module('zuulBuilds', [], function ($locationProvider) {
           }
           this.builds = result.data
         })
+    }
+    this.reenqueue = function (build) {
+        let queryString = getAdminSourceUrl('', $location)
+        queryString += this.tenant
+        queryString += "/" + build.project
+        queryString += "/" + build.pipeline
+        let payload = {}
+        payload.trigger = 'gerrit'
+        if (build.newrev) {
+            queryString += "/enqueue_ref"
+            payload.ref = build.ref
+            payload.newrev = build.newrev
+        } else {
+            queryString += "/enqueue"
+            payload.change = build.change + "," + build.patchset
+        }
+        console.log(queryString)
+        console.log(payload)
+        // Get the modal
+        var modal = $document[0].getElementById('alertModal')
+        // Get the button that opens the modal
+        var modalText = $document[0].getElementById('alertContent')
+        // Get the <span> element that closes the modal
+        var span = $document[0].getElementsByClassName("close")[0]
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function() {
+            modal.style.display = "none"
+        }
+        // When the user clicks anywhere outside of the modal, close it
+        $window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none"
+            }
+        }
+        $http.post(queryString, payload)
+            .then(function successCB(data) {
+                modalText.innerHTML = "<h4>Success</h4><br />Job successfully re-enqueued."
+                modal.style.display = "block"
+                console.log(data)
+            }, function errorCB(data) {
+                // TODO: status-specific messages ?
+                if (data.status == 401) {
+                    modalText.innerHTML = "<h4>Unauthorized</h4><br />You are not allowed to perform this operation."
+                }
+                else if (data.status == 404) {
+                    modalText.innerHTML = "<h4>Unsupported</h4><br />There is no admin API endpoint on this deployment."
+                }
+                else if (data.status > 500 ){
+                    modalText.innerHTML = "<h4>Server Side Error</h4><br />Please contact the administrator. Error was: <p>" + data.data.message + "</p>"
+                }
+                else {
+                    modalText.innerHTML = "<h4>Unknown Error</h4><br />Please contact the administrator. Error was: <p>" + data.statusText + "</p>"
+                }
+                modal.style.display = "block"
+                console.log(data)
+            });
     }
     this.builds_fetch()
   }
