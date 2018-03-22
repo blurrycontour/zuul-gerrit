@@ -559,6 +559,11 @@ class PipelineManager(object):
         # This runs on every iteration of _processOneItem
         # Returns True if the item is ready, false otherwise
         build_set = item.current_build_set
+        if item.change.type == "job":
+            # JobTrigger event doesn't have dependencies or merger_items
+            build_set.merger_items = []
+            build_set.dependent_changes = []
+            return True
         if not build_set.ref:
             build_set.setConfiguration()
         if build_set.merge_state == build_set.NEW:
@@ -808,7 +813,8 @@ class PipelineManager(object):
         layout = (item.layout or self.pipeline.layout)
 
         project_in_pipeline = True
-        if not layout.getProjectPipelineConfig(item.change.project,
+        if item.change.type != "job" and \
+           not layout.getProjectPipelineConfig(item.change.project,
                                                self.pipeline):
             self.log.debug("Project %s not in pipeline %s for change %s" % (
                 item.change.project, self.pipeline, item.change))

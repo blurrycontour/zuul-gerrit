@@ -1619,7 +1619,7 @@ class QueueItem(object):
     def debug(self, msg, indent=0):
         ppc = self.layout.getProjectPipelineConfig(self.change.project,
                                                    self.pipeline)
-        if not ppc.debug:
+        if not ppc or not ppc.debug:
             return
         if indent:
             indent = '  ' * indent
@@ -2126,6 +2126,8 @@ class Ref(object):
         self.oldrev = None
         self.newrev = None
         self.files = []
+        self.type = None
+        self.jobs = None
 
     def _id(self):
         return self.newrev
@@ -2342,6 +2344,31 @@ class TriggerEvent(object):
 
     def isChangeAbandoned(self):
         return False
+
+
+class JobTriggerEvent(TriggerEvent, Change):
+    """Direct jobs trigger event (not associated with a project or change)"""
+
+    def __init__(self, project=None):
+        TriggerEvent.__init__(self)
+        if project is None:
+            # Create a fake project
+            class Project:
+                name = ""
+                canonical_name = ""
+                canonical_hostname = ""
+                source = ""
+            project = Project()
+        Change.__init__(self, project)
+
+        self.project_hostname = ""
+        self.project_name = ""
+        self.number = uuid4().hex
+        self.patchset = 1
+        self.type = "job"
+        self.jobs = JobList()
+        self.branch = ""
+        self.message = ""
 
 
 class BaseFilter(object):
@@ -2914,10 +2941,13 @@ class Layout(object):
         # NOTE(pabelanger): It is possible for a foreign project not to have a
         # configured pipeline, if so return an empty JobGraph.
         ret = JobGraph()
-        ppc = self.getProjectPipelineConfig(item.change.project,
-                                            item.pipeline)
-        if ppc:
-            self._createJobGraph(item, ppc.job_list, ret)
+        if item.change.jobs:
+            self._createJobGraph(item, item.change.jobs, ret)
+        else:
+            ppc = self.getProjectPipelineConfig(item.change.project,
+                                                item.pipeline)
+            if ppc:
+                self._createJobGraph(item, ppc.job_list, ret)
         return ret
 
     def getProjectPipelineConfig(self, project, pipeline):
