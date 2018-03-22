@@ -2701,6 +2701,7 @@ class Ref(object):
         self.oldrev = None
         self.newrev = None
         self.files = []
+        self.job_filter = None
 
     def _id(self):
         return self.newrev
@@ -2728,7 +2729,8 @@ class Ref(object):
     def equals(self, other):
         if (self.project == other.project
             and self.ref == other.ref
-            and self.newrev == other.newrev):
+            and self.newrev == other.newrev
+            and self.job_filter == other.job_filter):
             return True
         return False
 
@@ -3689,6 +3691,8 @@ class Layout(object):
         item.debug("Freezing job graph")
         for jobname in job_list.jobs:
             # This is the final job we are constructing
+            if change.job_filter and jobname != change.job_filter['name']:
+                continue
             frozen_job = None
             self.log.debug("Collecting jobs %s for %s", jobname, change)
             item.debug("Freezing job {jobname}".format(
@@ -3770,6 +3774,10 @@ class Layout(object):
             # Now merge variables set from this parent ppc
             # (i.e. project+templates) directly into the job vars
             frozen_job.updateProjectVariables(ppc.variables)
+
+            if change.job_filter and change.job_filter.get('variables'):
+                frozen_job.updateProjectVariables(
+                    change.job_filter['variables'])
 
             job_graph.addJob(frozen_job)
 

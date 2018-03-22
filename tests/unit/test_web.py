@@ -407,6 +407,7 @@ class TestWeb(BaseTestWeb):
             {'name': 'check'},
             {'name': 'gate'},
             {'name': 'post'},
+            {'name': 'manual'}
         ]
         self.assertEqual(expected_list, data)
 
