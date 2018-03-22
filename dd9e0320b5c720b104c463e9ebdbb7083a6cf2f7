@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df7087c5_01d4251f",
+        "filename": "tests/remote/test_remote_action_modules.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-03-22T19:39:19Z",
+      "side": 1,
+      "message": "Flake8 may complain about this doesn\u0027t appear to actually be used.",
+      "revId": "dd9e0320b5c720b104c463e9ebdbb7083a6cf2f7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
