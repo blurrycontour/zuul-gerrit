@@ -27,6 +27,7 @@ import zuul.driver.sql
 import zuul.driver.bubblewrap
 import zuul.driver.nullwrap
 import zuul.driver.mqtt
+import zuul.driver.webtrigger
 from zuul.connection import BaseConnection
 from zuul.driver import SourceInterface
 
@@ -50,6 +51,7 @@ class ConnectionRegistry(object):
         self.registerDriver(zuul.driver.github.GithubDriver())
         self.registerDriver(zuul.driver.smtp.SMTPDriver())
         self.registerDriver(zuul.driver.timer.TimerDriver())
+        self.registerDriver(zuul.driver.webtrigger.WebTriggerDriver())
         self.registerDriver(zuul.driver.sql.SQLDriver())
         self.registerDriver(zuul.driver.bubblewrap.BubblewrapDriver())
         self.registerDriver(zuul.driver.nullwrap.NullwrapDriver())
