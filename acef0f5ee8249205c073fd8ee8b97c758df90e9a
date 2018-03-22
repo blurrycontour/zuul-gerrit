@@ -22,6 +22,30 @@
       "revId": "acef0f5ee8249205c073fd8ee8b97c758df90e9a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df7087c5_03051211",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1052,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-03-22T15:23:25Z",
+      "side": 1,
+      "message": "nm... i could see knowing if None is returned as useful info",
+      "parentUuid": "df7087c5_f819add6",
+      "range": {
+        "startLine": 1052,
+        "startChar": 8,
+        "endLine": 1052,
+        "endChar": 59
+      },
+      "revId": "acef0f5ee8249205c073fd8ee8b97c758df90e9a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
