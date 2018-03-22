@@ -322,7 +322,8 @@ class TestWeb(BaseTestWeb):
         self.assertEqual([
             {'name': 'check'},
             {'name': 'gate'},
-            {'name': 'post'}
+            {'name': 'post'},
+            {'name': 'manual'}
         ], data)
 
     def test_web_project_list(self):
