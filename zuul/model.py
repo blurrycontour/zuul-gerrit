@@ -2704,6 +2704,7 @@ class Ref(object):
         self.oldrev = None
         self.newrev = None
         self.files = []
+        self.web_variables = None
 
     def _id(self):
         return self.newrev
@@ -2731,7 +2732,8 @@ class Ref(object):
     def equals(self, other):
         if (self.project == other.project
             and self.ref == other.ref
-            and self.newrev == other.newrev):
+            and self.newrev == other.newrev
+            and self.web_variables == other.web_variables):
             return True
         return False
 
@@ -3773,6 +3775,9 @@ class Layout(object):
             # Now merge variables set from this parent ppc
             # (i.e. project+templates) directly into the job vars
             frozen_job.updateProjectVariables(ppc.variables)
+
+            if change.web_variables:
+                frozen_job.updateProjectVariables(change.web_variables)
 
             job_graph.addJob(frozen_job)
 
