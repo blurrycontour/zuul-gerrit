@@ -14,6 +14,7 @@
 
 import gc
 import json
+import re
 import textwrap
 
 import os
@@ -29,6 +30,7 @@ import testtools
 
 import zuul.change_matcher
 from zuul.driver.gerrit import gerritreporter
+from zuul.driver.webtrigger import WebTriggerEvent
 import zuul.scheduler
 import zuul.rpcclient
 import zuul.model
@@ -109,6 +111,36 @@ class TestSchedulerZone(ZuulTestCase):
 
 class TestScheduler(ZuulTestCase):
     tenant_config_file = 'config/single-tenant/main.yaml'
+
+    def test_web_trigger_event(self):
+        event = WebTriggerEvent()
+        tenant = self.sched.abide.tenants["tenant-one"]
+        _, project = tenant.getProject("org/project")
+        event.project_hostname = project.canonical_hostname
+        event.project_name = project.name
+        event.ref = 'refs/heads/master'
+        event.branch = 'master'
+        self.sched.addEvent(event)
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='project-test1', result='SUCCESS', ref=event.ref),
+            dict(name='project-test2', result='SUCCESS', ref=event.ref),
+        ])
+
+    def test_web_trigger_event_job_filter(self):
+        event = WebTriggerEvent()
+        tenant = self.sched.abide.tenants["tenant-one"]
+        _, project = tenant.getProject("org/project")
+        event.project_hostname = project.canonical_hostname
+        event.project_name = project.name
+        event.ref = 'refs/heads/master'
+        event.branch = 'master'
+        event.job_filters = [re.compile("project-test1")]
+        self.sched.addEvent(event)
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='project-test1', result='SUCCESS', ref=event.ref),
+        ])
 
     def test_jobs_executed(self):
         "Test that jobs are executed and a change is merged"
