@@ -482,11 +482,13 @@ class TestWeb(BaseTestWeb):
 
         gerrit_trigger = {'name': 'gerrit', 'driver': 'gerrit'}
         timer_trigger = {'name': 'timer', 'driver': 'timer'}
+        web_trigger = {'name': 'web', 'driver': 'web'}
         expected_list = [
             {'name': 'check', 'triggers': [gerrit_trigger]},
             {'name': 'gate', 'triggers': [gerrit_trigger]},
             {'name': 'post', 'triggers': [gerrit_trigger]},
             {'name': 'periodic', 'triggers': [timer_trigger]},
+            {'name': 'manual', 'triggers': [web_trigger]},
         ]
         self.assertEqual(expected_list, data)
 

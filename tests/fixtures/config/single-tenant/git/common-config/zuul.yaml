@@ -48,6 +48,12 @@
       timer:
         - time: '0 0 * * *'
 
+- pipeline:
+    name: manual
+    manager: independent
+    trigger:
+      web:
+
 - job:
     name: base
     parent: null
@@ -132,6 +138,10 @@
     post:
       jobs:
         - project-post
+    manual:
+      jobs:
+        - project-test1
+        - project-test2
 
 - project:
     name: org/project1
