@@ -41,6 +41,12 @@
           ref: ^(?!refs/).*$
     precedence: low
 
+- pipeline:
+    name: manual
+    manager: independent
+    trigger:
+      job-trigger:
+
 - job:
     name: base
     parent: null

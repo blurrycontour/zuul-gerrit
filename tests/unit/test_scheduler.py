@@ -67,6 +67,15 @@ class TestSchedulerSSL(SSLZuulTestCase):
 class TestScheduler(ZuulTestCase):
     tenant_config_file = 'config/single-tenant/main.yaml'
 
+    def test_job_trigger_event(self):
+        event = zuul.model.JobTriggerEvent()
+        tenant = self.sched.abide.tenants.get('tenant-one')
+        event.jobs.addJob(tenant.layout.getJob("project-post"))
+        self.sched.addEvent(event)
+        self.waitUntilSettled()
+        self.assertEqual(self.getJobFromHistory('project-post').result,
+                         'SUCCESS')
+
     def test_jobs_executed(self):
         "Test that jobs are executed and a change is merged"
 

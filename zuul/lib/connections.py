@@ -22,6 +22,7 @@ import zuul.driver.git
 import zuul.driver.github
 import zuul.driver.smtp
 import zuul.driver.timer
+import zuul.driver.jobtrigger
 import zuul.driver.sql
 import zuul.driver.bubblewrap
 import zuul.driver.nullwrap
@@ -48,6 +49,7 @@ class ConnectionRegistry(object):
         self.registerDriver(zuul.driver.github.GithubDriver())
         self.registerDriver(zuul.driver.smtp.SMTPDriver())
         self.registerDriver(zuul.driver.timer.TimerDriver())
+        self.registerDriver(zuul.driver.jobtrigger.JobTriggerDriver())
         self.registerDriver(zuul.driver.sql.SQLDriver())
         self.registerDriver(zuul.driver.bubblewrap.BubblewrapDriver())
         self.registerDriver(zuul.driver.nullwrap.NullwrapDriver())
