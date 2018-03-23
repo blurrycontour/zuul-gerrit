@@ -10,6 +10,14 @@ module.exports = Merge(CommonConfig, {
     rules: [
       {
         enforce: 'pre',
+        test: /\.ts$/,
+        use: [
+          'tslint-loader'
+        ],
+        exclude: /node_modules/,
+      },
+      {
+        enforce: 'pre',
         test: /\.js$/,
         use: [
           'babel-loader',

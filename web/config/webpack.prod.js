@@ -19,10 +19,6 @@ module.exports = Merge(CommonConfig, {
   plugins: [
     new CleanWebpackPlugin(
         ['zuul/web/static'], { root: path.resolve(__dirname, '../..')}),
-    new webpack.LoaderOptionsPlugin({
-      minimize: true,
-      debug: false
-    }),
     // Keeps the vendor bundle from changing needlessly.
     new webpack.HashedModuleIdsPlugin(),
     new ArchivePlugin({
