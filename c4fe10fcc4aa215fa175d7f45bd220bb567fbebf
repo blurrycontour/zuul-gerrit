@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "df7087c5_8e360b03",
+        "filename": "doc/source/_static/0x97ae496fc02dec9fc353b2e748f9961143495829.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2018-03-23T13:18:13Z",
+      "side": 1,
+      "message": "Indeed, every month I refresh the expiration date on my keys to a year, as a sort of \"dead-man switch\" but I agree I should include the most recent export (I copied this from the openstack/ossa repo... I should make a note to refresh the copy in there too for the same reason). It was mostly a placeholder, but I can think of no good reason not to just update it now. Thanks!",
+      "revId": "c4fe10fcc4aa215fa175d7f45bd220bb567fbebf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df7087c5_ad02506e",
         "filename": "doc/source/user/vulnerabilities.rst",
         "patchSetId": 1
@@ -42,6 +59,23 @@
         "endLine": 56,
         "endChar": 41
       },
+      "revId": "c4fe10fcc4aa215fa175d7f45bd220bb567fbebf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df7087c5_6e31370b",
+        "filename": "doc/source/user/vulnerabilities.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2018-03-23T13:18:13Z",
+      "side": 1,
+      "message": "Ideally anyone in the zuul-security team on storyboard.openstack.org (though I\u0027d also be fine if some of them want to opt out of having E-mail addresses listed in here). At a minimum I think it would be good to have at least three for the sake of redundancy.",
       "revId": "c4fe10fcc4aa215fa175d7f45bd220bb567fbebf",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
