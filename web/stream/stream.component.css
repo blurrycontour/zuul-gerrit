@@ -1,0 +1,12 @@
+#zuulstreamoverlay {
+    float: right;
+}
+
+pre#zuulstreamcontent {
+    font-family: monospace;
+    white-space: pre;
+    margin: 0px 10px;
+    background-color: black;
+    color: lightgrey;
+    border: none;
+}
