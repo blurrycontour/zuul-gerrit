@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "bf659307_32834007",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 563,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-03-23T19:57:26Z",
+      "side": 1,
+      "message": "oh, thanks, we do want to reraise here.",
+      "revId": "a1e2d46144197bd98d07726c405faff22351f5a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_61efac87",
         "filename": "zuul/scheduler.py",
         "patchSetId": 1
