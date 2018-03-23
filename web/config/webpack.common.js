@@ -1,9 +1,13 @@
-const path = require('path');
-const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const path = require('path')
+const webpack = require('webpack')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const { CheckerPlugin } = require('awesome-typescript-loader')
 
 module.exports = {
-  entry: './web/main.js',
+  entry: './web/main.ts',
+  resolve: {
+    extensions: [ '.tsx', '.ts', '.js' ]
+  },
   output: {
     filename: '[name].js',
     // path.resolve(__dirname winds up relative to the config dir
@@ -20,13 +24,14 @@ module.exports = {
       cacheGroups: {
         commons: {
           test: /node_modules/,
-          name: "vendor",
-          chunks: "all"
+          name: 'vendor',
+          chunks: 'all'
         }
       }
     }
   },
   plugins: [
+    new CheckerPlugin(),
     new webpack.ProvidePlugin({
         $: 'jquery/dist/jquery',
         jQuery: 'jquery/dist/jquery',
@@ -36,32 +41,39 @@ module.exports = {
     // output file.
     new HtmlWebpackPlugin({
       filename: 'status.html',
-      template: 'web/templates/status.ejs',
+      template: 'web/config/main.ejs',
       title: 'Zuul Status'
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Builds',
-      template: 'web/templates/builds.ejs',
+      template: 'web/config/main.ejs',
       filename: 'builds.html'
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Jobs',
-      template: 'web/templates/jobs.ejs',
+      template: 'web/config/main.ejs',
       filename: 'jobs.html'
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Tenants',
-      template: 'web/templates/tenants.ejs',
+      template: 'web/config/main.ejs',
       filename: 'tenants.html'
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Console Stream',
-      template: 'web/templates/stream.ejs',
+      template: 'web/config/main.ejs',
       filename: 'stream.html'
     })
   ],
   module: {
     rules: [
+      {
+        test: /\.ts$/,
+        exclude: /node_modules/,
+        use: [
+          'awesome-typescript-loader'
+        ]
+      },
       {
         test: /\.js$/,
         exclude: /node_modules/,
@@ -85,7 +97,7 @@ module.exports = {
       {
         test: /\.woff(2)?(\?v=\d+\.\d+\.\d+)?$/,
         use: {
-          loader: "url-loader",
+          loader: 'url-loader',
           options: {
             limit: 10000,
             mimetype: 'application/font-woff'
@@ -95,7 +107,7 @@ module.exports = {
       {
         test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
         use: {
-          loader: "url-loader",
+          loader: 'url-loader',
           options: {
             limit: 10000,
             mimetype: 'application/octet-stream'
@@ -109,7 +121,7 @@ module.exports = {
       {
         test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
         use: {
-          loader: "url-loader",
+          loader: 'url-loader',
           options: {
             limit: 10000,
             mimetype: 'image/svg+xml'
@@ -118,7 +130,7 @@ module.exports = {
       },
       {
         test: /\.html$/,
-        use: ['raw-loader'],
+        use: ['html-loader'],
         exclude: /node_modules/
       }
     ]
