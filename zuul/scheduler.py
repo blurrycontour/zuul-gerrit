@@ -559,6 +559,8 @@ class Scheduler(threading.Thread):
             for tenant in abide.tenants.values():
                 self._reconfigureTenant(tenant)
             self.abide = abide
+        except Exception:
+            self.log.error("Full reconfiguration failed")
         finally:
             self.layout_lock.release()
         self.log.info("Full reconfiguration complete")
@@ -583,6 +585,8 @@ class Scheduler(threading.Thread):
             tenant = abide.tenants[event.tenant_name]
             self._reconfigureTenant(tenant)
             self.abide = abide
+        except Exception:
+            self.log.error("Tenant reconfiguration failed")
         finally:
             self.layout_lock.release()
         self.log.info("Tenant reconfiguration complete")
