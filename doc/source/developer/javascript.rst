@@ -1,13 +1,14 @@
-Zuul Web Javascript
-===================
+Zuul Dashboard Javascript
+=========================
 
 zuul-web has an html, css and javascript component, `zuul-dashboard`, that
 is managed using Javascript toolchains. It is intended to be served by zuul-web
 directly from zuul/web/static in the simple case, or to be published to
 an alternate static web location, such as an Apache server.
 
-The web applications are managed by `yarn`_ and `webpack`_ which in turn both
-assume a functioning and recent `nodejs`_ installation.
+The web dashboard are written in `Typescript`_ and `Angular`_ and are
+managed by `yarn`_ and `webpack`_ which in turn both assume a functioning
+and recent `nodejs`_ installation.
 
 For the impatient who don't want deal with javascript toolchains
 ----------------------------------------------------------------
@@ -105,13 +106,20 @@ such as minifying and transpiling for older browsers. It takes a
 javascript-first approach, and generates a html file that includes the
 appropriate javascript and CSS to get going.
 
-We need to modify the html generated for each of our pages, so there are
-templates in ``web/templates``.
-
 The main `webpack`_ config file is ``webpack.config.js``. In the Zuul tree that
 file is a stub file that includes either a dev or a prod environment from
 ``web/config/webpack.dev.js`` or ``web/config/webpack.prod.js``. Most of the
 important bits are in ``web/config/webpack.common.js``.
+
+Angular Components
+------------------
+
+Each page has an `Angular Component`_ associated with it. For instance, the
+``status.html`` page has code in ``web/status/status.component.ts`` and the
+relevant HTML can be found in ``web/status/status.component.html``.
+
+Mapping of pages/urls to components can be found in the routing module in
+``web/app-routing.module.ts``.
 
 Development
 -----------
@@ -209,3 +217,6 @@ our case we use it for both.
 .. _webpack: https://webpack.js.org/
 .. _devtool: https://webpack.js.org/configuration/devtool/#devtool
 .. _nodeenv: https://pypi.python.org/pypi/nodeenv
+.. _Angular: https://angular.io
+.. _Angular Component: https://angular.io/guide/architecture-components
+.. _Typescript: https://www.typescriptlang.org/
