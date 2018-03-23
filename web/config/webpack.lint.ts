@@ -1,11 +1,13 @@
-const path = require('path');
-const webpack = require('webpack');
-const Merge = require('webpack-merge');
-const CommonConfig = require('./webpack.common.js');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+import * as path from 'path'
+import * as webpack from 'webpack'
+import * as WebpackMerge from 'webpack-merge'
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
 
-module.exports = Merge(CommonConfig, {
+import * as CommonConfig from './webpack.common'
 
+const config: webpack.Configuration = WebpackMerge(CommonConfig, {
+
+  mode: 'development',
   module: {
     rules: [
       {
@@ -30,3 +32,5 @@ module.exports = Merge(CommonConfig, {
     }),
   ]
 })
+
+export default config

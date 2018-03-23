@@ -1,9 +1,27 @@
-const path = require('path');
-const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+import * as path from 'path'
+import * as webpack from 'webpack'
+import * as HtmlWebpackPlugin from 'html-webpack-plugin'
 
-module.exports = {
-  entry: './web/main.js',
+// Workaround issue in the published typescript definition of
+// webpack.Options.SplitChunksOptions in @types/webpack. The published
+// definition says:
+//   cacheGroups?: false | string | ((...args: any[]) => any) | RegExp | CacheGroupsOptions
+// but what webpack ACTUALLY wants, rather than a CacheGroupsOptions is a
+// Map<string, CacheGroupsOptions>.
+// A PR has been submitted upstream:
+//    https://github.com/DefinitelyTyped/DefinitelyTyped/pull/24221
+// For now, just extend with any
+interface Configuration extends webpack.Configuration {
+  optimization?: any
+}
+
+const config: Configuration = {
+  entry: {
+    main: './web/main.js',
+  },
+  resolve: {
+    extensions: [ '.tsx', '.ts', '.js' ]
+  },
   output: {
     filename: '[name].js',
     // path.resolve(__dirname winds up relative to the config dir
@@ -35,9 +53,9 @@ module.exports = {
     // entry items from above. We can collapse this to just do one single
     // output file.
     new HtmlWebpackPlugin({
-      filename: 'status.html',
+      title: 'Zuul Status',
       template: 'web/templates/status.ejs',
-      title: 'Zuul Status'
+      filename: 'status.html'
     }),
     new HtmlWebpackPlugin({
       title: 'Zuul Builds',
@@ -123,4 +141,6 @@ module.exports = {
       }
     ]
   }
-};
+}
+
+export default config
