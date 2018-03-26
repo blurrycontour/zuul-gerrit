@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_5b911a52",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-03-26T00:51:13Z",
+      "side": 1,
+      "message": "Honestly, I\u0027m not sure we want to do this. It would be better if we used socket.getaddrinfo() to determine if the address is IPv6 then toggle this setting for statsd. However, that would then mean another socket.getaddrinfo() within statsd library:\n  https://github.com/jsocol/pystatsd/blob/master/statsd/client.py#L152\n\nSuggestions?",
+      "range": {
+        "startLine": 139,
+        "startChar": 0,
+        "endLine": 142,
+        "endChar": 65
+      },
+      "revId": "b0b22a9b6354caff324ce94e483139e8a5b1e240",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
