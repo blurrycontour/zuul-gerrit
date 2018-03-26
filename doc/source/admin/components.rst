@@ -136,6 +136,11 @@ The following sections of ``zuul.conf`` are used by all Zuul components:
 
       The UDP port on which the statsd server is listening.
 
+   .. attr:: ipv6
+      :default: False
+
+      Tells the client explicitly to look up the host using IPv6.
+
    .. attr:: prefix
 
       If present, this will be prefixed to all of the keys before
