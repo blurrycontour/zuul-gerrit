@@ -22,6 +22,30 @@
       "revId": "d487cf503f8a1eb318c285801dec9f1b583810f8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_d7f73af5",
+        "filename": "tests/base.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2827,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2018-03-26T04:09:55Z",
+      "side": 1,
+      "message": "good point, we should assert!",
+      "parentUuid": "bf659307_740d0c3d",
+      "range": {
+        "startLine": 2827,
+        "startChar": 31,
+        "endLine": 2827,
+        "endChar": 36
+      },
+      "revId": "d487cf503f8a1eb318c285801dec9f1b583810f8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
