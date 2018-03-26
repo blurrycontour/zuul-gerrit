@@ -18,9 +18,10 @@ from zuul.lib.config import get_default
 
 def get_statsd_config(config):
     statsd_host = get_default(config, 'statsd', 'server')
+    statsd_ipv6 = bool(get_default(config, 'statsd', 'ipv6', False))
     statsd_port = int(get_default(config, 'statsd', 'port', 8125))
     statsd_prefix = get_default(config, 'statsd', 'prefix')
-    return (statsd_host, statsd_port, statsd_prefix)
+    return (statsd_host, statsd_port, statsd_prefix, statsd_ipv6)
 
 
 def normalize_statsd_name(name):
@@ -30,21 +31,22 @@ def normalize_statsd_name(name):
 
 
 def get_statsd(config, extra_keys=None):
-    (statsd_host, statsd_port, statsd_prefix) = get_statsd_config(config)
+    (statsd_host, statsd_port,
+     statsd_prefix, statsd_ipv6) = get_statsd_config(config)
     if statsd_host is None:
         return None
     import statsd
 
     class CustomStatsClient(statsd.StatsClient):
 
-        def __init__(self, host, port, prefix, extra=None):
+        def __init__(self, host, port, prefix, ipv6, extra=None):
             self.extra_keys = copy.copy(extra) or {}
 
             for key in self.extra_keys:
                 value = normalize_statsd_name(self.extra_keys[key])
                 self.extra_keys[key] = value
 
-            super().__init__(host, port, prefix)
+            super().__init__(host, port, prefix, ipv6=ipv6)
 
         def _format_stat(self, name, **keys):
             format_keys = copy.copy(keys)
@@ -70,4 +72,4 @@ def get_statsd(config, extra_keys=None):
             super().timing(stat, delta, rate)
 
     return CustomStatsClient(
-        statsd_host, statsd_port, statsd_prefix, extra_keys)
+        statsd_host, statsd_port, statsd_prefix, statsd_ipv6, extra_keys)
