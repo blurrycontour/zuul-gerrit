@@ -181,6 +181,9 @@ class Client(zuul.cmd.ZuulApp):
         if self.args.change and self.args.ref:
             print("Change and ref can't be both used for the same request")
             return False
+        if "," in self.args.change:
+            print("No need to specify patchset number in change")
+            return False
 
         r = client.autohold(tenant=self.args.tenant,
                             project=self.args.project,
