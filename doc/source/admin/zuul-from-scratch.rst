@@ -11,6 +11,16 @@ Environment Setup
 We're going to be using Fedora 27 on a cloud server for this
 installation.
 
+Prerequisites
+~~~~~~~~~~~~~
+
+- As a minimum, Zuul's network ports must be open. 
+  This includes 7900 for the executor, 9000 for the web component 
+  and 4730 for the scheduler.
+- Port 9000 must be accessible from the internet.
+- You need an OpenStack cloud that serves as your node pool. 
+  For experimentation, DevStack is fine.
+
 Login to your environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -47,7 +57,7 @@ Install Nodepool
 
 ::
 
-   sudo adduser --system nodepool --home-dir /var/lib/nodepool --create-home
+   sudo useradd --system nodepool --home-dir /var/lib/nodepool --create-home
    git clone https://git.zuul-ci.org/nodepool
    cd nodepool/
    sudo dnf -y install $(bindep -b)
@@ -58,7 +68,7 @@ Install Zuul
 
 ::
 
-   sudo adduser --system zuul --home-dir /var/lib/zuul --create-home
+   sudo useradd --system zuul --home-dir /var/lib/zuul --create-home
    git clone https://git.zuul-ci.org/zuul
    cd zuul/
    sudo dnf install $(bindep -b) -y
@@ -89,9 +99,7 @@ fedora user's home directory.  It should be called
 that will be installed when instantiating the servers::
 
    cd ~
-   source <username>-openrc.sh  # this will prompt for password - enter it
-   umask 0066
-
+   source <username>-openrc.sh  # this may prompt for password - enter it
    ssh-keygen -t rsa -b 2048 -f nodepool_rsa  # don't enter a passphrase
    openstack keypair create --public-key nodepool_rsa.pub nodepool
 
@@ -99,6 +107,7 @@ We'll use the private key later wheen configuring Zuul.  In the same
 session, configure nodepool to talk to your cloud::
 
    sudo mkdir -p ~nodepool/.config/openstack
+   chmod -R 700 ~nodepool/.config
    cat > clouds.yaml <<EOF
    clouds:
      mycloud:
@@ -111,9 +120,9 @@ session, configure nodepool to talk to your cloud::
    EOF
    sudo mv clouds.yaml ~nodepool/.config/openstack/
    sudo chown -R nodepool.nodepool ~nodepool/.config
-   umask 0002
 
-Once you've written out the file, double check all the required fields have been filled out.
+Once you've written out the file, double check all the required fields 
+have been filled out.
 
 ::
 
@@ -392,7 +401,8 @@ Create a `GitHub application
 
 * Set Where can this GitHub App be installed to "Any account"
 * Create the App
-* Generate a Private key in the app settings page and save the file for later
+* Generate a Private key in the app settings page and save the file 
+  for later
 
 .. TODO See if we can script this using GitHub API
 
@@ -406,7 +416,7 @@ Edit ``/etc/zuul/zuul.conf`` to add the following::
   driver=github
   app_id=<APP ID NUMBER>
   app_key=/etc/zuul/github.pem
-  webhook_token=<WEBHOOK TOKEN>
+  webhook_token=<WEBHOOK SECRET>
 
 Upload the private key which was generated earlier, and save it in
 ``/etc/zuul/github.pem``.
@@ -424,13 +434,13 @@ delivered since Zuul wasn't configured at the time, so click
 ``Resend`` and verify that it is delivered now that Zuul is
 configured.
 
-Visit the public app page on GitHub,
-https://github.com/apps/my-org-zuul, and install the app into your org.
-
 Create two new repositories in your org.  One will hold the
 configuration for this tenant in Zuul, the other should be a normal
 project repo to use for testing.  We'll call them `zuul-test-config`
 and `zuul-test`, respectively.
+
+Visit the public app page on GitHub,
+https://github.com/apps/my-org-zuul, and install the app into your org.
 
 Edit ``/etc/zuul/main.yaml`` so that it looks like this::
 
