@@ -129,8 +129,9 @@ class SQLConnection(BaseConnection):
     def getWebHandlers(self, zuul_web, info):
         info.capabilities.job_history = True
         return [
-            SqlWebHandler(self, zuul_web, 'GET', '/{tenant}/builds'),
-            StaticHandler(zuul_web, '/{tenant}/builds.html'),
+            SqlWebHandler(
+                self, zuul_web, 'GET', '/api/tenant/{tenant}/builds'),
+            StaticHandler(zuul_web, '/t/{tenant}/builds.html'),
         ]
 
     def validateWebConfig(self, config, connections):

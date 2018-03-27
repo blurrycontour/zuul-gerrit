@@ -38,7 +38,7 @@ class BaseDriverWebHandler(BaseWebHandler):
             connection=connection, zuul_web=zuul_web, method=method, path=path)
         if path.startswith('/'):
             path = path[1:]
-        self.path = '/connection/{connection}/{path}'.format(
+        self.path = '/api/connection/{connection}/{path}'.format(
             connection=self.connection.connection_name,
             path=path)
 
