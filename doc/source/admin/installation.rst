@@ -107,6 +107,14 @@ Using Apache as the Reverse Proxy requires the ``mod_proxy``,
 ``mod_proxy_http`` and ``mod_proxy_wstunnel`` modules to be installed and
 enabled. Static Offload and White Label additionally require ``mod_rewrite``.
 
+All of the cases require a rewrite rule for the websocket streaming, so the
+simplest reverse-proxy case is::
+
+  RewriteEngine on
+  RewriteRule ^/api/tenant/(.*)/console-stream ws://localhost:9000/api/tenant/$1/console-stream [P]
+  RewriteRule ^/(.*)$ http://localhost:9000/$1 [P]
+
+
 Static Offload
 --------------
 
@@ -120,6 +128,7 @@ the web application as the document root and add a simple rewrite rule::
   </Directory>
   RewriteEngine on
   RewriteRule ^/t/(.*)$ /$1 [L]
+  RewriteRule ^/api/tenant/(.*)/console-stream ws://localhost:9000/api/tenant/$1/console-stream [P]
   RewriteRule ^/api/(.*)$ http://localhost:9000/api/$1 [P]
 
 White Labeled Tenant
@@ -141,4 +150,5 @@ Assuming the zuul tenant name is "example", the rewrite rules are::
   </Directory>
   RewriteEngine on
   RewriteRule ^/api/connection/(.*)$ http://localhost:9000/api/connection/$1 [P]
+  RewriteRule ^/api/console-stream ws://localhost:9000/api/tenant/example/console-stream [P]
   RewriteRule ^/api/(.*)$ http://localhost:9000/api/tenant/example/$1 [P]
