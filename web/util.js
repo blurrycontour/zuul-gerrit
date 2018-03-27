@@ -23,7 +23,7 @@
 // that fetches the other things from the info endpoint.
 export function getSourceUrl (filename, $location) {
   if (typeof ZUUL_API_URL !== 'undefined') {
-    return ZUUL_API_URL + '/' + filename
+    return ZUUL_API_URL + '/api/' + filename
   } else {
     return filename
   }
