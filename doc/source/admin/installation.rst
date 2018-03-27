@@ -107,4 +107,38 @@ Using Apache as the Reverse Proxy requires the ``mod_proxy``,
 ``mod_proxy_http`` and ``mod_proxy_wstunnel`` modules to be installed and
 enabled. Static Offload and White Label additionally require ``mod_rewrite``.
 
-.. TODO(mordred): Fill in specifics for all three methods
+Static Offload
+--------------
+
+To have the Reverse Proxy serve the static html/javscript assets instead of
+proxying them to the REST layer, register the location where you unpacked
+the web application as the document root and add a simple rewrite rule::
+
+  DocumentRoot /var/lib/html
+  <Directory /var/lib/html>
+    Require all granted
+  </Directory>
+  RewriteEngine on
+  RewriteRule ^/t/(.*)$ /$1 [L]
+  RewriteRule ^/api/(.*)$ http://localhost:9000/api/$1 [P]
+
+White Labeled Tenant
+--------------------
+
+Running a white-labeled tenant is similar to the offload case, but adds a
+rule to ensure connection webhooks don't try to get put into the tenant scope.
+
+.. note::
+
+  It's possible to do white-labelling without static offload, but it is more
+  complex with no benefit.
+
+Assuming the zuul tenant name is "example", the rewrite rules are::
+
+  DocumentRoot /var/lib/html
+  <Directory /var/lib/html>
+    Require all granted
+  </Directory>
+  RewriteEngine on
+  RewriteRule ^/api/connection/(.*)$ http://localhost:9000/api/connection/$1 [P]
+  RewriteRule ^/api/(.*)$ http://localhost:9000/api/tenant/example/$1 [P]
