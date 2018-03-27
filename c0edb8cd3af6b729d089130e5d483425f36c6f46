@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_3cc18481",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-03-27T17:10:49Z",
+      "side": 1,
+      "message": "shouldn\u0027t this be \"/api/tenant/{tenant}\" instead?",
+      "range": {
+        "startLine": 337,
+        "startChar": 34,
+        "endLine": 337,
+        "endChar": 35
+      },
+      "revId": "c0edb8cd3af6b729d089130e5d483425f36c6f46",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_dcbf28f9",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 345,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-03-27T17:10:49Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "c0edb8cd3af6b729d089130e5d483425f36c6f46",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
