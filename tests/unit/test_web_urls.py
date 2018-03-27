@@ -66,7 +66,7 @@ class TestDirect(TestWebURLs, ZuulTestCase):
         self.port = self.web.port
 
     def test_status_page(self):
-        self._crawl('/tenant-one/status.html')
+        self._crawl('/t/tenant-one/status.html')
 
 
 class TestWhiteLabel(TestWebURLs, ZuulTestCase):
@@ -75,7 +75,11 @@ class TestWhiteLabel(TestWebURLs, ZuulTestCase):
     def setUp(self):
         super(TestWhiteLabel, self).setUp()
         rules = [
-            ('^/(.*)$', 'http://localhost:{}/tenant-one/\\1'.format(
+            ('^/api/(.*)$',
+             'http://localhost:{}/api/tenant/tenant-one/\\1'.format(
+                self.web.port)),
+            ('^/(.*)$',
+             'http://localhost:{}/\\1'.format(
                 self.web.port)),
         ]
         self.proxy = self.useFixture(WebProxyFixture(rules))
@@ -98,4 +102,4 @@ class TestSuburl(TestWebURLs, ZuulTestCase):
         self.port = self.proxy.port
 
     def test_status_page(self):
-        self._crawl('/zuul3/tenant-one/status.html')
+        self._crawl('/zuul3/t/tenant-one/status.html')

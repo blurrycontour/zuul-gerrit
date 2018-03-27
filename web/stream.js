@@ -71,7 +71,7 @@ function zuulStartStream () {
     } else {
       protocol = 'ws://'
     }
-    let path = url['pathname'].replace(/stream.html.*$/g, '') + 'console-stream'
+    let path = url['pathname'].replace(/stream.html.*$/g, '') + 'api/console-stream'
     params['websocket_url'] = protocol + url['host'] + path
   }
   let ws = new WebSocket(params['websocket_url'])
