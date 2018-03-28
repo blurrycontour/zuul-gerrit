@@ -16,4 +16,3 @@
       npm_command: >-
         build:dist --
           --define "ZUUL_API_URL='{{ zuul_api_url }}'"
-          --define "ZUUL_BASE_HREF='/{{ zuul_log_path }}/npm/html'"

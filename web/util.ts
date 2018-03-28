@@ -15,6 +15,9 @@
 // TODO(mordred) This should be encapsulated in an Angular Service singleton
 // that fetches the other things from the info endpoint.
 
+import { DOCUMENT } from '@angular/common
+import { URL } from "url"
+
 declare var ZUUL_API_URL: string
 declare var ZUUL_BASE_HREF: string
 
@@ -35,10 +38,20 @@ function getSourceUrl (filename: string, tenant?: string): string {
 }
 export default getSourceUrl
 
+function getBaseHrefFromLocation (url: URL): string {
+  const path = url.path
+  if (path.includes('/t/') {
+    return path.slice(0, path.lastIndexOf('/t/') + 1
+  } else {
+    return path.split('/').slice(0, -1).join('/') + '/'
+  }
+}
+
 export function getBaseHref (): string {
   if (typeof ZUUL_BASE_HREF !== 'undefined') {
     return ZUUL_BASE_HREF
   } else {
-    return '/'
+    const url = new URL(DOCUMENT.location)
+    return getBaseHrefFromLocation(url)
   }
 }
