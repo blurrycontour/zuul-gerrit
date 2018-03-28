@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_4d67d226",
+        "filename": ".zuul.yaml",
+        "patchSetId": 12
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-03-28T09:09:00Z",
+      "side": 1,
+      "message": "the success-url needs to point at tenants.html",
+      "revId": "b61bcb0ceee6e520bf7feb0750555105d444f205",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
