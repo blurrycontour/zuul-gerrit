@@ -16,6 +16,24 @@
       "revId": "ffe36ad95b75aa384c7af044fc9fb8608d56aab7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_6255fc1c",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 335,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-03-28T12:22:08Z",
+      "side": 0,
+      "message": "Well crap.\n\nThis will work great once the angular2 patch with the use of @angular/router is in place. You\u0027re right though- it\u0027s broken atm. Lemme see if I can find a fix.",
+      "parentUuid": "bf659307_d1a3829d",
+      "revId": "ffe36ad95b75aa384c7af044fc9fb8608d56aab7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }

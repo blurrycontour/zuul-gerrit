@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bf659307_62d65cf4",
+        "filename": "doc/source/admin/installation.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-03-28T12:22:08Z",
+      "side": 1,
+      "message": "Oh - yes! Good catch.",
+      "parentUuid": "bf659307_3018bc7f",
+      "revId": "70fea50714afadaa5c9d579442b84c3c89ff7d6c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_9c775ed5",
         "filename": "doc/source/admin/installation.rst",
         "patchSetId": 6
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "bf659307_a23a3431",
+        "filename": "doc/source/admin/installation.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-03-28T12:22:08Z",
+      "side": 1,
+      "message": "Yes - definitely need instructions on ZUUL_API_URL - although in this case I forgot to update the navbar.",
+      "parentUuid": "bf659307_9c775ed5",
+      "revId": "70fea50714afadaa5c9d579442b84c3c89ff7d6c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_170d6736",
         "filename": "zuul/web/__init__.py",
         "patchSetId": 6
@@ -47,6 +83,24 @@
       "writtenOn": "2018-03-28T07:27:11Z",
       "side": 1,
       "message": "Not sure what\u0027s going on with this route, but the stream.html file will try to access \"api/console-stream\". So if the file is loaded from \"tenant_name/stream.html\" then network log shows access to \"tenant_name/api/console-stream\".",
+      "revId": "70fea50714afadaa5c9d579442b84c3c89ff7d6c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_02bf6061",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-03-28T12:22:08Z",
+      "side": 1,
+      "message": "Ah - that\u0027s a mistake in stream.js. It\u0027s not using getSourceUrl. I\u0027ve updated it to use getSourceUrl, so it should now try to access the right path.",
+      "parentUuid": "bf659307_170d6736",
       "revId": "70fea50714afadaa5c9d579442b84c3c89ff7d6c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
