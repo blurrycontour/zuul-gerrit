@@ -1,4 +1,4 @@
-/* global Image, jQuery */
+/* global Image, jQuery, ZUUL_STATUS_REFRESH */
 // jquery plugin for Zuul status page
 //
 // @licstart  The following is the entire license notice for the
@@ -639,13 +639,17 @@ import LineTImage from './images/line-t.png';
 
     let app = {
       schedule: function (app) {
+        let refresh = 5000
+        if (typeof ZUUL_STATUS_REFRESH !== 'undefined') {
+          refresh = ZUUL_STATUS_REFRESH
+        }
         app = app || this
         if (!options.enabled) {
-          setTimeout(function () { app.schedule(app) }, 5000)
+          setTimeout(function () { app.schedule(app) }, refresh)
           return
         }
         app.update().always(function () {
-          setTimeout(function () { app.schedule(app) }, 5000)
+          setTimeout(function () { app.schedule(app) }, refresh)
         })
 
         // Only update graphs every minute
