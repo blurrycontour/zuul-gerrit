@@ -16,6 +16,24 @@
       "revId": "1603225b7cb2a6d40652538a41edd8d365d96fe3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_5572ed12",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-03-28T14:49:38Z",
+      "side": 1,
+      "message": "Good call.",
+      "parentUuid": "bf659307_953725e4",
+      "revId": "1603225b7cb2a6d40652538a41edd8d365d96fe3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
