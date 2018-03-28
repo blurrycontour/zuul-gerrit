@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_906e6893",
+        "filename": "README.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-03-28T00:22:48Z",
+      "side": 1,
+      "message": "git clone https:// ?",
+      "revId": "21f9429411ea97200b4e2dbd1832f2fff05e98ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
