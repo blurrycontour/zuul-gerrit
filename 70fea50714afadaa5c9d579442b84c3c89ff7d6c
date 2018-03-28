@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_3018bc7f",
+        "filename": "doc/source/admin/installation.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-03-28T01:00:22Z",
+      "side": 1,
+      "message": "This doesn\u0027t seems to work with the static asset structure since it doesn\u0027t contain the tenant path. Shouldn\u0027t the rewrite be: \"^/t/.*/(.*)$\" \"/$1\" ?",
+      "revId": "70fea50714afadaa5c9d579442b84c3c89ff7d6c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
