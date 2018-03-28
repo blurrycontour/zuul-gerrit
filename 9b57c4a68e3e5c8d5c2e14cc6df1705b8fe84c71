@@ -46,6 +46,29 @@
       "revId": "9b57c4a68e3e5c8d5c2e14cc6df1705b8fe84c71",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_69b2bc96",
+        "filename": "web/dashboard.js",
+        "patchSetId": 8
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-03-28T16:32:15Z",
+      "side": 1,
+      "message": "This is incorrect but is fixed in a followup patch.",
+      "range": {
+        "startLine": 32,
+        "startChar": 31,
+        "endLine": 32,
+        "endChar": 44
+      },
+      "revId": "9b57c4a68e3e5c8d5c2e14cc6df1705b8fe84c71",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
