@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_d1a3829d",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 335,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-03-28T03:23:39Z",
+      "side": 0,
+      "message": "Shouldn\u0027t the dashboard be updated to reflect the new route when zuul-web is deployed standalone ?  E.g it used to serve \"/{tenant}/status.html\" which would query a relative \"status\" path that would reach the \"/{tenant}/status\" endpoint.\n\nNow it seems like the \"/t/{tenant}/status.html\" will query \"/t/{tenant}/status\" instead of \"/api/tenant/{tenant}/status\".",
+      "revId": "ffe36ad95b75aa384c7af044fc9fb8608d56aab7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
