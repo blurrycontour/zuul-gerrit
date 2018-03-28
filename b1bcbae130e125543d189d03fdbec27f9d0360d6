@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_79729c13",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-03-28T06:28:50Z",
+      "side": 1,
+      "message": "I think this need to be \"{tenant}/job/{job_name}\" to be consistent with the new route (\"/tenants\" and \"/tenant/{tenant}\") ?",
+      "range": {
+        "startLine": 344,
+        "startChar": 35,
+        "endLine": 344,
+        "endChar": 36
+      },
+      "revId": "b1bcbae130e125543d189d03fdbec27f9d0360d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
