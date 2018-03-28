@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_462fb7f5",
+        "filename": "web/templates/job.html",
+        "patchSetId": 9
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-03-28T05:43:54Z",
+      "side": 1,
+      "message": "This needs to be $ctrl.job_name too",
+      "range": {
+        "startLine": 32,
+        "startChar": 36,
+        "endLine": 32,
+        "endChar": 44
+      },
+      "revId": "da1540a5f1c8944b4cb9d77505196b9861eaf283",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
