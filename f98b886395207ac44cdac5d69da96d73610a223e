@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_689948c2",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-03-29T03:51:43Z",
+      "side": 1,
+      "message": "this should be nodepool",
+      "revId": "f98b886395207ac44cdac5d69da96d73610a223e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}

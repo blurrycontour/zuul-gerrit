@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_68de286e",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-03-29T03:51:43Z",
+      "side": 0,
+      "message": "What about explicitly setting chown on the files we expect to have permissions?",
+      "revId": "8f77b30923b005c178ff5e4208c3171d038e8b0c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
