@@ -2,6 +2,52 @@
   "comments": [
     {
       "key": {
+        "uuid": "bf659307_285270df",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-03-29T03:59:31Z",
+      "side": 1,
+      "message": "Well it must be able to talk between components, not necessarily open to the web or anybody.",
+      "range": {
+        "startLine": 17,
+        "startChar": 45,
+        "endLine": 17,
+        "endChar": 49
+      },
+      "revId": "f98b886395207ac44cdac5d69da96d73610a223e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_88493c32",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-03-29T03:59:31Z",
+      "side": 1,
+      "message": "Not necessarily true if you\u0027re using static nodes",
+      "range": {
+        "startLine": 19,
+        "startChar": 14,
+        "endLine": 19,
+        "endChar": 29
+      },
+      "revId": "f98b886395207ac44cdac5d69da96d73610a223e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_689948c2",
         "filename": "doc/source/admin/zuul-from-scratch.rst",
         "patchSetId": 2
@@ -13,6 +59,29 @@
       "writtenOn": "2018-03-29T03:51:43Z",
       "side": 1,
       "message": "this should be nodepool",
+      "revId": "f98b886395207ac44cdac5d69da96d73610a223e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_484fa433",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-03-29T03:59:31Z",
+      "side": 1,
+      "message": "This part of the instructions is meant to be for installing nodepool.",
+      "range": {
+        "startLine": 58,
+        "startChar": 37,
+        "endLine": 58,
+        "endChar": 41
+      },
       "revId": "f98b886395207ac44cdac5d69da96d73610a223e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
