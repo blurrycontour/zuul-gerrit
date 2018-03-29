@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bf659307_f4ad269b",
+        "filename": ".zuul.yaml",
+        "patchSetId": 21
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-03-29T14:00:13Z",
+      "side": 1,
+      "message": "The current issue is, I believe, that sf.io hasn\u0027t updated to the rest api changes yet -so they don\u0027t have an /api endpoint yet.\n\nI think though that I\u0027ll split the adding of this job into its own patch.",
+      "parentUuid": "bf659307_a880c0c0",
+      "revId": "57fb85cf9a26fe6153ca13462d76d691103f6a05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_2846f0c1",
         "filename": ".zuul.yaml",
         "patchSetId": 21
@@ -30,6 +48,24 @@
       "writtenOn": "2018-03-29T04:25:53Z",
       "side": 1,
       "message": "Success URL should be on the job, not on the vars.",
+      "revId": "57fb85cf9a26fe6153ca13462d76d691103f6a05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_549c1269",
+        "filename": ".zuul.yaml",
+        "patchSetId": 21
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-03-29T14:00:13Z",
+      "side": 1,
+      "message": "WHOOPS",
+      "parentUuid": "bf659307_2846f0c1",
       "revId": "57fb85cf9a26fe6153ca13462d76d691103f6a05",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
