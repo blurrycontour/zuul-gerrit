@@ -54,9 +54,9 @@ def timeout_handler(path):
 
 
 class Repo(object):
-    def __init__(self, remote, local, email, username, speed_limit, speed_time,
-                 sshkey=None, cache_path=None, logger=None, git_timeout=300,
-                 retry_attempts=3, retry_interval=30):
+    def __init__(self, remote, local, email, username, speed_limit='1000',
+                 speed_time='30', sshkey=None, cache_path=None, logger=None,
+                 git_timeout=300, retry_attempts=3, retry_interval=30):
         if logger is None:
             self.log = logging.getLogger("zuul.Repo")
         else:
