@@ -39,6 +39,30 @@
       "revId": "8f77b30923b005c178ff5e4208c3171d038e8b0c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_c3f07500",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 15002
+      },
+      "writtenOn": "2018-03-29T04:58:51Z",
+      "side": 0,
+      "message": "ssh-keygen sets the right key permissions already. \n\nMost of the remaining commands (openstack keypair create, creation of clouds.yaml, chown) are not affected by umask or don\u0027t need special permissions.\n\nDoes the .config/openstack directory need special permissions? umask 066 results in rwx--x--x on a directory, which is ugly :)",
+      "parentUuid": "bf659307_68faa8bd",
+      "range": {
+        "startLine": 93,
+        "startChar": 9,
+        "endLine": 93,
+        "endChar": 13
+      },
+      "revId": "8f77b30923b005c178ff5e4208c3171d038e8b0c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }

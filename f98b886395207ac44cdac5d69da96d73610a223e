@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "bf659307_83b03d45",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 15002
+      },
+      "writtenOn": "2018-03-29T04:58:51Z",
+      "side": 1,
+      "message": "If Zuul is not open to the web, github can\u0027t access it.",
+      "parentUuid": "bf659307_285270df",
+      "range": {
+        "startLine": 17,
+        "startChar": 45,
+        "endLine": 17,
+        "endChar": 49
+      },
+      "revId": "f98b886395207ac44cdac5d69da96d73610a223e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_88493c32",
         "filename": "doc/source/admin/zuul-from-scratch.rst",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2018-03-29T03:59:31Z",
       "side": 1,
       "message": "Not necessarily true if you\u0027re using static nodes",
+      "range": {
+        "startLine": 19,
+        "startChar": 14,
+        "endLine": 19,
+        "endChar": 29
+      },
+      "revId": "f98b886395207ac44cdac5d69da96d73610a223e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_63b3a94e",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 15002
+      },
+      "writtenOn": "2018-03-29T04:58:51Z",
+      "side": 1,
+      "message": "But the instructions work on that premise. See the Nodepool Setup chapter (https://docs.openstack.org/infra/zuul/admin/zuul-from-scratch.html#nodepool-setup).",
+      "parentUuid": "bf659307_88493c32",
       "range": {
         "startLine": 19,
         "startChar": 14,
@@ -76,6 +124,30 @@
       "writtenOn": "2018-03-29T03:59:31Z",
       "side": 1,
       "message": "This part of the instructions is meant to be for installing nodepool.",
+      "range": {
+        "startLine": 58,
+        "startChar": 37,
+        "endLine": 58,
+        "endChar": 41
+      },
+      "revId": "f98b886395207ac44cdac5d69da96d73610a223e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_03866d67",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 15002
+      },
+      "writtenOn": "2018-03-29T04:58:51Z",
+      "side": 1,
+      "message": "My mistake when solving the merge conflict.",
+      "parentUuid": "bf659307_484fa433",
       "range": {
         "startLine": 58,
         "startChar": 37,
