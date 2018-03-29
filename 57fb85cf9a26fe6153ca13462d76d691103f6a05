@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_a880c0c0",
+        "filename": ".zuul.yaml",
+        "patchSetId": 21
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-03-29T04:25:53Z",
+      "side": 1,
+      "message": "This needs a CORS or some rule to allow access to it.",
+      "revId": "57fb85cf9a26fe6153ca13462d76d691103f6a05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_2846f0c1",
+        "filename": ".zuul.yaml",
+        "patchSetId": 21
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-03-29T04:25:53Z",
+      "side": 1,
+      "message": "Success URL should be on the job, not on the vars.",
+      "revId": "57fb85cf9a26fe6153ca13462d76d691103f6a05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
