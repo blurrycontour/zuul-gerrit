@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_48c4845f",
+        "filename": "web/config/webpack.dev.ts",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-03-29T04:07:06Z",
+      "side": 1,
+      "message": "(nit) git didn\u0027t figure this out as a move making the diff difficult",
+      "revId": "6966198804ab8557c01e774218f18c621ef16bd7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_a8a8c08b",
+        "filename": "webpack.config.ts",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-03-29T04:07:06Z",
+      "side": 1,
+      "message": "(nit) ditto",
+      "revId": "6966198804ab8557c01e774218f18c621ef16bd7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
