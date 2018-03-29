@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_c42951e6",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-03-29T15:42:06Z",
+      "side": 1,
+      "message": "These should not be necessary for an all-in-one setup, which is what this document describes.  I\u0027d like to omit this to keep things simple.",
+      "revId": "df19c29bc76d2d8ca1d98852938f65f0353d712f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_e426d515",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-03-29T15:42:06Z",
+      "side": 1,
+      "message": "Why this change?",
+      "revId": "df19c29bc76d2d8ca1d98852938f65f0353d712f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_841fd9b5",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-03-29T15:42:06Z",
+      "side": 1,
+      "message": "When would this not prompt for a password?\nWhy remove the umask commands?  They are there to make sure that there is not a window where these secret files are readable.",
+      "revId": "df19c29bc76d2d8ca1d98852938f65f0353d712f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_a41c5dc1",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 443,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-03-29T15:42:06Z",
+      "side": 1,
+      "message": "Why is moving this necessary?  We\u0027re installing it into the org, so it should automatically be associated with any new repositories.",
+      "revId": "df19c29bc76d2d8ca1d98852938f65f0353d712f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
