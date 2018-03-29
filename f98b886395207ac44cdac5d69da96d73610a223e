@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "bf659307_03d50d1c",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-03-29T05:04:11Z",
+      "side": 1,
+      "message": "Yes, but it doesn\u0027t need all the ports. That said, this is just a intro tutorial so as it is is probably sufficient.",
+      "parentUuid": "bf659307_83b03d45",
+      "range": {
+        "startLine": 17,
+        "startChar": 45,
+        "endLine": 17,
+        "endChar": 49
+      },
+      "revId": "f98b886395207ac44cdac5d69da96d73610a223e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_88493c32",
         "filename": "doc/source/admin/zuul-from-scratch.rst",
         "patchSetId": 2
@@ -84,6 +108,30 @@
       "side": 1,
       "message": "But the instructions work on that premise. See the Nodepool Setup chapter (https://docs.openstack.org/infra/zuul/admin/zuul-from-scratch.html#nodepool-setup).",
       "parentUuid": "bf659307_88493c32",
+      "range": {
+        "startLine": 19,
+        "startChar": 14,
+        "endLine": 19,
+        "endChar": 29
+      },
+      "revId": "f98b886395207ac44cdac5d69da96d73610a223e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_e3dfb937",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-03-29T05:04:11Z",
+      "side": 1,
+      "message": "That\u0027s fair.",
+      "parentUuid": "bf659307_63b3a94e",
       "range": {
         "startLine": 19,
         "startChar": 14,

@@ -63,6 +63,30 @@
       "revId": "8f77b30923b005c178ff5e4208c3171d038e8b0c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_83235d56",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-03-29T05:04:11Z",
+      "side": 0,
+      "message": "True. Perhaps just a chmod for the .config to 700?",
+      "parentUuid": "bf659307_c3f07500",
+      "range": {
+        "startLine": 93,
+        "startChar": 9,
+        "endLine": 93,
+        "endChar": 13
+      },
+      "revId": "8f77b30923b005c178ff5e4208c3171d038e8b0c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
