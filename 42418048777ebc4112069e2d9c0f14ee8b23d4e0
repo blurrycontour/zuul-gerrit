@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_be5476ff",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-03-29T05:27:45Z",
+      "side": 1,
+      "message": "(nit) trailing whitespace",
+      "revId": "42418048777ebc4112069e2d9c0f14ee8b23d4e0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
