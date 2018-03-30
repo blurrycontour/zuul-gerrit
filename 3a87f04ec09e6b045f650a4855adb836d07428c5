@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_caa701bd",
+        "filename": "zuul/driver/fedmsg/fedmsgconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-03-30T19:39:45Z",
+      "side": 1,
+      "message": "fedmsg itself goes out to the local disk to pull is configuration in on load. Kinda like nodepool with clouds.yaml.\n\nIs that something we are okay with, or should we add then info directly into zuul.conf?",
+      "revId": "3a87f04ec09e6b045f650a4855adb836d07428c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
