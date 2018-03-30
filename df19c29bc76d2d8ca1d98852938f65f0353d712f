@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bf659307_b8e31534",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 15002
+      },
+      "writtenOn": "2018-03-30T00:38:59Z",
+      "side": 1,
+      "message": "This is mainly due to ignorance. I thought that the Zuul from Scratch server needed to be accessible. In any case 9000 must be open for Github to connect to it. I will remove the two other ports from the text.",
+      "parentUuid": "bf659307_c42951e6",
+      "revId": "df19c29bc76d2d8ca1d98852938f65f0353d712f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_e426d515",
         "filename": "doc/source/admin/zuul-from-scratch.rst",
         "patchSetId": 5
@@ -30,6 +48,24 @@
       "writtenOn": "2018-03-29T15:42:06Z",
       "side": 1,
       "message": "Why this change?",
+      "revId": "df19c29bc76d2d8ca1d98852938f65f0353d712f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_78d33d61",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 15002
+      },
+      "writtenOn": "2018-03-30T00:38:59Z",
+      "side": 1,
+      "message": "I like to be smarter than all the others. I learned that it\u0027s called useradd. If adduser exists on all distros, that change was not necessary.",
+      "parentUuid": "bf659307_e426d515",
       "revId": "df19c29bc76d2d8ca1d98852938f65f0353d712f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "bf659307_7861fda8",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 15002
+      },
+      "writtenOn": "2018-03-30T00:38:59Z",
+      "side": 1,
+      "message": "My openrc doesn\u0027t have a password, which is OK in an experimental setup, I thought. \n\nI didn\u0027t understand the need for umask. During the first time I followed these instructions, I forgot to reset umask to its default value, which yielded wrong permissions at all further installation steps. This was my oversight but I wanted to prevent others to go through this experience.\n\nSince ssh-keygen sets the correct permissions, I suggest we move umask 066 to the next code block, at which end the umask is reset.",
+      "parentUuid": "bf659307_841fd9b5",
+      "revId": "df19c29bc76d2d8ca1d98852938f65f0353d712f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_a41c5dc1",
         "filename": "doc/source/admin/zuul-from-scratch.rst",
         "patchSetId": 5
@@ -64,6 +118,24 @@
       "writtenOn": "2018-03-29T15:42:06Z",
       "side": 1,
       "message": "Why is moving this necessary?  We\u0027re installing it into the org, so it should automatically be associated with any new repositories.",
+      "revId": "df19c29bc76d2d8ca1d98852938f65f0353d712f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_d84e0937",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 443,
+      "author": {
+        "id": 15002
+      },
+      "writtenOn": "2018-03-30T00:38:59Z",
+      "side": 1,
+      "message": "When I went through the instructions, Github did not allow me to install the app before creating repos in the org. \n\nI need to do the whole thing again to check if I didn\u0027t make a mistake somewhere; this might take some time.",
+      "parentUuid": "bf659307_a41c5dc1",
       "revId": "df19c29bc76d2d8ca1d98852938f65f0353d712f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
