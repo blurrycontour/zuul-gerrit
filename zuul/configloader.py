@@ -1288,13 +1288,15 @@ class TenantParser(object):
             cached = True
         else:
             cached = False
+        loading_errors = model.LoadingErrors(length=model.MAX_ERROR_LENGTH)
         tenant.config_projects_config, tenant.untrusted_projects_config = \
             self._loadTenantInRepoLayouts(tenant.config_projects,
                                           tenant.untrusted_projects,
-                                          cached, tenant)
+                                          cached, tenant, loading_errors)
         unparsed_config.extend(tenant.config_projects_config)
         unparsed_config.extend(tenant.untrusted_projects_config)
-        tenant.layout = self._parseLayout(base, tenant, unparsed_config)
+        tenant.layout = self._parseLayout(
+            base, tenant, unparsed_config, loading_errors)
         return tenant
 
     def _resolveShadowProjects(self, tenant, tpc):
@@ -1458,7 +1460,7 @@ class TenantParser(object):
         return config_projects, untrusted_projects
 
     def _loadTenantInRepoLayouts(self, config_projects, untrusted_projects,
-                                 cached, tenant):
+                                 cached, tenant, loading_errors):
         config_projects_config = model.UnparsedTenantConfig()
         untrusted_projects_config = model.UnparsedTenantConfig()
         # project -> branch -> config; these will replace
@@ -1580,15 +1582,29 @@ class TenantParser(object):
                     project = source_context.project
                     branch = source_context.branch
                     if source_context.trusted:
-                        incdata = self.loadConfigProjectLayout(
-                            job.files[fn], source_context)
-                        config_projects_config.extend(incdata)
+                        try:
+                            with early_configuration_exceptions(
+                                    source_context):
+                                incdata = self.loadConfigProjectLayout(
+                                    job.files[fn], source_context)
+                                config_projects_config.extend(incdata)
+                                new_project_unparsed_branch_config[
+                                    project][branch].extend(incdata)
+                        except ConfigurationSyntaxError as e:
+                            loading_errors.append(
+                                (source_context, e))
                     else:
-                        incdata = self.loadUntrustedProjectLayout(
-                            job.files[fn], source_context)
-                        untrusted_projects_config.extend(incdata)
-                    new_project_unparsed_branch_config[project][branch].\
-                        extend(incdata)
+                        try:
+                            with early_configuration_exceptions(
+                                    source_context):
+                                incdata = self.loadUntrustedProjectLayout(
+                                    job.files[fn], source_context)
+                                untrusted_projects_config.extend(incdata)
+                                new_project_unparsed_branch_config[
+                                    project][branch].extend(incdata)
+                        except ConfigurationSyntaxError as e:
+                            loading_errors.append(
+                                (source_context, e))
         # Now that we've sucessfully loaded all of the configuration,
         # cache the unparsed data on the project objects.
         for project, branch_config in \
@@ -1607,6 +1623,7 @@ class TenantParser(object):
         config = model.UnparsedTenantConfig()
         with early_configuration_exceptions(source_context):
             config.extend(safe_load_yaml(data, source_context))
+
         if config.pipelines:
             with configuration_exceptions('pipeline', config.pipelines[0]):
                 raise PipelineNotPermittedError()
@@ -1624,54 +1641,80 @@ class TenantParser(object):
         # Handle pragma items first since they modify the source context
         # used by other classes.
         for config_pragma in data.pragmas:
-            pcontext.pragma_parser.fromYaml(config_pragma)
+            try:
+                pcontext.pragma_parser.fromYaml(config_pragma)
+            except ConfigurationSyntaxError as e:
+                layout.loading_errors.append(
+                    (config_pragma['_source_context'], e))
 
         if not skip_pipelines:
             for config_pipeline in data.pipelines:
                 classes = self._getLoadClasses(tenant, config_pipeline)
                 if 'pipeline' not in classes:
                     continue
-                layout.addPipeline(pcontext.pipeline_parser.fromYaml(
-                    config_pipeline))
+                try:
+                    layout.addPipeline(pcontext.pipeline_parser.fromYaml(
+                        config_pipeline))
+                except ConfigurationSyntaxError as e:
+                    layout.loading_errors.append(
+                        (config_pipeline['_source_context'], e))
         pcontext.setPipelines()
 
         for config_nodeset in data.nodesets:
             classes = self._getLoadClasses(tenant, config_nodeset)
             if 'nodeset' not in classes:
                 continue
-            with configuration_exceptions('nodeset', config_nodeset):
-                layout.addNodeSet(pcontext.nodeset_parser.fromYaml(
-                    config_nodeset))
+            try:
+                with configuration_exceptions('nodeset', config_nodeset):
+                    layout.addNodeSet(pcontext.nodeset_parser.fromYaml(
+                        config_nodeset))
+            except ConfigurationSyntaxError as e:
+                layout.loading_errors.append(
+                    (config_nodeset['_source_context'], e))
 
         for config_secret in data.secrets:
             classes = self._getLoadClasses(tenant, config_secret)
             if 'secret' not in classes:
                 continue
-            with configuration_exceptions('secret', config_secret):
-                layout.addSecret(pcontext.secret_parser.fromYaml(
-                    config_secret))
+            try:
+                with configuration_exceptions('secret', config_secret):
+                    layout.addSecret(pcontext.secret_parser.fromYaml(
+                        config_secret))
+            except ConfigurationSyntaxError as e:
+                layout.loading_errors.append(
+                    (config_secret['_source_context'], e))
 
         for config_job in data.jobs:
             classes = self._getLoadClasses(tenant, config_job)
             if 'job' not in classes:
                 continue
-            with configuration_exceptions('job', config_job):
-                job = pcontext.job_parser.fromYaml(config_job)
-                added = layout.addJob(job)
-                if not added:
-                    self.log.debug(
-                        "Skipped adding job %s which shadows an existing job" %
-                        (job,))
+            try:
+                with configuration_exceptions('job', config_job):
+                    job = pcontext.job_parser.fromYaml(config_job)
+                    added = layout.addJob(job)
+            except ConfigurationSyntaxError as e:
+                layout.loading_errors.append(
+                    (config_job['_source_context'], e))
+                continue
+            if not added:
+                self.log.debug(
+                    "Skipped adding job %s which shadows an existing job" %
+                    (job,))
 
         # Now that all the jobs are loaded, verify their parents exist
         for config_job in data.jobs:
             classes = self._getLoadClasses(tenant, config_job)
             if 'job' not in classes:
                 continue
-            with configuration_exceptions('job', config_job):
-                parent = config_job.get('parent')
-                if parent:
-                    layout.getJob(parent)
+            try:
+                with configuration_exceptions('job', config_job):
+                    parent = config_job.get('parent')
+                    if parent:
+                        layout.getJob(parent)
+            except ConfigurationSyntaxError as e:
+                layout.loading_errors.append(
+                    (config_job['_source_context'], e))
+                continue
 
         if skip_semaphores:
             # We should not actually update the layout with new
@@ -1686,21 +1729,31 @@ class TenantParser(object):
                 tenant, config_semaphore)
             if 'semaphore' not in classes:
                 continue
-            with configuration_exceptions('semaphore', config_semaphore):
-                semaphore = pcontext.semaphore_parser.fromYaml(
-                    config_semaphore)
-                semaphore_layout.addSemaphore(semaphore)
+            try:
+                with configuration_exceptions('semaphore', config_semaphore):
+                    semaphore = pcontext.semaphore_parser.fromYaml(
+                        config_semaphore)
+                    semaphore_layout.addSemaphore(semaphore)
+            except ConfigurationSyntaxError as e:
+                layout.loading_errors.append(
+                    (config_semaphore['_source_context'], e))
 
         for config_template in data.project_templates:
             classes = self._getLoadClasses(tenant, config_template)
             if 'project-template' not in classes:
                 continue
-            with configuration_exceptions('project-template', config_template):
-                layout.addProjectTemplate(
-                    pcontext.project_template_parser.fromYaml(
-                        config_template))
+            try:
+                with configuration_exceptions(
+                        'project-template', config_template):
+                    layout.addProjectTemplate(
+                        pcontext.project_template_parser.fromYaml(
+                            config_template))
+            except ConfigurationSyntaxError as e:
+                layout.loading_errors.append(
+                    (config_template['_source_context'], e))
 
-        flattened_projects = self._flattenProjects(data.projects, tenant)
+        flattened_projects = self._flattenProjects(
+            data.projects, tenant, layout.loading_errors)
         for config_projects in flattened_projects.values():
             # Unlike other config classes, we expect multiple project
             # stanzas with the same name, so that a config repo can
@@ -1718,33 +1771,42 @@ class TenantParser(object):
             if not filtered_projects:
                 continue
 
-            layout.addProjectConfig(pcontext.project_parser.fromYaml(
-                filtered_projects))
+            try:
+                layout.addProjectConfig(pcontext.project_parser.fromYaml(
+                    filtered_projects))
+            except ConfigurationSyntaxError as e:
+                layout.loading_errors.append(
+                    (filtered_projects[0]['_source_context'], e))
 
-    def _flattenProjects(self, projects, tenant):
+    def _flattenProjects(self, projects, tenant, loading_errors):
         # Group together all of the project stanzas for each project.
         result_projects = {}
         for config_project in projects:
-            with configuration_exceptions('project', config_project):
-                name = config_project.get('name')
-                if not name:
-                    # There is no name defined so implicitly add the name
-                    # of the project where it is defined.
-                    name = (config_project['_source_context'].
-                            project.canonical_name)
-                else:
-                    trusted, project = tenant.getProject(name)
-                    if project is None:
-                        raise ProjectNotFoundError(name)
-                    name = project.canonical_name
-                config_project['name'] = name
-                result_projects.setdefault(name, []).append(config_project)
+            try:
+                with configuration_exceptions('project', config_project):
+                    name = config_project.get('name')
+                    if not name:
+                        # There is no name defined so implicitly add the name
+                        # of the project where it is defined.
+                        name = (config_project['_source_context'].
+                                project.canonical_name)
+                    else:
+                        trusted, project = tenant.getProject(name)
+                        if project is None:
+                            raise ProjectNotFoundError(name)
+                        name = project.canonical_name
+                    config_project['name'] = name
+                    result_projects.setdefault(name, []).append(config_project)
+            except ConfigurationSyntaxError as e:
+                loading_errors.append(
+                    (config_project['_source_context'], e))
         return result_projects
 
-    def _parseLayout(self, base, tenant, data):
+    def _parseLayout(self, base, tenant, data, loading_errors):
         # Don't call this method from dynamic reconfiguration because
         # it interacts with drivers and connections.
         layout = model.Layout(tenant)
+        layout.loading_errors = loading_errors
         self.log.debug("Created layout id %s", layout.uuid)
 
         self._parseLayoutItems(layout, tenant, data)
@@ -1790,6 +1852,14 @@ class ConfigLoader(object):
                                                  project_key_dir,
                                                  conf_tenant, old_tenant=None)
             abide.tenants[tenant.name] = tenant
+            if len(tenant.layout.loading_errors):
+                self.log.warning(
+                    "%s errors detected during %s tenant "
+                    "configuration loading" % (
+                        len(tenant.layout.loading_errors), tenant.name))
+                # Log accumulated errors
+                for err in tenant.layout.loading_errors.errors:
+                    self.log.warning(str(err[1]))
         return abide
 
     def reloadTenant(self, config_path, project_key_dir, abide, tenant):
@@ -1804,10 +1874,18 @@ class ConfigLoader(object):
             base, project_key_dir,
             tenant.unparsed_config, old_tenant=tenant)
         new_abide.tenants[tenant.name] = new_tenant
+        if len(new_tenant.layout.loading_errors):
+            self.log.warning(
+                "%s errors detected during %s tenant "
+                "configuration re-loading" % (
+                    len(new_tenant.layout.loading_errors), tenant.name))
+            # Log accumulated errors
+            for err in new_tenant.layout.loading_errors.errors:
+                self.log.warning(str(err[1]))
         return new_abide
 
     def _loadDynamicProjectData(self, config, project,
-                                files, trusted, tenant):
+                                files, trusted, tenant, loading_errors):
         if trusted:
             branches = ['master']
         else:
@@ -1857,32 +1935,46 @@ class ConfigLoader(object):
                     loaded = conf_root
 
                     if trusted:
-                        incdata = (self.tenant_parser.
-                                   loadConfigProjectLayout(
-                                       data, source_context))
+                        try:
+                            with early_configuration_exceptions(
+                                    source_context):
+                                incdata = (self.tenant_parser.
+                                           loadConfigProjectLayout(
+                                               data, source_context))
+                                config.extend(incdata)
+                        except ConfigurationSyntaxError as e:
+                            loading_errors.append(
+                                (source_context, e))
                     else:
-                        incdata = (self.tenant_parser.
-                                   loadUntrustedProjectLayout(
-                                       data, source_context))
-
-                    config.extend(incdata)
+                        try:
+                            with early_configuration_exceptions(
+                                    source_context):
+                                incdata = (self.tenant_parser.
+                                           loadUntrustedProjectLayout(
+                                               data, source_context))
+                                config.extend(incdata)
+                        except ConfigurationSyntaxError as e:
+                            loading_errors.append(
+                                (source_context, e))
 
     def createDynamicLayout(self, tenant, files,
                             include_config_projects=False,
                             scheduler=None, connections=None):
+        loading_errors = model.LoadingErrors(length=model.MAX_ERROR_LENGTH)
         if include_config_projects:
             config = model.UnparsedTenantConfig()
             for project in tenant.config_projects:
                 self._loadDynamicProjectData(
-                    config, project, files, True, tenant)
+                    config, project, files, True, tenant, loading_errors)
         else:
             config = tenant.config_projects_config.copy()
 
         for project in tenant.untrusted_projects:
-            self._loadDynamicProjectData(config, project, files,
-                                         False, tenant)
+            self._loadDynamicProjectData(
+                config, project, files, False, tenant, loading_errors)
 
         layout = model.Layout(tenant)
+        layout.loading_errors = loading_errors
         self.log.debug("Created layout id %s", layout.uuid)
         if not include_config_projects:
             # NOTE: the actual pipeline objects (complete with queues
@@ -1907,5 +1999,4 @@ class ConfigLoader(object):
         self.tenant_parser._parseLayoutItems(layout, tenant, config,
                                              skip_pipelines=skip_pipelines,
                                              skip_semaphores=skip_semaphores)
-
         return layout
