@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_18d9e1f1",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-03-30T01:13:22Z",
+      "side": 1,
+      "message": "Note moving this here means that reportStart above will now mark jobs as an ERROR if they fail to report start. I\u0027m not sure if this has other side effects I have not considered but it seems to be a more consistent behavior.",
+      "revId": "026e4ad6a0291e723765eaa982dc04e6cb7a8f68",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
