@@ -56,6 +56,7 @@ To create a `GitHub application
 * Create a Webhook secret
 * Set permissions:
 
+  * Repository administration: Read
   * Commit statuses: Read & Write
   * Issues: Read & Write
   * Pull requests: Read & Write
