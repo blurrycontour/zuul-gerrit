@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_879c97c0",
+        "filename": "web/navigation/navigation.component.html",
+        "patchSetId": 23
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-04-01T05:56:38Z",
+      "side": 1,
+      "message": "This template doesn\u0027t parse correctly:\n\n  Error: Template parse errors:\n  Unexpected closing tag \"a\". It may happen when the tag has already been closed by another tag. For more info see https://www.w3.org/TR/html5/syntax.html#closing-elements-that-have-implied-end-tags (\"ontainer-fluid\u003e \u003cdiv class\u003dnavbar-header\u003e \u003ca class\u003dnavbar-brand href\u003d../ target\u003d_self\u003eZuul Dashboard[ERROR -\u003e]\u003c/a\u003e \u003c/div\u003e \u003cul class\u003d\"nav navbar-nav\"\u003e \u003cli\u003e\u003ca routerlink\u003d/status.html routerlinkactive\u003dactive\u003eStatus\"): ng:///J/B.html@0:149\n\nHowever I can\u0027t see why :-s",
+      "revId": "53e9e6b1bb6939f6ede09206b3000f9d5428d5a6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
