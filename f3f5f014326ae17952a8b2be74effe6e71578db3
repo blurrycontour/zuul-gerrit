@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_3a8d9631",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2279,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-02T14:51:11Z",
+      "side": 1,
+      "message": "This is probably okay if we\u0027re pretty sure our publish method works and isn\u0027t going to change.  But it doesn\u0027t test our use of the library very well.  A better option would be to make a fixture which starts an MQTT broker in a thread, and subscribes to it in order to record the messages.  Here\u0027s one we could use: http://hbmqtt.readthedocs.io/en/latest/references/broker.html",
+      "revId": "f3f5f014326ae17952a8b2be74effe6e71578db3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
