@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_772d67a6",
+        "filename": "tests/fixtures/config/broken/git/common-config/zuul.yaml",
+        "patchSetId": 9
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-02T14:23:08Z",
+      "side": 1,
+      "message": "Why did you make this change?  Shouldn\u0027t the previous yaml error still be sufficient?",
+      "revId": "48555e5b63b294b225a8e8a30400d62f9b72a987",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
