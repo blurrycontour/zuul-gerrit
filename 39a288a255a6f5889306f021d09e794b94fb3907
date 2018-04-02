@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_5095c931",
+        "filename": "zuul/ansible/action/template.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-02T16:40:55Z",
+      "side": 1,
+      "message": "We may want to set the TMPDIR environment variable to .../work/tmp when we call ansible, just on general principle.  And if we do that, we may not need this hack.",
+      "revId": "39a288a255a6f5889306f021d09e794b94fb3907",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
