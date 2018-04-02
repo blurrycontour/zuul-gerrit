@@ -101,6 +101,23 @@
       "revId": "f3f5f014326ae17952a8b2be74effe6e71578db3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_0d5c1eeb",
+        "filename": "zuul/driver/mqtt/mqttreporter.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-02T15:38:29Z",
+      "side": 1,
+      "message": "If we implement Matt\u0027s suggestion, branch and project should be reversed (ie, topic/pipeline/project/branch/number/patchset).\n\nNote that sometimes branch is null, so it might need to be \u0027branch or ref\u0027 or something similar.",
+      "revId": "f3f5f014326ae17952a8b2be74effe6e71578db3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
