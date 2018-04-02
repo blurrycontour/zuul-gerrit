@@ -59,6 +59,23 @@
     },
     {
       "key": {
+        "uuid": "bf659307_05a70ebf",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-02T23:43:18Z",
+      "side": 1,
+      "message": "One thought depending on how this flows is you might want to use the include directive instead so that the content all shows on a single page for the person reading it rather than needing to follow links and have several pages open.\n\nI was hoping to find there is some easy way to make these sections collapsible too but seems like we\u0027d have to add that to our sphinx theme.",
+      "revId": "6a86459edd7bdf86e910d8d17f26334ed1d909dc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_e530daa1",
         "filename": "doc/source/admin/zuul_install.rst",
         "patchSetId": 4
