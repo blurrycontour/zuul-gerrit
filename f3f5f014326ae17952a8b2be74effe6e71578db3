@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "bf659307_6d903a96",
+        "filename": "etc/zuul.conf-sample",
+        "patchSetId": 5
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5196
+      },
+      "writtenOn": "2018-04-02T15:30:28Z",
+      "side": 1,
+      "message": "Not sure if the semicolon is needed here",
+      "revId": "f3f5f014326ae17952a8b2be74effe6e71578db3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_3a8d9631",
         "filename": "tests/base.py",
         "patchSetId": 5
@@ -13,6 +30,74 @@
       "writtenOn": "2018-04-02T14:51:11Z",
       "side": 1,
       "message": "This is probably okay if we\u0027re pretty sure our publish method works and isn\u0027t going to change.  But it doesn\u0027t test our use of the library very well.  A better option would be to make a fixture which starts an MQTT broker in a thread, and subscribes to it in order to record the messages.  Here\u0027s one we could use: http://hbmqtt.readthedocs.io/en/latest/references/broker.html",
+      "revId": "f3f5f014326ae17952a8b2be74effe6e71578db3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_ed6e8ac7",
+        "filename": "zuul/driver/mqtt/mqttconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 5196
+      },
+      "writtenOn": "2018-04-02T15:30:28Z",
+      "side": 1,
+      "message": "Something missing here is the tls setup. We\u0027ll need this to use this with firehose.openstack.org. In the mqtt protocol unless you\u0027re using a tls socket the password and username are sent in plain text over the wire.",
+      "revId": "f3f5f014326ae17952a8b2be74effe6e71578db3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_8d5d8e16",
+        "filename": "zuul/driver/mqtt/mqttconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5196
+      },
+      "writtenOn": "2018-04-02T15:30:28Z",
+      "side": 1,
+      "message": "We probably want an argument for qos level somewhere. While defaulting to QoS 0 is fine, having an option to enable setting a higher level might be important for certain environments that want to guarantee delivery.",
+      "revId": "f3f5f014326ae17952a8b2be74effe6e71578db3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_adb17249",
+        "filename": "zuul/driver/mqtt/mqttconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5196
+      },
+      "writtenOn": "2018-04-02T15:30:28Z",
+      "side": 1,
+      "message": "Fwiw, I typically use the single shot paho.mqtt.publish.publish_single() method for these kind of things. Having a persistent client doesn\u0027t really buy us much if all we ever do is publish. But it doesn\u0027t really harm anything except keeping a socket open to the broker all the time.",
+      "revId": "f3f5f014326ae17952a8b2be74effe6e71578db3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_2d2b2283",
+        "filename": "zuul/driver/mqtt/mqttreporter.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 5196
+      },
+      "writtenOn": "2018-04-02T15:30:28Z",
+      "side": 1,
+      "message": "My concern here is we\u0027re using a static single topic here. One of the big advantages of MQTT is that we can use hierarchical topics.\n\nWe should try to leverage this here. This will enable clients subscribe to subsets of zuul events for the things they care about. There are some examples on how we\u0027re using these from other services the firehose schema docs:\n\nhttps://docs.openstack.org/infra/system-config/firehose_schema.html#firehose-schema\n\nOff the top of my head maybe something like:\n\ntopic \u003d \u0027/\u0027.join([self.conf[\u0027topic\u0027], item.pipeline.name, item.change.branch, item.change.project.name, item.change.number, item.change.patchset])\n\nIt\u0027s hard to know exactly what hierarchy makes sense up front though. For example, on the gerrit hierarchy that I used for germqtt I neglected to put user in it, which is something everyone always asks about. So erring on the side of putting more in here probably helps.",
       "revId": "f3f5f014326ae17952a8b2be74effe6e71578db3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
