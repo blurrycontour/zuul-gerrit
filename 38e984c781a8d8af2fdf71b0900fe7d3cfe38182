@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_fab07edf",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1027,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-02T14:57:52Z",
+      "side": 1,
+      "message": "I\u0027m not an expert in the area, but this seems like something that a user might need/want to know.  So perhaps we should either expose this as an option (with \u0027ignore\u0027 as default), or add a \".. note:\" to the docs.",
+      "revId": "38e984c781a8d8af2fdf71b0900fe7d3cfe38182",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
