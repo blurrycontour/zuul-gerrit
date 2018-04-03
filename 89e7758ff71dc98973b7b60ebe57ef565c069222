@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_856a3e17",
+        "filename": "tests/base.py",
+        "patchSetId": 27
+      },
+      "lineNbr": 1805,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-03T00:09:12Z",
+      "side": 1,
+      "message": "Maybe we should just drop the upper case options entirely then we can share this bit of code between mysql and postgres.\n\nIt is weird that we would increase the random bitspace then reduce it using  str.lower() so I think it worthwhile to just clean this up even if we don\u0027t share the code with mysql.",
+      "range": {
+        "startLine": 1805,
+        "startChar": 57,
+        "endLine": 1805,
+        "endChar": 66
+      },
+      "revId": "89e7758ff71dc98973b7b60ebe57ef565c069222",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_65060a55",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 27
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-03T00:09:12Z",
+      "side": 1,
+      "message": "The second time check_results is aclled this will be against a postgres db so this variable name is confusing. Can we make it db agnostic and not specify mysql or postgres here?",
+      "range": {
+        "startLine": 199,
+        "startChar": 12,
+        "endLine": 199,
+        "endChar": 37
+      },
+      "revId": "89e7758ff71dc98973b7b60ebe57ef565c069222",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_8501de3a",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 27
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-03T00:09:12Z",
+      "side": 1,
+      "message": "See above.",
+      "range": {
+        "startLine": 223,
+        "startChar": 12,
+        "endLine": 223,
+        "endChar": 46
+      },
+      "revId": "89e7758ff71dc98973b7b60ebe57ef565c069222",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
