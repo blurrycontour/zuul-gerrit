@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_a78c0d36",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 18
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-03T22:02:22Z",
+      "side": 1,
+      "message": "Note this isn\u0027t entirely accurate. Please see comment in scheduler.py.",
+      "range": {
+        "startLine": 255,
+        "startChar": 41,
+        "endLine": 256,
+        "endChar": 62
+      },
+      "revId": "e63535fe86c5c3864e872f8cc2d62822ff37854f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_c78fc127",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 18
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-03T22:02:22Z",
+      "side": 1,
+      "message": "See above.",
+      "range": {
+        "startLine": 261,
+        "startChar": 19,
+        "endLine": 262,
+        "endChar": 38
+      },
+      "revId": "e63535fe86c5c3864e872f8cc2d62822ff37854f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_87ac699f",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 552,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-03T22:02:22Z",
+      "side": 1,
+      "message": "Because this isn\u0027t an elif this the tenant_config option isn\u0027t actually exclusive with the tenant_config_script option. Instead tenant_config_script will always win. At the very least we should update the docs to ensure they are accurate. I think its fine to fall through but the docs should make it clear which one will win.\n\n(Note that making it an elif doesn\u0027t really fix it either because in that case tenant_config will always win if set).",
+      "revId": "e63535fe86c5c3864e872f8cc2d62822ff37854f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
