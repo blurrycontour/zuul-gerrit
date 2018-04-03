@@ -89,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "bf659307_b3077d18",
+        "filename": "zuul/driver/mqtt/mqttconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 5196
+      },
+      "writtenOn": "2018-04-03T12:11:30Z",
+      "side": 1,
+      "message": "There isn\u0027t really any example running in infra that sets up a client like this. We only need tls for publishes over the network.\n\nAlthough, I did write some docs on using it here: \n\nhttps://docs.openstack.org/infra/system-config/firehose.html#using-ssl-tls",
+      "parentUuid": "bf659307_a8263967",
+      "revId": "f3f5f014326ae17952a8b2be74effe6e71578db3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_8d5d8e16",
         "filename": "zuul/driver/mqtt/mqttconnection.py",
         "patchSetId": 5
