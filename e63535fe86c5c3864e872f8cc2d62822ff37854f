@@ -72,6 +72,23 @@
     },
     {
       "key": {
+        "uuid": "bf659307_27623d0b",
+        "filename": "releasenotes/notes/tenant-from-script-e28d736001db5365.yaml",
+        "patchSetId": 18
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-04-03T22:28:07Z",
+      "side": 1,
+      "message": "Don\u0027t want to block this, but today was solve this by using puppet / ansible to mange and layout this configure. It also means, main.yaml gets reviews via code review.\n\nBut doing this, zuul users could bypass that. Not that it is a bad thing, but do find it very helpful today with openstack-infra to atleast audit the history of changes via codereview or git.",
+      "revId": "e63535fe86c5c3864e872f8cc2d62822ff37854f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_87ac699f",
         "filename": "zuul/scheduler.py",
         "patchSetId": 18
