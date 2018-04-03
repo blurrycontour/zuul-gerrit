@@ -89,6 +89,23 @@
     },
     {
       "key": {
+        "uuid": "bf659307_025da713",
+        "filename": "releasenotes/notes/tenant-from-script-e28d736001db5365.yaml",
+        "patchSetId": 18
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-03T22:36:49Z",
+      "side": 1,
+      "message": "As maintainers of Zuul, I don\u0027t think we should enforce our opinions of how people create their main.yaml files.  We can share suggestions, but there are plenty of legitimate circumstances where code-review of main.yaml is not appropriate.",
+      "revId": "e63535fe86c5c3864e872f8cc2d62822ff37854f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_87ac699f",
         "filename": "zuul/scheduler.py",
         "patchSetId": 18
