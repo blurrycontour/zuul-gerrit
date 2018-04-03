@@ -15,10 +15,13 @@ under the License.
 -->
 <div class="container-fluid">
     <span id="zuulstreamoverlay">
-        <form>
-            <input type="checkbox" id="autoscroll" checked> autoscroll
+        <form #streamForm="ngForm">
+            <input id="autoscroll" [ngModel]="autoscroll" type="checkbox">
+            autoscroll
         </form>
     </span>
 </div>
 
-<pre id="zuulstreamcontent"></pre>
+<pre id="zuulstreamcontent">
+  <span *ngFor="let line of logLines">{{ line }}</span>
+</pre>

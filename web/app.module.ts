@@ -31,6 +31,7 @@ import NavigationComponent from './navigation/navigation.component'
 import JobsComponent from './jobs/jobs.component'
 import StatusComponent from './status/status.component'
 import StreamComponent from './stream/stream.component'
+import StreamService from './stream/stream.service'
 import TenantsComponent from './tenants/tenants.component'
 
 
@@ -59,6 +60,7 @@ import TenantsComponent from './tenants/tenants.component'
     TenantsComponent
   ],
   providers: [
+    StreamService,
     {provide: APP_BASE_HREF, useValue: getBaseHref()}
   ],
   bootstrap: [
