@@ -34,6 +34,23 @@
       "revId": "38e984c781a8d8af2fdf71b0900fe7d3cfe38182",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_72079c19",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1027,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-03T14:50:28Z",
+      "side": 1,
+      "message": "I think in the long run, providing the information from nodepool is probably the way to go, however, I think that needs more design and thought, so I\u0027d probably just put a note in the docs for now.",
+      "revId": "38e984c781a8d8af2fdf71b0900fe7d3cfe38182",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
