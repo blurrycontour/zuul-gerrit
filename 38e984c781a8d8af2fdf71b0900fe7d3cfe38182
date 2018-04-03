@@ -16,6 +16,24 @@
       "revId": "38e984c781a8d8af2fdf71b0900fe7d3cfe38182",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_4275f1f8",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1027,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-04-03T10:19:38Z",
+      "side": 1,
+      "message": "right, this might be exposed as an option. Not sure about the default. While \u0027validate\u0027 seems to be the safe default I actually don\u0027t know how this can be accomplished with dynamic nodes as one can only do real cert checking including subject which will be a random ip address. Static nodes probably could be checked. But in order to facilitate this this setting probably needs to come from nodepool.\n\nSo I see these options:\n\n* make configurable with default \u0027validate \u0027. Any deployments with dynamic nodes would need to set this to validate though.\n\n* make configurable with default \u0027ignore\u0027. Kind of unsafe by default but no customization needed in most deployments.\n\n* Configurable in nodepool pool config. This would make it possible to at least validate static nodes.\n\n* Add note to the docs\n\nWhat do you prefer?",
+      "parentUuid": "bf659307_fab07edf",
+      "revId": "38e984c781a8d8af2fdf71b0900fe7d3cfe38182",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
