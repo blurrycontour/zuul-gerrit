@@ -16,6 +16,24 @@
       "revId": "48555e5b63b294b225a8e8a30400d62f9b72a987",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_9fafe228",
+        "filename": "tests/fixtures/config/broken/git/common-config/zuul.yaml",
+        "patchSetId": 9
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2018-04-03T09:39:34Z",
+      "side": 1,
+      "message": "Because if not the pipeline (only check in that case) is not added to the tenant (as nothing from this file is loaded with a pure yaml error) so the default layout for org/project was impossible to set (I needed it for \u0027test_dynamic_conf_on_broken_config\u0027). Thus I changed the error to be a schema error instead.",
+      "parentUuid": "bf659307_772d67a6",
+      "revId": "48555e5b63b294b225a8e8a30400d62f9b72a987",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
