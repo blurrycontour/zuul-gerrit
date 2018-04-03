@@ -1096,10 +1096,11 @@ class AnsibleJob(object):
             self.preparePlaybook(jobdir_playbook, playbook, args)
 
     def preparePlaybook(self, jobdir_playbook, playbook, args):
-        self.log.debug("Prepare playbook repo for %s" %
-                       (playbook['project'],))
         # Check out the playbook repo if needed and set the path to
         # the playbook that should be run.
+        self.log.debug("Prepare playbook repo for %s: %s@%s" %
+                       (playbook['trusted'] and 'trusted' or 'untrusted',
+                        playbook['project'], playbook['branch']))
         source = self.executor_server.connections.getSource(
             playbook['connection'])
         project = source.getProject(playbook['project'])
@@ -1112,10 +1113,11 @@ class AnsibleJob(object):
             # This is a project repo, so it is safe to use the already
             # checked out version (from speculative merging) of the
             # playbook
-            for i in args['items']:
-                if (i['connection'] == playbook['connection'] and
-                    i['project'] == playbook['project']):
+            for p in args['projects']:
+                if (p['connection'] == playbook['connection'] and
+                    p['name'] == playbook['project']):
                     # We already have this repo prepared
+                    self.log.debug("Found workdir repo for playbook")
                     path = os.path.join(self.jobdir.src_root,
                                         project.canonical_hostname,
                                         project.name,
@@ -1125,7 +1127,8 @@ class AnsibleJob(object):
             # The playbook repo is either a config repo, or it isn't in
             # the stack of changes we are testing, so check out the branch
             # tip into a dedicated space.
-            path = self.checkoutTrustedProject(project, playbook['branch'])
+            path = self.checkoutTrustedProject(project,
+                                               branch=playbook['branch'])
             path = os.path.join(path, playbook['path'])
 
         jobdir_playbook.path = self.findPlaybook(
@@ -1148,15 +1151,39 @@ class AnsibleJob(object):
 
         self.writeAnsibleConfig(jobdir_playbook)
 
-    def checkoutTrustedProject(self, project, branch):
+    def checkoutTrustedProject(self, project, branch=None,
+                               zuul_branch=None, job_override_branch=None,
+                               job_override_checkout=None,
+                               project_default_branch=None):
+        # If branch is specified, use that.  Otherwise, use the rest
+        # of the arguments to perform the usual fallback procedure.
         root = self.jobdir.getTrustedProject(project.canonical_name,
                                              branch)
         if not root:
             root = self.jobdir.addTrustedProject(project.canonical_name,
                                                  branch)
+            self.log.debug("Cloning %s@%s into new trusted space %s",
+                           project, branch, root)
             merger = self.executor_server._getMerger(root, self.log)
-            merger.checkoutBranch(project.connection_name, project.name,
-                                  branch)
+            if branch:
+                merger.checkoutBranch(project.connection_name, project.name,
+                                      branch)
+            else:
+                repo = merger.getRepo(project.connection_name,
+                                      project.name)
+                self.checkoutBranch(
+                    repo,
+                    project.name,
+                    ref=None,
+                    zuul_branch=zuul_branch,
+                    job_override_branch=job_override_branch,
+                    job_override_checkout=job_override_checkout,
+                    project_override_branch=None,
+                    project_override_checkout=None,
+                    project_default_branch=project_default_branch)
+        else:
+            self.log.debug("Using existing repo %s@%s in trusted space %s",
+                           project, branch, root)
 
         path = os.path.join(root,
                             project.canonical_hostname,
@@ -1199,14 +1226,15 @@ class AnsibleJob(object):
         path = None
 
         if not jobdir_playbook.trusted:
-            # This playbook is untrested.  Use the already checked out
+            # This playbook is untrusted.  Use the already checked out
             # version (from speculative merging) of the role if it
             # exists.
 
-            for i in args['items']:
-                if (i['connection'] == role['connection'] and
-                    i['project'] == role['project']):
+            for p in args['projects']:
+                if (p['connection'] == role['connection'] and
+                    p['name'] == role['project']):
                     # We already have this repo prepared; use it.
+                    self.log.debug("Found workdir repo for role")
                     path = os.path.join(self.jobdir.src_root,
                                         project.canonical_hostname,
                                         project.name)
@@ -1217,7 +1245,12 @@ class AnsibleJob(object):
             # in the dependency chain for the change (in which case,
             # there is no existing untrusted checkout of it).  Check
             # out the branch tip into a dedicated space.
-            path = self.checkoutTrustedProject(project, 'master')
+            path = self.checkoutTrustedProject(
+                project,
+                zuul_branch=args['branch'],
+                job_override_branch=args['override_branch'],
+                job_override_checkout=args['override_checkout'],
+                project_default_branch=role['project_default_branch'])
 
         # The name of the symlink is the requested name of the role
         # (which may be the repo name or may be something else; this
