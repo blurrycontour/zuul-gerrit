@@ -109,4 +109,5 @@ Setup Your Repo
 
 Select your code repository to setup.
 
+  * :doc:`gerrit_setup`
   * :doc:`github_setup`
