@@ -16,6 +16,24 @@
       "revId": "72569c2b5db120b07f2bb31c616e38d022074b70",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_69ed80b5",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-04-03T08:12:08Z",
+      "side": 1,
+      "message": "oh right, will change",
+      "parentUuid": "bf659307_85747ed0",
+      "revId": "72569c2b5db120b07f2bb31c616e38d022074b70",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
