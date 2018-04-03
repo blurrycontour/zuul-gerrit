@@ -3535,3 +3535,30 @@ class TestPlugins(AnsibleZuulTestCase):
                       roles="roles: [{zuul: 'org/project2'}]")
         self._run_job('filter-plugin-shared-bare-role',
                       roles="roles: [{zuul: 'org/project3', name: 'shared'}]")
+
+    def test_implicit_role_path(self):
+        # Output extra ansible info so we might see errors.
+        self.executor_server.verbose = True
+        conf = textwrap.dedent(
+            """
+            - job:
+                name: org-project3-tests
+                run: tests/test.yaml
+                nodeset:
+                  nodes:
+                    - name: controller
+                      label: whatever
+            - project:
+                check:
+                  jobs:
+                    - org-project3-tests
+            """)
+
+        file_dict = {'zuul.yaml': conf}
+        A = self.fake_gerrit.addFakeChange('org/project3', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(
+            self.getJobFromHistory('org-project3-tests').result, 'SUCCESS')
