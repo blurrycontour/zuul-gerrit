@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "bf659307_e7c3e536",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 18
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-03T22:06:36Z",
+      "side": 1,
+      "message": "And on a second read I see there is an exception raised to handle the exclusivity. Sorry for the noise.",
+      "parentUuid": "bf659307_a78c0d36",
+      "range": {
+        "startLine": 255,
+        "startChar": 41,
+        "endLine": 256,
+        "endChar": 62
+      },
+      "revId": "e63535fe86c5c3864e872f8cc2d62822ff37854f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_c78fc127",
         "filename": "doc/source/admin/components.rst",
         "patchSetId": 18
@@ -59,6 +83,24 @@
       "writtenOn": "2018-04-03T22:02:22Z",
       "side": 1,
       "message": "Because this isn\u0027t an elif this the tenant_config option isn\u0027t actually exclusive with the tenant_config_script option. Instead tenant_config_script will always win. At the very least we should update the docs to ensure they are accurate. I think its fine to fall through but the docs should make it clear which one will win.\n\n(Note that making it an elif doesn\u0027t really fix it either because in that case tenant_config will always win if set).",
+      "revId": "e63535fe86c5c3864e872f8cc2d62822ff37854f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_67b035de",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 552,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-03T22:06:36Z",
+      "side": 1,
+      "message": "Whoops, of course its not on a reread that I see there is an exception raised here if both happen to be set making them exclusive. /me updates review.",
+      "parentUuid": "bf659307_87ac699f",
       "revId": "e63535fe86c5c3864e872f8cc2d62822ff37854f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
