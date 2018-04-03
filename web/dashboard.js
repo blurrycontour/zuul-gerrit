@@ -107,6 +107,10 @@ angular.module('zuulBuilds', [], function ($locationProvider) {
                 if (build.log_url === build.job_name) {
                   build.log_url = undefined
                 }
+
+                /* Localize time */
+                let start_time = new Date(build.start_time + '.000Z')
+                build.start_time = start_time.toLocaleString()
               }
               $scope.builds = result.data
             })
