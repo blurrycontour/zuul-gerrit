@@ -794,6 +794,11 @@ Here is an example of two job definitions:
       the addition of conflicting roles.  Roles added by a child will
       appear before those it inherits from its parent.
 
+      If a project used for a Zuul role has branches, the usual
+      process of selecting which branch should be checked out applies.
+      See :attr:`job.override-checkout` for a description of that
+      process and how to override it.
+
       A project which supplies a role may be structured in one of two
       configurations: a bare role (in which the role exists at the
       root of the project), or a contained role (in which the role
