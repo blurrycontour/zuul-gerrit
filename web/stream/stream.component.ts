@@ -26,6 +26,6 @@ export default class StreamComponent implements OnInit {
   constructor(private route: ActivatedRoute) {}
 
   ngOnInit() {
-    zuulStartStream(this.route.snapshot.paramMap.get('tenant'))
+    zuulStartStream(this.route.snapshot.paramMap.get('tenant'), this.route)
   }
 }
