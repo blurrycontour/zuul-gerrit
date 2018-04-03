@@ -22,6 +22,30 @@
       "revId": "4b9c438d14d9db09f43f31f12d1c88a7e413964b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_4e7afab9",
+        "filename": "package.json",
+        "patchSetId": 14
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-04-03T13:40:52Z",
+      "side": 1,
+      "message": "Good call, we do not need to.",
+      "parentUuid": "bf659307_6527eacb",
+      "range": {
+        "startLine": 53,
+        "startChar": 4,
+        "endLine": 53,
+        "endChar": 40
+      },
+      "revId": "4b9c438d14d9db09f43f31f12d1c88a7e413964b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
