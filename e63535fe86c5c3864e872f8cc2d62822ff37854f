@@ -106,6 +106,24 @@
     },
     {
       "key": {
+        "uuid": "bf659307_8242170e",
+        "filename": "releasenotes/notes/tenant-from-script-e28d736001db5365.yaml",
+        "patchSetId": 18
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-04-03T22:49:22Z",
+      "side": 1,
+      "message": "Sure, code review was just an example. It was more about managing configuration external, notify zuul to reload said yaml files.\n\nIf users want to store that info in a database, that is okay too. I believe there is external tooling today to handle that case vs having zuul trigger a dynamic build of configs.",
+      "parentUuid": "bf659307_025da713",
+      "revId": "e63535fe86c5c3864e872f8cc2d62822ff37854f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_87ac699f",
         "filename": "zuul/scheduler.py",
         "patchSetId": 18
