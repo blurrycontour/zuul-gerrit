@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bf659307_c49c986b",
+        "filename": "doc/source/admin/drivers/mqtt.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-04-04T04:39:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf659307_5316214b",
+      "revId": "ebc58027cb1421db4b0c3afa4075b37778122950",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_b3553dfc",
         "filename": "doc/source/admin/drivers/mqtt.rst",
         "patchSetId": 6
@@ -30,6 +48,24 @@
       "writtenOn": "2018-04-03T12:11:30Z",
       "side": 1,
       "message": "We might want to link to docs on topic hierarchy and how this is \u0027/\u0027 separated for each level. I wrote some docs on this in the general firehose guide: \n\nhttps://docs.openstack.org/infra/system-config/firehose.html#topics \n\nBut the mosquitto docs linked there: https://mosquitto.org/man/mqtt-7.html have more details on how it\u0027s used.",
+      "revId": "ebc58027cb1421db4b0c3afa4075b37778122950",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_247b1428",
+        "filename": "doc/source/admin/drivers/mqtt.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-04-04T04:39:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf659307_b3553dfc",
       "revId": "ebc58027cb1421db4b0c3afa4075b37778122950",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
