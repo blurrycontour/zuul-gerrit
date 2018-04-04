@@ -34,6 +34,24 @@
       "revId": "39a288a255a6f5889306f021d09e794b94fb3907",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_5215a647",
+        "filename": "zuul/ansible/action/template.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-04-04T06:51:49Z",
+      "side": 1,
+      "message": "I did that in PS2 but I thought there were problems with tox-remote tests (which was not reproducible locally) and ansible 2.4. But maybe I got dependencies wrong during that test. I\u0027ll retest as I also prefer the env variable solution.\n\nFurther we found out that win_template also suffers from this issue and the env variable solution should hopefully fix any of these problems.",
+      "parentUuid": "bf659307_e74685c0",
+      "revId": "39a288a255a6f5889306f021d09e794b94fb3907",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
