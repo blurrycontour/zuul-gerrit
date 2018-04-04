@@ -52,6 +52,24 @@
       "revId": "39a288a255a6f5889306f021d09e794b94fb3907",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_b8574326",
+        "filename": "zuul/ansible/action/template.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-04-04T07:58:26Z",
+      "side": 1,
+      "message": "Ok, I found out that using the TMPDIR variable has no effect in tox-remote but TMP does work. So switched back to the env variable approach using TMP instead of TMPDIR.",
+      "parentUuid": "bf659307_5215a647",
+      "revId": "39a288a255a6f5889306f021d09e794b94fb3907",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
