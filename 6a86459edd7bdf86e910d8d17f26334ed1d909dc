@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "bf659307_4f9df8b9",
+        "filename": "doc/source/admin/fedora27_setup.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-04-04T13:38:17Z",
+      "side": 1,
+      "message": "Noted, but not looking to modify current content ATM.",
+      "parentUuid": "bf659307_a50d02e9",
+      "range": {
+        "startLine": 32,
+        "startChar": 60,
+        "endLine": 32,
+        "endChar": 119
+      },
+      "revId": "6a86459edd7bdf86e910d8d17f26334ed1d909dc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_85f6bed6",
         "filename": "doc/source/admin/fedora27_setup.rst",
         "patchSetId": 4
@@ -36,6 +60,24 @@
       "writtenOn": "2018-04-02T23:24:39Z",
       "side": 1,
       "message": "Reading these docs the way they get organized a level up is such that we configure the unit files for the services then enable and start the services below before the pip installation for nodepool and zuul is done.\n\nMaybe what we want is a first step distro specific bootstrapping and it can have all the stuff above in it (so docs on how to get python and bindep and zookeeper working). Then docs on installing the python things. Then a service management (systemd, etc) section which will likely just start as systemd only to begin.",
+      "revId": "6a86459edd7bdf86e910d8d17f26334ed1d909dc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_efabacd2",
+        "filename": "doc/source/admin/fedora27_setup.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-04-04T13:38:17Z",
+      "side": 1,
+      "message": "Jim has suggested directly adding service management files directly to our repo, which will simplify these steps. I see that as something for future reviews.",
+      "parentUuid": "bf659307_85f6bed6",
       "revId": "6a86459edd7bdf86e910d8d17f26334ed1d909dc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -59,6 +101,24 @@
     },
     {
       "key": {
+        "uuid": "bf659307_afb13446",
+        "filename": "doc/source/admin/nodepool_install.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-04-04T13:38:17Z",
+      "side": 1,
+      "message": "Noted, but not looking to modify current content ATM.",
+      "parentUuid": "bf659307_2501f2af",
+      "revId": "6a86459edd7bdf86e910d8d17f26334ed1d909dc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_05a70ebf",
         "filename": "doc/source/admin/zuul-from-scratch.rst",
         "patchSetId": 4
@@ -76,6 +136,24 @@
     },
     {
       "key": {
+        "uuid": "bf659307_ef940c8d",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-04-04T13:38:17Z",
+      "side": 1,
+      "message": "I specifically did not want a single page view. See the follow up reviews which add more content.",
+      "parentUuid": "bf659307_05a70ebf",
+      "revId": "6a86459edd7bdf86e910d8d17f26334ed1d909dc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_e530daa1",
         "filename": "doc/source/admin/zuul_install.rst",
         "patchSetId": 4
@@ -87,6 +165,24 @@
       "writtenOn": "2018-04-02T23:24:39Z",
       "side": 1,
       "message": "Note that pip10 is going to break this installation method likely. The problem is distro python packages will use distutils and pip10 will refuse to touch anything with distutils if there is a conflict.\n\nThis probably won\u0027t be an issue until the next release of $distro with pip10 in it but maybe we just get ahead of it here and install everything into a virtualenv or two?",
+      "revId": "6a86459edd7bdf86e910d8d17f26334ed1d909dc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_8f8f9073",
+        "filename": "doc/source/admin/zuul_install.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-04-04T13:38:17Z",
+      "side": 1,
+      "message": "Noted, but not looking at modifying current content ATM.",
+      "parentUuid": "bf659307_e530daa1",
       "revId": "6a86459edd7bdf86e910d8d17f26334ed1d909dc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
