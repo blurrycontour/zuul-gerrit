@@ -55,6 +55,10 @@ further restrict public access.
 
    [scheduler]
    tenant_config=/etc/zuul/main.yaml
+
+   [connection zuul-git]
+   driver=git
+   baseurl=https://git.zuul-ci.org/
    EOF"
 
    sudo bash -c "cat > /etc/zuul/main.yaml <<EOF
@@ -90,23 +94,6 @@ all of the services with::
    sudo systemctl start zuul-web.service
    sudo systemctl status zuul-web.service
    sudo systemctl enable zuul-web.service
-
-Use Zuul Jobs
--------------
-
-Add to ``/etc/zuul/zuul.conf``::
-
-   sudo bash -c "cat >> /etc/zuul/zuul.conf <<EOF
-
-   [connection zuul-git]
-   driver=git
-   baseurl=https://git.zuul-ci.org/
-   EOF"
-
-Restart executor and scheduler::
-
-   sudo systemctl restart zuul-executor.service
-   sudo systemctl restart zuul-scheduler.service
 
 Setup Your Repo
 ---------------
