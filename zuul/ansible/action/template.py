@@ -14,6 +14,7 @@
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
 
+import os
 from zuul.ansible import paths
 template = paths._import_ansible_action_plugin("template")
 
@@ -27,5 +28,10 @@ class ActionModule(template.ActionModule):
     def run(self, tmp=None, task_vars=None):
         if not paths._is_official_module(self):
             return paths._fail_module_dict(self._task.action)
+
+        print("############################################################")
+        for key, value in os.environ.items():
+            print("%s: %s" % (key, value))
+        print("############################################################")
 
         return super(ActionModule, self).run(tmp, task_vars)
