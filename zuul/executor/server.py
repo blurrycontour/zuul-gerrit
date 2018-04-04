@@ -1351,7 +1351,8 @@ class AnsibleJob(object):
             env_copy['ARA_LOG_CONFIG'] = self.jobdir.logging_json
         env_copy['ZUUL_JOB_LOG_CONFIG'] = self.jobdir.logging_json
         env_copy['ZUUL_JOBDIR'] = self.jobdir.root
-        env_copy['TMPDIR'] = self.jobdir.local_tmp
+        # env_copy['TMPDIR'] = self.jobdir.local_tmp
+        env_copy['TMP'] = self.jobdir.local_tmp
         pythonpath = env_copy.get('PYTHONPATH')
         if pythonpath:
             pythonpath = [pythonpath]
