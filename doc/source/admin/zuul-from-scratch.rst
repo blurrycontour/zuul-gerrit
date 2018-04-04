@@ -40,6 +40,7 @@ Nodepool can support different backends. Select the configuration for
 your installation.
 
   * :doc:`nodepool_openstack`
+  * :doc:`nodepool_static`
 
 
 Zuul Setup
