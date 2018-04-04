@@ -88,6 +88,53 @@ further restrict public access.
        name: quickstart
    EOF"
 
+Service Management
+------------------
+
+Zuul and Nodepool
+~~~~~~~~~~~~~~~~~
+
+Zuul includes some sample systemd service files in the ``etc`` source
+directory. To use those, do the following steps::
+
+  $ sudo cp etc/nodepool-launcher.service-sample /etc/systemd/system/nodepool-launcher.service
+  $ sudo cp etc/zuul-scheduler.service-sample /etc/systemd/system/zuul-scheduler.service
+  $ sudo cp etc/zuul-executor.service-sample /etc/systemd/system/zuul-executor.service
+  $ sudo cp etc/zuul-web.service-sample /etc/systemd/system/zuul-web.service
+  $ sudo chmod 0644 /etc/systemd/system/nodepool-launcher.service
+  $ sudo chmod 0644 /etc/systemd/system/zuul-scheduler.service
+  $ sudo chmod 0644 /etc/systemd/system/zuul-executor.service
+  $ sudo chmod 0644 /etc/systemd/system/zuul-web.service
+
+Starting Services
+~~~~~~~~~~~~~~~~~
+
+Your system software management should have installed the Zookeeper service
+files for you.
+
+After you have Zuul and Nodepool installed and configured, you can start
+all of the services with::
+
+   sudo systemctl daemon-reload
+
+   sudo systemctl start zookeeper.service
+   sudo systemctl status zookeeper.service
+   sudo systemctl enable zookeeper.service
+
+   sudo systemctl start nodepool-launcher.service
+   sudo systemctl status nodepool-launcher.service
+   sudo systemctl enable nodepool-launcher.service
+
+   sudo systemctl start zuul-scheduler.service
+   sudo systemctl status zuul-scheduler.service
+   sudo systemctl enable zuul-scheduler.service
+   sudo systemctl start zuul-executor.service
+   sudo systemctl status zuul-executor.service
+   sudo systemctl enable zuul-executor.service
+   sudo systemctl start zuul-web.service
+   sudo systemctl status zuul-web.service
+   sudo systemctl enable zuul-web.service
+
 Use Zuul Jobs
 -------------
 
