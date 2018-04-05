@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_375316e5",
+        "filename": "zuul/ansible/lookup/file.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-05T21:57:41Z",
+      "side": 1,
+      "message": "TIL there are multiple things called \u0027file\u0027 in ansible. The lookup file plugin in particular is for reading a file\u0027s contents not setting attributes on a file so this should be safe.",
+      "revId": "b4385b2d93d4fcc216740d582a41a2e954163baf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
