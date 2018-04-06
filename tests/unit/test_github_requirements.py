@@ -430,3 +430,59 @@ class TestGithubRequirements(ZuulTestCase):
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 1)
         self.assertEqual(self.history[0].name, 'project10-label')
+
+    @simple_layout('layouts/requirements-github.yaml', driver='github')
+    def test_pipeline_reject_label(self):
+        "Test pipeline reject: label"
+        A = self.fake_github.openFakePullRequest('org/project11', 'master',
+                                                 'A')
+        # A comment event that we will keep submitting to trigger
+        comment = A.getCommentAddedEvent('test me')
+        self.fake_github.emitEvent(comment)
+        self.waitUntilSettled()
+        # No label so should not be enqueued
+        self.assertEqual(len(self.history), 0)
+
+        # A do-not-merge label should not cause it to be enqueued
+        A.addLabel('do-not-merge')
+        self.fake_github.emitEvent(comment)
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 0)
+
+        # An approved label should still not enqueue due to d-n-m
+        A.addLabel('approved')
+        self.fake_github.emitEvent(comment)
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 0)
+
+        # Remove do-not-merge should enqueue
+        A.removeLabel('do-not-merge')
+        self.fake_github.emitEvent(comment)
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 1)
+        self.assertEqual(self.history[0].name, 'project11-label')
+
+    @simple_layout('layouts/requirements-github.yaml', driver='github')
+    def test_pipeline_reject_status(self):
+        "Test pipeline reject: status"
+        project = 'org/project12'
+        A = self.fake_github.openFakePullRequest(project, 'master', 'A')
+
+        # Set rejected error status
+        self.fake_github.setCommitStatus(project, A.head_sha, 'error',
+                                         context='check')
+
+        # A comment event that we will keep submitting to trigger
+        comment = A.getCommentAddedEvent('test me')
+        self.fake_github.emitEvent(comment)
+        self.waitUntilSettled()
+        # Status should cause it to be rejected
+        self.assertEqual(len(self.history), 0)
+
+        self.fake_github.setCommitStatus(project, A.head_sha, 'success',
+                                         context='check')
+        # Now that status is not error, it should be enqueued
+        self.fake_github.emitEvent(comment)
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 1)
+        self.assertEqual(self.history[0].name, 'project12-status')

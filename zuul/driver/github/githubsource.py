@@ -140,7 +140,9 @@ class GithubSource(BaseSource):
     def getRejectFilters(self, config):
         f = GithubRefFilter(
             connection_name=self.connection.connection_name,
-            reject_reviews=to_list(config.get('review'))
+            reject_reviews=to_list(config.get('review')),
+            reject_labels=to_list(config.get('label')),
+            reject_statuses=to_list(config.get('status'))
         )
         return [f]
 
@@ -167,5 +169,7 @@ def getRequireSchema():
 
 
 def getRejectSchema():
-    reject = {'review': scalar_or_list(review)}
+    reject = {'review': scalar_or_list(review),
+              'label': scalar_or_list(str),
+              'status': scalar_or_list(str)}
     return reject
