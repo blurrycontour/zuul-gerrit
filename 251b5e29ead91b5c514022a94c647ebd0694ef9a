@@ -16,6 +16,24 @@
       "revId": "251b5e29ead91b5c514022a94c647ebd0694ef9a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_cfc47395",
+        "filename": "tests/unit/test_streaming.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-06T16:42:15Z",
+      "side": 1,
+      "message": "Speaking to Shrews on IRC this would only be the case if the job was forcefully stopped. But since the job is allowed to gracefully end the entirety of its log file should make it through the entirety of the streaming machinery.",
+      "parentUuid": "bf659307_8cb7693b",
+      "revId": "251b5e29ead91b5c514022a94c647ebd0694ef9a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
