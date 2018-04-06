@@ -16,6 +16,7 @@
 
 
 import asyncio
+import codecs
 import copy
 import json
 import logging
@@ -61,10 +62,15 @@ class LogStreamingHandler(object):
         writer.write(msg.encode('utf8'))
         await writer.drain()
 
+        Decoder = codecs.getincrementaldecoder('utf8')
+        decoder = Decoder()
+
         while True:
             data = await reader.read(1024)
             if data:
-                await ws.send_str(data.decode('utf8'))
+                data = decoder.decode(data)
+                if data:
+                    await ws.send_str(data)
             else:
                 writer.close()
                 return
