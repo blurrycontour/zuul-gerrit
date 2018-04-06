@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_8cb7693b",
+        "filename": "tests/unit/test_streaming.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-06T16:02:41Z",
+      "side": 1,
+      "message": "Is it possible that by stopping the job above the ws_client_thread will read fewer than the full 1025 bytes? Maybe before allowing the job to complete above we can check the size of the buffer read by ws_client_thread to ensure it is at least 1025 bytes or 1024 characters?\n\nWithout this I worry the assert on line 325 could be racey and potentially lead to a flaky test.",
+      "revId": "251b5e29ead91b5c514022a94c647ebd0694ef9a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
