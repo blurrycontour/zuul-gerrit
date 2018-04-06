@@ -16,6 +16,7 @@
         - faillocal
         - check-vars
         - check-hostvars
+        - check-groupvars
         - check-secret-names
         - timeout
         - post-timeout

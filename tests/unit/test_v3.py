@@ -2065,6 +2065,12 @@ class TestAnsible(AnsibleZuulTestCase):
         build_check_vars = self.getJobFromHistory('check-vars')
         with self.jobLog(build_check_vars):
             self.assertEqual(build_check_vars.result, 'SUCCESS')
+        build_check_hostvars = self.getJobFromHistory('check-hostvars')
+        with self.jobLog(build_check_hostvars):
+            self.assertEqual(build_check_hostvars.result, 'SUCCESS')
+        build_check_groupvars = self.getJobFromHistory('check-groupvars')
+        with self.jobLog(build_check_groupvars):
+            self.assertEqual(build_check_groupvars.result, 'SUCCESS')
         build_check_secret_names = self.getJobFromHistory('check-secret-names')
         with self.jobLog(build_check_secret_names):
             self.assertEqual(build_check_secret_names.result, 'SUCCESS')

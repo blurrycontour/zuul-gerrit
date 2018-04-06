@@ -146,6 +146,11 @@
         groupvar: group
 
 - job:
+    parent: check-hostvars
+    name: check-groupvars
+    run: playbooks/check-groupvars.yaml
+
+- job:
     parent: python27
     name: check-secret-names
     run: playbooks/check-secret-names.yaml

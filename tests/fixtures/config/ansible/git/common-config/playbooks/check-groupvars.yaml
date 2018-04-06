@@ -1,0 +1,7 @@
+- hosts: group1
+  serial: 1
+  tasks:
+    - name: Assert groupvar is present.
+      assert:
+        that:
+          - groupvar == 'group'
