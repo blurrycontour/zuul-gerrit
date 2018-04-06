@@ -53,6 +53,24 @@
     },
     {
       "key": {
+        "uuid": "bf659307_a9557f1f",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 2426,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-06T15:55:19Z",
+      "side": 1,
+      "message": "Thanks. I guess only minor nit is in real world the role would go in before the playbook so flipping order of addPlaybook and addRole here would be more realistic. But doubt that makes a difference here.",
+      "parentUuid": "bf659307_e0186b85",
+      "revId": "d0a3567221011eda22c9b42645887e5eb623e308",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_001ebf6f",
         "filename": "tests/unit/test_v3.py",
         "patchSetId": 8
