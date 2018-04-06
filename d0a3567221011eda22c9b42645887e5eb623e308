@@ -122,6 +122,24 @@
     },
     {
       "key": {
+        "uuid": "bf659307_8c7f69aa",
+        "filename": "zuul/ansible/paths.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-04-06T16:40:23Z",
+      "side": 1,
+      "message": "I like separating is_safe_for_reads and writes. We should consider this as a follow up, but should not block this.",
+      "parentUuid": "bf659307_c0176751",
+      "revId": "d0a3567221011eda22c9b42645887e5eb623e308",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_faba65df",
         "filename": "zuul/executor/server.py",
         "patchSetId": 8
@@ -150,6 +168,24 @@
       "writtenOn": "2018-04-06T14:35:57Z",
       "side": 1,
       "message": "No, we don\u0027t want users knowing these details.  A user can\u0027t really predict where the playbook or role will end up anyway.",
+      "revId": "d0a3567221011eda22c9b42645887e5eb623e308",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_0c135968",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-04-06T16:40:23Z",
+      "side": 1,
+      "message": "I also think this is an implementation detail and no api. Otherwise we won\u0027t be able to change this structure in the future.",
+      "parentUuid": "",
       "revId": "d0a3567221011eda22c9b42645887e5eb623e308",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
