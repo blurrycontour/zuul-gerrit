@@ -19,6 +19,57 @@
     },
     {
       "key": {
+        "uuid": "bf659307_a0127361",
+        "filename": "tests/fixtures/config/role-branches/git/project1/zuul.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-06T14:35:57Z",
+      "side": 1,
+      "message": "It\u0027s done in the test so that we have exclusively different content on the master and stable branches.  See test_v3.py.",
+      "revId": "d0a3567221011eda22c9b42645887e5eb623e308",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_e0186b85",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 2426,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-06T14:35:57Z",
+      "side": 1,
+      "message": "This is where the playbook is defined.",
+      "revId": "d0a3567221011eda22c9b42645887e5eb623e308",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_001ebf6f",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 2432,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-06T14:35:57Z",
+      "side": 1,
+      "message": "And here.",
+      "revId": "d0a3567221011eda22c9b42645887e5eb623e308",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_da12010a",
         "filename": "zuul/ansible/paths.py",
         "patchSetId": 8
@@ -30,6 +81,23 @@
       "writtenOn": "2018-04-05T23:45:17Z",
       "side": 1,
       "message": "Should untrusted just be allowed always?\n\nI think I will leave this question here, but on further review I notice that we don\u0027t really make the contents of this dir directly accessible as they are all named project_$COUNTER. Still though if it is untrusted does that mean it can always be read?",
+      "revId": "d0a3567221011eda22c9b42645887e5eb623e308",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_c0176751",
+        "filename": "zuul/ansible/paths.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-06T14:35:57Z",
+      "side": 1,
+      "message": "Both of these are always safe to be read from, but not safe to be written to.  This method is used for checking both reads and writes.  The allow_trusted argument is generally set to true for reads.\n\nPerhaps a more clear approach would be to define two methods: \"is_safe_for_reads\" and \"is_safe_for_writes\".  We never expect a user to directly create this path, however, Ansible implicitly uses it for some operations, and it can be constructed with the \"{{role_path}}\" ansible variable.",
       "revId": "d0a3567221011eda22c9b42645887e5eb623e308",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +121,23 @@
     },
     {
       "key": {
+        "uuid": "bf659307_600c5b42",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-06T14:35:57Z",
+      "side": 1,
+      "message": "No, we don\u0027t want users knowing these details.  A user can\u0027t really predict where the playbook or role will end up anyway.",
+      "revId": "d0a3567221011eda22c9b42645887e5eb623e308",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_ba814dc6",
         "filename": "zuul/executor/server.py",
         "patchSetId": 8
@@ -70,6 +155,23 @@
     },
     {
       "key": {
+        "uuid": "bf659307_80096f32",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 412,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-06T14:35:57Z",
+      "side": 1,
+      "message": "Right.",
+      "revId": "d0a3567221011eda22c9b42645887e5eb623e308",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_3a2d3da8",
         "filename": "zuul/executor/server.py",
         "patchSetId": 8
@@ -81,6 +183,23 @@
       "writtenOn": "2018-04-05T23:45:17Z",
       "side": 1,
       "message": "Might consider doing the above task attribute updates here so that the attributes are available for the life of the task? I guess the only current consumers of that info are waiting for the task to complete first.",
+      "revId": "d0a3567221011eda22c9b42645887e5eb623e308",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_20066322",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 2056,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-06T14:35:57Z",
+      "side": 1,
+      "message": "Merger.getRepo() can cause a repo to be cloned, so it\u0027s slow, and in this situation, needs to be done with the merger lock so we don\u0027t have multiple threads writing to the executor git cache.  So all of that needs to happen in the inner loop.  And yes, the only use of the task is the job waiting for the updates to complete -- nothing will expect to be able to use that information before they do.",
       "revId": "d0a3567221011eda22c9b42645887e5eb623e308",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
