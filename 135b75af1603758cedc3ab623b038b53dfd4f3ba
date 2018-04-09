@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_164a6954",
+        "filename": "releasenotes/notes/git-remote-refs-71bd2fc2bb05155d.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-04-09T09:14:32Z",
+      "side": 1,
+      "message": "commands",
+      "range": {
+        "startLine": 9,
+        "startChar": 24,
+        "endLine": 9,
+        "endChar": 31
+      },
+      "revId": "135b75af1603758cedc3ab623b038b53dfd4f3ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
