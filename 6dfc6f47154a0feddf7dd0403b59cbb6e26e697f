@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_fb1c8078",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-04-09T09:09:40Z",
+      "side": 1,
+      "message": "this needs to begin with api/tenant/",
+      "revId": "6dfc6f47154a0feddf7dd0403b59cbb6e26e697f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_3b29989a",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-04-09T09:09:40Z",
+      "side": 1,
+      "message": "similarly to tenants and tenant/{tenant} , how about we use projects and project/{project_name} ?",
+      "revId": "6dfc6f47154a0feddf7dd0403b59cbb6e26e697f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
