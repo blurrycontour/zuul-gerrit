@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_5fe0e3cc",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-09T22:02:22Z",
+      "side": 1,
+      "message": "This is where we will handle any exceptions like an asyncio timeout exception in get_builds().",
+      "revId": "09de4d8e6bf9f02f2ed988f7f43c0c44bd314855",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
