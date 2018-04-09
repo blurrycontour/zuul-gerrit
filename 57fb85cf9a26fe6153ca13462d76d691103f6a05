@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "bf659307_980c11a6",
+        "filename": ".zuul.yaml",
+        "patchSetId": 21
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-04-09T09:40:57Z",
+      "side": 1,
+      "message": "fwiw, sf.io now has the /api endpoint",
+      "parentUuid": "bf659307_f4ad269b",
+      "revId": "57fb85cf9a26fe6153ca13462d76d691103f6a05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_2846f0c1",
         "filename": ".zuul.yaml",
         "patchSetId": 21
