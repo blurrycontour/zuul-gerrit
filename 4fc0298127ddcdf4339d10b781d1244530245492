@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_5b5fac40",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-04-09T09:08:35Z",
+      "side": 1,
+      "message": "this needs to begin with \"api/tenant/\"",
+      "revId": "4fc0298127ddcdf4339d10b781d1244530245492",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_fb332012",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-04-09T09:08:35Z",
+      "side": 1,
+      "message": "to match the tenants and tenant/{tenant} endpoint, i think we should have jobs and job/{job_name} endpoint.",
+      "revId": "4fc0298127ddcdf4339d10b781d1244530245492",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
