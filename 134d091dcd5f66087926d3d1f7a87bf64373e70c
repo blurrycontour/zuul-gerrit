@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_76ac0535",
+        "filename": "web/navigation/navigation.component.html",
+        "patchSetId": 26
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-04-09T09:40:57Z",
+      "side": 1,
+      "message": "This doesn\u0027t seems to work for multi-tenant deployment. For example, when loading \"/zuul/t/local/builds.html\", the \"Status\" link points at \"/zuul/status.html\".\n\nShouldn\u0027t this be using [routerLink]\u003d\"[\u0027/t\u0027, tenant.name, \u0027status.html\u0027]  ?",
+      "revId": "134d091dcd5f66087926d3d1f7a87bf64373e70c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
