@@ -397,6 +397,12 @@ class PipelineManager(object):
                     build_set.dependent_changes,
                     build_set.merger_items)
             except Exception:
+                # If we hit an exception we don't have a build in the current
+                # item so a potentially aquired semaphore must be released
+                # as it won't be released on dequeue of the item.
+                tenant = item.pipeline.layout.tenant
+                tenant.semaphore_handler.release(item, job)
+
                 self.log.exception("Exception while executing job %s "
                                    "for change %s:" % (job, item.change))
 
