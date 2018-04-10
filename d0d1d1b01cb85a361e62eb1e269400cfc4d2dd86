@@ -1,0 +1,174 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_9a5bcc85",
+        "filename": "doc/source/admin/drivers/mqtt.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-10T21:38:54Z",
+      "side": 1,
+      "message": "These should be separate entries.  It\u0027s more verbose, but it\u0027s also more clear.  There\u0027s also a lot of magic reference generation and linking that happens here, so we\u0027ve inadvertently created an entry for \"certfile, keyfile\", rather than two entries for \"certfile\" and \"keyfile\".",
+      "revId": "d0d1d1b01cb85a361e62eb1e269400cfc4d2dd86",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_ba5ed073",
+        "filename": "doc/source/admin/drivers/mqtt.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-10T21:38:54Z",
+      "side": 1,
+      "message": "Would be nice to quote those with ``TLSv1``, see https://zuul-ci.org/docs/zuul/developer/docs.html#literal-values",
+      "revId": "d0d1d1b01cb85a361e62eb1e269400cfc4d2dd86",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_5a55344f",
+        "filename": "doc/source/admin/drivers/mqtt.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-10T21:38:54Z",
+      "side": 1,
+      "message": "Can you link to that doc?",
+      "revId": "d0d1d1b01cb85a361e62eb1e269400cfc4d2dd86",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_7a50385f",
+        "filename": "doc/source/admin/drivers/mqtt.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-10T21:38:54Z",
+      "side": 1,
+      "message": "If you\u0027re going to suggest patchset, {change} should appear before it.",
+      "revId": "d0d1d1b01cb85a361e62eb1e269400cfc4d2dd86",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_1a4fbcbd",
+        "filename": "doc/source/admin/drivers/mqtt.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-10T21:38:54Z",
+      "side": 1,
+      "message": "Can you use ``quotes`` for the parameter names and also the /",
+      "revId": "d0d1d1b01cb85a361e62eb1e269400cfc4d2dd86",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_fa64484b",
+        "filename": "releasenotes/notes/driver-mqtt-28f62e8510863b40.yaml",
+        "patchSetId": 7
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-10T21:38:54Z",
+      "side": 1,
+      "message": "Optional: you might consider cross-referencing the docs.  \":attr:\u003cmqtt connection\u003e\".",
+      "revId": "d0d1d1b01cb85a361e62eb1e269400cfc4d2dd86",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_3a4ac0ab",
+        "filename": "zuul/driver/mqtt/mqttconnection.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-10T21:38:54Z",
+      "side": 1,
+      "message": "If a user specifies certfile or keyfile without cacerts, they won\u0027t get an error.\n\nWe should check that if one of those is specified, all of them are.",
+      "revId": "d0d1d1b01cb85a361e62eb1e269400cfc4d2dd86",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_dac62417",
+        "filename": "zuul/driver/mqtt/mqttconnection.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-10T21:38:54Z",
+      "side": 1,
+      "message": "Is this used?",
+      "revId": "d0d1d1b01cb85a361e62eb1e269400cfc4d2dd86",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_fac9a824",
+        "filename": "zuul/driver/mqtt/mqttreporter.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-10T21:38:54Z",
+      "side": 1,
+      "message": "If this is reporting a start event, there won\u0027t be any builds, but that\u0027s a legitimate thing to report.  We should probably handle that case.",
+      "revId": "d0d1d1b01cb85a361e62eb1e269400cfc4d2dd86",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_9ad0accb",
+        "filename": "zuul/driver/mqtt/mqttreporter.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-10T21:38:54Z",
+      "side": 1,
+      "message": "Can you add a validator to ensure only the variables we support appear in the string?  You could probably just have the validator try to format the string with dummy values inside of a try/except.",
+      "revId": "d0d1d1b01cb85a361e62eb1e269400cfc4d2dd86",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
