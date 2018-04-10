@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_94764ed8",
+        "filename": "tests/unit/test_streaming.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-04-10T13:33:45Z",
+      "side": 1,
+      "message": "This todo looks like a leftover from PS1.",
+      "range": {
+        "startLine": 282,
+        "startChar": 8,
+        "endLine": 282,
+        "endChar": 53
+      },
+      "revId": "8962d6abaaa7179a755f9a8b1cc8c208440afef3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
