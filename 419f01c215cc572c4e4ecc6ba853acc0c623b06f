@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_a2e1d4fe",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-10T14:27:19Z",
+      "side": 1,
+      "message": "I\u0027d put this call in its own internal exception handler, so if something goes wrong with the release, we log that as well.  You might want to put it after the exception below for clarity.  Like:\n\nexcept exception:\n  self.log.exception(\u0027while executing job\u0027)\n  try:\n    tenant\u003d\n    release\n  except exception:\n    self.log.execption(\u0027while releasing semaphore\u0027)",
+      "revId": "419f01c215cc572c4e4ecc6ba853acc0c623b06f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
