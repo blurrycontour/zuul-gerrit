@@ -1,0 +1,8 @@
+---
+features:
+  - |
+    PostgreSQL is now officially supported as database backend.
+
+    Check out the documentation_ on how to configure database connections.
+
+    .. _documentation: https://zuul-ci.org/docs/zuul/admin/drivers/sql.html
