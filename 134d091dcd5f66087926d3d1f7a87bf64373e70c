@@ -16,6 +16,24 @@
       "revId": "134d091dcd5f66087926d3d1f7a87bf64373e70c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_6872bd4b",
+        "filename": "web/navigation/navigation.component.html",
+        "patchSetId": 26
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-04-10T15:27:11Z",
+      "side": 1,
+      "message": "Yes - except that that won\u0027t work for whitelabeled things. We probably need to put a little more logic in the javascript. I\u0027ll get a fix up.",
+      "parentUuid": "bf659307_76ac0535",
+      "revId": "134d091dcd5f66087926d3d1f7a87bf64373e70c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
