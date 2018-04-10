@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_043a0597",
+        "filename": "tox.ini",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-04-10T19:59:31Z",
+      "side": 1,
+      "message": "This file doesn\u0027t seem to exist.",
+      "range": {
+        "startLine": 17,
+        "startChar": 7,
+        "endLine": 17,
+        "endChar": 23
+      },
+      "revId": "c81b8d112c1ec32efc95be3bf2b425888dc7b477",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
