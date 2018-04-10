@@ -51,9 +51,9 @@ def upgrade(table_prefix=''):
     # To allow a dashboard to show a job lib view. buildset_id is included
     # so that it's a covering index and can satisfy the join back to buildset
     # without an additional lookup.
-    op.create_index(
-        'job_name_buildset_id_idx', prefixed_build,
-        ['job_name', 'buildset_id'])
+    # op.create_index(
+    #     'job_name_buildset_id_idx', prefixed_build,
+    #     ['job_name', 'buildset_id'])
 
 
 def downgrade():
