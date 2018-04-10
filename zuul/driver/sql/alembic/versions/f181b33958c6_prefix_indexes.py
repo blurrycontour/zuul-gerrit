@@ -103,6 +103,7 @@ def upgrade(table_prefix=''):
     finally:
         if connection:
             connection.close()
+        engine.dispose()
 
 
 def downgrade():
