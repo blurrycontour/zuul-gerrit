@@ -27,7 +27,7 @@ branch_labels = None
 depends_on = None
 
 from alembic import op
-from sqlalchemy import engine_from_config
+from sqlalchemy import inspect
 from sqlalchemy.engine import reflection
 
 BUILDSET_TABLE = 'zuul_buildset'
@@ -46,16 +46,13 @@ def upgrade(table_prefix=''):
     if not table_prefix:
         return
 
-    config = op.get_context().config
-    engine = engine_from_config(
-        config.get_section(config.config_ini_section), prefix='sqlalchemy.')
-    inspector = reflection.Inspector.from_engine(engine)
+    inspector = inspect(op.get_bind())
 
     prefixed_buildset = table_prefix + BUILDSET_TABLE
     prefixed_build = table_prefix + BUILD_TABLE
 
-    # We need to prefix any non-prefixed index if needed. Do this by dropping
-    # and recreating the index.
+    # We need to prefix any non-prefixed index if needed. Do this by
+    # dropping and recreating the index.
     if index_exists('project_pipeline_idx', prefixed_buildset, inspector):
         op.drop_index('project_pipeline_idx', prefixed_buildset)
 
@@ -90,8 +87,8 @@ def upgrade(table_prefix=''):
                         prefixed_buildset, ['change'])
 
     # To allow a dashboard to show a job lib view. buildset_id is included
-    # so that it's a covering index and can satisfy the join back to buildset
-    # without an additional lookup.
+    # so that it's a covering index and can satisfy the join back to
+    # buildset without an additional lookup.
     if not index_exists(table_prefix + 'job_name_buildset_id_idx',
                         prefixed_build, inspector):
         op.create_index(
