@@ -1,0 +1,6 @@
+---
+other:
+  - |
+      The ``build:docker`` npm target has been removed in favor of using
+      nodeenv inside of tox to support local testing without installed
+      javascript toolchain.
