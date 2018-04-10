@@ -18,6 +18,7 @@
 import asyncio
 import codecs
 import copy
+import gear
 import json
 import logging
 import os
@@ -27,8 +28,6 @@ import uvloop
 import aiohttp
 from aiohttp import web
 
-import zuul.model
-import zuul.rpcclient
 from zuul.web.handler import StaticHandler
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
@@ -153,56 +152,99 @@ class LogStreamingHandler(object):
         return ws
 
 
+class GearmanClient(gear.Client):
+    def __init__(self, handler_object):
+        super().__init__(client_id='zuul-web')
+        self._handler = handler_object
+
+    def submitJob(self, name, data):
+        job = gear.TextJob(name, json.dumps(data), unique=str(time.time()))
+        super().submitJob(job, timeout=300)
+
+    def handleWorkComplete(self, packet):
+        job = super().handleWorkComplete(packet)
+        self._handler.onRequestCompleted(job)
+        return job
+
+    def handleWorkFail(self, packet):
+        job = super().handleWorkFail(packet)
+        self._handler.onRequestCompleted(job)
+        return job
+
+    def handleWorkException(self, packet):
+        job = super().handleWorkException(packet)
+        self._handler.onRequestCompleted(job)
+        return job
+
+
 class GearmanHandler(object):
     log = logging.getLogger("zuul.web.GearmanHandler")
 
     # Tenant status cache expiry
     cache_expiry = 1
 
-    def __init__(self, rpc):
-        self.rpc = rpc
+    def __init__(self, server, port, ssl_key, ssl_cert, ssl_ca):
         self.cache = {}
         self.cache_time = {}
         self.controllers = {
-            'tenant_list': self.tenant_list,
-            'status_get': self.status_get,
-            'job_list': self.job_list,
-            'key_get': self.key_get,
+            'tenant_list': self.tenantList,
+            'status_get': self.statusGet,
+            'job_list': self.jobList,
+            'key_get': self.keyGet,
         }
+        self.client = GearmanClient()
+        self.client.addServer(server, port, ssl_key, ssl_cert, ssl_ca)
 
-    async def tenant_list(self, request, result_filter=None):
-        job = self.rpc.submitJob('zuul:tenant_list', {})
-        return web.json_response(json.loads(job.data[0]))
+    def setEventLoop(self, event_loop):
+        self.event_loop = event_loop
 
-    async def status_get(self, request, result_filter=None):
-        tenant = request.match_info["tenant"]
-        if tenant not in self.cache or \
-           (time.time() - self.cache_time[tenant]) > self.cache_expiry:
-            job = self.rpc.submitJob('zuul:status_get', {'tenant': tenant})
-            self.cache[tenant] = json.loads(job.data[0])
-            self.cache_time[tenant] = time.time()
-        payload = self.cache[tenant]
+    def onRequestCompleted(self, job):
+        if job.name == b'zuul:tenant_list':
+            return web.json_response(json.loads(job.data[0]))
+        elif job.name == b'zuul:job_list':
+            resp = web.json_response(json.loads(job.data[0]))
+            resp.headers['Access-Control-Allow-Origin'] = '*'
+            return resp
+        elif job.name == b'zuul:key_get':
+            return web.Response(body=job.data[0])
+        elif job.name == b'zuul:status_get':
+            self.cache[self.tenant] = json.loads(job.data[0])
+            self.cache_time[self.tenant] = time.time()
+            self._returnStatus()
+
+    async def tenantList(self, request, result_filter=None):
+        self.client.submitJob('zuul:tenant_list', {})
+
+    async def statusGet(self, request, result_filter=None):
+        self.result_filter = result_filter
+        self.tenant = request.match_info["tenant"]
+        if self.tenant not in self.cache or \
+           (time.time() - self.cache_time[self.tenant]) > self.cache_expiry:
+            self.client.submitJob('zuul:status_get', {'tenant': self.tenant})
+        else:
+            self._returnStatus()
+
+    def _returnStatus(self):
+        payload = self.cache[self.tenant]
         if payload.get('code') == 404:
             return web.HTTPNotFound(reason=payload['message'])
-        if result_filter:
-            payload = result_filter.filterPayload(payload)
+        if self.result_filter:
+            payload = self.result_filter.filterPayload(payload)
         resp = web.json_response(payload)
         resp.headers["Cache-Control"] = "public, max-age=%d" % \
                                         self.cache_expiry
-        resp.last_modified = self.cache_time[tenant]
+        resp.last_modified = self.cache_time[self.tenant]
         return resp
 
-    async def job_list(self, request, result_filter=None):
+    async def jobList(self, request, result_filter=None):
         tenant = request.match_info["tenant"]
-        job = self.rpc.submitJob('zuul:job_list', {'tenant': tenant})
-        return web.json_response(json.loads(job.data[0]))
+        self.client.submitJob('zuul:job_list', {'tenant': tenant})
 
-    async def key_get(self, request, result_filter=None):
+    async def keyGet(self, request, result_filter=None):
         tenant = request.match_info["tenant"]
         project = request.match_info["project"]
-        job = self.rpc.submitJob('zuul:key_get', {'tenant': tenant,
-                                                  'project': project})
-        return web.Response(body=job.data[0])
+        self.client.submitJob('zuul:key_get', {'tenant': tenant,
+                                               'project': project})
 
     async def processRequest(self, request, action, result_filter=None):
         resp = None
@@ -256,11 +298,10 @@ class ZuulWeb(object):
         self.static_cache_expiry = static_cache_expiry
         self.info = info
         self.static_path = static_path or STATIC_DIR
-        # instanciate handlers
-        self.rpc = zuul.rpcclient.RPCClient(gear_server, gear_port,
-                                            ssl_key, ssl_cert, ssl_ca)
+        # instantiate handlers
         self.log_streaming_handler = LogStreamingHandler(self.rpc)
-        self.gearman_handler = GearmanHandler(self.rpc)
+        self.gearman_handler = GearmanHandler(
+            gear_server, gear_port, ssl_key, ssl_cert, ssl_ca)
         self._plugin_routes = []  # type: List[zuul.web.handler.BaseWebHandler]
         self._connection_handlers = []
         connections = connections or []
