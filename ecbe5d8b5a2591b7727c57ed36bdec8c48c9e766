@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_da2aa4e5",
+        "filename": "releasenotes/notes/postgres-ae4f8594d0f4b256.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-10T21:35:31Z",
+      "side": 1,
+      "message": "Could you use \"See\" instead of \"Check out\", and maybe combine these two sentences into one paragrah?  I know the existing release note I wrote had this format, but only because the second paragraph was really long.  :)",
+      "revId": "ecbe5d8b5a2591b7727c57ed36bdec8c48c9e766",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
