@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_0b2bf881",
+        "filename": "setup.cfg",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-10T17:38:46Z",
+      "side": 1,
+      "message": "How about just https://zuul-ci.org/  ?",
+      "revId": "0db92c8b05cc13d27b7ccb9eb3fd29470de2ad35",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
