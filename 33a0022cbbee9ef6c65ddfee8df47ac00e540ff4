@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_aba44c09",
+        "filename": "setup.cfg",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-04-10T17:44:00Z",
+      "side": 1,
+      "message": "Is it common to have a trailing slash?",
+      "range": {
+        "startLine": 8,
+        "startChar": 12,
+        "endLine": 8,
+        "endChar": 32
+      },
+      "revId": "33a0022cbbee9ef6c65ddfee8df47ac00e540ff4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
