@@ -49,54 +49,60 @@ def upgrade(table_prefix=''):
     config = op.get_context().config
     engine = engine_from_config(
         config.get_section(config.config_ini_section), prefix='sqlalchemy.')
-    inspector = reflection.Inspector.from_engine(engine)
+    connection = None
+    try:
+        connection = engine.connect()
+        inspector = reflection.Inspector.from_engine(engine)
 
-    prefixed_buildset = table_prefix + BUILDSET_TABLE
-    prefixed_build = table_prefix + BUILD_TABLE
+        prefixed_buildset = table_prefix + BUILDSET_TABLE
+        prefixed_build = table_prefix + BUILD_TABLE
 
-    # We need to prefix any non-prefixed index if needed. Do this by dropping
-    # and recreating the index.
-    if index_exists('project_pipeline_idx', prefixed_buildset, inspector):
-        op.drop_index('project_pipeline_idx', prefixed_buildset)
+        # We need to prefix any non-prefixed index if needed. Do this by
+        # dropping and recreating the index.
+        if index_exists('project_pipeline_idx', prefixed_buildset, inspector):
+            op.drop_index('project_pipeline_idx', prefixed_buildset)
 
-    if index_exists('project_change_idx', prefixed_buildset, inspector):
-        op.drop_index('project_change_idx', prefixed_buildset)
+        if index_exists('project_change_idx', prefixed_buildset, inspector):
+            op.drop_index('project_change_idx', prefixed_buildset)
 
-    if index_exists('change_idx', prefixed_buildset, inspector):
-        op.drop_index('change_idx', prefixed_buildset)
+        if index_exists('change_idx', prefixed_buildset, inspector):
+            op.drop_index('change_idx', prefixed_buildset)
 
-    if index_exists('job_name_buildset_id_idx', prefixed_build, inspector):
-        op.drop_index('job_name_buildset_id_idx', prefixed_build)
+        if index_exists('job_name_buildset_id_idx', prefixed_build, inspector):
+            op.drop_index('job_name_buildset_id_idx', prefixed_build)
 
-    # To allow a dashboard to show a per-project view, optionally filtered
-    # by pipeline.
-    if not index_exists(table_prefix + 'project_pipeline_idx',
-                        prefixed_buildset, inspector):
-        op.create_index(
-            table_prefix + 'project_pipeline_idx',
-            prefixed_buildset, ['project', 'pipeline'])
+        # To allow a dashboard to show a per-project view, optionally filtered
+        # by pipeline.
+        if not index_exists(table_prefix + 'project_pipeline_idx',
+                            prefixed_buildset, inspector):
+            op.create_index(
+                table_prefix + 'project_pipeline_idx',
+                prefixed_buildset, ['project', 'pipeline'])
 
-    # To allow a dashboard to show a per-project-change view
-    if not index_exists(table_prefix + 'project_change_idx',
-                        prefixed_buildset, inspector):
-        op.create_index(
-            table_prefix + 'project_change_idx',
-            prefixed_buildset, ['project', 'change'])
+        # To allow a dashboard to show a per-project-change view
+        if not index_exists(table_prefix + 'project_change_idx',
+                            prefixed_buildset, inspector):
+            op.create_index(
+                table_prefix + 'project_change_idx',
+                prefixed_buildset, ['project', 'change'])
 
-    # To allow a dashboard to show a per-change view
-    if not index_exists(table_prefix + 'change_idx',
-                        prefixed_buildset, inspector):
-        op.create_index(table_prefix + 'change_idx',
-                        prefixed_buildset, ['change'])
+        # To allow a dashboard to show a per-change view
+        if not index_exists(table_prefix + 'change_idx',
+                            prefixed_buildset, inspector):
+            op.create_index(table_prefix + 'change_idx',
+                            prefixed_buildset, ['change'])
 
-    # To allow a dashboard to show a job lib view. buildset_id is included
-    # so that it's a covering index and can satisfy the join back to buildset
-    # without an additional lookup.
-    if not index_exists(table_prefix + 'job_name_buildset_id_idx',
-                        prefixed_build, inspector):
-        op.create_index(
-            table_prefix + 'job_name_buildset_id_idx', prefixed_build,
-            ['job_name', 'buildset_id'])
+        # To allow a dashboard to show a job lib view. buildset_id is included
+        # so that it's a covering index and can satisfy the join back to
+        # buildset without an additional lookup.
+        if not index_exists(table_prefix + 'job_name_buildset_id_idx',
+                            prefixed_build, inspector):
+            op.create_index(
+                table_prefix + 'job_name_buildset_id_idx', prefixed_build,
+                ['job_name', 'buildset_id'])
+    finally:
+        if connection:
+            connection.close()
 
 
 def downgrade():
