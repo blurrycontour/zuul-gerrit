@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_cb3739b0",
+        "filename": "README.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-10T22:47:21Z",
+      "side": 1,
+      "message": "https://zuul-ci.org/docs/zuul/user/vulnerabilities.html",
+      "revId": "e9bb6e0e66cf1685c03e93bf261ce162adc06299",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
