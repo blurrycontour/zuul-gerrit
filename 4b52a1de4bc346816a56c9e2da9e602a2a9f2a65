@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_f8bbf8e1",
+        "filename": "releasenotes/notes/postgres-ae4f8594d0f4b256.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-04-10T17:12:26Z",
+      "side": 1,
+      "message": "should maybe link to the documentation here on \u0027database backend\u0027 to make it easier for people to find it?",
+      "revId": "4b52a1de4bc346816a56c9e2da9e602a2a9f2a65",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
