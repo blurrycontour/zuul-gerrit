@@ -14,6 +14,7 @@
 
 import os
 import textwrap
+import json
 
 from tests.base import AnsibleZuulTestCase
 
@@ -78,3 +79,16 @@ class TestZuulJSON(AnsibleZuulTestCase):
             text = self._get_json_as_text(build)
             self.assertIn('rosebud', text)
             self.assertNotIn('setec', text)
+
+    def test_json_role_log(self):
+        job = self._run_job('json-role')
+        with self.jobLog(job):
+            build = self.history[-1]
+            self.assertEqual(build.result, 'SUCCESS')
+
+            text = self._get_json_as_text(build)
+            self.assertIn('json-role', text)
+
+            json_result = json.loads(text)
+            role_name = json_result[0]['plays'][0]['tasks'][0]['role']['name']
+            self.assertEqual('json-role', role_name)
