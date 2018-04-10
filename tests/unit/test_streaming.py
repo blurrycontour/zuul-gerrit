@@ -169,9 +169,9 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
         self.log.debug("\n\nStreamed: %s\n\n", self.streaming_data)
         self.assertEqual(file_contents, self.streaming_data)
 
-    def runWSClient(self, build_uuid, event):
+    def runWSClient(self, port, build_uuid, event):
         async def client(loop, build_uuid, event):
-            uri = 'http://[::1]:9000/api/tenant/tenant-one/console-stream'
+            uri = 'http://[::1]:%s/api/tenant/tenant-one/console-stream' % port
             try:
                 session = aiohttp.ClientSession(loop=loop)
                 async with session.ws_connect(uri) as ws:
@@ -279,8 +279,9 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
         self.addCleanup(logfile.close)
 
         # Start the web server
+        # TODO(Shrews): Use a random port for ZuulWeb
         web_server = zuul.web.ZuulWeb(
-            listen_address='::', listen_port=9000,
+            listen_address='::', listen_port=9001,
             gear_server='127.0.0.1', gear_port=self.gearman_server.port,
             static_path=tempfile.gettempdir())
         loop = asyncio.new_event_loop()
@@ -294,7 +295,7 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
         # Wait until web server is started
         while True:
             try:
-                with socket.create_connection((self.host, 9000)):
+                with socket.create_connection((self.host, 9001)):
                     break
             except ConnectionRefusedError:
                 time.sleep(0.1)
@@ -303,7 +304,7 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
         ws_client_event = threading.Event()
         self.ws_client_results = ''
         ws_client_thread = threading.Thread(
-            target=self.runWSClient, args=(build.uuid, ws_client_event)
+            target=self.runWSClient, args=(9001, build.uuid, ws_client_event)
         )
         ws_client_thread.start()
         ws_client_event.wait()
@@ -389,7 +390,7 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
         ws_client_event = threading.Event()
         self.ws_client_results = ''
         ws_client_thread = threading.Thread(
-            target=self.runWSClient, args=(build.uuid, ws_client_event)
+            target=self.runWSClient, args=(9000, build.uuid, ws_client_event)
         )
         ws_client_thread.start()
         ws_client_event.wait()
