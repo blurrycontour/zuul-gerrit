@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_cb10a0ab",
+        "filename": "doc/source/developer/javascript.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-04-10T18:10:38Z",
+      "side": 1,
+      "message": "refreshes?",
+      "revId": "c87960a5cf43745c1eae680ffcdb9b1e9ce37f9f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
