@@ -1,0 +1,4 @@
+---
+features:
+  - |
+    Postgresql is now officially supported as database backend.
