@@ -36,8 +36,9 @@ def upgrade(table_prefix=''):
     op.create_table(
         table_prefix + BUILD_TABLE,
         sa.Column('id', sa.Integer, primary_key=True),
-        sa.Column('buildset_id', sa.Integer,
-                  sa.ForeignKey(table_prefix + BUILDSET_TABLE + ".id")),
+        sa.Column('buildset_id', sa.Integer),
+        # sa.Column('buildset_id', sa.Integer,
+        #           sa.ForeignKey(table_prefix + BUILDSET_TABLE + ".id")),
         sa.Column('uuid', sa.String(36)),
         sa.Column('job_name', sa.String(255)),
         sa.Column('result', sa.String(255)),
