@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    PostgreSQL is now officially supported as database backend.
+
+    Check out connection-config-sql_ on how to configure database
+    connections.

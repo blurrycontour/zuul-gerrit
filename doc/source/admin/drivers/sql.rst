@@ -1,5 +1,7 @@
 :title: SQL Driver
 
+.. _connection-config-sql:
+
 SQL
 ===
 
