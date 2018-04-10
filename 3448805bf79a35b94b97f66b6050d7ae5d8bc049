@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_1f59ee58",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 2334,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-10T21:05:28Z",
+      "side": 1,
+      "message": "We should add two more tests here: one which alters the project+branch which is broken but does not fix it.  It should get an error message.\n\nAnd then another which alters a different project\u0027s zuul.yaml, but does not introduce an error.  It should (in the current code), be successful.",
+      "revId": "3448805bf79a35b94b97f66b6050d7ae5d8bc049",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_7f5a6a50",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 527,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-10T21:05:28Z",
+      "side": 1,
+      "message": "What if the patch being tested changes something that is used by the part of the configuration which is currently broken?  That could lead us to break the configuration even more.  That suggests that we should report failure here until we can verify success.  On the other hand, that would make it harder to correct multiple failures.\n\nOn the whole, the approach of this patch seems to be to try to limp along with as much configuration as possible, so I think what you have here may be the best approach.\n\nWe might, in the future, decide to leave a warning message on the patch, but we don\u0027t have a facility for that yet.",
+      "revId": "3448805bf79a35b94b97f66b6050d7ae5d8bc049",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
