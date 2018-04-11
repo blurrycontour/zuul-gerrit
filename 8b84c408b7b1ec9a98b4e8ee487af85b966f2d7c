@@ -16,6 +16,24 @@
       "revId": "8b84c408b7b1ec9a98b4e8ee487af85b966f2d7c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_30eac30e",
+        "filename": "etc/zuul-web.service-sample",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-04-11T18:19:05Z",
+      "side": 1,
+      "message": "Well that\u0027s unfortunate, especially since we\u0027ve already merged this sample in our ZfS doc. I can work on trying to add that to zuul-web in a separate review to make this correct.",
+      "parentUuid": "bf659307_c9c7b664",
+      "revId": "8b84c408b7b1ec9a98b4e8ee487af85b966f2d7c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
