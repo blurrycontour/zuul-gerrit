@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_840b528c",
+        "filename": "doc/source/admin/nodepool_static.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-11T20:28:29Z",
+      "side": 1,
+      "message": "This shouldn\u0027t be required -- we don\u0027t even set it for the OpenStack driver.",
+      "revId": "1203c83589a4d4bb01fc5353ce53547bbbd34730",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_24fcc670",
+        "filename": "doc/source/admin/nodepool_static.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-11T20:28:29Z",
+      "side": 1,
+      "message": "images-dir shouldn\u0027t be required.",
+      "revId": "1203c83589a4d4bb01fc5353ce53547bbbd34730",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
