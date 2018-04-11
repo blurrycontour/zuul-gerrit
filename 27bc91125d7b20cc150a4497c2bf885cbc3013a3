@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_47de9c3e",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-11T21:00:48Z",
+      "side": 1,
+      "message": "We could do this, but as the goal of this patch is to make this more efficient, I think we should consider taking advantage of the fact that the gear library is already async.\n(To be clear: I\u0027m not saying gear is or should be an asyncio library -- just that it implements an asynchronous communication pattern which fits in with asyncio easily.)\n\nThe RPC client submitJob is synchronous, because that was convenient for its original user, the command line client.\n\nThe fact that we\u0027re wrapping an async library with a sync interface and then wrapping that in an async executor indicates to me that using the existing RPC client as written is the wrong approach here.\n\nWe should probably have a version of the RPC client which provides the standard gear interface.  For example, the \u0027enqueue\u0027 method would submit an enqueue job and return the job object.  Then, we could subclass that client and add a job.wait() call to its enqueue method.  The existing CLI could use that, but Zuul web could use the earlier class.\n\ngear.Client.submitJob() does wait on network traffic, so, for now at least, we may want to run the functions which call that in an executor (but maybe we can update gear to do something else).  However, it should get a response very quickly, and should not take up much in the way of executor resources.\n\nThe job completion process is already async.  Take a look at executor/client.py to see how it receives completion events from gear and puts them on Zuul\u0027s event queue.  We could pass in a subclassed gear.Client class to the RPC client so that when job completion events arrive, we put them on asyncio\u0027s event queue.",
+      "revId": "27bc91125d7b20cc150a4497c2bf885cbc3013a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
