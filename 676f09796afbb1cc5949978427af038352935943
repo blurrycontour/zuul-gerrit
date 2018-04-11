@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_6e6709b9",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-04-11T13:27:06Z",
+      "side": 1,
+      "message": "Will be interesting to consider any OpenShift limits here (which I\u0027m unfamiliar with). E.g., the link below discusses limits on the number of projects that can be created. \"admin\" level users do not have a limit, but not sure of the implications of Nodepool using an account at that level.\n\nhttps://docs.openshift.com/container-platform/3.3/admin_guide/managing_projects.html#limit-projects-per-user",
+      "range": {
+        "startLine": 133,
+        "startChar": 0,
+        "endLine": 134,
+        "endChar": 70
+      },
+      "revId": "676f09796afbb1cc5949978427af038352935943",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_2e0b51d6",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-04-11T13:27:06Z",
+      "side": 1,
+      "message": "nit: s/accouns/accounts/",
+      "range": {
+        "startLine": 137,
+        "startChar": 48,
+        "endLine": 137,
+        "endChar": 55
+      },
+      "revId": "676f09796afbb1cc5949978427af038352935943",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
