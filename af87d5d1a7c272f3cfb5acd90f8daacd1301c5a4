@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "bf659307_d84da93b",
+        "filename": "tests/fixtures/config/ansible/git/common-config/playbooks/check-groupvars.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-04-11T23:51:04Z",
+      "side": 1,
+      "message": "This is what we really want to test, so we can move it to the check-hostvars playbooks if you like.",
+      "revId": "af87d5d1a7c272f3cfb5acd90f8daacd1301c5a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_a42a168e",
         "filename": "tests/fixtures/config/ansible/git/common-config/zuul.yaml",
         "patchSetId": 1
