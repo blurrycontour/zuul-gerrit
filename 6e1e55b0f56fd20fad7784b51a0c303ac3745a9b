@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_c7a5cca0",
+        "filename": "releasenotes/notes/build-docker-removed-374032be168df068.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-11T21:07:41Z",
+      "side": 1,
+      "message": "Since this isn\u0027t related to actually installing Zuul, does it need a release note?  I\u0027d like to avoid adding so many release notes that people don\u0027t read them.  I think the audience should be users or administrators.",
+      "revId": "6e1e55b0f56fd20fad7784b51a0c303ac3745a9b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
