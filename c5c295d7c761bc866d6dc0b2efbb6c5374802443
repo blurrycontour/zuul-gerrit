@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_a4e0d698",
+        "filename": "doc/source/admin/gerrit_setup.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-11T20:34:20Z",
+      "side": 1,
+      "message": "I\u0027d prefer we don\u0027t discuss installing Gerrit at all.  Similarly, I don\u0027t want us to have the install instructions for GitHub Enterprise as well.  If you really want, we could probably have a single sentence pointing folks to the install instructions, but I\u0027d be okay even omitting that.\n\nConfiguring Gerrit for Zuul (as below) is certainly in scope.",
+      "revId": "c5c295d7c761bc866d6dc0b2efbb6c5374802443",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_c4ddcadd",
+        "filename": "doc/source/admin/gerrit_setup.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-11T20:34:20Z",
+      "side": 1,
+      "message": "I think it might be worth walking folks through creating a Verified label.  We can do that as a followup change if you like.",
+      "revId": "c5c295d7c761bc866d6dc0b2efbb6c5374802443",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
