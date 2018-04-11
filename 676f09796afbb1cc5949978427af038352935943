@@ -37,6 +37,23 @@
     },
     {
       "key": {
+        "uuid": "bf659307_78281d85",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-11T23:29:15Z",
+      "side": 1,
+      "message": "Tristan, indeed -- synchronize may or may not work (I\u0027m not sure about that).  I don\u0027t have an answer for zuul_stream, but I bet we could, if we wanted, plumb the container stdout to the log streaming system.  Aside from those things (which are handled in base jobs, and therefore, we can solve them once for the whole system), I think that most simple jobs should \"just work\".  That is, once you\u0027ve got the git repos copied over, whether \"tox\" is executed by kubectl or ssh the results should be the same.\n\nWe should definitely update this to include this info.\n\nClark, ssh-ing into a container is certainly a thing one might want to do, however, it requires setting up a service and ingress access to the cluster, which is not always guaranteed to be present.  Being able to support the non-ssh case means we can work in more environments (and possibly with smaller images).\n\nBut maybe we should support the ssh-case better as well?",
+      "revId": "676f09796afbb1cc5949978427af038352935943",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_6e6709b9",
         "filename": "doc/source/developer/specs/container-build-resources.rst",
         "patchSetId": 1
@@ -54,6 +71,23 @@
         "endLine": 134,
         "endChar": 70
       },
+      "revId": "676f09796afbb1cc5949978427af038352935943",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_982df196",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-11T23:29:15Z",
+      "side": 1,
+      "message": "That looks to be an administrative choice.  But yeah, I guess we have \"quota\". :)",
       "revId": "676f09796afbb1cc5949978427af038352935943",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -100,6 +134,23 @@
     },
     {
       "key": {
+        "uuid": "bf659307_381e255f",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-11T23:29:15Z",
+      "side": 1,
+      "message": "IIUC, that\u0027s basically the \"run a process in a container to build an image\" model, so it might fit into the \u0027container native workflow\u0027 process.  The question is: how to get the speculative source code into that image.  It looks like s2i does that by \"downloading the source\" inside the container.  But Zuul v3 is a push system; there\u0027s no place to download the source from.  That\u0027s why this section describes pushing git repos into a container.\n\nBut if we push our git repo state onto a sidecar container attached to a pod running s2i with a shared volume, the s2i script could just be \"copy over the git repos from the shared volume\".  I don\u0027t know much about s2i though, so there\u0027s probably more to explore here.",
+      "revId": "676f09796afbb1cc5949978427af038352935943",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_95014109",
         "filename": "doc/source/developer/specs/container-build-resources.rst",
         "patchSetId": 1
@@ -111,6 +162,23 @@
       "writtenOn": "2018-04-11T18:29:08Z",
       "side": 1,
       "message": "I think some of this cumbersomeness may be beneficial if it doesn\u0027t tie you to a specific container tool like k8s and since you\u0027d have to run a long lived process in k8s anyways having that be sshd doesn\u0027t seem like too much effort?\n\nI think my biggest concern with this is we are calling it the  containers that behave like a machine but then tying it explicitly to k8s which does the opposite of behaving like a machine. I would expect users to that want containers to behave like a machine to be looking at alternatives like lxc/lxd since that is what they do (act like machines).\n\nMaybe we \"optimize\" k8s for this use case if k8s is chosen but not necessarily build the system around that expectation?",
+      "revId": "676f09796afbb1cc5949978427af038352935943",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_5823d9a7",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-11T23:29:15Z",
+      "side": 1,
+      "message": "The ssh aspect is addressed above.  This process is in its own section because it has relevance to both \u0027containers like a machine\u0027 and \u0027container native workflow\u0027.  It\u0027s really hard for me to see how to build a container image based on a git repo in a container without this, and that\u0027s step 0 for container native.\n\nI do think this can apply to any container system where you can run a command in a container with stdin/stdout connected.",
       "revId": "676f09796afbb1cc5949978427af038352935943",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -145,6 +213,23 @@
       "writtenOn": "2018-04-11T18:29:08Z",
       "side": 1,
       "message": "Worth considering that using the build job then N test jobs model isn\u0027t limited to having a single build job with N test jobs.\n\nWe could set it up such that for each partition there was a separate build job X with N_x test jobs following it to handle the general case.\n\nThen you end up having the same mechanism regardless of need.",
+      "revId": "676f09796afbb1cc5949978427af038352935943",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_f83bcdcd",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-11T23:29:15Z",
+      "side": 1,
+      "message": "Yeah, IIUC, the suggestion on line 231 can be generalized as: each root node in a buildset\u0027s job graph gets its own registry.",
       "revId": "676f09796afbb1cc5949978427af038352935943",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
