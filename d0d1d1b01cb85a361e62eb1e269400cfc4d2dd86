@@ -121,6 +121,24 @@
     },
     {
       "key": {
+        "uuid": "bf659307_2e704308",
+        "filename": "zuul/driver/mqtt/mqttconnection.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5196
+      },
+      "writtenOn": "2018-04-11T00:16:42Z",
+      "side": 1,
+      "message": "I don\u0027t think that would be fatal. Based on https://github.com/eclipse/paho.mqtt.python/blob/master/src/paho/mqtt/client.py#L636 I think if you don\u0027t specify cacerts it just uses insecure mode. But, I might be misreading the code.\n\nThat being said the way I treat ssl in paho mqtt is that the only required arg for ssl/tls is cacerts to do the verification. In a lot of cases you don\u0027t need user certificates for auth. Like for firehose.o.o we don\u0027t use them.",
+      "parentUuid": "bf659307_3a4ac0ab",
+      "revId": "d0d1d1b01cb85a361e62eb1e269400cfc4d2dd86",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_dac62417",
         "filename": "zuul/driver/mqtt/mqttconnection.py",
         "patchSetId": 7
