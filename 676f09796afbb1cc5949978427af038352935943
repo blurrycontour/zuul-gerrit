@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "bf659307_14bd3ad7",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-04-11T14:49:31Z",
+      "side": 1,
+      "message": "Perhaps we should list the tasks to look for when running with the kubectl or raw ansible module? For example synchronize or zuul_stream may work differently.\n\nOr are we expecting a new set of zuul-jobs when using container build resources?",
+      "revId": "676f09796afbb1cc5949978427af038352935943",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_6e6709b9",
         "filename": "doc/source/developer/specs/container-build-resources.rst",
         "patchSetId": 1
@@ -42,6 +59,40 @@
         "endLine": 137,
         "endChar": 55
       },
+      "revId": "676f09796afbb1cc5949978427af038352935943",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_34be3eb4",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-04-11T14:49:31Z",
+      "side": 1,
+      "message": "Perhaps this could be solved using the OpenShift s2i tool: https://docs.openshift.com/enterprise/3.0/creating_images/s2i.html",
+      "revId": "676f09796afbb1cc5949978427af038352935943",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_f40f6685",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-04-11T14:49:31Z",
+      "side": 1,
+      "message": "IIRC there was discussion about an intermediate job state (e.g. \"CONTINUE\") that a parent job could use to indicate the scheduler that child job can start while keeping the parent job running. This would let a \"build-image\" job host a registry that will be alive until all child job are finished.\n\nThis would be a handy generic alternative.",
       "revId": "676f09796afbb1cc5949978427af038352935943",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
