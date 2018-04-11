@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bf659307_15ba116d",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-11T18:29:08Z",
+      "side": 1,
+      "message": "Out of curiosity if the intent is to run VM compute like containers why not make the command to run sshd and just ssh in like other VM/baremetal compute instances?\n\nThen synchronize and just about everything else should continue to work as is right?\n\nI think it may be simplest to just have the general compute base job that expects eg ssh and then that works regardless of being a container, vm, or baremetal.\n\nAdditionally doing it this way would more easily open the door to people using lxc instead of k8s and so on. Since the base interaction remains the same and you\u0027d just need to update nodepool to speak to the provisioner.",
+      "parentUuid": "bf659307_14bd3ad7",
+      "revId": "676f09796afbb1cc5949978427af038352935943",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_6e6709b9",
         "filename": "doc/source/developer/specs/container-build-resources.rst",
         "patchSetId": 1
@@ -76,6 +94,74 @@
       "writtenOn": "2018-04-11T14:49:31Z",
       "side": 1,
       "message": "Perhaps this could be solved using the OpenShift s2i tool: https://docs.openshift.com/enterprise/3.0/creating_images/s2i.html",
+      "revId": "676f09796afbb1cc5949978427af038352935943",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_95014109",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-11T18:29:08Z",
+      "side": 1,
+      "message": "I think some of this cumbersomeness may be beneficial if it doesn\u0027t tie you to a specific container tool like k8s and since you\u0027d have to run a long lived process in k8s anyways having that be sshd doesn\u0027t seem like too much effort?\n\nI think my biggest concern with this is we are calling it the  containers that behave like a machine but then tying it explicitly to k8s which does the opposite of behaving like a machine. I would expect users to that want containers to behave like a machine to be looking at alternatives like lxc/lxd since that is what they do (act like machines).\n\nMaybe we \"optimize\" k8s for this use case if k8s is chosen but not necessarily build the system around that expectation?",
+      "revId": "676f09796afbb1cc5949978427af038352935943",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_30d40320",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-11T18:29:08Z",
+      "side": 1,
+      "message": "Based on our current set of container tester users I expect that this particular use case will be very popular. And that for most users this is what they will want at least for their \"base\" testing.\n\n++ to supporting this use case.",
+      "revId": "676f09796afbb1cc5949978427af038352935943",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_90eaafd5",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-11T18:29:08Z",
+      "side": 1,
+      "message": "Worth considering that using the build job then N test jobs model isn\u0027t limited to having a single build job with N test jobs.\n\nWe could set it up such that for each partition there was a separate build job X with N_x test jobs following it to handle the general case.\n\nThen you end up having the same mechanism regardless of need.",
+      "revId": "676f09796afbb1cc5949978427af038352935943",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_5090974a",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-11T18:29:08Z",
+      "side": 1,
+      "message": "Similarly to my concerns about assuming k8s for the container like machine case, I think it may be beneficial to not assume openshift for the container orchestration case. For this particular case assuming k8s is probably fine since it appears to be the thing everyone is using, but not sure we should assume additional openshift features.",
       "revId": "676f09796afbb1cc5949978427af038352935943",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
