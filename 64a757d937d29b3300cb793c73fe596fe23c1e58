@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_047bc227",
+        "filename": "doc/source/admin/nodepool_install.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-11T20:25:24Z",
+      "side": 1,
+      "message": "Why don\u0027t we put this in the nodepool repo?",
+      "revId": "64a757d937d29b3300cb793c73fe596fe23c1e58",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_44853a06",
+        "filename": "doc/source/admin/zuul_install.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-11T20:25:24Z",
+      "side": 1,
+      "message": "Why don\u0027t we drop the \"-sample\" suffix?  These files can be used-as-is (ie, they don\u0027t need to be customized), and we can make this command simpler.",
+      "revId": "64a757d937d29b3300cb793c73fe596fe23c1e58",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_e47d6e1c",
+        "filename": "doc/source/admin/zuul_install.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-11T20:25:24Z",
+      "side": 1,
+      "message": "Is the chmod necessary?",
+      "revId": "64a757d937d29b3300cb793c73fe596fe23c1e58",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
