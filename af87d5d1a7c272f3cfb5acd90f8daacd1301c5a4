@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_a42a168e",
+        "filename": "tests/fixtures/config/ansible/git/common-config/zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-11T20:42:47Z",
+      "side": 1,
+      "message": "Can we just put the assert check into the check-hostvars playbook?  That saves resources when running tests.  The data are already in that job.",
+      "revId": "af87d5d1a7c272f3cfb5acd90f8daacd1301c5a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
