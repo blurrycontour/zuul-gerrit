@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_b556c55b",
+        "filename": "doc/source/user/vulnerabilities.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-04-11T18:01:34Z",
+      "side": 1,
+      "message": "As this is user facing documentation we should fix the todo before landing.",
+      "range": {
+        "startLine": 56,
+        "startChar": 0,
+        "endLine": 56,
+        "endChar": 41
+      },
+      "revId": "22c834eb799eb6a43adac904a324526e0543bc8e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
