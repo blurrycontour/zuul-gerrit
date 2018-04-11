@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_2818301c",
+        "filename": "web/navigation/navigation.component.ts",
+        "patchSetId": 31
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-04-11T07:37:25Z",
+      "side": 1,
+      "message": "This doesn\u0027t seems to work, for some reason, the navigation links doesn\u0027t have a \u0027tenant\u0027 param.",
+      "revId": "c7329288f985828ad088ef2ac247dc54c24becc8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
