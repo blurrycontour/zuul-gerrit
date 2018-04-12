@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bf659307_ec79bac4",
+        "filename": "doc/source/admin/nodepool_install.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-04-12T17:59:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf659307_047bc227",
+      "revId": "64a757d937d29b3300cb793c73fe596fe23c1e58",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_44853a06",
         "filename": "doc/source/admin/zuul_install.rst",
         "patchSetId": 3
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "bf659307_2c5d7246",
+        "filename": "doc/source/admin/zuul_install.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-04-12T17:59:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf659307_44853a06",
+      "revId": "64a757d937d29b3300cb793c73fe596fe23c1e58",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_e47d6e1c",
         "filename": "doc/source/admin/zuul_install.rst",
         "patchSetId": 3
@@ -47,6 +83,24 @@
       "writtenOn": "2018-04-11T20:25:24Z",
       "side": 1,
       "message": "Is the chmod necessary?",
+      "revId": "64a757d937d29b3300cb793c73fe596fe23c1e58",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_ec521a35",
+        "filename": "doc/source/admin/zuul_install.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-04-12T17:59:14Z",
+      "side": 1,
+      "message": "No idea. Just copying this from the text that was already merged.",
+      "parentUuid": "bf659307_e47d6e1c",
       "revId": "64a757d937d29b3300cb793c73fe596fe23c1e58",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
