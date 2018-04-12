@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_c2ecbdf5",
+        "filename": "doc/source/admin/nodepool_install.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-04-12T18:43:39Z",
+      "side": 1,
+      "message": "I wonder if we should link it instead of copying it. That way it gets automatically updated together with nodepool.",
+      "revId": "7ccc7b154f4c810b24870ef2f395d037c27c3aaf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
