@@ -16,6 +16,23 @@
       "revId": "27bc91125d7b20cc150a4497c2bf885cbc3013a3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_f16f5125",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-12T17:08:59Z",
+      "side": 1,
+      "message": "Or, actually, just leave the rpcclient as-is, and instantiate a new gear.Client for zuul-web.",
+      "revId": "27bc91125d7b20cc150a4497c2bf885cbc3013a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
