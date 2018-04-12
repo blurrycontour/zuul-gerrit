@@ -54,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "bf659307_0ed99854",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-04-12T04:25:12Z",
+      "side": 1,
+      "message": "James, there is also the custom task such as tox_install_sibling_packages which may not work too. Also note that according to the synchronize module source, it currently only works via ssh, docker client or a direct filesystem. This would be a big drawback as upload-logs and fetch-* roles relies on it.\n\nI agree with Clark, containers behaving like a machine should run sshd.",
+      "parentUuid": "bf659307_78281d85",
+      "revId": "676f09796afbb1cc5949978427af038352935943",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_6e6709b9",
         "filename": "doc/source/developer/specs/container-build-resources.rst",
         "patchSetId": 1
@@ -151,6 +169,24 @@
     },
     {
       "key": {
+        "uuid": "bf659307_ee7a2422",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-04-12T04:25:12Z",
+      "side": 1,
+      "message": "Couldn\u0027t we just make the s2i process fetch from the zuul-merger/executor? Container shouldn\u0027t have the tool to build and install the source, iiuc the image needs to be built before being started and tested.",
+      "parentUuid": "bf659307_381e255f",
+      "revId": "676f09796afbb1cc5949978427af038352935943",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_95014109",
         "filename": "doc/source/developer/specs/container-build-resources.rst",
         "patchSetId": 1
@@ -179,6 +215,24 @@
       "writtenOn": "2018-04-11T23:29:15Z",
       "side": 1,
       "message": "The ssh aspect is addressed above.  This process is in its own section because it has relevance to both \u0027containers like a machine\u0027 and \u0027container native workflow\u0027.  It\u0027s really hard for me to see how to build a container image based on a git repo in a container without this, and that\u0027s step 0 for container native.\n\nI do think this can apply to any container system where you can run a command in a container with stdin/stdout connected.",
+      "revId": "676f09796afbb1cc5949978427af038352935943",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_4e1470a0",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-04-12T04:25:12Z",
+      "side": 1,
+      "message": "That sounds like a special use-case where the image is built inside a container. Projects may build the software on a regular system and only install the final package into an image.",
+      "parentUuid": "bf659307_5823d9a7",
       "revId": "676f09796afbb1cc5949978427af038352935943",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -247,6 +301,24 @@
       "writtenOn": "2018-04-11T18:29:08Z",
       "side": 1,
       "message": "Similarly to my concerns about assuming k8s for the container like machine case, I think it may be beneficial to not assume openshift for the container orchestration case. For this particular case assuming k8s is probably fine since it appears to be the thing everyone is using, but not sure we should assume additional openshift features.",
+      "revId": "676f09796afbb1cc5949978427af038352935943",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_8ea7e850",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-04-12T04:25:12Z",
+      "side": 1,
+      "message": "I agree with Clark, moreover OpenShift projects may already be using the included ci/cd pipelines. Shouldn\u0027t the spec be splitted in two, one section for image building (e.g. covering docker file or buildah script), and one section for image runtime covering different providers like runc, docker or k8s?",
+      "parentUuid": "bf659307_5090974a",
       "revId": "676f09796afbb1cc5949978427af038352935943",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
