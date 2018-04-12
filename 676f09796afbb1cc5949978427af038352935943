@@ -72,6 +72,23 @@
     },
     {
       "key": {
+        "uuid": "bf659307_333cf12d",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-12T15:55:31Z",
+      "side": 1,
+      "message": "Upload-logs doesn\u0027t interact with the worker, so that\u0027s not relevant here.\n\nWhy would tox_install_sibling_packages not work?\n\nThe fetch roles do rely on synchronize.  We may be able to get synchronize to work with kubectl (if it works with docker, it may be able to work with kubectl).\n\nWe can *certainly* run a container with sshd, but I think this is much more compelling if we design for being able to execute simple container workloads without it.  Requiring ssh and ingress support is a big thing to ask and puts us at a disadvantage.\n\nOf course if it better fits the specific workload, a user *can* run sshd.  So to be clear about what we want, how about I update this to explicitly discuss the non-sshd use case, but also the sshd use-case, and what\u0027s needed to support both?",
+      "revId": "676f09796afbb1cc5949978427af038352935943",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_6e6709b9",
         "filename": "doc/source/developer/specs/container-build-resources.rst",
         "patchSetId": 1
@@ -181,6 +198,23 @@
       "side": 1,
       "message": "Couldn\u0027t we just make the s2i process fetch from the zuul-merger/executor? Container shouldn\u0027t have the tool to build and install the source, iiuc the image needs to be built before being started and tested.",
       "parentUuid": "bf659307_381e255f",
+      "revId": "676f09796afbb1cc5949978427af038352935943",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_d34495ba",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-12T15:55:31Z",
+      "side": 1,
+      "message": "The executor is not remotely accessible.",
       "revId": "676f09796afbb1cc5949978427af038352935943",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
