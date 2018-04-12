@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_5105dd0e",
+        "filename": "zuul/driver/mqtt/mqttconnection.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-12T16:39:06Z",
+      "side": 1,
+      "message": "Okay, sorry I\u0027ve failed to convey the concern twice now.  Here\u0027s what we need to do:\n\nRemove lines 54 through 67 and replace them with this pseudocode:\n\nif (cert or key) and not cacert:\n  raise Exception\nif cacert:\n  tls_set()\n\nThis isn\u0027t about making sure we pass the right arguments to tls_set.  The problem is the conditional on line 54.  It means that someone could write a config file that looks like:\n\n[connection mqtt]\ncertfile\u003dfoo.pem\nkeyfile\u003dkey.pem\n\nAnd they would think that means they\u0027re getting a TLS connection, but they aren\u0027t and they would never know.  We need to prevent that from happening.",
+      "revId": "478985e0388a287e6c0de710399c89780cd6b9a9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_710a6120",
+        "filename": "zuul/driver/mqtt/mqttreporter.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-12T16:39:06Z",
+      "side": 1,
+      "message": "I really updated PS7 with comments this time, sorry I forgot to post them before.",
+      "revId": "478985e0388a287e6c0de710399c89780cd6b9a9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
