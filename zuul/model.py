@@ -2154,6 +2154,7 @@ class Tag(Ref):
     def __init__(self, project):
         super(Tag, self).__init__(project)
         self.tag = None
+        self.branch = ''
 
 
 class Change(Branch):
