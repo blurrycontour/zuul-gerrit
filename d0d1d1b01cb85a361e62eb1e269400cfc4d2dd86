@@ -265,6 +265,23 @@
     },
     {
       "key": {
+        "uuid": "bf659307_36861fbb",
+        "filename": "zuul/driver/mqtt/mqttconnection.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-12T16:32:46Z",
+      "side": 1,
+      "message": "I agree that cacerts alone is valid.  My concern here was that if someone set certfile and/or keyfile but did not set ca_certs, then we\u0027re just silently ignoring all three.  If it\u0027s okay to pass cert/key without cacert, then we should do so, but if it\u0027s not, we should raise an exception because we\u0027re almost certainly about to do something the user did not expect (e.g., connect without ssl and possibly send their password over plaintext).",
+      "revId": "d0d1d1b01cb85a361e62eb1e269400cfc4d2dd86",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_dac62417",
         "filename": "zuul/driver/mqtt/mqttconnection.py",
         "patchSetId": 7
@@ -300,6 +317,23 @@
     },
     {
       "key": {
+        "uuid": "bf659307_d68ec3cf",
+        "filename": "zuul/driver/mqtt/mqttconnection.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-12T16:32:46Z",
+      "side": 1,
+      "message": "Huh, so they are.  I think they\u0027re not used.  If you want to remove this and find out, that\u0027s fine.  If you want to leave this we can clean them all up later.",
+      "revId": "d0d1d1b01cb85a361e62eb1e269400cfc4d2dd86",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_fac9a824",
         "filename": "zuul/driver/mqtt/mqttreporter.py",
         "patchSetId": 7
@@ -329,6 +363,23 @@
       "side": 1,
       "message": "What else need to be done then?",
       "parentUuid": "bf659307_fac9a824",
+      "revId": "d0d1d1b01cb85a361e62eb1e269400cfc4d2dd86",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_f68bc7bc",
+        "filename": "zuul/driver/mqtt/mqttreporter.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-12T16:32:46Z",
+      "side": 1,
+      "message": "It may be as simple as just removing this check, and then being careful about the values you add to the buildset dict below (some will be null).  The jobs should all be there though, so the event would indicate \"this item is in the queue and these are the jobs that will be run\".  This suggests to me that it might be useful for people to encode the type of report in the topic (e.g., \u0027zuul/{pipeline}/start\u0027, \u0027zuul/{pipeline}/complete\u0027.  You may want to also include the same information in the message.  You can access the action this reporter is assigned to with the self._action attribute.",
       "revId": "d0d1d1b01cb85a361e62eb1e269400cfc4d2dd86",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
