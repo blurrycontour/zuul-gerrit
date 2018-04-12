@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_a7cc3b35",
+        "filename": "etc/zuul-executor.service",
+        "patchSetId": 4
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-04-12T18:23:23Z",
+      "side": 1,
+      "message": "I believe this should be forking, see the discussion in https://review.openstack.org/560993/",
+      "revId": "8bed5499557949aa084a630084fd9f7f70361d53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_47cd1f2e",
+        "filename": "etc/zuul-scheduler.service",
+        "patchSetId": 4
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-04-12T18:23:23Z",
+      "side": 1,
+      "message": "same",
+      "revId": "8bed5499557949aa084a630084fd9f7f70361d53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_67d2a3d3",
+        "filename": "etc/zuul-web.service",
+        "patchSetId": 4
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-04-12T18:23:23Z",
+      "side": 1,
+      "message": "same",
+      "revId": "8bed5499557949aa084a630084fd9f7f70361d53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
