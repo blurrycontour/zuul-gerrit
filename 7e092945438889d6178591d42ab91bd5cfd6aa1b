@@ -16,6 +16,24 @@
       "revId": "7e092945438889d6178591d42ab91bd5cfd6aa1b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_4b06a288",
+        "filename": "tools/zuul-changes.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-04-12T03:22:10Z",
+      "side": 1,
+      "message": "I added the api/info lookup so that users doesn\u0027t have to accommodate with the api change.",
+      "parentUuid": "bf659307_2b703508",
+      "revId": "7e092945438889d6178591d42ab91bd5cfd6aa1b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
