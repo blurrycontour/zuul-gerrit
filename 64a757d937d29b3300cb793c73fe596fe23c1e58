@@ -104,6 +104,24 @@
       "revId": "64a757d937d29b3300cb793c73fe596fe23c1e58",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_a7651bb7",
+        "filename": "doc/source/admin/zuul_install.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-04-12T18:03:57Z",
+      "side": 1,
+      "message": "I think systemd will complain on boot if these are not 0644.",
+      "parentUuid": "bf659307_ec521a35",
+      "revId": "64a757d937d29b3300cb793c73fe596fe23c1e58",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
