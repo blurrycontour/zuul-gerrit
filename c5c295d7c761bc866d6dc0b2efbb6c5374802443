@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bf659307_6c9a8a62",
+        "filename": "doc/source/admin/gerrit_setup.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-04-12T17:44:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf659307_a4e0d698",
+      "revId": "c5c295d7c761bc866d6dc0b2efbb6c5374802443",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_c4ddcadd",
         "filename": "doc/source/admin/gerrit_setup.rst",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2018-04-11T20:34:20Z",
       "side": 1,
       "message": "I think it might be worth walking folks through creating a Verified label.  We can do that as a followup change if you like.",
+      "revId": "c5c295d7c761bc866d6dc0b2efbb6c5374802443",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_eca53aa0",
+        "filename": "doc/source/admin/gerrit_setup.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-04-12T17:44:38Z",
+      "side": 1,
+      "message": "Well, I\u0027m not really sure of that process myself. I think it\u0027s best to do that as a follow up change.",
+      "parentUuid": "bf659307_c4ddcadd",
       "revId": "c5c295d7c761bc866d6dc0b2efbb6c5374802443",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
