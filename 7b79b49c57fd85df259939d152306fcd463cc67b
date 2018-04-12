@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bf659307_13254209",
+        "filename": "zuul/driver/mqtt/mqttconnection.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-04-12T01:03:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf659307_ba98f4bf",
+      "revId": "7b79b49c57fd85df259939d152306fcd463cc67b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_da95a888",
         "filename": "zuul/driver/mqtt/mqttreporter.py",
         "patchSetId": 9
@@ -30,6 +48,24 @@
       "writtenOn": "2018-04-11T17:08:51Z",
       "side": 1,
       "message": "See additional comments on PS7.",
+      "revId": "7b79b49c57fd85df259939d152306fcd463cc67b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_33cde62f",
+        "filename": "zuul/driver/mqtt/mqttreporter.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-04-12T01:03:34Z",
+      "side": 1,
+      "message": "To which I replied I\u0027m not sure what else should be done. If it\u0027s a start event, the buildset will be empty but the event would be reported.\n\nLet me know if you want something special to be done in that case.",
+      "parentUuid": "bf659307_da95a888",
       "revId": "7b79b49c57fd85df259939d152306fcd463cc67b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
