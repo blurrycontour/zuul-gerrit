@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_22f7b98d",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-12T18:52:39Z",
+      "side": 1,
+      "message": "I think it\u0027s actually \"scheduler.pid\"  and same for the others.  No \"zuul-\".",
+      "revId": "bb240cdd1ef7b91d63c94c0084222b9c7c330cf7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
