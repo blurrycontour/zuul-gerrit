@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_e17315e6",
+        "filename": "tools/zuul-changes.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-04-12T05:15:19Z",
+      "side": 1,
+      "message": "Maybe for white label we even could make the tenant argument optional.",
+      "range": {
+        "startLine": 31,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 50
+      },
+      "revId": "559af7048bc8029cf120d09bb2ed0b74577bc28c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
