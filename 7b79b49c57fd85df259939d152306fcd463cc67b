@@ -69,6 +69,23 @@
       "revId": "7b79b49c57fd85df259939d152306fcd463cc67b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_b69a2f11",
+        "filename": "zuul/driver/mqtt/mqttreporter.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-12T16:32:41Z",
+      "side": 1,
+      "message": "Sorry! I forgot to post them.  Updated.",
+      "revId": "7b79b49c57fd85df259939d152306fcd463cc67b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
