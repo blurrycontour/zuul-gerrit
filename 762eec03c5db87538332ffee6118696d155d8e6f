@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_31f7098e",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1216,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-12T17:03:05Z",
+      "side": 1,
+      "message": "This is a fairly small timeout, especially considering the task is the RPC submitJob, not the gear client submitJob, which means it\u0027s waiting for completion.  The default timeout for even submitting the gearman job to the queue is 30 seconds.\n\nThis will probably typically work in practice since the receiver is a helper thread in the scheduler that just sticks the json into an event queue.  But I wonder if it would be better to set the timeout to 30 seconds, since that\u0027s closer to our tolerance for other gearman-related issues?",
+      "revId": "762eec03c5db87538332ffee6118696d155d8e6f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
