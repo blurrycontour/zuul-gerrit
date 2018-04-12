@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bf659307_6c84cad3",
+        "filename": "doc/source/admin/nodepool_static.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-04-12T17:50:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf659307_840b528c",
+      "revId": "1203c83589a4d4bb01fc5353ce53547bbbd34730",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_24fcc670",
         "filename": "doc/source/admin/nodepool_static.rst",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2018-04-11T20:28:29Z",
       "side": 1,
       "message": "images-dir shouldn\u0027t be required.",
+      "revId": "1203c83589a4d4bb01fc5353ce53547bbbd34730",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_0c6d0e31",
+        "filename": "doc/source/admin/nodepool_static.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-04-12T17:50:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf659307_24fcc670",
       "revId": "1203c83589a4d4bb01fc5353ce53547bbbd34730",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
