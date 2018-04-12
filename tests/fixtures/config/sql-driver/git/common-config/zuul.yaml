@@ -44,6 +44,14 @@
         Verified: 0
     precedence: high
 
+- pipeline:
+    name: tag
+    manager: independent
+    trigger:
+      gerrit:
+        - event: ref-updated
+          ref: ^refs/tags/.*$
+
 - job:
     name: base
     parent: null
@@ -63,6 +71,10 @@
 - job:
     name: project-test3
     run: playbooks/project-test3.yaml
+
+- job:
+    name: project-publish
+    run: playbooks/project-publish.yaml
 
 - project:
     name: org/project
@@ -86,6 +98,9 @@
             dependencies: project-merge
         - project-test2:
             dependencies: project-merge
+    tag:
+      jobs:
+        - project-publish
 
 - project:
     name: org/project1
