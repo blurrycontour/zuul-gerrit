@@ -266,7 +266,7 @@ The following sections of ``zuul.conf`` are used by the scheduler:
       Path to log config file.
 
    .. attr:: pidfile
-      :default: /var/run/zuul-schedurecr/zuul-scheduler.pid
+      :default: /var/run/zuul-scheduler/zuul-scheduler.pid
 
       Path to PID lock file.
 
