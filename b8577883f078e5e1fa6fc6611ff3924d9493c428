@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_f6d72e22",
+        "filename": "doc/source/admin/drivers/github.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 424,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-04-13T10:58:35Z",
+      "side": 1,
+      "message": "(nit) docs are typically wrapped to 72chars (afaik)",
+      "revId": "b8577883f078e5e1fa6fc6611ff3924d9493c428",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
