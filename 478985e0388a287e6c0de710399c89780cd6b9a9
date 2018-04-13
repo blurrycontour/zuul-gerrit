@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bf659307_17cd0bb6",
+        "filename": "zuul/driver/mqtt/mqttconnection.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-04-13T01:54:03Z",
+      "side": 1,
+      "message": "Thanks for the clear instruction :-)",
+      "parentUuid": "bf659307_5105dd0e",
+      "revId": "478985e0388a287e6c0de710399c89780cd6b9a9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_710a6120",
         "filename": "zuul/driver/mqtt/mqttreporter.py",
         "patchSetId": 10
