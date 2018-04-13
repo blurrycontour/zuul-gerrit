@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_9f9fe24e",
+        "filename": "doc/source/admin/nodepool_static.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-04-13T14:56:51Z",
+      "side": 1,
+      "message": "Awesome. I feel like the word pre-allocated (or something similar) should make it in here, so that we capture that the point of static is that nodepool is not going to manage machine lifecyle, only access. Maybe something like:\n\n  The static driver allows you to use existing compute resources, such as real hardware or long-lived virtual machines, with nodepool.\n\nOr something better",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 36
+      },
+      "revId": "fba5cf12a7afd56b93f3c87bfa58d8da5a0dda9d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_3feed6ec",
+        "filename": "doc/source/admin/nodepool_static.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-04-13T14:56:51Z",
+      "side": 1,
+      "message": "Zuul Executors",
+      "range": {
+        "startLine": 15,
+        "startChar": 23,
+        "endLine": 15,
+        "endChar": 27
+      },
+      "revId": "fba5cf12a7afd56b93f3c87bfa58d8da5a0dda9d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_1fc19254",
+        "filename": "doc/source/admin/nodepool_static.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-04-13T14:56:51Z",
+      "side": 1,
+      "message": "I think windows static hosts with winrm connetivity should also work, yes?",
+      "range": {
+        "startLine": 15,
+        "startChar": 37,
+        "endLine": 15,
+        "endChar": 56
+      },
+      "revId": "fba5cf12a7afd56b93f3c87bfa58d8da5a0dda9d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
