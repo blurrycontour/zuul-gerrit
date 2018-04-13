@@ -1,0 +1,9 @@
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Code-Review+2: Clark Boylan <cboylan@sapwetik.org>
+Workflow+1: Clark Boylan <cboylan@sapwetik.org>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Fri, 13 Apr 2018 20:37:40 +0000
+Reviewed-on: https://review.openstack.org/553702
+Project: openstack-infra/zuul
+Branch: refs/heads/master
