@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_53b8610f",
+        "filename": "zuul/driver/mqtt/mqttconnection.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2018-04-13T17:03:21Z",
+      "side": 1,
+      "message": "Should we be testing this condition since it\u0027s a security precaution?",
+      "revId": "7e21539b609d776d45c400ba9fa8076ff64d6782",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_f33895a0",
+        "filename": "zuul/driver/mqtt/mqttconnection.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2018-04-13T17:03:21Z",
+      "side": 1,
+      "message": "And maybe this too?",
+      "revId": "7e21539b609d776d45c400ba9fa8076ff64d6782",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
