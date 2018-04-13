@@ -16,6 +16,23 @@
       "revId": "b061db0411d15c8bdba0bc821ef6924191934d3a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf659307_6ed1fe22",
+        "filename": "doc/source/admin/gerrit_setup.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-13T18:00:15Z",
+      "side": 1,
+      "message": "Might consider git review as a simpler tool to use than manually setting up the commit hook and pushing with the foo:bar refs.",
+      "revId": "b061db0411d15c8bdba0bc821ef6924191934d3a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
