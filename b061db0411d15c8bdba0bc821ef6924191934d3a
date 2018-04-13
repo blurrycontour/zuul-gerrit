@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf659307_b311bd5f",
+        "filename": "doc/source/admin/gerrit_setup.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-04-13T17:39:12Z",
+      "side": 1,
+      "message": "nit: that\u0027s a very long line",
+      "revId": "b061db0411d15c8bdba0bc821ef6924191934d3a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
