@@ -386,6 +386,24 @@
     },
     {
       "key": {
+        "uuid": "bf659307_1aa69210",
+        "filename": "zuul/driver/mqtt/mqttreporter.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-04-13T01:54:03Z",
+      "side": 1,
+      "message": "Ok makes sense, code is updated in the next PS",
+      "parentUuid": "bf659307_f68bc7bc",
+      "revId": "d0d1d1b01cb85a361e62eb1e269400cfc4d2dd86",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_9ad0accb",
         "filename": "zuul/driver/mqtt/mqttreporter.py",
         "patchSetId": 7
