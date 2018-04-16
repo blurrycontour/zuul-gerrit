@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_f51e016f",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 500,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-16T16:50:32Z",
+      "side": 1,
+      "message": "You shouldn\u0027t need a log fixture for this.  This should get reported back to the fake gerrit in a message, so you can check it with:\n\n  self.assertIn(\"topic component\", A.messages[0])\n\nI recommend running the test in the foreground to look at the message it reports back and make sure it looks good.  You can then just search for key strings from that message.",
+      "revId": "e5b898f6c56b329ff9b91de9fe0ee92dceb15df2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
