@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_4ae9567e",
+        "filename": "doc/source/user/jobs.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 587,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-04-16T10:23:59Z",
+      "side": 1,
+      "message": "(nit) perhaps make the results bold or a table?",
+      "range": {
+        "startLine": 587,
+        "startChar": 10,
+        "endLine": 587,
+        "endChar": 17
+      },
+      "revId": "241dcf7889b70ce44748622d1ebccbf0478c106f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
