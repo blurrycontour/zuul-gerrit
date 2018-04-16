@@ -59,6 +59,30 @@
     },
     {
       "key": {
+        "uuid": "9f6a8fd7_89d0db52",
+        "filename": "zuul/driver/mqtt/mqttconnection.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-04-16T11:30:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f6a8fd7_0aa27e9b",
+      "range": {
+        "startLine": 68,
+        "startChar": 33,
+        "endLine": 68,
+        "endChar": 49
+      },
+      "revId": "7e21539b609d776d45c400ba9fa8076ff64d6782",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f6a8fd7_0a27de14",
         "filename": "zuul/driver/mqtt/mqttreporter.py",
         "patchSetId": 13
@@ -70,6 +94,24 @@
       "writtenOn": "2018-04-16T10:21:35Z",
       "side": 1,
       "message": "perhaps useful to test these schema checks",
+      "revId": "7e21539b609d776d45c400ba9fa8076ff64d6782",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_09512bd9",
+        "filename": "zuul/driver/mqtt/mqttreporter.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-04-16T11:30:25Z",
+      "side": 1,
+      "message": "Nest PS adds a test, though I had to use logger fixture to detect an invalid topic. Let me know if there is a better way to test this.",
+      "parentUuid": "9f6a8fd7_0a27de14",
       "revId": "7e21539b609d776d45c400ba9fa8076ff64d6782",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
