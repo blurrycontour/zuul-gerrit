@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "9f6a8fd7_816f47c4",
+        "filename": "tools/encrypt_secret.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 17556
+      },
+      "writtenOn": "2018-04-16T19:03:12Z",
+      "side": 1,
+      "message": "This should be removed",
+      "range": {
+        "startLine": 47,
+        "startChar": 61,
+        "endLine": 47,
+        "endChar": 72
+      },
+      "revId": "453e41e52355574ed114a117f0cef01e2dfef9be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f6a8fd7_c14c5f78",
         "filename": "tools/encrypt_secret.py",
         "patchSetId": 2
