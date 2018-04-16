@@ -33,6 +33,46 @@
       "revId": "7e21539b609d776d45c400ba9fa8076ff64d6782",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_0aa27e9b",
+        "filename": "zuul/driver/mqtt/mqttconnection.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-04-16T10:21:35Z",
+      "side": 1,
+      "message": "I think this is meant to be _translate_tls_version?\n\nMore reason to take Jeremy\u0027s suggestion of testing the cert options.",
+      "range": {
+        "startLine": 68,
+        "startChar": 33,
+        "endLine": 68,
+        "endChar": 49
+      },
+      "revId": "7e21539b609d776d45c400ba9fa8076ff64d6782",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_0a27de14",
+        "filename": "zuul/driver/mqtt/mqttreporter.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-04-16T10:21:35Z",
+      "side": 1,
+      "message": "perhaps useful to test these schema checks",
+      "revId": "7e21539b609d776d45c400ba9fa8076ff64d6782",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
