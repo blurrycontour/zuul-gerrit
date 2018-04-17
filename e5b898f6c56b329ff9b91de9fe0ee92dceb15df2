@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9f6a8fd7_9508d328",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 500,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-04-17T08:41:47Z",
+      "side": 1,
+      "message": "For some reason this didn\u0027t worked, though when running this test on a real deployment, the scheduler do correctly report on the review comments:\n\n  topic component \u0027bad\u0027 is invalid for dictionary value @ data[\u0027start\u0027][\u0027mqtt\u0027][\u0027topic\u0027]\n\nPerhaps it\u0027s because the scheduler (sometime) doesn\u0027t report syntax error on patchset adding first zuul.yaml.",
+      "parentUuid": "9f6a8fd7_f51e016f",
+      "revId": "e5b898f6c56b329ff9b91de9fe0ee92dceb15df2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f6a8fd7_6bcd325c",
         "filename": "zuul/driver/mqtt/mqttconnection.py",
         "patchSetId": 14
