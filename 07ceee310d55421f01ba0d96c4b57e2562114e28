@@ -16,6 +16,24 @@
       "revId": "07ceee310d55421f01ba0d96c4b57e2562114e28",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_9a9bf2c7",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 621,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-04-18T17:00:45Z",
+      "side": 1,
+      "message": "In this case (job is not defining its own name for the secret) both strings of the tuple are the same. However it looks to me that secret_name is actually used as the secret_alias. So it might make sense to make this clear. This looks correct to me though.",
+      "parentUuid": "9f6a8fd7_abc54f3e",
+      "revId": "07ceee310d55421f01ba0d96c4b57e2562114e28",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
