@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_abc54f3e",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 621,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-18T16:09:52Z",
+      "side": 1,
+      "message": "Here we do a layout.secrets.get on secret_name which becomes the second item of the secret tuple. In model.py we use the first item of the secret tuple (also called secret_name) as that argment to layout.secrets.get.\n\nAre the streams getting crossed here? At the very least its a little confusing that secret_name seems to switch places but is viable as an arg to the same function.",
+      "revId": "07ceee310d55421f01ba0d96c4b57e2562114e28",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
