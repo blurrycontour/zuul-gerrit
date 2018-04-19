@@ -948,6 +948,7 @@ class ProjectParser(object):
         default_branch = conf.get('default-branch', 'master')
         project_config.default_branch = default_branch
 
+        project_config.freeze()
         return project_config
 
 

@@ -2437,9 +2437,100 @@ class ProjectPipelineConfig(object):
         self.job_list.inheritFrom(other.job_list)
 
 
-class ProjectConfig(object):
+class Freezable(object):
+    """A mix-in class so that an object can be made immutable"""
+
+    def __init__(self):
+        super(Freezable, self).__setattr__('_frozen', False)
+
+    def freeze(self):
+        """Make this object immutable"""
+        self._frozen = True
+        for v in self.__dict__.values():
+            if isinstance(v, Freezable):
+                v.freeze()
+
+    def __setattr__(self, name, value):
+        if self._frozen:
+            raise Exception("Unable to modify frozen object %s" %
+                            (repr(self),))
+        super(Freezable, self).__setattr__(name, value)
+
+
+class FreezableDict(dict, Freezable):
+    def __init__(self, *args, **kw):
+        Freezable.__init__(self)
+        dict.__init__(self, *args, **kw)
+
+    def __setitem__(self, key, value):
+        if self._frozen:
+            raise Exception("Unable to modify frozen dict %s" %
+                            (repr(self),))
+        super(FreezableDict, self).__setitem__(key, value)
+
+
+class FreezableList(list, Freezable):
+    def __init__(self, *args, **kw):
+        Freezable.__init__(self)
+        list.__init__(self, *args, **kw)
+
+    def __setitem__(self, *args, **kw):
+        if self._frozen:
+            raise Exception("Unable to modify frozen list %s" %
+                            (repr(self),))
+        super(FreezableList, self).__setitem__(*args, **kw)
+
+    def append(self, *args, **kw):
+        if self._frozen:
+            raise Exception("Unable to modify frozen list %s" %
+                            (repr(self),))
+        super(FreezableList, self).append(*args, **kw)
+
+    def extend(self, *args, **kw):
+        if self._frozen:
+            raise Exception("Unable to modify frozen list %s" %
+                            (repr(self),))
+        super(FreezableList, self).extend(*args, **kw)
+
+    def insert(self, *args, **kw):
+        if self._frozen:
+            raise Exception("Unable to modify frozen list %s" %
+                            (repr(self),))
+        super(FreezableList, self).insert(*args, **kw)
+
+    def pop(self, *args, **kw):
+        if self._frozen:
+            raise Exception("Unable to modify frozen list %s" %
+                            (repr(self),))
+        super(FreezableList, self).pop(*args, **kw)
+
+    def remove(self, *args, **kw):
+        if self._frozen:
+            raise Exception("Unable to modify frozen list %s" %
+                            (repr(self),))
+        super(FreezableList, self).remove(*args, **kw)
+
+    def reverse(self, *args, **kw):
+        if self._frozen:
+            raise Exception("Unable to modify frozen list %s" %
+                            (repr(self),))
+        super(FreezableList, self).reverse(*args, **kw)
+
+    def sort(self, *args, **kw):
+        if self._frozen:
+            raise Exception("Unable to modify frozen list %s" %
+                            (repr(self),))
+        super(FreezableList, self).sort(*args, **kw)
+
+
+class ConfigurationObject(Freezable):
+    pass
+
+
+class ProjectConfig(ConfigurationObject):
     # Represents a project configuration
     def __init__(self, name, source_context=None):
+        super(ProjectConfig, self).__init__()
         self.name = name
         # If this is a template, it will have a source_context, but
         # not if it is a project definition.
@@ -2447,9 +2538,9 @@ class ProjectConfig(object):
         self.merge_mode = None
         # The default branch for the project (usually master).
         self.default_branch = None
-        self.templates = []
+        self.templates = FreezableList()
         # Pipeline name -> ProjectPipelineConfig
-        self.pipelines = {}
+        self.pipelines = FreezableDict()
         self.branch_matcher = None
 
     def addImpliedBranchMatcher(self, branch):
