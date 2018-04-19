@@ -72,6 +72,23 @@
     },
     {
       "key": {
+        "uuid": "9f6a8fd7_b3e28a00",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 500,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-19T15:13:00Z",
+      "side": 1,
+      "message": "That\u0027s very tricky -- our naive first implementation of that caused the project to get a syntax error for every pipeline in the system.  If we did that, it would have to be handled as a special case.",
+      "revId": "e5b898f6c56b329ff9b91de9fe0ee92dceb15df2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f6a8fd7_6bcd325c",
         "filename": "zuul/driver/mqtt/mqttconnection.py",
         "patchSetId": 14
