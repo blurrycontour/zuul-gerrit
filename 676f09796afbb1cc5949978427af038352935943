@@ -89,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "9f6a8fd7_bcd1f7cf",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-19T16:35:51Z",
+      "side": 1,
+      "message": "++ I think it would be fine to support both, to make it easy for people that want container like VMs using a system like lxd and also to support people who already have a k8s and don\u0027t want to deploy something new but have similar functionality. I just didn\u0027t want to exclude non k8s systems by coupling tightly to k8s expectations.",
+      "parentUuid": "bf659307_333cf12d",
+      "revId": "676f09796afbb1cc5949978427af038352935943",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_6e6709b9",
         "filename": "doc/source/developer/specs/container-build-resources.rst",
         "patchSetId": 1
