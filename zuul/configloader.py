@@ -452,6 +452,7 @@ class NodeSetParser(object):
             group = model.Group(conf_group['name'], conf_group['nodes'])
             ns.addGroup(group)
             group_names.add(conf_group['name'])
+        ns.freeze()
         return ns
 
 
@@ -477,6 +478,7 @@ class SecretParser(object):
             self.schema(conf)
         s = model.Secret(conf['name'], conf['_source_context'])
         s.secret_data = conf['data']
+        s.freeze()
         return s
 
 
@@ -790,6 +792,7 @@ class JobParser(object):
                 matchers.append(change_matcher.FileMatcher(fn))
             job.irrelevant_file_matcher = change_matcher.MatchAllFiles(
                 matchers)
+        job.freeze()
         return job
 
     def _makeZuulRole(self, job, role):
@@ -858,6 +861,9 @@ class ProjectTemplateParser(object):
             self.parseJobList(
                 conf_pipeline.get('jobs', []),
                 source_context, start_mark, project_pipeline.job_list)
+        # We don't freeze template here, we do it either in
+        # ProjectParser or after the templates are added to the
+        # layout.
         return project_template
 
     def parseJobList(self, conf, source_context, start_mark, job_list):
@@ -948,6 +954,7 @@ class ProjectParser(object):
         default_branch = conf.get('default-branch', 'master')
         project_config.default_branch = default_branch
 
+        project_config.freeze()
         return project_config
 
 
@@ -1110,6 +1117,7 @@ class PipelineParser(object):
             manager.event_filters.extend(
                 trigger.getEventFilters(conf['trigger'][trigger_name]))
 
+        # Pipelines don't get frozen
         return pipeline
 
 
@@ -1132,6 +1140,7 @@ class SemaphoreParser(object):
         self.schema(conf)
         semaphore = model.Semaphore(conf['name'], conf.get('max', 1))
         semaphore.source_context = conf.get('_source_context')
+        semaphore.freeze()
         return semaphore
 
 
@@ -1653,6 +1662,10 @@ class TenantParser(object):
                 layout.addProjectTemplate(
                     pcontext.project_template_parser.fromYaml(
                         config_template))
+        # Because addProjectTemplate combines templates of the same
+        # name, we have to wait until now to freeze them.
+        for pt in layout.project_templates.values():
+            pt.freeze()
 
         for config_project in data.projects:
             classes = self._getLoadClasses(tenant, config_project)
