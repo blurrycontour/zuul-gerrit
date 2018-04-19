@@ -22,6 +22,7 @@ import time
 from uuid import uuid4
 import urllib.parse
 import textwrap
+import types
 
 from zuul import change_matcher
 from zuul.lib.config import get_default
@@ -2437,9 +2438,54 @@ class ProjectPipelineConfig(object):
         self.job_list.inheritFrom(other.job_list)
 
 
-class ProjectConfig(object):
+class Freezable(object):
+    """A mix-in class so that an object can be made immutable"""
+
+    def __init__(self):
+        super(Freezable, self).__setattr__('_frozen', False)
+
+    def freeze(self):
+        """Make this object immutable"""
+        def _freezelist(l):
+            for i, v in enumerate(l):
+                if isinstance(v, Freezable):
+                    v.freeze()
+                if isinstance(v, dict):
+                    l[i] = _freezedict(v)
+                if isinstance(v, list):
+                    l[i] = _freezelist(v)
+            return tuple(l)
+
+        def _freezedict(d):
+            for k, v in list(d.items()):
+                if isinstance(v, Freezable):
+                    v.freeze()
+                if isinstance(v, dict):
+                    d[k] = _freezedict(v)
+                if isinstance(v, list):
+                    d[k] = tuple(v)
+            return types.MappingProxyType(d)
+
+        _freezedict(self.__dict__)
+        # Ignore return value from freezedict because __dict__ can't
+        # be a mappingproxy.
+        self._frozen = True
+
+    def __setattr__(self, name, value):
+        if self._frozen:
+            raise Exception("Unable to modify frozen object %s" %
+                            (repr(self),))
+        super(Freezable, self).__setattr__(name, value)
+
+
+class ConfigurationObject(Freezable):
+    pass
+
+
+class ProjectConfig(ConfigurationObject):
     # Represents a project configuration
     def __init__(self, name, source_context=None):
+        super(ProjectConfig, self).__init__()
         self.name = name
         # If this is a template, it will have a source_context, but
         # not if it is a project definition.
