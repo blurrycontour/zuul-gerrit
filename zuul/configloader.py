@@ -452,6 +452,7 @@ class NodeSetParser(object):
             group = model.Group(conf_group['name'], conf_group['nodes'])
             ns.addGroup(group)
             group_names.add(conf_group['name'])
+        ns.freeze()
         return ns
 
 
@@ -477,6 +478,7 @@ class SecretParser(object):
             self.schema(conf)
         s = model.Secret(conf['name'], conf['_source_context'])
         s.secret_data = conf['data']
+        s.freeze()
         return s
 
 
@@ -790,6 +792,7 @@ class JobParser(object):
                 matchers.append(change_matcher.FileMatcher(fn))
             job.irrelevant_file_matcher = change_matcher.MatchAllFiles(
                 matchers)
+        job.freeze()
         return job
 
     def _makeZuulRole(self, job, role):
@@ -840,7 +843,7 @@ class ProjectTemplateParser(object):
 
         return vs.Schema(project)
 
-    def fromYaml(self, conf, validate=True):
+    def fromYaml(self, conf, validate=True, freeze=True):
         if validate:
             with configuration_exceptions('project-template', conf):
                 self.schema(conf)
@@ -858,6 +861,8 @@ class ProjectTemplateParser(object):
             self.parseJobList(
                 conf_pipeline.get('jobs', []),
                 source_context, start_mark, project_pipeline.job_list)
+        if freeze:
+            project_template.freeze()
         return project_template
 
     def parseJobList(self, conf, source_context, start_mark, job_list):
@@ -923,7 +928,7 @@ class ProjectParser(object):
         # Parse the project as a template since they're mostly the
         # same.
         project_config = self.pcontext.project_template_parser.\
-            fromYaml(conf, validate=False)
+            fromYaml(conf, validate=False, freeze=False)
         project_config.name = project.canonical_name
 
         if not conf['_source_context'].trusted:
@@ -948,6 +953,7 @@ class ProjectParser(object):
         default_branch = conf.get('default-branch', 'master')
         project_config.default_branch = default_branch
 
+        project_config.freeze()
         return project_config
 
 
@@ -1110,6 +1116,7 @@ class PipelineParser(object):
             manager.event_filters.extend(
                 trigger.getEventFilters(conf['trigger'][trigger_name]))
 
+        # Pipelines don't get frozen
         return pipeline
 
 
@@ -1132,6 +1139,7 @@ class SemaphoreParser(object):
         self.schema(conf)
         semaphore = model.Semaphore(conf['name'], conf.get('max', 1))
         semaphore.source_context = conf.get('_source_context')
+        sempahore.freeze()
         return semaphore
 
 

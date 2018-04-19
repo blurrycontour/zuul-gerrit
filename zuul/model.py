@@ -22,6 +22,7 @@ import time
 from uuid import uuid4
 import urllib.parse
 import textwrap
+import types
 
 from zuul import change_matcher
 from zuul.lib.config import get_default
@@ -91,6 +92,52 @@ class Attributes(object):
 
     def __init__(self, **kw):
         setattr(self, '__dict__', kw)
+
+
+class Freezable(object):
+    """A mix-in class so that an object can be made immutable"""
+
+    def __init__(self):
+        super(Freezable, self).__setattr__('_frozen', False)
+
+    def freeze(self):
+        """Make this object immutable"""
+        def _freezelist(l):
+            for i, v in enumerate(l):
+                if isinstance(v, Freezable):
+                    if not v._frozen:
+                        v.freeze()
+                elif isinstance(v, dict):
+                    l[i] = _freezedict(v)
+                elif isinstance(v, list):
+                    l[i] = _freezelist(v)
+            return tuple(l)
+
+        def _freezedict(d):
+            for k, v in list(d.items()):
+                if isinstance(v, Freezable):
+                    if not v._frozen:
+                        v.freeze()
+                elif isinstance(v, dict):
+                    d[k] = _freezedict(v)
+                elif isinstance(v, list):
+                    d[k] = _freezelist(v)
+            return types.MappingProxyType(d)
+
+        _freezedict(self.__dict__)
+        # Ignore return value from freezedict because __dict__ can't
+        # be a mappingproxy.
+        self._frozen = True
+
+    def __setattr__(self, name, value):
+        if self._frozen:
+            raise Exception("Unable to modify frozen object %s" %
+                            (repr(self),))
+        super(Freezable, self).__setattr__(name, value)
+
+
+class ConfigObject(Freezable):
+    pass
 
 
 class Pipeline(object):
@@ -362,7 +409,7 @@ class Project(object):
         return Attributes(name=self.name)
 
 
-class Node(object):
+class Node(ConfigObject):
     """A single node for use by a job.
 
     This may represent a request for a node, or an actual node
@@ -370,6 +417,7 @@ class Node(object):
     """
 
     def __init__(self, name, label):
+        super(Node, self).__init__()
         self.name = name
         self.label = label
         self.id = None
@@ -436,7 +484,7 @@ class Node(object):
         self._keys = keys
 
 
-class Group(object):
+class Group(ConfigObject):
     """A logical group of nodes for use by a job.
 
     A Group is a named set of node names that will be provided to
@@ -445,6 +493,7 @@ class Group(object):
     """
 
     def __init__(self, name, nodes):
+        super(Group, self).__init__()
         self.name = name
         self.nodes = nodes
 
@@ -467,7 +516,7 @@ class Group(object):
         }
 
 
-class NodeSet(object):
+class NodeSet(ConfigObject):
     """A set of nodes.
 
     In configuration, NodeSets are attributes of Jobs indicating that
@@ -478,6 +527,7 @@ class NodeSet(object):
     """
 
     def __init__(self, name=None, source_context=None):
+        super(NodeSet, self).__init__()
         self.name = name or ''
         self.source_context = source_context
         self.nodes = OrderedDict()
@@ -587,7 +637,7 @@ class NodeRequest(object):
         self.state_time = data['state_time']
 
 
-class Secret(object):
+class Secret(ConfigObject):
     """A collection of private data.
 
     In configuration, Secrets are collections of private data in
@@ -597,6 +647,7 @@ class Secret(object):
     """
 
     def __init__(self, name, source_context):
+        super(Secret, self).__init__()
         self.name = name
         self.source_context = source_context
         # The secret data may or may not be encrypted.  This attribute
@@ -635,13 +686,14 @@ class Secret(object):
         return r
 
 
-class SourceContext(object):
+class SourceContext(ConfigObject):
     """A reference to the branch of a project in configuration.
 
     Jobs and playbooks reference this to keep track of where they
     originate."""
 
     def __init__(self, project, branch, path, trusted):
+        super(SourceContext, self).__init__()
         self.project = project
         self.branch = branch
         self.path = path
@@ -681,8 +733,7 @@ class SourceContext(object):
                 self.trusted == other.trusted)
 
 
-class PlaybookContext(object):
-
+class PlaybookContext(ConfigObject):
     """A reference to a playbook in the context of a project.
 
     Jobs refer to objects of this class for their main, pre, and post
@@ -695,6 +746,7 @@ class PlaybookContext(object):
     """
 
     def __init__(self, source_context, path, roles, secrets):
+        super(PlaybookContext, self).__init__()
         self.source_context = source_context
         self.path = path
         self.roles = roles
@@ -769,10 +821,11 @@ class PlaybookContext(object):
             path=self.path)
 
 
-class Role(object, metaclass=abc.ABCMeta):
+class Role(ConfigObject, metaclass=abc.ABCMeta):
     """A reference to an ansible role."""
 
     def __init__(self, target_name):
+        super(Role, self).__init__()
         self.target_name = target_name
 
     @abc.abstractmethod
@@ -825,7 +878,7 @@ class ZuulRole(Role):
         return d
 
 
-class Job(object):
+class Job(ConfigObject):
 
     """A Job represents the defintion of actions to perform.
 
@@ -841,6 +894,7 @@ class Job(object):
     BASE_JOB_MARKER = object()
 
     def __init__(self, name):
+        super(Job, self).__init__()
         # These attributes may override even the final form of a job
         # in the context of a project-pipeline.  They can not affect
         # the execution of the job, but only whether the job is run
@@ -1145,8 +1199,7 @@ class Job(object):
                                  'variables', 'host_variables',
                                  'group_variables', 'required_projects',
                                  'allowed_projects']):
-                    # TODO(jeblair): determine if deepcopy is required
-                    setattr(self, k, copy.deepcopy(other._get(k)))
+                    setattr(self, k, other._get(k))
 
         # Don't set final above so that we don't trip an error halfway
         # through assignment.
@@ -1233,20 +1286,22 @@ class Job(object):
         return True
 
 
-class JobProject(object):
+class JobProject(ConfigObject):
     """ A reference to a project from a job. """
 
     def __init__(self, project_name, override_branch=None,
                  override_checkout=None):
+        super(JobProject, self).__init__()
         self.project_name = project_name
         self.override_branch = override_branch
         self.override_checkout = override_checkout
 
 
-class JobList(object):
+class JobList(ConfigObject):
     """ A list of jobs in a project's pipeline. """
 
     def __init__(self):
+        super(JobList, self).__init__()
         self.jobs = OrderedDict()  # job.name -> [job, ...]
 
     def addJob(self, job):
@@ -2376,7 +2431,7 @@ class TriggerEvent(object):
         return False
 
 
-class BaseFilter(object):
+class BaseFilter(ConfigObject):
     """Base Class for filtering which Changes and Events to process."""
     pass
 
@@ -2420,9 +2475,10 @@ class TenantProjectConfig(object):
         self.exclude_unprotected_branches = None
 
 
-class ProjectPipelineConfig(object):
+class ProjectPipelineConfig(ConfigObject):
     # Represents a project cofiguration in the context of a pipeline
     def __init__(self):
+        super(ProjectPipelineConfig, self).__init__()
         self.job_list = JobList()
         self.queue_name = None
         self.debug = False
@@ -2437,9 +2493,10 @@ class ProjectPipelineConfig(object):
         self.job_list.inheritFrom(other.job_list)
 
 
-class ProjectConfig(object):
+class ProjectConfig(ConfigObject):
     # Represents a project configuration
     def __init__(self, name, source_context=None):
+        super(ProjectConfig, self).__init__()
         self.name = name
         # If this is a template, it will have a source_context, but
         # not if it is a project definition.
@@ -3032,8 +3089,9 @@ class Layout(object):
         return ret
 
 
-class Semaphore(object):
+class Semaphore(ConfigObject):
     def __init__(self, name, max=1):
+        super(Semaphore, self).__init__()
         self.name = name
         self.max = int(max)
 
