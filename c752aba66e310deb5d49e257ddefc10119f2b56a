@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_aa2204a3",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2485,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-19T21:35:40Z",
+      "side": 1,
+      "message": "You might consider just making this Freezable and deleting the new ConfigurationObject class.",
+      "range": {
+        "startLine": 2485,
+        "startChar": 20,
+        "endLine": 2485,
+        "endChar": 39
+      },
+      "revId": "c752aba66e310deb5d49e257ddefc10119f2b56a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
