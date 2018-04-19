@@ -221,6 +221,24 @@
     },
     {
       "key": {
+        "uuid": "bf659307_056e38ff",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-04-19T03:26:28Z",
+      "side": 1,
+      "message": "Then maybe the s2i process could run on the executor?",
+      "parentUuid": "bf659307_d34495ba",
+      "revId": "676f09796afbb1cc5949978427af038352935943",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_95014109",
         "filename": "doc/source/developer/specs/container-build-resources.rst",
         "patchSetId": 1
