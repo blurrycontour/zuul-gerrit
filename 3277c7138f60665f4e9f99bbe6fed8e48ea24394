@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_19d7d025",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 1159,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-04-19T19:06:43Z",
+      "side": 1,
+      "message": "Sphinx says this is not defined. You probably mean job.override-checkout?",
+      "range": {
+        "startLine": 1159,
+        "startChar": 9,
+        "endLine": 1159,
+        "endChar": 36
+      },
+      "revId": "3277c7138f60665f4e9f99bbe6fed8e48ea24394",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
