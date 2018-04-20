@@ -676,12 +676,14 @@ class GithubConnection(BaseConnection):
 
     def getGithubClient(self,
                         project=None,
-                        user_id=None):
+                        user_id=None,
+                        inst_id=None):
         # if you're authenticating for a project and you're an integration then
         # you need to use the installation specific token.
         if project and self.app_id:
             github = self._createGithubClient()
-            github.login(token=self._get_installation_key(project, user_id))
+            github.login(token=self._get_installation_key(
+                project, user_id=user_id, inst_id=inst_id))
             github._zuul_project = project
             github._zuul_user_id = user_id
             return github
@@ -754,9 +756,8 @@ class GithubConnection(BaseConnection):
         if not change.uris:
             return changes
 
-        # Get a list of projects with unique installation ids
+        # Get a list of unique installation ids
         installation_ids = set()
-        installation_projects = set()
 
         if projects:
             # We only need to find changes in projects in the supplied
@@ -771,7 +772,6 @@ class GithubConnection(BaseConnection):
                 installation_id = self.installation_map.get(project.name)
                 if installation_id not in installation_ids:
                     installation_ids.add(installation_id)
-                    installation_projects.add(project.name)
         else:
             # We aren't in the context of a change queue and we just
             # need to query all installations of this tenant. This currently
@@ -784,14 +784,13 @@ class GithubConnection(BaseConnection):
                     continue
                 if installation_id not in installation_ids:
                     installation_ids.add(installation_id)
-                    installation_projects.add(project)
 
         keys = set()
         pattern = ' OR '.join(change.uris)
         query = '%s type:pr is:open in:body' % pattern
         # Repeat the search for each installation id (project)
-        for installation_project in installation_projects:
-            github = self.getGithubClient(installation_project)
+        for installation_id in installation_ids:
+            github = self.getGithubClient(None, inst_id=installation_id)
             for issue in github.search_issues(query=query):
                 pr = issue.issue.pull_request().as_dict()
                 if not pr.get('url'):
