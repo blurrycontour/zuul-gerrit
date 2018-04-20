@@ -77,7 +77,8 @@ class ZuulDriver(Driver, TriggerInterface):
 
         if event_needed:
             try:
-                self._createParentChangeEnqueuedEvents(change, pipeline)
+                self._createParentChangeEnqueuedEvents(
+                    change, pipeline, tenant)
             except Exception:
                 self.log.exception(
                     "Unable to create parent-change-enqueued events for "
@@ -102,7 +103,7 @@ class ZuulDriver(Driver, TriggerInterface):
         event.ref = change.ref
         self.sched.addEvent(event)
 
-    def _createParentChangeEnqueuedEvents(self, change, pipeline):
+    def _createParentChangeEnqueuedEvents(self, change, pipeline, tenant):
         self.log.debug("Checking for changes needing %s:" % change)
         if not hasattr(change, 'needed_by_changes'):
             self.log.debug("  %s does not support dependencies" % type(change))
@@ -115,7 +116,7 @@ class ZuulDriver(Driver, TriggerInterface):
         for source in self.sched.connections.getSources():
             self.log.debug("  Checking source: %s", source)
             needed_by_changes.update(
-                source.getChangesDependingOn(change, None))
+                source.getChangesDependingOn(change, None, tenant))
         self.log.debug("  Following changes: %s", needed_by_changes)
 
         for needs in needed_by_changes:
