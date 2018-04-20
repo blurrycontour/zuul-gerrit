@@ -58,7 +58,24 @@ class ZuulDriver(Driver, TriggerInterface):
     def onChangeEnqueued(self, tenant, change, pipeline):
         self.log.debug("onChangeEnqueued %s", self.tenant_events[tenant.name])
         # Called each time a change is enqueued in a pipeline
-        if PARENT_CHANGE_ENQUEUED in self.tenant_events[tenant.name]:
+
+        # Emitting the parent-change-enqueued event can be very expensive
+        # when used with the Github driver and many app installations. Thus
+        # only emit it if this is really used.
+        event_needed = False
+        for p in tenant.layout.pipelines.values():
+            for ef in p.manager.event_filters:
+                if not isinstance(ef.trigger, zuultrigger.ZuulTrigger):
+                    continue
+                if PARENT_CHANGE_ENQUEUED not in ef._types:
+                    continue
+                if pipeline.name in ef._pipelines:
+                    event_needed = True
+                    break
+            if event_needed:
+                break
+
+        if event_needed:
             try:
                 self._createParentChangeEnqueuedEvents(change, pipeline)
             except Exception:
