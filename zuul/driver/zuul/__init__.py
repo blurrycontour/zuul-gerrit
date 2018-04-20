@@ -28,26 +28,36 @@ class ZuulDriver(Driver, TriggerInterface):
     log = logging.getLogger("zuul.ZuulTrigger")
 
     def __init__(self):
-        self.tenant_events = {}
+        self.parent_change_enqueued_events = {}
+        self.project_change_merged_events = {}
 
     def registerScheduler(self, scheduler):
         self.sched = scheduler
 
     def reconfigure(self, tenant):
-        events = set()
-        self.tenant_events[tenant.name] = events
+        project_change_merged_events = set()
+        self.project_change_merged_events[tenant.name] = \
+            project_change_merged_events
         for pipeline in tenant.layout.pipelines.values():
             for ef in pipeline.manager.event_filters:
                 if not isinstance(ef.trigger, zuultrigger.ZuulTrigger):
                     continue
                 if PARENT_CHANGE_ENQUEUED in ef._types:
-                    events.add(PARENT_CHANGE_ENQUEUED)
+                    # parent-change-enqueued events need to be filtered by
+                    # pipeline
+                    for pipeline in ef._pipelines:
+                        key = (tenant.name, pipeline)
+                        self.parent_change_enqueued_events.setdefault(
+                            key, set())
+                        self.parent_change_enqueued_events[key].add(
+                            PARENT_CHANGE_ENQUEUED)
                 elif PROJECT_CHANGE_MERGED in ef._types:
-                    events.add(PROJECT_CHANGE_MERGED)
+                    project_change_merged_events.add(PROJECT_CHANGE_MERGED)
 
     def onChangeMerged(self, tenant, change, source):
         # Called each time zuul merges a change
-        if PROJECT_CHANGE_MERGED in self.tenant_events[tenant.name]:
+        tenant_events = self.project_change_merged_events[tenant.name]
+        if PROJECT_CHANGE_MERGED in tenant_events:
             try:
                 self._createProjectChangeMergedEvents(change, source)
             except Exception:
@@ -56,9 +66,11 @@ class ZuulDriver(Driver, TriggerInterface):
                     "%s" % (change,))
 
     def onChangeEnqueued(self, tenant, change, pipeline):
-        self.log.debug("onChangeEnqueued %s", self.tenant_events[tenant.name])
         # Called each time a change is enqueued in a pipeline
-        if PARENT_CHANGE_ENQUEUED in self.tenant_events[tenant.name]:
+        tenant_events = self.parent_change_enqueued_events.get(
+            (tenant.name, pipeline.name), [])
+        self.log.debug("onChangeEnqueued %s", tenant_events)
+        if PARENT_CHANGE_ENQUEUED in tenant_events:
             try:
                 self._createParentChangeEnqueuedEvents(change, pipeline)
             except Exception:
