@@ -89,6 +89,80 @@ class TestZuulTriggerParentChangeEnqueued(ZuulTestCase):
         self.assertEqual(zuultrigger_event_count, 0)
 
 
+class TestZuulTriggerParentChangeEnqueuedGithub(ZuulTestCase):
+    tenant_config_file = \
+        'config/zuultrigger/parent-change-enqueued-github/main.yaml'
+    config_file = 'zuul-github-driver.conf'
+
+    def test_zuul_trigger_parent_change_enqueued(self):
+        "Test Zuul trigger event: parent-change-enqueued"
+        # This test has the following three changes:
+        # B1 -> A; B2 -> A
+        # When A is enqueued in the gate, B1 and B2 should both attempt
+        # to be enqueued in both pipelines.  B1 should end up in check
+        # and B2 in gate because of differing pipeline requirements.
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_github.openFakePullRequest('org/project', 'master', 'A')
+        msg = "Depends-On: https://github.com/org/project1/pull/%s" % A.number
+        B1 = self.fake_github.openFakePullRequest(
+            'org/project', 'master', 'B1', body=msg)
+        B2 = self.fake_github.openFakePullRequest(
+            'org/project', 'master', 'B2', body=msg)
+        A.addReview('derp', 'APPROVED')
+        B1.addReview('derp', 'APPROVED')
+        B2.addReview('derp', 'APPROVED')
+        A.addLabel('for-gate')    # required by gate
+        B1.addLabel('for-check')  # should go to check
+        B2.addLabel('for-gate')   # should go to gate
+        # B1.setDependsOn(A, 1)
+        # B2.setDependsOn(A, 1)
+        self.fake_github.emitEvent(A.getReviewAddedEvent('approved'))
+        # Jobs are being held in build to make sure that 3,1 has time
+        # to enqueue behind 1,1 so that the test is more
+        # deterministic.
+        self.waitUntilSettled()
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.history), 3)
+        for job in self.history:
+            if job.changes == '1,1':
+                self.assertEqual(job.name, 'project-gate')
+            elif job.changes == '1,1 2,1':
+                self.assertEqual(job.name, 'project-check')
+            elif job.changes == '1,1 3,1':
+                self.assertEqual(job.name, 'project-gate')
+            else:
+                raise Exception("Unknown job")
+
+        # Now directly enqueue a change into the check. As no pipeline reacts
+        # on parent-change-enqueued from pipeline check no
+        # parent-change-enqueued event is expected.
+        zuultrigger_event_count = 0
+
+        def counting_put(*args, **kwargs):
+            nonlocal zuultrigger_event_count
+            if isinstance(args[0], ZuulTriggerEvent):
+                zuultrigger_event_count += 1
+            self.sched.trigger_event_queue.put_orig(*args, **kwargs)
+
+        self.sched.trigger_event_queue.put_orig = \
+            self.sched.trigger_event_queue.put
+        self.sched.trigger_event_queue.put = counting_put
+
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+        C.addApproval('Verified', -1)
+        D = self.fake_gerrit.addFakeChange('org/project', 'master', 'D')
+        D.addApproval('Verified', -1)
+        D.setDependsOn(C, 1)
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 4)
+        self.assertEqual(zuultrigger_event_count, 0)
+
+
 class TestZuulTriggerProjectChangeMerged(ZuulTestCase):
 
     tenant_config_file = 'config/zuultrigger/project-change-merged/main.yaml'
