@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_36163faa",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 409,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-20T23:38:49Z",
+      "side": 1,
+      "message": "Reading the release() code I don\u0027t think it can raise, but these extra belts and suspenders don\u0027t hurt.",
+      "revId": "c5e6f5cefe3ee33c65e0007a18241ab7e197b1d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
