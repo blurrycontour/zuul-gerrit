@@ -777,8 +777,8 @@ class GithubConnection(BaseConnection):
             # need to query all installations of this tenant. This currently
             # only happens if certain features of the zuul trigger are
             # used; generally it should be avoided.
-            for project, installation_id in self.installation_map.items():
-                trusted, project = tenant.getProject(project.name)
+            for project_name, installation_id in self.installation_map.items():
+                trusted, project = tenant.getProject(project_name)
                 # ignore projects from different tenants
                 if not project:
                     continue
