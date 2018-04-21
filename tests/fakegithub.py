@@ -65,9 +65,11 @@ class FakeCommit(object):
 
 
 class FakeRepository(object):
-    def __init__(self):
+    def __init__(self, name, data):
         self._branches = [FakeBranch()]
         self._commits = {}
+        self.data = data
+        self.name = name
 
     def branches(self, protected=False):
         if protected:
@@ -92,6 +94,16 @@ class FakeRepository(object):
             self._commits[sha] = commit
         return commit
 
+    def pull_requests(self, state=None):
+        pulls = []
+        for pull in self.data.pull_requests.values():
+            if pull.project != self.name:
+                continue
+            if state and pull.state != state:
+                continue
+            pulls.append(FakePull(pull))
+        return pulls
+
 
 class FakeLabel(object):
     def __init__(self, name):
@@ -113,6 +125,11 @@ class FakeIssue(object):
 class FakeFile(object):
     def __init__(self, filename):
         self.filename = filename
+
+
+class FakeHead(object):
+    def __init__(self, sha):
+        self.sha = sha
 
 
 class FakePull(object):
@@ -155,6 +172,10 @@ class FakePull(object):
         }
         return data
 
+    @property
+    def head(self):
+        return FakeHead(self._fake_pull_request.head_sha)
+
 
 class FakeIssueSearchResult(object):
     def __init__(self, issue):
@@ -185,11 +206,13 @@ class FakeGithubClient(object):
 
     def addProject(self, project):
         owner, proj = project.name.split('/')
-        self._data.repos[(owner, proj)] = FakeRepository()
+        self._data.repos[(owner, proj)] = FakeRepository(
+            project.name, self._data)
 
     def addProjectByName(self, project_name):
         owner, proj = project_name.split('/')
-        self._data.repos[(owner, proj)] = FakeRepository()
+        self._data.repos[(owner, proj)] = FakeRepository(
+            project_name, self._data)
 
     def pull_request(self, owner, project, number):
         fake_pr = self._data.pull_requests[number]
