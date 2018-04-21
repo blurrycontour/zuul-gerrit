@@ -27,47 +27,46 @@ class MQTTConnection(BaseConnection):
     driver_name = 'mqtt'
     log = logging.getLogger("zuul.MQTTConnection")
 
-    def _translate_tls_version(self, tls_version):
-        """Convert tls version string from config to ssl id"""
-        tls_versions = {
-            'tlsv1': ssl.PROTOCOL_TLSv1,
-            'tlsv1.1': ssl.PROTOCOL_TLSv1_1,
-            'tlsv1.2': ssl.PROTOCOL_TLSv1_2,
-        }
-        try:
-            return tls_versions[tls_version.lower()]
-        except KeyError:
-            msg = "%s: unknown tls version (supported: %s)" % (
-                tls_version, list(tls_versions.keys()))
-            self.log.error(msg)
-            raise ConfigurationError(msg)
+    def configure_tls(self):
+        ca_certs = self.connection_config.get('ca_certs')
+        certfile = self.connection_config.get('certfile')
+        keyfile = self.connection_config.get('keyfile')
+        ciphers = self.connection_config.get('ciphers')
+        tls_version = self.connection_config.get('tls_version')
+        if (certfile or keyfile or ciphers or tls_version) and not ca_certs:
+            raise ConfigurationError(
+                "MQTT TLS configuration requires the ca_certs option")
+        if ca_certs:
+            if (certfile and not keyfile) or (not certfile and keyfile):
+                raise ConfigurationError(
+                    "MQTT configuration keyfile and certfile "
+                    "options must both be set.")
+            if tls_version:
+                try:
+                    tls_version = getattr(ssl, 'PROTOCOL_%s' % tls_version)
+                except AttributeError:
+                    tls_versions = list(filter(
+                        lambda x: x.startswith('PROTOCOL_TLSv'), dir(ssl)))
+                    raise ConfigurationError(
+                        "%s: Unknown tls_version (supported: %s)" % (
+                            tls_version, tls_versions))
+            self.client.tls_set(
+                ca_certs=ca_certs,
+                certfile=certfile,
+                keyfile=keyfile,
+                tls_version=tls_version,
+                ciphers=ciphers)
 
     def __init__(self, driver, connection_name, connection_config):
-        super(MQTTConnection, self).__init__(driver, connection_name,
-                                             connection_config)
+        super(MQTTConnection, self).__init__(
+            driver, connection_name, connection_config)
         self.client = mqtt.Client(
             client_id=self.connection_config.get('client_id'))
         if self.connection_config.get('user'):
             self.client.username_pw_set(
                 self.connection_config.get('user'),
                 self.connection_config.get('password'))
-        ca_certs = self.connection_config.get('ca_certs')
-        certfile = self.connection_config.get('certfile')
-        keyfile = self.connection_config.get('keyfile')
-        if (certfile or keyfile) and not ca_certs:
-            raise Exception("MQTT TLS configuration requires "
-                            "the ca_certs option")
-        if ca_certs:
-            if (certfile and not keyfile) or (not certfile and keyfile):
-                raise Exception("MQTT configuration keyfile and certfile "
-                                "options must both be set.")
-            self.client.tls_set(
-                ca_certs,
-                certfile=certfile,
-                keyfile=keyfile,
-                tls_version=self._translate_tls_version(
-                    self.connection_config.get('tls_version', 'tlsv1.2')),
-                ciphers=self.connection_config.get('ciphers'))
+        self.configure_tls()
         self.connected = False
 
     def onLoad(self):

@@ -59,10 +59,11 @@ Connection Configuration
       be set too.
 
    .. attr:: tls_version
-      :default: TLSv1.2
+      :default: highest version available
 
       Specifies the version of the SSL/TLS protocol to be used.
-      Available versions are ``TLSv1``, ``TLSv1.1``, ``TLSv1.2``.
+      Check the available protocol list supported by the
+      `python ssl doc <https://docs.python.org/3/library/ssl.html#ssl.PROTOCOL_TLS>`_.
 
    .. attr:: ciphers
 
