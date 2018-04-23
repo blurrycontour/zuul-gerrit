@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_61c937aa",
+        "filename": "zuul/model.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 496,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-04-23T16:48:45Z",
+      "side": 1,
+      "message": "with python 3 the arguments of super are not needed anymore",
+      "range": {
+        "startLine": 496,
+        "startChar": 14,
+        "endLine": 496,
+        "endChar": 25
+      },
+      "revId": "7dd10ca8b4672e163ef32e7c6c613b87b16dad3e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
