@@ -57,22 +57,26 @@ Go back to the `General` settings page for the app,
 https://github.com/organizations/my-org/settings/apps/my-org-zuul
 and look for the app `ID` number, under the `About` section.
 
-Edit ``/etc/zuul/zuul.conf`` to add the following::
+Edit ``/etc/zuul/zuul.conf`` to add the following
 
-  [connection github]
-  driver=github
-  app_id=<APP ID NUMBER>
-  app_key=/etc/zuul/github.pem
-  webhook_token=<WEBHOOK SECRET>
+.. code-block:: ini
+
+   [connection github]
+   driver=github
+   app_id=<APP ID NUMBER>
+   app_key=/etc/zuul/github.pem
+   webhook_token=<WEBHOOK SECRET>
 
 Upload the private key which was generated earlier, and save it in
 ``/etc/zuul/github.pem``.
 
-Restart all of Zuul::
+Restart all of Zuul
 
-  sudo systemctl restart zuul-executor.service
-  sudo systemctl restart zuul-web.service
-  sudo systemctl restart zuul-scheduler.service
+.. code-block:: console
+
+   $ sudo systemctl restart zuul-executor.service
+   $ sudo systemctl restart zuul-web.service
+   $ sudo systemctl restart zuul-scheduler.service
 
 Go to the `Advanced` tab for the app in GitHub,
 https://github.com/organizations/my-org/settings/apps/my-org-zuul/advanced,
@@ -89,7 +93,9 @@ and `zuul-test`, respectively.
 Visit the public app page on GitHub,
 https://github.com/apps/my-org-zuul, and install the app into your org.
 
-Edit ``/etc/zuul/main.yaml`` so that it looks like this::
+Edit ``/etc/zuul/main.yaml`` so that it looks like this
+
+.. code-block:: yaml
 
    - tenant:
        name: quickstart
@@ -111,13 +117,17 @@ installation.
 
 The second section is your GitHub configuration.
 
-After updating the file, restart the Zuul scheduler::
+After updating the file, restart the Zuul scheduler
 
-  sudo systemctl restart zuul-scheduler.service
+.. code-block:: console
+
+   $ sudo systemctl restart zuul-scheduler.service
 
 Add an initial pipeline configuration to the `zuul-test-config`
 repository.  Inside that project, create a ``zuul.yaml`` file with the
-following contents::
+following contents
+
+.. code-block:: yaml
 
    - pipeline:
        name: check
@@ -149,7 +159,9 @@ following contents::
 Merge that commit into the repository.
 
 In the `zuul-test` project, create a `.zuul.yaml` file with the
-following contents::
+following contents
+
+.. code-block:: yaml
 
    - project:
        check:

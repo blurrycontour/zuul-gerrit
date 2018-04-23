@@ -10,19 +10,23 @@ Before starting on this, you need to download your `openrc`
 configuration from your OpenStack cloud.  Put it on your server in the
 fedora user's home directory.  It should be called
 ``<username>-openrc.sh``.  Once that is done, create a new keypair
-that will be installed when instantiating the servers::
+that will be installed when instantiating the servers
 
-   cd ~
-   source <username>-openrc.sh  # this may prompt for password - enter it
-   ssh-keygen -t rsa -b 2048 -f nodepool_rsa  # don't enter a passphrase
-   openstack keypair create --public-key nodepool_rsa.pub nodepool
+.. code-block:: console
+
+   $ cd ~
+   $ source <username>-openrc.sh  # this may prompt for password - enter it
+   $ ssh-keygen -t rsa -b 2048 -f nodepool_rsa  # don't enter a passphrase
+   $ openstack keypair create --public-key nodepool_rsa.pub nodepool
 
 We'll use the private key later wheen configuring Zuul.  In the same
-session, configure nodepool to talk to your cloud::
+session, configure nodepool to talk to your cloud
 
-   umask 0066
-   sudo mkdir -p ~nodepool/.config/openstack
-   cat > clouds.yaml <<EOF
+.. code-block:: console
+
+   $ umask 0066
+   $ sudo mkdir -p ~nodepool/.config/openstack
+   $ cat > clouds.yaml <<EOF
    clouds:
      mycloud:
        auth:
@@ -32,19 +36,19 @@ session, configure nodepool to talk to your cloud::
          auth_url: $OS_AUTH_URL
        region_name: $OS_REGION_NAME
    EOF
-   sudo mv clouds.yaml ~nodepool/.config/openstack/
-   sudo chown -R nodepool.nodepool ~nodepool/.config
-   umask 0002
+   $ sudo mv clouds.yaml ~nodepool/.config/openstack/
+   $ sudo chown -R nodepool.nodepool ~nodepool/.config
+   $ umask 0002
 
 Once you've written out the file, double check all the required fields
 have been filled out.
 
-::
+.. code-block:: console
 
-   sudo mkdir /etc/nodepool/
-   sudo mkdir /var/log/nodepool
-   sudo chgrp -R nodepool /var/log/nodepool/
-   sudo chmod 775 /var/log/nodepool/
+   $ sudo mkdir /etc/nodepool/
+   $ sudo mkdir /var/log/nodepool
+   $ sudo chgrp -R nodepool /var/log/nodepool/
+   $ sudo chmod 775 /var/log/nodepool/
 
 Configuration
 -------------
@@ -55,9 +59,9 @@ Inputs needed for this file:
 * flavor-name
 * image-name - from your cloud
 
-::
+.. code-block:: console
 
-   sudo bash -c "cat >/etc/nodepool/nodepool.yaml <<EOF
+   $ sudo bash -c "cat >/etc/nodepool/nodepool.yaml <<EOF
    zookeeper-servers:
      - host: localhost
        port: 2181
