@@ -20,7 +20,7 @@ access to gerrit, and have the `stream-events <https://gerrit-review.googlesourc
 
 As the admin user, create the 'zuul' user, and import an SSH key for 'zuul'::
 
-  $ cat $PUBKEY | ssh -p 29418 $USER@localhost gerrit create-account \
+  cat $PUBKEY | ssh -p 29418 $USER@localhost gerrit create-account \
      --group "'Registered Users'" --ssh-key - zuul
 
 `$PUBKEY` is the location of the SSH public key for the 'zuul' user. `$USER` is
@@ -28,7 +28,7 @@ the username for the admin user.
 
 The 'zuul' user should now be able to stream events::
 
-  $ ssh -p 29418 zuul@localhost gerrit stream-events
+  ssh -p 29418 zuul@localhost gerrit stream-events
 
 Configure Gerrit
 ----------------
@@ -58,25 +58,25 @@ these submissions.
 
 To create a new project named 'demo-project'::
 
-  $ ssh -p 29418 $USER@localhost gerrit create-project demo-project --empty-commit
+  ssh -p 29418 $USER@localhost gerrit create-project demo-project --empty-commit
 
 Modify the Project
 ------------------
 
 * Clone the project::
 
-  $ git clone ssh://$USER@localhost:29418/demo-project.git
+  git clone ssh://$USER@localhost:29418/demo-project.git
 
 * Install the change ID hook that Gerrit requires::
 
-  $ cd demo-project
-  $ scp -p -P 29418 $USER@localhost:hooks/commit-msg .git/hooks/
+  cd demo-project
+  scp -p -P 29418 $USER@localhost:hooks/commit-msg .git/hooks/
 
 * Now you are ready to modify the project and push the changes to Gerrit::
 
-  $ echo "test" > README.txt
-  $ git add .
-  $ git commit -m "First commit"
-  $ git push origin HEAD:refs/for/master
+  echo "test" > README.txt
+  git add .
+  git commit -m "First commit"
+  git push origin HEAD:refs/for/master
 
 You should now be able to see your change in Gerrit.

@@ -17,5 +17,5 @@ Service File
 Nodepool includes a systemd service file for nodepool-launcher in the ``etc``
 source directory. To use it, do the following steps::
 
-  $ sudo cp etc/nodepool-launcher.service /etc/systemd/system/nodepool-launcher.service
-  $ sudo chmod 0644 /etc/systemd/system/nodepool-launcher.service
+  sudo cp etc/nodepool-launcher.service /etc/systemd/system/nodepool-launcher.service
+  sudo chmod 0644 /etc/systemd/system/nodepool-launcher.service

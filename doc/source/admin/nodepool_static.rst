@@ -21,7 +21,7 @@ When setting up your nodepool.yaml file, you will need the host keys
 for each node for the ``host-key`` value. This can be obtained with
 the command::
 
-  $ ssh-keyscan -t ed25519 <HOST>
+  ssh-keyscan -t ed25519 <HOST>
 
 Nodepool Configuration
 ----------------------
