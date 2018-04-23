@@ -152,9 +152,10 @@ class Pipeline(object):
     Reporter
         Communicates success and failure results somewhere
     """
-    def __init__(self, name, layout):
+    def __init__(self, name, tenant_name):
         self.name = name
-        self.layout = layout
+        self.tenant_name = tenant_name
+        self.layout = None
         self.description = None
         self.failure_message = None
         self.merge_failure_message = None
@@ -2843,6 +2844,7 @@ class Layout(object):
 
     def addPipeline(self, pipeline):
         self.pipelines[pipeline.name] = pipeline
+        pipeline.layout = self
 
     def addProjectTemplate(self, project_template):
         template = self.project_templates.get(project_template.name)

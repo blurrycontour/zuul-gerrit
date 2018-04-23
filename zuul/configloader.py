@@ -949,8 +949,6 @@ class ProjectParser(object):
 
         # Add templates
         for name in conf.get('templates', []):
-            if name not in self.pcontext.layout.project_templates:
-                raise TemplateNotFoundError(name)
             if name not in project_config.templates:
                 project_config.templates.append(name)
 
@@ -1041,7 +1039,7 @@ class PipelineParser(object):
     def fromYaml(self, conf):
         with configuration_exceptions('pipeline', conf):
             self.schema(conf)
-        pipeline = model.Pipeline(conf['name'], self.pcontext.layout)
+        pipeline = model.Pipeline(conf['name'], self.pcontext.tenant.name)
         pipeline.description = conf.get('description')
 
         precedence = model.PRECEDENCE_MAP[conf.get('precedence')]
@@ -1104,7 +1102,6 @@ class PipelineParser(object):
                 self.pcontext.scheduler, pipeline)
 
         pipeline.setManager(manager)
-        self.pcontext.layout.pipelines[conf['name']] = pipeline
 
         for source_name, require_config in conf.get('require', {}).items():
             source = self.pcontext.connections.getSource(source_name)
@@ -1153,23 +1150,16 @@ class SemaphoreParser(object):
 class ParseContext(object):
     """Hold information about a particular run of the parser"""
 
-    def __init__(self, connections, scheduler, tenant, layout):
+    def __init__(self, connections, scheduler, tenant):
         self.connections = connections
         self.scheduler = scheduler
         self.tenant = tenant
-        self.layout = layout
         self.pragma_parser = PragmaParser(self)
         self.pipeline_parser = PipelineParser(self)
         self.nodeset_parser = NodeSetParser(self)
         self.secret_parser = SecretParser(self)
         self.job_parser = JobParser(self)
         self.semaphore_parser = SemaphoreParser(self)
-        self.project_template_parser = None
-        self.project_parser = None
-
-    def setPipelines(self):
-        # Call after pipelines are fixed in the layout to construct
-        # the project parser, which relies on them.
         self.project_template_parser = ProjectTemplateParser(self)
         self.project_parser = ProjectParser(self)
 
@@ -1590,8 +1580,8 @@ class TenantParser(object):
 
     def _parseLayoutItems(self, layout, tenant, data,
                           skip_pipelines=False, skip_semaphores=False):
-        pcontext = ParseContext(self.connections, self.scheduler,
-                                tenant, layout)
+        pcontext = ParseContext(self.connections, self.scheduler, tenant)
+
         # Handle pragma items first since they modify the source context
         # used by other classes.
         for config_pragma in data.pragmas:
@@ -1604,7 +1594,6 @@ class TenantParser(object):
                     continue
                 layout.addPipeline(pcontext.pipeline_parser.fromYaml(
                     config_pipeline))
-        pcontext.setPipelines()
 
         for config_nodeset in data.nodesets:
             classes = self._getLoadClasses(tenant, config_nodeset)
@@ -1692,6 +1681,8 @@ class TenantParser(object):
         for project_name in layout.project_configs.keys():
             for project_config in layout.project_configs[project_name]:
                 for template_name in project_config.templates:
+                    if template_name not in layout.project_templates:
+                        raise TemplateNotFoundError(template_name)
                     project_template = layout.getProjectTemplate(template_name)
                     ppcs.extend(list(project_template.pipelines.values()))
                 ppcs.extend(list(project_config.pipelines.values()))
