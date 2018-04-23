@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_526ddfc9",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 848,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-23T19:47:45Z",
+      "side": 1,
+      "message": "Won\u0027t a ProjectConfig always have a name? This switch to .get() which may return None seems odd.",
+      "range": {
+        "startLine": 848,
+        "startChar": 47,
+        "endLine": 848,
+        "endChar": 63
+      },
+      "revId": "dbae558c498ad882d1edb3e227836bb83f2ac37b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_b2c47bf6",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 931,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-23T19:47:45Z",
+      "side": 1,
+      "message": "Does this need to be wrapped in one of the exception handler with nice error message formatting context managers?\n\n(it was previously)",
+      "range": {
+        "startLine": 931,
+        "startChar": 16,
+        "endLine": 931,
+        "endChar": 48
+      },
+      "revId": "dbae558c498ad882d1edb3e227836bb83f2ac37b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_8d611aac",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 1661,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-23T19:47:45Z",
+      "side": 1,
+      "message": "I guess we moved the context manager to here wrapping the entire fromYaml() instead.",
+      "revId": "dbae558c498ad882d1edb3e227836bb83f2ac37b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
