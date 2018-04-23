@@ -38,7 +38,7 @@ server to listen on all public addresses.  This is so that Zuul may
 receive webhook events from GitHub.  You may wish to proxy this or
 further restrict public access.
 
-::
+.. code-block:: bash
 
    sudo bash -c "cat > /etc/zuul/zuul.conf <<EOF
    [gearman]
@@ -69,7 +69,9 @@ Your system software management should have installed the Zookeeper service
 files for you.
 
 After you have Zuul and Nodepool installed and configured, you can start
-all of the services with::
+all of the services with
+
+.. code-block:: bash
 
    sudo systemctl daemon-reload
 
@@ -94,7 +96,9 @@ all of the services with::
 Use Zuul Jobs
 -------------
 
-Add to ``/etc/zuul/zuul.conf``::
+Add to ``/etc/zuul/zuul.conf``
+
+.. code-block:: bash
 
    sudo bash -c "cat >> /etc/zuul/zuul.conf <<EOF
 
@@ -103,7 +107,9 @@ Add to ``/etc/zuul/zuul.conf``::
    baseurl=https://git.zuul-ci.org/
    EOF"
 
-Restart executor and scheduler::
+Restart executor and scheduler
+
+.. code-block:: bash
 
    sudo systemctl restart zuul-executor.service
    sudo systemctl restart zuul-scheduler.service

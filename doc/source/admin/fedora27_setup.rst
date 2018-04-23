@@ -18,14 +18,16 @@ Since we'll be using a cloud image for Fedora 27, our login user will
 be ``fedora`` which will also be the staging user for installation of
 Zuul and Nodepool.
 
-To get started, ssh to your machine as the ``fedora`` user::
+To get started, ssh to your machine as the ``fedora`` user
+
+.. code-block:: bash
 
    ssh fedora@<ip_address>
 
 Environment Setup
 -----------------
 
-::
+.. code-block:: bash
 
    sudo dnf update -y
    sudo systemctl reboot
@@ -35,7 +37,7 @@ Environment Setup
 Install Zookeeper
 -----------------
 
-::
+.. code-block:: bash
 
    sudo dnf install zookeeper -y
    sudo cp /etc/zookeeper/zoo_sample.cfg /etc/zookeeper/zoo.cfg

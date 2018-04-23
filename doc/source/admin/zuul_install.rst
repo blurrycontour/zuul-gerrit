@@ -3,7 +3,7 @@
 Install Zuul
 ============
 
-::
+.. code-block:: bash
 
    sudo adduser --system zuul --home-dir /var/lib/zuul --create-home
    git clone https://git.zuul-ci.org/zuul
@@ -14,7 +14,7 @@ Install Zuul
 Initial Setup
 -------------
 
-::
+.. code-block:: bash
 
    sudo mkdir /etc/zuul/
    sudo mkdir /var/log/zuul/
@@ -28,11 +28,13 @@ Service Files
 -------------
 
 Zuul includes some systemd service files for Zuul in the ``etc`` source
-directory. To use them, do the following steps::
+directory. To use them, do the following steps
 
-  $ sudo cp etc/zuul-scheduler.service /etc/systemd/system/zuul-scheduler.service
-  $ sudo cp etc/zuul-executor.service /etc/systemd/system/zuul-executor.service
-  $ sudo cp etc/zuul-web.service /etc/systemd/system/zuul-web.service
-  $ sudo chmod 0644 /etc/systemd/system/zuul-scheduler.service
-  $ sudo chmod 0644 /etc/systemd/system/zuul-executor.service
-  $ sudo chmod 0644 /etc/systemd/system/zuul-web.service
+.. code-block:: bash
+
+   sudo cp etc/zuul-scheduler.service /etc/systemd/system/zuul-scheduler.service
+   sudo cp etc/zuul-executor.service /etc/systemd/system/zuul-executor.service
+   sudo cp etc/zuul-web.service /etc/systemd/system/zuul-web.service
+   sudo chmod 0644 /etc/systemd/system/zuul-scheduler.service
+   sudo chmod 0644 /etc/systemd/system/zuul-executor.service
+   sudo chmod 0644 /etc/systemd/system/zuul-web.service

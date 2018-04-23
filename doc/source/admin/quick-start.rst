@@ -7,9 +7,11 @@ read the following sections for more details.
 Install Zuul
 ------------
 
-You can get zuul from pypi via::
+You can get zuul from pypi via
 
-    pip install zuul
+.. code-block:: bash
+
+   pip install zuul
 
 Zuul Components
 ---------------
@@ -95,18 +97,22 @@ You can run any zuul process with the **-d** option to make it not
 daemonize. It's a good idea at first to confirm there's no issues with
 your configuration.
 
-To start, simply run::
+To start, simply run
 
-    zuul-scheduler
+.. code-block:: bash
+
+   zuul-scheduler
 
 Once run you should have two zuul-scheduler processes (if using the
 built-in gearman server, or one process otherwise).
 
 Before Zuul can run any jobs, it needs to load its configuration, most
 of which is in the git repositories that Zuul operates on.  Start an
-executor to allow zuul to do that::
+executor to allow zuul to do that
 
-    zuul-executor
+.. code-block:: bash
+
+   zuul-executor
 
 Zuul should now be able to read its configuration from the configured
 repo and process any jobs defined therein.
@@ -115,9 +121,11 @@ Troubleshooting
 ---------------
 
 You can use telnet to connect to gearman to check which Zuul
-components are online::
+components are online
 
-    telnet <gearman_ip> 4730
+.. code-block:: bash
+
+   telnet <gearman_ip> 4730
 
 Useful commands are **workers** and **status** which you can run by just
 typing those commands once connected to gearman.
