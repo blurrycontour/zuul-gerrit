@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_ad697ef9",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 1659,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-23T20:09:23Z",
+      "side": 1,
+      "message": "Here we get only the first element of the config_projects list, but below we apply the config_project config for every entry in this list to every project matching this first element only.\n\nI think this implies that this list only ever has one item, otherwise this wouldn\u0027t work properly.\n\nA more clear way to write this may be to do something like:\n\n  config_project \u003d config_projects[0]\n  projects \u003d tenant.getProjectsByRegex(config_project[\u0027name\u0027])\n\n  for trusted, project in projects:\n      # we just override the project name here so a simple copy\n      # should be enough\n      conf \u003d copy.copy(config_project)\n      name \u003d project.canonical_name\n      conf[\u0027name\u0027] \u003d name\n      data.projects.append(conf)\n\nI don\u0027t mean to bikeshed but the for loop here really warped my thinking process doing this review.",
+      "range": {
+        "startLine": 1659,
+        "startChar": 64,
+        "endLine": 1659,
+        "endChar": 67
+      },
+      "revId": "e3f67e67891f675488742cba84b3f4ede0f0f06d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_ad373eff",
+        "filename": "zuul/model.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 3260,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-23T20:09:23Z",
+      "side": 1,
+      "message": "You might want to list the valid hostnames in the hostname_dict here to help the user understand what the valid canonical names are.",
+      "revId": "e3f67e67891f675488742cba84b3f4ede0f0f06d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_cd04f21a",
+        "filename": "zuul/model.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 3266,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-23T20:09:23Z",
+      "side": 1,
+      "message": "Should be \u0027projects\u0027 not \u0027project\u0027. I think this may also indicate a new test case is needed?",
+      "range": {
+        "startLine": 3266,
+        "startChar": 24,
+        "endLine": 3266,
+        "endChar": 31
+      },
+      "revId": "e3f67e67891f675488742cba84b3f4ede0f0f06d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
