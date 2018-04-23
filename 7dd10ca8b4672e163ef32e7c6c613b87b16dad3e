@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_8137ab4d",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1107,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-04-23T16:58:15Z",
+      "side": 0,
+      "message": "I\u0027m probably missing something here. Where is the new place where the pipeline is added to the layout? Or is that completely unneeded now?",
+      "range": {
+        "startLine": 1107,
+        "startChar": 8,
+        "endLine": 1107,
+        "endChar": 63
+      },
+      "revId": "7dd10ca8b4672e163ef32e7c6c613b87b16dad3e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
