@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_0d618a05",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 1746,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-23T20:05:12Z",
+      "side": 0,
+      "message": "[1] This is where we used to alter the YAML-dict to force a name for all projects.  Now we update the ProjectConfig object after the fact.",
+      "revId": "b4995332aad70762755ba98f9c51380158a56f98",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}

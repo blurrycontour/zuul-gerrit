@@ -25,6 +25,40 @@
     },
     {
       "key": {
+        "uuid": "9f6a8fd7_8d4d9a9b",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 848,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-23T20:05:12Z",
+      "side": 1,
+      "message": "This is to support the case where a project has a \"project:\" stanza in their zuul.yaml, with no name.  We used to detect that case and alter the YAML-dict before passing it into this method[1], but now we only alter the object, after the fact[2].\n\n(See footnotes in other comments.)",
+      "revId": "dbae558c498ad882d1edb3e227836bb83f2ac37b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_ad52de39",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 927,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-23T20:05:12Z",
+      "side": 1,
+      "message": "[2] This is where we now set the name on the ProjectConfig object after parsing the YAML-dict.",
+      "revId": "dbae558c498ad882d1edb3e227836bb83f2ac37b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f6a8fd7_b2c47bf6",
         "filename": "zuul/configloader.py",
         "patchSetId": 16
@@ -48,6 +82,23 @@
     },
     {
       "key": {
+        "uuid": "9f6a8fd7_4d43026d",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 931,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-23T20:05:12Z",
+      "side": 1,
+      "message": "Your comment below is correct; it\u0027s still wrapped.",
+      "revId": "dbae558c498ad882d1edb3e227836bb83f2ac37b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f6a8fd7_8d611aac",
         "filename": "zuul/configloader.py",
         "patchSetId": 16
@@ -59,6 +110,23 @@
       "writtenOn": "2018-04-23T19:47:45Z",
       "side": 1,
       "message": "I guess we moved the context manager to here wrapping the entire fromYaml() instead.",
+      "revId": "dbae558c498ad882d1edb3e227836bb83f2ac37b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_6d484686",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 1661,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-23T20:05:12Z",
+      "side": 1,
+      "message": "Exactly.",
       "revId": "dbae558c498ad882d1edb3e227836bb83f2ac37b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
