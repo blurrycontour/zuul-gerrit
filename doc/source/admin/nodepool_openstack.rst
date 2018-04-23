@@ -10,7 +10,9 @@ Before starting on this, you need to download your `openrc`
 configuration from your OpenStack cloud.  Put it on your server in the
 fedora user's home directory.  It should be called
 ``<username>-openrc.sh``.  Once that is done, create a new keypair
-that will be installed when instantiating the servers::
+that will be installed when instantiating the servers
+
+.. code-block:: bash
 
    cd ~
    source <username>-openrc.sh  # this may prompt for password - enter it
@@ -18,7 +20,9 @@ that will be installed when instantiating the servers::
    openstack keypair create --public-key nodepool_rsa.pub nodepool
 
 We'll use the private key later wheen configuring Zuul.  In the same
-session, configure nodepool to talk to your cloud::
+session, configure nodepool to talk to your cloud
+
+.. code-block:: bash
 
    umask 0066
    sudo mkdir -p ~nodepool/.config/openstack
@@ -39,7 +43,7 @@ session, configure nodepool to talk to your cloud::
 Once you've written out the file, double check all the required fields
 have been filled out.
 
-::
+.. code-block:: bash
 
    sudo mkdir /etc/nodepool/
    sudo mkdir /var/log/nodepool
@@ -55,7 +59,7 @@ Inputs needed for this file:
 * flavor-name
 * image-name - from your cloud
 
-::
+.. code-block:: bash
 
    sudo bash -c "cat >/etc/nodepool/nodepool.yaml <<EOF
    zookeeper-servers:

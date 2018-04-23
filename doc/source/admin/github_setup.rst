@@ -89,7 +89,9 @@ and `zuul-test`, respectively.
 Visit the public app page on GitHub,
 https://github.com/apps/my-org-zuul, and install the app into your org.
 
-Edit ``/etc/zuul/main.yaml`` so that it looks like this::
+Edit ``/etc/zuul/main.yaml`` so that it looks like this
+
+.. code-block:: yaml
 
    - tenant:
        name: quickstart
@@ -111,13 +113,17 @@ installation.
 
 The second section is your GitHub configuration.
 
-After updating the file, restart the Zuul scheduler::
+After updating the file, restart the Zuul scheduler
 
-  sudo systemctl restart zuul-scheduler.service
+.. code-block:: bash
+
+   sudo systemctl restart zuul-scheduler.service
 
 Add an initial pipeline configuration to the `zuul-test-config`
 repository.  Inside that project, create a ``zuul.yaml`` file with the
-following contents::
+following contents
+
+.. code-block:: yaml
 
    - pipeline:
        name: check
@@ -149,7 +155,9 @@ following contents::
 Merge that commit into the repository.
 
 In the `zuul-test` project, create a `.zuul.yaml` file with the
-following contents::
+following contents
+
+.. code-block:: yaml
 
    - project:
        check:

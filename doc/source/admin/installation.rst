@@ -4,13 +4,17 @@ Installation
 Install Zuul
 ------------
 
-To install a Zuul release from PyPI, run::
+To install a Zuul release from PyPI, run
 
-    pip install zuul
+.. code-block:: bash
 
-Or from a git checkout, run::
+   pip install zuul
 
-    pip install .
+Or from a git checkout, run
+
+.. code-block:: bash
+
+   pip install .
 
 That will also install Zuul's python dependencies.  To minimize
 interaction with other python packages installed on a system, you may
@@ -170,4 +174,4 @@ In order to serve the zuul dashboard code from an external static location,
 
 .. code-block:: bash
 
-  npm build:dist -- --define "ZUUL_API_URL='http://zuul-web.example.com'"
+   npm build:dist -- --define "ZUUL_API_URL='http://zuul-web.example.com'"
