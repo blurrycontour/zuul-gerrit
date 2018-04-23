@@ -152,9 +152,10 @@ class Pipeline(object):
     Reporter
         Communicates success and failure results somewhere
     """
-    def __init__(self, name, tenant_name):
+    def __init__(self, name, tenant_name, source_context):
         self.name = name
         self.tenant_name = tenant_name
+        self.source_context = source_context
         self.layout = None
         self.description = None
         self.failure_message = None
@@ -398,7 +399,6 @@ class Project(object):
         # when deciding whether to enqueue their changes
         # TODOv3 (jeblair): re-add support for foreign projects if needed
         self.foreign = foreign
-        self.unparsed_branch_config = {}  # branch -> UnparsedTenantConfig
 
     def __str__(self):
         return self.name
@@ -2477,6 +2477,7 @@ class TenantProjectConfig(object):
         # The tenant's default setting of exclude_unprotected_branches will
         # be overridden by this one if not None.
         self.exclude_unprotected_branches = None
+        self.parsed_branch_config = {}  # branch -> ParsedConfig
 
 
 class ProjectPipelineConfig(ConfigObject):
@@ -2641,7 +2642,7 @@ class UnparsedAbideConfig(object):
                 raise ConfigItemUnknownError()
 
 
-class UnparsedTenantConfig(object):
+class UnparsedConfig(object):
     """A collection of yaml lists that has not yet been parsed into objects."""
 
     def __init__(self):
@@ -2654,20 +2655,21 @@ class UnparsedTenantConfig(object):
         self.secrets = []
         self.semaphores = []
 
-    def copy(self):
-        r = UnparsedTenantConfig()
-        r.pragmas = copy.deepcopy(self.pragmas)
-        r.pipelines = copy.deepcopy(self.pipelines)
-        r.jobs = copy.deepcopy(self.jobs)
-        r.project_templates = copy.deepcopy(self.project_templates)
-        r.projects = copy.deepcopy(self.projects)
-        r.nodesets = copy.deepcopy(self.nodesets)
-        r.secrets = copy.deepcopy(self.secrets)
-        r.semaphores = copy.deepcopy(self.semaphores)
+    def copy(self, trusted=None):
+        # If trusted is not None, update the source context of each
+        # object in the copy.
+        r = UnparsedConfig()
+        for attr in ['pragmas', 'pipelines', 'jobs', 'project_templates',
+                     'projects', 'nodesets', 'secrets', 'semaphores']:
+            # Make a deep copy of each of our attributes
+            setattr(r, attr, copy.deepcopy(getattr(self, attr)))
+            if trusted is not None:
+                for obj in getattr(r, attr):
+                    obj['_source_context'].trusted = trusted
         return r
 
     def extend(self, conf):
-        if isinstance(conf, UnparsedTenantConfig):
+        if isinstance(conf, UnparsedConfig):
             self.pragmas.extend(conf.pragmas)
             self.pipelines.extend(conf.pipelines)
             self.jobs.extend(conf.jobs)
@@ -2705,6 +2707,44 @@ class UnparsedTenantConfig(object):
                 self.pragmas.append(value)
             else:
                 raise ConfigItemUnknownError()
+
+
+class ParsedConfig(object):
+    """A collection of parsed config objects."""
+
+    def __init__(self):
+        self.pragmas = []
+        self.pipelines = []
+        self.jobs = []
+        self.project_templates = []
+        self.projects = []
+        self.nodesets = []
+        self.secrets = []
+        self.semaphores = []
+
+    def copy(self):
+        r = ParsedConfig()
+        r.pragmas = self.pragmas[:]
+        r.pipelines = self.pipelines[:]
+        r.jobs = self.jobs[:]
+        r.project_templates = self.project_templates[:]
+        r.projects = self.projects[:]
+        r.nodesets = self.nodesets[:]
+        r.secrets = self.secrets[:]
+        r.semaphores = self.semaphores[:]
+        return r
+
+    def extend(self, conf):
+        if isinstance(conf, ParsedConfig):
+            self.pragmas.extend(conf.pragmas)
+            self.pipelines.extend(conf.pipelines)
+            self.jobs.extend(conf.jobs)
+            self.project_templates.extend(conf.project_templates)
+            self.projects.extend(conf.projects)
+            self.nodesets.extend(conf.nodesets)
+            self.secrets.extend(conf.secrets)
+            self.semaphores.extend(conf.semaphores)
+            return
 
 
 class Layout(object):
@@ -3205,12 +3245,12 @@ class Tenant(object):
         # The list of projects from which we will read full
         # configuration.
         self.config_projects = []
-        # The unparsed config from those projects.
+        # The parsed config from those projects.
         self.config_projects_config = None
         # The list of projects from which we will read untrusted
         # in-repo configuration.
         self.untrusted_projects = []
-        # The unparsed config from those projects.
+        # The parsed config from those projects.
         self.untrusted_projects_config = None
         self.semaphore_handler = SemaphoreHandler()
         # Metadata about projects for this tenant
@@ -3311,6 +3351,20 @@ class Tenant(object):
 class Abide(object):
     def __init__(self):
         self.tenants = OrderedDict()
+        # project -> branch -> UnparsedConfig
+        self.unparsed_project_branch_config = {}
+
+    def cacheUnparsedConfig(self, canonical_project_name, branch, conf):
+        self.unparsed_project_branch_config.setdefault(
+            canonical_project_name, {})[branch] = conf
+
+    def getUnparsedConfig(self, canonical_project_name, branch):
+        return self.unparsed_project_branch_config.get(
+            canonical_project_name, {}).get(branch)
+
+    def clearUnparsedConfigCache(self, canonical_project_name):
+        if canonical_project_name in self.unparsed_project_branch_config:
+            del self.unparsed_project_branch_config[canonical_project_name]
 
 
 class JobTimeData(object):
