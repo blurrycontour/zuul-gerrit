@@ -1219,7 +1219,7 @@ class TenantParser(object):
                   }
         return vs.Schema(tenant)
 
-    def fromYaml(self, base, project_key_dir, conf, old_tenant):
+    def fromYaml(self, project_key_dir, conf, old_tenant):
         self.getSchema()(conf)
         tenant = model.Tenant(conf['name'])
         if conf.get('max-nodes-per-job') is not None:
@@ -1255,7 +1255,7 @@ class TenantParser(object):
                                           cached, tenant)
         unparsed_config.extend(tenant.config_projects_config)
         unparsed_config.extend(tenant.untrusted_projects_config)
-        tenant.layout = self._parseLayout(base, tenant, unparsed_config)
+        tenant.layout = self._parseLayout(tenant, unparsed_config)
         return tenant
 
     def _resolveShadowProjects(self, tenant, tpc):
@@ -1699,7 +1699,7 @@ class TenantParser(object):
                         layout.getJob(job.name)
                         job.validateReferences(layout)
 
-    def _parseLayout(self, base, tenant, data):
+    def _parseLayout(self, tenant, data):
         # Don't call this method from dynamic reconfiguration because
         # it interacts with drivers and connections.
         layout = model.Layout(tenant)
@@ -1756,8 +1756,7 @@ class ConfigLoader(object):
                         "Tenant config script exec failed: %s (%s)" % (
                             str(error), str(ret.stderr)))
                     data = []
-        base = os.path.dirname(os.path.realpath(config_path))
-        unparsed_abide = model.UnparsedAbideConfig(base)
+        unparsed_abide = model.UnparsedAbideConfig()
         unparsed_abide.extend(data)
         return unparsed_abide
 
@@ -1765,22 +1764,18 @@ class ConfigLoader(object):
         abide = model.Abide()
         for conf_tenant in unparsed_abide.tenants:
             # When performing a full reload, do not use cached data.
-            tenant = self.tenant_parser.fromYaml(unparsed_abide.base,
-                                                 project_key_dir,
+            tenant = self.tenant_parser.fromYaml(project_key_dir,
                                                  conf_tenant, old_tenant=None)
             abide.tenants[tenant.name] = tenant
         return abide
 
-    def reloadTenant(self, config_path, project_key_dir, abide, tenant):
+    def reloadTenant(self, project_key_dir, abide, tenant):
         new_abide = model.Abide()
         new_abide.tenants = abide.tenants.copy()
 
-        config_path = self.expandConfigPath(config_path)
-        base = os.path.dirname(os.path.realpath(config_path))
-
         # When reloading a tenant only, use cached data if available.
         new_tenant = self.tenant_parser.fromYaml(
-            base, project_key_dir,
+            project_key_dir,
             tenant.unparsed_config, old_tenant=tenant)
         new_abide.tenants[tenant.name] = new_tenant
         return new_abide
