@@ -18,24 +18,26 @@ Since we'll be using a cloud image for Fedora 27, our login user will
 be ``fedora`` which will also be the staging user for installation of
 Zuul and Nodepool.
 
-To get started, ssh to your machine as the ``fedora`` user::
+To get started, ssh to your machine as the ``fedora`` user
 
-   ssh fedora@<ip_address>
+.. code-block:: console
+
+   $ ssh fedora@<ip_address>
 
 Environment Setup
 -----------------
 
-::
+.. code-block:: console
 
-   sudo dnf update -y
-   sudo systemctl reboot
-   sudo dnf install git redhat-lsb-core python3 python3-pip python3-devel make gcc openssl-devel python-openstackclient -y
-   pip3 install --user bindep
+   $ sudo dnf update -y
+   $ sudo systemctl reboot
+   $ sudo dnf install git redhat-lsb-core python3 python3-pip python3-devel make gcc openssl-devel python-openstackclient -y
+   $ pip3 install --user bindep
 
 Install Zookeeper
 -----------------
 
-::
+.. code-block:: console
 
-   sudo dnf install zookeeper -y
-   sudo cp /etc/zookeeper/zoo_sample.cfg /etc/zookeeper/zoo.cfg
+   $ sudo dnf install zookeeper -y
+   $ sudo cp /etc/zookeeper/zoo_sample.cfg /etc/zookeeper/zoo.cfg

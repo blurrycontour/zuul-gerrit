@@ -18,17 +18,21 @@ has been setup for that user, you can use that account to create a new 'zuul'
 user. This user, which will be used by our Zuul installation, must have SSH
 access to gerrit, and have the `stream-events <https://gerrit-review.googlesource.com/Documentation/access-control.html#global_capabilities>`_ ACL enabled.
 
-As the admin user, create the 'zuul' user, and import an SSH key for 'zuul'::
+As the admin user, create the 'zuul' user, and import an SSH key for 'zuul'
 
-  $ cat $PUBKEY | ssh -p 29418 $USER@localhost gerrit create-account \
-     --group "'Registered Users'" --ssh-key - zuul
+.. code-block:: console
+
+   $ cat $PUBKEY | ssh -p 29418 $USER@localhost gerrit create-account \
+         --group "'Registered Users'" --ssh-key - zuul
 
 `$PUBKEY` is the location of the SSH public key for the 'zuul' user. `$USER` is
 the username for the admin user.
 
-The 'zuul' user should now be able to stream events::
+The 'zuul' user should now be able to stream events
 
-  $ ssh -p 29418 zuul@localhost gerrit stream-events
+.. code-block:: console
+
+   $ ssh -p 29418 zuul@localhost gerrit stream-events
 
 Configure Gerrit
 ----------------
@@ -56,27 +60,35 @@ The admin user can create new projects in Gerrit, which users can then clone
 and use to submit code changes. Zuul will monitor the Gerrit event stream for
 these submissions.
 
-To create a new project named 'demo-project'::
+To create a new project named 'demo-project'
 
-  $ ssh -p 29418 $USER@localhost gerrit create-project demo-project --empty-commit
+.. code-block:: console
+
+   $ ssh -p 29418 $USER@localhost gerrit create-project demo-project --empty-commit
 
 Modify the Project
 ------------------
 
-* Clone the project::
+Clone the project
 
-  $ git clone ssh://$USER@localhost:29418/demo-project.git
+.. code-block:: console
 
-* Install the change ID hook that Gerrit requires::
+   $ git clone ssh://$USER@localhost:29418/demo-project.git
 
-  $ cd demo-project
-  $ scp -p -P 29418 $USER@localhost:hooks/commit-msg .git/hooks/
+Install the change ID hook that Gerrit requires
 
-* Now you are ready to modify the project and push the changes to Gerrit::
+.. code-block:: console
 
-  $ echo "test" > README.txt
-  $ git add .
-  $ git commit -m "First commit"
-  $ git push origin HEAD:refs/for/master
+   $ cd demo-project
+   $ scp -p -P 29418 $USER@localhost:hooks/commit-msg .git/hooks/
+
+Now you are ready to modify the project and push the changes to Gerrit
+
+.. code-block:: console
+
+   $ echo "test" > README.txt
+   $ git add .
+   $ git commit -m "First commit"
+   $ git push origin HEAD:refs/for/master
 
 You should now be able to see your change in Gerrit.

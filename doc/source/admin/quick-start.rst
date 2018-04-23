@@ -7,9 +7,11 @@ read the following sections for more details.
 Install Zuul
 ------------
 
-You can get zuul from pypi via::
+You can get zuul from pypi via
 
-    pip install zuul
+.. code-block:: console
+
+   $ pip install zuul
 
 Zuul Components
 ---------------
@@ -55,31 +57,35 @@ At minimum you need to provide **zuul.conf** and **main.yaml** placed
 in **/etc/zuul/**.  The following example uses the builtin gearman
 service in Zuul, and a connection to Gerrit.
 
-**zuul.conf**::
+**zuul.conf**:
 
-    [scheduler]
-    tenant_config=/etc/zuul/main.yaml
+.. code-block:: ini
 
-    [gearman_server]
-    start=true
+   [scheduler]
+   tenant_config=/etc/zuul/main.yaml
 
-    [gearman]
-    server=127.0.0.1
+   [gearman_server]
+   start=true
 
-    [connection my_gerrit]
-    driver=gerrit
-    server=git.example.com
-    port=29418
-    baseurl=https://git.example.com/gerrit/
-    user=zuul
-    sshkey=/home/zuul/.ssh/id_rsa
+   [gearman]
+   server=127.0.0.1
+
+   [connection my_gerrit]
+   driver=gerrit
+   server=git.example.com
+   port=29418
+   baseurl=https://git.example.com/gerrit/
+   user=zuul
+   sshkey=/home/zuul/.ssh/id_rsa
 
 See :ref:`components` and :ref:`connections` for more details.
 
 The following tells Zuul to read its configuration from and operate on
-the *example-project* project:
+the *example-project* project.
 
-**main.yaml**::
+**main.yaml**:
+
+.. code-block:: yaml
 
     - tenant:
         name: example-tenant
@@ -95,18 +101,22 @@ You can run any zuul process with the **-d** option to make it not
 daemonize. It's a good idea at first to confirm there's no issues with
 your configuration.
 
-To start, simply run::
+To start, simply run
 
-    zuul-scheduler
+.. code-block:: console
+
+   $ zuul-scheduler
 
 Once run you should have two zuul-scheduler processes (if using the
 built-in gearman server, or one process otherwise).
 
 Before Zuul can run any jobs, it needs to load its configuration, most
 of which is in the git repositories that Zuul operates on.  Start an
-executor to allow zuul to do that::
+executor to allow zuul to do that
 
-    zuul-executor
+.. code-block:: console
+
+   $ zuul-executor
 
 Zuul should now be able to read its configuration from the configured
 repo and process any jobs defined therein.
@@ -115,9 +125,11 @@ Troubleshooting
 ---------------
 
 You can use telnet to connect to gearman to check which Zuul
-components are online::
+components are online
 
-    telnet <gearman_ip> 4730
+.. code-block:: console
+
+   $ telnet <gearman_ip> 4730
 
 Useful commands are **workers** and **status** which you can run by just
 typing those commands once connected to gearman.

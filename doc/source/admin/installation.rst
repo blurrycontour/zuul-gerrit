@@ -4,13 +4,17 @@ Installation
 Install Zuul
 ------------
 
-To install a Zuul release from PyPI, run::
+To install a Zuul release from PyPI, run
 
-    pip install zuul
+.. code-block:: console
 
-Or from a git checkout, run::
+   $ pip install zuul
 
-    pip install .
+Or from a git checkout, run
+
+.. code-block:: console
+
+   $ pip install .
 
 That will also install Zuul's python dependencies.  To minimize
 interaction with other python packages installed on a system, you may
@@ -168,6 +172,6 @@ In order to serve the zuul dashboard code from an external static location,
 ``ZUUL_API_URL`` must be set at javascript build time by passing the
 ``--define`` flag to the ``npm build:dist`` command.
 
-.. code-block:: bash
+.. code-block:: console
 
-  npm build:dist -- --define "ZUUL_API_URL='http://zuul-web.example.com'"
+   $ npm build:dist -- --define "ZUUL_API_URL='http://zuul-web.example.com'"
