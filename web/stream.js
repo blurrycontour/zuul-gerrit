@@ -34,6 +34,14 @@ function escapeLog (text) {
   })
 }
 
+function escapeColor (text) {
+  const pattern = /\u001B\[\d+(;\d+)?m/g
+
+  return text.replace(pattern, function (match) {
+   return ''
+  })
+}
+
 function zuulStartStream ($location) {
   let pageUpdateInMS = 250
   let receiveBuffer = ''
@@ -80,7 +88,7 @@ function zuulStartStream ($location) {
 
   ws.onmessage = function (event) {
     console.log('onmessage')
-    receiveBuffer = receiveBuffer + escapeLog(event.data)
+    receiveBuffer = receiveBuffer + escapeLog(escapeColor((event.data))
   }
 
   ws.onopen = function (event) {
