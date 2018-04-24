@@ -12,6 +12,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import dateutil
+import json
 import os
 import textwrap
 
@@ -78,3 +80,25 @@ class TestZuulJSON(AnsibleZuulTestCase):
             text = self._get_json_as_text(build)
             self.assertIn('rosebud', text)
             self.assertNotIn('setec', text)
+
+    def test_json_time_log(self):
+        job = self._run_job('no-log')
+        with self.jobLog(job):
+            build = self.history[-1]
+            self.assertEqual(build.result, 'SUCCESS')
+
+            print(build)
+            text = self._get_json_as_text(build)
+            # Assert that 'start' and 'end' are part of the result at all
+            self.assertIn('start', text)
+            self.assertIn('end', text)
+
+            json_result = json.loads(text)
+            # Assert that the start and end timestamps are present at the
+            # right place in the dictionary
+            start_time = json_result[0]['plays'][0]['tasks'][0]['start']
+            end_time = json_result[0]['plays'][0]['tasks'][0]['end']
+
+            # Assert that the start and end timestamps are valid dates
+            dateutil.parser.parse(start_time)
+            dateutil.parser.parse(end_time)

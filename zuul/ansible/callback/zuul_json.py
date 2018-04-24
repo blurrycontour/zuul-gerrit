@@ -23,6 +23,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 import copy
+import datetime
 import json
 import os
 
@@ -99,7 +100,8 @@ class CallbackModule(CallbackBase):
                 'name': task.name,
                 'id': str(task._uuid)
             },
-            'hosts': {}
+            'hosts': {},
+            'start': datetime.datetime.utcnow().isoformat()
         }
 
     def v2_playbook_on_start(self, playbook):
@@ -136,6 +138,8 @@ class CallbackModule(CallbackBase):
                              " 'no_log: true' was specified for this result")
 
             self.results[-1]['tasks'][-1]['hosts'][host.name] = clean_result
+        end_time = datetime.datetime.utcnow().isoformat()
+        self.results[-1]['tasks'][-1]['end'] = end_time
 
     def v2_playbook_on_stats(self, stats):
         """Display info about playbook statistics"""
