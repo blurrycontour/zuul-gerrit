@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "9f6a8fd7_15f2da9a",
+        "filename": "doc/source/admin/drivers/mqtt.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-24T16:44:57Z",
+      "side": 1,
+      "message": "I think the default value of always using the highest tls version available is likely to be what every user wants? I can\u0027t come up with a reason for why I might want older less secure versions of tls which would necessitate having an option for this.\n\nBasically we should just do the right thing here and not add another knob the user has to worry about.",
+      "range": {
+        "startLine": 61,
+        "startChar": 13,
+        "endLine": 61,
+        "endChar": 24
+      },
+      "revId": "124e02f85ffc2cc38816bfe9322c190bfc9c62e6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f6a8fd7_55e932e3",
         "filename": "zuul/driver/mqtt/mqttconnection.py",
         "patchSetId": 2
