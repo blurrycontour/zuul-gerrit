@@ -35,6 +35,23 @@ from zuul.ansible import logconfig
 
 LOG_STREAM_PORT = 19885
 
+ANSIBLE_COLORING = True
+
+ANSIBLE_DEFAULT_COLORS = {
+    'changed': '0;33',
+    'debug': '1;30',
+    'deprecate': '0;35',
+    'diff_add': '0;32',
+    'diff_lines': '0;36',
+    'diff_remove': '0;31',
+    'error': '0;31',
+    'highlight': '1;37',
+    'ok': '0;32',
+    'skipping': '0;36',
+    'unreachable': '1;31',
+    'verbose': '0;34',
+    'warn': '1:35'}
+
 
 def zuul_filter_result(result):
     """Remove keys from shell/command output.
@@ -477,14 +494,29 @@ class CallbackModule(default.CallbackModule):
         self._log("PLAY RECAP")
 
         hosts = sorted(stats.processed.keys())
+        if ANSIBLE_COLORING:
+            color_ok = '\x1b[%sm' % ANSIBLE_DEFAULT_COLORS['ok']
+            color_changed = '\x1b[%sm' % ANSIBLE_DEFAULT_COLORS['changed']
+            color_unreach = '\x1b[%sm' % ANSIBLE_DEFAULT_COLORS['unreachable']
+            color_failed = '\x1b[%sm' % ANSIBLE_DEFAULT_COLORS['error']
+            color_end = '\x1b[0m'
+        else:
+            color_ok = ''
+            color_changed = ''
+            color_unreach = ''
+            color_failed = ''
+            color_end = ''
         for host in hosts:
             t = stats.summarize(host)
             self._log(
                 "{host} |"
-                " ok: {ok}"
-                " changed: {changed}"
-                " unreachable: {unreachable}"
-                " failed: {failures}".format(host=host, **t))
+                " {color_ok}ok: {ok}{color_end}"
+                " {color_changed}changed: {changed}{color_end}"
+                " {color_unreach}unreachable: {unreachable}{color_end}"
+                " {color_failed}failed: {failures}{color_end}".format(
+                    host=host, color_ok=color_ok, color_changed=color_changed,
+                    color_unreach=color_unreach, color_failed=color_failed,
+                    color_end=color_end, **t))
 
         # Add a spacer line after the stats so that there will be a line
         # between each playbook
@@ -551,10 +583,18 @@ class CallbackModule(default.CallbackModule):
         hostname = self._get_hostname(result)
         if result_dict:
             result_dict = self._dump_result_dict(result_dict)
+        if ANSIBLE_COLORING:
+            color = '\x1b[%sm' % ANSIBLE_DEFAULT_COLORS.get(
+                status.lower(), '0;30')
+            color_end = '\x1b[0m'
+        else:
+            color = color_end = ''
         if result._task.no_log:
-            self._log("{host} | {msg}".format(
+            self._log("{color}{host} | {msg}{color_end}".format(
                 host=hostname,
-                msg="Output suppressed because no_log was given"))
+                msg="Output suppressed because no_log was given",
+                color=color,
+                color_end=color_end))
             return
         if (not msg and result_dict
                 and set(result_dict.keys()) == set(['msg', 'failed'])):
@@ -563,21 +603,26 @@ class CallbackModule(default.CallbackModule):
         if msg:
             msg_lines = msg.rstrip().split('\n')
             if len(msg_lines) > 1:
-                self._log("{host} | {status}:".format(
-                    host=hostname, status=status))
+                self._log("{color}{host} | {status}:{color_end}".format(
+                    host=hostname, status=status,
+                    color=color, color_end=color_end))
                 for msg_line in msg_lines:
                     self._log("{host} | {msg_line}".format(
                         host=hostname, msg_line=msg_line))
             else:
-                self._log("{host} | {status}: {msg}".format(
-                    host=hostname, status=status, msg=msg))
+                self._log("{color}{host} | {status}: {msg}{color_end}".format(
+                    host=hostname, status=status, msg=msg,
+                    color=color, color_end=color_end))
         else:
-            self._log("{host} | {status}".format(
-                host=hostname, status=status, msg=msg))
+            self._log("{color}{host} | {status}{color_end}".format(
+                host=hostname, status=status, msg=msg,
+                color=color, color_end=color_end))
         if result_dict:
             result_string = json.dumps(result_dict, indent=2, sort_keys=True)
             for line in result_string.split('\n'):
-                self._log("{host} | {line}".format(host=hostname, line=line))
+                self._log("{color}{host} | {line}{color_end}".format(
+                    host=hostname, line=line,
+                    color=color, color_end=color_end))
 
     def _get_hostname(self, result):
         delegated_vars = result._result.get('_ansible_delegated_vars', None)
