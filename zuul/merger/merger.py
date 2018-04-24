@@ -192,7 +192,10 @@ class Repo(object):
         repo.git.clean('-x', '-f', '-d')
         for ref in stale_refs:
             self.log.debug("Delete stale ref %s", ref.remote_head)
-            repo.delete_head(ref.remote_head, force=True)
+            for head in repo.heads:
+                if head.name == ref.remote_head:
+                    repo.delete_head(ref.remote_head, force=True)
+                    break
             git.refs.RemoteReference.delete(repo, ref, force=True)
 
     def prune(self):
