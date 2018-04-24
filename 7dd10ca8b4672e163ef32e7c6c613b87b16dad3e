@@ -22,6 +22,23 @@
       "revId": "7dd10ca8b4672e163ef32e7c6c613b87b16dad3e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_40c40d40",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1107,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-24T21:52:08Z",
+      "side": 0,
+      "message": "This is redundant with an existing line in Layout.addPipeline.  I marked it with another comment.",
+      "revId": "7dd10ca8b4672e163ef32e7c6c613b87b16dad3e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
