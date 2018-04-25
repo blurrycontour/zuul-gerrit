@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9f6a8fd7_de9a3a60",
+        "filename": "doc/source/admin/drivers/mqtt.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-04-25T01:04:02Z",
+      "side": 1,
+      "message": "I\u0027m fine with dropping this setting entirely. If the user (or a regulation) requires a specific TLS version to be used, then the setting could be re-added in a follow-up.\n\nIf that\u0027s ok with you, then I\u0027ll abandon this patch and drop the tls_version setting from the parent review.",
+      "parentUuid": "9f6a8fd7_15f2da9a",
+      "range": {
+        "startLine": 61,
+        "startChar": 13,
+        "endLine": 61,
+        "endChar": 24
+      },
+      "revId": "124e02f85ffc2cc38816bfe9322c190bfc9c62e6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f6a8fd7_55e932e3",
         "filename": "zuul/driver/mqtt/mqttconnection.py",
         "patchSetId": 2
@@ -36,6 +60,24 @@
       "writtenOn": "2018-04-24T16:38:51Z",
       "side": 1,
       "message": "That could be simpler \u0027not (certfile and keyfile)\u0027",
+      "revId": "124e02f85ffc2cc38816bfe9322c190bfc9c62e6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_1e1af2ca",
+        "filename": "zuul/driver/mqtt/mqttconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-04-25T01:04:02Z",
+      "side": 1,
+      "message": "Unfortunately this won\u0027t work if none of the options are set, e.g.: \u0027not (False and False)\u0027 is True.\n\nThough a xor would work, e.g.: bool(certfile) !\u003d bool(keyfile)",
+      "parentUuid": "9f6a8fd7_55e932e3",
       "revId": "124e02f85ffc2cc38816bfe9322c190bfc9c62e6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
