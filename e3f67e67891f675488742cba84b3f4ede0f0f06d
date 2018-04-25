@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "9f6a8fd7_b2ee80ea",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 1659,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-25T23:13:37Z",
+      "side": 1,
+      "message": "Much easier to read now, thanks.",
+      "parentUuid": "9f6a8fd7_dd522d35",
+      "range": {
+        "startLine": 1659,
+        "startChar": 64,
+        "endLine": 1659,
+        "endChar": 67
+      },
+      "revId": "e3f67e67891f675488742cba84b3f4ede0f0f06d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f6a8fd7_ad373eff",
         "filename": "zuul/model.py",
         "patchSetId": 8
