@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9f6a8fd7_dd522d35",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 1659,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-04-25T18:00:47Z",
+      "side": 1,
+      "message": "I think what\u0027s confusing here is the name where actually this should be the regex (the key of the item). So I changed that a bit differently than your suggestion but hopefully it\u0027s much clearer now :)",
+      "parentUuid": "9f6a8fd7_ad697ef9",
+      "range": {
+        "startLine": 1659,
+        "startChar": 64,
+        "endLine": 1659,
+        "endChar": 67
+      },
+      "revId": "e3f67e67891f675488742cba84b3f4ede0f0f06d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f6a8fd7_ad373eff",
         "filename": "zuul/model.py",
         "patchSetId": 8
