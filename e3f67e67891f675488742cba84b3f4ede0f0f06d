@@ -42,6 +42,24 @@
     },
     {
       "key": {
+        "uuid": "9f6a8fd7_5db7fdf5",
+        "filename": "zuul/model.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 3260,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-04-25T17:58:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f6a8fd7_ad373eff",
+      "revId": "e3f67e67891f675488742cba84b3f4ede0f0f06d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f6a8fd7_cd04f21a",
         "filename": "zuul/model.py",
         "patchSetId": 8
@@ -53,6 +71,30 @@
       "writtenOn": "2018-04-23T20:09:23Z",
       "side": 1,
       "message": "Should be \u0027projects\u0027 not \u0027project\u0027. I think this may also indicate a new test case is needed?",
+      "range": {
+        "startLine": 3266,
+        "startChar": 24,
+        "endLine": 3266,
+        "endChar": 31
+      },
+      "revId": "e3f67e67891f675488742cba84b3f4ede0f0f06d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_39e49e0c",
+        "filename": "zuul/model.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 3266,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-04-25T17:58:41Z",
+      "side": 1,
+      "message": "You\u0027re absolutely right, also tox cover tells me that this line is untested",
+      "parentUuid": "9f6a8fd7_cd04f21a",
       "range": {
         "startLine": 3266,
         "startChar": 24,
