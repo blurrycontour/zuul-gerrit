@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_f41ab5c3",
+        "filename": "zuul/driver/mqtt/mqttreporter.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-04-25T12:49:15Z",
+      "side": 1,
+      "message": "I\u0027d also like the buildset uuid in there. \n\nHowever the current structure looks like this:\n\n  buildset:\n    - uuid: 23423\n      start_time: adsf\n      ...\n\nI don\u0027t see a place where this would naturally fit into.\n\n\nWhen using the following data structure the buildset uuid would fit nicely into:\n\n  buildset:\n    uuid: 2343415\n    builds:\n      - uuid: 4545645\n        start_time: ...\n      - uuid: 34245\n        start_time...",
+      "range": {
+        "startLine": 42,
+        "startChar": 0,
+        "endLine": 42,
+        "endChar": 26
+      },
+      "revId": "b02cf780a0cf0e632acd0e4f7f43c8e41ae294ca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
