@@ -15,6 +15,17 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import pkg_resources
+
 import pbr.version
 
 version_info = pbr.version.VersionInfo('zuul')
+release_string = version_info.release_string()
+
+_metadata = pkg_resources.get_distribution('zuul').get_metadata('pbr.json')
+if _metadata:
+    is_release = _metadata['is_release']
+    git_version = _metadata['git_version']
+else:
+    is_release = None
+    git_version = None
