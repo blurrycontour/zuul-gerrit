@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_7068dbf3",
+        "filename": "doc/source/admin/fedora27_setup.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2018-04-26T09:05:03Z",
+      "side": 1,
+      "message": "\"console\" would be right.",
+      "revId": "b7d6191f73c0772ba47b332f6155efcab6449b4c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
