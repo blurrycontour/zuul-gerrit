@@ -147,6 +147,24 @@
       "revId": "e8cf0b5fd7965badd847cd8b0f0f3c0072c4b2cd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_8970dbde",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2685,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-26T23:30:30Z",
+      "side": 1,
+      "message": "Ya I don\u0027t think we need to create new_sc here, instead we can just do something like:\n\n  new_obj[\u0027_source_context\u0027].trusted \u003d trusted\n\nAnd update the object in place since it has already been deep copied.",
+      "parentUuid": "9f6a8fd7_a9bcbf6c",
+      "revId": "e8cf0b5fd7965badd847cd8b0f0f3c0072c4b2cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
