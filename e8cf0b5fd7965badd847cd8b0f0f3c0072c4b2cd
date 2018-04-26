@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_297c2f1f",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1495,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-26T23:21:29Z",
+      "side": 1,
+      "message": "Not a -1 because not a regression but maybe we should indicate which contents were loaded and which were ignored.",
+      "revId": "e8cf0b5fd7965badd847cd8b0f0f3c0072c4b2cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_899c5b5e",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1518,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-26T23:21:29Z",
+      "side": 1,
+      "message": "Are config projects required to only use master or should we use the repo HEAD instaed? Also this may not be a regression so not a -1.",
+      "range": {
+        "startLine": 1518,
+        "startChar": 40,
+        "endLine": 1518,
+        "endChar": 48
+      },
+      "revId": "e8cf0b5fd7965badd847cd8b0f0f3c0072c4b2cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_69330764",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1746,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-26T23:21:29Z",
+      "side": 1,
+      "message": "This might be more accurately _buildLayout() at this point? Parsing should have already happened by the time this is called.",
+      "range": {
+        "startLine": 1746,
+        "startChar": 8,
+        "endLine": 1746,
+        "endChar": 14
+      },
+      "revId": "e8cf0b5fd7965badd847cd8b0f0f3c0072c4b2cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_29d98ff3",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2685,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-26T23:21:29Z",
+      "side": 1,
+      "message": "Wouldn\u0027t the deep copy have done all of the above project, branch, and path copying for us? Then we can just set the trusted value here if necessary. Its still been deepcopied so I think we can safely update that object without making a new object?",
+      "revId": "e8cf0b5fd7965badd847cd8b0f0f3c0072c4b2cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
