@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_7903dabf",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1446,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-04-26T19:03:29Z",
+      "side": 1,
+      "message": "nit: using itertools.chain [1] would avoid list copying here.\n\n[1] https://docs.python.org/3.5/library/itertools.html#itertools.chain",
+      "revId": "0a6b9e9534e9afb668cdd25f9acc00f0767ca07a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_b975f234",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1478,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-04-26T19:03:29Z",
+      "side": 1,
+      "message": "idea for later: we might want to add a retry mechanism here like the merger failure retry Joshua is working on.",
+      "revId": "0a6b9e9534e9afb668cdd25f9acc00f0767ca07a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_79c51a0a",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1569,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-04-26T19:03:29Z",
+      "side": 1,
+      "message": "Should we add `with configuration_exceptions` here? \n\nI know that the pipeline parser currently doesn\u0027t raise any exception but I\u0027m pretty sure if it will in the future we will forget to add this here.\n\nI\u0027m ambivalent here, just want to raise that question.",
+      "range": {
+        "startLine": 1567,
+        "startChar": 0,
+        "endLine": 1569,
+        "endChar": 67
+      },
+      "revId": "0a6b9e9534e9afb668cdd25f9acc00f0767ca07a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
