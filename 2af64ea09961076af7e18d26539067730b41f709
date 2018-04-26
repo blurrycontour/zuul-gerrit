@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_8a18ce84",
+        "filename": "zuul/version.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2018-04-26T21:30:11Z",
+      "side": 1,
+      "message": "If it\u0027s _possible_ for zuul to be packaged without PBR metadata (is this possible?) then we might want to wrap this in some error handling. I don\u0027t know whether it\u0027s a legitimate concern or not.",
+      "revId": "2af64ea09961076af7e18d26539067730b41f709",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
