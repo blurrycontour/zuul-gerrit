@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_c979f393",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 602,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-26T22:24:40Z",
+      "side": 0,
+      "message": "Yay for removing _ (whcih can conflict with i18n stuff).",
+      "range": {
+        "startLine": 602,
+        "startChar": 27,
+        "endLine": 602,
+        "endChar": 28
+      },
+      "revId": "5bd8716954252d08caf5d75549cd3a0d4f7a0038",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
