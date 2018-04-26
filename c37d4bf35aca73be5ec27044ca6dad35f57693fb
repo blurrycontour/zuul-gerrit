@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_4ffe486c",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1448,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-04-26T20:24:49Z",
+      "side": 1,
+      "message": "when using chain it should be:\n\n  itertools.chain(tenant.config_projects, tenant.untrusted_projects):",
+      "parentUuid": "",
+      "revId": "c37d4bf35aca73be5ec27044ca6dad35f57693fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
