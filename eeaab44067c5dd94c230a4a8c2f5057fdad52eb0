@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_8981bb4d",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-26T22:30:44Z",
+      "side": 1,
+      "message": "Question about consistency. This isn\u0027t a ConfigObject and gets source_context set via __init__() the ConfigObjects on the other hand have their source_context __init__() parameters removed and are set directly instead.\n\nMaybe we want to set it directly instead and use a consistent pattern there with the non ConfigObject pipeline objects too?",
+      "range": {
+        "startLine": 158,
+        "startChar": 42,
+        "endLine": 158,
+        "endChar": 56
+      },
+      "revId": "eeaab44067c5dd94c230a4a8c2f5057fdad52eb0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
