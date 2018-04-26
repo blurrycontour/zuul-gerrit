@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "9f6a8fd7_c9c1f3e6",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1495,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-26T23:25:48Z",
+      "side": 1,
+      "message": "++",
+      "revId": "e8cf0b5fd7965badd847cd8b0f0f3c0072c4b2cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f6a8fd7_899c5b5e",
         "filename": "zuul/configloader.py",
         "patchSetId": 6
@@ -36,6 +53,23 @@
         "endLine": 1518,
         "endChar": 48
       },
+      "revId": "e8cf0b5fd7965badd847cd8b0f0f3c0072c4b2cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_69b6a78d",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1518,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-26T23:25:48Z",
+      "side": 1,
+      "message": "We could improve this to use the default branch, but this is the current behavior.",
       "revId": "e8cf0b5fd7965badd847cd8b0f0f3c0072c4b2cd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -65,6 +99,23 @@
     },
     {
       "key": {
+        "uuid": "9f6a8fd7_89bbfb70",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1746,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-26T23:25:48Z",
+      "side": 1,
+      "message": "Yeah, I ran out of words.  That\u0027s a good suggestion.",
+      "revId": "e8cf0b5fd7965badd847cd8b0f0f3c0072c4b2cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f6a8fd7_29d98ff3",
         "filename": "zuul/model.py",
         "patchSetId": 6
@@ -76,6 +127,23 @@
       "writtenOn": "2018-04-26T23:21:29Z",
       "side": 1,
       "message": "Wouldn\u0027t the deep copy have done all of the above project, branch, and path copying for us? Then we can just set the trusted value here if necessary. Its still been deepcopied so I think we can safely update that object without making a new object?",
+      "revId": "e8cf0b5fd7965badd847cd8b0f0f3c0072c4b2cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_a9bcbf6c",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2685,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-26T23:25:48Z",
+      "side": 1,
+      "message": "I guess you\u0027re suggesting that instead of creating a new sourcecontext here, we could use the deepcopied source context from the first object with this key... I reckon that would work.",
       "revId": "e8cf0b5fd7965badd847cd8b0f0f3c0072c4b2cd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
