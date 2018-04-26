@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "9f6a8fd7_a52b8580",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-26T21:33:10Z",
+      "side": 1,
+      "message": "I think this may show the version as:\n\n  3.0.2 None\n\nWhen packaged by packagers and they don\u0027t include the pbr.json file.\n\nTo fix that I think you can do:\n\n  if zuul_version.is_release or not zuul_version.git_version:\n\nThen if it is a release but no pbr.json you\u0027ll print just 3.0.2.",
+      "revId": "2af64ea09961076af7e18d26539067730b41f709",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f6a8fd7_8a18ce84",
         "filename": "zuul/version.py",
         "patchSetId": 1
