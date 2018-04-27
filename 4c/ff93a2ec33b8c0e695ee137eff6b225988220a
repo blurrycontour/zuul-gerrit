@@ -1,0 +1,9 @@
+Code-Review+2: Tobias Henkel <tobias.henkel@bmw.de>
+Code-Review+2: Clark Boylan <cboylan@sapwetik.org>
+Workflow+1: Tobias Henkel <tobias.henkel@bmw.de>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Fri, 27 Apr 2018 18:58:17 +0000
+Reviewed-on: https://review.openstack.org/564562
+Project: openstack-infra/zuul
+Branch: refs/heads/master
