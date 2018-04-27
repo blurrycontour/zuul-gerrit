@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_c32eacf9",
+        "filename": "doc/source/admin/tenants.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-04-27T07:06:23Z",
+      "side": 1,
+      "message": "s/any/the",
+      "range": {
+        "startLine": 242,
+        "startChar": 28,
+        "endLine": 242,
+        "endChar": 31
+      },
+      "revId": "02bda7904877f506d23fc4d4b2ec911da354d1ac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_63332064",
+        "filename": "doc/source/admin/tenants.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-04-27T07:06:23Z",
+      "side": 1,
+      "message": "ditto",
+      "range": {
+        "startLine": 249,
+        "startChar": 28,
+        "endLine": 249,
+        "endChar": 31
+      },
+      "revId": "02bda7904877f506d23fc4d4b2ec911da354d1ac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_e34650c1",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-04-27T07:06:23Z",
+      "side": 1,
+      "message": "Not sure if we should consider saying \"Disallowed or unknown\"?",
+      "revId": "02bda7904877f506d23fc4d4b2ec911da354d1ac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
