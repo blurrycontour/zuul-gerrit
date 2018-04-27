@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_82d980f5",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 945,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-27T18:43:47Z",
+      "side": 1,
+      "message": "Maybe this should fail early before setting regex \u003d True. This helps avoid any parsing side effects that shouldn\u0027t happen if not trusted.",
+      "revId": "c81e06b2044778a1aee4e803a2d1bd59bc3eb3ea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_42fcc83d",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 962,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-04-27T18:43:47Z",
+      "side": 1,
+      "message": "Similar to above comment if we move this check to just after the getProject() call then we avoid any potential side effecting and error as early as possible.",
+      "revId": "c81e06b2044778a1aee4e803a2d1bd59bc3eb3ea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
