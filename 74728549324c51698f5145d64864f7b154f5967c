@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_f2029709",
+        "filename": "zuul/driver/mqtt/mqttreporter.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2018-04-27T08:27:14Z",
+      "side": 1,
+      "message": "Would it be useful to also store the \u0027tenant\u0027 information in the payload? As far as I can see, this information is currently only part of the topic.",
+      "range": {
+        "startLine": 30,
+        "startChar": 8,
+        "endLine": 30,
+        "endChar": 15
+      },
+      "revId": "74728549324c51698f5145d64864f7b154f5967c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
