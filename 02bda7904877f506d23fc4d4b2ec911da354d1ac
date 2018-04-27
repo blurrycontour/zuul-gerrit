@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "9f6a8fd7_d9bbef6f",
+        "filename": "doc/source/admin/tenants.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-27T16:30:53Z",
+      "side": 1,
+      "message": "Fixed.",
+      "revId": "02bda7904877f506d23fc4d4b2ec911da354d1ac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f6a8fd7_63332064",
         "filename": "doc/source/admin/tenants.rst",
         "patchSetId": 3
@@ -48,6 +65,23 @@
     },
     {
       "key": {
+        "uuid": "9f6a8fd7_79b0a38c",
+        "filename": "doc/source/admin/tenants.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-27T16:30:53Z",
+      "side": 1,
+      "message": "Fixed.",
+      "revId": "02bda7904877f506d23fc4d4b2ec911da354d1ac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f6a8fd7_e34650c1",
         "filename": "zuul/configloader.py",
         "patchSetId": 3
@@ -59,6 +93,23 @@
       "writtenOn": "2018-04-27T07:06:23Z",
       "side": 1,
       "message": "Not sure if we should consider saying \"Disallowed or unknown\"?",
+      "revId": "02bda7904877f506d23fc4d4b2ec911da354d1ac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_99ad7733",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-27T16:30:53Z",
+      "side": 1,
+      "message": "I lean toward disallowed, but let\u0027s see what Tristan says.",
       "revId": "02bda7904877f506d23fc4d4b2ec911da354d1ac",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
