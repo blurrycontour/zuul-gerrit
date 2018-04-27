@@ -22,6 +22,30 @@
       "revId": "b02cf780a0cf0e632acd0e4f7f43c8e41ae294ca",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_5dca79a1",
+        "filename": "zuul/driver/mqtt/mqttreporter.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-04-27T04:01:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f6a8fd7_f41ab5c3",
+      "range": {
+        "startLine": 42,
+        "startChar": 0,
+        "endLine": 42,
+        "endChar": 26
+      },
+      "revId": "b02cf780a0cf0e632acd0e4f7f43c8e41ae294ca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
