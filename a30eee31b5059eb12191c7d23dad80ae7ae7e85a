@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_0d3601b6",
+        "filename": "zuul/version.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2018-04-27T19:00:49Z",
+      "side": 1,
+      "message": "I realized later last night (when playing around with similar support for a personal project) that json.loads() was necessary. Sorry, I should have circled back around and checked that we were doing it here too.",
+      "revId": "a30eee31b5059eb12191c7d23dad80ae7ae7e85a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
