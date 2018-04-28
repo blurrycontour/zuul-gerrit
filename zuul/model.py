@@ -1141,9 +1141,13 @@ class Job(ConfigObject):
     def _deepUpdate(a, b):
         # Merge nested dictionaries if possible, otherwise, overwrite
         # the value in 'a' with the value in 'b'.
+
+        # We need to handle nested MappingProxyTypes that may not be
+        # on the b side and are only on the "parent" a side.
         ret = {}
         for k, av in a.items():
             if k not in b:
+                # This here specifically needs coersion too.
                 ret[k] = av
         for k, bv in b.items():
             av = a.get(k)
@@ -1151,8 +1155,12 @@ class Job(ConfigObject):
                 isinstance(bv, (dict, types.MappingProxyType))):
                 ret[k] = Job._deepUpdate(av, bv)
             elif isinstance(bv, types.MappingProxyType):
+                # Todo is this sufficient? dict types could contain
+                # more dict types that need to be serializable
                 ret[k] = dict(bv)
             else:
+                # Could we have a list type here that needs to also have
+                # dict types get converted?
                 ret[k] = bv
         return ret
 
