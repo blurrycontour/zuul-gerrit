@@ -1212,6 +1212,27 @@ pipeline.
          :attr:`job` definition.  Any attributes set on the job here
          will override previous versions of the job.
 
+         When a job appears multiple times on a project (for instance,
+         if it appears in a project-template and also on the project
+         itself), all of the project-local variants which match the
+         item's branch must also match the item in order for the job
+         to run.  In other words, if a job appears in a
+         project-template used by a project and on the project, then
+         both must match.
+
+         This effectively causes the :attr:`job.files` and
+         :attr:`job.irrelevant-files` on all of the project-local job
+         definitions matching a given branch to be combined.  The
+         combination of multiple files matchers behaves as a union,
+         and irrelevant-files matchers as an intersection.
+
+         ================  ========  =======  =======
+         Matcher           Template  Project  Result
+         ================  ========  =======  =======
+         files             AB        BC       ABC
+         irrelevant-files  AB        BC       B
+         ================  ========  =======  =======
+
       .. attr:: queue
 
          If this pipeline is a :value:`dependent
