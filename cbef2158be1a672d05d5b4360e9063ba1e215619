@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_345f80e6",
+        "filename": "bindep.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 15362
+      },
+      "writtenOn": "2018-04-29T19:43:30Z",
+      "side": 1,
+      "message": "this is needed for CentOS7 as well due to the same reason - gcc doesn\u0027t bring gcc-c++ in. I should perhaps skip adding it to the doc if you can add it here.",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 23
+      },
+      "revId": "cbef2158be1a672d05d5b4360e9063ba1e215619",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
