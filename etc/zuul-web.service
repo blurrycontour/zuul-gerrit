@@ -8,7 +8,6 @@ Group=zuul
 User=zuul
 RuntimeDirectory=zuul
 ExecStart=/usr/local/bin/zuul-web
-ExecStop=/usr/local/bin/zuul-web stop
 
 [Install]
 WantedBy=multi-user.target
