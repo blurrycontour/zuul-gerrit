@@ -1,0 +1,6 @@
+- hosts: all
+  tasks:
+    - name: Start zuul_console daemon
+      zuul_console:
+    - name: Command with undefined variable
+      command: "{{ some_undefined_variable }}"

@@ -153,3 +153,27 @@ class TestZuulStream(AnsibleZuulTestCase):
             self.assertLogLine(r'TASK \[Module failure\]', text)
             self.assertLogLine(
                 r'controller \| MODULE FAILURE: This module is broken', text)
+
+    def test_syntax_error(self):
+        job = self._run_job('syntax_error')
+
+        with self.jobLog(job):
+            build = self.history[-1]
+            self.assertEqual(build.result, 'FAILURE')
+
+            text = self._get_job_output(build)
+            self.assertLogLine('ANSIBLE PARSE ERROR', text)
+            self.assertLogLine('ERROR! Syntax Error while loading YAML.', text)
+
+    def test_undefined_variable(self):
+        job = self._run_job('undefined_variable')
+
+        with self.jobLog(job):
+            build = self.history[-1]
+            self.assertEqual(build.result, 'FAILURE')
+
+            text = self._get_job_output(build)
+            self.assertLogLine('controller \| The task includes an option with'
+                               ' an undefined variable. The error was: '
+                               '\'some_undefined_variable\' is undefined',
+                               text)
