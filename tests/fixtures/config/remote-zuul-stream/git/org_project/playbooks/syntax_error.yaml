@@ -1,0 +1,5 @@
+- hosts: all
+  tasks:
+    - name: Start zuul_console daemon
+      zuul_console:
+    syntax error
