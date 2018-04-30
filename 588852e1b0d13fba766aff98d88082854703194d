@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_fa6b2fee",
+        "filename": "doc/source/admin/drivers/mqtt.rst",
+        "patchSetId": 22
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-04-30T07:01:02Z",
+      "side": 1,
+      "message": "I think to be aligned with the other parts of the documentation this should be just indented below buildset.builds and not a separate section.",
+      "range": {
+        "startLine": 77,
+        "startChar": 0,
+        "endLine": 103,
+        "endChar": 54
+      },
+      "revId": "588852e1b0d13fba766aff98d88082854703194d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
