@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_68d74a51",
+        "filename": "doc/source/admin/nodepool_install.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-30T21:53:53Z",
+      "side": 1,
+      "message": "This is the only difference I spot in this section.  We still have yum on fedora, right?  If so, we could switch to yum for both.\n\nObviously when we add debian, we\u0027ll have this issue again, but maybe we can just get it to one line of difference so it ends up being:\n\n* clone\n* cd\nfedora or centos:\n  * yum install\ndebian or ubuntu:\n  * apt install\n* pip install",
+      "revId": "f28c777daa725ba35a906231d5d01492f2dce679",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_08e6ce45",
+        "filename": "doc/source/admin/nodepool_install.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-30T21:53:53Z",
+      "side": 1,
+      "message": "Similarly, we could keep the common items together and then just have an additional \"on centos, also do this\" section.",
+      "revId": "f28c777daa725ba35a906231d5d01492f2dce679",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
