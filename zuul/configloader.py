@@ -930,8 +930,6 @@ class ProjectParser(object):
             # of the project where it is defined.
             project_name = (conf['_source_context'].project.canonical_name)
 
-        # regex matched projects need to be validatd later
-        regex = False
         if project_name.startswith('^'):
             # regex matching is designed to match other projects so disallow
             # in untrusted contexts
@@ -940,7 +938,6 @@ class ProjectParser(object):
 
             # Parse the project as a template since they're mostly the
             # same.
-            regex = True
             project_config = self.pcontext.project_template_parser. \
                 fromYaml(conf, validate=False, freeze=False)
 
@@ -978,9 +975,6 @@ class ProjectParser(object):
         default_branch = conf.get('default-branch', 'master')
         project_config.default_branch = default_branch
 
-        # we need to freeze regex projects later
-        if not regex:
-            project_config.freeze()
         return project_config
 
 
