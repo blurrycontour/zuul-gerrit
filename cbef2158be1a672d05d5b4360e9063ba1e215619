@@ -22,6 +22,30 @@
       "revId": "cbef2158be1a672d05d5b4360e9063ba1e215619",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_54f4745b",
+        "filename": "bindep.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2018-04-30T00:23:59Z",
+      "side": 1,
+      "message": "i agree we should probably just make this platform:rpm\n\nwe\u0027ve never found a good \"build-essential\" analogue unforutnately",
+      "parentUuid": "9f6a8fd7_345f80e6",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 23
+      },
+      "revId": "cbef2158be1a672d05d5b4360e9063ba1e215619",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
