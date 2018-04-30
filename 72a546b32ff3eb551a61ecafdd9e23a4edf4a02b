@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_e8783a90",
+        "filename": "doc/source/admin/centos7_setup.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-04-30T21:47:38Z",
+      "side": 1,
+      "message": "I notice a package called zookeeper-server with a description \"This package starts the zookeeper server on startup\".  If we install that, will that install the unit file for us?\n\nThat\u0027s actually how things work on the debian side of the house too.",
+      "revId": "72a546b32ff3eb551a61ecafdd9e23a4edf4a02b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
