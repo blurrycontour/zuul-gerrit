@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9f6a8fd7_b475be9a",
+        "filename": "zuul/driver/zuul/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-04-30T21:03:07Z",
+      "side": 1,
+      "message": "Based on IRC discussion, this variable should be updated with pipeline information instead of checking on every enqueue.",
+      "parentUuid": "9f6a8fd7_7945df6f",
+      "revId": "e46ff531e78a0070c25e58ae3b0a64279b8ca3ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f6a8fd7_9948f387",
         "filename": "zuul/driver/zuul/__init__.py",
         "patchSetId": 3
