@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9f6a8fd7_b07b77f2",
+        "filename": "doc/source/admin/nodepool_install.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 15362
+      },
+      "writtenOn": "2018-05-01T18:36:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f6a8fd7_68d74a51",
+      "revId": "f28c777daa725ba35a906231d5d01492f2dce679",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f6a8fd7_08e6ce45",
         "filename": "doc/source/admin/nodepool_install.rst",
         "patchSetId": 7
@@ -30,6 +48,24 @@
       "writtenOn": "2018-04-30T21:53:53Z",
       "side": 1,
       "message": "Similarly, we could keep the common items together and then just have an additional \"on centos, also do this\" section.",
+      "revId": "f28c777daa725ba35a906231d5d01492f2dce679",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_50821bca",
+        "filename": "doc/source/admin/nodepool_install.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 15362
+      },
+      "writtenOn": "2018-05-01T18:36:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f6a8fd7_08e6ce45",
       "revId": "f28c777daa725ba35a906231d5d01492f2dce679",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
