@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_8dd0a8cb",
+        "filename": "tests/remote/test_remote_zuul_json.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-05-01T11:05:00Z",
+      "side": 1,
+      "message": "(nit) left over debugging?",
+      "revId": "e701310da8bee5b6c72b8a0d23a6c2c949bfe192",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
