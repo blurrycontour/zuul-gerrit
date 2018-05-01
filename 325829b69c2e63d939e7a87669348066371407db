@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_4d6930bc",
+        "filename": "requirements.txt",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-05-01T10:02:34Z",
+      "side": 1,
+      "message": "That looks a bit weird as we already require a specific version of yarl.",
+      "range": {
+        "startLine": 24,
+        "startChar": 12,
+        "endLine": 24,
+        "endChar": 35
+      },
+      "revId": "325829b69c2e63d939e7a87669348066371407db",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
