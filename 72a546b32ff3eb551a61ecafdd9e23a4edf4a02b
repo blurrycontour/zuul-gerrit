@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "9f6a8fd7_e4537138",
+        "filename": "doc/source/admin/centos7_setup.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-05-01T22:32:25Z",
+      "side": 1,
+      "message": "Is this preferable to using the python3.5 software collection on centos? (I\u0027ve never used a software collection so don\u0027t know).",
+      "revId": "72a546b32ff3eb551a61ecafdd9e23a4edf4a02b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_040d453d",
+        "filename": "doc/source/admin/centos7_setup.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-05-01T22:32:25Z",
+      "side": 1,
+      "message": "Should we let bindep\u0027s listing install deps like make, gcc, gcc-c++ and openssl-devel. That way the python installation can control its deps a bit more directly and we just have to bootstrap python and java+zookeer here.\n\nLooks like fedora similarly says to install these deps so this isn\u0027t really a regression.",
+      "revId": "72a546b32ff3eb551a61ecafdd9e23a4edf4a02b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f6a8fd7_e8783a90",
         "filename": "doc/source/admin/centos7_setup.rst",
         "patchSetId": 4
@@ -31,6 +65,24 @@
       "side": 1,
       "message": "the package contains an init script rather than the unit file.\n\n[centos@zuul ~]$ repoquery -l zookeeper-server\n/etc/rc.d/init.d/zookeeper-server\n\nhttps://github.com/apache/bigtop/blob/master/bigtop-packages/src/deb/zookeeper/zookeeper-server.init",
       "parentUuid": "9f6a8fd7_e8783a90",
+      "revId": "72a546b32ff3eb551a61ecafdd9e23a4edf4a02b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_44457d6f",
+        "filename": "doc/source/admin/centos7_setup.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-05-01T22:32:25Z",
+      "side": 1,
+      "message": "That should be fine right? systemd should still manage the service through its compatibility layer.",
+      "parentUuid": "9f6a8fd7_d034ebe0",
       "revId": "72a546b32ff3eb551a61ecafdd9e23a4edf4a02b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
