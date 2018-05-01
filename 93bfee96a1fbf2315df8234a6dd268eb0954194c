@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_cd2a20e6",
+        "filename": "etc/zuul.conf-sample",
+        "patchSetId": 31
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-05-01T11:00:38Z",
+      "side": 1,
+      "message": "why is this default changing?",
+      "revId": "93bfee96a1fbf2315df8234a6dd268eb0954194c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_cd1300b8",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-05-01T11:00:38Z",
+      "side": 1,
+      "message": "(nit) where is this used?",
+      "revId": "93bfee96a1fbf2315df8234a6dd268eb0954194c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_ed7b64f1",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 427,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-05-01T11:00:38Z",
+      "side": 1,
+      "message": "Should check that the change has actually ran through the gate pipeline.",
+      "revId": "93bfee96a1fbf2315df8234a6dd268eb0954194c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_6d675453",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 456,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-05-01T11:00:38Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "93bfee96a1fbf2315df8234a6dd268eb0954194c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_ad9b2c64",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-05-01T11:00:38Z",
+      "side": 1,
+      "message": "Should update documentation for this new default",
+      "revId": "93bfee96a1fbf2315df8234a6dd268eb0954194c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
