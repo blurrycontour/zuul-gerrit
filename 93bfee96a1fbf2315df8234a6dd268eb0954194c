@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "9f6a8fd7_3713e668",
+        "filename": "etc/zuul.conf-sample",
+        "patchSetId": 31
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-05-01T14:23:46Z",
+      "side": 1,
+      "message": "Indeed, we probably should not change it.",
+      "revId": "93bfee96a1fbf2315df8234a6dd268eb0954194c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f6a8fd7_cd1300b8",
         "filename": "tests/unit/test_web.py",
         "patchSetId": 31
@@ -81,6 +98,125 @@
       "writtenOn": "2018-05-01T11:00:38Z",
       "side": 1,
       "message": "Should update documentation for this new default",
+      "revId": "93bfee96a1fbf2315df8234a6dd268eb0954194c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_573d3adb",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-05-01T14:23:46Z",
+      "side": 1,
+      "message": "There\u0027s no need to do this.",
+      "revId": "93bfee96a1fbf2315df8234a6dd268eb0954194c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_f7232ebd",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-05-01T14:23:46Z",
+      "side": 1,
+      "message": "Or this.",
+      "revId": "93bfee96a1fbf2315df8234a6dd268eb0954194c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_171fc270",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-05-01T14:23:46Z",
+      "side": 1,
+      "message": "Or this.",
+      "revId": "93bfee96a1fbf2315df8234a6dd268eb0954194c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_b72db6a9",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-05-01T14:23:46Z",
+      "side": 1,
+      "message": "Or this.",
+      "revId": "93bfee96a1fbf2315df8234a6dd268eb0954194c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_d7286a98",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-05-01T14:23:46Z",
+      "side": 1,
+      "message": "Or this.",
+      "revId": "93bfee96a1fbf2315df8234a6dd268eb0954194c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_77195e86",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-05-01T14:23:46Z",
+      "side": 1,
+      "message": "Or this.",
+      "revId": "93bfee96a1fbf2315df8234a6dd268eb0954194c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_971c3278",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-05-01T14:23:46Z",
+      "side": 1,
+      "message": "Or this.",
       "revId": "93bfee96a1fbf2315df8234a6dd268eb0954194c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
