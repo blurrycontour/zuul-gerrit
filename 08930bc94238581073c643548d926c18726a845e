@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_8462b515",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2764,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-05-01T22:25:15Z",
+      "side": 1,
+      "message": "This layout file doesn\u0027t actually seem to have any regexes in it?",
+      "revId": "08930bc94238581073c643548d926c18726a845e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
