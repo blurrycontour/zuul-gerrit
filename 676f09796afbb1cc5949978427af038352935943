@@ -257,6 +257,23 @@
     },
     {
       "key": {
+        "uuid": "9f6a8fd7_f30ec7e3",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-05-02T14:38:54Z",
+      "side": 1,
+      "message": "S2I is itself an image that is used to run a container process which builds an image.  To run it on the executor means requiring that the executor run a docker daemon.  That\u0027s out of scope.",
+      "revId": "676f09796afbb1cc5949978427af038352935943",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_95014109",
         "filename": "doc/source/developer/specs/container-build-resources.rst",
         "patchSetId": 1
