@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f6a8fd7_c1941a47",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 458,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-05-02T04:33:29Z",
+      "side": 1,
+      "message": "I\u0027m probably missing something. But judging from the comment above we\u0027re in a queue with only config-projects involved ahead which, by definition, don\u0027t use speculative layouts. So can\u0027t we just directly do the fallback to the pipeline layout?",
+      "range": {
+        "startLine": 450,
+        "startChar": 0,
+        "endLine": 458,
+        "endChar": 53
+      },
+      "revId": "d5e3d00e4f97d8f1c777855ae14d61bd263016d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
