@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9f6a8fd7_9063c6dc",
+        "filename": "doc/source/admin/centos7_setup.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 15362
+      },
+      "writtenOn": "2018-05-02T11:57:46Z",
+      "side": 1,
+      "message": "if software collection is used, the stuff gets installed under /opt/rh/rh-python35/root. a script is included to modify the paths pointing to /opt/rh/rh-python35/root/usr/bin, /opt/rh/rh-python35/root/usr/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}} etc etc. \n\nius-release looked easier to install and use but this is my personal preference.",
+      "parentUuid": "9f6a8fd7_e4537138",
+      "revId": "72a546b32ff3eb551a61ecafdd9e23a4edf4a02b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f6a8fd7_040d453d",
         "filename": "doc/source/admin/centos7_setup.rst",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2018-05-01T22:32:25Z",
       "side": 1,
       "message": "Should we let bindep\u0027s listing install deps like make, gcc, gcc-c++ and openssl-devel. That way the python installation can control its deps a bit more directly and we just have to bootstrap python and java+zookeer here.\n\nLooks like fedora similarly says to install these deps so this isn\u0027t really a regression.",
+      "revId": "72a546b32ff3eb551a61ecafdd9e23a4edf4a02b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_b0ba8a07",
+        "filename": "doc/source/admin/centos7_setup.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 15362
+      },
+      "writtenOn": "2018-05-02T11:57:46Z",
+      "side": 1,
+      "message": "the list was basically taken from fedora and missing stuff were added for centos7. i tried again by only installing the packages below and haven\u0027t had any problem with nodepool and zuul installations.\n\ngit python35u python35u-pip python35u-devel java-1.8.0-openjdk\n\nthe rest is either not needed or in bindep.txt. make is already available on clean centos7 installation.\n\nfedora27 instructions might need to be revisited to clean the list there as well but maybe later once someone else verifies centos7 installation instructions.",
+      "parentUuid": "9f6a8fd7_040d453d",
       "revId": "72a546b32ff3eb551a61ecafdd9e23a4edf4a02b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -83,6 +119,24 @@
       "side": 1,
       "message": "That should be fine right? systemd should still manage the service through its compatibility layer.",
       "parentUuid": "9f6a8fd7_d034ebe0",
+      "revId": "72a546b32ff3eb551a61ecafdd9e23a4edf4a02b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_70d5d242",
+        "filename": "doc/source/admin/centos7_setup.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 15362
+      },
+      "writtenOn": "2018-05-02T11:57:46Z",
+      "side": 1,
+      "message": "you are right. will amend the change, add installation of zookeeper-server package and get rid of the included service file below.",
+      "parentUuid": "9f6a8fd7_44457d6f",
       "revId": "72a546b32ff3eb551a61ecafdd9e23a4edf4a02b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
