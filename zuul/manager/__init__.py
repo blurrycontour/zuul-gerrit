@@ -447,8 +447,13 @@ class PipelineManager(object):
                 # We're a change to a config repo (with no untrusted
                 # items ahead), so just use the most recently
                 # generated layout.
-                if item.item_ahead:
-                    return item.item_ahead.layout
+                item_ahead = item.item_ahead
+                while item_ahead:
+                    if item_ahead.layout:
+                        break
+                    item_ahead = item_ahead.item_ahead
+                if item_ahead:
+                    return item_ahead.layout
                 else:
                     return item.queue.pipeline.layout
             self.log.debug("Loading dynamic layout complete")
