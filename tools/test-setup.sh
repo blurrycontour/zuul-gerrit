@@ -47,7 +47,9 @@ sudo -u postgres psql -c "CREATE DATABASE openstack_citest OWNER $DB_USER TEMPLA
 # NOTE(pabelanger): Avoid hitting http://keyserver.ubuntu.com
 sudo apt-key add $TOOLSDIR/018D05F5.gpg
 LSBDISTCODENAME=$(lsb_release -cs)
-echo "deb http://ppa.launchpad.net/openstack-ci-core/bubblewrap/ubuntu $LSBDISTCODENAME main" | \
-    sudo tee /etc/apt/sources.list.d/openstack-ci-core-ubuntu-bubblewrap-xenial.list
+if [ $LSBDISTCODENAME == 'xenial' ]; then
+    echo "deb http://ppa.launchpad.net/openstack-ci-core/bubblewrap/ubuntu $LSBDISTCODENAME main" | \
+        sudo tee /etc/apt/sources.list.d/openstack-ci-core-ubuntu-bubblewrap-xenial.list
+fi
 sudo apt-get update
 sudo apt-get --assume-yes install bubblewrap
