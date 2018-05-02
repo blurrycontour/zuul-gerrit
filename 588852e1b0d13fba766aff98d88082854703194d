@@ -22,6 +22,30 @@
       "revId": "588852e1b0d13fba766aff98d88082854703194d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f6a8fd7_0446a07d",
+        "filename": "doc/source/admin/drivers/mqtt.rst",
+        "patchSetId": 22
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-05-02T07:18:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f6a8fd7_fa6b2fee",
+      "range": {
+        "startLine": 77,
+        "startChar": 0,
+        "endLine": 103,
+        "endChar": 54
+      },
+      "revId": "588852e1b0d13fba766aff98d88082854703194d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
