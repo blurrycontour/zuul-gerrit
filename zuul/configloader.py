@@ -736,12 +736,11 @@ class JobParser(object):
                     project_override_checkout = None
                 (trusted, project) = self.pcontext.tenant.getProject(
                     project_name)
-                if project is None:
-                    raise Exception("Unknown project %s" % (project_name,))
-                job_project = model.JobProject(project.canonical_name,
-                                               project_override_branch,
-                                               project_override_checkout)
-                new_projects[project.canonical_name] = job_project
+                if project is not None:
+                    job_project = model.JobProject(project.canonical_name,
+                                                   project_override_branch,
+                                                   project_override_checkout)
+                    new_projects[project.canonical_name] = job_project
             job.required_projects = new_projects
 
         tags = conf.get('tags')
