@@ -1,0 +1,9 @@
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Code-Review+2: Clark Boylan <cboylan@sapwetik.org>
+Workflow+1: Clark Boylan <cboylan@sapwetik.org>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Thu, 03 May 2018 16:11:52 +0000
+Reviewed-on: https://review.openstack.org/565973
+Project: openstack-infra/zuul
+Branch: refs/heads/master
