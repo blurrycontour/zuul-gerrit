@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_84677026",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 739,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-05-03T07:16:17Z",
+      "side": 1,
+      "message": "I don\u0027t see where this validation is placed now. It doesn\u0027t seem to validate this anymore (see https://review.openstack.org/#/c/565979/1)",
+      "revId": "dbb22e1850a4ebf4dbdcdd76f35ab2f70051c647",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
