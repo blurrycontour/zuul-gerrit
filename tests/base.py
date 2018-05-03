@@ -2970,7 +2970,8 @@ class ZuulTestCase(BaseTestCase):
                             break
                     if not found:
                         raise Exception("No match found for element %i "
-                                        "in history" % (i,))
+                                        "(%s) in history:\n%s"
+                                        % (i, d, self.history[:]))
                 if unseen:
                     raise Exception("Unexpected items in history")
         except Exception:
