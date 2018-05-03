@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_09d7ebef",
+        "filename": "tools/test-setup.sh",
+        "patchSetId": 5
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-05-03T17:55:53Z",
+      "side": 1,
+      "message": "You might even move this into the above if block then update bindep.txt to install bubblewrap on newer systems.",
+      "range": {
+        "startLine": 54,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 44
+      },
+      "revId": "985977cf36f89ba6a25ac3940c9962c4cebb89fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
