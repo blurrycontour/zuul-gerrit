@@ -22,6 +22,30 @@
       "revId": "985977cf36f89ba6a25ac3940c9962c4cebb89fc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_49f64392",
+        "filename": "tools/test-setup.sh",
+        "patchSetId": 5
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-05-03T17:58:17Z",
+      "side": 1,
+      "message": "good idea",
+      "parentUuid": "5f7c97a3_09d7ebef",
+      "range": {
+        "startLine": 54,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 44
+      },
+      "revId": "985977cf36f89ba6a25ac3940c9962c4cebb89fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
