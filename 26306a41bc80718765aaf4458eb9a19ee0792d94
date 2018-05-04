@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_2e309756",
+        "filename": "zuul/driver/zuul/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-05-04T20:47:15Z",
+      "side": 1,
+      "message": "It seems unecessary to keep so many empty sets around, especially since this is an unusal case, and the only possible values for the set are () and (PROJECT_CHANGE_MERGED).\n\nWhy don\u0027t we just make the value for the dict be True if the tenant (or tenant+pipeline) has that event?\n\nThen:\n\nproject_change_merged_events is a dictionary of tenant -\u003e True values if the tenant needs change_merged_events\nparent_change_enqueued_events is a dictionary of (tenant, pipeline) -\u003e True values if the tenant+pipeline needs parent_change_enqueued events.\n\nThat will use less memory and be faster to evaluate.",
+      "revId": "26306a41bc80718765aaf4458eb9a19ee0792d94",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
