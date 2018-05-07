@@ -16,6 +16,24 @@
       "revId": "26306a41bc80718765aaf4458eb9a19ee0792d94",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_b5d94184",
+        "filename": "zuul/driver/zuul/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-05-07T16:36:15Z",
+      "side": 1,
+      "message": "Oh that\u0027s absolutely logical. No idea why I blindly stayed with the dicts of sets while working in this.",
+      "parentUuid": "5f7c97a3_2e309756",
+      "revId": "26306a41bc80718765aaf4458eb9a19ee0792d94",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
