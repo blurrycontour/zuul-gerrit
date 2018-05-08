@@ -121,6 +121,9 @@ class TestActionModules(AnsibleZuulTestCase):
         self._run_job('script-bad', 'FAILURE', ERROR_ACCESS_OUTSIDE)
         self._run_job('script-bad-symlink', 'FAILURE', ERROR_ACCESS_OUTSIDE)
 
+    def test_script_module(self):
+        self._run_job('shell-good', 'SUCCESS')
+
     def test_template_module(self):
         self._run_job('template-good', 'SUCCESS')
 

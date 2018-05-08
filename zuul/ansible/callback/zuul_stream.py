@@ -194,6 +194,9 @@ class CallbackModule(default.CallbackModule):
 
         if self._play.strategy != 'free':
             task_name = self._print_task_banner(task)
+        print('#################')
+        print('task.action = %s' % task.action)
+        print('#################')
         if task.action == 'command':
             log_id = uuid.uuid4().hex
             task.args['zuul_log_id'] = log_id
