@@ -86,6 +86,9 @@ class TestActionModules(AnsibleZuulTestCase):
         self._run_job('assemble-bad-dir-with-symlink', 'FAILURE',
                       ERROR_ACCESS_OUTSIDE)
 
+    def test_command_module(self):
+        self._run_job('command-good', 'SUCCESS')
+
     def test_copy_module(self):
         self._run_job('copy-good', 'SUCCESS')
 
@@ -120,6 +123,9 @@ class TestActionModules(AnsibleZuulTestCase):
 
         self._run_job('script-bad', 'FAILURE', ERROR_ACCESS_OUTSIDE)
         self._run_job('script-bad-symlink', 'FAILURE', ERROR_ACCESS_OUTSIDE)
+
+    def test_shell_module(self):
+        self._run_job('shell-good', 'SUCCESS')
 
     def test_template_module(self):
         self._run_job('template-good', 'SUCCESS')

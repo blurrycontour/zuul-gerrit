@@ -1,0 +1,4 @@
+- hosts: all
+  tasks:
+    - name: Normal shell
+      command: echo 123
