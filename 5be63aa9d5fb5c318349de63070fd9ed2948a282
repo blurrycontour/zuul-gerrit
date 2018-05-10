@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_eb3d558f",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 1233,
+      "author": {
+        "id": 8556
+      },
+      "writtenOn": "2018-05-10T06:05:52Z",
+      "side": 1,
+      "message": "as most of the people agree on your proposal#2 in ML, you might want to update this now or wait for more feedback?\n\n- http://lists.openstack.org/pipermail/openstack-dev/2018-May/130074.html",
+      "range": {
+        "startLine": 1229,
+        "startChar": 0,
+        "endLine": 1233,
+        "endChar": 47
+      },
+      "revId": "5be63aa9d5fb5c318349de63070fd9ed2948a282",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
