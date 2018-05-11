@@ -77,10 +77,11 @@ class BaseTestWeb(ZuulTestCase):
         # Wait until web server is started
         while True:
             time.sleep(0.1)
-            if self.web.server is None:
-                continue
-            self.port = self.web.server.sockets[0].getsockname()[1]
-            print(self.host, self.port)
+            try:
+                print(self.web.port)
+                self.port = self.web.port
+            except Exception:
+                self.log.exception('ex:')
             try:
                 with socket.create_connection((self.host, self.port)):
                     break
