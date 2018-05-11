@@ -12,7 +12,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from aiohttp import web
 import urllib.parse
 
 from zuul.driver import Driver, ConnectionInterface, ReporterInterface
@@ -55,40 +54,3 @@ class SQLDriver(Driver, ConnectionInterface, ReporterInterface):
 
     def getReporterSchema(self):
         return sqlreporter.getSchema()
-
-    # TODO(corvus): these are temporary, remove after cherrypy conversion
-    def setEventLoop(self, event_loop):
-        self.event_loop = event_loop
-
-    async def handleRequest(self, request):
-        tenant_name = request.match_info["tenant"]
-        connection = self.tenant_connections.get(tenant_name)
-        if not connection:
-            return
-        try:
-            args = {
-                'buildset_filters': {},
-                'build_filters': {},
-                'limit': 50,
-                'skip': 0,
-                'tenant': tenant_name,
-            }
-            for k, v in urllib.parse.parse_qsl(request.rel_url.query_string):
-                if k in ("project", "pipeline", "change", "branch",
-                         "patchset", "ref", "newrev"):
-                    args['buildset_filters'].setdefault(k, []).append(v)
-                elif k in ("uuid", "job_name", "voting", "node_name",
-                           "result"):
-                    args['build_filters'].setdefault(k, []).append(v)
-                elif k in ("limit", "skip"):
-                    args[k] = int(v)
-                else:
-                    raise ValueError("Unknown parameter %s" % k)
-            data = await self.get_builds(args)
-            resp = web.json_response(data)
-            resp.headers['Access-Control-Allow-Origin'] = '*'
-        except Exception as e:
-            self.log.exception("Jobs exception:")
-            resp = web.json_response({'error_description': 'Internal error'},
-                                     status=500)
-        return resp
