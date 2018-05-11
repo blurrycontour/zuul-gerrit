@@ -519,7 +519,8 @@ def main():
                 cmd=args,
                 stdout="skipped, since %s exists" % creates,
                 changed=False,
-                rc=0
+                rc=0,
+                delta=str(0)
             )
 
     if removes:
@@ -531,7 +532,8 @@ def main():
                 cmd=args,
                 stdout="skipped, since %s does not exist" % removes,
                 changed=False,
-                rc=0
+                rc=0,
+                delta=str(0)
             )
 
     warnings = list()
