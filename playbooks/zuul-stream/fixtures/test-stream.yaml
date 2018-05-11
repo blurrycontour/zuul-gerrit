@@ -49,3 +49,14 @@
 
     - name: Print binary data
       command: echo -e '\x80abc'
+
+    - name: Test shell with_items
+      shell:
+        cmd: |
+          ./output.sh {{ item }}
+      args:
+        executable: /bin/bash
+      with_items:
+        - item1
+        - item2
+        - item2

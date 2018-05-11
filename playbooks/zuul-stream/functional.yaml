@@ -63,3 +63,15 @@
       shell: |
         egrep "^.*\| node1 \| \\\\x80abc" job-output.txt
         egrep "^.*\| node2 \| \\\\x80abc" job-output.txt
+
+    - name: Test shell with_items
+      shell:
+        cmd: |
+          cd {{ zuul.project.src_dir }}
+          ./playbooks/zuul-stream/fixtures/output.sh
+      args:
+        exectuable: /bin/bash
+      with_items:
+        - item1
+        - item2
+        - item3
