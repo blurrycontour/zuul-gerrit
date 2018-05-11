@@ -15,6 +15,10 @@
 # limitations under the License.
 
 
+import cherrypy
+import socket
+from ws4py.server.cherrypyserver import WebSocketPlugin, WebSocketTool
+from ws4py.websocket import WebSocket
 import asyncio
 import codecs
 import copy
@@ -32,6 +36,8 @@ import zuul.rpcclient
 from zuul.web.handler import StaticHandler
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
+WebSocketPlugin(cherrypy.engine).subscribe()
+cherrypy.tools.websocket = WebSocketTool()
 
 
 class LogStreamingHandler(object):
@@ -256,6 +262,108 @@ class ChangeFilter(object):
         return change['id'] == self.desired
 
 
+class LogStreamHandler(WebSocket):
+    log = logging.getLogger("zuul.web")
+
+    def received_message(self, message):
+        if message.is_text:
+            req = json.loads(message.data.decode('utf-8'))
+            self.log.debug("Websocket request: %s", req)
+            self._streamLog(req)
+
+    def _streamLog(self, request):
+        """
+        Stream the log for the requested job back to the client.
+
+        :param aiohttp.web.WebSocketResponse ws: The websocket response object.
+        :param dict request: The client request parameters.
+        """
+        for key in ('uuid', 'logfile'):
+            if key not in request:
+                return (4000, "'{key}' missing from request payload".format(
+                        key=key))
+
+        port_location = self.rpc.get_job_log_stream_address(request['uuid'])
+        if not port_location:
+            return (4011, "Error with Gearman")
+
+        self._fingerClient(
+            port_location['server'], port_location['port'],
+            request['uuid'])
+
+        return (1000, "No more data")
+
+    def _fingerClient(self, server, port, build_uuid):
+        """
+        Create a client to connect to the finger streamer and pull results.
+
+        :param aiohttp.web.WebSocketResponse ws: The websocket response object.
+        :param str server: The executor server running the job.
+        :param str port: The executor server port.
+        :param str build_uuid: The build UUID to stream.
+        """
+        self.log.debug("Connecting to finger server %s:%s", server, port)
+        Decoder = codecs.getincrementaldecoder('utf8')
+        decoder = Decoder()
+        with socket.create_connection((server, port), timeout=10) as s:
+            # timeout only on the connection, let recv() wait forever
+            s.settimeout(None)
+            msg = "%s\n" % build_uuid    # Must have a trailing newline!
+            s.sendall(msg.encode('utf-8'))
+            while True:
+                data = s.recv(1024)
+                if data:
+                    data = decoder.decode(data)
+                    if data:
+                        self.send(data, False)
+                else:
+                    # Make sure we flush anything left in the decoder
+                    data = decoder.decode(b'', final=True)
+                    if data:
+                        self.send(data, False)
+                    self.close()
+                    return
+
+
+class ZuulWebAPI(object):
+    log = logging.getLogger("zuul.web")
+
+    def __init__(self, rpc):
+        self.rpc = rpc
+        self.cache = {}
+        self.cache_time = {}
+        self.cache_expiry = 1
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    def status(self, tenant):
+        resp = None
+        try:
+            if tenant not in self.cache or \
+               (time.time() - self.cache_time[tenant]) > self.cache_expiry:
+                job = self.rpc.submitJob('zuul:status_get',
+                                         {'tenant': tenant})
+                self.cache[tenant] = json.loads(job.data[0])
+                self.cache_time[tenant] = time.time()
+            payload = self.cache[tenant]
+            if payload.get('code') == 404:
+                return web.HTTPNotFound(reason=payload['message'])
+            resp = cherrypy.response
+            resp.headers["Cache-Control"] = "public, max-age=%d" % \
+                                            self.cache_expiry
+            resp.headers["Last-modified"] = self.cache_time[tenant]
+            resp.headers['Access-Control-Allow-Origin'] = '*'
+        except Exception as e:
+            self.log.exception("Exception:")
+            raise
+        return payload
+
+    @cherrypy.expose
+    @cherrypy.tools.websocket(handler_cls=LogStreamHandler)
+    def console_stream(self, tenant):
+        cherrypy.request.ws_handler.rpc = self.rpc
+
+
 class ZuulWeb(object):
 
     log = logging.getLogger("zuul.web.ZuulWeb")
@@ -288,6 +396,29 @@ class ZuulWeb(object):
             self._connection_handlers.extend(
                 connection.getWebHandlers(self, self.info))
         self._plugin_routes.extend(self._connection_handlers)
+
+        route_map = cherrypy.dispatch.RoutesDispatcher()
+        api = ZuulWebAPI(self.rpc)
+        route_map.connect(None, '/api/tenant/{tenant}/status',
+                          controller=api, action='status')
+        route_map.connect(None, '/api/tenant/{tenant}/console-stream',
+                          controller=api, action='console_stream')
+
+        conf = {'/': {'request.dispatch': route_map}}
+        cherrypy.config.update({
+            'global': {
+                'environment' : 'production',
+                'server.socket_host': listen_address,
+                'server.socket_port': listen_port,
+            },
+        })
+
+        cherrypy.tree.mount(None, '/', config=conf)
+        cherrypy.engine.start()
+
+    @property
+    def port(self):
+        return cherrypy.server.bound_addr[1]
 
     async def _handleWebsocket(self, request):
         return await self.log_streaming_handler.processRequest(
@@ -368,28 +499,32 @@ class ZuulWeb(object):
             StaticHandler(self, '/', 'tenants.html'),
         ]
 
-        for route in static_routes + self._plugin_routes:
-            routes.append((route.method, route.path, route.handleRequest))
+        #for route in static_routes + self._plugin_routes:
+        #    routes.append((route.method, route.path, route.handleRequest))
 
         # Add fallthrough routes at the end for the static html/js files
-        routes.append(('GET', '/t/{tenant}/{path:.*}', self._handleStatic))
-        routes.append(('GET', '/{path:.*}', self._handleStatic))
+        #routes.append(('GET', '/t/{tenant}/{path:.*}', self._handleStatic))
+        #routes.append(('GET', '/{path:.*}', self._handleStatic))
 
         self.log.debug("ZuulWeb starting")
-        asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-        user_supplied_loop = loop is not None
-        if not loop:
-            loop = asyncio.get_event_loop()
-        asyncio.set_event_loop(loop)
+        #asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+        #user_supplied_loop = loop is not None
+        #if not loop:
+        #    loop = asyncio.get_event_loop()
+        #asyncio.set_event_loop(loop)
 
-        self.event_loop = loop
-        self.log_streaming_handler.setEventLoop(loop)
-        self.gearman_handler.setEventLoop(loop)
+        #self.event_loop = loop
+        #self.log_streaming_handler.setEventLoop(loop)
+        #self.gearman_handler.setEventLoop(loop)
 
-        for handler in self._connection_handlers:
-            if hasattr(handler, 'setEventLoop'):
-                handler.setEventLoop(loop)
+        #for handler in self._connection_handlers:
+        #    if hasattr(handler, 'setEventLoop'):
+        #        handler.setEventLoop(loop)
 
+        #cherrypy.engine.block()
+        return
+
+        self.log.debug("HERE")
         app = web.Application()
         for method, path, handler in routes:
             app.router.add_route(method, path, handler)
@@ -424,14 +559,16 @@ class ZuulWeb(object):
         self.rpc.shutdown()
 
     def stop(self):
-        if self.event_loop and self.term:
-            self.event_loop.call_soon_threadsafe(self.term.set_result, True)
+        #if self.event_loop and self.term:
+        #    self.event_loop.call_soon_threadsafe(self.term.set_result, True)
+        self.rpc.shutdown()
+        cherrypy.engine.exit()
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    loop = asyncio.get_event_loop()
-    loop.set_debug(True)
+    #loop = asyncio.get_event_loop()
+    #loop.set_debug(True)
     z = ZuulWeb(listen_address="127.0.0.1", listen_port=9000,
                 gear_server="127.0.0.1", gear_port=4730)
-    z.run(loop)
+    z.run()#loop)
