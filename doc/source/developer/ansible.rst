@@ -43,7 +43,7 @@ that starts a log streaming daemon on the build node.
 All jobs run with the :py:mod:`zuul.ansible.callback.zuul_stream` callback
 plugin enabled, which writes the build log to a file so that the
 :py:class:`zuul.lib.log_streamer.LogStreamer` can provide the data on demand
-over the finger protocol. Finally, :py:class:`zuul.web.LogStreamingHandler`
+over the finger protocol. Finally, :py:class:`zuul.web.LogStreamHandler`
 exposes that log stream over a websocket connection as part of
 :py:class:`zuul.web.ZuulWeb`.
 
