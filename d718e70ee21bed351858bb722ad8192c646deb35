@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_92c4ff60",
+        "filename": "playbooks/zuul-stream/functional.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2018-05-11T07:05:08Z",
+      "side": 1,
+      "message": "This appears to trigger the problem, see \n\nhttps://storyboard.openstack.org/#!/story/2002004#comment-81558",
+      "revId": "d718e70ee21bed351858bb722ad8192c646deb35",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
