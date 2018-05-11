@@ -383,10 +383,7 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
 
         # Wait until web server is started
         while True:
-            if web_server.server is None:
-                time.sleep(0.1)
-                continue
-            port = web_server.server.sockets[0].getsockname()[1]
+            port = web_server.port
             try:
                 with socket.create_connection((self.host, port)):
                     break
