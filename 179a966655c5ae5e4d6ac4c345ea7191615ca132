@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_770b3fd5",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-05-12T13:31:30Z",
+      "side": 1,
+      "message": "(nit) Would be useful to have this a constant (possibly defined at the top of this file).",
+      "range": {
+        "startLine": 123,
+        "startChar": 67,
+        "endLine": 123,
+        "endChar": 69
+      },
+      "revId": "179a966655c5ae5e4d6ac4c345ea7191615ca132",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
