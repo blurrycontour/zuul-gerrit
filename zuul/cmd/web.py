@@ -54,17 +54,7 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
         params['ssl_key'] = get_default(self.config, 'gearman', 'ssl_key')
         params['ssl_cert'] = get_default(self.config, 'gearman', 'ssl_cert')
         params['ssl_ca'] = get_default(self.config, 'gearman', 'ssl_ca')
-
-        params['_connections'] = self.connections
-        params['connections'] = []
-        # Validate config here before we spin up the ZuulWeb object
-        for conn_name, connection in self.connections.connections.items():
-            try:
-                if connection.validateWebConfig(self.config, self.connections):
-                    params['connections'].append(connection)
-            except Exception:
-                self.log.exception("Error validating config")
-                sys.exit(1)
+        params['connections'] = self.connections
 
         try:
             self.web = zuul.web.ZuulWeb(**params)

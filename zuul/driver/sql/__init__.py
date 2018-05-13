@@ -16,11 +16,14 @@ from aiohttp import web
 import urllib.parse
 
 from zuul.driver import Driver, ConnectionInterface, ReporterInterface
+from zuul.driver import WebHandlerInterface
 from zuul.driver.sql import sqlconnection
 from zuul.driver.sql import sqlreporter
+from zuul.web.handler import BaseTenantWebHandler
 
 
-class SQLDriver(Driver, ConnectionInterface, ReporterInterface):
+class SQLDriver(Driver, ConnectionInterface, ReporterInterface,
+                WebHandlerInterface):
     name = 'sql'
 
     def __init__(self):
@@ -42,7 +45,6 @@ class SQLDriver(Driver, ConnectionInterface, ReporterInterface):
                 if not isinstance(reporter, sqlreporter.SQLReporter):
                     continue
                 self.tenant_connections[tenant.name] = reporter.connection
-                return
 
     def registerScheduler(self, scheduler):
         self.sched = scheduler
@@ -56,6 +58,15 @@ class SQLDriver(Driver, ConnectionInterface, ReporterInterface):
     def getReporterSchema(self):
         return sqlreporter.getSchema()
 
+    def getWebHandlers(self, zuul_web, info):
+        info.capabilities.job_history = True
+        return [SQLBuildsWebhookHandler(self, zuul_web, 'GET', 'builds')]
+
+
+class SQLBuildsWebhookHandler(BaseTenantWebHandler):
+
+    log = logging.getLogger("zuul.SQLWebhookHandler")
+
     # TODO(corvus): these are temporary, remove after cherrypy conversion
     def setEventLoop(self, event_loop):
         self.event_loop = event_loop
@@ -63,7 +74,8 @@ class SQLDriver(Driver, ConnectionInterface, ReporterInterface):
     async def handleRequest(self, request):
         request_args = urllib.parse.parse_qsl(request.rel_url.query_string)
         tenant_name = request_args.get('tenant')
-        connection = self.tenant_connections.get(tenant_name)
+
+        # TODO: Get connection(s) for tenant
         if not connection:
             return
         try:

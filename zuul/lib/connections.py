@@ -163,6 +163,13 @@ class ConnectionRegistry(object):
         connection = self.connections[connection_name]
         return connection.driver.getTrigger(connection, config)
 
+    def getWebHandlers(self, zuul_web, info):
+        webHandlers = []
+        for driver_name, driver in self.drivers:
+            if hasattr(driver, 'getWebHandlers'):
+                webHandlers += driver.getWebHandlers()
+        return webHandlers
+
     def getSourceByHostname(self, hostname):
         for connection in self.connections.values():
             if hasattr(connection, 'canonical_hostname'):
