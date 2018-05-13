@@ -31,16 +31,35 @@ class BaseWebHandler(object, metaclass=abc.ABCMeta):
         """Process a web request."""
 
 
-class BaseDriverWebHandler(BaseWebHandler):
+class BaseConnectionWebHandler(BaseWebHandler):
 
     def __init__(self, connection, zuul_web, method, path):
-        super(BaseDriverWebHandler, self).__init__(
+        super(BaseConnectionWebHandler, self).__init__(
             connection=connection, zuul_web=zuul_web, method=method, path=path)
         if path.startswith('/'):
             path = path[1:]
         self.path = '/api/connection/{connection}/{path}'.format(
             connection=self.connection.connection_name,
             path=path)
+
+
+class BaseDriverWebHandler(BaseWebHandler):
+
+    def __init__(self, driver, zuul_web, method, path):
+        super(BaseDriverWebHandler, self).__init__(
+            connection=connection, zuul_web=zuul_web, method=method, path=path)
+        if path.startswith('/'):
+            path = path[1:]
+        self.path = '/api/{driver}/{path}'.format(
+            driver=self.driver.name,
+            path=path)
+
+
+class BaseTenantWebHandler(BaseWebHandler):
+
+    def __init__(self, connection, zuul_web, method, path):
+        super(BaseTenantWebHandler, self).__init__(
+            connection, zuul_web, method, '/api/tenant/{tenant}/' + path)
 
 
 class StaticHandler(BaseWebHandler):

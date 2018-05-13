@@ -277,3 +277,23 @@ class WrapperInterface(object, metaclass=abc.ABCMeta):
 
         """
         pass
+
+
+class WebHandlerInterface(object, metaclass=abc.ABCMeta):
+    """The web handler interface to be implmeneted by a driver.
+
+    A driver which supplies custom web handlers
+
+    """
+
+    @abc.abstractmethod
+    def getWebHandlers(self):
+        """Create and return a list of webhook handlers
+
+        This method is required by the interface
+
+        :returns: a list of BaseWebHandler's
+        :rtype: BaseWebHandler
+
+        """
+        pass

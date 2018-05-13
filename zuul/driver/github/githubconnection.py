@@ -39,7 +39,7 @@ import github3.exceptions
 import gear
 
 from zuul.connection import BaseConnection
-from zuul.web.handler import BaseDriverWebHandler
+from zuul.web.handler import BaseConnectionWebHandler
 from zuul.lib.config import get_default
 from zuul.model import Ref, Branch, Tag, Project
 from zuul.exceptions import MergeFailure
@@ -1157,7 +1157,7 @@ class GithubConnection(BaseConnection):
         return True
 
 
-class GithubWebhookHandler(BaseDriverWebHandler):
+class GithubWebhookHandler(BaseConnectionWebHandler):
 
     log = logging.getLogger("zuul.GithubWebhookHandler")
 

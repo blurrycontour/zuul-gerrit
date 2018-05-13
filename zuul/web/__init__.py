@@ -265,7 +265,6 @@ class ZuulWeb(object):
                  ssl_key=None, ssl_cert=None, ssl_ca=None,
                  static_cache_expiry=3600,
                  connections=None,
-                 _connections=None,
                  info=None,
                  static_path=None):
         self.start_time = time.time()
@@ -284,12 +283,22 @@ class ZuulWeb(object):
         self.gearman_handler = GearmanHandler(self.rpc)
         self._plugin_routes = []  # type: List[zuul.web.handler.BaseWebHandler]
         self._connection_handlers = []
-        connections = connections or []
-        for connection in connections:
-            self._connection_handlers.extend(
-                connection.getWebHandlers(self, self.info))
-        self.connections = _connections
+        self.connections = connections or []
+
+        for conn_name, connection in self.connections.connections.items():
+            try:
+                if connection.validateWebConfig(self.config, self.connections):
+                    self._connection_handlers.extend(
+                        connection.getWebHandlers(self, self.info))
+            except Exception:
+                self.log.warning(
+                    "Error validating config for connection %s, skipping.."
+                    % conn_name)
         self._plugin_routes.extend(self._connection_handlers)
+
+        self._driver_handlers = \
+            self.connections.getWebHandlers(self, self.info)
+        self._plugin_routes.extend(self._driver_handlers)
 
     async def _handleWebsocket(self, request):
         return await self.log_streaming_handler.processRequest(
