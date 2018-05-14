@@ -87,6 +87,12 @@ The supported options in ``zuul.conf`` connections are:
 
       SSH connection keepalive timeout; ``0`` disables.
 
+   .. attr:: report_only
+      :default: False
+
+      Disable the gerrit events stream watcher.
+
+
 Trigger Configuration
 ---------------------
 
