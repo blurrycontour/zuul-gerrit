@@ -176,7 +176,7 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
                 session = aiohttp.ClientSession(loop=loop)
                 async with session.ws_connect(uri) as ws:
                     req = {'uuid': build_uuid, 'logfile': None}
-                    ws.send_str(json.dumps(req))
+                    await ws.send_str(json.dumps(req))
                     event.set()  # notify we are connected and req sent
                     async for msg in ws:
                         if msg.type == aiohttp.WSMsgType.TEXT:
@@ -185,7 +185,7 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
                             break
                         elif msg.type == aiohttp.WSMsgType.ERROR:
                             break
-                session.close()
+                await session.close()
             except Exception as e:
                 self.log.exception("client exception:")
 
