@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_f104361a",
+        "filename": "zuul/ansible/library/command.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 523,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2018-05-14T00:29:25Z",
+      "side": 1,
+      "message": "I think this is correct.  However, upstream have added with [1] more complete documentation the return values [2] which also says that start/end/delta are *also* always returned.\n\nI think it\u0027s excusable that this was missed as that was added after this file branched (I didn\u0027t dig further, maybe there\u0027s more context).\n\nHowever, I think that justifies adding start and end values to this return as well, and we might as well do that all at once?\n\n[1] https://github.com/ansible/ansible/commit/b7fbc57227650a0aab05231bf245889f247484dd\n[2] https://github.com/ansible/ansible/blob/57f6abdb8460f8501eb9668004f4d7722bda5570/lib/ansible/modules/commands/command.py#L89",
+      "revId": "841a8f6deb4031bcd6574d1ba28affe3065d1822",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
