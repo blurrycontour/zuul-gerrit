@@ -284,10 +284,27 @@ class ZuulWeb(object):
         self._plugin_routes = []  # type: List[zuul.web.handler.BaseWebHandler]
         self._connection_handlers = []
         connections = connections or []
+
+        seen_routes = []
         for connection in connections:
-            self._connection_handlers.extend(
-                connection.getWebHandlers(self, self.info))
-        self._plugin_routes.extend(self._connection_handlers)
+            handlers = connection.getWebHandlers(self, self.info)
+            self._connection_handlers.extend(handlers)
+            # NOTE(ianw): we have a situation ATM where several
+            # handlers try to handle GET /builds.  Earlier versions of
+            # aiohttp ignored this; later versions raise an exception.
+            # Check for duplicate method+path combos, and ignore
+            # duplicates for now.  This warning should turn into a
+            # sensible & helpful exception.
+            for route in handlers:
+                r = (route.method, route.path)
+                if r not in seen_routes:
+                    self._plugin_routes.append(route)
+                else:
+                    self.log.warning(
+                        "Duplicate handler for %s %s; ignoring" % r)
+                seen_routes.append(r)
+
+
 
     async def _handleWebsocket(self, request):
         return await self.log_streaming_handler.processRequest(
