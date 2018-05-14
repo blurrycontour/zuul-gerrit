@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_70a57646",
+        "filename": "tests/unit/test_zuultrigger.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-05-14T12:54:47Z",
+      "side": 1,
+      "message": "TIL abou nonlocal. :)",
+      "revId": "1dbb3ccabca5b3fd939214645fc3064a3811347b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
