@@ -123,6 +123,12 @@ The supported options in ``zuul.conf`` connections are:
       When using a self-signed certificate, this may be set to
       ``false`` to disable SSL certificate verification.
 
+   .. attr:: report_only
+      :default: False
+
+      Disable the gerrit events stream watcher.
+
+
 Trigger Configuration
 ---------------------
 

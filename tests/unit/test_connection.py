@@ -405,6 +405,33 @@ class TestMultipleGerrits(ZuulTestCase):
         self.waitUntilSettled()
 
 
+class TestConnectionGerritReportOnly(ZuulTestCase):
+    config_file = 'zuul-gerrit-report-only.conf'
+    tenant_config_file = 'config/gerrit-report-only/main.yaml'
+
+    def test_connection_report_only_gerrit(self):
+        "Test report only connection doesn't trigger"
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange(
+            'org/project', 'master', 'A')
+        self.fake_report_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+
+        self.waitUntilSettled()
+
+        self.assertBuilds([
+            dict(name='test',
+                 changes='1,1',
+                 project='org/project',
+                 pipeline='check'),
+        ])
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+
 class TestConnectionsMerger(ZuulTestCase):
     config_file = 'zuul-connections-merger.conf'
     tenant_config_file = 'config/single-tenant/main.yaml'
