@@ -298,6 +298,9 @@ class GerritConnection(BaseConnection):
         self.port = int(self.connection_config.get('port', 29418))
         self.keyfile = self.connection_config.get('sshkey', None)
         self.keepalive = int(self.connection_config.get('keepalive', 60))
+        self.report_only = self.connection_config.get('report_only', False)
+        if self.report_only not in ("True", "true"):
+            self.report_only = False
         self.watcher_thread = None
         self.event_queue = queue.Queue()
         self.client = None
@@ -897,9 +900,10 @@ class GerritConnection(BaseConnection):
             sha=sha)
 
     def onLoad(self):
-        self.log.debug("Starting Gerrit Connection/Watchers")
-        self._start_watcher_thread()
-        self._start_event_connector()
+        if not self.report_only:
+            self.log.debug("Starting Gerrit Connection/Watchers")
+            self._start_watcher_thread()
+            self._start_event_connector()
 
     def onStop(self):
         self.log.debug("Stopping Gerrit Connection/Watchers")
