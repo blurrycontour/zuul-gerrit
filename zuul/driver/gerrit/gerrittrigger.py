@@ -17,11 +17,18 @@ import voluptuous as v
 from zuul.trigger import BaseTrigger
 from zuul.driver.gerrit.gerritmodel import GerritEventFilter
 from zuul.driver.util import scalar_or_list, to_list
+from zuul.configloader import ConfigurationSyntaxError
 
 
 class GerritTrigger(BaseTrigger):
     name = 'gerrit'
     log = logging.getLogger("zuul.GerritTrigger")
+
+    def __init__(self, driver, connection, config):
+        if connection.report_only:
+            raise ConfigurationSyntaxError(
+                "Connection doesn't support trigger")
+        super().__init__(driver, connection, config)
 
     def getEventFilters(self, trigger_conf):
         efilters = []
