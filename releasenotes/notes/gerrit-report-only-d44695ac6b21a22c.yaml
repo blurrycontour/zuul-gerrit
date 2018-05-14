@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    A new report_only gerrit connection option enables setup of Gerrit
+    connection to be used only for reporting. This enables a single
+    Zuul scheduler to report as different third party CI accounts
+    while using a single events stream.
