@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_50207af7",
+        "filename": "doc/source/admin/centos7_setup.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-05-14T12:47:51Z",
+      "side": 1,
+      "message": "TIL about iuscommunity.org. They seem to have some weirdness in their website.. sometimes I get an expired cert.",
+      "revId": "714d0dedd41e21d1f6b50525f6ead7d9a39c7b12",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
