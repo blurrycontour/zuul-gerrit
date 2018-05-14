@@ -450,6 +450,9 @@ class GerritConnection(BaseConnection):
         if self.enable_stream_events not in [
                 'true', 'True', '1', 1, 'TRUE', True]:
             self.enable_stream_events = False
+        self.report_only = self.connection_config.get('report_only', False)
+        if self.report_only not in ("True", "true"):
+            self.report_only = False
         self.watcher_thread = None
         self.poller_thread = None
         self.event_queue = queue.Queue()
@@ -1331,17 +1334,18 @@ class GerritConnection(BaseConnection):
                       (version, self.version))
 
     def onLoad(self):
-        self.log.debug("Starting Gerrit Connection/Watchers")
-        try:
-            if self.session:
-                self._getRemoteVersion()
-        except Exception:
-            self.log.exception("Unable to determine remote Gerrit version")
+        if not self.report_only:
+            self.log.debug("Starting Gerrit Connection/Watchers")
+            try:
+                if self.session:
+                    self._getRemoteVersion()
+            except Exception:
+                self.log.exception("Unable to determine remote Gerrit version")
 
-        if self.enable_stream_events:
-            self._start_watcher_thread()
-        self._start_poller_thread()
-        self._start_event_connector()
+            if self.enable_stream_events:
+                self._start_watcher_thread()
+            self._start_poller_thread()
+            self._start_event_connector()
 
     def onStop(self):
         self.log.debug("Stopping Gerrit Connection/Watchers")

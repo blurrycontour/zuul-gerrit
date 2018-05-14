@@ -3318,7 +3318,9 @@ class ZuulTestCase(BaseTestCase):
             if con.web_server:
                 self.addCleanup(con.web_server.stop)
 
-            self.event_queues.append(con.event_queue)
+            # We don't care about report only connection queues
+            if not con.report_only:
+                self.event_queues.append(con.event_queue)
             setattr(self, 'fake_' + name, con)
             return con
 
