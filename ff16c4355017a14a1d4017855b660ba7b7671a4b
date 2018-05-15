@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_b70764ca",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-05-15T14:44:51Z",
+      "side": 1,
+      "message": "This seems like it would break if the user doens\u0027t have SQL driver configured - are we wanting to say that you must have a SQL driver for the dashboard to work? I think I\u0027d rather see this line move to after the routes \u003d [] section as:\n\n  sql_driver \u003d self.connections.drivers.get(\u0027sql\u0027)\n  if sql_driver:\n    routes.append((\u0027GET\u0027, \u0027/api/tenant/{tenant}/builds\u0027, sql_driver.handleRequest))",
+      "revId": "ff16c4355017a14a1d4017855b660ba7b7671a4b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_d70a20d0",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 393,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-05-15T14:44:51Z",
+      "side": 1,
+      "message": "and then here:\n\n  if sql_driver:\n    sql_driver.setEventLoop(loop)",
+      "revId": "ff16c4355017a14a1d4017855b660ba7b7671a4b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
