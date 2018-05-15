@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_9dc92227",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-05-15T20:06:58Z",
+      "side": 1,
+      "message": "connections is a list of connection objects which are pre-filtered to be only the ones which have web handlers.\n\n_connections is the connection registry object.  Typically in Zuul, an argument named \"connections\" would be that.  I\u0027m going to replace the old pre-filtered list with the connection registry, but it\u0027s too big of a change for one commit, so I\u0027m adding the new argument first, then dropping the old.\n\nWhen we\u0027re done, we will have one argument named \"connections\" and it will be the connection registry, just like other places in Zuul.",
+      "revId": "ff16c4355017a14a1d4017855b660ba7b7671a4b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_b70764ca",
         "filename": "zuul/web/__init__.py",
         "patchSetId": 4
