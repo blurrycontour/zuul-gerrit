@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "5f7c97a3_cbc035e4",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-05-15T17:38:31Z",
+      "side": 1,
+      "message": "I don\u0027t quite understand what\u0027s the difference between connections and _connections?",
+      "revId": "ff16c4355017a14a1d4017855b660ba7b7671a4b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_b70764ca",
         "filename": "zuul/web/__init__.py",
         "patchSetId": 4
