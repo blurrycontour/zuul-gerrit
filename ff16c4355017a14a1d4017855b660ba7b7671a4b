@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_098cf0d4",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-05-16T01:20:41Z",
+      "side": 1,
+      "message": "My follow up change should also fix this confusion.",
+      "parentUuid": "5f7c97a3_9dc92227",
+      "revId": "ff16c4355017a14a1d4017855b660ba7b7671a4b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_b70764ca",
         "filename": "zuul/web/__init__.py",
         "patchSetId": 4
