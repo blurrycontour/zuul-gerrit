@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_8aec572a",
+        "filename": "zuul/ansible/library/command.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 526,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-05-17T01:33:13Z",
+      "side": 1,
+      "message": "why not computing the real delta of the task ? (e.g. doing startd at the begining of the module and computing \"delta \u003d endd - startd\" when exiting)",
+      "revId": "ecc1e9f4be1ffdd84377693c3f6d239a1c83b15a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
