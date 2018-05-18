@@ -31,6 +31,7 @@ import zuul.web
 import zuul.lib.log_streamer
 import zuul.lib.fingergw
 import tests.base
+from tests.base import never_capture
 
 
 class TestLogStreamer(tests.base.BaseTestCase):
@@ -329,6 +330,7 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
         self.log.debug("\n\nStreamed: %s\n\n", self.ws_client_results)
         self.assertEqual(file_contents, self.ws_client_results)
 
+    @never_capture()
     def test_websocket_streaming(self):
         # Start the finger streamer daemon
         streamer = zuul.lib.log_streamer.LogStreamer(
