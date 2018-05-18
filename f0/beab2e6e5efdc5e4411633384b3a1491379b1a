@@ -1,0 +1,10 @@
+Code-Review+2: Clint 'SpamapS' Byrum <clint@fewbar.com>
+Code-Review+1: wu.chunyang <wu.chunyang@99cloud.net>
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Fri, 18 May 2018 16:08:50 +0000
+Reviewed-on: https://review.openstack.org/565075
+Project: openstack-infra/zuul
+Branch: refs/heads/master
