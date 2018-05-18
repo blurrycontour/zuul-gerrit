@@ -31,6 +31,7 @@ import zuul.web
 import zuul.lib.log_streamer
 import zuul.lib.fingergw
 import tests.base
+from tests.base import never_capture
 
 
 class TestLogStreamer(tests.base.BaseTestCase):
@@ -218,6 +219,7 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
                 self.streaming_data += data.decode('utf-8')
             s.shutdown(socket.SHUT_RDWR)
 
+    @never_capture()
     def test_decode_boundaries(self):
         '''
         Test multi-byte characters crossing read buffer boundaries.
