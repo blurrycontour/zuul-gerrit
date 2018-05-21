@@ -702,7 +702,7 @@ class FakeGithubPullRequest(object):
         self.comments.append(message)
         self._updateTimeStamp()
 
-    def getCommentAddedEvent(self, text):
+    def getIssueCommentAddedEvent(self, text):
         name = 'issue_comment'
         data = {
             'action': 'created',
@@ -718,6 +718,16 @@ class FakeGithubPullRequest(object):
             'sender': {
                 'login': 'ghuser'
             }
+        }
+        return (name, data)
+
+    def getCommentAddedEvent(self, text):
+        name = 'issue_comment'
+        data = self.getIssueCommentAddedEvent(text)
+        # A PR comment has an additional 'pull_request' key in the issue data
+        data['issue']['pull_request'] = {
+            'url': 'http://%s/api/v3/repos/%s/pull/%s' % (
+                self.github.git_host, self.project, self.number)
         }
         return (name, data)
 
