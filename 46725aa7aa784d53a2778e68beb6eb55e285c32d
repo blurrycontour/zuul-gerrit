@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_79614439",
+        "filename": "zuul/driver/gerrit/gerritsource.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-05-22T18:06:30Z",
+      "side": 1,
+      "message": "We could move this into the __init__ method so this is a bit more efficient.",
+      "revId": "46725aa7aa784d53a2778e68beb6eb55e285c32d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
