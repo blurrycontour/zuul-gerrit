@@ -16,6 +16,7 @@ import re
 import urllib
 import logging
 import voluptuous as vs
+from urllib.parse import urlparse
 from zuul.source import BaseSource
 from zuul.model import Project
 from zuul.driver.gerrit.gerritmodel import GerritRefFilter
@@ -47,8 +48,6 @@ class GerritSource(BaseSource):
     def getChange(self, event, refresh=False):
         return self.connection.getChange(event, refresh)
 
-    change_re = re.compile(r"/(\#\/c\/)?(\d+)[\w]*")
-
     def getChangeByURL(self, url):
         try:
             parsed = urllib.parse.urlparse(url)
@@ -57,7 +56,11 @@ class GerritSource(BaseSource):
         path = parsed.path
         if parsed.fragment:
             path += '#' + parsed.fragment
-        m = self.change_re.match(path)
+        prefix = ''
+        if hasattr(self.connection, 'baseurl'):
+            prefix = urlparse(self.connection.baseurl).path.lstrip('/')
+        change_re = re.compile(r"/%s(\#\/c\/)?(\d+)[\w]*" % prefix)
+        m = change_re.match(path)
         if not m:
             return None
         try:
