@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_f6202c9e",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-05-23T02:27:57Z",
+      "side": 1,
+      "message": "nit: decorator",
+      "revId": "f3959093a75a9e62769d0baa09944257c7939e7f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
