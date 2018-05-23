@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "5f7c97a3_af3bfcce",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-05-23T17:22:35Z",
+      "side": 1,
+      "message": "s/there are a/there are/",
+      "revId": "676f09796afbb1cc5949978427af038352935943",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_14bd3ad7",
         "filename": "doc/source/developer/specs/container-build-resources.rst",
         "patchSetId": 1
@@ -101,6 +118,23 @@
       "side": 1,
       "message": "++ I think it would be fine to support both, to make it easy for people that want container like VMs using a system like lxd and also to support people who already have a k8s and don\u0027t want to deploy something new but have similar functionality. I just didn\u0027t want to exclude non k8s systems by coupling tightly to k8s expectations.",
       "parentUuid": "bf659307_333cf12d",
+      "revId": "676f09796afbb1cc5949978427af038352935943",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_cf3678e8",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-05-23T17:22:35Z",
+      "side": 1,
+      "message": "This is in line with something I\u0027ve been thinking about, which is that instead of \u0027nodepool\u0027 it could be changed to \u0027thingpool\u0027. In many cases, I want more than just instances from my cloud. I want load balancers, volumes, images, etc. So, it would be interesting to see if we can change nodepool from being node/ssh centric to being API-generic, with OpenShift projects just being one of the many \"things\" it could do.",
       "revId": "676f09796afbb1cc5949978427af038352935943",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -320,6 +354,23 @@
       "side": 1,
       "message": "That sounds like a special use-case where the image is built inside a container. Projects may build the software on a regular system and only install the final package into an image.",
       "parentUuid": "bf659307_5823d9a7",
+      "revId": "676f09796afbb1cc5949978427af038352935943",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_6f35e4d9",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-05-23T17:22:35Z",
+      "side": 1,
+      "message": "I think I like the idea of building a container image with the git repos in it, and pushing that into wherever the k8s needs it. This will be an extremely quick process, just a FROM whatever-is-already-built and a push to a registry. I don\u0027t even think it needs to be all that isolated from other builds, it will get a unique ID and we can use that.",
       "revId": "676f09796afbb1cc5949978427af038352935943",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
