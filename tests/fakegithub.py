@@ -113,6 +113,8 @@ class FakeRepository(object):
 
         if entity == 'branches':
             return self.get_url_branch(request)
+        if entity == 'collaborators':
+            return self.get_url_collaborators(request)
         else:
             return None
 
@@ -124,6 +126,30 @@ class FakeRepository(object):
         else:
             return None
 
+    def get_url_collaborators(self, path):
+        login, entity = path.split('/')
+
+        if entity == 'permission':
+            owner, proj = self.name.split('/')
+            permission = None
+            for pr in self.data.pull_requests.values():
+                pr_owner, pr_project = pr.project.split('/')
+                if (pr_owner == owner and proj == pr_project):
+                    if login in pr.admins:
+                        permission = 'admin'
+                        break
+                    elif login in pr.writers:
+                        permission = 'write'
+                        break
+                    else:
+                        permission = 'read'
+            data = {
+                'permission': permission,
+            }
+            return FakeResponse(data)
+        else:
+            return None
+
     def get_url_protection(self, branch):
         contexts = self.data.required_contexts.get((self.name, branch), [])
         data = {
@@ -132,7 +158,6 @@ class FakeRepository(object):
             }
         }
         return FakeResponse(data)
-
 
     def pull_requests(self, state=None):
         pulls = []
