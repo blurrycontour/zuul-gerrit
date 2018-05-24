@@ -25,10 +25,11 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
 
     log = logging.getLogger("zuul.reporter.BaseReporter")
 
-    def __init__(self, driver, connection, config=None):
+    def __init__(self, driver, connection, pipeline, config=None):
         self.driver = driver
         self.connection = connection
         self.config = config or {}
+        self.pipeline = pipeline
         self._action = None
 
     def setAction(self, action):

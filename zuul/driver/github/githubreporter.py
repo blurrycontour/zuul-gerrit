@@ -28,8 +28,8 @@ class GithubReporter(BaseReporter):
     name = 'github'
     log = logging.getLogger("zuul.GithubReporter")
 
-    def __init__(self, driver, connection, config=None):
-        super(GithubReporter, self).__init__(driver, connection, config)
+    def __init__(self, driver, connection, pipeline, config=None):
+        super().__init__(driver, connection, pipeline, config)
         self._commit_status = self.config.get('status', None)
         self._create_comment = self.config.get('comment', True)
         self._merge = self.config.get('merge', False)
@@ -191,6 +191,22 @@ class GithubReporter(BaseReporter):
         message += self.connection.getUserUri(username)
 
         return message
+
+    def getSubmitAllowNeeds(self):
+        """Get a list of code review labels that are allowed to be
+        "needed" in the submit records for a change, with respect
+        to this queue.  In other words, the list of review labels
+        this reporter itself is likely to set before submitting.
+        """
+
+        # check if we report a status, if not we can return an empty list
+        status = self.config.get('status')
+        if not status:
+            return []
+
+        # we return a status so return the status we report to github
+        return ["%s/%s" % (self.pipeline.layout.tenant.name,
+                           self.pipeline.name)]
 
 
 def getSchema():
