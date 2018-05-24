@@ -49,7 +49,7 @@ class GerritReporter(BaseReporter):
         return self.connection.review(item.change.project.name, changeid,
                                       message, self.config)
 
-    def getSubmitAllowNeeds(self):
+    def getSubmitAllowNeeds(self, tenant_name, pipeline_name):
         """Get a list of code review labels that are allowed to be
         "needed" in the submit records for a change, with respect
         to this queue.  In other words, the list of review labels
