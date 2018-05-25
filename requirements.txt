@@ -1,5 +1,6 @@
 pbr>=1.1.0
 
+pathlib
 github3.py>=1.1.0
 PyYAML>=3.1.0
 paramiko>=2.0.1
