@@ -1,0 +1,4 @@
+- hosts: pod
+  tasks:
+    - name: Run command in pod
+      command: cat /etc/os-release
