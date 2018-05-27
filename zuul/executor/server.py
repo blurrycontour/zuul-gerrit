@@ -46,7 +46,7 @@ BUFFER_LINES_FOR_SYNTAX = 200
 COMMANDS = ['stop', 'pause', 'unpause', 'graceful', 'verbose',
             'unverbose', 'keep', 'nokeep']
 DEFAULT_FINGER_PORT = 7900
-BLACKLISTED_ANSIBLE_CONNECTION_TYPES = ['network_cli']
+BLACKLISTED_ANSIBLE_CONNECTION_TYPES = ['network_cli', 'resource']
 
 
 class StopException(Exception):
@@ -631,6 +631,7 @@ class AnsibleJob(object):
         self.ssh_agent = SshAgent()
 
         self.executor_variables_file = None
+        self.resources_variable_file = None
 
         if self.executor_server.config.has_option('executor', 'variables'):
             self.executor_variables_file = self.executor_server.config.get(
@@ -1351,6 +1352,24 @@ class AnsibleJob(object):
             work_root=self.jobdir.work_root,
             result_data_file=self.jobdir.result_data_file)
 
+        resources_nodes = []
+        resources_var = {}
+        for node in args['nodes']:
+            if node.get('connection_type') == 'resource':
+                resources_nodes.append(node)
+                # TODO: decrypt resource data using scheduler key
+                resources_var[node['name'][0]] = node.get('connection_port')
+        # Remove resource node from nodes list
+        for node in resources_nodes:
+            args['nodes'].remove(node)
+        if resources_var:
+            self.resources_variable_file = os.path.join(
+                self.jobdir.ansible_root, "resources.yaml")
+            with open(self.resources_variable_file, 'w') as resources_yaml:
+                resources_yaml.write(
+                    yaml.safe_dump({'zuul_resources': resources_var},
+                                   default_flow_style=False))
+
         nodes = self.getHostList(args)
         setup_inventory = make_setup_inventory_dict(nodes)
         inventory = make_inventory_dict(nodes, args, all_vars)
@@ -1731,6 +1750,9 @@ class AnsibleJob(object):
 
         if self.executor_variables_file is not None:
             cmd.extend(['-e@%s' % self.executor_variables_file])
+
+        if self.resources_variable_file is not None:
+            cmd.extend(['-e@%s' % self.resources_variable_file])
 
         self.emitPlaybookBanner(playbook, 'START', phase)
 
