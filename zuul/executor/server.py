@@ -46,7 +46,7 @@ BUFFER_LINES_FOR_SYNTAX = 200
 COMMANDS = ['stop', 'pause', 'unpause', 'graceful', 'verbose',
             'unverbose', 'keep', 'nokeep']
 DEFAULT_FINGER_PORT = 7900
-BLACKLISTED_ANSIBLE_CONNECTION_TYPES = ['network_cli']
+BLACKLISTED_ANSIBLE_CONNECTION_TYPES = ['network_cli', 'resource']
 
 
 class StopException(Exception):
@@ -1343,6 +1343,17 @@ class AnsibleJob(object):
             log_root=self.jobdir.log_root,
             work_root=self.jobdir.work_root,
             result_data_file=self.jobdir.result_data_file)
+
+        resource_nodes = []
+        for node in args['nodes']:
+            if node.get('connection_type') == 'resource':
+                resource_nodes.append(node)
+                # TODO: decrypt resource data using scheduler key
+                all_vars['zuul']['resource'] = json.loads(
+                    node.get('connection_port'))
+        # Remove resource node from nodes list
+        for node in resource_nodes:
+            args['nodes'].remove(node)
 
         nodes = self.getHostList(args)
         setup_inventory = make_setup_inventory_dict(nodes)
