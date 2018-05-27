@@ -93,6 +93,7 @@ order of precedence is:
 #. :ref:`Job variables <user_jobs_job_variables>`
 #. :ref:`Project variables <user_jobs_project_variables>`
 #. :ref:`Parent job results <user_jobs_parent_results>`
+#. :ref:`Container variables <user_jobs_container_variables>`
 
 Meaning that a site-wide variable with the same name as any other will
 override its value, and similarly, secrets override job variables of
@@ -206,6 +207,57 @@ Parent Job Results
 
 A job may return data to Zuul for later use by jobs which depend on
 it.  For details, see :ref:`return_values`.
+
+.. _user_jobs_container_variables:
+
+Container Variables
+~~~~~~~~~~~~~~~~~~~
+
+A job using a container build resources has access to a zuul_resources variable
+that describes the resource:
+
+.. var:: zuul_resources
+   :type: dict
+
+   A dictionary of label keys, each value consists of:
+
+   .. var:: namespace
+
+      The resource's namespace name.
+
+   .. var:: context
+
+      The kube config context name.
+
+   .. var:: pod
+
+      The name of the pod when the label defines a kubectl connection.
+
+Project or namespace resources might be used in a template as:
+
+.. code-block:: yaml
+
+   - hosts: localhost
+     tasks:
+       - name: Create a k8s resource
+         k8s_raw:
+           state: present
+           context: "{{ zuul_resources['label-name'].context }}"
+           namespace: "{{ zuul_resources['label-name'].namespace }}"
+
+Kubectl resources might be used in a template as:
+
+.. code-block:: yaml
+
+   - hosts: localhost
+     tasks:
+      - name: Copy src repos to the pod
+        command: >
+          oc rsync -q --progress=false
+            {{ zuul.executor.src_root }}/
+            {{ zuul_resources['label-name'].pod }}:src/
+        no_log: true
+
 
 Zuul Variables
 --------------
