@@ -20,6 +20,12 @@ add_host = paths._import_ansible_action_plugin("add_host")
 class ActionModule(add_host.ActionModule):
 
     def run(self, tmp=None, task_vars=None):
+        if self._task.args.get('ansible_connection') == 'kubectl':
+            # Allow kubectl connection to be added from untrusted-project
+            # This could be removed when a trusted phase is allowed to inject
+            # dynamic host in the inventory (for container-native where the
+            # pod is created by the job)
+            return super(ActionModule, self).run(tmp, task_vars)
 
         return dict(
             failed=True,
