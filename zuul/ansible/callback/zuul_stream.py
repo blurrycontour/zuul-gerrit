@@ -227,6 +227,10 @@ class CallbackModule(default.CallbackModule):
                 if ip in ('localhost', '127.0.0.1'):
                     # Don't try to stream from localhost
                     continue
+                connection = play_vars[host].get('ansible_connection')
+                if connection in ('kubectl', ):
+                    # Don't try to stream from kubectl connection
+                    continue
                 log_id = "%s-%s" % (
                     task._uuid, paths._sanitize_filename(inventory_hostname))
                 streamer = threading.Thread(
