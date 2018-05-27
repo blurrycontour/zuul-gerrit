@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import base64
 import collections
 import datetime
 import json
@@ -50,7 +51,8 @@ BUFFER_LINES_FOR_SYNTAX = 200
 COMMANDS = ['stop', 'pause', 'unpause', 'graceful', 'verbose',
             'unverbose', 'keep', 'nokeep']
 DEFAULT_FINGER_PORT = 7900
-BLACKLISTED_ANSIBLE_CONNECTION_TYPES = ['network_cli']
+BLACKLISTED_ANSIBLE_CONNECTION_TYPES = [
+    'network_cli', 'kubectl', 'project', 'namespace']
 
 
 class StopException(Exception):
@@ -635,6 +637,7 @@ class AnsibleJob(object):
         self.ssh_agent = SshAgent()
 
         self.executor_variables_file = None
+        self.resources_variable_file = None
 
         self.cpu_times = {'user': 0, 'system': 0,
                           'children_user': 0, 'children_system': 0}
@@ -1062,6 +1065,11 @@ class AnsibleJob(object):
                         private_ipv4=node.get('private_ipv4'),
                         public_ipv6=node.get('public_ipv6'))))
 
+                python_interpreter = node.get('python')
+                if python_interpreter:
+                    host_vars[
+                        'ansible_python_interpreter'] = python_interpreter
+
                 username = node.get('username')
                 if username:
                     host_vars['ansible_user'] = username
@@ -1355,6 +1363,53 @@ class AnsibleJob(object):
         self.log.debug("Adding role path %s", role_path)
         jobdir_playbook.roles_path.append(role_path)
 
+    def prepareNodeSecret(self, secret_type, secret_data):
+        if secret_type == "openshift-service-account":
+            kube_cfg = os.path.join(self.jobdir.work_root, ".kube", "config")
+            os.makedirs(os.path.dirname(kube_cfg), exist_ok=True)
+            argv = [
+                'oc', '--namespace', secret_data['namespace'],
+                'login', secret_data['host'],
+                '--config', kube_cfg,
+                '--token', secret_data['token'],
+            ]
+            if secret_data['skiptls']:
+                argv.append('--insecure-skip-tls-verify=true')
+            proc = subprocess.Popen(
+                argv, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            proc.wait()
+            self.log.debug("Secret creation output [%s] [%s]",
+                           proc.stdout.read(), proc.stderr.read())
+        elif secret_type == "kubernetes-service-account":
+            kube_cfg = os.path.join(self.jobdir.work_root, ".kube", "config")
+            kube_ca = os.path.join(self.jobdir.work_root, ".kube", "ca.crt")
+            os.makedirs(os.path.dirname(kube_cfg), exist_ok=True)
+            with open(kube_ca, "w") as ca_file:
+                ca_file.write(base64.b64decode(
+                    secret_data['ca_crt']).decode('utf-8'))
+            argv = ["kubectl", "config", "--kubeconfig", kube_cfg]
+
+            def _exec(args):
+                proc = subprocess.Popen(
+                    argv + args,
+                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                proc.wait()
+                self.log.debug("%s output [%s] [%s]",
+                               args[0], proc.stdout.read(), proc.stderr.read())
+            skip_tls = "true" if secret_data['skiptls'] else "false"
+            _exec(["set-cluster", "nodepool",
+                   "--server=%s" % secret_data['host'],
+                   "--certificate-authority=%s" % kube_ca,
+                   "--insecure-skip-tls-verify=%s" % skip_tls])
+            _exec(["set-credentials", "zuul",
+                   "--token=%s" % base64.b64decode(
+                       secret_data['token']).decode('utf-8')])
+            _exec(["set-context", "zuul-build-resource",
+                   "--cluster=nodepool",
+                   "--user=zuul",
+                   "--namespace=%s" % secret_data["namespace"]])
+            _exec(["use-context", "zuul-build-resource"])
+
     def prepareAnsibleFiles(self, args):
         all_vars = args['vars'].copy()
         check_varnames(all_vars)
@@ -1368,6 +1423,36 @@ class AnsibleJob(object):
             work_root=self.jobdir.work_root,
             result_data_file=self.jobdir.result_data_file,
             inventory_file=self.jobdir.inventory)
+
+        resources_nodes = []
+        resources_var = {}
+        for node in args['nodes']:
+            if node.get('connection_type') in (
+                    'namespace', 'project', 'kubectl'):
+                # TODO: decrypt resource data using scheduler key
+                resources_var[node['name'][0]] = node.get('connection_port')
+                if node.get('connection_port', {}).get('ca_crt'):
+                    secret_type = "kubernetes-service-account"
+                else:
+                    secret_type = "openshift-service-account"
+                self.prepareNodeSecret(
+                    secret_type, node.get('connection_port'))
+                node['connection_port'] = None
+                # Assume default python3
+                node['python'] = '/usr/bin/python3'
+            if node.get('connection_type') in ('project', 'namespace'):
+                # Project are special node that can't be used in the inventory
+                resources_nodes.append(node)
+        # Remove resource node from nodes list
+        for node in resources_nodes:
+            args['nodes'].remove(node)
+        if resources_var:
+            self.resources_variable_file = os.path.join(
+                self.jobdir.ansible_root, "resources.yaml")
+            with open(self.resources_variable_file, 'w') as resources_yaml:
+                resources_yaml.write(
+                    yaml.safe_dump({'zuul_resources': resources_var},
+                                   default_flow_style=False))
 
         nodes = self.getHostList(args)
         setup_inventory = make_setup_inventory_dict(nodes)
@@ -1760,6 +1845,9 @@ class AnsibleJob(object):
 
         if self.executor_variables_file is not None:
             cmd.extend(['-e@%s' % self.executor_variables_file])
+
+        if self.resources_variable_file is not None:
+            cmd.extend(['-e@%s' % self.resources_variable_file])
 
         self.emitPlaybookBanner(playbook, 'START', phase)
 
