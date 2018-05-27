@@ -1244,6 +1244,8 @@ class AnsibleJob(object):
                     ansible_host=ip,
                     ansible_user=self.executor_server.default_username,
                     ansible_port=port,
+                    ansible_python_interpreter=node.get(
+                        'python_path', '/usr/bin/python2'),
                     nodepool=dict(
                         label=node.get('label'),
                         az=node.get('az'),
@@ -1625,8 +1627,6 @@ class AnsibleJob(object):
     def prepareAnsibleFiles(self, args):
         all_vars = args['vars'].copy()
         check_varnames(all_vars)
-        # TODO(mordred) Hack to work around running things with python3
-        all_vars['ansible_python_interpreter'] = '/usr/bin/python2'
         all_vars['zuul'] = args['zuul'].copy()
         all_vars['zuul']['executor'] = dict(
             hostname=self.executor_server.hostname,
