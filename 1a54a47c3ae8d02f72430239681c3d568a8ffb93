@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_8e7d5de8",
+        "filename": "zuul/driver/github/githubreporter.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-01T21:03:27Z",
+      "side": 1,
+      "message": "A reporter is instantiated for every pipeline (which is unique to a tenant).  So we shouldn\u0027t need to pass both of these in.  At the least, we can just pass in the pipeline and get to the rest of the info from there.\n\nBut since the reporter itself is attached to the pipeline, it feels like we shouldn\u0027t need to pass anything here.  How about instead we update the reporter constructor and pass in the pipeline when we construct it?  Then in here, we can use self.pipeline.\n\nIn fact, if we do that, we can go ahead and set the status string we use in the initializer for this, and use that pre-computed value here and in the report method.",
+      "revId": "1a54a47c3ae8d02f72430239681c3d568a8ffb93",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
