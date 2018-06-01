@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_3957b5cc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-01T21:18:03Z",
+      "side": 1,
+      "message": "What about adding a \"protected-branch\" requirement?  That would match the event only if the branch of the ref (refs/heads/.*) matched a protected branch?\n\nI think that may be worth doing regardless because \"push\" and \"pull_request\" pipelines are subtly different (you may end up with a different sha on a merge commit, and push pipelines can respond to someone manually pushing to the branch).\n\nNone of that detracts from this change which stands on its own.",
+      "revId": "735190f2ec538d8e19d9db707d827cb6c84bf901",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
