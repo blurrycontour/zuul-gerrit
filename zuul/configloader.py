@@ -788,6 +788,9 @@ class JobParser(object):
             branches = as_list(conf['branches'])
         if branches:
             job.setBranchMatcher(branches)
+        if 'files' in conf and 'irrelevant-files' in conf:
+            raise Exception(
+                "Jobs may not have both files and irrelevant-files attributes")
         if 'files' in conf:
             matchers = []
             for fn in as_list(conf['files']):

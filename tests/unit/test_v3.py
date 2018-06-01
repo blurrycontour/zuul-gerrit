@@ -1931,6 +1931,28 @@ class TestInRepoConfig(ZuulTestCase):
         self.assertIn('Debug information:',
                       A.messages[0], "A should have debug info")
 
+    def test_files_and_irrelevant_files(self):
+        """Test files and irrelevant-files on the same job"""
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: project-test1
+                files: foo
+                irrelevant-files: bar
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertEqual(A.reported, 1,
+                         "A should report failure")
+        self.assertEqual(A.patchsets[0]['approvals'][0]['value'], "-1")
+        self.assertIn('Jobs may not have both files and', A.messages[0],
+                      "A should have failed the check pipeline")
+        self.assertHistory([])
+
 
 class TestInRepoJoin(ZuulTestCase):
     # In this config, org/project is not a member of any pipelines, so

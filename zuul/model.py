@@ -1260,11 +1260,21 @@ class Job(ConfigObject):
 
         for k in self.context_attributes:
             if (other._get(k) is not None and
-                k not in set(['tags'])):
+                k not in set(['tags', 'file_matcher',
+                              'irrelevant_file_matcher'])):
                 setattr(self, k, other._get(k))
 
         if other._get('tags') is not None:
             self.tags = frozenset(self.tags.union(other.tags))
+
+        # Only one of files/irrelevant-files should be used
+        if other._get('irrelevant_file_matcher') is not None:
+            self.file_matcher = None
+            self.irrelevant_file_matcher = other.irrelevant_file_matcher
+
+        if other._get('file_matcher') is not None:
+            self.file_matcher = other.file_matcher
+            self.irrelevant_file_matcher = None
 
         self.inheritance_path = self.inheritance_path + (repr(other),)
 

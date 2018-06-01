@@ -1,0 +1,6 @@
+features:
+  - |
+    Files and irrelevant-files now operate as a pair.  It is no longer
+    permitted for both to appear on a single job variant.  When a
+    files matcher appears later in the inheritance path, it overrides
+    any earlier files and irrelevant-files matchers, and vice versa.
