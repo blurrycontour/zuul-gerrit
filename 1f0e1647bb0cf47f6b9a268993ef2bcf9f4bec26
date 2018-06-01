@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_e822c451",
+        "filename": "tests/unit/test_streaming.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-06-01T22:35:13Z",
+      "side": 1,
+      "message": "The ws4py docs say that received_message receives a complete message. Does that imply we won\u0027t receive half a utf8 character as bytes in message? If that isn\u0027t teh case we may need to accommodate for that.",
+      "revId": "1f0e1647bb0cf47f6b9a268993ef2bcf9f4bec26",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
