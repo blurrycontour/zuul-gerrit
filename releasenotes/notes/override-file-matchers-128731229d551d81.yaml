@@ -1,0 +1,13 @@
+features:
+  - |
+    Files (and irrelevant-files) matchers are now overridable.  Zuul
+    now uses only branch matchers to collect job variants.  Once those
+    variants are collected, they are combined, and the files and
+    irrelevant-files attributes are inherited and overridden as any
+    other job attribute.  The final values are used to determine
+    whether the job should ultimately run.
+
+    Files and irrelevant-files now operate as a pair.  It is no longer
+    permitted for both to appear on a single job variant.  When a
+    files matcher appears later in the inheritance path, it overrides
+    any earlier files and irrelevant-files matchers, and vice versa.
