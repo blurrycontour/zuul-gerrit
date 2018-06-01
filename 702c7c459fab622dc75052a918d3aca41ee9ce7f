@@ -16,6 +16,24 @@
       "revId": "702c7c459fab622dc75052a918d3aca41ee9ce7f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_77da2c4b",
+        "filename": "doc/source/user/pti.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-06-01T00:20:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f7c97a3_47e2e7a1",
+      "revId": "702c7c459fab622dc75052a918d3aca41ee9ce7f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
