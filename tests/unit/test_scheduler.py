@@ -4924,29 +4924,17 @@ For CI problems and help debugging, contact ci@example.org"""
         self.fake_gerrit.addEvent(D.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
-        files = {'tests/foo': ''}
-        E = self.fake_gerrit.addFakeChange('org/project', 'master', 'E',
-                                           files=files)
-        self.fake_gerrit.addEvent(E.getPatchsetCreatedEvent(1))
-        self.waitUntilSettled()
-
-        files = {'tests/docs/foo': ''}
-        F = self.fake_gerrit.addFakeChange('org/project', 'master', 'F',
-                                           files=files)
-        self.fake_gerrit.addEvent(F.getPatchsetCreatedEvent(1))
-        self.waitUntilSettled()
-
         self.assertHistory([
+            dict(name='files-override-job', result='SUCCESS', changes='1,1'),
+
             dict(name='child-job', result='SUCCESS', changes='2,1'),
+            dict(name='irr-override-job', result='SUCCESS', changes='2,1'),
 
             dict(name='child-override-job', result='SUCCESS', changes='3,1'),
+            dict(name='irr-override-job', result='SUCCESS', changes='3,1'),
 
             dict(name='project-override-job', result='SUCCESS', changes='4,1'),
-
-            dict(name='irr-job', result='SUCCESS', changes='5,1'),
-            dict(name='irr-override-job', result='SUCCESS', changes='5,1'),
-
-            dict(name='irr-job', result='SUCCESS', changes='6,1'),
+            dict(name='irr-override-job', result='SUCCESS', changes='4,1'),
         ], ordered=False)
 
     def test_trusted_project_dep_on_non_live_untrusted_project(self):

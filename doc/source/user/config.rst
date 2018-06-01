@@ -1053,8 +1053,9 @@ Here is an example of two job definitions:
       This indicates that the job should only run on changes where the
       specified files are modified.  Unlike **branches**, this value
       is subject to inheritance and overriding, so only the final
-      value is used to determine if the job should run. This is a
-      regular expression or list of regular expressions.
+      value is used to determine if the job should run. Mutually
+      exclusive with **irrelevant-files**; a regular expression or
+      list of regular expressions.
 
    .. attr:: irrelevant-files
 
@@ -1062,8 +1063,8 @@ Here is an example of two job definitions:
       the job should run unless *all* of the files changed match this
       list.  In other words, if the regular expression ``docs/.*`` is
       supplied, then this job will not run if the only files changed
-      are in the docs directory.  A regular expression or list of
-      regular expressions.
+      are in the docs directory.  Mutually exclusive with **files**; a
+      regular expression or list of regular expressions.
 
 .. _project:
 

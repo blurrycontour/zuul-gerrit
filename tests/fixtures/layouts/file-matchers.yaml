@@ -38,18 +38,16 @@
     parent: parent-override-job
 
 - job:
-    name: irr-job
-    files:
-      - tests/.*
+    name: irr-override-job
+    parent: parent-override-job
     irrelevant-files:
+      - parent1.txt  # make sure we have overriden parent files
       - README
 
 - job:
-    name: irr-override-job
-    parent: irr-job
-    irrelevant-files:
-      - README
-      - tests/docs/.*
+    name: files-override-job
+    parent: irr-override-job
+    files: parent1.txt  # make sure we have overriden parent irr-files
 
 - project:
     name: org/project
@@ -59,5 +57,5 @@
         - child-override-job  # child
         - project-override-job:  # project
             files: project.txt
-        - irr-job  # tests/docs/foo tests/foo
-        - irr-override-job  # tests/foo
+        - irr-override-job  # parent2, child, project
+        - files-override-job  # parent1
