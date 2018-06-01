@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_08faa5bb",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-06-01T19:04:09Z",
+      "side": 1,
+      "message": "I think this may have been the source of confusion on my part regarding \"machine like containers\". From my perspective you are most likely to interact with them without a kubernetes. LXD/LXC for example.\n\nMaybe we want to scope this spec to k8s support in nodepool/zuul and worry about other thingpool items including lxc/lxd and other machine like containers separately?\n\nMy previous concerns were that we were assuming k8s was the only way to get a machine like container hence the reliance on k8s specific access methods. I think that concern persists unless we want to scope this specifically to k8s rather than the bigger \"containers\".",
+      "range": {
+        "startLine": 81,
+        "startChar": 0,
+        "endLine": 81,
+        "endChar": 69
+      },
+      "revId": "c1b8dacf43541a4a7fb09c8cb22c2e1827858f99",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
