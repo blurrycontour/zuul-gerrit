@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_ced275fd",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-06-01T20:57:56Z",
+      "side": 1,
+      "message": "Thinking out loud here, but maybe it would be better to reset the git state here if the merge fails? Then we avoid putting the repo in a bad state regardless of the merge conflict?\n\nSomething like:\n\n  try:\n    repo.git.merge(*args)\n  except Exception:\n    self.reset()\n    raise",
+      "revId": "d357ff3292d670c645412470e6ba486b3e4cc103",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
