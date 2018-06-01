@@ -16,6 +16,23 @@
       "revId": "1f0e1647bb0cf47f6b9a268993ef2bcf9f4bec26",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_4884180b",
+        "filename": "tests/unit/test_streaming.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-01T22:40:02Z",
+      "side": 1,
+      "message": "Yes, we control the sending side and we know that it only sends valid utf8 chunks.",
+      "revId": "1f0e1647bb0cf47f6b9a268993ef2bcf9f4bec26",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
