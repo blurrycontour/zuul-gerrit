@@ -16,6 +16,24 @@
       "revId": "d357ff3292d670c645412470e6ba486b3e4cc103",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_6107af83",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-06-02T07:08:02Z",
+      "side": 1,
+      "message": "Sure that would work most of the time except if the merger (or vm) is killed before the reset can be performed. In this case the cached repo is permanently broken (without us knowing it) if we don\u0027t handle it when actually using this repo.\n\nThat\u0027s why I prefer to make the merger able to work with broken repos (and fix any further permanently broken cached repo we encounter in the future).",
+      "parentUuid": "5f7c97a3_ced275fd",
+      "revId": "d357ff3292d670c645412470e6ba486b3e4cc103",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
