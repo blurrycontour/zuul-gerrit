@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_210c57ea",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-06-02T05:47:04Z",
+      "side": 1,
+      "message": "(query) can they set it to nothing? Wouldn\u0027t they need to set it to something inelegant such as \u0027a-file-that-will-never-exist\u0027?",
+      "range": {
+        "startLine": 27,
+        "startChar": 53,
+        "endLine": 27,
+        "endChar": 60
+      },
+      "revId": "aecc6547a4987caa05dec7cbd7c9fef1f1258d27",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
