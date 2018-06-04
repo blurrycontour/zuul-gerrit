@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_4cac0cee",
+        "filename": "zuul/lib/connections.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-06-04T21:02:18Z",
+      "side": 1,
+      "message": "Because you use a break above I believe this check and continue are a noop.\n\nAdditionally I\u0027m not sure what the intent of this code is? If we find the driver we fall through below same if we don\u0027t find the driver?",
+      "range": {
+        "startLine": 119,
+        "startChar": 16,
+        "endLine": 120,
+        "endChar": 28
+      },
+      "revId": "a13985667ac39c71b26a11e8af0343473c770b60",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_ec863866",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-06-04T21:02:18Z",
+      "side": 1,
+      "message": "Can\u0027t this return more than one conn? We may need to index it in that case?",
+      "revId": "a13985667ac39c71b26a11e8af0343473c770b60",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
