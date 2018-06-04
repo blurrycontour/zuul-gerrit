@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_720be823",
+        "filename": "tests/unit/test_supercedent.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-06-04T17:59:12Z",
+      "side": 1,
+      "message": "this looks like a noop",
+      "range": {
+        "startLine": 36,
+        "startChar": 8,
+        "endLine": 36,
+        "endChar": 35
+      },
+      "revId": "1a20651ab51881113bc96890b1120ce32e07a008",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_d2bc3c08",
+        "filename": "zuul/manager/supercedent.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-06-04T17:59:12Z",
+      "side": 1,
+      "message": "nit: This might as well be just \u0027super().addChange...\u0027",
+      "range": {
+        "startLine": 54,
+        "startChar": 14,
+        "endLine": 54,
+        "endChar": 53
+      },
+      "revId": "1a20651ab51881113bc96890b1120ce32e07a008",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
