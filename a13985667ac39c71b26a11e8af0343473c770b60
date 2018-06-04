@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_8cc9c4ad",
+        "filename": "zuul/lib/connections.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-04T21:06:39Z",
+      "side": 1,
+      "message": "Because the break is in the inner loop, it doesn\u0027t apply to the outer loop which is what the continue is for.  This should skip any driver that isn\u0027t in the argument list.",
+      "revId": "a13985667ac39c71b26a11e8af0343473c770b60",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_ec863866",
         "filename": "zuul/rpclistener.py",
         "patchSetId": 1
@@ -36,6 +53,23 @@
       "writtenOn": "2018-06-04T21:02:18Z",
       "side": 1,
       "message": "Can\u0027t this return more than one conn? We may need to index it in that case?",
+      "revId": "a13985667ac39c71b26a11e8af0343473c770b60",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_ecd4f849",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-04T21:06:39Z",
+      "side": 1,
+      "message": "Nope, this can currently only be one -- if you look in driver/sql/__init__.py, you\u0027ll see it finds a single connection for each tenant on reconfiguration.  And there\u0027s a big note about why it\u0027s weird and what we need to do if we want to fix it.",
       "revId": "a13985667ac39c71b26a11e8af0343473c770b60",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
