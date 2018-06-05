@@ -9,3 +9,8 @@
     - wait_for:
         state: present
         path: "{{waitpath}}"
+        # Wait for longer than our socket timeout to ensure that
+        # if logs are not produced during this time period we
+        # don't break the streaming.
+        delay: 6
+        sleep: 6
