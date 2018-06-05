@@ -121,6 +121,13 @@ class CallbackModule(default.CallbackModule):
         while True:
             try:
                 s = socket.create_connection((ip, LOG_STREAM_PORT), 5)
+                # The timeout above applies to the lifetime of the socket,
+                # we use keepalives to ensure that a quiet period of logging
+                # doesn't kill the socket.
+                s.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+                s.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 3)
+                s.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 3)
+                s.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 5)
             except socket.timeout:
                 self._log(
                     "Timeout exception waiting for the logger. "
