@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_98e7b0ad",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 2334,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2018-06-05T14:27:40Z",
+      "side": 1,
+      "message": "Yes I\u0027m adding that in a new PS.",
+      "parentUuid": "bf659307_1f59ee58",
+      "revId": "3448805bf79a35b94b97f66b6050d7ae5d8bc049",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf659307_7f5a6a50",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 10
@@ -30,6 +48,24 @@
       "writtenOn": "2018-04-10T21:05:28Z",
       "side": 1,
       "message": "What if the patch being tested changes something that is used by the part of the configuration which is currently broken?  That could lead us to break the configuration even more.  That suggests that we should report failure here until we can verify success.  On the other hand, that would make it harder to correct multiple failures.\n\nOn the whole, the approach of this patch seems to be to try to limp along with as much configuration as possible, so I think what you have here may be the best approach.\n\nWe might, in the future, decide to leave a warning message on the patch, but we don\u0027t have a facility for that yet.",
+      "revId": "3448805bf79a35b94b97f66b6050d7ae5d8bc049",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_38d53ce6",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 527,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2018-06-05T14:27:40Z",
+      "side": 1,
+      "message": "\u003e What if the patch being tested changes something that is used by\n \u003e the part of the configuration which is currently broken?  That\n \u003e could lead us to break the configuration even more.  That suggests\n \u003e that we should report failure here until we can verify success.  On\n \u003e the other hand, that would make it harder to correct multiple\n \u003e failures.\n\nIn a case of jobs configurations spreads into multiple repositories and if those repositories contains broken config I fear it will be then difficult even impossible to fix the whole configuration if we report failure until the tenant config is fixed. Reporting a failure only if we detect an issue in the project/branch related to the proposed change seems more flexible.\n\n \u003e On the whole, the approach of this patch seems to be to try to limp\n \u003e along with as much configuration as possible, so I think what you\n \u003e have here may be the best approach.\n \u003e \n \u003e We might, in the future, decide to leave a warning message on the\n \u003e patch, but we don\u0027t have a facility for that yet.\n\nYes, you are right, this would be super handy in that specific case where we can warn on a config related change that Zuul have detected those \"issues\" in the tenant config.\nFor now there is a follow up change https://review.openstack.org/#/c/553873.\nI\u0027ll have a look in a follow up change if I can send this warning information.",
+      "parentUuid": "bf659307_7f5a6a50",
       "revId": "3448805bf79a35b94b97f66b6050d7ae5d8bc049",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
