@@ -494,13 +494,15 @@ class TestGovernor(ZuulTestCase):
             time.sleep(0.1)
         if build.uuid in self.executor_server.job_workers:
             self.log.debug("Build %s did not complete", build)
+            raise Exception("Build of %s did not complete "
+                            "in thirty seconds" % build)
         else:
             self.log.debug("Build %s complete", build)
 
     def test_slow_start(self):
         self.executor_server.hold_jobs_in_build = True
         self.executor_server.max_starting_builds = 1
-        self.executor_server.min_starting_builds = 1
+        self.executor_server.min_starting_builds = 0
         self.executor_server.manageLoad()
         self.assertTrue(self.executor_server.accepting_work)
         A = self.fake_gerrit.addFakeChange('common-config', 'master', 'A')
@@ -511,16 +513,27 @@ class TestGovernor(ZuulTestCase):
         # be accepting new work
         self.assertFalse(self.executor_server.accepting_work)
         self.assertEqual(len(self.executor_server.job_workers), 1)
-        # Allow enough starting builds for the test to complete.
-        self.executor_server.max_starting_builds = 3
+        # We must wait for build1 to enter a waiting state otherwise the
+        # subsequent release() is a nop and the build is never released.
+        # We don't use waitUntilSettled as that requires the other two
+        # builds to start which can't happen while we don't accept jobs.
+        while not build1.waiting:
+            time.sleep(.1)
         build1.release()
         self.waitForWorkerCompletion(build1)
+        # Allow enough starting builds for the test to complete.
+        self.executor_server.max_starting_builds = 2
         self.executor_server.manageLoad()
 
         self.waitForExecutorBuild('test2')
         self.waitForExecutorBuild('test3')
+        # Because min starting builds is 0 we'll use up our 2 starting
+        # build slots with test2 and test3 and end up in a non accepting
+        # state.
+        self.executor_server.manageLoad()
         self.assertFalse(self.executor_server.accepting_work)
 
+        self.waitUntilSettled()
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
         self.waitUntilSettled()
