@@ -494,6 +494,8 @@ class TestGovernor(ZuulTestCase):
             time.sleep(0.1)
         if build.uuid in self.executor_server.job_workers:
             self.log.debug("Build %s did not complete", build)
+            raise Exception("Build of %s did not complete "
+                            "in thirty seconds" % build)
         else:
             self.log.debug("Build %s complete", build)
 
@@ -513,6 +515,11 @@ class TestGovernor(ZuulTestCase):
         self.assertEqual(len(self.executor_server.job_workers), 1)
         # Allow enough starting builds for the test to complete.
         self.executor_server.max_starting_builds = 3
+        # We must wait until settled before releasing build1 otherwise
+        # there is a race where we release a build that hasn't entered
+        # a waiting state yet which is a nop. Then the job enters a waiting
+        # state and we never release it.
+        self.waitUntilSettled()
         build1.release()
         self.waitForWorkerCompletion(build1)
         self.executor_server.manageLoad()
@@ -520,6 +527,7 @@ class TestGovernor(ZuulTestCase):
         self.waitForExecutorBuild('test2')
         self.waitForExecutorBuild('test3')
         self.assertFalse(self.executor_server.accepting_work)
+        self.waitUntilSettled()
 
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
