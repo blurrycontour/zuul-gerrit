@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_1f97dd3c",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2018-06-06T23:10:04Z",
+      "side": 1,
+      "message": "I guess this is shadowing/overriding an inherited closed() method from the WebSocket class?",
+      "revId": "4f8b61dccbd7a5bf327294e25a1b6fc74c476cd0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
