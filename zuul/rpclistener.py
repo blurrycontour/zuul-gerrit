@@ -61,6 +61,7 @@ class RPCListener(object):
         self.worker.registerFunction("zuul:status_get")
         self.worker.registerFunction("zuul:job_list")
         self.worker.registerFunction("zuul:key_get")
+        self.worker.registerFunction("zuul:loading_errors_list")
 
     def getFunctions(self):
         functions = {}
@@ -345,3 +346,11 @@ class RPCListener(object):
         (trusted, project) = tenant.getProject(args.get("project"))
         job.sendWorkComplete(
             encryption.serialize_rsa_public_key(project.public_key))
+
+    def handle_loading_errors_list(self, job):
+        args = json.loads(job.arguments)
+        tenant = self.sched.abide.tenants.get(args.get("tenant"))
+        output = []
+        for err in tenant.layout.loading_errors.errors:
+            output.append(str(err))
+        job.sendWorkComplete(json.dumps(output))

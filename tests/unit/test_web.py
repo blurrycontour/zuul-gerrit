@@ -57,13 +57,15 @@ class BaseTestWeb(ZuulTestCase):
                 info=zuul.model.WebInfo.fromConfig(self.zuul_ini_config)))
 
         self.executor_server.hold_jobs_in_build = True
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addApproval('Code-Review', 2)
-        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
-        B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
-        B.addApproval('Code-Review', 2)
-        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
-        self.waitUntilSettled()
+
+        if self.tenant_config_file == 'config/single-tenant/main.yaml':
+            A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+            A.addApproval('Code-Review', 2)
+            self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+            B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
+            B.addApproval('Code-Review', 2)
+            self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+            self.waitUntilSettled()
 
         self.host = 'localhost'
         self.port = self.web.port
@@ -313,6 +315,19 @@ class TestInfo(BaseTestWeb):
                     "websocket_url": self.websocket_url,
                 }
             })
+
+
+class TestTenantInfoConfigBroken(BaseTestWeb):
+
+    tenant_config_file = 'config/broken/main.yaml'
+
+    def test_tenant_info_broken_config(self):
+        info = self.get_url("api/tenant/tenant-one/info").json()
+        self.assertIn(
+            "Zuul encountered a syntax error while",
+            info["info"]["loading_errors"][0])
+        self.assertEqual(
+            len(info["info"]["loading_errors"]), 1)
 
 
 class TestWebSocketInfo(TestInfo):
