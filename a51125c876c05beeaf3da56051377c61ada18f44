@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_5fe79547",
+        "filename": "tests/unit/test_streaming.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-06-06T22:51:43Z",
+      "side": 1,
+      "message": "We will ignore the case where the message is already encoded to a unicode string? I seem to recall that may have been a possibility in other websocket reviews.",
+      "revId": "a51125c876c05beeaf3da56051377c61ada18f44",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
