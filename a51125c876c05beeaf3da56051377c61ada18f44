@@ -16,6 +16,23 @@
       "revId": "a51125c876c05beeaf3da56051377c61ada18f44",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_7fd37160",
+        "filename": "tests/unit/test_streaming.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-06T22:53:46Z",
+      "side": 1,
+      "message": "No, the ws4py client always gets binary data.",
+      "revId": "a51125c876c05beeaf3da56051377c61ada18f44",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
