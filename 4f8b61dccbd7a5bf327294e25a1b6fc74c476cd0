@@ -16,6 +16,23 @@
       "revId": "4f8b61dccbd7a5bf327294e25a1b6fc74c476cd0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_3f8419d3",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-06T23:23:37Z",
+      "side": 1,
+      "message": "Yes.  The default implementation does nothing, which is why there\u0027s no super here (it\u0027s like the received_message method above).\n\nhttps://ws4py.readthedocs.io/en/latest/sources/ws4py/#ws4py.websocket.WebSocket.closed",
+      "revId": "4f8b61dccbd7a5bf327294e25a1b6fc74c476cd0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
