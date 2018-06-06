@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_75d63b56",
+        "filename": "tests/unit/test_executor.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 505,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-06-06T17:53:25Z",
+      "side": 1,
+      "message": "We discussed this on IRC and basically this was done to make sure that assertFalse(accepting_work) wouldn\u0027t fail due to a manageLoad() running and flipping it back to true because min starting builds was 1. Setting it to zero preventing this from every happening.\n\nIn a different change corvus updated the order in which we start running a job and call manageLoad() which makes this deterministic as long as we are holding jobs in queue without setting this to 0.",
+      "parentUuid": "5f7c97a3_1a4e14c1",
+      "revId": "36e9f97f4e222d31a4a48eae68c35e849b258091",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_3a4990b6",
         "filename": "tests/unit/test_executor.py",
         "patchSetId": 4
