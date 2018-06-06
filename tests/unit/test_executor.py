@@ -506,6 +506,11 @@ class TestGovernor(ZuulTestCase):
         # actually "running".  But because manageLoad hasn't run
         # again, it still uses the old values.  Keep this in mind when
         # double checking its calculations.
+        #
+        # Disable the periodic governor runs to make sure they don't
+        # interefere (only possible if the test runs longer than 10
+        # seconds).
+        self.executor_server.governor_stop_event.set()
         self.executor_server.hold_jobs_in_build = True
         self.executor_server.max_starting_builds = 1
         self.executor_server.min_starting_builds = 1
@@ -543,10 +548,11 @@ class TestGovernor(ZuulTestCase):
         # be called, the second invocation calculated that there were
         # 2 workers running, so our starting build limit was reduced
         # to 1.  Usually it will calculate that there are 2 starting
-        # builds, but theoretically it could be less if one or the
-        # other builds leaves the starting phase before manageLoad is
-        # called.  As long as at least one build is still in the
-        # starting phase, this will exceed the limin and unregister.
+        # builds, but theoretically it could count only 1 if the first
+        # build manages to leave the starting phase before the second
+        # build starts.  It should always count the second build as
+        # starting.  As long as at least one build is still in the
+        # starting phase, this will exceed the limit and unregister.
         self.assertFalse(self.executor_server.accepting_work)
 
         self.executor_server.hold_jobs_in_build = False
