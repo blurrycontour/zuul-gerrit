@@ -22,6 +22,52 @@
       "revId": "c1b8dacf43541a4a7fb09c8cb22c2e1827858f99",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_31b452f2",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1921
+      },
+      "writtenOn": "2018-06-06T21:17:33Z",
+      "side": 1,
+      "message": "This sounds great, as long as the priority is to provide standard k8s API - since resource providers may support k8s but not OpenShift.\n\nI wonder if it makes sense for node pool to expose a plugin interface that different cloud providers may implement to let nodepool even manage k8s clusters (add worker nodes, or even create / delete clusters).",
+      "range": {
+        "startLine": 180,
+        "startChar": 0,
+        "endLine": 182,
+        "endChar": 33
+      },
+      "revId": "c1b8dacf43541a4a7fb09c8cb22c2e1827858f99",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_118ef631",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 290,
+      "author": {
+        "id": 1921
+      },
+      "writtenOn": "2018-06-06T21:17:33Z",
+      "side": 1,
+      "message": "+1. I think it\u0027s definitely worth trying to use the in-cluster capabilities.",
+      "range": {
+        "startLine": 286,
+        "startChar": 0,
+        "endLine": 290,
+        "endChar": 48
+      },
+      "revId": "c1b8dacf43541a4a7fb09c8cb22c2e1827858f99",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
