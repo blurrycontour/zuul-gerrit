@@ -165,6 +165,10 @@ class ZuulWebAPI(object):
         return self._handleInfo(info)
 
     def _handleInfo(self, info):
+        if info.tenant:
+            loading_errors = self.rpc.submitJob(
+                'zuul:loading_errors_list', {'tenant': info.tenant})
+            info.loading_errors = json.loads(loading_errors.data[0])
         ret = {'info': info.toDict()}
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
