@@ -1,0 +1,4 @@
+- name: NODEPOOL_BUILDER_VOLUME_SIZE
+  description: Size of persistent volume for nodepool-builder instances.
+  value: 100Gi
+  required: true

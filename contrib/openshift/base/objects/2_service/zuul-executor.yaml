@@ -1,0 +1,12 @@
+# This is a headless service required to setup network identity for the
+# zuul-executor statefulset.
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: zuul-executor
+    labels:
+      app: zuul-executor
+  spec:
+    clusterIP: None
+    selector:
+      app: zuul-executor

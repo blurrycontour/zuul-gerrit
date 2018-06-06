@@ -1,0 +1,12 @@
+# This is a headless service required to setup network identity for the
+# zuul-merger statefulset.
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: zuul-merger
+    labels:
+      app: zuul-merger
+  spec:
+    clusterIP: None
+    selector:
+      app: zuul-merger

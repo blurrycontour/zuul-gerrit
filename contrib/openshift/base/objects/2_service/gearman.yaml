@@ -1,0 +1,14 @@
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: gearman
+  spec:
+    ports:
+      - name: gearman
+        port: 4730
+        targetPort: 4730
+        protocol: TCP
+    selector:
+      app: zuul-scheduler
+    sessionAffinity: None
+    type: ClusterIP

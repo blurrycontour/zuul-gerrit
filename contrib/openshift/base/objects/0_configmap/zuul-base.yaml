@@ -1,0 +1,55 @@
+- kind: ConfigMap
+  apiVersion: v1
+  metadata:
+    name: zuul-base
+  data:
+    zuul.conf: |+
+      [gearman]
+      server=gearman
+      ssl_ca=/etc/ssl/gearman-client/root-ca.pem
+      ssl_cert=/etc/ssl/gearman-client/client.pem
+      ssl_key=/etc/ssl/gearman-client/client.key
+
+      [zookeeper]
+      # Deploy zookeeper like https://github.com/kubernetes/contrib/tree/master/statefulsets/zookeeper
+      hosts=zookeeper-0.zookeeper,zookeeper-1.zookeeper,zookeeper-2.zookeeper,zookeeper-3.zookeeper,zookeeper-4.zookeeper
+
+      [zuul]
+      pidfile=/var/run/zuul/zuul.pid
+
+      [executor]
+      log_config=/etc/zuul/logging.conf
+      private_key_file=/opt/secrets/ssh-nodes/id_rsa
+      finger_port=1079
+      trusted_rw_paths=/home/zuul/zuul-logs
+      hostname=${EXECUTOR_HOSTNAME}
+      variables=/etc/zuul/variables/variables.yaml
+      winrm_cert_key_file=/opt/secrets/winrm-nodes/winrm_client_cert.key
+      winrm_cert_pem_file=/opt/secrets/winrm-nodes/winrm_client_cert.pem
+
+      [merger]
+      log_config=/etc/zuul/logging.conf
+
+      [scheduler]
+      log_config=/etc/zuul/logging.conf
+      tenant_config=/opt/zuul/tenants/main.yaml
+
+      [gearman_server]
+      start=true
+      ssl_ca=/etc/ssl/gearman-server/root-ca.pem
+      ssl_cert=/etc/ssl/gearman-server/server.pem
+      ssl_key=/etc/ssl/gearman-server/server.key
+      log_config=/etc/zuul/gearman-logging.conf
+
+      [web]
+      status_url=https://${PUBLIC_HOST_NAME}/zuul/t/{tenant.name}/status.html
+      log_config=/etc/zuul/logging.conf
+      listen_address=0.0.0.0
+      gearman_server=gearman
+      websocket_url=wss://dummy/zuul/console-stream
+
+      [connection "gerrit"]
+      INSERT=SETTINGS
+
+    main.yaml: |+
+      INSERT YOUR TENANT CONFIG HERE

@@ -1,0 +1,65 @@
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    name: zuul-scheduler
+  spec:
+    strategy:
+      type: Recreate
+    triggers:
+      - type: ConfigChange
+    replicas: 1
+    test: false
+    template:
+      metadata:
+        labels:
+          app: zuul-scheduler
+      spec:
+        # NOTE: create service account with access to anyuid scc
+        serviceAccountName: anyuid
+        nodeSelector:
+          region: primary
+        containers:
+          - name: zuul-scheduler
+            ports:
+              - containerPort: 8001
+                protocol: TCP
+              - containerPort: 4730
+                protocol: TCP
+            volumeMounts:
+              - name: zuul-conf
+                mountPath: /etc/zuul/
+                readOnly: true
+
+              # certificates for gearman
+              - name: gearman-client-certificate
+                mountPath: /etc/ssl/gearman-client
+                readOnly: true
+              - name: gearman-server-certificate
+                mountPath: /etc/ssl/gearman-server
+                readOnly: true
+
+            resources:
+              requests:
+                cpu: 200m
+                memory: 400Mi
+              limits:
+                cpu: 2000m
+                memory: 1Gi
+
+        volumes:
+          - name: zuul-conf
+            configMap:
+              name: zuul-base
+              items:
+                - key: zuul.conf
+                  path: zuul.conf
+                - key: main.yaml
+                  path: main.yaml
+
+          # gearman certificates
+          - name: gearman-client-certificate
+            secret:
+              secretName: gearman-client-certificate
+          - name: gearman-server-certificate
+            secret:
+              secretName: gearman-server-certificate

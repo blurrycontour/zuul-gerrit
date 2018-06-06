@@ -1,0 +1,9 @@
+- kind: Secret
+  apiVersion: v1
+  metadata:
+    name: ssh-nodes
+  stringData:
+    id_rsa:  |+
+      -----BEGIN OPENSSH PRIVATE KEY-----
+      # INSERT ZUUL MASTER SSH KEY TO NODES
+      -----END OPENSSH PRIVATE KEY-----

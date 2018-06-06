@@ -1,0 +1,39 @@
+- kind: ConfigMap
+  apiVersion: v1
+  metadata:
+    name: nodepool
+  data:
+    nodepool.yaml: |+
+      labels:
+        - name: foo
+          min-ready: 2
+          max-ready-age: 3600
+
+      elements-dir: '/opt/image/elements'
+
+      images-dir: '/mnt/gen'
+
+      cron:
+        cleanup: '* * * * *'
+        check: '*/15 * * * *'
+
+      zookeeper-servers:
+        - host: zookeeper-0.zookeeper
+        - host: zookeeper-1.zookeeper
+        - host: zookeeper-2.zookeeper
+        - host: zookeeper-3.zookeeper
+        - host: zookeeper-4.zookeeper
+
+      providers:
+        # ADD CONFIG
+
+      diskimages:
+        - name: ubuntu1604
+          # renew every 4 hours
+          rebuild-age: 14400
+          elements:
+            - ubuntu
+            - vm
+          release: xenial
+
+    secure.conf: ""

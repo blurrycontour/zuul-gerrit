@@ -1,0 +1,12 @@
+# This is a headless service required to setup network identity for the
+# nodepool-builder statefulset.
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: nodepool-builder
+    labels:
+      app: nodepool-builder
+  spec:
+    clusterIP: None
+    selector:
+      app: nodepool-builder

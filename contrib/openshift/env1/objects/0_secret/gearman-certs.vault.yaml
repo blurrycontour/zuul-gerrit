@@ -1,0 +1,39 @@
+- kind: Secret
+  apiVersion: v1
+  metadata:
+    name: gearman-server-certificate
+  stringData:
+    root-ca.pem: |+
+      -----BEGIN CERTIFICATE-----
+      INSERT
+      -----END CERTIFICATE-----
+
+    server.key: |+
+      -----BEGIN PRIVATE KEY-----
+      INSERT
+      -----END PRIVATE KEY-----
+
+    server.pem: |+
+      -----BEGIN CERTIFICATE-----
+      INSERT
+      -----END CERTIFICATE-----
+
+- kind: Secret
+  apiVersion: v1
+  metadata:
+    name: gearman-client-certificate
+  stringData:
+    root-ca.pem: |+
+      -----BEGIN CERTIFICATE-----
+      INSERT
+      -----END CERTIFICATE-----
+
+    client.key: |+
+      -----BEGIN PRIVATE KEY-----
+      INSERT
+      -----END PRIVATE KEY-----
+
+    client.pem: |+
+      -----BEGIN CERTIFICATE-----
+      INSERT
+      -----END CERTIFICATE-----

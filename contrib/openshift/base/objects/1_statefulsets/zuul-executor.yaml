@@ -1,0 +1,114 @@
+- kind: StatefulSet
+  apiVersion: apps/v1beta1
+  metadata:
+    name: zuul-executor
+    annotations:
+      openshift.io/scc: privileged
+  spec:
+    serviceName: zuul-executor
+    updateStrategy:
+      type: RollingUpdate
+    replicas: "${{ZUUL_EXECUTOR_REPLICAS}}"
+    template:
+      metadata:
+        labels:
+          app: zuul-executor
+      spec:
+        serviceAccountName: privileged
+        containers:
+          - name: zuul-executor
+            image: zuul-executor:latest
+            ports:
+              - containerPort: 1079
+                protocol: TCP
+            volumeMounts:
+              - name: zuul-connection-keyfiles
+                mountPath: /opt/zuul/keyfiles
+                readOnly: true
+
+              - name: ssh-nodes
+                mountPath: /opt/secrets/ssh-nodes
+                readOnly: true
+              - name: zuul-ssh
+                mountPath: /home/zuul/.ssh
+                readOnly: false
+
+              - name: zuul-conf
+                mountPath: /etc/zuul
+                readOnly: true
+
+              - name: zuul-site-variables
+                mountPath: /etc/zuul/variables
+                readOnly: true
+
+              # certificates for gearman
+              - name: gearman-client-certificate
+                mountPath: /etc/ssl/gearman-client
+                readOnly: true
+
+              # persistent space for git repos
+              - name: zuul-executor-git
+                mountPath: /var/lib/zuul/executor-git
+                readOnly: false
+
+            resources:
+              requests:
+                cpu: 2000m
+                memory: 8Gi
+              limits:
+                cpu: 12000m
+                memory: 8Gi
+
+            securityContext:
+              # The zuul executor utilizes bwrap for sandboxing ansible runs.
+              # This needs elevated privileges.
+              privileged: true
+
+              # Also run as zuul user (1000) so we don't run as root due to the
+              # privileged flag.
+              runAsUser: 1000
+
+        # the filesystem group must be part of the pod security group
+        securityContext:
+          fsGroup: 1000
+        volumes:
+          - name: ssh-nodes
+            secret:
+              secretName: ssh-nodes
+          - name: zuul-ssh
+            configMap:
+              name: zuul-ssh
+              items:
+                - key: config
+                  path: config
+                - key: known_hosts
+                  path: known_hosts
+
+          - name: zuul-conf
+            configMap:
+              name: zuul-base
+              items:
+                - key: zuul.conf
+                  path: zuul.conf
+
+          # site variables
+          - name: zuul-site-variables
+            configMap:
+              name: zuul-site-variables
+              items:
+                - key: variables.yaml
+                  path: variables.yaml
+
+          # gearman certificates
+          - name: gearman-client-certificate
+            secret:
+              secretName: gearman-client-certificate
+
+    volumeClaimTemplates:
+      - metadata:
+          name: zuul-executor-git
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: "${VOLUME_SIZE_EXECUTOR_GIT}"

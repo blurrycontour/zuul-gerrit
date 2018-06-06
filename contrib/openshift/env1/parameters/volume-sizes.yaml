@@ -1,0 +1,9 @@
+- name: VOLUME_SIZE_EXECUTOR_GIT
+  description: "The size of the zuul-executor volume"
+  value: 50Gi
+  required: true
+
+- name: VOLUME_SIZE_MERGER_GIT
+  description: "The size of the zuul-merger volume"
+  value: 50Gi
+  required: true

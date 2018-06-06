@@ -1,0 +1,4 @@
+- name: ZUUL_EXECUTOR_REPLICAS
+  description: Number of zuul-executor pods
+  value: "1"
+  required: true

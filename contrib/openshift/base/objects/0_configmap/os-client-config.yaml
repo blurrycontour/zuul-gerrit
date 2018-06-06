@@ -1,0 +1,17 @@
+- kind: ConfigMap
+  apiVersion: v1
+  metadata:
+    name: os-client-config
+  data:
+    clouds.yaml: |+
+      cache:
+        expiration:
+          server: 5
+          port: 5
+          floating-ip: 5
+      clouds:
+        nodepool-cloud1:
+          auth:
+            project_name: tenant-foo
+            auth_url: http://example.com:5000
+            # add further config

@@ -1,0 +1,75 @@
+- kind: StatefulSet
+  apiVersion: apps/v1beta1
+  metadata:
+    name: nodepool-builder
+  spec:
+    serviceName: nodepool-builder
+    updateStrategy:
+      type: RollingUpdate
+    replicas: 3
+    template:
+      metadata:
+        labels:
+          app: nodepool-builder
+      spec:
+        # NOTE: create service account 'privileged' with access to privileged scc
+        serviceAccountName: privileged
+        nodeSelector:
+          region: primary
+        containers:
+          - name: nodepool-builder
+            image: nodepool-builder:latest
+
+            volumeMounts:
+              - name: os-client-config-secure
+                mountPath: /openshift/os-client-config/secure
+                readOnly: true
+              - name: os-client-config
+                mountPath: /openshift/os-client-config/clouds
+                readOnly: true
+              - name: nodepool
+                mountPath: /openshift/etc/nodepool
+                readOnly: true
+
+              - name: nodepool-builder
+                mountPath: /mnt
+
+            securityContext:
+              # nodepool-builder uses diskimage-builder which needs privileges
+              privileged: true
+
+            resources:
+              requests:
+                cpu: 1000m
+                memory: 4Gi
+              limits:
+                cpu: 2000m
+                memory: 4Gi
+
+        volumes:
+          - name: os-client-config-secure
+            secret:
+              secretName: os-client-config-secure
+          - name: os-client-config
+            configMap:
+              name: os-client-config
+              items:
+                - key: clouds.yaml
+                  path: clouds.yaml
+          - name: nodepool
+            configMap:
+              name: nodepool
+              items:
+                - key: nodepool.yaml
+                  path: nodepool.yaml
+                - key: secure.conf
+                  path: secure.conf
+
+    volumeClaimTemplates:
+      - metadata:
+          name: nodepool-builder
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: ${NODEPOOL_BUILDER_VOLUME_SIZE}

@@ -1,0 +1,7 @@
+- kind: ConfigMap
+  apiVersion: v1
+  metadata:
+    name: zuul-site-variables
+  data:
+    variables.yaml: |+
+      # ADD OPTIONAL SITE VARS

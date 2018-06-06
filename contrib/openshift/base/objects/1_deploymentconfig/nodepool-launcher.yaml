@@ -1,0 +1,78 @@
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    name: nodepool-launcher
+  spec:
+    strategy:
+      type: Rolling
+      rollingParams:
+        updatePeriodSeconds: 1
+        intervalSeconds: 1
+        timeoutSeconds: 60
+        maxUnavailable: 25%
+        maxSurge: 25%
+    triggers:
+      - type: ConfigChange
+    replicas: 1
+    test: false
+    template:
+      metadata:
+        labels:
+          app: nodepool-launcher
+      spec:
+        serviceAccountName: anyuid
+        nodeSelector:
+          region: primary
+        containers:
+          - name: nodepool-launcher
+            image: ADD IMAGE NAME HERE
+            ports:
+              - containerPort: 8005
+                protocol: TCP
+            env:
+              - name: STATSD_HOST
+                value: "${STATSD_HOST}"
+            volumeMounts:
+              - name: os-client-config-secure
+                mountPath: /openshift/os-client-config/secure
+                readOnly: true
+              - name: os-client-config
+                mountPath: /openshift/os-client-config/clouds
+                readOnly: true
+              - name: nodepool
+                mountPath: /openshift/etc/nodepool
+                readOnly: true
+            livenessProbe:
+              httpGet:
+                path: /image-list
+                port: 8005
+              timeoutSeconds: 15
+            readinessProbe:
+              httpGet:
+                path: /image-list
+                port: 8005
+            resources:
+              requests:
+                cpu: 300m
+                memory: 400Mi
+              limits:
+                cpu: 1000m
+                memory: 400Mi
+        volumes:
+          - name: os-client-config-secure
+            secret:
+              secretName: os-client-config-secure
+          - name: os-client-config
+            configMap:
+              name: os-client-config
+              items:
+                - key: clouds.yaml
+                  path: clouds.yaml
+          - name: nodepool
+            configMap:
+              name: nodepool
+              items:
+                - key: nodepool.yaml
+                  path: nodepool.yaml
+                - key: secure.conf
+                  path: secure.conf

@@ -1,0 +1,12 @@
+- kind: Route
+  apiVersion: v1
+  metadata:
+    name: zuul-web
+  spec:
+    to:
+      kind: Service
+      name: zuul-web
+    port:
+      targetPort: 9000
+    host: "${PUBLIC_HOST_NAME}"
+    path: /

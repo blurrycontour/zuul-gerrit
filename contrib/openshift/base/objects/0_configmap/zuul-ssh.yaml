@@ -1,0 +1,11 @@
+- kind: ConfigMap
+  apiVersion: v1
+  metadata:
+    name: zuul-ssh
+  data:
+    config: |+
+      Host GERRIT_HOST
+          PreferredAuthentications publickey
+          StrictHostKeyChecking yes
+    known_hosts: |+
+      # ADD GERRIT KNOWN HOST ENTRY

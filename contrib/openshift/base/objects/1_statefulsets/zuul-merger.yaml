@@ -1,0 +1,80 @@
+- kind: StatefulSet
+  apiVersion: apps/v1beta1
+  metadata:
+    name: zuul-merger
+  spec:
+    serviceName: zuul-merger
+    updateStrategy:
+      type: RollingUpdate
+    replicas: 3
+    template:
+      metadata:
+        labels:
+          app: zuul-merger
+      spec:
+        # NOTE: create service account 'anyuid' with access to anyuid scc
+        serviceAccountName: anyuid
+        containers:
+          - name: zuul-merger
+            image: zuul-merger:latest
+            volumeMounts:
+              - name: zuul-ssh
+                mountPath: /home/zuul/.ssh
+                readOnly: false
+
+              - name: zuul-conf
+                mountPath: /conf/base/etc/zuul/zuul.conf
+                readOnly: true
+
+              # certificates for gearman
+              - name: gearman-client-certificate
+                mountPath: /etc/ssl/gearman-client
+                readOnly: true
+
+              # persistent space for git repos
+              - name: zuul-merger-git
+                mountPath: /var/lib/zuul/merger-git
+                readOnly: false
+
+            resources:
+              requests:
+                cpu: 500m
+                memory: 1500Mi
+              limits:
+                cpu: 1500m
+                memory: 1500Mi
+
+        # the filesystem group must be part of the pod security group
+        securityContext:
+          fsGroup: 1000
+
+        volumes:
+          - name: zuul-ssh
+            configMap:
+              name: zuul-ssh
+              items:
+                - key: config
+                  path: config
+                - key: known_hosts
+                  path: known_hosts
+
+          - name: zuul-conf
+            configMap:
+              name: zuul-base
+              items:
+                - key: zuul.conf
+                  path: zuul.conf
+
+          # gearman certificates
+          - name: gearman-client-certificate
+            secret:
+              secretName: gearman-client-certificate
+
+    volumeClaimTemplates:
+      - metadata:
+          name: zuul-merger-git
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: "${VOLUME_SIZE_MERGER_GIT}"

@@ -1,0 +1,4 @@
+- name: PUBLIC_HOST_NAME
+  description: "The host name used to access the deployment"
+  value: zuul.example.com
+  required: true
