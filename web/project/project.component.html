@@ -34,7 +34,13 @@ under the License.
         </table>
       </div>
     </div>
-    <div class="panel panel-info" *ngIf="project.pipelines">
+    <button type="button" class="pull-right btn-xs btn-primary btn" (click)="toggleGraph()">
+      Toggle graph
+    </button>
+    <div style="margin: auto; text-align: center; width: 100%">
+      <svg width="1400" height="1060" id="projectGraph" style="display: none; text-align: center" />
+    </div>
+    <div class="panel panel-info" *ngIf="project.pipelines" id="projectTable">
       <div class="panel-heading">Pipelines</div>
       <div class="panel panel-body">
         <div *ngFor="let pipeline of project.pipelines">
