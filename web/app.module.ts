@@ -32,6 +32,7 @@ import JobComponent from './job/job.component'
 import JobsComponent from './jobs/jobs.component'
 import ProjectComponent from './project/project.component'
 import ProjectsComponent from './projects/projects.component'
+import LabelsComponent from './labels/labels.component'
 import StatusComponent from './status/status.component'
 import StreamComponent from './stream/stream.component'
 import TenantsComponent from './tenants/tenants.component'
@@ -53,6 +54,7 @@ import ZuulService from './zuul/zuul.service'
     JobsComponent,
     ProjectComponent,
     ProjectsComponent,
+    LabelsComponent,
     StatusComponent,
     StreamComponent,
     TenantsComponent
@@ -64,6 +66,7 @@ import ZuulService from './zuul/zuul.service'
     JobsComponent,
     ProjectComponent,
     ProjectsComponent,
+    LabelsComponent,
     StatusComponent,
     StreamComponent,
     TenantsComponent
