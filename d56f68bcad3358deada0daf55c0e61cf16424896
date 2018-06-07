@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "5f7c97a3_d25860fb",
+        "filename": "doc/source/developer/javascript.rst",
+        "patchSetId": 40
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-07T21:45:30Z",
+      "side": 1,
+      "message": "nit: s/are/is/",
+      "revId": "d56f68bcad3358deada0daf55c0e61cf16424896",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_747153a8",
         "filename": "web/app-routing.module.ts",
         "patchSetId": 40
@@ -13,6 +30,40 @@
       "writtenOn": "2018-06-07T03:49:00Z",
       "side": 1,
       "message": "Isn\u0027t this missing {path: \u0027t/tenants.html\u0027, component: TenantsComponent} ?",
+      "revId": "d56f68bcad3358deada0daf55c0e61cf16424896",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_125fb8e5",
+        "filename": "web/jobs/jobs.component.html",
+        "patchSetId": 40
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-07T21:45:30Z",
+      "side": 1,
+      "message": "IIUC this isn\u0027t used yet (I think job.expanded is hard-coded to false for all jobs elsewhere).  That\u0027s fine, I just wanted to double check.",
+      "revId": "d56f68bcad3358deada0daf55c0e61cf16424896",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_3262f4ae",
+        "filename": "web/jobs/jobs.component.ts",
+        "patchSetId": 40
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-07T21:45:30Z",
+      "side": 1,
+      "message": "This probably wants to be removed.",
       "revId": "d56f68bcad3358deada0daf55c0e61cf16424896",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
