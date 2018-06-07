@@ -62,3 +62,14 @@
 .form-inline > .form-group {
     padding-right: 5px;
 }
+
+#jobGraph {
+    font: 14px sans-serif;
+}
+
+.link {
+    fill: none;
+    stroke: black;
+    stroke-opacity: 0.5;
+    stroke-width: 1px;
+}
