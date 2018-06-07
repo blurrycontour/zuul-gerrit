@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_4fe347a5",
+        "filename": "zuul/model.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 472,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-07T21:26:01Z",
+      "side": 1,
+      "message": "This method is used to write to zookeeper.  I don\u0027t think we should add these items to it.  Maybe you could either add another method to this class, or an argument to this method indicating whether the internal zuul attributes should be included.",
+      "revId": "cfba587aaed0231b4c04e026fc2929c91be721fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_6fde43db",
+        "filename": "zuul/model.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 555,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-07T21:26:01Z",
+      "side": 1,
+      "message": "How about a toDict on source_context so this remains structured data?",
+      "revId": "cfba587aaed0231b4c04e026fc2929c91be721fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_0fef8f87",
+        "filename": "zuul/model.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 989,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-07T21:26:01Z",
+      "side": 1,
+      "message": "These should be in self.other_attributes rather than on their own here.  Then the copy method will take care of them automatically.  _branches should be a tuple instead of a list, just to make sure it\u0027s immutable.\n\nDo you also want to add _files and _irrelevant_files?  I think they would be especially useful.",
+      "revId": "cfba587aaed0231b4c04e026fc2929c91be721fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_2ff28b70",
+        "filename": "zuul/model.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 999,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-07T21:26:01Z",
+      "side": 1,
+      "message": "I suggest toDict here as well.",
+      "revId": "cfba587aaed0231b4c04e026fc2929c91be721fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_cfe8b77d",
+        "filename": "zuul/model.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1001,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-07T21:26:01Z",
+      "side": 1,
+      "message": "How about keeping this as structured data as well?",
+      "revId": "cfba587aaed0231b4c04e026fc2929c91be721fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_efeb3375",
+        "filename": "zuul/model.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1003,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-07T21:26:01Z",
+      "side": 1,
+      "message": "This should already be a dict?",
+      "revId": "cfba587aaed0231b4c04e026fc2929c91be721fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_8f02bf3d",
+        "filename": "zuul/model.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1010,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-07T21:26:01Z",
+      "side": 1,
+      "message": "How about structured data here?",
+      "revId": "cfba587aaed0231b4c04e026fc2929c91be721fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_affd3b3c",
+        "filename": "zuul/model.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1013,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-07T21:26:01Z",
+      "side": 1,
+      "message": "str should not be necessary -- as long as it\u0027s not a base job, it should be a string.",
+      "revId": "cfba587aaed0231b4c04e026fc2929c91be721fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
