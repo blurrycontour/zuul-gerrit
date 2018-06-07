@@ -23,6 +23,7 @@ import JobsComponent from './jobs/jobs.component'
 import ProjectComponent from './project/project.component'
 import ProjectsComponent from './projects/projects.component'
 import LabelsComponent from './labels/labels.component'
+import NodesComponent from './nodes/nodes.component'
 import StatusComponent from './status/status.component'
 import StreamComponent from './stream/stream.component'
 import TenantsComponent from './tenants/tenants.component'
@@ -83,6 +84,14 @@ const appRoutes: Routes = [
   {
     path: 'labels.html',
     component: LabelsComponent
+  },
+  {
+    path: 't/:tenant/nodes.html',
+    component: NodesComponent
+  },
+  {
+    path: 'nodes.html',
+    component: NodesComponent
   },
   {
     path: 'stream.html',
