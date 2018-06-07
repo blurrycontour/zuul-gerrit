@@ -12,21 +12,39 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, OnDestroy } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 
 import ZuulService from '../zuul/zuul.service'
 import zuulStart from './zuulStart'
 
+interface ZuulStatusOption {
+  enabled: boolean
+}
+
+interface ZuulStatus {
+  options: ZuulStatusOption
+}
+
 @Component({
   template: require('./status.component.html')
 })
-export default class StatusComponent implements OnInit {
+export default class StatusComponent implements OnInit, OnDestroy {
   tenant: string
+  app: ZuulStatus
 
   constructor(private route: ActivatedRoute, private zuul: ZuulService) {}
 
   ngOnInit() {
-    zuulStart(jQuery, this.route.snapshot.paramMap.get('tenant'), this.zuul)
+    if (this.app) {
+      this.app.options.enabled = true
+    } else {
+      this.app = zuulStart(
+        jQuery, this.route.snapshot.paramMap.get('tenant'), this.zuul)
+    }
+  }
+
+  ngOnDestroy() {
+    this.app.options.enabled = false
   }
 }

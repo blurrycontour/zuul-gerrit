@@ -58,6 +58,10 @@ const appRoutes: Routes = [
     component: StreamComponent
   },
   {
+    path: 't/tenants.html',
+    component: TenantsComponent
+  },
+  {
     path: 'tenants.html',
     component: TenantsComponent
   },

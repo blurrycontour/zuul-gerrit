@@ -39,7 +39,6 @@ export default class JobsComponent implements OnInit {
   }
 
   jobsFetch(): void {
-    console.log('blert')
     this.http.get<Job[]>(this.zuul.getSourceUrl('jobs', this.tenant))
       .subscribe(jobs => this.injestJobs(jobs))
   }

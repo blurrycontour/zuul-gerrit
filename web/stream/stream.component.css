@@ -1,5 +1,11 @@
 #zuulstreamoverlay {
     float: right;
+    position: fixed;
+    top: 5px;
+    right: 5px;
+    background-color: white;
+    padding: 2px;
+    color: black;
 }
 
 pre#zuulstreamcontent {
