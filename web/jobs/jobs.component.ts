@@ -17,6 +17,7 @@ import { ActivatedRoute } from '@angular/router'
 import { HttpClient, HttpParams } from '@angular/common/http'
 import { Observable } from 'rxjs/Observable'
 import 'rxjs/add/operator/map'
+import * as d3 from 'd3'
 
 import ZuulService from '../zuul/zuul.service'
 import JobDetails from './details'
@@ -29,6 +30,7 @@ export default class JobsComponent implements OnInit {
 
   jobs: Job[]
   tenant?: string
+  graph: Object
 
   constructor(
     private http: HttpClient, private route: ActivatedRoute,
@@ -37,7 +39,7 @@ export default class JobsComponent implements OnInit {
 
   ngOnInit() {
     this.tenant = this.route.snapshot.paramMap.get('tenant')
-
+    this.graph = undefined
     this.jobsFetch()
   }
 
@@ -61,5 +63,74 @@ export default class JobsComponent implements OnInit {
         .subscribe(details => {job.details = details})
     }
     job.expanded = !job.expanded
+  }
+
+  toggleGraph() {
+    jQuery('#jobTable').toggle()
+    jQuery('#jobGraph').toggle()
+    if (!this.graph) {
+      this.graph = this.jobsGraph(this.jobs)
+    }
+  }
+
+  jobsGraph(jobs) {
+    let w = d3.select('#jobGraph').attr('width')
+    let h = d3.select('#jobGraph').attr('height')
+    let svg = d3.select('#jobGraph').append('g').attr(
+      'transform', 'translate(40,0)')
+
+    let stratify = d3.stratify()
+      .id(function (d) {
+        return d.name
+      })
+      .parentId(function (d) {
+        if (d.name === 'base') {
+          return ''
+        }
+        return d.parent
+      })
+
+    let tree = d3.cluster().size([h, w - 250])
+
+    let root = stratify(jobs)
+
+    tree(root)
+
+    svg.selectAll('.link')
+      .data(root.descendants().slice(1))
+      .enter().append('path')
+      .attr('class', 'link')
+      .attr('d', function (d) {
+        return 'M' + d.y + ',' + d.x + 'C' + (d.parent.y + 100) + ',' + d.x +
+            ' ' + (d.parent.y + 100) + ',' + d.parent.x + ' ' +
+            d.parent.y + ',' + d.parent.x
+      })
+
+    let node = svg.selectAll('.node')
+      .data(root.descendants())
+      .enter().append('g')
+      .attr('transform', function (d) {
+        return 'translate(' + d.y + ',' + d.x + ')'
+      })
+
+    node.append('circle').attr('r', 2)
+
+    node.append('svg:a')
+      .attr('xlink:href', function (d) {
+        return 'job.html?job_name=' + d.id
+      })
+      .attr('target', '_self')
+      .append('text')
+      .attr('dy', 3)
+      .attr('x', function (d) {
+        return d.children ? -8 : 8
+      })
+      .style('text-anchor', function (d) {
+        return d.children ? 'end' : 'start'
+      })
+      .text(function (d) {
+        return d.id
+      })
+    return svg
   }
 }

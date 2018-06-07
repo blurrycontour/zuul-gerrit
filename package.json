@@ -21,6 +21,7 @@
     "@angular/router": "^6.0.3",
     "bootstrap": "3.1.1",
     "core-js": "^2.5.3",
+    "d3": "^5.4.0",
     "graphitejs": "https://github.com/prestontimmons/graphitejs/archive/master.tar.gz",
     "jquery": "^3.3.1",
     "jquery-visibility": "https://github.com/mathiasbynens/jquery-visibility/archive/master.tar.gz",
