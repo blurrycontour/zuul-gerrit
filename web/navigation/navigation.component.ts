@@ -39,7 +39,8 @@ export default class NavigationComponent implements OnInit {
       filter(evt => evt instanceof ResolveEnd)
     ) as Observable<ResolveEnd>
     this.resolveEnd$.subscribe(evt => {
-      this.showNavbar = (evt.url !== '/tenants.html')
+      // TODO: use a dynamic solution to support non-sub-path deployment too
+      this.showNavbar = (evt.url !== '/t/tenants.html')
       this.navbarRoutes = this.getNavbarRoutes(evt.url)
     })
   }
