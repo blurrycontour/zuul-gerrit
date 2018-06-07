@@ -28,7 +28,8 @@ export default class NavigationComponent implements OnInit {
   resolveEnd$: Observable<ResolveEnd>
   showNavbar = true
 
-  private routePages = ['status', 'projects', 'jobs', 'labels', 'builds']
+  private routePages = [
+    'status', 'projects', 'jobs', 'labels', 'nodes', 'builds']
 
   constructor(private router: Router) {}
 
