@@ -13,8 +13,14 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations
 under the License.
 -->
+<button type="button" class="pull-right btn-xs btn-primary btn" (click)="toggleGraph()">
+  Toggle graph
+</button>
+<div style="margin: auto; text-align: center; width: 100%">
+  <svg width="1400" height="1060" id="jobGraph" style="display: none; text-align: center" />
+</div>
 <div class="container-fluid">
-  <table class="table table-hover table-condensed">
+  <table class="table table-hover table-condensed" id="jobTable">
     <thead>
       <tr>
         <th>Name</th>
