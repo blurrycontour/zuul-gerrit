@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_32019405",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-07T21:33:24Z",
+      "side": 1,
+      "message": "Why don\u0027t we convert this back to the string constant we use in yaml rather that the numeric constant, that way we\u0027re not leaking internal zuul constants which have no meaning to end users.  Or, instead, we could just change the values of the constants to strings rather than numbers, then this line can stay as-is.",
+      "revId": "1c665870885bd4e5c896486c61e41ec1bae51b1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_d2070018",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 383,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-07T21:33:24Z",
+      "side": 1,
+      "message": "Why the subscript here?  That means you\u0027d only get one variant.",
+      "revId": "1c665870885bd4e5c896486c61e41ec1bae51b1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_f20a3c1e",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 392,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-07T21:33:24Z",
+      "side": 1,
+      "message": "Why not use job.toDict() here?  The full job configuration language is available in a project-pipeline job config, and this is the only place that would be exposed in the web api.  Omitting it could be very misleading to someone trying to understand why a job is behaving a certain way on a project.",
+      "revId": "1c665870885bd4e5c896486c61e41ec1bae51b1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
