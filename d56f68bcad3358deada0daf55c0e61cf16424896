@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_804dca9a",
+        "filename": "web/zuul/zuul.service.ts",
+        "patchSetId": 40
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-06-07T03:34:10Z",
+      "side": 1,
+      "message": "I think this need to be: \"${baseHref}api\":\n\n- we need to use the const baseHref and not from this\n- baseHref already has a trailing \u0027/\u0027 so no need to add one here.",
+      "range": {
+        "startLine": 43,
+        "startChar": 14,
+        "endLine": 43,
+        "endChar": 34
+      },
+      "revId": "d56f68bcad3358deada0daf55c0e61cf16424896",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_2044f673",
+        "filename": "web/zuul/zuul.service.ts",
+        "patchSetId": 40
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-06-07T03:34:10Z",
+      "side": 1,
+      "message": "Ditto",
+      "range": {
+        "startLine": 47,
+        "startChar": 14,
+        "endLine": 47,
+        "endChar": 35
+      },
+      "revId": "d56f68bcad3358deada0daf55c0e61cf16424896",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
