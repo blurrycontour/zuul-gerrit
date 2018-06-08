@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "5f7c97a3_19e26b31",
+        "filename": "web/navigation/navigation.component.html",
+        "patchSetId": 43
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-06-08T16:58:30Z",
+      "side": 1,
+      "message": "From \"https://sftests.com/zuul/t/local/status.html\", clicking that link loads \"https://sftests.com/zuul/zuul\"",
+      "revId": "36aecc1229d8071980210314bb1caa3fd4f9ef90",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_59978391",
         "filename": "web/zuul/zuul.service.ts",
         "patchSetId": 43
