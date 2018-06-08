@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_78de0bdb",
+        "filename": "zuul/model.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 472,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-06-08T02:03:13Z",
+      "side": 1,
+      "message": "Good point, next PS adds a \"internal_attributes\" argument.",
+      "parentUuid": "5f7c97a3_4fe347a5",
+      "revId": "cfba587aaed0231b4c04e026fc2929c91be721fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_6fde43db",
         "filename": "zuul/model.py",
         "patchSetId": 13
@@ -30,6 +48,24 @@
       "writtenOn": "2018-06-07T21:26:01Z",
       "side": 1,
       "message": "How about a toDict on source_context so this remains structured data?",
+      "revId": "cfba587aaed0231b4c04e026fc2929c91be721fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_9802073e",
+        "filename": "zuul/model.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 555,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-06-08T02:03:13Z",
+      "side": 1,
+      "message": "Turns out nodeset source_context may be None. Is this really useful after-all?",
+      "parentUuid": "5f7c97a3_6fde43db",
       "revId": "cfba587aaed0231b4c04e026fc2929c91be721fc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_980c4743",
+        "filename": "zuul/model.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 989,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-06-08T02:03:13Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "5f7c97a3_0fef8f87",
+      "revId": "cfba587aaed0231b4c04e026fc2929c91be721fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_2ff28b70",
         "filename": "zuul/model.py",
         "patchSetId": 13
@@ -64,6 +118,24 @@
       "writtenOn": "2018-06-07T21:26:01Z",
       "side": 1,
       "message": "I suggest toDict here as well.",
+      "revId": "cfba587aaed0231b4c04e026fc2929c91be721fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_f8b9bb78",
+        "filename": "zuul/model.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 999,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-06-08T02:03:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f7c97a3_2ff28b70",
       "revId": "cfba587aaed0231b4c04e026fc2929c91be721fc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_63441c48",
+        "filename": "zuul/model.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1001,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-06-08T02:03:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f7c97a3_cfe8b77d",
+      "revId": "cfba587aaed0231b4c04e026fc2929c91be721fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_efeb3375",
         "filename": "zuul/model.py",
         "patchSetId": 13
@@ -98,6 +188,24 @@
       "writtenOn": "2018-06-07T21:26:01Z",
       "side": 1,
       "message": "This should already be a dict?",
+      "revId": "cfba587aaed0231b4c04e026fc2929c91be721fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_18627717",
+        "filename": "zuul/model.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1003,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-06-08T02:03:13Z",
+      "side": 1,
+      "message": "It\u0027s a proxymapping object that can\u0027t json encoded. Next PS adds a note about it.",
+      "parentUuid": "5f7c97a3_efeb3375",
       "revId": "cfba587aaed0231b4c04e026fc2929c91be721fc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_a36314dd",
+        "filename": "zuul/model.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1010,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-06-08T02:03:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f7c97a3_8f02bf3d",
+      "revId": "cfba587aaed0231b4c04e026fc2929c91be721fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_affd3b3c",
         "filename": "zuul/model.py",
         "patchSetId": 13
@@ -132,6 +258,24 @@
       "writtenOn": "2018-06-07T21:26:01Z",
       "side": 1,
       "message": "str should not be necessary -- as long as it\u0027s not a base job, it should be a string.",
+      "revId": "cfba587aaed0231b4c04e026fc2929c91be721fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_436240da",
+        "filename": "zuul/model.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1013,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-06-08T02:03:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f7c97a3_affd3b3c",
       "revId": "cfba587aaed0231b4c04e026fc2929c91be721fc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
