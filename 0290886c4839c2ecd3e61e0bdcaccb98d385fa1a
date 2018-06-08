@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_c9b66f8b",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-06-08T05:16:48Z",
+      "side": 1,
+      "message": "I guess this is necessary only until all occurrences are changed?",
+      "revId": "0290886c4839c2ecd3e61e0bdcaccb98d385fa1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
