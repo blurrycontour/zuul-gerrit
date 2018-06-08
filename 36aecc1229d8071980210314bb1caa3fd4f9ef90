@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_59978391",
+        "filename": "web/zuul/zuul.service.ts",
+        "patchSetId": 43
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-06-08T16:56:29Z",
+      "side": 1,
+      "message": "this is not working when deployed on \"https://sftests.com/zuul/t/local/status.html\", the client tries to load \"https://api/tenant/local/status\".\n\nFor some reason, using the edit from https://review.openstack.org/#/c/573494/1/web/zuul/zuul.service.ts worked properly.",
+      "revId": "36aecc1229d8071980210314bb1caa3fd4f9ef90",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
