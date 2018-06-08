@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_95abc073",
+        "filename": "web/app-routing.module.ts",
+        "patchSetId": 40
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-06-08T13:39:01Z",
+      "side": 1,
+      "message": "It\u0027s not - because there is no tenants list inside of a tenant. The other pairs (t/status.html and status.html) are to handle both the multi-tenant and the white-label case. Also, your follow up fix for this one won\u0027t handle the white-label case (where there won\u0027t be a t/tenants.html to naviagate to)",
+      "parentUuid": "5f7c97a3_747153a8",
+      "revId": "d56f68bcad3358deada0daf55c0e61cf16424896",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_125fb8e5",
         "filename": "web/jobs/jobs.component.html",
         "patchSetId": 40
@@ -81,6 +99,30 @@
       "writtenOn": "2018-06-07T03:34:10Z",
       "side": 1,
       "message": "I think this need to be: \"${baseHref}api\":\n\n- we need to use the const baseHref and not from this\n- baseHref already has a trailing \u0027/\u0027 so no need to add one here.",
+      "range": {
+        "startLine": 43,
+        "startChar": 14,
+        "endLine": 43,
+        "endChar": 34
+      },
+      "revId": "d56f68bcad3358deada0daf55c0e61cf16424896",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_d53db82c",
+        "filename": "web/zuul/zuul.service.ts",
+        "patchSetId": 40
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-06-08T13:39:01Z",
+      "side": 1,
+      "message": "I think it\u0027s actually the opposite problem - we should use this.baseHref so that this obeys the ZUUL_API_URL override.",
+      "parentUuid": "5f7c97a3_804dca9a",
       "range": {
         "startLine": 43,
         "startChar": 14,
