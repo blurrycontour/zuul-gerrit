@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_099467e7",
+        "filename": "zuul/model.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 472,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-06-08T05:14:16Z",
+      "side": 1,
+      "message": "I wonder if we should mix internal and zk attributes in the same class.\n\nWhat do you think about composing the object instead and forward the attributes via property methods? That could separate data coming from nodepool from internal data and avoid confusion.\n\n  class Node(ConfigObject):\n      NodeZK _zkRepresentation\n\n      @property\n      def interface_ip(self):\n          return self._zkRepresentation.interface_ip",
+      "parentUuid": "5f7c97a3_78de0bdb",
+      "revId": "cfba587aaed0231b4c04e026fc2929c91be721fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_6fde43db",
         "filename": "zuul/model.py",
         "patchSetId": 13
