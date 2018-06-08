@@ -71,6 +71,24 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_251a9ec5",
+        "filename": "web/jobs/jobs.component.html",
+        "patchSetId": 40
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-06-08T14:06:24Z",
+      "side": 1,
+      "message": "Yeah - that snuck in from the later patch to add job details.",
+      "parentUuid": "5f7c97a3_125fb8e5",
+      "revId": "d56f68bcad3358deada0daf55c0e61cf16424896",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_3262f4ae",
         "filename": "web/jobs/jobs.component.ts",
         "patchSetId": 40
@@ -82,6 +100,24 @@
       "writtenOn": "2018-06-07T21:45:30Z",
       "side": 1,
       "message": "This probably wants to be removed.",
+      "revId": "d56f68bcad3358deada0daf55c0e61cf16424896",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_c5788af9",
+        "filename": "web/jobs/jobs.component.ts",
+        "patchSetId": 40
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-06-08T14:06:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f7c97a3_3262f4ae",
       "revId": "d56f68bcad3358deada0daf55c0e61cf16424896",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
