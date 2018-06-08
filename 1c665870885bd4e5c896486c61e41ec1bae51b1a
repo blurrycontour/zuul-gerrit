@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_231624a9",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-06-08T02:48:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f7c97a3_32019405",
+      "revId": "1c665870885bd4e5c896486c61e41ec1bae51b1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_d2070018",
         "filename": "zuul/rpclistener.py",
         "patchSetId": 15
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_0378c8f5",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 383,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-06-08T02:48:04Z",
+      "side": 1,
+      "message": "The intent of this project endpoint is to list jobs attached to the project so that we could get a view of all the projects using a specific job. I think it\u0027s fine to not be exhaustive here and rather let the user/javascript query the job endpoint to get the full details.",
+      "parentUuid": "5f7c97a3_d2070018",
+      "revId": "1c665870885bd4e5c896486c61e41ec1bae51b1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_f20a3c1e",
         "filename": "zuul/rpclistener.py",
         "patchSetId": 15
@@ -47,6 +83,24 @@
       "writtenOn": "2018-06-07T21:33:24Z",
       "side": 1,
       "message": "Why not use job.toDict() here?  The full job configuration language is available in a project-pipeline job config, and this is the only place that would be exposed in the web api.  Omitting it could be very misleading to someone trying to understand why a job is behaving a certain way on a project.",
+      "revId": "1c665870885bd4e5c896486c61e41ec1bae51b1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_836b781d",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 392,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-06-08T02:48:04Z",
+      "side": 1,
+      "message": "I would prefer the interface to use the job endpoint to get more detail if needed.",
+      "parentUuid": "5f7c97a3_f20a3c1e",
       "revId": "1c665870885bd4e5c896486c61e41ec1bae51b1a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
