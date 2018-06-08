@@ -268,6 +268,14 @@ class TestWeb(BaseTestWeb):
         resp = self.get_url("api/tenant/non-tenant/status")
         self.assertEqual(404, resp.status_code)
 
+    def test_web_job_list(self):
+        resp = self.get_url("api/tenant/tenant-one/jobs").json()
+        for job in resp:
+            if job['name'] in ["base", "noop"]:
+                self.assertEqual(job['parent'], None)
+            else:
+                self.assertEqual(job['parent'], 'base')
+
 
 class TestInfo(BaseTestWeb):
 
