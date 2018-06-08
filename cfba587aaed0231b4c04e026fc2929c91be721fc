@@ -73,6 +73,24 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_ae8214ff",
+        "filename": "zuul/model.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 472,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-06-08T11:35:13Z",
+      "side": 1,
+      "message": "That was just an idea for discussion. Jim what do you think?\n\nIf we want to do that this would be its own change.",
+      "parentUuid": "5f7c97a3_4e1580e4",
+      "revId": "cfba587aaed0231b4c04e026fc2929c91be721fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_6fde43db",
         "filename": "zuul/model.py",
         "patchSetId": 13
