@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_c7415c65",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-06-10T07:33:42Z",
+      "side": 1,
+      "message": "As your change makes that transition complete I don\u0027t see a place where accumulator is None. I think in the POC change this had to be done to be backwards compatible to the rest of the code. If that is correct we should make this parameter mandatory and remove the \u0027if accumulator is not None\u0027 below.\n\nThe same applies to \u0027configuration_exceptions\u0027.",
+      "revId": "e720b13b86a79655a711c7334bf74727f9f97c49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
