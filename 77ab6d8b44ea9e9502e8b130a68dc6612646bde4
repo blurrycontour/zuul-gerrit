@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_2d658fb5",
+        "filename": "tests/base.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2082,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-06-10T14:28:40Z",
+      "side": 1,
+      "message": "aiohttp is gone now",
+      "range": {
+        "startLine": 2082,
+        "startChar": 18,
+        "endLine": 2082,
+        "endChar": 25
+      },
+      "revId": "77ab6d8b44ea9e9502e8b130a68dc6612646bde4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
