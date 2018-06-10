@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_2dd82f51",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2095,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-06-10T14:41:22Z",
+      "side": 1,
+      "message": "We should fix and not hide these warnings. Change https://review.openstack.org/573641 resolves all current warnings of the sql tests.\nSo no need for this.",
+      "range": {
+        "startLine": 2092,
+        "startChar": 0,
+        "endLine": 2095,
+        "endChar": 67
+      },
+      "revId": "19eb4fcc281feaa9a8f1b9e0505784afc3fb0780",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
