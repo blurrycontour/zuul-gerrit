@@ -48,6 +48,7 @@
               - playbooks/zuul-migrate/.*
             vars:
               sphinx_python: python3
+        - tox-cover
         - tox-pep8
         - tox-py35:
             irrelevant-files:
