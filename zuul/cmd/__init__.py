@@ -179,6 +179,9 @@ class ZuulDaemonApp(ZuulApp, metaclass=abc.ABCMeta):
         self.parseArguments()
         self.readConfig()
 
+        if self.args.validate:
+            self.validate()
+
         pid_fn = self.getPidFile()
         pid = pid_file_module.TimeoutPIDLockFile(pid_fn, 10)
 
