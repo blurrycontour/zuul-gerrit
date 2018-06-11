@@ -1,0 +1,6 @@
+- name: Skip
+  shell: /bin/false
+  when: false
+- name: NoSkip
+  shell: /bin/true
+  when: true

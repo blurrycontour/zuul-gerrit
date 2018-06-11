@@ -1,4 +1,6 @@
 - hosts: all
+  roles:
+    - mirrors
   tasks:
     - name: Start zuul_console daemon
       zuul_console:
@@ -14,3 +16,14 @@
       command: "cat {{ ansible_user_dir }}/command_test_file1"
     - name: Show contents of second file
       command: "cat {{ ansible_user_dir }}/command_test_file2"
+    - name: notify apt
+      command: /bin/true
+      notify: Run apt-get update
+      with_items:
+        - foo
+        - bar
+
+- hosts: all
+  strategy: linear
+  roles:
+    - devstack

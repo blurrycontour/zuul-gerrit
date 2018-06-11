@@ -1,0 +1,17 @@
+- name: include role
+  include_role:
+    name: earlyrole
+  when: true
+
+- name: test block
+  block:
+    - name: Succeed
+      become: true
+      become_user: corvus
+      shell: 'echo yay'
+      args:
+        chdir: /tmp
+      when: inventory_hostname == 'controller'
+  when:
+    - true
+    - true
