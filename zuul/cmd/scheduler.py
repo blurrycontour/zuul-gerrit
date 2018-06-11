@@ -26,6 +26,8 @@ import zuul.nodepool
 import zuul.scheduler
 import zuul.zk
 
+from zuul import configloader
+
 from zuul.lib.config import get_default
 from zuul.lib.statsd import get_statsd_config
 
@@ -40,6 +42,9 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
 
     def createParser(self):
         parser = super(Scheduler, self).createParser()
+        parser.add_argument('-v', dest='validate',
+                            action='store_true',
+                            help='Validate tenants configuration file')
         parser.add_argument('command',
                             choices=zuul.scheduler.COMMANDS,
                             nargs='?')
@@ -113,6 +118,29 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
     def stop_gear_server(self):
         if self.gear_server_pid:
             os.kill(self.gear_server_pid, signal.SIGKILL)
+
+    def validate(self):
+        self.setup_logging('scheduler', 'log_config')
+        self.log = logging.getLogger("zuul.Scheduler")
+        self.sched = zuul.scheduler.Scheduler(self.config)
+        merger = zuul.merger.client.MergeClient(self.config, self.sched)
+        self.configure_connections()
+        self.sched.setMerger(merger)
+        self.sched.registerConnections(self.connections, load=False)
+        loader = configloader.ConfigLoader(
+            self.sched.connections, self.sched, self.sched.merger)
+        tenant_config, script = self.sched._checkTenantSourceConf(self.config)
+        unparsed_abide = loader.readConfig(tenant_config, from_script=script)
+        try:
+            for conf_tenant in unparsed_abide.tenants:
+                loader.tenant_parser.getSchema()(conf_tenant)
+            self.log.info(
+                "Tenant config validated with success")
+            sys.exit(0)
+        except Exception as e:
+            self.log.exception(
+                "Error when validating tenant config: %s" % str(e))
+            sys.exit(1)
 
     def run(self):
         if self.args.command in zuul.scheduler.COMMANDS:
