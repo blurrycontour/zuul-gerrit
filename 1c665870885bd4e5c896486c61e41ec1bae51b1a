@@ -138,6 +138,24 @@
       "revId": "1c665870885bd4e5c896486c61e41ec1bae51b1a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_1aec6fb9",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 392,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-06-11T22:24:56Z",
+      "side": 1,
+      "message": "I would really prefer to keep this interface simple to consume. But I agree we better get this right. I think we have 3 options here:\n\nA: add a \"variants_list\" attribute to the pipeline_job dictionary to store the variant description field.\nB: add a \"jobs_list\" attribute to the pipeline_job dictionary to store each job.toDict() content.\nC: make pipeline_jobs a list of list of job.toDict() content.\n\nI guess C makes the most sense, but if possible I would go with A or B.\n\nOn a side note, it seems like graphQL would really help us simplify zuul-web REST complexity and I would like to start a PoC in zuul in parallel of the one the API working group is doing with Neutron.",
+      "parentUuid": "5f7c97a3_5cef4886",
+      "revId": "1c665870885bd4e5c896486c61e41ec1bae51b1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
