@@ -99,7 +99,7 @@ class TestZuulStream(AnsibleZuulTestCase):
                 'controller \| ok: Runtime: \d:\d\d:\d\d\.\d\d\d\d\d\d', text)
             self.assertLogLine('PLAY RECAP', text)
             self.assertLogLine(
-                'controller \| ok: 5 changed: \d unreachable: 0 failed: 0',
+                'controller \| ok: \d+ changed: \d+ unreachable: 0 failed: 0',
                 text)
             self.assertLogLine(
                 'RUN END RESULT_NORMAL: \[untrusted : review.example.com/'
