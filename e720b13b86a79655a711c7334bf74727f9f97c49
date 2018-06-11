@@ -16,6 +16,24 @@
       "revId": "e720b13b86a79655a711c7334bf74727f9f97c49",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_c11e1f0b",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2018-06-11T09:01:15Z",
+      "side": 1,
+      "message": "Yes that\u0027s true, next PS removes this. Thanks for the review.",
+      "parentUuid": "5f7c97a3_c7415c65",
+      "revId": "e720b13b86a79655a711c7334bf74727f9f97c49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
