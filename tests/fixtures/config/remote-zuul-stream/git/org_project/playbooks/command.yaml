@@ -1,4 +1,6 @@
 - hosts: all
+  roles:
+    - mirrors
   tasks:
     # Create unwritable /tmp/console-None.log
     # This ensures that no further task can write to it without failing.
@@ -24,6 +26,12 @@
       command: "cat {{ ansible_user_dir }}/command_test_file1"
     - name: Show contents of second file
       command: "cat {{ ansible_user_dir }}/command_test_file2"
+    - name: notify apt
+      command: /bin/true
+      notify: Run apt-get update
+      with_items:
+        - foo
+        - bar
 
     # Test a task with a handler
     - name: Run a command with notifying a handler
@@ -53,3 +61,8 @@
       command: echo "First free task"
     - name: Command task 2 within free strategy
       command: echo "Second free task"
+
+- hosts: all
+  strategy: linear
+  roles:
+    - devstack
