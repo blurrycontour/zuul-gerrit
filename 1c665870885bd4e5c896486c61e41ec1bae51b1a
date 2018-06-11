@@ -72,6 +72,23 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_bcdc5ce1",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 383,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-11T19:18:07Z",
+      "side": 1,
+      "message": "I think you need to return all of the variants here.  Querying the jobs endpoint will only get you the global job variants, not the variants defined on this project.  You need both to understand the configuration.  Since this is fundamental to the API, I think we need to get it right now.  I don\u0027t think it\u0027s going to be easy to switch from a dict to a list-of-dicts later.",
+      "revId": "1c665870885bd4e5c896486c61e41ec1bae51b1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_f20a3c1e",
         "filename": "zuul/rpclistener.py",
         "patchSetId": 15
@@ -101,6 +118,23 @@
       "side": 1,
       "message": "I would prefer the interface to use the job endpoint to get more detail if needed.",
       "parentUuid": "5f7c97a3_f20a3c1e",
+      "revId": "1c665870885bd4e5c896486c61e41ec1bae51b1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_5cef4886",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 392,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-11T19:18:07Z",
+      "side": 1,
+      "message": "As I mentioned in the reply above, there is no other way to get this data.  The jobs endpoint will not provide it, so I think we need to do this here.",
       "revId": "1c665870885bd4e5c896486c61e41ec1bae51b1a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
