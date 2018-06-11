@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_75690d8a",
+        "filename": "tests/base.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2087,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-06-11T05:17:11Z",
+      "side": 0,
+      "message": "Actually I think we shouldn\u0027t remove that but rather let it override the default log levels. Otherwise it\u0027s hard to modify log levels in local testing.",
+      "range": {
+        "startLine": 2087,
+        "startChar": 13,
+        "endLine": 2087,
+        "endChar": 28
+      },
+      "revId": "6ad7168338226367beac8c43135ae6c83032d865",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
