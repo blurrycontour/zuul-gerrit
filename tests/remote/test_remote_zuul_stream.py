@@ -46,6 +46,8 @@ class TestZuulStream(AnsibleZuulTestCase):
                   - zuul: org/common-config
                 nodeset:
                   nodes:
+                    - name: compute1
+                      label: whatever
                     - name: controller
                       label: whatever
 
