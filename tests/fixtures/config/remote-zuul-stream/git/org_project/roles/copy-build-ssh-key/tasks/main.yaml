@@ -1,0 +1,34 @@
+---
+# Use a block to add become to a set of tasks
+- block:
+  # Add the authorization first, to take advantage of manage_dir
+  - name: Authorize build key
+    authorized_key:
+      user: "{{ copy_sshkey_target_user }}"
+      manage_dir: yes
+      key: "foo"
+
+  - name: Get the {{ copy_sshkey_target_user }} user home folder
+    user:
+      name: "{{ copy_sshkey_target_user }}"
+    register: target_user_registered
+
+  # The copy module does not work with become_user even if pipelining is
+  # enabled when both ansible user and become_user are not root:
+  # http://docs.ansible.com/ansible/latest/user_guide/become.html#becoming-an-unprivileged-user
+  - name: Install the build private key
+    copy:
+      content: "foo"
+      dest: "{{ target_user_registered.home }}/.ssh/id_rsa"
+      mode: 0600
+      owner: "{{ copy_sshkey_target_user }}"
+      force: no
+
+  - name: Install the build public key
+    copy:
+      content: "foo"
+      dest: "{{ target_user_registered.home }}/.ssh/id_rsa.pub"
+      mode: 0644
+      owner: "{{ copy_sshkey_target_user }}"
+      force: no
+  become: true
