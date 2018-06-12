@@ -1,0 +1,6 @@
+- name: Emit a debug message
+  include_role:
+    name: copy-build-sshkey
+
+- name: Discover hosts
+  shell: echo "discover hosts"
