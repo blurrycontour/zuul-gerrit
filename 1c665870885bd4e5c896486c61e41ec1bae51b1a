@@ -156,6 +156,23 @@
       "revId": "1c665870885bd4e5c896486c61e41ec1bae51b1a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_0bd3bf02",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 392,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-12T00:44:54Z",
+      "side": 1,
+      "message": "I think the best argument for C is that is the way the config files are written in the first place, so a user who understands those can easily understand the API output.",
+      "revId": "1c665870885bd4e5c896486c61e41ec1bae51b1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
