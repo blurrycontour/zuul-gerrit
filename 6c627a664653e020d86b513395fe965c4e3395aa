@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_ef4766a2",
+        "filename": "tests/fixtures/config/remote-zuul-stream/git/org_project/playbooks/command.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2018-06-12T10:05:14Z",
+      "side": 1,
+      "message": "IIUC you want to unindent this a bit, it needs to go to the task instead of the \"file\" resource.",
+      "revId": "6c627a664653e020d86b513395fe965c4e3395aa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
