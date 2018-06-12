@@ -44,12 +44,36 @@ class TestZuulStream(AnsibleZuulTestCase):
                 run: playbooks/{job_name}.yaml
                 roles:
                   - zuul: org/common-config
+                vars:
+                  devstack_base_dir: /tmp/stack
                 nodeset:
                   nodes:
                     - name: compute1
                       label: whatever
                     - name: controller
                       label: whatever
+                  groups:
+                    # Node where tests are executed and test results collected
+                    - name: tempest
+                      nodes:
+                        - controller
+                    # Nodes running the compute service
+                    - name: compute
+                      nodes:
+                        - controller
+                        - compute1
+                    # Nodes that are not the controller
+                    - name: subnode
+                      nodes:
+                        - compute1
+                    # Switch node for multinode networking setup
+                    - name: switch
+                      nodes:
+                        - controller
+                    # Peer nodes for multinode networking setup
+                    - name: peers
+                      nodes:
+                        - compute1
 
             - project:
                 check:
