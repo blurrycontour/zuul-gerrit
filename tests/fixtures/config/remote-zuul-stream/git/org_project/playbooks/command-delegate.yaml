@@ -1,0 +1,28 @@
+- hosts: all
+  tasks:
+    # Create unwritable /tmp/console-None.log
+    # This ensures that no further task can write to it without failing.
+    # A task trying to write to /tmp/console-None.log is considered broken
+    # because zuul_log_id is missing.
+    - name: Create unwritable /tmp/console-None.log
+      file:
+        path: /tmp/console-None.log
+        state: touch
+        mode: 0444
+      # FIXME(tobiash): remove this
+      failed_when: false
+
+    - name: Start zuul_console daemon
+      zuul_console:
+    - name: Create first file
+      copy:
+        content: "command test one\n"
+        dest: "{{ ansible_user_dir }}/command_test_file1"
+
+    - name: include role
+      include_role:
+        name: included-role
+
+    - name: Succeed
+      delegate_to: compute1
+      shell: echo "delegated woo"

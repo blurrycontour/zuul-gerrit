@@ -213,10 +213,15 @@ class CallbackModule(default.CallbackModule):
         else:
             task_name = task.get_name().strip()
 
+        self._logger.info("v2_playbook_on_task_start: task.action = %s" % task.action)
+
         if task.action in ('command', 'shell'):
             log_id = uuid.uuid4().hex
             task.args['zuul_log_id'] = log_id
             play_vars = self._play._variable_manager._hostvars
+
+            self._logger.info(
+                "v2_playbook_on_task_start: task.args = %s" % task.args)
 
             hosts = self._get_task_hosts(task)
             for host in hosts:
