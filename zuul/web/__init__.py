@@ -30,6 +30,7 @@ import threading
 
 import zuul.model
 import zuul.rpcclient
+import zuul.web.graphql
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
 cherrypy.tools.websocket = WebSocketTool()
@@ -283,6 +284,22 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
+    @cherrypy.tools.json_in()
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    def graphql(self, tenant):
+        # Ask the scheduler which sql connection to use for this tenant
+        job = self.rpc.submitJob('zuul:tenant_sql_connection',
+                                 {'tenant': tenant})
+        connection_name = json.loads(job.data[0])
+
+        if not connection_name:
+            raise Exception("Unable to find connection for tenant %s" % tenant)
+        connection = self.zuulweb.connections.connections[connection_name]
+        return zuul.web.graphql.execute(
+            cherrypy.request.json["query"], tenant, connection)
+
+    @cherrypy.expose
+    @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def builds(self, tenant, project=None, pipeline=None, change=None,
                branch=None, patchset=None, ref=None, newrev=None,
@@ -442,6 +459,8 @@ class ZuulWeb(object):
                           controller=api, action='info')
         route_map.connect('api', '/api/tenants',
                           controller=api, action='tenants')
+        route_map.connect('api', '/api/tenant/{tenant}/graphql',
+                          controller=api, action='graphql')
         route_map.connect('api', '/api/tenant/{tenant}/info',
                           controller=api, action='tenant_info')
         route_map.connect('api', '/api/tenant/{tenant}/status',
