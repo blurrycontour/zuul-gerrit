@@ -16,6 +16,24 @@
       "revId": "6c627a664653e020d86b513395fe965c4e3395aa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_45d8bb50",
+        "filename": "tests/fixtures/config/remote-zuul-stream/git/org_project/playbooks/command.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-06-12T11:19:54Z",
+      "side": 1,
+      "message": "Yes, thanks, also noticed that during lunch",
+      "parentUuid": "5f7c97a3_ef4766a2",
+      "revId": "6c627a664653e020d86b513395fe965c4e3395aa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
