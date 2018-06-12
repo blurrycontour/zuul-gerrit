@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_2fcc7e87",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-06-12T09:46:39Z",
+      "side": 1,
+      "message": "it used to be called \"-t\"",
+      "revId": "dfd05d4c3546fc7a0a3a280f87c55970bc024abc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_8f891227",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-06-12T09:46:39Z",
+      "side": 1,
+      "message": "I think you can use \"source_only\u003dTrue\"",
+      "revId": "dfd05d4c3546fc7a0a3a280f87c55970bc024abc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_6fab5687",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-06-12T09:46:39Z",
+      "side": 1,
+      "message": "Tenants*",
+      "range": {
+        "startLine": 138,
+        "startChar": 17,
+        "endLine": 138,
+        "endChar": 23
+      },
+      "revId": "dfd05d4c3546fc7a0a3a280f87c55970bc024abc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
