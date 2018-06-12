@@ -48,6 +48,8 @@ class TestZuulStream(AnsibleZuulTestCase):
                   nodes:
                     - name: controller
                       label: whatever
+                    - name: compute1
+                      label: whatever
 
             - project:
                 check:
@@ -109,6 +111,29 @@ class TestZuulStream(AnsibleZuulTestCase):
             self.assertLogLine(
                 'RUN END RESULT_NORMAL: \[untrusted : review.example.com/'
                 'org/project/playbooks/command.yaml@master]', text)
+
+    def test_command_delegate(self):
+        job = self._run_job('command-delegate')
+        with self.jobLog(job):
+            build = self.history[-1]
+            self.assertEqual(build.result, 'SUCCESS')
+
+            text = self._get_job_output(build)
+            self.assertLogLine(
+                'RUN START: \[untrusted : review.example.com/org/project/'
+                'playbooks/command-delegate.yaml@master\]', text)
+            self.assertLogLine('PLAY \[all\]', text)
+            self.assertLogLine('compute1 \| delegated woo', text)
+            self.assertLogLine('PLAY RECAP', text)
+            self.assertLogLine(
+                'controller \| ok: \d+ changed: \d+ unreachable: 0 failed: 0',
+                text)
+            self.assertLogLine(
+                'compute1 \| ok: \d+ changed: \d+ unreachable: 0 failed: 0',
+                text)
+            self.assertLogLine(
+                'RUN END RESULT_NORMAL: \[untrusted : review.example.com/'
+                'org/project/playbooks/command-delegate.yaml@master]', text)
 
     def test_module_failure(self):
         job = self._run_job('module_failure')
