@@ -270,6 +270,78 @@ class TestWeb(BaseTestWeb):
         self.assertEqual(404, resp.status_code)
 
 
+class TestGraphQL(BaseTestWeb):
+    def post_query(self, query, tenant_name="tenant-one"):
+        return requests.post(
+            urllib.parse.urljoin(
+                self.base_url, "api/tenant/%s/graphql" % tenant_name),
+            json={"query": query}).json()
+
+    def test_graphql(self):
+        schema = self.post_query("{__schema {queryType{name}}}")
+        self.assertEquals(
+            schema, {'__schema': {'queryType': {'name': 'Query'}}})
+
+    def test_graphql_projects(self):
+        projects = self.post_query("""
+{tenant {
+   projects {
+     edges {
+       node {
+         name
+         type
+       }
+     }
+   }
+}}
+        """)
+        self.assertEquals(projects, {
+            'tenant': {'projects': {'edges': [
+                {'node': {'name': 'common-config',
+                          'type': 'config'}},
+                {'node': {'name': 'org/project',
+                          'type': 'untrusted'}},
+                {'node': {'name': 'org/project1',
+                          'type': 'untrusted'}},
+                {'node': {'name': 'org/project2',
+                          'type': 'untrusted'}}]
+            }}})
+
+    def test_graphql_jobs(self):
+        jobs = self.post_query("""
+{tenant {
+   jobs {
+     edges {
+       node {
+         name
+         description
+       }
+     }
+   }
+}}
+        """)
+        self.assertEquals(
+            jobs,
+            {'tenant': {'jobs': {'edges': [
+                {'node': {'description': None, 'name': 'base'}},
+                {'node': {'description': 'A job that will always succeed, '
+                                         'no operation.',
+                          'name': 'noop'}},
+                {'node': {'description': None,
+                          'name': 'project-merge'}},
+                {'node': {'description': None,
+                          'name': 'project-post'}},
+                {'node': {'description': None,
+                          'name': 'project-test1'}},
+                {'node': {'description': None,
+                          'name': 'project-test2'}},
+                {'node': {'description': None,
+                          'name': 'project-testfile'}},
+                {'node': {'description': None,
+                          'name': 'project1-project2-integration'}}
+            ]}}})
+
+
 class TestInfo(BaseTestWeb):
 
     def setUp(self):

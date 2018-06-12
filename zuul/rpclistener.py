@@ -21,6 +21,7 @@ import traceback
 import gear
 
 from zuul import model
+from zuul.graphql import Schema
 from zuul.lib import encryption
 from zuul.lib.config import get_default
 
@@ -31,6 +32,7 @@ class RPCListener(object):
     def __init__(self, config, sched):
         self.config = config
         self.sched = sched
+        self.schema = Schema()
 
     def start(self):
         self._running = True
@@ -62,6 +64,7 @@ class RPCListener(object):
         self.worker.registerFunction("zuul:status_get")
         self.worker.registerFunction("zuul:job_list")
         self.worker.registerFunction("zuul:key_get")
+        self.worker.registerFunction("zuul:graphql")
 
     def getFunctions(self):
         functions = {}
@@ -356,3 +359,9 @@ class RPCListener(object):
         (trusted, project) = tenant.getProject(args.get("project"))
         job.sendWorkComplete(
             encryption.serialize_rsa_public_key(project.public_key))
+
+    def handle_graphql(self, job):
+        args = json.loads(job.arguments)
+        tenant = self.sched.abide.tenants.get(args.get("tenant"))
+        output = self.schema.execute(tenant, args.get("query"))
+        job.sendWorkComplete(json.dumps(output))
