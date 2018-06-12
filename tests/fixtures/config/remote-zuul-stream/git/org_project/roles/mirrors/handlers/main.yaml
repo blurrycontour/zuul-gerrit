@@ -1,2 +1,0 @@
-- name: Run apt-get update
-  command: /bin/true

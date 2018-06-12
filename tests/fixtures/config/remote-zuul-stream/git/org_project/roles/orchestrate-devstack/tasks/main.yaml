@@ -1,0 +1,6 @@
+- name: Distribute the build sshkey for the user "stack"
+  include_role:
+    name: copy-build-sshkey
+
+- name: Discover hosts
+  shell: echo "discover hosts"

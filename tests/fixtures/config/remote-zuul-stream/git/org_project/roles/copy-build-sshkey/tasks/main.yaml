@@ -1,0 +1,4 @@
+- name: Get the {{ copy_sshkey_target_user }} user home folder
+  user:
+    name: "zuul"
+  register: target_user_registered
