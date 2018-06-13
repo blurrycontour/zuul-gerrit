@@ -333,7 +333,11 @@ class Repo(object):
             current_refs[ref.path] = ref
         unseen = set(current_refs.keys())
         for path, hexsha in refs.items():
-            self.setRef(path, hexsha, repo)
+            try:
+                # HACK(tobiash): This is a temporary hack
+                self.setRef(path, hexsha, repo)
+            except Exception:
+                self.log.warning('Failed to set ref %s to %s', path, hexsha)
             unseen.discard(path)
             ref = current_refs.get(path)
             if keep_remotes and ref:
