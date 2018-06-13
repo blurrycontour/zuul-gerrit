@@ -349,13 +349,18 @@ class Repo(object):
         git.refs.Reference.create(repo, path, obj, force=True)
 
     def setRefs(self, refs, keep_remotes=False, zuul_event_id=None):
+        log = get_annotated_logger(self.log, zuul_event_id)
         repo = self.createRepoObject(zuul_event_id)
         current_refs = {}
         for ref in repo.refs:
             current_refs[ref.path] = ref
         unseen = set(current_refs.keys())
         for path, hexsha in refs.items():
-            self.setRef(path, hexsha, repo, zuul_event_id=zuul_event_id)
+            try:
+                # HACK(tobiash): This is a temporary hack
+                self.setRef(path, hexsha, repo, zuul_event_id=zuul_event_id)
+            except Exception:
+                log.warning('Failed to set ref %s to %s', path, hexsha)
             unseen.discard(path)
             ref = current_refs.get(path)
             if keep_remotes and ref:
