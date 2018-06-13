@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_5ac870a6",
+        "filename": "zuul/ansible/paths.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-06-13T18:17:52Z",
+      "side": 1,
+      "message": "Do we really want to hard code that to the first element? In case we add further module paths (or maybe later add custom whitelisted module paths by config) that might break. So maybe we should loop over that list?",
+      "range": {
+        "startLine": 147,
+        "startChar": 8,
+        "endLine": 147,
+        "endChar": 67
+      },
+      "revId": "85536b0dc23f1d3adf498846f6b57c606aa36079",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
