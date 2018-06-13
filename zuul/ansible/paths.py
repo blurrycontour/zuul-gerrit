@@ -16,6 +16,7 @@
 import imp
 import os
 
+from ansible import constants as C
 from ansible.errors import AnsibleError
 import ansible.modules
 import ansible.plugins.action
@@ -139,7 +140,12 @@ def _is_official_module(module):
     # local execution it's a problem because their version could subvert our
     # path checks and/or do other things on the local machine that we don't
     # want them to do.
-    return task_module_path.startswith(ansible_module_path)
+    res = task_module_path.startswith(ansible_module_path)
+    if not res:
+        # Also check library path in ansible.cfg for action plugins like
+        # zuul_return.
+        res = task_module_path.startswith(C.DEFAULT_MODULE_PATH[0])
+    return res
 
 
 def _fail_module_dict(module_name):
