@@ -355,6 +355,7 @@ class Repo(object):
             path, hexsha, repo.git_dir)
 
     def setRefs(self, refs, keep_remotes=False, zuul_event_id=None):
+        log = get_annotated_logger(self.log, zuul_event_id)
         repo = self.createRepoObject(zuul_event_id)
         log = get_annotated_logger(self.log, zuul_event_id)
         self._setRefs(repo, refs, keep_remotes=keep_remotes, log=log)
@@ -376,8 +377,15 @@ class Repo(object):
             if log:
                 log.debug("Create reference %s at %s in %s",
                           path, hexsha, repo.git_dir)
-            message = Repo._setRef(path, hexsha, repo)
-            messages.append(message)
+            try:
+                message = Repo._setRef(path, hexsha, repo)
+                messages.append(message)
+            except Exception:
+                if log:
+                    log.warning('Failed to set ref %s to %s', path, hexsha)
+                else:
+                    messages.append('Failed to set ref %s to %s' % (
+                        path, hexsha))
             unseen.discard(path)
             ref = current_refs.get(path)
             if keep_remotes and ref:
