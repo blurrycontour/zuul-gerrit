@@ -150,7 +150,9 @@ def _fail_module_dict(module_name):
 
 
 def _fail_if_local_module(module):
-    if not _is_official_module(module):
+    # NOTE(pabelanger): Whitelist zuul_return for untrusted projects.
+    if module._task.action != 'zuul_return' \
+            and not _is_official_module(module):
         msg_dict = _fail_module_dict(module._task.action)
         raise AnsibleError(msg_dict['msg'])
 
