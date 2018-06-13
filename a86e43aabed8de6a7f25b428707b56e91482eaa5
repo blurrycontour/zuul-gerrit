@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_4b8985c7",
+        "filename": "zuul/ansible/paths.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-06-13T17:05:30Z",
+      "side": 1,
+      "message": "That won\u0027t prevent you to locally override zuul_return and having the ability to run arbitrary code on localhost. Instead we need to adapt _is_official_module to check for the path where we expect zuul_return.",
+      "range": {
+        "startLine": 154,
+        "startChar": 4,
+        "endLine": 154,
+        "endChar": 45
+      },
+      "revId": "a86e43aabed8de6a7f25b428707b56e91482eaa5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
