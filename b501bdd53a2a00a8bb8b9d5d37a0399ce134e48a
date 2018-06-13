@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_890ec0e1",
+        "filename": "releasenotes/notes/whitelist-zuul-return-bd78bf3e598e85f6.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-13T22:47:17Z",
+      "side": 1,
+      "message": "Er, that\u0027s not really an upgrade note.  This should be a bug fix.",
+      "revId": "b501bdd53a2a00a8bb8b9d5d37a0399ce134e48a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
