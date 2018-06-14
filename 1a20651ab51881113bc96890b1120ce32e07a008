@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_0194ad8b",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-14T23:23:40Z",
+      "side": 1,
+      "message": "Jeremy: for the first part -- correct.  For the second part -- I think the answer is pretty close to \"replace\".\n\nThe pipeline holds a varying number of dynamically generated queues, one for each project-ref combination.  When a new project-ref is added to the pipeline, a queue will be created for it, and when all items for that project-ref have been processed, it\u0027s removed.  If an item comes in for an existing project-ref, it supercedes the item in the second position in that project-ref queue.  But the queue itself retains the same ordering in the pipeline.  And Zuul\u0027s pipeline processor iterates over the queues in order.  That *could* mean that a busy project could starve others.  OTOH, the dependent pipeline manager probably has the same flaw, except that projects which happen to appear earlier may have the advantage.  It might be worth attempting to make both managers more fair.  I don\u0027t think the independent pipeline manager has this flaw.",
+      "revId": "1a20651ab51881113bc96890b1120ce32e07a008",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_720be823",
         "filename": "tests/unit/test_supercedent.py",
         "patchSetId": 3
@@ -65,6 +82,23 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_417aa577",
+        "filename": "zuul/manager/supercedent.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-14T23:23:40Z",
+      "side": 1,
+      "message": "Correct.",
+      "revId": "1a20651ab51881113bc96890b1120ce32e07a008",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_81499d67",
         "filename": "zuul/manager/supercedent.py",
         "patchSetId": 3
@@ -82,6 +116,23 @@
         "endLine": 47,
         "endChar": 34
       },
+      "revId": "1a20651ab51881113bc96890b1120ce32e07a008",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_617fa166",
+        "filename": "zuul/manager/supercedent.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-14T23:23:40Z",
+      "side": 1,
+      "message": "I agree, the log entry should be queue[-1].  But I believe the assignment of remove is correct.  We never want to remove the [0] item because it\u0027s already running.",
       "revId": "1a20651ab51881113bc96890b1120ce32e07a008",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
