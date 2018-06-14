@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_9ef90a4f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-06-14T12:29:22Z",
+      "side": 1,
+      "message": "I don\u0027t think this last part is true anymore- that has been moved to the first patch, yes?",
+      "revId": "9bf5682be733eb5b019cb45438d616cbb556f015",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
