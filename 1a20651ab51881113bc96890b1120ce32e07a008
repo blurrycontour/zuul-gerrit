@@ -42,6 +42,52 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_7e16605b",
+        "filename": "zuul/manager/supercedent.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-06-14T23:12:11Z",
+      "side": 1,
+      "message": "This comment does not appear to be accurate anymore. It is one change queue per project,ref tuple right?",
+      "range": {
+        "startLine": 23,
+        "startChar": 10,
+        "endLine": 23,
+        "endChar": 53
+      },
+      "revId": "1a20651ab51881113bc96890b1120ce32e07a008",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_81499d67",
+        "filename": "zuul/manager/supercedent.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-06-14T23:12:11Z",
+      "side": 1,
+      "message": "0:-1 maybe? then the log below is superceded by queue.queue[-1] instead of :-1.",
+      "range": {
+        "startLine": 47,
+        "startChar": 33,
+        "endLine": 47,
+        "endChar": 34
+      },
+      "revId": "1a20651ab51881113bc96890b1120ce32e07a008",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_d2bc3c08",
         "filename": "zuul/manager/supercedent.py",
         "patchSetId": 3
