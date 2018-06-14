@@ -25,6 +25,40 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_259eac53",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-06-14T04:33:53Z",
+      "side": 1,
+      "message": "Turns out this is already working. Commands\u0027 logs do contain some initial \"waiting for logger\" but then the output is properly logged. Though if/when zuul_stream uses ssh port forward, then this may need some adjustments to work with the kubectl connection plugin.",
+      "revId": "c1b8dacf43541a4a7fb09c8cb22c2e1827858f99",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_e5a3d499",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-06-14T04:33:53Z",
+      "side": 1,
+      "message": "At least oc has a synchronize command that will try rsync or tar usage over the k8s exec interface. So I think the synchronize module could be easily fixed to work with the kubectl connection plugin.",
+      "revId": "c1b8dacf43541a4a7fb09c8cb22c2e1827858f99",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_31b452f2",
         "filename": "doc/source/developer/specs/container-build-resources.rst",
         "patchSetId": 2
