@@ -16,6 +16,24 @@
       "revId": "9bf5682be733eb5b019cb45438d616cbb556f015",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_a1e06798",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-06-14T13:07:03Z",
+      "side": 1,
+      "message": "whoops, that was a rebase mistake ;)",
+      "parentUuid": "5f7c97a3_9ef90a4f",
+      "revId": "9bf5682be733eb5b019cb45438d616cbb556f015",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
