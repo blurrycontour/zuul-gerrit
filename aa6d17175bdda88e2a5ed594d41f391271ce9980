@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_41a705be",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2018-06-14T23:43:17Z",
+      "side": 1,
+      "message": "What I was getting to in my comment on the previous patchset is that this seems to be worded misleadingly. It might be clearer to say something along the lines of, \"If more than one additional item is enqueued for the project-ref, the previously enqueued item which has not started processing is replaced.\" As it stands the sentence isn\u0027t wrong, but does imply that there could be more than one previously enqueued item which has not started processing yet if this works as designed there should never be.",
+      "revId": "aa6d17175bdda88e2a5ed594d41f391271ce9980",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
