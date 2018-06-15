@@ -1,0 +1,12 @@
+- hosts: localhost
+  tasks:
+    - debug:
+        msg: "tag1/tag2 used"
+      tags:
+        - tag1
+        - tag2
+
+    - debug:
+        msg: "tag3 used"
+      tags:
+        - tag3

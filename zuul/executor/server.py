@@ -938,7 +938,8 @@ class AnsibleJob(object):
             # TODOv3(pabelanger): Implement pre-run timeout setting.
             ansible_timeout = self.getAnsibleTimeout(time_started, job_timeout)
             pre_status, pre_code = self.runAnsiblePlaybook(
-                playbook, ansible_timeout, phase='pre', index=index)
+                playbook, ansible_timeout, phase='pre', index=index,
+                tags=args['ansible_tags'], skip_tags=args['ansible_skip_tags'])
             if pre_status != self.RESULT_NORMAL or pre_code != 0:
                 # These should really never fail, so return None and have
                 # zuul try again
@@ -948,7 +949,8 @@ class AnsibleJob(object):
         if not pre_failed:
             ansible_timeout = self.getAnsibleTimeout(time_started, job_timeout)
             job_status, job_code = self.runAnsiblePlaybook(
-                self.jobdir.playbook, ansible_timeout, phase='run')
+                self.jobdir.playbook, ansible_timeout, phase='run',
+                tags=args['ansible_tags'], skip_tags=args['ansible_skip_tags'])
             if job_status == self.RESULT_ABORTED:
                 return 'ABORTED'
             elif job_status == self.RESULT_TIMED_OUT:
@@ -975,7 +977,8 @@ class AnsibleJob(object):
             # which are vital to understanding why timeouts have happened in
             # the first place.
             post_status, post_code = self.runAnsiblePlaybook(
-                playbook, post_timeout, success, phase='post', index=index)
+                playbook, post_timeout, success, phase='post', index=index,
+                tags=args['ansible_tags'], skip_tags=args['ansible_skip_tags'])
             if post_status == self.RESULT_ABORTED:
                 return 'ABORTED'
             if post_status != self.RESULT_NORMAL or post_code != 0:
@@ -1703,7 +1706,7 @@ class AnsibleJob(object):
                 msg=msg))
 
     def runAnsiblePlaybook(self, playbook, timeout, success=None,
-                           phase=None, index=None):
+                           phase=None, index=None, tags=None, skip_tags=None):
         if self.executor_server.verbose:
             verbose = '-vvv'
         else:
@@ -1731,6 +1734,12 @@ class AnsibleJob(object):
 
         if self.executor_variables_file is not None:
             cmd.extend(['-e@%s' % self.executor_variables_file])
+
+        if tags:
+            cmd.extend(["--tags=%s" % ",".join(tags)])
+
+        if skip_tags:
+            cmd.extend(["--skip-tags=%s" % ",".join(skip_tags)])
 
         self.emitPlaybookBanner(playbook, 'START', phase)
 
