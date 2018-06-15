@@ -189,6 +189,8 @@ class ExecutorClient(object):
         params['job'] = job.name
         params['timeout'] = job.timeout
         params['post_timeout'] = job.post_timeout
+        params['ansible_tags'] = job.ansible_tags
+        params['ansible_skip_tags'] = job.ansible_skip_tags
         params['items'] = merger_items
         params['projects'] = []
         if hasattr(item.change, 'branch'):

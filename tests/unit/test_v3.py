@@ -3032,6 +3032,61 @@ class TestDataReturn(AnsibleZuulTestCase):
         self.assertIn('Build succeeded', A.messages[-1])
 
 
+class TestAnsibleTags(AnsibleZuulTestCase):
+    tenant_config_file = 'config/ansible-tags/main.yaml'
+
+    def _get_output(self, project_config):
+        self.executor_server.keep_jobdir = True
+        file_dict = {'.zuul.yaml': project_config}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        test_tag = self.getJobFromHistory("test-tags")
+        with self.jobLog(test_tag):
+            build = self.history[-1]
+            path = os.path.join(
+                self.test_root, build.uuid, 'work', 'logs', 'job-output.txt')
+            return open(path).read()
+
+    def test_ansible_tags(self):
+        job_log = self._get_output(textwrap.dedent(
+            """
+            - project:
+                check:
+                  jobs:
+                    - test-tags:
+                        ansible-tags: tag2
+            """))
+        self.assertIn("tag1/tag2 used", job_log)
+        self.assertNotIn("tag3 used", job_log)
+
+        job_log = self._get_output(textwrap.dedent(
+            """
+            - project:
+                check:
+                  jobs:
+                    - test-tags:
+                        ansible-tags:
+                          - tag1
+                          - tag3
+            """))
+        self.assertIn("tag1/tag2 used", job_log)
+        self.assertIn("tag3 used", job_log)
+
+    def test_ansible_skip_tags(self):
+        job_log = self._get_output(textwrap.dedent(
+            """
+            - project:
+                check:
+                  jobs:
+                    - test-tags:
+                        ansible-skip-tags: tag3
+            """))
+        self.assertIn("tag1/tag2 used", job_log)
+        self.assertNotIn("tag3 used", job_log)
+
+
 class TestDiskAccounting(AnsibleZuulTestCase):
     config_file = 'zuul-disk-accounting.conf'
     tenant_config_file = 'config/disk-accountant/main.yaml'

@@ -520,6 +520,8 @@ class JobParser(object):
                       'hold-following-changes': bool,
                       'voting': bool,
                       'semaphore': str,
+                      'ansible-tags': to_list(str),
+                      'ansible-skip-tags': to_list(str),
                       'tags': to_list(str),
                       'branches': to_list(str),
                       'files': to_list(str),
@@ -721,6 +723,9 @@ class JobParser(object):
         tags = conf.get('tags')
         if tags:
             job.tags = set(tags)
+
+        job.ansible_tags = as_list(conf.get('ansible-tags'))
+        job.ansible_skip_tags = as_list(conf.get('ansible-skip-tags'))
 
         job.dependencies = frozenset(as_list(conf.get('dependencies')))
 

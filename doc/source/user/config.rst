@@ -902,6 +902,14 @@ Here is an example of two job definitions:
          when collecting any jobs to run which are defined in this
          project.
 
+   .. attr:: ansible-tags
+
+      A list of Ansible tags to use in the run playbook.
+
+   .. attr:: ansible-skip-tags
+
+      A list of Ansible tags to skip in the run playbook.
+
    .. attr:: vars
 
       A dictionary of variables to supply to Ansible.  When inheriting
