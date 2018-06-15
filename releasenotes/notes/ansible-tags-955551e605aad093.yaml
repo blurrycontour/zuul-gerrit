@@ -1,0 +1,4 @@
+---
+features:
+  - |
+    Job attribute support for ansible-tags and ansible-skip-tags.

@@ -1174,6 +1174,8 @@ class Job(ConfigObject):
             parent=None,
             timeout=None,
             post_timeout=None,
+            ansible_tags=(),
+            ansible_skip_tags=(),
             variables={},
             extra_variables={},
             host_variables={},

@@ -593,6 +593,8 @@ class JobParser(object):
                       'hold-following-changes': bool,
                       'voting': bool,
                       'semaphore': vs.Any(semaphore, str),
+                      'ansible-tags': to_list(str),
+                      'ansible-skip-tags': to_list(str),
                       'tags': to_list(str),
                       'branches': to_list(str),
                       'files': to_list(str),
@@ -856,6 +858,8 @@ class JobParser(object):
             v = frozenset(as_list(conf.get(k)))
             if v:
                 setattr(job, k, v)
+        job.ansible_tags = as_list(conf.get('ansible-tags'))
+        job.ansible_skip_tags = as_list(conf.get('ansible-skip-tags'))
 
         variables = conf.get('vars', None)
         if variables:
