@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_942c7d02",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 6525
+      },
+      "writtenOn": "2018-06-15T04:29:18Z",
+      "side": 1,
+      "message": "I believe GraphQL responses by convention contain \"data\".",
+      "revId": "19de0d2c0d941c358bcf7b2f9331603cebee168c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_3431e95a",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 6525
+      },
+      "writtenOn": "2018-06-15T04:29:18Z",
+      "side": 1,
+      "message": "Same with \"data\"",
+      "revId": "19de0d2c0d941c358bcf7b2f9331603cebee168c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_37cd6b30",
+        "filename": "zuul/graphql.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 6525
+      },
+      "writtenOn": "2018-06-15T04:29:18Z",
+      "side": 1,
+      "message": "\"data\" block needed along \"errors\" if any.",
+      "revId": "19de0d2c0d941c358bcf7b2f9331603cebee168c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_14386d39",
+        "filename": "zuul/web/graphql.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 6525
+      },
+      "writtenOn": "2018-06-15T04:29:18Z",
+      "side": 1,
+      "message": "Response to be within \"data\" block.",
+      "revId": "19de0d2c0d941c358bcf7b2f9331603cebee168c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_f4513165",
+        "filename": "zuul/web/graphql.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 6525
+      },
+      "writtenOn": "2018-06-15T04:29:18Z",
+      "side": 1,
+      "message": "Response data to be within \"data\" block (along \"errors\" if any)",
+      "revId": "19de0d2c0d941c358bcf7b2f9331603cebee168c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
