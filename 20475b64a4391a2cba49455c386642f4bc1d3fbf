@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_6ebf6faa",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-06-16T12:50:55Z",
+      "side": 1,
+      "message": "the commit message says -v",
+      "range": {
+        "startLine": 45,
+        "startChar": 30,
+        "endLine": 45,
+        "endChar": 31
+      },
+      "revId": "20475b64a4391a2cba49455c386642f4bc1d3fbf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
