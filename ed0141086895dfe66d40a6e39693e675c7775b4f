@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_0a257d5c",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1389,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-06-18T05:15:38Z",
+      "side": 1,
+      "message": "I don\u0027t understand this yet. Shouldn\u0027t that case already be handled? If that is None the above should return an empty list which should stay empty throughout as_list and frozenset.",
+      "range": {
+        "startLine": 1388,
+        "startChar": 35,
+        "endLine": 1389,
+        "endChar": 38
+      },
+      "revId": "ed0141086895dfe66d40a6e39693e675c7775b4f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
