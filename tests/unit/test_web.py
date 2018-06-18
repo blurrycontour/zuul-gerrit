@@ -832,8 +832,7 @@ class TestTenantInfoConfigBroken(BaseTestWeb):
     def test_tenant_info_broken_config(self):
         config_errors = self.get_url(
             "api/tenant/tenant-one/config-errors").json()
-        self.assertEqual(
-            len(config_errors), 2)
+        self.assertEqual(len(config_errors), 1)
 
         self.assertEqual(
             config_errors[0]['source_context']['project'], 'org/project3')
