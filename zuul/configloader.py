@@ -1385,7 +1385,8 @@ class TenantParser(object):
 
             project_include = frozenset(
                 as_list(conf[project_name].get('include', [])))
-            if not project_include:
+            if not project_include and conf[project_name].get(
+                    "include") is None:
                 project_include = current_include
             project_exclude = frozenset(
                 as_list(conf[project_name].get('exclude', [])))
