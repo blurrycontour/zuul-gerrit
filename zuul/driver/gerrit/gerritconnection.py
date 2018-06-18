@@ -806,8 +806,12 @@ class GerritConnection(BaseConnection):
         branches = self._project_branch_cache.get(project.name)
         if branches is not None:
             return branches
-
-        refs = self.getInfoRefs(project)
+        try:
+            refs = self.getInfoRefs(project)
+        except Exception:
+            self.log.exception("Exception looking for project %s refs" %
+                               project)
+            return []
         heads = [str(k[len('refs/heads/'):]) for k in refs
                  if k.startswith('refs/heads/') and
                  GerritConnection._checkRefFormat(k)]
