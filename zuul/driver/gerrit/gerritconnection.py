@@ -700,7 +700,12 @@ class GerritConnection(BaseConnection):
         return changes
 
     def getProjectBranches(self, project: Project, tenant) -> List[str]:
-        refs = self.getInfoRefs(project)
+        try:
+            refs = self.getInfoRefs(project)
+        except Exception:
+            self.log.exception("Exception looking for project %s refs" %
+                               project)
+            return []
         heads = [str(k[len('refs/heads/'):]) for k in refs.keys()
                  if k.startswith('refs/heads/')]
         return heads
