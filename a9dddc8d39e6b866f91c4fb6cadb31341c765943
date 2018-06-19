@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_08f6bcd9",
+        "filename": "releasenotes/notes/override-file-matchers-128731229d551d81.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2018-06-19T15:18:18Z",
+      "side": 1,
+      "message": "I should update this with proper reporter attribution.",
+      "revId": "a9dddc8d39e6b866f91c4fb6cadb31341c765943",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
