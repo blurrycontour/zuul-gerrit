@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_910526c4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-19T08:50:46Z",
+      "side": 1,
+      "message": "I don\u0027t think this should be generally recommended.  It\u0027s not at all certain at this point that every project should have merge errors reported.  For example. OpenStack does not report merge conflicts to ansible.  For that reason, as well as the fact that in later versions of gerrit, it\u0027s no longer necessary, OpenStack does not enable the merge-check pipeline globally.\n\nFurther, the goal of getting a report on the initial configuration of a project-pipeline shouldn\u0027t depend on the merge-check pipeline.  It shouldn\u0027t require a noop job either.  It should be sufficient to add any project for which you want to receive config error messages to the check pipeline with an empty jobs list (jobs: []).  That might be a more suitable candidate for this recommendation.  Also, if you want to procede with this, you may want to suggest using the project regex to apply the template to all projects at once, if the circumstances are suitable (again, openstack wouldn\u0027t do that for \".*\" because of ansible and other third-party-check projects, but we might do it for \"^openstack/.*\" etc).",
+      "revId": "ff798cfd32da012d4274f194008acc6ed3ffdc38",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_310c52eb",
+        "filename": "doc/source/user/howtos/minimal-template.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-19T08:50:46Z",
+      "side": 1,
+      "message": "This anchor doesn\u0027t make sense.",
+      "revId": "ff798cfd32da012d4274f194008acc6ed3ffdc38",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_510f8edf",
+        "filename": "doc/source/user/howtos/minimal-template.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-19T08:50:46Z",
+      "side": 1,
+      "message": "This description shouldn\u0027t be openstack specific.",
+      "revId": "ff798cfd32da012d4274f194008acc6ed3ffdc38",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
