@@ -56,6 +56,13 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
         params['ssl_ca'] = get_default(self.config, 'gearman', 'ssl_ca')
 
         params['connections'] = self.connections
+        params['enable_admin_endpoints'] = get_default(
+            self.config,
+            'web',
+            'enable_admin_endpoints',
+            False)
+        params['JWTsecret'] = get_default(
+            self.config, 'web', 'JWTSecret', '')
         # Validate config here before we spin up the ZuulWeb object
         for conn_name, connection in self.connections.connections.items():
             try:
