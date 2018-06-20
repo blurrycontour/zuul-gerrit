@@ -1,0 +1,38 @@
+---
+features:
+  - |
+    Add an endpoint protection mechanism to zuul-web's REST API, based on the JWT
+    standard. A user can access protected endpoints with a valid bearer token.
+    The actions associated to these endpoints are tenant-scoped via a token claim.
+    Zuul supports token signatures using the HS256 or RS256 algorithms. External
+    JWKS are also supported.
+  - Add a "autohold" protected endpoint to zuul-web's REST API.
+  - Add a "dequeue" protected endpoint to zuul-web's REST API.
+  - Add an "enqueue" protected endpoint to zuul-web's REST API.
+  - |
+    Allow an operator to configure multiple authenticators in Zuul Web Server's
+    configuration. Authenticators define ways to validate JWTs issued by a given
+    Identity Provider, and sometimes to generate tokens as well if the signing
+    secret is known.
+upgrade:
+  - |
+    The "autohold", "dequeue" and "enqueue" endpoints are deactivated by default.
+    Activating them requires to configure at least one authenticator in zuul.conf.
+    Configuring an authenticator requires setting up a secret, depending on the
+    chosen signing algorithm.
+security:
+  - |
+    Anybody with a valid Token can perform privileged actions exposed
+    through the REST API. Furthermore revoking Tokens, especially when manually
+    issued, is not trivial.
+
+    As a mitigation, Tokens should be generated with a short time to
+    live, like 10 minutes or less. If the Token contains authorization information,
+    it should be generated with as little a scope as possible (one tenant only)
+    to reduce the surface of attack should the Token be compromised.
+
+    Exposing administration tasks can impact build results (dequeue-ing buildsets),
+    and pose potential resources problems with Nodepool if the ``autohold`` feature
+    is abused, leading to a significant number of nodes remaining in "hold" state for
+    extended periods of time. As always, "with great power comes great responsibility"
+    and Tokens should be handed over with discernment.
