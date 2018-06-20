@@ -39,6 +39,9 @@ listen_address=127.0.0.1
 port=9000
 static_cache_expiry=0
 status_url=https://zuul.example.com/status
+enable_admin_endpoints=False
+JWTsecret=NoDanaOnlyZuul
+JWTalgorithm=HS256
 
 [connection gerrit]
 driver=gerrit
