@@ -2017,7 +2017,8 @@ class WebProxyFixture(fixtures.Fixture):
 
 
 class ZuulWebFixture(fixtures.Fixture):
-    def __init__(self, gearman_server_port, config, info=None):
+    def __init__(self, gearman_server_port, config, info=None,
+                 enable_admin_endpoints=False, JWTsecret=None):
         super(ZuulWebFixture, self).__init__()
         self.gearman_server_port = gearman_server_port
         self.connections = zuul.lib.connections.ConnectionRegistry()
@@ -2029,6 +2030,8 @@ class ZuulWebFixture(fixtures.Fixture):
             self.info = zuul.model.WebInfo()
         else:
             self.info = info
+        self.enable_admin_endpoints = enable_admin_endpoints
+        self.JWTsecret = JWTsecret
 
     def _setUp(self):
         # Start the web server
@@ -2036,7 +2039,9 @@ class ZuulWebFixture(fixtures.Fixture):
             listen_address='::', listen_port=0,
             gear_server='127.0.0.1', gear_port=self.gearman_server_port,
             info=self.info,
-            connections=self.connections)
+            connections=self.connections,
+            enable_admin_endpoints=self.enable_admin_endpoints,
+            JWTsecret=self.JWTsecret)
         self.web.start()
         self.addCleanup(self.stop)
 
