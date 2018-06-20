@@ -1909,6 +1909,10 @@ class ZuulWebFixture(fixtures.Fixture):
             self.info = zuul.model.WebInfo()
         else:
             self.info = info
+        self.enable_admin_endpoints = config.get('web',
+                                                 'enable_admin_endpoints')
+        self.JWTsecret = config.get('web',
+                                    'JWTsecret')
 
     def _setUp(self):
         # Start the web server
@@ -1916,7 +1920,9 @@ class ZuulWebFixture(fixtures.Fixture):
             listen_address='::', listen_port=0,
             gear_server='127.0.0.1', gear_port=self.gearman_server_port,
             info=self.info,
-            connections=self.connections)
+            connections=self.connections,
+            enable_admin_endpoints=self.enable_admin_endpoints,
+            JWTsecret=self.JWTsecret)
         self.web.start()
         self.addCleanup(self.stop)
 
