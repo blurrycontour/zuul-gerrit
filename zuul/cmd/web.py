@@ -17,6 +17,8 @@ import logging
 import signal
 import sys
 
+import jwt.algorithms as ja
+
 import zuul.cmd
 import zuul.model
 import zuul.web
@@ -56,6 +58,22 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
         params['ssl_ca'] = get_default(self.config, 'gearman', 'ssl_ca')
 
         params['connections'] = self.connections
+        params['enable_admin_endpoints'] = get_default(
+            self.config,
+            'web',
+            'enable_admin_endpoints',
+            False)
+        params['JWTsecret'] = get_default(
+            self.config, 'web', 'JWTsecret', '')
+        params['JWTalgorithm'] = get_default(
+            self.config, 'web', 'JWTalgorithm', '')
+        default_algorithms = ja.get_default_algorithms().keys()
+        if (params['enable_admin_endpoints'] and
+           params['JWTalgorithm'] not in default_algorithms):
+            msg = "Unknown JWT algorithm %s, allowed algorithms: %s"
+            self.log.exception(msg % (params['JWTalgorithm'],
+                                      ', '.join(default_algorithms)))
+            sys.exit(1)
         # Validate config here before we spin up the ZuulWeb object
         for conn_name, connection in self.connections.connections.items():
             try:
