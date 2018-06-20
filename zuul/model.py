@@ -4116,7 +4116,7 @@ class WebInfo(object):
             stats_prefix=get_default(config, 'statsd', 'prefix'),
             stats_type=get_default(config, 'web', 'stats_type', 'graphite'),
             stats_url=get_default(config, 'web', 'stats_url', None),
-            websocket_url=get_default(config, 'web', 'websocket_url', None),
+            websocket_url=get_default(config, 'web', 'websocket_url', None)
         )
 
     def toDict(self):
