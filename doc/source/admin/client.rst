@@ -1,5 +1,7 @@
 :title: Zuul Client
 
+.. _zuul_client:
+
 Zuul Client
 ===========
 
