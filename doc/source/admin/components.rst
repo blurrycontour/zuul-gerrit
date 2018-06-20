@@ -712,6 +712,25 @@ sections of ``zuul.conf`` are used by the web server:
       The Cache-Control max-age response header value for static files served
       by the zuul-web. Set to 0 during development to disable Cache-Control.
 
+   .. attr:: enable_admin_endpoints
+      :default: False
+
+      Whether to enable the Admin Web API or not. By default, these endpoints
+      are not enabled.
+      If set to True, the JWT-related parameters below must be set as well.
+
+   .. attr:: JWTsecret
+
+      A secret passphrase used to sign JWTs (JSON Web Tokens). JWTs are used
+      to access the Admin Web API.
+
+   .. attr:: JWTalgorithm
+      :default: HS256
+
+      The signing algorithm to use when handling JWTs. The possible values are
+      the algorithms supported by pyJWT, as listed here:
+      https://pyjwt.readthedocs.io/en/latest/algorithms.html
+
 Operation
 ~~~~~~~~~
 
