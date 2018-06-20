@@ -1,0 +1,11 @@
+Code-Review+1: Tristan Cacqueray <tdecacqu@redhat.com>
+Code-Review+1: Tomi Juvonen <tomi.juvonen@nokia.com>
+Code-Review+2: Tobias Henkel <tobias.henkel@bmw.de>
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Workflow+1: Monty Taylor <mordred@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Wed, 20 Jun 2018 12:45:39 +0000
+Reviewed-on: https://review.openstack.org/576684
+Project: openstack-infra/zuul
+Branch: refs/heads/master
