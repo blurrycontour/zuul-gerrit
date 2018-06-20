@@ -19,10 +19,12 @@ import json
 import os
 import urllib.parse
 import socket
+import jwt
 
 import requests
 
 import zuul.web
+import zuul.rpcclient
 
 from tests.base import ZuulTestCase, ZuulDBTestCase, FIXTURE_DIR
 from tests.base import ZuulWebFixture
@@ -48,13 +50,16 @@ class BaseTestWeb(ZuulTestCase):
         super(BaseTestWeb, self).setUp()
 
         self.zuul_ini_config = FakeConfig(self.config_ini_data)
-
+        enable_admin_endpoints = self.zuul_ini_config.get(
+            'web', 'enable_admin_endpoints')
         # Start the web server
         self.web = self.useFixture(
             ZuulWebFixture(
                 self.gearman_server.port,
                 self.config,
-                info=zuul.model.WebInfo.fromConfig(self.zuul_ini_config)))
+                info=zuul.model.WebInfo.fromConfig(self.zuul_ini_config),
+                enable_admin_endpoints=enable_admin_endpoints,
+                JWTsecret=self.zuul_ini_config.get('web', 'JWTsecret')))
 
         self.executor_server.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
@@ -79,6 +84,10 @@ class BaseTestWeb(ZuulTestCase):
 
     def get_url(self, url, *args, **kwargs):
         return requests.get(
+            urllib.parse.urljoin(self.base_url, url), *args, **kwargs)
+
+    def post_url(self, url, *args, **kwargs):
+        return requests.post(
             urllib.parse.urljoin(self.base_url, url), *args, **kwargs)
 
     def tearDown(self):
@@ -269,6 +278,31 @@ class TestWeb(BaseTestWeb):
         resp = self.get_url("api/tenant/non-tenant/status")
         self.assertEqual(404, resp.status_code)
 
+    def test_admin_routes_403_by_default(self):
+        resp = self.get_url("api/tenant/tenant-one/autohold")
+        self.assertEqual(403, resp.status_code)
+        resp = self.post_url("api/tenant/tenant-one/autohold",
+                             json={'project': 'org/project',
+                                   'job': 'project-test1',
+                                   'count': 1,
+                                   'reason': 'because',
+                                   'node_hold_expiration': 36000})
+        self.assertEqual(403, resp.status_code)
+        resp = self.post_url(
+            "api/tenant/tenant-one/project/org/project/enqueue",
+            json={'trigger': 'gerrit',
+                  'change': '2,1',
+                  'pipeline': 'check'})
+        self.assertEqual(403, resp.status_code)
+        resp = self.post_url(
+            "api/tenant/tenant-one/project/org/project/enqueue",
+            json={'trigger': 'gerrit',
+                  'ref': 'abcd',
+                  'newrev': 'aaaa',
+                  'oldrev': 'bbbb',
+                  'pipeline': 'check'})
+        self.assertEqual(403, resp.status_code)
+
 
 class TestInfo(BaseTestWeb):
 
@@ -285,6 +319,7 @@ class TestInfo(BaseTestWeb):
         self.assertEqual(
             info, {
                 "info": {
+                    "admin_endpoints_enabled": False,
                     "capabilities": {
                         "job_history": False
                     },
@@ -302,6 +337,7 @@ class TestInfo(BaseTestWeb):
         self.assertEqual(
             info, {
                 "info": {
+                    "admin_endpoints_enabled": False,
                     "tenant": "tenant-one",
                     "capabilities": {
                         "job_history": False
@@ -349,3 +385,113 @@ class TestBuildInfo(ZuulDBTestCase, BaseTestWeb):
 
         builds = self.get_url("api/tenant/tenant-one/builds").json()
         self.assertEqual(len(builds), 6)
+
+
+class TestTenantScopedWebApi(BaseTestWeb):
+    config_ini_data = {
+        'web': {
+            'enable_admin_endpoints': True,
+            'JWTsecret': 'NoDanaOnlyZuul',
+        }
+    }
+
+    def test_admin_routes_no_token(self):
+        resp = self.get_url("api/tenant/tenant-one/autohold")
+        self.assertEqual(401, resp.status_code)
+        resp = self.post_url("api/tenant/tenant-one/autohold",
+                             json={'project': 'org/project',
+                                   'job': 'project-test1',
+                                   'count': 1,
+                                   'reason': 'because',
+                                   'node_hold_expiration': 36000})
+        self.assertEqual(401, resp.status_code)
+        resp = self.post_url(
+            "api/tenant/tenant-one/project/org/project/enqueue",
+            json={'trigger': 'gerrit',
+                  'change': '2,1',
+                  'pipeline': 'check'})
+        self.assertEqual(401, resp.status_code)
+        resp = self.post_url(
+            "api/tenant/tenant-one/project/org/project/enqueue",
+            json={'trigger': 'gerrit',
+                  'ref': 'abcd',
+                  'newrev': 'aaaa',
+                  'oldrev': 'bbbb',
+                  'pipeline': 'check'})
+        self.assertEqual(401, resp.status_code)
+
+    def test_invalid_JWT_token(self):
+        authz = {'iss': 'me', 'zuul.tenants': ['tenant-one', ]}
+        token = jwt.encode(authz, key='OnlyZuulNoDana', algorithm='HS256')
+        resp = self.get_url(
+            "api/tenant/tenant-one/autohold",
+            headers={'Authorization': 'Bearer %s' % token})
+        self.assertEqual(401, resp.status_code)
+        resp = self.post_url("api/tenant/tenant-one/autohold",
+                             headers={'Authorization': 'Bearer %s' % token},
+                             json={'project': 'org/project',
+                                   'job': 'project-test1',
+                                   'count': 1,
+                                   'reason': 'because',
+                                   'node_hold_expiration': 36000})
+        self.assertEqual(401, resp.status_code)
+        resp = self.post_url(
+            "api/tenant/tenant-one/project/org/project/enqueue",
+            headers={'Authorization': 'Bearer %s' % token},
+            json={'trigger': 'gerrit',
+                  'change': '2,1',
+                  'pipeline': 'check'})
+        self.assertEqual(401, resp.status_code)
+        resp = self.post_url(
+            "api/tenant/tenant-one/project/org/project/enqueue",
+            headers={'Authorization': 'Bearer %s' % token},
+            json={'trigger': 'gerrit',
+                  'ref': 'abcd',
+                  'newrev': 'aaaa',
+                  'oldrev': 'bbbb',
+                  'pipeline': 'check'})
+        self.assertEqual(401, resp.status_code)
+
+    def test_valid_JWT_bad_tenants(self):
+        authz = {'iss': 'me', 'zuul.tenants': ['tenant-six', 'tenant-ten']}
+        token = jwt.encode(authz, key='NoDanaOnlyZuul', algorithm='HS256')
+        resp = self.get_url(
+            "api/tenant/tenant-one/autohold",
+            headers={'Authorization': 'Bearer %s' % token})
+        self.assertEqual(401, resp.status_code)
+        resp = self.post_url("api/tenant/tenant-one/autohold",
+                             headers={'Authorization': 'Bearer %s' % token},
+                             json={'project': 'org/project',
+                                   'job': 'project-test1',
+                                   'count': 1,
+                                   'reason': 'because',
+                                   'node_hold_expiration': 36000})
+        self.assertEqual(401, resp.status_code)
+        resp = self.post_url(
+            "api/tenant/tenant-one/project/org/project/enqueue",
+            headers={'Authorization': 'Bearer %s' % token},
+            json={'trigger': 'gerrit',
+                  'change': '2,1',
+                  'pipeline': 'check'})
+        self.assertEqual(401, resp.status_code)
+        resp = self.post_url(
+            "api/tenant/tenant-one/project/org/project/enqueue",
+            headers={'Authorization': 'Bearer %s' % token},
+            json={'trigger': 'gerrit',
+                  'ref': 'abcd',
+                  'newrev': 'aaaa',
+                  'oldrev': 'bbbb',
+                  'pipeline': 'check'})
+        self.assertEqual(401, resp.status_code)
+
+    def test_autohold(self):
+        # TODO
+        self.assertEqual(1, 0)
+
+    def test_autohold_list(self):
+        # TODO
+        self.assertEqual(1, 0)
+
+    def test_enqueue(self):
+        # TODO
+        self.assertEqual(1, 0)
