@@ -3962,13 +3962,15 @@ class WebInfo(object):
 
     def __init__(self, websocket_url=None,
                  capabilities=None, stats_url=None,
-                 stats_prefix=None, stats_type=None):
+                 stats_prefix=None, stats_type=None,
+                 admin_endpoints_enabled=False):
         self.capabilities = capabilities or Capabilities()
         self.stats_prefix = stats_prefix
         self.stats_type = stats_type
         self.stats_url = stats_url
         self.tenant = None
         self.websocket_url = websocket_url
+        self.admin_endpoints_enabled = admin_endpoints_enabled
 
     def __repr__(self):
         return '<WebInfo 0x%x capabilities=%s>' % (
@@ -3980,7 +3982,8 @@ class WebInfo(object):
             stats_prefix=self.stats_prefix,
             stats_type=self.stats_type,
             stats_url=self.stats_url,
-            websocket_url=self.websocket_url)
+            websocket_url=self.websocket_url,
+            admin_endpoints_enabled=self.admin_endpoints_enabled)
 
     @staticmethod
     def fromConfig(config):
@@ -3989,6 +3992,8 @@ class WebInfo(object):
             stats_type=get_default(config, 'web', 'stats_type', 'graphite'),
             stats_url=get_default(config, 'web', 'stats_url', None),
             websocket_url=get_default(config, 'web', 'websocket_url', None),
+            admin_endpoints_enabled=get_default(
+                config, 'web', 'enable_admin_endpoints', False)
         )
 
     def toDict(self):
@@ -4002,4 +4007,5 @@ class WebInfo(object):
         d['stats'] = stats
         if self.tenant:
             d['tenant'] = self.tenant
+        d['admin_endpoints_enabled'] = self.admin_endpoints_enabled
         return d
