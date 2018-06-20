@@ -916,7 +916,7 @@ class GithubConnection(BaseConnection):
             else:
                 self.log.error(str(e), exc_info=True)
 
-        return self._project_branch_cache[project.name]
+        return self._project_branch_cache.get(project.name, [])
 
     def getPullUrl(self, project, number):
         return '%s/pull/%s' % (self.getGitwebUrl(project), number)
