@@ -572,9 +572,8 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         }
         return event
 
-    def review(self, project, changeid, message, action):
-        number, ps = changeid.split(',')
-        change = self.changes[int(number)]
+    def review(self, change, message, action):
+        change = self.changes[int(change.number)]
 
         # Add the approval back onto the change (ie simulate what gerrit would
         # do).
