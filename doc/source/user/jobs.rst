@@ -569,6 +569,25 @@ To set the log URL for a build, use *zuul_return* to set the
           zuul:
             log_url: http://logs.example.com/path/to/build/logs
 
+To instruct the reporters to leave line comments on files in the
+change, set the **zuul.file_comments** value.  For example:
+
+.. code-block:: yaml
+
+  tasks:
+    - zuul_return:
+        data:
+          zuul:
+            file_comments:
+	      path/to/file.py:
+	        - line: 42
+		  message: "Line too long"
+		- line: 82
+		  message: "Line too short"
+
+Not all reporters currently support line comments; in these cases,
+reporters will simply ignore this data.
+
 Any values other than those in the ``zuul`` hierarchy will be supplied
 as Ansible variables to child jobs.  These variables have less
 precedence than any other type of variable in Zuul, so be sure their
