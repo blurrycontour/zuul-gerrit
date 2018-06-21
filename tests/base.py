@@ -655,10 +655,10 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         }
         return event
 
-    def review(self, change, message, action):
+    def review(self, change, message, action, file_comments):
         if self.web_server:
             return super(FakeGerritConnection, self).review(
-                change, message, action)
+                change, message, action, file_comments)
         self._test_handle_review(int(change.number), message, action)
 
     def _test_handle_review(self, change_number, message, action):
