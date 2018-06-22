@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_3793865e",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 741,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-06-22T22:10:14Z",
+      "side": 1,
+      "message": "The cache lookup is done with patchset as part of the key. I think it is safe to do the below in this case. Basically each \"patchset\" will have a timestamp of when it was originally pushed within zuul.",
+      "revId": "bb1a5ef0a80a7f80169d0391237a17e052696214",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
