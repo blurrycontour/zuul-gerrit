@@ -840,8 +840,9 @@ class GithubConnection(BaseConnection):
         change.labels = change.pr.get('labels')
         # ensure message is at least an empty string
         change.message = change.pr.get('body') or ''
-        change.updated_at = self._ghTimestampToDate(
-            change.pr.get('updated_at'))
+        if not change.updated_at:
+            change.updated_at = self._ghTimestampToDate(
+                change.pr.get('updated_at'))
         change.url = change.pr.get('url')
         change.uris = [
             '%s/%s/pull/%s' % (self.server, change.project.name,
