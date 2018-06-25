@@ -2230,6 +2230,7 @@ class ZuulTestCase(BaseTestCase):
             os.path.join(self.test_root, 'scheduler.socket'))
         self.config.set('merger', 'git_dir', self.merger_src_root)
         self.config.set('executor', 'git_dir', self.executor_src_root)
+        self.config.set('executor', 'hostname', 'ze01.example.org')
         self.config.set('executor', 'private_key_file', self.private_key_file)
         self.config.set('executor', 'state_dir', self.executor_state_root)
         self.config.set(
