@@ -782,10 +782,10 @@ class JobParser(object):
             job.allowed_projects = frozenset(allowed)
 
         branches = None
-        if ('branches' not in conf):
-            branches = self._getImpliedBranches(job)
-        if (not branches) and ('branches' in conf):
+        if 'branches' in conf:
             branches = as_list(conf['branches'])
+        elif not project_pipeline:
+            branches = self._getImpliedBranches(job)
         if branches:
             job.setBranchMatcher(branches)
         if 'files' in conf:
@@ -868,6 +868,13 @@ class ProjectTemplateParser(object):
             self.parseJobList(
                 conf_pipeline.get('jobs', []),
                 source_context, start_mark, project_pipeline.job_list)
+
+        if not conf['_source_context'].trusted:
+            # If this project definition is in a place where it
+            # should get implied branch matchers, set it.
+            project_template.addImpliedBranchMatcher(
+                conf['_source_context'].branch)
+
         if freeze:
             project_template.freeze()
         return project_template
@@ -956,12 +963,6 @@ class ProjectParser(object):
                 fromYaml(conf, validate=False, freeze=False)
 
             project_config.name = project.canonical_name
-
-            if not conf['_source_context'].trusted:
-                # If this project definition is in a place where it
-                # should get implied branch matchers, set it.
-                project_config.addImpliedBranchMatcher(
-                    conf['_source_context'].branch)
 
         # Add templates
         for name in conf.get('templates', []):
