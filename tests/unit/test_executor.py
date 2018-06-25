@@ -464,6 +464,25 @@ class TestGovernor(ZuulTestCase):
         self.executor_server.manageLoad()
         self.assertFalse(self.executor_server.accepting_work)
 
+    @mock.patch('os.statvfs')
+    def test_hdd_governor(self, statvfs_mock):
+        class Dummy(object):
+            pass
+        hdd = Dummy()
+        hdd.f_frsize = 4096
+        hdd.f_blocks = 120920708
+        hdd.f_bfree = 95716701
+        statvfs_mock.return_value = hdd  # 20.84% used
+
+        self.executor_server.manageLoad()
+        self.assertTrue(self.executor_server.accepting_work)
+
+        hdd.f_bfree = 5716701
+        statvfs_mock.return_value = hdd  # 95.27% used
+
+        self.executor_server.manageLoad()
+        self.assertFalse(self.executor_server.accepting_work)
+
     def test_pause_governor(self):
         self.executor_server.manageLoad()
         self.assertTrue(self.executor_server.accepting_work)
