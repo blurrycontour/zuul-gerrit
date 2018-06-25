@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_cf0dbc35",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 844,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-25T16:14:22Z",
+      "side": 1,
+      "message": "I think this warrants a note (probably something like the last paragraph of the commit message) to explain why we\u0027re only conditionally setting this here.  Otherwise, it looks a bit like a bug that someone may want to fix later.",
+      "revId": "ed03b8bdc65f755a25c86d045b6a5ed37ca188e1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
