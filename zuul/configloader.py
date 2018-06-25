@@ -782,10 +782,10 @@ class JobParser(object):
             job.allowed_projects = frozenset(allowed)
 
         branches = None
-        if ('branches' not in conf):
-            branches = self._getImpliedBranches(job)
-        if (not branches) and ('branches' in conf):
+        if 'branches' in conf:
             branches = as_list(conf['branches'])
+        elif not project_pipeline:
+            branches = self._getImpliedBranches(job)
         if branches:
             job.setBranchMatcher(branches)
         if 'files' in conf:
