@@ -183,6 +183,11 @@ class ExecutorClient(object):
         zuul_params['projects'] = {}  # Set below
         zuul_params['items'] = dependent_changes
 
+        child_jobs = []
+        for child_job in item.job_graph.getDirectDependentJobs(job.name):
+            child_jobs.append(child_job)
+        zuul_params['child_jobs'] = child_jobs
+
         params = dict()
         params['job'] = job.name
         params['timeout'] = job.timeout
