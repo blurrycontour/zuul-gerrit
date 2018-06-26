@@ -21,6 +21,10 @@
     run: playbooks/data-return.yaml
 
 - job:
+    name: data-return-child-jobs
+    run: playbooks/data-return-child-jobs.yaml
+
+- job:
     name: data-return-relative
     success-url: docs/index.html
     run: playbooks/data-return-relative.yaml
@@ -39,3 +43,15 @@
             dependencies:
               - data-return
               - data-return-relative
+
+- project:
+    name: org/project1
+    check:
+      jobs:
+        - data-return-child-jobs
+        - data-return:
+            dependencies:
+              - data-return-child-jobs
+        - child:
+            dependencies:
+              - data-return-child-jobs
