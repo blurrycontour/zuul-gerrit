@@ -1802,14 +1802,24 @@ class QueueItem(object):
     def didAllJobsSucceed(self):
         if not self.hasJobGraph():
             return False
+
+        skipped = True
         for job in self.getJobs():
             if not job.voting:
                 continue
             build = self.current_build_set.getBuild(job.name)
             if not build:
                 return False
-            if build.result != 'SUCCESS':
+            if build.result == 'SKIPPED':
+                continue
+            elif build.result != 'SUCCESS':
                 return False
+            skipped = False
+
+        # NOTE(pabelanger): We shouldn't be able to skip all jobs.
+        if skipped:
+            return False
+
         return True
 
     def didAnyJobFail(self):
@@ -1971,12 +1981,29 @@ class QueueItem(object):
     def setResult(self, build):
         if build.retry:
             self.removeBuild(build)
+            return
+
+        skipped = []
+        # NOTE(pabelanger): Check successful jobs to see if job returned list
+        # of child jobs to skip.
+        zuul_return = build.result_data.get('zuul', {}).get('child_jobs')
+        if zuul_return:
+            dependent_jobs = self.job_graph.getDirectDependentJobs(
+                build.job.name)
+            child_jobs_diff = dependent_jobs.symmetric_difference(zuul_return)
+
+            for skip in child_jobs_diff:
+                skipped.append(self.job_graph.jobs.get(skip))
+                skipped += self.job_graph.getDependentJobsRecursively(skip)
+
         elif build.result != 'SUCCESS':
-            for job in self.job_graph.getDependentJobsRecursively(
-                    build.job.name):
-                fakebuild = Build(job, None)
-                fakebuild.result = 'SKIPPED'
-                self.addBuild(fakebuild)
+            skipped += self.job_graph.getDependentJobsRecursively(
+                build.job.name)
+
+        for job in skipped:
+            fakebuild = Build(job, None)
+            fakebuild.result = 'SKIPPED'
+            self.addBuild(fakebuild)
 
     def setNodeRequestFailure(self, job):
         fakebuild = Build(job, None)
