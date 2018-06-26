@@ -8,6 +8,12 @@
           - nodepool.region == 'test-region'
           - nodepool.provider == 'test-provider'
 
+    - name: Assert zuul variables are valid.
+      assert:
+        that:
+          - zuul.child_jobs is defined
+          - "'check-hostvars' in zuul.child_jobs"
+
     - name: Assert zuul-executor variables are valid.
       assert:
         that:
