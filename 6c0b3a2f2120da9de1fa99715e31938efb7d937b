@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_ced4be49",
+        "filename": "tests/fakegithub.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-26T20:30:47Z",
+      "side": 1,
+      "message": "Nit: obsolete/misleading comment",
+      "revId": "6c0b3a2f2120da9de1fa99715e31938efb7d937b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_6ec7aa99",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 830,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-26T20:30:47Z",
+      "side": 1,
+      "message": "I guess this is still sufficient to change the project2 zuul.yaml to a valid config.",
+      "revId": "6c0b3a2f2120da9de1fa99715e31938efb7d937b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
