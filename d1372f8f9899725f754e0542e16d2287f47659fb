@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_4fb1a38e",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2012,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-06-26T01:06:17Z",
+      "side": 1,
+      "message": "Nit: how about using a setPause method and use the sensor logger to track such event?",
+      "revId": "d1372f8f9899725f754e0542e16d2287f47659fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
