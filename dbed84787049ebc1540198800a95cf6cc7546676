@@ -16,6 +16,24 @@
       "revId": "dbed84787049ebc1540198800a95cf6cc7546676",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_37e6f417",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 565,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-06-26T13:27:07Z",
+      "side": 1,
+      "message": "It was suggest by both jeblair and fungi to do a percentage, but absolute value would also work.  I don\u0027t really have a preference myself.",
+      "parentUuid": "5f7c97a3_8fd81b52",
+      "revId": "dbed84787049ebc1540198800a95cf6cc7546676",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
