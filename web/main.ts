@@ -12,6 +12,10 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
+// Enable prodMode early. TODO: do not run this on dev mode
+import { enableProdMode } from '@angular/core'
+enableProdMode();
+
 import 'zone.js'
 import 'reflect-metadata'
 

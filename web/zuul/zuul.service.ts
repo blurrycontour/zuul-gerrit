@@ -37,13 +37,14 @@ class ZuulService {
   }
 
   getSourceUrl (filename: string, tenant?: string): string {
+    const baseHref = getBaseHrefFromPath(window.location.pathname)
     if (tenant) {
       // Multi-tenant deploy. This is at t/a-tenant/x.html
-      return `${this.baseHref}/api/tenant/${tenant}/${filename}`
+      return `${baseHref}api/tenant/${tenant}/${filename}`
     } else {
       // Whitelabel deploy or tenants list, such as /status.html,
       // /tenants.html or /zuul/status.html or /zuul/tenants.html
-      return `${this.baseHref}/api/${filename}`
+      return `${baseHref}api/${filename}`
     }
   }
 

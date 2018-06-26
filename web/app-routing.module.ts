@@ -14,7 +14,7 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import { NgModule, isDevMode } from '@angular/core'
+import { NgModule } from '@angular/core'
 import { RouterModule, Routes } from '@angular/router'
 
 import BuildsComponent from './builds/builds.component'
@@ -58,6 +58,10 @@ const appRoutes: Routes = [
     component: StreamComponent
   },
   {
+    path: 't/tenants.html',
+    component: TenantsComponent
+  },
+  {
     path: 'tenants.html',
     component: TenantsComponent
   },
@@ -73,7 +77,8 @@ const appRoutes: Routes = [
       appRoutes,
       // Enable router tracing in devel mode. This prints router decisions
       // to the console.log.
-      { enableTracing: isDevMode() }
+      // TODO: make this true on dev mode
+      { enableTracing: false }
     )],
   exports: [RouterModule]
 })
