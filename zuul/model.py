@@ -1802,14 +1802,24 @@ class QueueItem(object):
     def didAllJobsSucceed(self):
         if not self.hasJobGraph():
             return False
+
+        skipped = True
         for job in self.getJobs():
             if not job.voting:
                 continue
             build = self.current_build_set.getBuild(job.name)
             if not build:
                 return False
-            if build.result != 'SUCCESS':
+            if build.result == 'SKIPPED':
+                continue
+            elif build.result != 'SUCCESS':
                 return False
+            skipped = False
+
+        # NOTE(pabelanger): We shouldn't be able to skip all jobs.
+        if skipped:
+            return False
+
         return True
 
     def didAnyJobFail(self):
@@ -1890,6 +1900,27 @@ class QueueItem(object):
                     successful_job_names.add(job.name)
             else:
                 jobs_not_started.add(job)
+
+        # NOTE(pabelanger): Check successful jobs to see if job returned list
+        # of child jobs to skip.
+        for job in successful_job_names:
+            build = self.current_build_set.getBuild(job)
+            zuul_return = build.result_data.get('zuul', {}).get('child_jobs')
+            if not zuul_return:
+                continue
+
+            dependent_jobs = self.job_graph.getDirectDependentJobs(job)
+            child_jobs_diff = dependent_jobs.symmetric_difference(zuul_return)
+
+            skipped = []
+            for skip in child_jobs_diff:
+                skipped.append(self.job_graph.jobs.get(skip))
+                skipped += self.job_graph.getDependentJobsRecursively(skip)
+
+            for job in skipped:
+                fakebuild = Build(job, None)
+                fakebuild.result = 'SKIPPED'
+                self.addBuild(fakebuild)
 
         # Attempt to run jobs in the order they appear in
         # configuration.

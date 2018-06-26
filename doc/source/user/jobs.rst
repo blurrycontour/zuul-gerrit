@@ -580,6 +580,22 @@ To set the log URL for a build, use *zuul_return* to set the
           zuul:
             log_url: http://logs.example.com/path/to/build/logs
 
+To skip a child job for current build, use *zuul_return* to set the
+**zuul.child_jobs** value. For example:
+
+.. code-block:: yaml
+
+  tasks:
+    - zuul_return:
+        data:
+          zuul:
+            child_jobs:
+              - child_jobA
+              - child_jobC
+
+Will tell zuul to only run the child_jobA and child_jobC for per-configured
+child jobs. If child_jobB was configured, it would be now marked as SKIPPED.
+
 Any values other than those in the ``zuul`` hierarchy will be supplied
 as Ansible variables to child jobs.  These variables have less
 precedence than any other type of variable in Zuul, so be sure their
