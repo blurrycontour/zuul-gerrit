@@ -15,6 +15,13 @@
           - zuul.child_jobs|length == 1
           - "'check-hostvars' in zuul.child_jobs"
 
+    - name: test
+      zuul_return:
+        data:
+          zuul:
+            skip_child_jobs:
+              - check-hostvars
+
     - name: Assert zuul-executor variables are valid.
       assert:
         that:

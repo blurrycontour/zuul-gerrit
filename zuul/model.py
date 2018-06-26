@@ -1884,6 +1884,23 @@ class QueueItem(object):
             else:
                 jobs_not_started.add(job)
 
+        # NOTE(pabelanger): Check successful jobs to see if job returned list
+        # of child jobs to skip.
+        for job in successful_job_names:
+            build = self.current_build_set.getBuild(job)
+            zuul_return = build.result_data.get('zuul', {}).get('skip_child_jobs')
+            if zuul_return:
+                skipped = []
+                for skip in zuul_return:
+                    skipped.append(self.job_graph.jobs.get(skip))
+                    for job in self.job_graph.getDependentJobsRecursively(skip):
+                        skipped.append(job)
+
+                for job in skipped:
+                    fakebuild = Build(job, None)
+                    fakebuild.result = 'SKIPPED'
+                    self.addBuild(fakebuild)
+
         # Attempt to run jobs in the order they appear in
         # configuration.
         for job in self.job_graph.getJobs():
