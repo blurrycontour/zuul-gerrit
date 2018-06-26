@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_8fd81b52",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 565,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-06-26T00:20:21Z",
+      "side": 1,
+      "message": "Why not using an absolute value?",
+      "revId": "dbed84787049ebc1540198800a95cf6cc7546676",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
