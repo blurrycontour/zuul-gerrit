@@ -2827,6 +2827,24 @@ class TestDataReturn(AnsibleZuulTestCase):
                       'http://example.com/test/log/url/docs/index.html',
                       A.messages[-1])
 
+    def test_data_return_child_jobs(self):
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='data-return-child-jobs', result='SUCCESS',
+                 changes='1,1'),
+            dict(name='data-return', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+        self.assertIn(
+            '- data-return-child-jobs http://example.com/test/log/url/',
+            A.messages[-1])
+        self.assertIn(
+            '- data-return http://example.com/test/log/url/',
+            A.messages[-1])
+        self.assertIn('child : SKIPPED', A.messages[-1])
+        self.assertIn('Build succeeded', A.messages[-1])
+
 
 class TestDiskAccounting(AnsibleZuulTestCase):
     config_file = 'zuul-disk-accounting.conf'
