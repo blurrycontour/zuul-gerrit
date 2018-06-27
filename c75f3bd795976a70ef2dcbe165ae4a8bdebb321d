@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "5f7c97a3_f36b9e1b",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 565,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-06-27T05:59:07Z",
+      "side": 1,
+      "message": "percentage",
+      "range": {
+        "startLine": 565,
+        "startChar": 26,
+        "endLine": 565,
+        "endChar": 36
+      },
+      "revId": "c75f3bd795976a70ef2dcbe165ae4a8bdebb321d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_53261269",
         "filename": "zuul/executor/sensors/hdd.py",
         "patchSetId": 5
@@ -18,6 +41,75 @@
         "startChar": 2,
         "endLine": 1,
         "endChar": 32
+      },
+      "revId": "c75f3bd795976a70ef2dcbe165ae4a8bdebb321d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_7361ce38",
+        "filename": "zuul/executor/sensors/hdd.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-06-27T05:59:07Z",
+      "side": 1,
+      "message": "percent",
+      "range": {
+        "startLine": 27,
+        "startChar": 4,
+        "endLine": 27,
+        "endChar": 11
+      },
+      "revId": "c75f3bd795976a70ef2dcbe165ae4a8bdebb321d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_93c90a26",
+        "filename": "zuul/executor/sensors/hdd.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-06-27T05:59:07Z",
+      "side": 1,
+      "message": "Just saw that get_default breaks on None values so we should either fix that or make the config argument non-optional.",
+      "range": {
+        "startLine": 37,
+        "startChar": 12,
+        "endLine": 37,
+        "endChar": 23
+      },
+      "revId": "c75f3bd795976a70ef2dcbe165ae4a8bdebb321d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_f3871eb5",
+        "filename": "zuul/executor/sensors/hdd.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-06-27T05:59:07Z",
+      "side": 1,
+      "message": "Side note: I noticed that we scattered the hard coded /var/lib/zuul all around the code base. Maybe we should add a constants file where we put such stuff. But that is no topic for this change.",
+      "range": {
+        "startLine": 39,
+        "startChar": 46,
+        "endLine": 39,
+        "endChar": 59
       },
       "revId": "c75f3bd795976a70ef2dcbe165ae4a8bdebb321d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
