@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_53261269",
+        "filename": "zuul/executor/sensors/hdd.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-06-27T05:25:52Z",
+      "side": 1,
+      "message": "I would like to have you as a colleague but that seems to be wrong ;)",
+      "range": {
+        "startLine": 1,
+        "startChar": 2,
+        "endLine": 1,
+        "endChar": 32
+      },
+      "revId": "c75f3bd795976a70ef2dcbe165ae4a8bdebb321d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
