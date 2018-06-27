@@ -1,0 +1,11 @@
+Code-Review+1: Tristan Cacqueray <tdecacqu@redhat.com>
+Code-Review+2: Paul Belanger <pabelanger@redhat.com>
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Wed, 27 Jun 2018 21:40:35 +0000
+Reviewed-on: https://review.openstack.org/577827
+Project: openstack-infra/zuul
+Branch: refs/heads/master
