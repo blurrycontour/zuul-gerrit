@@ -2750,10 +2750,11 @@ class ExecutorServer(object):
     def refstate(self, job):
         args = json.loads(job.arguments)
         zuul_event_id = args.get('zuul_event_id')
-        success, repo_state = self.merger.getRepoState(
+        success, repo_state, item_in_branches = self.merger.getRepoState(
             args['items'], repo_locks=self.repo_locks)
         result = dict(updated=success,
-                      repo_state=repo_state)
+                      repo_state=repo_state,
+                      item_in_branches=item_in_branches)
         result['zuul_event_id'] = zuul_event_id
         job.sendWorkComplete(json.dumps(result))
 

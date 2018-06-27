@@ -528,6 +528,19 @@ class Repo(object):
                 return int(m.group(1))
         return None
 
+    def contains(self, hexsha):
+        repo = self.createRepoObject()
+        try:
+            branches = repo.git.branch(contains=hexsha, color='never')
+        except git.GitCommandError as e:
+            if e.status == 129:
+                self.log.debug("Found commit %s in no branches" % (hexsha,))
+                return []
+        branches = [x.replace('*', '').strip() for x in branches.split('\n')]
+        branches = [x for x in branches if x != '(no branch)']
+        self.log.debug("Found commit %s in branches: %s" % (hexsha, branches))
+        return branches
+
 
 class Merger(object):
     def __init__(self, working_root, connections, email, username,
@@ -798,6 +811,8 @@ class Merger(object):
         seen = set()
         recent = {}
         repo_state = {}
+        # A list of branch names the last item appears in.
+        item_in_branches = []
         for item in items:
             # If we're in the executor context we have the repo_locks object
             # and perform per repo locking.
@@ -814,7 +829,7 @@ class Merger(object):
                         repo.reset()
                     except Exception:
                         self.log.exception("Unable to reset repo %s" % repo)
-                        return (False, {})
+                        return (False, {}, [])
 
                     self._saveRepoState(item['connection'], item['project'],
                                         repo, repo_state, recent)
@@ -825,7 +840,10 @@ class Merger(object):
                     self._alterRepoState(
                         item['connection'], item['project'], repo_state,
                         item['ref'], item['newrev'])
-        return (True, repo_state)
+        item = items[-1]
+        repo = self.getRepo(item['connection'], item['project'])
+        item_in_branches = repo.contains(item['newrev'])
+        return (True, repo_state, item_in_branches)
 
     def getFiles(self, connection_name, project_name, branch, files, dirs=[]):
         repo = self.getRepo(connection_name, project_name)
