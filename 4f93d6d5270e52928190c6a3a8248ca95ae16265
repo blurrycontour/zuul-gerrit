@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_0dc13c82",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-06-27T23:04:14Z",
+      "side": 1,
+      "message": "This commit message is a shining example for us all to live by. Thanks for answering \"why is this change needed\" so eloquently.",
+      "revId": "4f93d6d5270e52928190c6a3a8248ca95ae16265",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
