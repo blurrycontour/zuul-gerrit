@@ -147,6 +147,7 @@ class MergeClient(object):
         commit = data.get('commit')
         files = data.get('files', {})
         repo_state = data.get('repo_state', {})
+        item_in_branches = data.get('item_in_branches', [])
         job.files = files
         self.log.info("Merge %s complete, merged: %s, updated: %s, "
                       "commit: %s" %
@@ -155,7 +156,7 @@ class MergeClient(object):
         if job.build_set:
             self.sched.onMergeCompleted(job.build_set,
                                         merged, job.updated, commit, files,
-                                        repo_state)
+                                        repo_state, item_in_branches)
         # The test suite expects the job to be removed from the
         # internal account after the wake flag is set.
         self.jobs.remove(job)
