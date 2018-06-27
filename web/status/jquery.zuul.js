@@ -525,18 +525,13 @@ import LineTImage from '../images/line-t.png';
 
         $.each(pipeline.change_queues, function (queueIndex, changeQueue) {
           $.each(changeQueue.heads, function (headIndex, changes) {
-            let $changeQueueHtml = $('<div />')
-              .addClass('change-queue')
-              .data('zuul-pipeline', pipeline.name)
-            $html.append($changeQueueHtml)
-
             if (pipeline.change_queues.length > 1 && headIndex === 0) {
               let name = changeQueue.name
               let shortName = name
               if (shortName.length > 32) {
                 shortName = shortName.substr(0, 32) + '...'
               }
-              $changeQueueHtml.append($('<p />')
+              $html.append($('<p />')
                 .text('Queue: ')
                 .append(
                   $('<abbr />')
@@ -546,18 +541,13 @@ import LineTImage from '../images/line-t.png';
               )
             }
 
-            let $changeBoxes = $.map(changes, function (change) {
-              return format.change_with_status_tree(change, changeQueue)
+            $.each(changes, function (changeIndex, change) {
+              let $changeBox =
+                        format.change_with_status_tree(
+                          change, changeQueue)
+              $html.append($changeBox)
+              format.display_patchset($changeBox)
             })
-
-            let visible = $.map($changeBoxes, function (changeBox) {
-              $changeQueueHtml.append(changeBox)
-              return format.display_patchset(changeBox)
-            }).some(function (visible) {
-              return visible
-            })
-
-            if (!visible) $changeQueueHtml.remove()
           })
         })
         return $html
@@ -617,10 +607,8 @@ import LineTImage from '../images/line-t.png';
           .html()
           .toLowerCase()
 
-        let showPanel = true
-
         if (currentFilter !== '') {
-          showPanel = false
+          let showPanel = false
           let filter = currentFilter.trim().split(/[\s,]+/)
           $.each(filter, function (index, filterVal) {
             if (filterVal !== '') {
@@ -632,15 +620,14 @@ import LineTImage from '../images/line-t.png';
               }
             }
           })
-        }
-
-        if (showPanel === true) {
-          $changeBox.show(animate)
+          if (showPanel === true) {
+            $changeBox.show(animate)
+          } else {
+            $changeBox.hide(animate)
+          }
         } else {
-          $changeBox.hide(animate)
+          $changeBox.show(animate)
         }
-
-        return showPanel
       }
     }
 
@@ -846,7 +833,10 @@ import LineTImage from '../images/line-t.png';
           $('#filter_form_clear_box').show()
         }
 
-        this.update()
+        $('.zuul-change-box').each(function (index, obj) {
+          let $changeBox = $(obj)
+          format.display_patchset($changeBox, 200)
+        })
         return false
       },
 
