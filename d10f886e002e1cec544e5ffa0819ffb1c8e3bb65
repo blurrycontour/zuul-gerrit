@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_f71ff36e",
+        "filename": "zuul/zk.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-27T21:56:51Z",
+      "side": 1,
+      "message": "This isn\u0027t really a callback though, right?  It\u0027s a method that rate limits logging.  I spent a while trying to figure that out; I think it\u0027s misleading enough we should call it something like \"logConnectionRetryEvent\".  Sorry to niggle on a method name, but callbacks are an important concept in zk.\n\nOtherwise I think the change is fine.",
+      "revId": "d10f886e002e1cec544e5ffa0819ffb1c8e3bb65",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
