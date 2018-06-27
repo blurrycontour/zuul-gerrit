@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "5f7c97a3_64fa5412",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 567,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-27T16:52:21Z",
+      "side": 1,
+      "message": "This should mention that it\u0027s multiplied by 100.",
+      "revId": "ddb9c9ae2dae237616162f6844d3a7ef88ed0e89",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_49b651fc",
         "filename": "zuul/executor/sensors/hdd.py",
         "patchSetId": 6
@@ -125,6 +142,23 @@
         "endLine": 54,
         "endChar": 54
       },
+      "revId": "ddb9c9ae2dae237616162f6844d3a7ef88ed0e89",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_c9ffc100",
+        "filename": "zuul/executor/sensors/hdd.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-27T16:52:21Z",
+      "side": 1,
+      "message": "We multiply the percentage by 100 so we can report it to 2 decimal points.",
       "revId": "ddb9c9ae2dae237616162f6844d3a7ef88ed0e89",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
