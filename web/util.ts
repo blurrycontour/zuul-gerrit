@@ -14,7 +14,8 @@
 
 declare var ZUUL_BASE_HREF: string
 
-export function getBaseHrefFromPath (path: string) {
+function getBaseHrefFromWindowHref () {
+  const path = window.location.href
   if (path.includes('/t/')) {
     return path.slice(0, path.lastIndexOf('/t/') + 1)
   } else {
@@ -26,6 +27,6 @@ export function getBaseHref (): string {
   if (typeof ZUUL_BASE_HREF !== 'undefined') {
     return ZUUL_BASE_HREF
   } else {
-    return getBaseHrefFromPath(window.location.pathname)
+    return getBaseHrefFromWindowHref()
   }
 }
