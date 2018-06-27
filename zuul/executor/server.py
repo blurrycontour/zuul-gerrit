@@ -2251,7 +2251,8 @@ class ExecutorServer(object):
     def refstate(self, job):
         args = json.loads(job.arguments)
         with self.merger_lock:
-            success, repo_state = self.merger.getRepoState(args['items'])
+            success, repo_state, item_in_branches = \
+                self.merger.getRepoState(args['items'])
         result = dict(updated=success,
                       repo_state=repo_state)
         job.sendWorkComplete(json.dumps(result))
