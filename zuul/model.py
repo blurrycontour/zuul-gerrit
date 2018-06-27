@@ -2580,6 +2580,7 @@ class Tag(Ref):
     def __init__(self, project):
         super(Tag, self).__init__(project)
         self.tag = None
+        self.containing_branches = []
 
 
 class Change(Branch):
