@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_55fa6c11",
+        "filename": "web/util.ts",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-06-27T14:17:17Z",
+      "side": 1,
+      "message": "A more accurate name would probably by getBaseHreffromURL() as it takes a complete url and returns only the base portion of it.",
+      "revId": "92625301f84c83366b95546916867338fc9bd90f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_4d198285",
+        "filename": "web/util.ts",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-06-27T14:17:17Z",
+      "side": 1,
+      "message": "This should be -1 to remove the /. As is we only keep the first character of the href.",
+      "range": {
+        "startLine": 34,
+        "startChar": 25,
+        "endLine": 34,
+        "endChar": 26
+      },
+      "revId": "92625301f84c83366b95546916867338fc9bd90f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
