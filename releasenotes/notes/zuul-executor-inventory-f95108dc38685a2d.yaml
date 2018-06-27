@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    The path to the inventory is copied to the zuul.executor.inventory job
+    variable.
