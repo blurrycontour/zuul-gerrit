@@ -511,6 +511,10 @@ executor running the job is available:
 
          The path to the working directory.
 
+      .. var:: inventory_file
+
+         The path to the Ansible inventory.
+
 .. _user_sitewide_variables:
 
 Site-wide Variables
