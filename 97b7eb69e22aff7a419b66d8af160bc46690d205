@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_4294fe35",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1906,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-06-27T01:22:43Z",
+      "side": 1,
+      "message": "I wonder if we should consider a new result, to indicate that zuul dynamically skipped this job via zuul_return.",
+      "revId": "97b7eb69e22aff7a419b66d8af160bc46690d205",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
