@@ -16,6 +16,40 @@
       "revId": "4f93d6d5270e52928190c6a3a8248ca95ae16265",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_7b0f3c39",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 1255,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2018-06-28T14:00:05Z",
+      "side": 1,
+      "message": "nit: \"may be used outside of the projects WHERE they are defined\"",
+      "revId": "4f93d6d5270e52928190c6a3a8248ca95ae16265",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_9b14984f",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 1256,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2018-06-28T14:00:05Z",
+      "side": 1,
+      "message": "nit: \"implied branch\u0027s pragma\" or \"implied branches\u0027 pragma\" (possessive form, not sure whether you meant singular possessive or plural possessive here)",
+      "revId": "4f93d6d5270e52928190c6a3a8248ca95ae16265",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
