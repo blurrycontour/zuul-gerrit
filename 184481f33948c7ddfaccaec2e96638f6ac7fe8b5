@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_02a24fae",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-06-28T19:57:12Z",
+      "side": 1,
+      "message": "This loop looks superfluous to me as you\u0027re looping over a list to build up an equal list again. or maybe I\u0027m missing something here.",
+      "parentUuid": "",
+      "revId": "184481f33948c7ddfaccaec2e96638f6ac7fe8b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
