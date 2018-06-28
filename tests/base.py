@@ -1434,6 +1434,11 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
         self.fail_tests = {}
         self.job_builds = {}
 
+        class FakeJobObject:
+            arguments = "{}"
+
+        self.job = FakeJobObject
+
     def failJob(self, name, change):
         """Instruct the executor to report matching builds as failures.
 
