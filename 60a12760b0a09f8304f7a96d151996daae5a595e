@@ -22,6 +22,30 @@
       "revId": "60a12760b0a09f8304f7a96d151996daae5a595e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_a93277bf",
+        "filename": "web/status/jquery.zuul.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 650,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-06-28T04:55:01Z",
+      "side": 1,
+      "message": "That\u0027s a good question. It\u0027s also using \u0027options\u0027 bellow, perhaps js automatically try local member?",
+      "parentUuid": "5f7c97a3_86b8ca75",
+      "range": {
+        "startLine": 650,
+        "startChar": 13,
+        "endLine": 650,
+        "endChar": 20
+      },
+      "revId": "60a12760b0a09f8304f7a96d151996daae5a595e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
