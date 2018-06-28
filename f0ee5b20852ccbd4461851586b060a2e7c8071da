@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_bb286633",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1923,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-28T22:15:20Z",
+      "side": 1,
+      "message": "This should all happen in setResult -- this method shouldn\u0027t actually modify the build results.  If you set the SKIPPED value there, you shouldn\u0027t need to do anything here.",
+      "revId": "f0ee5b20852ccbd4461851586b060a2e7c8071da",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
