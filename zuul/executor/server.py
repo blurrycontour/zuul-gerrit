@@ -2152,6 +2152,11 @@ class ExecutorServer(object):
         if self.statsd:
             base_key = 'zuul.executor.{hostname}'
             self.statsd.incr(base_key + '.builds')
+        args = json.loads(self.job.arguments)
+        self.log.info("Executing job %s for %s (id: %s)" % (
+            args.get("zuul", {}).get("job"),
+            args.get("zuul", {}).get("change_url"),
+            args.get("uuid")))
         self.job_workers[job.unique] = self._job_class(self, job)
         # Run manageLoad before starting the thread mostly for the
         # benefit of the unit tests to make the calculation of the
