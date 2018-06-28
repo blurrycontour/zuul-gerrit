@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "5f7c97a3_bbddc642",
+        "filename": "doc/source/user/jobs.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 583,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-28T22:16:28Z",
+      "side": 1,
+      "message": "\"child job of the current build\"",
+      "revId": "f0ee5b20852ccbd4461851586b060a2e7c8071da",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_5be27204",
+        "filename": "doc/source/user/jobs.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 596,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-06-28T22:16:28Z",
+      "side": 1,
+      "message": "pre-configured",
+      "revId": "f0ee5b20852ccbd4461851586b060a2e7c8071da",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_bb286633",
         "filename": "zuul/model.py",
         "patchSetId": 6
