@@ -479,8 +479,8 @@ class GerritConnection(BaseConnection):
         change.branch = data['branch']
         change.url = data['url']
         change.uris = [
-            '%s/%s' % (self.server, change.number),
-            '%s/#/c/%s' % (self.server, change.number),
+            '%s/%s' % (self.baseurl, change.number),
+            '%s/#/c/%s' % (self.baseurl, change.number),
         ]
 
         max_ps = 0
