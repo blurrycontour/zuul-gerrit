@@ -478,9 +478,11 @@ class GerritConnection(BaseConnection):
         change.project = self.source.getProject(data['project'])
         change.branch = data['branch']
         change.url = data['url']
+        # Remove ':' from urls
+        baseurl = self.baseurl.replace("https://", "").replace("http://", "")
         change.uris = [
-            '%s/%s' % (self.server, change.number),
-            '%s/#/c/%s' % (self.server, change.number),
+            '%s/%s' % (baseurl, change.number),
+            '%s/#/c/%s' % (baseurl, change.number),
         ]
 
         max_ps = 0
