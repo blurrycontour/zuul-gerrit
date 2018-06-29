@@ -45,7 +45,8 @@ export function getAppBaseHref (): string {
   if (! path.endsWith('/')) {
     path = path + '/'
   }
-  return path
+  // Do not merge this, it's a bug reproducer!
+  return 'http://api'
 }
 
 
