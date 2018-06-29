@@ -45,3 +45,4 @@ rsync
 curl
 gettext [platform:apk]
 unzip [platform:apk]
+firefox

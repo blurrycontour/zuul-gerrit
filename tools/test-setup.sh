@@ -53,3 +53,10 @@ if [ $LSBDISTCODENAME == 'xenial' ]; then
     sudo apt-get update
     sudo apt-get --assume-yes install bubblewrap
 fi
+
+# Install selenium test requirements
+GECKODRIVER_URL="https://github.com/mozilla/geckodriver/releases/download/v0.21.0/geckodriver-v0.21.0-linux64.tar.gz"
+if [ ! -f /usr/local/bin/geckodriver ]; then
+    echo "Installing /usr/local/bin/geckodriver using ${GECKODRIVER_URL}"
+    curl -L -o - ${GECKODRIVER_URL} | sudo tar -xzvf - -C /usr/local/bin/
+fi
