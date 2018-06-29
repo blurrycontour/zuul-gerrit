@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_15cfd58b",
+        "filename": "web/stream/stream.service.ts",
+        "patchSetId": 3
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-06-29T16:15:50Z",
+      "side": 1,
+      "message": "Is this used? Sending the initial params is already done in initSocket.",
+      "range": {
+        "startLine": 66,
+        "startChar": 0,
+        "endLine": 69,
+        "endChar": 3
+      },
+      "revId": "e425d2678d0e1b3eb414d3b3a855a80e1db54a53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
