@@ -53,3 +53,26 @@ if [ $LSBDISTCODENAME == 'xenial' ]; then
     sudo apt-get update
     sudo apt-get --assume-yes install bubblewrap
 fi
+
+
+# Install chrome because firefox geckodriver doesn't implement logging interface
+# see https://github.com/mozilla/geckodriver/issues/284
+if [ ! -f /usr/bin/chrome ]; then
+    if type -p apt-get; then
+        curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add
+        echo "deb http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+        sudo apt-get -y update
+        sudo apt-get -y install google-chrome-stable
+    elif type -p dnf; then
+        cat << EOF | sudo tee /etc/yum.repos.d/google-chrome.repo
+[google-chrome]
+name=google-chrome - x86_64
+baseurl=http://dl.google.com/linux/chrome/rpm/stable/x86_64
+enabled=1
+gpgcheck=1
+showdupesfromrepos=1
+gpgkey=https://dl-ssl.google.com/linux/linux_signing_key.pub
+EOF
+        sudo dnf install -y google-chrome-stable
+    fi
+fi

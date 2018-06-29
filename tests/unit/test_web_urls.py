@@ -15,9 +15,16 @@
 # under the License.
 
 import json
+import logging
 import urllib
 
 from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver import ChromeOptions
+
 
 from tests.base import ZuulTestCase, WebProxyFixture
 from tests.base import ZuulWebFixture
@@ -59,6 +66,65 @@ class TestWebURLs(ZuulTestCase):
                     continue
                 link = urllib.parse.urljoin(url, suburl)
                 self._get(self.port, link)
+
+
+class TestWebSelenium(TestWebURLs):
+    log = logging.getLogger("zuul.TestWebSelenium")
+
+    def setUp(self):
+        super().setUp()
+        opts = ChromeOptions()
+        opts.add_argument("--headless")
+        opts.add_argument("--no-sandbox")
+        opts.add_argument("--disable-gpu")
+        self.driver = webdriver.Chrome(chrome_options=opts)
+
+    def tearDown(self):
+        super().tearDown()
+        self.driver.close()
+
+    def check_js_errors(self):
+        errors = []
+        for log in self.driver.get_log('browser'):
+            self.log.info("Log event recorded: %s", log)
+            if log['level'] in ('SEVERE', ):
+                errors.append(log)
+        self.assertEquals([], errors)
+
+    def _get_url(self, uri):
+        return "http://localhost:{}{}".format(self.port, uri)
+
+
+class TestFunctionalWhiteLabel(TestWebSelenium):
+    def setUp(self):
+        super().setUp()
+        rules = [
+            ('^/(.*)$', 'http://localhost:{}/\\1'.format(self.web.port)),
+        ]
+        self.proxy = self.useFixture(WebProxyFixture(rules))
+        self.port = self.proxy.port
+
+    def test_functional_white_label_status_page(self):
+        self.driver.get(self._get_url('/status.html'))
+        self.assertIn("Zuul Status", self.driver.title)
+        WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.ID, "zuul_pipelines"))
+        )
+        self.check_js_errors()
+
+
+class TestFunctionalDirect(TestWebSelenium):
+    def setUp(self):
+        super().setUp()
+        self.port = self.web.port
+
+    def test_functional_direct_status_page(self):
+        self.driver.get(self._get_url('/t/tenant-one/status.html'))
+        self.assertIn("Zuul Status", self.driver.title)
+        WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.ID, "zuul_pipelines"))
+        )
+        self.check_js_errors()
 
 
 class TestDirect(TestWebURLs):
