@@ -12,7 +12,7 @@
             ]
         },
         {
-            "description": "Changes that have been approved by core developers are enqueued in order in this pipeline, and .",
+            "description": "Changes that have been approved by core reviewers are enqueued in order in this pipeline, and .",
             "change_queues": [
                 {
                     "heads": [],
