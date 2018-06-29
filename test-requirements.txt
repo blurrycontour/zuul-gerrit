@@ -14,3 +14,4 @@ psycopg2-binary
 mypy
 zuul-sphinx
 beautifulsoup4
+selenium

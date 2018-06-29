@@ -15,9 +15,17 @@
 # under the License.
 
 import json
+import logging
 import urllib
+import time
 
 from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver import FirefoxOptions
+
 
 from tests.base import ZuulTestCase, WebProxyFixture
 from tests.base import ZuulWebFixture
@@ -59,6 +67,79 @@ class TestWebURLs(ZuulTestCase):
                     continue
                 link = urllib.parse.urljoin(url, suburl)
                 self._get(self.port, link)
+
+
+class TestWebSelenium(TestWebURLs):
+    log = logging.getLogger("zuul.TestWebSelenium")
+
+    def setUp(self):
+        super().setUp()
+        opts = FirefoxOptions()
+        opts.add_argument("--headless")
+        self.driver = webdriver.Firefox(firefox_options=opts)
+
+    def tearDown(self):
+        super().tearDown()
+        self.driver.close()
+
+    def check_js_errors(self):
+        errors = []
+        try:
+            for log in self.driver.get_log('browser'):
+                self.log.info("Log event recorded: %s", log)
+                if log['level'] in ('SEVERE', ):
+                    errors.append(log)
+        except Exception:
+            # This doesn't work yet with Firefox, see
+            # https://github.com/mozilla/geckodriver/issues/284
+            pass
+        self.assertEquals([], errors)
+
+    def _get_url(self, uri):
+        return "http://localhost:{}{}".format(self.port, uri)
+
+    def check_pipelines_list(self, pipelines=['check', 'gate', 'post']):
+        # Wait for page load
+        for i in range(3):
+            pipelines_dom = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.ID, "zuul_pipelines"))
+            )
+            pipelines_headers = pipelines_dom.find_elements_by_class_name(
+                "zuul-pipeline-header")
+            if len(pipelines_headers):
+                break
+            time.sleep(3)
+        self.assertEquals(len(pipelines_headers), len(pipelines))
+        for pos in range(len(pipelines)):
+            self.assertIn(pipelines[pos], pipelines_headers[pos].text)
+
+
+class TestFunctionalWhiteLabel(TestWebSelenium):
+    def setUp(self):
+        super().setUp()
+        rules = [
+            ('^/(.*)$', 'http://localhost:{}/\\1'.format(self.web.port)),
+        ]
+        self.proxy = self.useFixture(WebProxyFixture(rules))
+        self.port = self.proxy.port
+
+    def test_functional_white_label_status_page(self):
+        self.driver.get(self._get_url('/status.html'))
+        self.assertIn("Zuul Status", self.driver.title)
+        self.check_pipelines_list()
+        self.check_js_errors()
+
+
+class TestFunctionalDirect(TestWebSelenium):
+    def setUp(self):
+        super().setUp()
+        self.port = self.web.port
+
+    def test_functional_direct_status_page(self):
+        self.driver.get(self._get_url('/t/tenant-one/status.html'))
+        self.assertIn("Zuul Status", self.driver.title)
+        self.check_pipelines_list()
+        self.check_js_errors()
 
 
 class TestDirect(TestWebURLs):
