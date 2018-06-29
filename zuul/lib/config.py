@@ -21,3 +21,10 @@ def get_default(config, section, option, default=None, expand_user=False):
     if expand_user and value:
         return os.path.expanduser(value)
     return value
+
+
+def get_environ_template(dict_option, option):
+    value = dict_option.get(option)
+    if value:
+        value = value.format(**os.environ)
+    return value

@@ -40,6 +40,7 @@ import gear
 from zuul.connection import BaseConnection
 from zuul.web.handler import BaseWebController
 from zuul.lib.config import get_default
+from zuul.lib.config import get_environ_template
 from zuul.model import Ref, Branch, Tag, Project
 from zuul.exceptions import MergeFailure
 from zuul.driver.github.githubmodel import PullRequest, GithubTriggerEvent
@@ -1302,7 +1303,8 @@ class GithubWebController(BaseWebController):
     def __init__(self, zuul_web, connection):
         self.connection = connection
         self.zuul_web = zuul_web
-        self.token = self.connection.connection_config.get('webhook_token')
+        self.token = get_environ_template(
+            self.connection.connection_config, 'webhook_token')
 
     def _validate_signature(self, body, headers):
         try:

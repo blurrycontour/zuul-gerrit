@@ -23,6 +23,8 @@ from sqlalchemy.sql import select
 import voluptuous
 
 from zuul.connection import BaseConnection
+from zuul.lib.config import get_environ_template
+
 
 BUILDSET_TABLE = 'zuul_buildset'
 BUILD_TABLE = 'zuul_build'
@@ -44,7 +46,7 @@ class SQLConnection(BaseConnection):
         self.table_prefix = self.connection_config.get('table_prefix', '')
 
         try:
-            self.dburi = self.connection_config.get('dburi')
+            self.dburi = get_environ_template(self.connection_config, 'dburi')
             # Recycle connections if they've been idle for more than 1 second.
             # MySQL connections are lightweight and thus keeping long-lived
             # connections around is not valuable.
