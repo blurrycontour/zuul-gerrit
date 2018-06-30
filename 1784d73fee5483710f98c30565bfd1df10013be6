@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_9c21c4a1",
+        "filename": "zuul/model.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1993,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-06-30T06:21:13Z",
+      "side": 1,
+      "message": "That will also contain non-existing jobs if child_jobs contains jobs that aren\u0027t in the job graph. That will create problems a few lines below. I think this also misses a test case that we handle a bogus list gracefully.\n\nThus I think instead of the symmetric difference we want to just subtract zuul_return from dependent_jobs.",
+      "range": {
+        "startLine": 1993,
+        "startChar": 12,
+        "endLine": 1993,
+        "endChar": 78
+      },
+      "revId": "1784d73fee5483710f98c30565bfd1df10013be6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
