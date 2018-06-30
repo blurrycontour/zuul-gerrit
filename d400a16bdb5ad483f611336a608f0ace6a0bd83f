@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_a9132065",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 693,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-06-30T05:54:56Z",
+      "side": 1,
+      "message": "A similar log line is here.",
+      "revId": "d400a16bdb5ad483f611336a608f0ace6a0bd83f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_8910a45b",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2155,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-06-30T05:54:56Z",
+      "side": 1,
+      "message": "json decoding this (not really small) data structure just for logging seems a little odd. A similar log line is above (line 693) where the json is already decoded. Would improving that and changing it to info solve your issue?",
+      "revId": "d400a16bdb5ad483f611336a608f0ace6a0bd83f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
