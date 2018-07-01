@@ -22,6 +22,30 @@
       "revId": "7f81e7e360e7f31b8e50f2f5bf4557ebef9221b7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_5aaecc2f",
+        "filename": "zuul/zk.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-07-01T01:01:00Z",
+      "side": 1,
+      "message": "Ooops :-)",
+      "parentUuid": "5f7c97a3_dc041cc8",
+      "range": {
+        "startLine": 100,
+        "startChar": 8,
+        "endLine": 100,
+        "endChar": 28
+      },
+      "revId": "7f81e7e360e7f31b8e50f2f5bf4557ebef9221b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
