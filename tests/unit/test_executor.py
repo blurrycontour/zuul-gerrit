@@ -16,6 +16,8 @@
 # under the License.
 
 import logging
+import os
+import shutil
 import time
 from unittest import mock
 
@@ -491,6 +493,34 @@ class TestGovernor(ZuulTestCase):
         self.assertReportedStat(
             'zuul.executor.test-executor-hostname_example_com.pct_used_hdd',
             value='9527', kind='g')
+
+    @mock.patch('os.statvfs')
+    def test_hdd_governor_missing_state_dir(self, statvfs_mock):
+        class Dummy(object):
+            pass
+
+        # Delete executor state_dir to force race. We don't actually care about
+        # the git repos here.
+        shutil.rmtree(self.executor_state_root)
+        self.executor_server.manageLoad()
+        self.assertFalse(self.executor_server.accepting_work)
+
+        # Recreate missing directory
+        os.mkdir(self.executor_state_root)
+
+        hdd = Dummy()
+        hdd.f_frsize = 4096
+        hdd.f_blocks = 120920708
+        hdd.f_bfree = 95716701
+
+        statvfs_mock.return_value = hdd  # 20.84% used
+
+        self.executor_server.manageLoad()
+        self.assertTrue(self.executor_server.accepting_work)
+
+        self.assertReportedStat(
+            'zuul.executor.test-executor-hostname_example_com.pct_used_hdd',
+            value='2084', kind='g')
 
     def test_pause_governor(self):
         self.executor_server.manageLoad()
