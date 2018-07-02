@@ -73,7 +73,8 @@ const appRoutes: Routes = [
       appRoutes,
       // Enable router tracing in devel mode. This prints router decisions
       // to the console.log.
-      { enableTracing: isDevMode() }
+      // TODO: make this true on dev mode
+      { enableTracing: false }
     )],
   exports: [RouterModule]
 })
