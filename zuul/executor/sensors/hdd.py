@@ -37,6 +37,9 @@ class HDDSensor(SensorInterface):
             config, 'executor', 'state_dir', '/var/lib/zuul', expand_user=True)
 
     def isOk(self):
+        if not os.path.exists(self.state_dir):
+            return False, "Executor state_dir does not exist"
+
         avail_hdd_pct = get_avail_hdd_pct(self.state_dir)
 
         if avail_hdd_pct < self.min_avail_hdd:
@@ -46,6 +49,10 @@ class HDDSensor(SensorInterface):
         return True, "{:3.1f}% <= {}".format(avail_hdd_pct, self.min_avail_hdd)
 
     def reportStats(self, statsd, base_key):
+        if not os.path.exists(self.state_dir):
+            self.log.warning("Executor state_dir does not exist: %s" %
+                             self.state_dir)
+            return
         avail_hdd_pct = get_avail_hdd_pct(self.state_dir)
 
         # We multiply the percentage by 100 so we can report it to 2 decimal
