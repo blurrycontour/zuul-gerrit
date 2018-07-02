@@ -29,6 +29,8 @@ export default class NavigationComponent implements OnInit {
   navbarRoutes: RouteDescription[]
   resolveEnd$: Observable<ResolveEnd>
   showNavbar = true
+  enableDashboardLink = false
+  dashboardLink: string
 
   private routePages = ['status', 'jobs', 'builds']
 
@@ -39,7 +41,13 @@ export default class NavigationComponent implements OnInit {
       filter(evt => evt instanceof ResolveEnd)
     ) as Observable<ResolveEnd>
     this.resolveEnd$.subscribe(evt => {
-      this.showNavbar = (evt.url !== '/tenants.html')
+      this.showNavbar = (evt.url !== '/tenants.html' &&
+                         evt.url !== '/t/tenants.html')
+      if (evt.url.startsWith('/t/')) {
+          // Multi-tenant deployment, dashboardLink is clickable
+          this.enableDashboardLink = true
+          this.dashboardLink = '/t/tenants.html'
+      }
       this.navbarRoutes = this.getNavbarRoutes(evt.url)
     })
   }
