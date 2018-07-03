@@ -326,23 +326,28 @@ class TestTenantInfoConfigBroken(BaseTestWeb):
         config_errors = self.get_url(
             "api/tenant/tenant-one/config-errors").json()
         self.assertEqual(
-            len(config_errors), 2)
+            len(config_errors), 3)
         self.assertEqual(
-            config_errors[0]['source_context']['project'], 'org/project2')
-        self.assertEqual(
-            config_errors[0]['source_context']['branch'], 'master')
-        self.assertEqual(
-            config_errors[0]['source_context']['path'], '.zuul.yaml')
-        self.assertIn('Zuul encountered a syntax error',
+            config_errors[0]['source_context']['project'], 'org/project4')
+        self.assertIn('Zuul encountered an error while accessing the repo '
+                      'org/project4',
                       config_errors[0]['error'])
         self.assertEqual(
-            config_errors[1]['source_context']['project'], 'org/project3')
+            config_errors[1]['source_context']['project'], 'org/project2')
         self.assertEqual(
             config_errors[1]['source_context']['branch'], 'master')
         self.assertEqual(
             config_errors[1]['source_context']['path'], '.zuul.yaml')
         self.assertIn('Zuul encountered a syntax error',
                       config_errors[1]['error'])
+        self.assertEqual(
+            config_errors[2]['source_context']['project'], 'org/project3')
+        self.assertEqual(
+            config_errors[2]['source_context']['branch'], 'master')
+        self.assertEqual(
+            config_errors[2]['source_context']['path'], '.zuul.yaml')
+        self.assertIn('Zuul encountered a syntax error',
+                      config_errors[2]['error'])
 
 
 class TestWebSocketInfo(TestInfo):
