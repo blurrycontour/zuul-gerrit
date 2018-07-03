@@ -764,6 +764,23 @@ class Secret(ConfigObject):
         return r
 
 
+class ProjectContext(ConfigObject):
+
+    def __init__(self, project):
+        super().__init__()
+        self.project = project
+        self.branch = None
+        self.path = None
+
+    def __str__(self):
+        return self.project.name
+
+    def toDict(self):
+        return dict(
+            project=self.project.name,
+        )
+
+
 class SourceContext(ConfigObject):
     """A reference to the branch of a project in configuration.
 

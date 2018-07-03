@@ -2455,19 +2455,26 @@ class TestBrokenConfig(ZuulTestCase):
     def test_broken_config_on_startup(self):
         # verify get the errors at tenant level.
         tenant = self.sched.abide.tenants.get('tenant-one')
+        loading_errors = tenant.layout.loading_errors
         self.assertEquals(
-            len(tenant.layout.loading_errors), 2,
+            len(loading_errors), 3,
             "An error should have been stored")
         self.assertIn(
+            "Zuul encountered an error while accessing the repo org/project4",
+            str(loading_errors[0].error))
+        self.assertIn(
             "Zuul encountered a syntax error",
-            str(tenant.layout.loading_errors[0].error))
+            str(loading_errors[1].error))
+        self.assertIn(
+            "Zuul encountered a syntax error",
+            str(loading_errors[2].error))
 
     def test_dynamic_ignore(self):
         # Verify dynamic config behaviors inside a tenant broken config
         tenant = self.sched.abide.tenants.get('tenant-one')
         # There is a configuration error
         self.assertEquals(
-            len(tenant.layout.loading_errors), 2,
+            len(tenant.layout.loading_errors), 3,
             "An error should have been stored")
 
         # Inside a broken tenant configuration environment,
@@ -2499,7 +2506,7 @@ class TestBrokenConfig(ZuulTestCase):
         tenant = self.sched.abide.tenants.get('tenant-one')
         # There is a configuration error
         self.assertEquals(
-            len(tenant.layout.loading_errors), 2,
+            len(tenant.layout.loading_errors), 3,
             "An error should have been stored")
 
         # Inside a broken tenant configuration environment,
@@ -2533,7 +2540,7 @@ class TestBrokenConfig(ZuulTestCase):
         tenant = self.sched.abide.tenants.get('tenant-one')
         # There is a configuration error
         self.assertEquals(
-            len(tenant.layout.loading_errors), 2,
+            len(tenant.layout.loading_errors), 3,
             "An error should have been stored")
 
         # Inside a broken tenant configuration environment,
@@ -2567,7 +2574,7 @@ class TestBrokenConfig(ZuulTestCase):
         tenant = self.sched.abide.tenants.get('tenant-one')
         # There is a configuration error
         self.assertEquals(
-            len(tenant.layout.loading_errors), 2,
+            len(tenant.layout.loading_errors), 3,
             "An error should have been stored")
 
         # Inside a broken tenant configuration environment,
@@ -2599,7 +2606,7 @@ class TestBrokenConfig(ZuulTestCase):
         tenant = self.sched.abide.tenants.get('tenant-one')
         # There is a configuration error
         self.assertEquals(
-            len(tenant.layout.loading_errors), 2,
+            len(tenant.layout.loading_errors), 3,
             "An error should have been stored")
 
         # Inside a broken tenant configuration environment, remove a
