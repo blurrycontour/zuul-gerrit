@@ -16,6 +16,24 @@
       "revId": "3b84199f9274a4b16b2de13ddb2f31f0965ae7ce",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_8ec71866",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1283,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-07-03T15:05:09Z",
+      "side": 1,
+      "message": "Yes, just noticed that too and then had a meeting. Will change that.",
+      "parentUuid": "5f7c97a3_ce08b028",
+      "revId": "3b84199f9274a4b16b2de13ddb2f31f0965ae7ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
