@@ -1985,6 +1985,55 @@ class TestInRepoConfig(ZuulTestCase):
         self.assertIn('Debug information:',
                       A.messages[0], "A should have debug info")
 
+    def test_post_playbook_add(self):
+        conf = textwrap.dedent(
+            """
+            - pipeline:
+                name: check
+                manager: independent
+                trigger:
+                  gerrit:
+                    - event: patchset-created
+                success:
+                  gerrit:
+                    Verified: 1
+                failure:
+                  gerrit:
+                    Verified: -1
+            
+            - job:
+                name: base
+                post-run:
+                  - playbooks/something-new.yaml
+                parent: null
+            """)
+
+        file_dict = {'.zuul.yaml': conf}
+        A = self.fake_gerrit.addFakeChange('common-config', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        conf = textwrap.dedent(
+            """
+            - job:
+                name: project-test1
+                run: playbooks/project-test1.yaml
+            
+            - project:
+                name: org/project
+                check:
+                  jobs:
+                    - project-test1
+            """)
+        file_dict = {'.zuul.yaml': conf}
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        pass
+
 
 class TestInRepoJoin(ZuulTestCase):
     # In this config, org/project is not a member of any pipelines, so
