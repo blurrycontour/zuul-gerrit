@@ -42,7 +42,17 @@ class DependentPipelineManager(PipelineManager):
             (trusted, project) = tenant.getProject(project_name)
             queue_name = None
             project_in_pipeline = False
-            for project_config in layout.getAllProjectConfigs(project_name):
+
+            # In case we have loading errors getAllProjectConfigs may fail due
+            # to references to not existing project templates. In this case
+            # the best thing we can do is to treat the project to not be part
+            # of any pipeline.
+            try:
+                all_project_configs = layout.getAllProjectConfigs(project_name)
+            except Exception:
+                all_project_configs = []
+
+            for project_config in all_project_configs:
                 project_pipeline_config = project_config.pipelines.get(
                     self.pipeline.name)
                 if project_pipeline_config is None:
