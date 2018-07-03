@@ -233,7 +233,7 @@ def configuration_exceptions(stanza, conf, accumulator):
                      content=indent(start_mark.snippet.rstrip()),
                      start_mark=str(start_mark))
 
-        accumulator.append((context, m))
+        accumulator.addError(context, start_mark, m)
 
 
 @contextmanager
@@ -269,7 +269,7 @@ def reference_exceptions(stanza, obj, accumulator):
                      content=indent(start_mark.snippet.rstrip()),
                      start_mark=str(start_mark))
 
-        accumulator.append((context, m))
+        accumulator.addError(context, start_mark, m)
 
 
 class ZuulMark(object):
@@ -1277,7 +1277,7 @@ class TenantParser(object):
             self._resolveShadowProjects(tenant, tpc)
 
         # We prepare a stack to store config loading issues
-        loading_errors = model.LoadingErrors(length=model.MAX_ERROR_LENGTH)
+        loading_errors = model.LoadingErrors()
 
         # Start by fetching any YAML needed by this tenant which isn't
         # already cached.  Full reconfigurations start with an empty
@@ -1571,7 +1571,7 @@ class TenantParser(object):
                 r = safe_load_yaml(data, source_context)
                 config.extend(r)
         except ConfigurationSyntaxError as e:
-            loading_errors.append((source_context, e))
+            loading_errors.addError(source_context, None, e)
         return config
 
     def filterConfigProjectYAML(self, data):
@@ -1600,8 +1600,9 @@ class TenantParser(object):
             try:
                 pcontext.pragma_parser.fromYaml(config_pragma)
             except ConfigurationSyntaxError as e:
-                loading_errors.append(
-                    (config_pragma['_source_context'], e))
+                loading_errors.addError(
+                    config_pragma['_source_context'],
+                    config_pragma['_start_mark'], e)
 
         for config_pipeline in unparsed_config.pipelines:
             classes = self._getLoadClasses(tenant, config_pipeline)
@@ -1892,8 +1893,8 @@ class ConfigLoader(object):
                     "configuration loading" % (
                         len(tenant.layout.loading_errors), tenant.name))
                 # Log accumulated errors
-                for err in tenant.layout.loading_errors.errors:
-                    self.log.warning(str(err[1]))
+                for err in tenant.layout.loading_errors.errors[:10]:
+                    self.log.warning(err.error)
         return abide
 
     def reloadTenant(self, project_key_dir, abide, tenant):
@@ -1914,8 +1915,8 @@ class ConfigLoader(object):
                 "configuration re-loading" % (
                     len(new_tenant.layout.loading_errors), tenant.name))
             # Log accumulated errors
-            for err in new_tenant.layout.loading_errors.errors:
-                self.log.warning(str(err[1]))
+            for err in new_tenant.layout.loading_errors.errors[:10]:
+                self.log.warning(err.error)
         return new_abide
 
     def _loadDynamicProjectData(self, config, project,
@@ -1982,7 +1983,7 @@ class ConfigLoader(object):
     def createDynamicLayout(self, tenant, files,
                             include_config_projects=False,
                             scheduler=None, connections=None):
-        loading_errors = model.LoadingErrors(length=model.MAX_ERROR_LENGTH)
+        loading_errors = model.LoadingErrors()
         if include_config_projects:
             config = model.ParsedConfig()
             for project in tenant.config_projects:
