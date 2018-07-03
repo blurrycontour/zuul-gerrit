@@ -40,7 +40,7 @@
         ZUUL_REMOTE_KEEP: "true"
 
 - job:
-    name: zuul-build-dashboard
+    name: xzuul-build-dashboard
     parent: build-javascript-content
     success-url: 'npm/html/status.html'
     files:
