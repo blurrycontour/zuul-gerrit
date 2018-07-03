@@ -2392,7 +2392,7 @@ class TestBrokenConfig(ZuulTestCase):
         # verify get the errors at tenant level.
         tenant = self.sched.abide.tenants.get('tenant-one')
         self.assertEquals(
-            len(tenant.layout.loading_errors), 1,
+            len(tenant.layout.loading_errors), 2,
             "An error should have been stored")
         self.assertIn(
             "Zuul encountered a syntax error",

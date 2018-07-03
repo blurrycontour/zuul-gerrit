@@ -1826,8 +1826,11 @@ class TenantParser(object):
 
         self._addLayoutItems(layout, tenant, data)
 
-        for pipeline in layout.pipelines.values():
-            pipeline.manager._postConfig(layout)
+        # Only do post config if we have no loading errors. Otherwise we cannot
+        # be sure that this works.
+        if len(loading_errors) == 0:
+            for pipeline in layout.pipelines.values():
+                pipeline.manager._postConfig(layout)
 
         return layout
 
