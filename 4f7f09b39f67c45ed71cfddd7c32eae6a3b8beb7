@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_62388dd3",
+        "filename": "zuul/model.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1802,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-07-03T18:14:57Z",
+      "side": 1,
+      "message": "This was done as a result of something jeblair said, but not sure how to actually test this.",
+      "revId": "4f7f09b39f67c45ed71cfddd7c32eae6a3b8beb7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
