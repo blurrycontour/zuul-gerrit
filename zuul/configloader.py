@@ -1272,12 +1272,15 @@ class TenantParser(object):
         for tpc in untrusted_tpcs:
             tenant.addUntrustedProject(tpc)
 
-        for tpc in config_tpcs + untrusted_tpcs:
-            self._getProjectBranches(tenant, tpc, old_tenant)
-            self._resolveShadowProjects(tenant, tpc)
-
         # We prepare a stack to store config loading issues
         loading_errors = model.LoadingErrors(length=model.MAX_ERROR_LENGTH)
+
+        try:
+            for tpc in config_tpcs + untrusted_tpcs:
+                self._getProjectBranches(tenant, tpc, old_tenant)
+                self._resolveShadowProjects(tenant, tpc)
+        except Exception as e:
+            loading_errors.append((None, repr(e)))
 
         # Start by fetching any YAML needed by this tenant which isn't
         # already cached.  Full reconfigurations start with an empty
