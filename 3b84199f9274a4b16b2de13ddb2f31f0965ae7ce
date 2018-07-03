@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_ce08b028",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1283,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-03T14:49:02Z",
+      "side": 1,
+      "message": "This ends up in the log as:\n\n2018-07-03 07:44:42,556 zuul.ConfigLoader                WARNING  NoSuchPathError(\u0027/tmpfs/tmplmm958e4/zuul-test/upstream/org/project4\u0027,)\n\nI suppose using None as the source context to mean the main tenant config is fine for now (if it\u0027s confusing, we could make a special SourceContext object for it later).  But we should probably have a dedicated exception for this which formats to a nice error message like the others.",
+      "revId": "3b84199f9274a4b16b2de13ddb2f31f0965ae7ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
