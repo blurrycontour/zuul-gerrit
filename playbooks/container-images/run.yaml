@@ -1,0 +1,7 @@
+- hosts: all
+  tasks:
+
+    - name: Build zuul container images
+      command: pbrx --debug build-containers
+      args:
+        chdir: src/git.openstack.org/openstack-infra/zuul
