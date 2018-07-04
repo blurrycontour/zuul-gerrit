@@ -1,0 +1,6 @@
+# Override file for zuul-executor which adds ara
+FROM zuul-base
+
+RUN pip install ara
+
+CMD ["/usr/local/bin/zuul-executor"]
