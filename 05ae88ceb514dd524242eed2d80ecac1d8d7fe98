@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_a29d2e58",
+        "filename": "bindep.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-07-04T17:42:03Z",
+      "side": 1,
+      "message": "The package name is libre2-1v5 for xenial: https://packages.ubuntu.com/de/xenial/libre2-1v5",
+      "revId": "05ae88ceb514dd524242eed2d80ecac1d8d7fe98",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
