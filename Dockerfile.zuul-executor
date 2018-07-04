@@ -1,0 +1,7 @@
+FROM zuul-base
+
+COPY tools/018D05F5.gpg /018D05F5.gpg
+RUN apt-key add /018D05F5.gpg && rm /018D05F5.gpg
+RUN echo "deb http://ppa.launchpad.net/openstack-ci-core/bubblewrap/ubuntu xenial main" > /etc/apt/sources.list.d/openstack-ci-core-ubuntu-bubblewrap-xenial.list && apt-get update && apt-get -y install bubblewrap git && apt-get clean
+
+CMD ["/usr/local/bin/zuul-executor"]

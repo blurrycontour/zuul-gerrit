@@ -64,6 +64,13 @@
       zuul_api_url: https://softwarefactory-project.io/zuul
       javascript_copy_links: false
 
+- job:
+    name: zuul-build-container-images
+    required-projects:
+      - openstack/pbrx
+    pre-run: playbooks/container-images/pre.yaml
+    run: plabyooks/container-images/run.yaml
+
 - project:
     check:
       jobs:
@@ -98,6 +105,7 @@
               - yarn.lock
         - zuul-stream-functional
         - zuul-tox-remote
+        - zuul-build-container-images
         - nodepool-zuul-functional:
             voting: false
     gate:
