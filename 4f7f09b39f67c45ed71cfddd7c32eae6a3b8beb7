@@ -2,6 +2,57 @@
   "comments": [
     {
       "key": {
+        "uuid": "5f7c97a3_147a32ba",
+        "filename": "doc/source/user/jobs.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 598,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-07-04T03:38:17Z",
+      "side": 1,
+      "message": "(nit) Should document what will happen if an invalid job is listed. It is simply ignored and if only invalid jobs are listed it is the same as providing an empty list to child_jobs.",
+      "revId": "4f7f09b39f67c45ed71cfddd7c32eae6a3b8beb7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_34896ec6",
+        "filename": "releasenotes/notes/zuul-return-skip-child-jobs-772988c87c495cb2.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-07-04T03:38:17Z",
+      "side": 1,
+      "message": "(nit) s/job/jobs",
+      "revId": "4f7f09b39f67c45ed71cfddd7c32eae6a3b8beb7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_bf7c7771",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 2861,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-07-04T03:38:17Z",
+      "side": 1,
+      "message": "Why is data-return not skipped in this case? (I must be missing something because I read the code as skipping anything not in the new child_jobs list)",
+      "revId": "4f7f09b39f67c45ed71cfddd7c32eae6a3b8beb7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_62388dd3",
         "filename": "zuul/model.py",
         "patchSetId": 10
