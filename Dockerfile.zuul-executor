@@ -1,0 +1,14 @@
+# Override file for zuul-executor. The version of bubblewrap in stretch is
+# too old, so use the PPA.
+# Also, the executor needs the git executable.
+# And, although it's not strictly required, add ara to the install
+FROM zuul-base
+
+COPY tools/018D05F5.gpg /018D05F5.gpg
+RUN apt-key add /018D05F5.gpg && rm /018D05F5.gpg
+RUN echo "deb http://ppa.launchpad.net/openstack-ci-core/bubblewrap/ubuntu bionic main" \
+  > /etc/apt/sources.list.d/openstack-ci-core-ubuntu-bubblewrap-bionic.list \
+  && apt-get update && apt-get -y install bubblewrap git && apt-get clean
+RUN python3 -m pip install ara
+
+CMD ["/usr/local/bin/zuul-executor"]
