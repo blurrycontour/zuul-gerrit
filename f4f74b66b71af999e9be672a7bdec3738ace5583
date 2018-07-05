@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_18fec537",
+        "filename": "doc/source/admin/drivers/github.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-05T14:26:40Z",
+      "side": 1,
+      "message": "Please note this note.",
+      "revId": "f4f74b66b71af999e9be672a7bdec3738ace5583",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
