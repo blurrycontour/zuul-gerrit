@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_a18bd5be",
+        "filename": "Dockerfile.zuul-executor",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-07-05T20:44:29Z",
+      "side": 1,
+      "message": "while at it you may want to update bwrap in that ppa because that version won\u0027t work on centos kernels",
+      "revId": "2c17bef16ef8f7bb5e0409578bec583e00c43e5d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
