@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    GitHub rate limit logging now can be configured. If disabled this can save
+    some network round trip times.
