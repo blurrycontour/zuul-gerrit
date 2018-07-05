@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_17e3eba1",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-07-05T22:48:34Z",
+      "side": 1,
+      "message": "How are zuul-executors supposed to authenticate with the cluster?",
+      "range": {
+        "startLine": 78,
+        "startChar": 34,
+        "endLine": 79,
+        "endChar": 16
+      },
+      "revId": "1b2b1d0b8c34774df3012f7390311021c59b3642",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
