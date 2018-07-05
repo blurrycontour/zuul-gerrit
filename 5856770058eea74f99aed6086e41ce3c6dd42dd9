@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_b2925b57",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2018-07-05T03:14:42Z",
+      "side": 1,
+      "message": "FYI, ara.setup is a simple module with the single purpose of returning paths where it\u0027s plugins can be found.",
+      "range": {
+        "startLine": 35,
+        "startChar": 9,
+        "endLine": 35,
+        "endChar": 18
+      },
+      "revId": "5856770058eea74f99aed6086e41ce3c6dd42dd9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
