@@ -16,6 +16,24 @@
       "revId": "90bc6fa4a850c059dd076cd924efc182f4ad0d4c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_38f94181",
+        "filename": "Dockerfile.zuul-executor",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-07-05T14:19:35Z",
+      "side": 1,
+      "message": "Good call.",
+      "parentUuid": "5f7c97a3_a2cbee47",
+      "revId": "90bc6fa4a850c059dd076cd924efc182f4ad0d4c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
