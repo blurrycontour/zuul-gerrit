@@ -49,3 +49,20 @@
 
     - name: Print binary data
       command: echo -e '\x80abc'
+
+    - name: Record something with ARA
+      ara_record:
+        key: setup_key
+        value: "{{ setup_var }}"
+        type: json
+
+    - name: Read something with ARA
+      ara_read:
+        key: setup_key
+      register: ara_data
+
+    - name: Assert that value is identical
+      assert:
+        that:
+          - ara_data['key'] == 'setup_key'
+          - ara_data['value'] == setup_var

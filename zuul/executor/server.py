@@ -32,9 +32,12 @@ from zuul.lib.config import get_default
 from zuul.lib.statsd import get_statsd
 
 try:
-    import ara.plugins.callbacks as ara_callbacks
+    from ara.setup import callback_plugins as ara_callbacks
+    from ara.setup import action_plugins as ara_action_plugins
 except ImportError:
     ara_callbacks = None
+    ara_action_plugins = None
+
 import gear
 
 import zuul.merger.merger
@@ -1385,14 +1388,15 @@ class AnsibleJob(object):
         trusted = jobdir_playbook.trusted
 
         # TODO(mordred) This should likely be extracted into a more generalized
-        #               mechanism for deployers being able to add callback
-        #               plugins.
+        #               mechanism for deployers being able to add plugins.
+        action_plugins = [self.executor_server.action_dir]
+        if ara_action_plugins:
+            action_plugins.append(ara_action_plugins)
+
+        callback_plugins = [self.executor_server.callback_dir]
         if ara_callbacks:
-            callback_path = '%s:%s' % (
-                self.executor_server.callback_dir,
-                os.path.dirname(ara_callbacks.__file__))
-        else:
-            callback_path = self.executor_server.callback_dir
+            callback_plugins.append(ara_callbacks)
+
         with open(jobdir_playbook.ansible_config, 'w') as config:
             config.write('[defaults]\n')
             config.write('inventory = %s\n' % self.jobdir.inventory)
@@ -1405,7 +1409,12 @@ class AnsibleJob(object):
             config.write('library = %s\n'
                          % self.executor_server.library_dir)
             config.write('command_warnings = False\n')
-            config.write('callback_plugins = %s\n' % callback_path)
+            config.write(
+                'action_plugins = %s\n' % os.pathsep.join(action_plugins)
+            )
+            config.write(
+                'callback_plugins = %s\n' % os.pathsep.join(callback_plugins)
+            )
             config.write('stdout_callback = zuul_stream\n')
             config.write('filter_plugins = %s\n'
                          % self.executor_server.filter_dir)
