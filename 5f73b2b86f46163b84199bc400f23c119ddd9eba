@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_52817ec1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-07-05T12:59:40Z",
+      "side": 1,
+      "message": "(nit) The commit message makes it seem like skip_child_jobs is a new return option.",
+      "range": {
+        "startLine": 7,
+        "startChar": 8,
+        "endLine": 7,
+        "endChar": 23
+      },
+      "revId": "5f73b2b86f46163b84199bc400f23c119ddd9eba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_32072273",
+        "filename": "doc/source/user/jobs.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 598,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-07-05T12:59:40Z",
+      "side": 1,
+      "message": "(nit) Should document what will happen if an invalid job is listed. It is simply ignored and if only invalid jobs are listed it is the same as providing an empty list to child_jobs.",
+      "revId": "5f73b2b86f46163b84199bc400f23c119ddd9eba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
