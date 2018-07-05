@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_7791ff45",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-05T22:32:24Z",
+      "side": 1,
+      "message": "I think k8s-container-like-machine is still a sufficiently useful case to support that it\u0027s worth implementing and talking about here.  If I wanted to build a Zuul system that ran a bunch of simple test jobs in containers for efficiency, that\u0027s probably how I\u0027d do it today.\n\nI think that we\u0027ve hit the right balance here now with indicating that this spec is about targeting k8s, but many of the general concepts should apply elsewhere as well.\n\nI\u0027ve made one more revision in PS3 to indicate that it is Nodepool that tells Zuul to use the kubectl connection plugin for Ansible -- so by no means are we limited to using k8s for container-like-machine.  If Nodepool tells Zuul that it provided a label using some other system, that will be fine.  I hope that addresses your concern.",
+      "revId": "c1b8dacf43541a4a7fb09c8cb22c2e1827858f99",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_259eac53",
         "filename": "doc/source/developer/specs/container-build-resources.rst",
         "patchSetId": 2
@@ -36,6 +53,23 @@
       "writtenOn": "2018-06-14T04:33:53Z",
       "side": 1,
       "message": "Turns out this is already working. Commands\u0027 logs do contain some initial \"waiting for logger\" but then the output is properly logged. Though if/when zuul_stream uses ssh port forward, then this may need some adjustments to work with the kubectl connection plugin.",
+      "revId": "c1b8dacf43541a4a7fb09c8cb22c2e1827858f99",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_17920b4b",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-05T22:32:24Z",
+      "side": 1,
+      "message": "Neat!",
       "revId": "c1b8dacf43541a4a7fb09c8cb22c2e1827858f99",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -59,6 +93,23 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_3797073c",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-05T22:32:24Z",
+      "side": 1,
+      "message": "Double neat!",
+      "revId": "c1b8dacf43541a4a7fb09c8cb22c2e1827858f99",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_31b452f2",
         "filename": "doc/source/developer/specs/container-build-resources.rst",
         "patchSetId": 2
@@ -76,6 +127,23 @@
         "endLine": 182,
         "endChar": 33
       },
+      "revId": "c1b8dacf43541a4a7fb09c8cb22c2e1827858f99",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_d79fb34e",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-05T22:32:24Z",
+      "side": 1,
+      "message": "It is to support k8s first, but the additional OpenShift functionality sounds very compelling and worth looking into.\n\nI worry about scope creep here -- there must be other applications which manage k8s clusters to scale with load.",
       "revId": "c1b8dacf43541a4a7fb09c8cb22c2e1827858f99",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
