@@ -79,10 +79,15 @@ class PipelineManager(object):
             else:
                 return False
         for ef in self.event_filters:
-            if ef.matches(event, change):
+            match_result = ef.matches(event, change)
+            if match_result is True:
                 self.log.debug("Event %s for change %s matched %s "
                                "in pipeline %s" % (event, change, ef, self))
                 return True
+            else:
+                self.log.debug("Event %s for change %s does not match %s "
+                               "in pipeline %s because %s" % (
+                                   event, change, ef, self, match_result))
         return False
 
     def isChangeAlreadyInPipeline(self, change):
@@ -244,9 +249,11 @@ class PipelineManager(object):
                     self.log.debug("Filter %s skipped for change %s due "
                                    "to mismatched connections" % (f, change))
                     continue
-                if not f.matches(change):
+                match_result = f.matches(change)
+                if match_result is not True:
                     self.log.debug("Change %s does not match pipeline "
-                                   "requirement %s" % (change, f))
+                                   "requirement %s because %s" % (
+                                       change, f, match_result))
                     return False
 
         with self.getChangeQueue(change, change_queue) as change_queue:
