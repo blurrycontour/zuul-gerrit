@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_efae86e2",
+        "filename": "web/config/status-openstack.json",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2018-07-06T14:42:24Z",
+      "side": 1,
+      "message": "Yeah, I suppose this says \"Jenkins\" too. We could do with reevaluating/refreshing all the sample JSON blobs from pre-v3 days. I\u0027ll just drop these from the patch and focus on the one documentation diff for now.",
+      "revId": "eb1d65275bf0cb5fbceb30334cb628d1b8ad556b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_8bef3385",
         "filename": "web/config/status-tree.json",
         "patchSetId": 1
