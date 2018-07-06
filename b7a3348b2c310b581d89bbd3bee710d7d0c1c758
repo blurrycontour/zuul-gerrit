@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_45667b2a",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-07-06T16:27:06Z",
+      "side": 1,
+      "message": "The old code had a guard against mark being None before accessing subelements of mark. Do we need to carry that over here?\n\nThe mark parameter doesn\u0027t have a default value so callers would be passing in None explicitly.\n\nSimilar guards were used with the context parameter as well.",
+      "revId": "b7a3348b2c310b581d89bbd3bee710d7d0c1c758",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
