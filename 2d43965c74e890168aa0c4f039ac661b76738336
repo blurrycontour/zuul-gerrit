@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_aa915c48",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-06T15:26:24Z",
+      "side": 1,
+      "message": "Sure, we can hash that and the error text even.",
+      "revId": "2d43965c74e890168aa0c4f039ac661b76738336",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_cb609910",
         "filename": "zuul/model.py",
         "patchSetId": 1
@@ -36,6 +53,23 @@
       "writtenOn": "2018-07-03T23:50:07Z",
       "side": 1,
       "message": "Any concern with __hash__ for two errors being the same but not being __eq__ because the objects aren\u0027t strictly equal until converted to a string? May want to compare hash values to avoid this potential problem.",
+      "revId": "2d43965c74e890168aa0c4f039ac661b76738336",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_8a8ca02e",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-06T15:26:24Z",
+      "side": 1,
+      "message": "No -- things like set membership check equality after hash.  It\u0027s expected that hash is imperfect.",
       "revId": "2d43965c74e890168aa0c4f039ac661b76738336",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
