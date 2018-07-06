@@ -16,6 +16,24 @@
       "revId": "2c17bef16ef8f7bb5e0409578bec583e00c43e5d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_f6a1873b",
+        "filename": "Dockerfile.zuul-executor",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-07-06T12:57:23Z",
+      "side": 1,
+      "message": "Aha! Yes - I just added 0.2.1 to a new repo for bionic (so we can control the upgrade in Infra) Thanks",
+      "parentUuid": "5f7c97a3_a18bd5be",
+      "revId": "2c17bef16ef8f7bb5e0409578bec583e00c43e5d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
