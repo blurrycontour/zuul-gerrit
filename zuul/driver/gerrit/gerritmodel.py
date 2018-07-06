@@ -216,7 +216,7 @@ class GerritEventFilter(EventFilter, GerritApprovalFilter):
             if etype.match(event.type):
                 matches_type = True
         if self.types and not matches_type:
-            return False
+            return False, ""
 
         # branches are ORed
         matches_branch = False
@@ -224,7 +224,7 @@ class GerritEventFilter(EventFilter, GerritApprovalFilter):
             if branch.match(event.branch):
                 matches_branch = True
         if self.branches and not matches_branch:
-            return False
+            return False, ""
 
         # refs are ORed
         matches_ref = False
@@ -233,11 +233,11 @@ class GerritEventFilter(EventFilter, GerritApprovalFilter):
                 if ref.match(event.ref):
                     matches_ref = True
         if self.refs and not matches_ref:
-            return False
+            return False, ""
         if self.ignore_deletes and event.newrev == EMPTY_GIT_REF:
             # If the updated ref has an empty git sha (all 0s),
             # then the ref is being deleted
-            return False
+            return False, ""
 
         # comments are ORed
         matches_comment_re = False
@@ -246,7 +246,7 @@ class GerritEventFilter(EventFilter, GerritApprovalFilter):
                 comment_re.search(event.comment)):
                 matches_comment_re = True
         if self.comments and not matches_comment_re:
-            return False
+            return False, ""
 
         # We better have an account provided by Gerrit to do
         # email filtering.
@@ -259,7 +259,7 @@ class GerritEventFilter(EventFilter, GerritApprovalFilter):
                         email_re.search(account_email)):
                     matches_email_re = True
             if self.emails and not matches_email_re:
-                return False
+                return False, ""
 
             # usernames are ORed
             account_username = event.account.get('username')
@@ -269,7 +269,7 @@ class GerritEventFilter(EventFilter, GerritApprovalFilter):
                     username_re.search(account_username)):
                     matches_username_re = True
             if self.usernames and not matches_username_re:
-                return False
+                return False, ""
 
         # approvals are ANDed
         for category, value in self.event_approvals.items():
@@ -279,13 +279,13 @@ class GerritEventFilter(EventFilter, GerritApprovalFilter):
                         int(eapp['value']) == int(value)):
                     matches_approval = True
             if not matches_approval:
-                return False
+                return False, ""
 
         # required approvals are ANDed (reject approvals are ORed)
         if not self.matchesApprovals(change):
-            return False
+            return False, ""
 
-        return True
+        return True, None
 
 
 class GerritRefFilter(RefFilter, GerritApprovalFilter):
@@ -328,25 +328,25 @@ class GerritRefFilter(RefFilter, GerritApprovalFilter):
             # and cannot possibly pass this test.
             if hasattr(change, 'number'):
                 if self.open != change.open:
-                    return False
+                    return False, ""
             else:
-                return False
+                return False, ""
 
         if self.current_patchset is not None:
             # if a "change" has no number, it's not a change, but a push
             # and cannot possibly pass this test.
             if hasattr(change, 'number'):
                 if self.current_patchset != change.is_current_patchset:
-                    return False
+                    return False, ""
             else:
-                return False
+                return False, ""
 
         if self.statuses:
             if change.status not in self.statuses:
-                return False
+                return False, ""
 
         # required approvals are ANDed (reject approvals are ORed)
         if not self.matchesApprovals(change):
-            return False
+            return False, ""
 
-        return True
+        return True, None

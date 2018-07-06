@@ -140,14 +140,17 @@ class GithubCommonFilter(object):
         if self.required_reviews or self.reject_reviews:
             if not hasattr(change, 'number'):
                 # not a PR, no reviews
-                return False
+                return False, "Change is not a PR"
             if self.required_reviews and not change.reviews:
                 # No reviews means no matching of required bits
                 # having reject reviews but no reviews on the change is okay
-                return False
+                return False, "Reviews %s does not match %s" % (
+                    self.required_reviews, change.reviews)
 
-        return (self.matchesRequiredReviews(change) and
-                self.matchesNoRejectReviews(change))
+        required_reviews_results, perror = self.matchesRequiredReviews(change)
+        if required_reviews_results is not True:
+            return required_reviews_results, perror
+        return self.matchesNoRejectReviews(change)
 
     def matchesRequiredReviews(self, change):
         for rreview in self.required_reviews:
@@ -158,26 +161,31 @@ class GithubCommonFilter(object):
                     matches_review = True
                     break
             if not matches_review:
-                return False
-        return True
+                return False, "Required reviews %s does not match %s" % (
+                    self.required_reviews, change.reviews)
+        return True, None
 
     def matchesNoRejectReviews(self, change):
         for rreview in self.reject_reviews:
             for review in change.reviews:
                 if self._match_review_required_review(rreview, review):
                     # A review matched, we can reject right away
-                    return False
-        return True
+                    return False, "Reject reviews %s matches %s" % (
+                        self.reject_reviews, change.reviews)
+        return True, None
 
     def matchesStatuses(self, change):
         if self.required_statuses or self.reject_statuses:
             if not hasattr(change, 'number'):
                 # not a PR, no status
-                return False
+                return False, "Can't match statuses without PR"
             if self.required_statuses and not change.status:
-                return False
-        return (self.matchesRequiredStatuses(change) and
-                self.matchesNoRejectStatuses(change))
+                return False, "Required statuses %s does not match %s" % (
+                    self.required_statuses, change.status)
+        required_statuses_result, perror = self.matchesRequiredStatuses(change)
+        if required_statuses_result is not True:
+            return required_statuses_result, perror
+        return self.matchesNoRejectStatuses(change)
 
     def matchesRequiredStatuses(self, change):
         # statuses are ORed
@@ -189,8 +197,9 @@ class GithubCommonFilter(object):
                 for status in change.status:
                     if re2.fullmatch(required_status, status):
                         return True
-            return False
-        return True
+            return False, "RequiredStatuses %s does not match %s" % (
+                self.required_statuses, change.status)
+        return True, None
 
     def matchesNoRejectStatuses(self, change):
         # statuses are ANDed
@@ -198,8 +207,9 @@ class GithubCommonFilter(object):
         for rstatus in self.reject_statuses:
             for status in change.status:
                 if re2.fullmatch(rstatus, status):
-                    return False
-        return True
+                    return False, "NoRejectStatuses %s matches %s" % (
+                        self.reject_statuses, change.status)
+        return True, None
 
 
 class GithubEventFilter(EventFilter, GithubCommonFilter):
@@ -264,7 +274,8 @@ class GithubEventFilter(EventFilter, GithubCommonFilter):
             if etype.match(event.type):
                 matches_type = True
         if self.types and not matches_type:
-            return False
+            return False, "Types %s doesn't match %s" % (
+                self.types, event.type)
 
         # branches are ORed
         matches_branch = False
@@ -272,7 +283,8 @@ class GithubEventFilter(EventFilter, GithubCommonFilter):
             if branch.match(event.branch):
                 matches_branch = True
         if self.branches and not matches_branch:
-            return False
+            return False, "Branches %s doesn't match %s" % (
+                self.branches, event.branch)
 
         # refs are ORed
         matches_ref = False
@@ -281,11 +293,11 @@ class GithubEventFilter(EventFilter, GithubCommonFilter):
                 if ref.match(event.ref):
                     matches_ref = True
         if self.refs and not matches_ref:
-            return False
+            return False, "Refs %s doesn't match %s" % (self.refs, event.ref)
         if self.ignore_deletes and event.newrev == EMPTY_GIT_REF:
             # If the updated ref has an empty git sha (all 0s),
             # then the ref is being deleted
-            return False
+            return False, "Ref deletion are ignored"
 
         # comments are ORed
         matches_comment_re = False
@@ -294,7 +306,8 @@ class GithubEventFilter(EventFilter, GithubCommonFilter):
                 comment_re.search(event.comment)):
                 matches_comment_re = True
         if self.comments and not matches_comment_re:
-            return False
+            return False, "Comments %s doesn't match %s" % (
+                self.comments, event.comment)
 
         # actions are ORed
         matches_action = False
@@ -302,19 +315,23 @@ class GithubEventFilter(EventFilter, GithubCommonFilter):
             if (event.action == action):
                 matches_action = True
         if self.actions and not matches_action:
-            return False
+            return False, "Actions %s doesn't match %s" % (
+                self.actions, event.action)
 
         # labels are ORed
         if self.labels and event.label not in self.labels:
-            return False
+            return False, "Labels %s doesn't match %s" % (
+                self.labels, event.label)
 
         # unlabels are ORed
         if self.unlabels and event.unlabel not in self.unlabels:
-            return False
+            return False, "Unlabels %s doesn't match %s" % (
+                self.unlabels, event.unlabel)
 
         # states are ORed
         if self.states and event.state not in self.states:
-            return False
+            return False, "States %s doesn't match %s" % (
+                self.states, event.state)
 
         # statuses are ORed
         if self.statuses:
@@ -324,12 +341,10 @@ class GithubEventFilter(EventFilter, GithubCommonFilter):
                     status_found = True
                     break
             if not status_found:
-                return False
+                return False, "Statuses %s doesn't match %s" % (
+                    self.statuses, event.status)
 
-        if not self.matchesStatuses(change):
-            return False
-
-        return True
+        return self.matchesStatuses(change)
 
 
 class GithubRefFilter(RefFilter, GithubCommonFilter):
@@ -390,48 +405,52 @@ class GithubRefFilter(RefFilter, GithubCommonFilter):
         return ret
 
     def matches(self, change):
-        if not self.matchesStatuses(change):
-            return False
+        statuses_result, perror = self.matchesStatuses(change)
+        if not statuses_result:
+            return statuses_result, perror
 
         if self.open is not None:
             # if a "change" has no number, it's not a change, but a push
             # and cannot possibly pass this test.
             if hasattr(change, 'number'):
                 if self.open != change.open:
-                    return False
+                    return False, "Change is not a PR"
             else:
-                return False
+                return False, "Change is not a PR"
 
         if self.merged is not None:
             # if a "change" has no number, it's not a change, but a push
             # and cannot possibly pass this test.
             if hasattr(change, 'number'):
                 if self.merged != change.is_merged:
-                    return False
+                    return False, "Change is not a PR"
             else:
-                return False
+                return False, "Change is not a PR"
 
         if self.current_patchset is not None:
             # if a "change" has no number, it's not a change, but a push
             # and cannot possibly pass this test.
             if hasattr(change, 'number'):
                 if self.current_patchset != change.is_current_patchset:
-                    return False
+                    return False, "Change is not current"
             else:
-                return False
+                return False, "Change is not a PR"
 
         # required reviews are ANDed (reject reviews are ORed)
-        if not self.matchesReviews(change):
-            return False
+        reviews_result, perror = self.matchesReviews(change)
+        if not reviews_result:
+            return reviews_result, perror
 
         # required labels are ANDed
         for label in self.labels:
             if label not in change.labels:
-                return False
+                return False, "Labels %s does not match %s" % (
+                    self.labels, change.labels)
 
         # rejected reviews are OR'd
         for label in self.reject_labels:
             if label in change.labels:
-                return False
+                return False, "RejectLabels %s matches %s" % (
+                    self.reject_labels, change.labels)
 
-        return True
+        return True, None
