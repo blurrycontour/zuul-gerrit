@@ -48,6 +48,23 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_fd9f0462",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-09T15:00:46Z",
+      "side": 1,
+      "message": "The two are not so different.  It is anticipated that nodepool may build container images as well, for the same reasons that we build VM images: to cache git repos and ensure OS packages are present.  See line 243.\n\nFor the container-as-machine case, I think we should maintain parity between the two systems -- the difference is not really meant to be user-visible.\n\nThis idea is a good one, however.  Perhaps we should discuss it further, but we should also discuss applying the same thing to cloud images (I can see no argument for this for container images that doesn\u0027t also apply to cloud images), as well as how to restrict it (it\u0027s certainly valid for an admin to want to restrict what container images are available to jobs).",
+      "revId": "1b2b1d0b8c34774df3012f7390311021c59b3642",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_17e3eba1",
         "filename": "doc/source/developer/specs/container-build-resources.rst",
         "patchSetId": 4
@@ -112,6 +129,23 @@
         "endLine": 96,
         "endChar": 48
       },
+      "revId": "1b2b1d0b8c34774df3012f7390311021c59b3642",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_1da3e0b2",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-09T15:00:46Z",
+      "side": 1,
+      "message": "Yes, it would be a flag in nodepool (either a label or, if nodepool builds the image, an image flag).\nLines 109-111 say we\u0027re not going to do this right now.  This is just collecting the information we\u0027ve generated as part of this process for future work if someone wants to take it on, as well as providing contect for why we\u0027re doing the other thing (this was, after all, one of the most important questions we set out to answer about how to do this).",
       "revId": "1b2b1d0b8c34774df3012f7390311021c59b3642",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -221,6 +255,23 @@
       "writtenOn": "2018-07-06T07:27:25Z",
       "side": 1,
       "message": "https://docs.ansible.com/ansible/latest/modules/k8s_module.html (note, k8s is present only from 2.6, while k8s_raw only in 2.5. https://github.com/openshift/openshift-restclient-python guys have deprecated k8s_raw. Instead `k8s` is able to handle k8s and openshift resources with one module",
+      "revId": "1b2b1d0b8c34774df3012f7390311021c59b3642",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_bda50cb6",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-09T15:00:46Z",
+      "side": 1,
+      "message": "k8s_raw handles openshift and k8s as well.",
       "revId": "1b2b1d0b8c34774df3012f7390311021c59b3642",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
