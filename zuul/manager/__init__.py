@@ -449,7 +449,7 @@ class PipelineManager(object):
                 # config items ahead), so just use the current pipeline
                 # layout.
                 if not len(layout.loading_errors):
-                    return item.queue.pipeline.layout
+                    return item.queue.pipeline.layout.tenant.layout
             if len(layout.loading_errors):
                 self.log.info("Configuration syntax error in dynamic layout")
                 if trusted_layout_verified:
@@ -498,7 +498,7 @@ class PipelineManager(object):
     def getLayout(self, item):
         if not self._queueUpdatesConfig(item):
             # No config updates in queue. Use existing pipeline layout
-            return item.queue.pipeline.layout
+            return item.queue.pipeline.layout.tenant.layout
         elif (not item.change.updatesConfig() and
                 item.item_ahead and item.item_ahead.live):
             # Current change does not update layout, use its parent if parent
