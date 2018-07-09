@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_d338f9ed",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 452,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-07-09T16:39:01Z",
+      "side": 0,
+      "message": "The bug happened here",
+      "range": {
+        "startLine": 452,
+        "startChar": 20,
+        "endLine": 452,
+        "endChar": 53
+      },
+      "revId": "f4280d4afc1b6b0c13bb755944f9342543bd8a4e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_732325bf",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 501,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-07-09T16:39:01Z",
+      "side": 0,
+      "message": "and here",
+      "range": {
+        "startLine": 501,
+        "startChar": 12,
+        "endLine": 501,
+        "endChar": 45
+      },
+      "revId": "f4280d4afc1b6b0c13bb755944f9342543bd8a4e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
