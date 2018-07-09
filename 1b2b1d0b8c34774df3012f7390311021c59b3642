@@ -130,6 +130,30 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_7d021440",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-07-09T15:16:17Z",
+      "side": 1,
+      "message": "Could you define \"handling it to the executors\"? It seems like the ansible-playbook runners needs a .kube/config or kubectl_cert_file or  kubectl_token or *something* to be able to use kubectl exec and run tasks on any inventory pods. Would be nice to know more about this and how it qualifies as \"little customization expected here\" :)",
+      "parentUuid": "5f7c97a3_27d56b1b",
+      "range": {
+        "startLine": 78,
+        "startChar": 34,
+        "endLine": 79,
+        "endChar": 16
+      },
+      "revId": "1b2b1d0b8c34774df3012f7390311021c59b3642",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_27c9eb23",
         "filename": "doc/source/developer/specs/container-build-resources.rst",
         "patchSetId": 4
