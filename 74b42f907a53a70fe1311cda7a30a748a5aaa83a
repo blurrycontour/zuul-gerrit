@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_5707f01d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-09T20:28:32Z",
+      "side": 1,
+      "message": "Adding the following to the commit message may help clarify this:\n\nBecause the pipeline definition is in a different repository than the\nproposed config repo change, when the dynamic layout is created for\nthe config repo change, the previously cached Pipeline objects are used\nto build the layout.  These objects are the actual live pipelines, and\nwhen they are added to the layout, they have their Pipeline.layout\nattributes set to the dynamic layout.  This dynamic layout is then not\nused further (it is only created for syntax validation), but the pipelines\nremain altered.",
+      "revId": "74b42f907a53a70fe1311cda7a30a748a5aaa83a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_f7015c08",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-09T20:28:32Z",
+      "side": 1,
+      "message": "Because the tenant object is never expected to change during the lifetime\nof the pipeline object, holding the reference to the tenant, rather than\nthe layout, is safe.",
+      "revId": "74b42f907a53a70fe1311cda7a30a748a5aaa83a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_17fdf807",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1726,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-09T20:28:32Z",
+      "side": 1,
+      "message": "I\u0027m a little uncomfortable with this because I worry that we could end up with the opposite error from this one in the future (where we keep an old tenant reference past when we should).\n\nI\u0027ve written a followup change which I think reduces the potential for future error:  https://review.openstack.org/581129",
+      "revId": "74b42f907a53a70fe1311cda7a30a748a5aaa83a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
