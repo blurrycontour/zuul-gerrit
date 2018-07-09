@@ -25,6 +25,7 @@ import socket
 import sys
 import threading
 import time
+import enum
 
 from zuul import configloader
 from zuul import model
@@ -80,10 +81,16 @@ class TenantReconfigureEvent(ManagementEvent):
     :arg Project project: if supplied, clear the cached configuration
          from this project first
     """
-    def __init__(self, tenant, project):
+
+    class BranchAction(enum.Enum):
+        CREATED = 1
+        UPDATED = 2
+        DELETED = 3
+
+    def __init__(self, tenant, project, branch, branch_action):
         super(TenantReconfigureEvent, self).__init__()
         self.tenant_name = tenant.name
-        self.projects = set([project])
+        self.project_branches = set([(project, branch, branch_action)])
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -98,7 +105,7 @@ class TenantReconfigureEvent(ManagementEvent):
     def merge(self, other):
         if self.tenant_name != other.tenant_name:
             raise Exception("Can not merge events from different tenants")
-        self.projects |= other.projects
+        self.project_branches |= other.project_branches
 
 
 class PromoteEvent(ManagementEvent):
@@ -429,7 +436,25 @@ class Scheduler(threading.Thread):
         self.log.debug("Submitting tenant reconfiguration event for "
                        "%s due to event %s in project %s",
                        tenant.name, event, project)
-        event = TenantReconfigureEvent(tenant, project)
+
+        if event is not None:
+            branch = event.branch
+
+            if event.branch_created:
+                branch_action = TenantReconfigureEvent.BranchAction.CREATED
+            elif event.branch_deleted:
+                branch_action = TenantReconfigureEvent.BranchAction.DELETED
+            elif event.branch_updated:
+                branch_action = TenantReconfigureEvent.BranchAction.UPDATED
+            else:
+                self.log.warning("Tenant reconfiguration requested "
+                                 "without any branch action. Dropping event.")
+                return
+        else:
+            branch = None
+            branch_action = None
+
+        event = TenantReconfigureEvent(tenant, project, branch, branch_action)
         self.management_event_queue.put(event)
         self.wake_event.set()
 
@@ -592,27 +617,47 @@ class Scheduler(threading.Thread):
             self.layout_lock.release()
         self.log.info("Full reconfiguration complete")
 
+    @staticmethod
+    def _isReconfigurationNeeded(branch_action, config_removed):
+        return (
+            branch_action == TenantReconfigureEvent.BranchAction.CREATED or
+            branch_action == TenantReconfigureEvent.BranchAction.UPDATED or
+            (branch_action == TenantReconfigureEvent.BranchAction.DELETED and
+             config_removed)
+        )
+
     def _doTenantReconfigureEvent(self, event):
         # This is called in the scheduler loop after another thread submits
         # a request
         self.layout_lock.acquire()
         try:
             self.log.info("Tenant reconfiguration beginning for %s due to "
-                          "projects %s", event.tenant_name, event.projects)
+                          "projects %s",
+                          event.tenant_name, event.project_branches)
             # If a change landed to a project, clear out the cached
-            # config before reconfiguring.
-            # TODO(jeblair): this could probably clear only the specific branch
-            for project in event.projects:
-                self.abide.clearUnparsedConfigCache(project.canonical_name)
-            old_tenant = self.abide.tenants[event.tenant_name]
-            loader = configloader.ConfigLoader(
-                self.connections, self, self.merger)
-            abide = loader.reloadTenant(
-                self._get_project_key_dir(),
-                self.abide, old_tenant)
-            tenant = abide.tenants[event.tenant_name]
-            self._reconfigureTenant(tenant)
-            self.abide = abide
+            # config of the changed branch before reconfiguring.
+            reconfig_needed = False
+            for (project, branch, branch_action) in event.project_branches:
+                removed = self.abide.clearUnparsedConfigCache(
+                    project.canonical_name, branch)
+                reconfig_needed = (
+                    reconfig_needed or
+                    Scheduler._isReconfigurationNeeded(branch_action, removed)
+                )
+
+            if reconfig_needed:
+                old_tenant = self.abide.tenants[event.tenant_name]
+                loader = configloader.ConfigLoader(
+                    self.connections, self, self.merger)
+                abide = loader.reloadTenant(
+                    self._get_project_key_dir(),
+                    self.abide, old_tenant)
+                tenant = abide.tenants[event.tenant_name]
+                self._reconfigureTenant(tenant)
+                self.abide = abide
+            else:
+               self.log.info("Skipped reconfiguration due to deletion of a "
+                             "non-config branch")
         finally:
             self.layout_lock.release()
         self.log.info("Tenant reconfiguration complete")
