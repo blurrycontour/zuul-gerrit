@@ -65,6 +65,24 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_7d6bf41d",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-07-09T15:11:41Z",
+      "side": 1,
+      "message": "I\u0027m going to ignore the cached resources part first for a sec. I\u0027ll come back to it, I promise.\n\nThe reason I think that container images are different from vm images is that there is currently a defacto global registry of  container names that can be used from anywhere that are not cloud-vendor specific. The newer technologies that aim to be more decentralized still allow image references to be urls - so a container image name can be specified by a user and the vendor of a cloud doesn\u0027t have an opportunity to mess things up.\n\nVM images, otoh, are different on every cloud. There is no \"ubuntu:xenial\" image that can be counted on to be ubuntu:xenial - so our vm image labels provide value in that they allow us to describe a generic concept and map it to specific image implementation names. This is both for hiding different names for pre-existing cloud provider images, as well as our serial number named images produced by nodepool-builder.\n\nBack to cached resources ...\n\nSince we\u0027re talking about always booting a pod-of-one-container, to deal with caching without needing to rebuild container images (or without having to build derivitive images) - we could alternately make a container image with the cached git repos in it (and other cached content) and have nodepool be configured to boot a pod with the requested image as well as the repo cache image with directories from the cache container bind-mounted in to the requested image as volumes. Since containers in pods can share a filesystem, this is a way we could provide the same functionality we provide to vm images.\n\nIt would also be much more efficient - since we\u0027d otherwise be laying the caching on TOP of the requested base image - which means if we made 5 different container images with added cache we\u0027d have 5 complete copies of the cache layer in the docker image cache. With a cache image that\u0027s just there to provide directories, the cache layer can be in the image layer cache once on each k8s node, and then the requested container image itself can be used over and over again unmodified.",
+      "parentUuid": "5f7c97a3_fd9f0462",
+      "revId": "1b2b1d0b8c34774df3012f7390311021c59b3642",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_17e3eba1",
         "filename": "doc/source/developer/specs/container-build-resources.rst",
         "patchSetId": 4
@@ -146,6 +164,24 @@
       "writtenOn": "2018-07-09T15:00:46Z",
       "side": 1,
       "message": "Yes, it would be a flag in nodepool (either a label or, if nodepool builds the image, an image flag).\nLines 109-111 say we\u0027re not going to do this right now.  This is just collecting the information we\u0027ve generated as part of this process for future work if someone wants to take it on, as well as providing contect for why we\u0027re doing the other thing (this was, after all, one of the most important questions we set out to answer about how to do this).",
+      "revId": "1b2b1d0b8c34774df3012f7390311021c59b3642",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_9d4ff0bc",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-07-09T15:11:41Z",
+      "side": 1,
+      "message": "++",
+      "parentUuid": "5f7c97a3_1da3e0b2",
       "revId": "1b2b1d0b8c34774df3012f7390311021c59b3642",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
