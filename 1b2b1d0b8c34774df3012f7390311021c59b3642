@@ -25,6 +25,29 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_873d5f2d",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-07-09T13:59:16Z",
+      "side": 1,
+      "message": "container images and vm images have a different costs and no consistent naming scheme. For vm images, we define how to build and upload them for the nodepool builders, then we define nodepool labels that abstract away the details of the actual cloud image name, allowing use to have a label like \u0027ubuntu-xenial\u0027 and an actual image on each cloud with a much more complex name.\n\nWith containers, it feels like requiring a nodepool admin to create (or review/approve) a label for a container image in the nodepool config is admin work that doesn\u0027t provide any value. It also doesn\u0027t allow for experimentation, since the nodepool config is not speculative, so in order to write a zuul job that uses the node:slim image, I\u0027d need to go make a label in nodepool.yaml, get it landed, then make a zuul job that uses it. Then, if it turns out I needed the node image or the node:alpine image - or the node:slim-8.5 image, I need to go make nodepool labels for each of them. (incidentally, for openstack, I\u0027d need to, I believe, make those labels for every cloud we have, assuming we\u0027re running a k8s in every cloud region) \n\nWhat about adding another field to the nodeset construct that is mutually exclusive with label that is something like:\n\n  - nodeset:\n      nodes:\n        - name: contoller\n          container: python:3.6\n\nthat can pull and boot any container image by reference?\n\nThen, in the nodepool config, for a given provider - or maybe a pool - we could add config information indicating that the provider/pool has the capabilities of providing containers, so when a request for container: python:3.6 comes in, the nodepool scheduler can check to see which provider can boot a container at all, then just boot the pod with the appropriate things.",
+      "range": {
+        "startLine": 76,
+        "startChar": 0,
+        "endLine": 76,
+        "endChar": 57
+      },
+      "revId": "1b2b1d0b8c34774df3012f7390311021c59b3642",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_17e3eba1",
         "filename": "doc/source/developer/specs/container-build-resources.rst",
         "patchSetId": 4
@@ -41,6 +64,76 @@
         "startChar": 34,
         "endLine": 79,
         "endChar": 16
+      },
+      "revId": "1b2b1d0b8c34774df3012f7390311021c59b3642",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_27d56b1b",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-07-09T13:59:16Z",
+      "side": 1,
+      "message": "I do not believe they are supposed to authenticate with the cluster in this context- I believe this is supposed to be nodepool doing the k8s/openshift api calls, creating the pod and handing it to the executors in the ansible inventory.",
+      "parentUuid": "5f7c97a3_17e3eba1",
+      "range": {
+        "startLine": 78,
+        "startChar": 34,
+        "endLine": 79,
+        "endChar": 16
+      },
+      "revId": "1b2b1d0b8c34774df3012f7390311021c59b3642",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_27c9eb23",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-07-09T13:59:16Z",
+      "side": 1,
+      "message": "Related to my earlier comment, the \u0027this has ssh\u0027 vs. \u0027this uses kubectl\u0027 seems like it would need to be a config flag somewhere. (whether it\u0027s in a label definition, or in a nodeset definition)\n\nHowever, have we identitied environments where people would want to use k8s/containers as build resources that specifically want to ssh into the containers rather than using the inventory/kubectl approach you list below? As you mention, it\u0027s rather complicated - and I\u0027d hate to take on the complexity if it\u0027s not really a thing anyone wants.",
+      "range": {
+        "startLine": 95,
+        "startChar": 24,
+        "endLine": 96,
+        "endChar": 48
+      },
+      "revId": "1b2b1d0b8c34774df3012f7390311021c59b3642",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_e7ce932a",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-07-09T13:59:16Z",
+      "side": 1,
+      "message": "++",
+      "range": {
+        "startLine": 109,
+        "startChar": 38,
+        "endLine": 111,
+        "endChar": 56
       },
       "revId": "1b2b1d0b8c34774df3012f7390311021c59b3642",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
