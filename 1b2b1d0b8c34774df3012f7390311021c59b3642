@@ -83,6 +83,23 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_9a812dfd",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-09T20:56:37Z",
+      "side": 1,
+      "message": "Okay, we\u0027ve got two suggestions here:\n\n1) Possibly using a two-container pod with the second container only holding the cached repos so that the image for the first container can be more vanilla.  Let\u0027s look into whether that would work, because if so, that seems like a better approach rather than building new images for each upstream image just to add the local cache.\n\n2) Specifying containers from Zuul.  If we agree (and I think we do) that there\u0027s still a place for nodepool providing a label-to-image mapping for containers (so that a local admin can provide their own local container images, or add certain local information (possibly the thing in #1 even), or restrict access to only defined container images, then I think the spec as written stands.  I think the suggestion to dynamically request container images from Zuul is a good one, but it opens some questions about implementation, usage, and access control which we should think about carefully and may distract us from the immediate goal.  So I\u0027d like to consider that separately later.\n\nHow\u0027s that sound?",
+      "revId": "1b2b1d0b8c34774df3012f7390311021c59b3642",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_17e3eba1",
         "filename": "doc/source/developer/specs/container-build-resources.rst",
         "patchSetId": 4
@@ -148,6 +165,23 @@
         "endLine": 79,
         "endChar": 16
       },
+      "revId": "1b2b1d0b8c34774df3012f7390311021c59b3642",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_3a7c991e",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-09T20:56:37Z",
+      "side": 1,
+      "message": "Yes, the executors will need some credentials.  Nodepool will provide the credentials to the executors via zookeeper (much in the way it provides other connection information now, such as the connection plugin and ip address (and if we were designing it from scratch now, we might even have it provide the ssh key; we still may in the future)).  I expect that the best way to do that would be for nodepool to create a service account and pass the resulting token to zuul via zookeeper.  I could add this to the spec if you like, or if you have another suggestion, I could incorporate that.  Though I\u0027m happy to leave some flexibility here for implementation -- if we communicate the idea that nodepool should provide whatever zuul needs to run kubectl, I\u0027m happy.\n\nBy \"very little customization\", I mean that the nodepool configuration language is not designed to replace or re-implement the k8s api.  If we find ourselves adding more than the minimum of information needed to bring up a usable image to run a pep8 job to the nodepool config, then we should rethink what we\u0027re doing.",
       "revId": "1b2b1d0b8c34774df3012f7390311021c59b3642",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
