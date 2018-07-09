@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_a9786a7d",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 501,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-07-09T17:34:23Z",
+      "side": 0,
+      "message": "The bug happened here",
+      "range": {
+        "startLine": 501,
+        "startChar": 12,
+        "endLine": 501,
+        "endChar": 45
+      },
+      "revId": "3cf229c2d4b76f9b9de10361b5717cfcb95c1ba7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
