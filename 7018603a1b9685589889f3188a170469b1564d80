@@ -16,6 +16,24 @@
       "revId": "7018603a1b9685589889f3188a170469b1564d80",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_680c79ea",
+        "filename": "doc/source/admin/nodepool_install.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-07-10T11:39:56Z",
+      "side": 1,
+      "message": "Yes, thanks.",
+      "parentUuid": "5f7c97a3_1f3501db",
+      "revId": "7018603a1b9685589889f3188a170469b1564d80",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
