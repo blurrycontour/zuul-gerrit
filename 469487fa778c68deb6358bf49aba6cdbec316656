@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_be3f1d21",
+        "filename": "doc/source/admin/opensuse_leap15_setup.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-10T23:29:04Z",
+      "side": 1,
+      "message": "Is zookeeper not in suse?\n\nCan you use the bigtop repo like centos?",
+      "revId": "469487fa778c68deb6358bf49aba6cdbec316656",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
