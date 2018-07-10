@@ -75,21 +75,24 @@ def main():
                          "unencrypted connection. Your secret may get "
                          "compromised.\n")
 
-    # Check if tenant is white label
-    req = Request("%s/api/info" % (args.url.rstrip('/'),))
-    info = json.loads(urlopen(req).read().decode('utf8'))
-
-    api_tenant = info.get('info', {}).get('tenant')
-    if not api_tenant and not args.tenant:
-        print("Error: the --tenant argument is required")
-        exit(1)
-
-    if api_tenant:
-        req = Request("%s/api/key/%s.pub" % (
-            args.url.rstrip('/'), args.project))
+    if url.scheme == 'file':
+        req = Request(args.url)
     else:
-        req = Request("%s/api/tenant/%s/key/%s.pub" % (
-            args.url.rstrip('/'), args.tenant, args.project))
+        # Check if tenant is white label
+        req = Request("%s/api/info" % (args.url.rstrip('/'),))
+        info = json.loads(urlopen(req).read().decode('utf8'))
+
+        api_tenant = info.get('info', {}).get('tenant')
+        if not api_tenant and not args.tenant:
+            print("Error: the --tenant argument is required")
+            exit(1)
+
+        if api_tenant:
+            req = Request("%s/api/key/%s.pub" % (
+                args.url.rstrip('/'), args.project))
+        else:
+            req = Request("%s/api/tenant/%s/key/%s.pub" % (
+                args.url.rstrip('/'), args.tenant, args.project))
     pubkey = urlopen(req)
 
     if args.infile:
