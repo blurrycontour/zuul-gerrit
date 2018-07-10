@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_2b1c3664",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 429,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-07-10T15:18:39Z",
+      "side": 1,
+      "message": "This needs to be item.pipeline.tenant.layout once 580949 merges.",
+      "range": {
+        "startLine": 429,
+        "startChar": 28,
+        "endLine": 429,
+        "endChar": 48
+      },
+      "revId": "4e571d5d292b7e9d8f4de52d96e03f8a6fb17cbb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
