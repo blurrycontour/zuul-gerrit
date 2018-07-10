@@ -16,6 +16,24 @@
       "revId": "4e37156abba435f62c726d71af9bdb77778408d4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_7ebd0566",
+        "filename": "doc/source/user/encryption.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 17799
+      },
+      "writtenOn": "2018-07-10T23:41:37Z",
+      "side": 1,
+      "message": "Yep good catch, thank you. Fixed",
+      "parentUuid": "5f7c97a3_8d8c7ad8",
+      "revId": "4e37156abba435f62c726d71af9bdb77778408d4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
