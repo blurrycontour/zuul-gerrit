@@ -36,12 +36,14 @@ required.
    $ pushd zuul/
 
    # For Fedora and CentOS:
-   $ sudo yum -y install $(bindep -b)
+   $ sudo yum -y install $(bindep -b web)
 
    # For openSUSE:
-   $ zypper install -y $(bindep -b)
+   $ zypper install -y $(bindep -b web)
 
    # All:
+   $ npm install webpack yarn
+   $ npm run build
    $ sudo pip3 install .
    $ popd
 
