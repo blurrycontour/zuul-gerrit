@@ -24,7 +24,7 @@ which we will use in these instructions.
 
 ::
 
-   sudo zypper install -y git python3-pip lsb-release
+   sudo zypper install -y git python3-pip lsb-release nodejs-common
 
 Then install bindep
 
