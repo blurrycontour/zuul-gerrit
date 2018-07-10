@@ -42,6 +42,8 @@ required.
    $ zypper install -y $(bindep -b)
 
    # All:
+   $ npm install webpack yarn
+   $ npm run build
    $ sudo pip3 install .
    $ popd
 
