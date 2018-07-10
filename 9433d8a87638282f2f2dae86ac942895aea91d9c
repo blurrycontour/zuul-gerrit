@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_0d2f0af5",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-10T20:25:34Z",
+      "side": 1,
+      "message": "We should add docs for the new args.",
+      "revId": "9433d8a87638282f2f2dae86ac942895aea91d9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_2d32065e",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 996,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-10T20:25:34Z",
+      "side": 1,
+      "message": "I would find it easier to follow if we put the new logic here (it\u0027s getting log enough, we should probably make this another method).  We already have some logic here that decides that we should reconfigure the tenant.  This change adds some more logic in a different place.  I think it would be better if it were all together.  Then once the decision is made, an event is added to the queue.\n\nI think you should be able to do that by peeking into the unparsed config cache here.",
+      "revId": "9433d8a87638282f2f2dae86ac942895aea91d9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
