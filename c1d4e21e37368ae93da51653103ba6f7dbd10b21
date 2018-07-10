@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_fb35a744",
+        "filename": "tools/encrypt_secret.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-07-10T22:26:36Z",
+      "side": 1,
+      "message": "We should update help to include new functionality.",
+      "range": {
+        "startLine": 47,
+        "startChar": 24,
+        "endLine": 47,
+        "endChar": 28
+      },
+      "revId": "c1d4e21e37368ae93da51653103ba6f7dbd10b21",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
