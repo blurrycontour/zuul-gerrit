@@ -369,6 +369,46 @@
       "revId": "1b2b1d0b8c34774df3012f7390311021c59b3642",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_f0d95df0",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-07-10T05:08:06Z",
+      "side": 1,
+      "message": "I think it\u0027s possibly implied here, but for completeness I think it\u0027s worth pointing out that we\u0027d want a resource to be able to be placed in multiple [child] jobs at once. This would allow multiple jobs to reuse a built image at once.\n\nThis means nodepool will need to handle the cleanup only after each job using a resource is complete.",
+      "range": {
+        "startLine": 310,
+        "startChar": 56,
+        "endLine": 310,
+        "endChar": 59
+      },
+      "revId": "1b2b1d0b8c34774df3012f7390311021c59b3642",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_b09685ee",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-07-10T05:08:06Z",
+      "side": 1,
+      "message": "An alternate, or perhaps additional, approach is to consider how to pass arbitrary resources or files around between any jobs, regardless of their buildset.\n\nFor example, a job may build an image or some kind of artifact, which after gating has been completed needs to be uploaded to a central registry. A post job should be able to grab the same verified image.\n\nThis is likely a bit out of the scope of this spec though. I think having the pool resource (as described in this section) shared between child jobs is still necessary. Artifact persistence could be revisited later.",
+      "revId": "1b2b1d0b8c34774df3012f7390311021c59b3642",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
