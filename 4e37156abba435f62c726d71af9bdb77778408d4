@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_8d8c7ad8",
+        "filename": "doc/source/user/encryption.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-10T20:32:58Z",
+      "side": 1,
+      "message": "Oof.  Actually, shouldn\u0027t this now be: /api/\u003ctenant\u003e/key/\u003cproject\u003e.pub  ?",
+      "revId": "4e37156abba435f62c726d71af9bdb77778408d4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
