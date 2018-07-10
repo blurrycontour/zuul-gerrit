@@ -40,9 +40,13 @@ re2-devel [compile test platform:rpm]
 re2-dev [platform:apk]
 re2 [platform:rpm platform:apk]
 yarn [compile test platform:apk]
-nodejs-npm [compile test platform:apk]
+nodejs-npm [compile test web platform:apk]
 git
 rsync
 curl
 gettext [platform:apk]
 unzip [platform:apk]
+
+nodejs [web platform:rpm !platform:suse]
+nodejs-common [web platform:suse]
+npm [web platform:dpkg]
