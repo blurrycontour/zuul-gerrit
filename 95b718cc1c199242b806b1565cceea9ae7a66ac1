@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_de21b9ff",
+        "filename": "doc/source/admin/opensuse_leap15_setup.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-10T23:30:16Z",
+      "side": 1,
+      "message": "Do the other operating systems need something similar?  Shouldn\u0027t this be handled by bindep?",
+      "revId": "95b718cc1c199242b806b1565cceea9ae7a66ac1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
