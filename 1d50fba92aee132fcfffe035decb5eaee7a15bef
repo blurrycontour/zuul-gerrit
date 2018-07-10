@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_784c3d75",
+        "filename": "Dockerfile.zuul-executor",
+        "patchSetId": 12
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-07-10T21:16:25Z",
+      "side": 1,
+      "message": "should these 3 run commands be a single? To avoid multiple layers?\n\nWe also should delete /root/.pip cache here too",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 30
+      },
+      "revId": "1d50fba92aee132fcfffe035decb5eaee7a15bef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
