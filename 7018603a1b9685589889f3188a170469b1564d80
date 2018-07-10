@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_1f3501db",
+        "filename": "doc/source/admin/nodepool_install.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-07-10T09:23:46Z",
+      "side": 1,
+      "message": "shouldn\u0027t this be in zuul_install instead?",
+      "revId": "7018603a1b9685589889f3188a170469b1564d80",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
