@@ -273,8 +273,12 @@ class TestWeb(BaseTestWeb):
         resp = self.get_url("api/tenant/tenant-one/key/org/no-project.pub")
         self.assertEqual(404, resp.status_code)
 
-    def test_web_404_on_unknown_tenant(self):
+    def test_status_404_on_unknown_tenant(self):
         resp = self.get_url("api/tenant/non-tenant/status")
+        self.assertEqual(404, resp.status_code)
+
+    def test_jobslist_404_on_unknown_tenant(self):
+        resp = self.get_url("api/tenant/non-tenant/jobs")
         self.assertEqual(404, resp.status_code)
 
 
