@@ -16,6 +16,24 @@
       "revId": "95b718cc1c199242b806b1565cceea9ae7a66ac1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_2999951d",
+        "filename": "doc/source/admin/opensuse_leap15_setup.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-07-11T00:58:57Z",
+      "side": 1,
+      "message": "Not sure what the others come with by default, but this could be handled by bindep (and probably should), so let me do that",
+      "parentUuid": "5f7c97a3_de21b9ff",
+      "revId": "95b718cc1c199242b806b1565cceea9ae7a66ac1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
