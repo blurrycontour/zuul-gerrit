@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_cafecf05",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-07-11T04:21:12Z",
+      "side": 1,
+      "message": "I think what\u0027s important here is to note that timer operates on branch heads and doesn\u0027t need speculative layouts to decide if it should be enqueued or not. So it can be decided on cached data if it needs to run or not.",
+      "revId": "01bcb459d2c25ddf478e4f6ca9e609cc459e0e33",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_7ef9801a",
+        "filename": "zuul/driver/timer/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-07-11T04:21:12Z",
+      "side": 1,
+      "message": "I\u0027d like a comment here that notes that timer operates on branch heads and doesn\u0027t need speculative layouts to decide if it should be enqueued or not. So it can be decided on cached data if it needs to run or not.",
+      "revId": "01bcb459d2c25ddf478e4f6ca9e609cc459e0e33",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
