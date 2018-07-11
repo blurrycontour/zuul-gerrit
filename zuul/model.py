@@ -112,6 +112,11 @@ class NoMatchingParentError(Exception):
     pass
 
 
+class TemplateNotFoundError(Exception):
+    """A project referenced a template that does not exist."""
+    pass
+
+
 class Attributes(object):
     """A class to hold attributes for string formatting."""
 
@@ -3052,7 +3057,7 @@ class Layout(object):
     def getProjectTemplates(self, name):
         pt = self.project_templates.get(name, None)
         if pt is None:
-            raise Exception("Project template %s not found" % name)
+            raise TemplateNotFoundError("Project template %s not found" % name)
         return pt
 
     def addProjectConfig(self, project_config):
@@ -3074,13 +3079,17 @@ class Layout(object):
     def getAllProjectConfigs(self, name):
         # Get all the project configs (project and project-template
         # stanzas) for a project.
-        ret = []
-        for pc in self.getProjectConfigs(name):
-            ret.append(pc)
-            for template_name in pc.templates:
-                templates = self.getProjectTemplates(template_name)
-                ret.extend(templates)
-        return ret
+        try:
+            ret = []
+            for pc in self.getProjectConfigs(name):
+                ret.append(pc)
+                for template_name in pc.templates:
+                    templates = self.getProjectTemplates(template_name)
+                    ret.extend(templates)
+            return ret
+        except TemplateNotFoundError as e:
+            self.log.warning("%s for project %s" % (e, name))
+            return []
 
     def getProjectMetadata(self, name):
         if name in self.project_metadata:
