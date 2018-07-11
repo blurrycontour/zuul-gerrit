@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "5f7c97a3_8f36a9b3",
+        "filename": "Dockerfile.zuul-executor",
+        "patchSetId": 12
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-07-11T02:15:28Z",
+      "side": 1,
+      "message": "we should pull it from stretch-backports, it has version 0.2.1\n\n  https://packages.debian.org/stretch-backports/bubblewrap",
+      "range": {
+        "startLine": 1,
+        "startChar": 35,
+        "endLine": 2,
+        "endChar": 26
+      },
+      "revId": "1d50fba92aee132fcfffe035decb5eaee7a15bef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_784c3d75",
         "filename": "Dockerfile.zuul-executor",
         "patchSetId": 12
