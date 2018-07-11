@@ -2280,6 +2280,7 @@ class ZuulTestCase(BaseTestCase):
         gerritconnection.GerritEventConnector.delay = 0.0
 
         self.sched = zuul.scheduler.Scheduler(self.config)
+        self.sched.setZuulApp(self)
         self.sched._stats_interval = 1
 
         self.event_queues = [
@@ -2329,6 +2330,12 @@ class ZuulTestCase(BaseTestCase):
 
         self.sched.reconfigure(self.config)
         self.sched.resume()
+
+    def fullReconfigure(self):
+        try:
+            self.sched.reconfigure(self.config)
+        except Exception:
+            self.log.exception("Reconfiguration failed:")
 
     def configure_connections(self, source_only=False):
         # Set up gerrit related fakes
