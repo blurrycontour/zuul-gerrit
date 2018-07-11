@@ -51,6 +51,23 @@
       "revId": "9433d8a87638282f2f2dae86ac942895aea91d9c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_7b7dfce4",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 996,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-11T20:44:20Z",
+      "side": 1,
+      "message": "Since currently the event is added and consumed within the single scheduler thread, I don\u0027t think there\u0027s a risk of a race.  We would need to think about that in the future if something outside the loop submits a TenantReconfigurationEvent.  It\u0027s hard to say what the risk of a race might be in that place, but still, I think that having the logic in one place will at least make that easier to evaluate.",
+      "revId": "9433d8a87638282f2f2dae86ac942895aea91d9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
