@@ -33,6 +33,24 @@
       "revId": "9433d8a87638282f2f2dae86ac942895aea91d9c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_8a19b788",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 996,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-07-11T04:12:44Z",
+      "side": 1,
+      "message": "This was in fact Markus\u0027 first idea but I feared this might create a risk for races due to delayed execution of the tenant reconfiguration and merging of tenant reconfiguration events (here we just add the event to the event queue). So adding the skip later was the safe way to avoid that possibility.\n\nIf we come to the conclusion that this is not a problem here I\u0027m fine moving the check here (it probably even simplifies this change significantly).",
+      "parentUuid": "5f7c97a3_2d32065e",
+      "revId": "9433d8a87638282f2f2dae86ac942895aea91d9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
