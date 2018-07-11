@@ -3658,6 +3658,45 @@ class TestScheduler(ZuulTestCase):
         self.assertIn('project-post', job_names)
         self.assertEqual(r, True)
 
+    def test_client_dequeue_dependent_change(self):
+        "Test that the RPC client can dequeue a change"
+
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+
+        C.setDependsOn(B, 1)
+        B.setDependsOn(A, 1)
+
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+        C.addApproval('Code-Review', 2)
+
+        # Promote to 'gate' pipeline
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        client = zuul.rpcclient.RPCClient('127.0.0.1',
+                                          self.gearman_server.port)
+        client.dequeue(
+            tenant='tenant-one',
+            pipeline='gate',
+            change_ids=['1,1'])
+
+        self.waitUntilSettled()
+
+        tenant = self.sched.abide.tenants.get('tenant-one')
+        gate_pipeline = tenant.layout.pipelines['gate']
+        self.assertEqual(gate_pipeline.getAllItems(), [])
+        self.assertEqual(self.countJobResults(self.history, 'ABORTED'), 1)
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
     def test_client_enqueue_negative(self):
         "Test that the RPC client returns errors"
         client = zuul.rpcclient.RPCClient('127.0.0.1',
