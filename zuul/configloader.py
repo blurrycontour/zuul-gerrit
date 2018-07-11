@@ -233,7 +233,7 @@ def configuration_exceptions(stanza, conf, accumulator):
                      content=indent(start_mark.snippet.rstrip()),
                      start_mark=str(start_mark))
 
-        accumulator.addError(context, start_mark, m)
+        accumulator.addError(context, start_mark, m, str(e))
 
 
 @contextmanager
