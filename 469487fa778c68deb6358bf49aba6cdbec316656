@@ -16,6 +16,24 @@
       "revId": "469487fa778c68deb6358bf49aba6cdbec316656",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_e94f1dbd",
+        "filename": "doc/source/admin/opensuse_leap15_setup.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-07-11T00:54:56Z",
+      "side": 1,
+      "message": "It\u0027s not in SUSE yet. I didn\u0027t want to link to any unofficial build repos as they may not be suitable or up to date etc. I figured this would do for a \u0027quick start\u0027 and that a more serious deployment would want to look into their zookeeper options themselves.",
+      "parentUuid": "5f7c97a3_be3f1d21",
+      "revId": "469487fa778c68deb6358bf49aba6cdbec316656",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
