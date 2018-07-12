@@ -22,6 +22,30 @@
       "revId": "19afda37a3e5fe6189e19bf92f112bcb266a5c2e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_27b674fb",
+        "filename": "doc/source/user/encryption.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 28208
+      },
+      "writtenOn": "2018-07-12T13:41:01Z",
+      "side": 0,
+      "message": "\u003e where the url is /api/key/\u003cproject\u003e.pub\n\nExactly this path works, and the path provided currently in documentation does not work, whether I would try /api/tenant/openstack/key/airship-armada.pub or /api/tenant/openstack/key/openstack/airship-armada.pub.",
+      "parentUuid": "5f7c97a3_b1b2c795",
+      "range": {
+        "startLine": 18,
+        "startChar": 2,
+        "endLine": 18,
+        "endChar": 40
+      },
+      "revId": "19afda37a3e5fe6189e19bf92f112bcb266a5c2e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
