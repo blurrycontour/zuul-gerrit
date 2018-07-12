@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_29b39eee",
+        "filename": "Dockerfile.zuul-executor",
+        "patchSetId": 12
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-07-12T21:00:26Z",
+      "side": 1,
+      "message": "I found me a whole new solution ...",
+      "parentUuid": "5f7c97a3_8f36a9b3",
+      "range": {
+        "startLine": 1,
+        "startChar": 35,
+        "endLine": 2,
+        "endChar": 26
+      },
+      "revId": "1d50fba92aee132fcfffe035decb5eaee7a15bef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_784c3d75",
         "filename": "Dockerfile.zuul-executor",
         "patchSetId": 12
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_09b262e6",
+        "filename": "Dockerfile.zuul-executor",
+        "patchSetId": 12
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-07-12T21:00:26Z",
+      "side": 1,
+      "message": "yup. you\u0027re right - but it turns out we can do a whole different thing. :)",
+      "parentUuid": "5f7c97a3_784c3d75",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 30
+      },
+      "revId": "1d50fba92aee132fcfffe035decb5eaee7a15bef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_be463da7",
         "filename": "playbooks/container-images/run.yaml",
         "patchSetId": 12
@@ -59,6 +107,24 @@
       "writtenOn": "2018-07-10T23:35:23Z",
       "side": 1,
       "message": "Should this be in the install-docker role?",
+      "revId": "1d50fba92aee132fcfffe035decb5eaee7a15bef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_c9c30a39",
+        "filename": "playbooks/container-images/run.yaml",
+        "patchSetId": 12
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-07-12T21:00:26Z",
+      "side": 1,
+      "message": "yes. I stuck it here for expedience.",
+      "parentUuid": "5f7c97a3_be463da7",
       "revId": "1d50fba92aee132fcfffe035decb5eaee7a15bef",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
