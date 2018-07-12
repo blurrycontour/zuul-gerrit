@@ -304,6 +304,8 @@ class GerritConnection(BaseConnection):
 
         self.baseurl = self.connection_config.get('baseurl',
                                                   'https://%s' % self.server)
+        if self.baseurl[-1] == "/":
+            self.baseurl = self.baseurl.rstrip('/')
         default_gitweb_url_template = '{baseurl}/gitweb?' \
                                       'p={project.name}.git;' \
                                       'a=commitdiff;h={sha}'
