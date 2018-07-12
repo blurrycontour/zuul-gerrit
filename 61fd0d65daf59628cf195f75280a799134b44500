@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_2423c5ac",
+        "filename": "setup.cfg",
+        "patchSetId": 15
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-12T21:17:39Z",
+      "side": 1,
+      "message": "Maybe put a comment here saying that these correspond to container images?\nAlso, can these go in requirements.txt instead?",
+      "revId": "61fd0d65daf59628cf195f75280a799134b44500",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
