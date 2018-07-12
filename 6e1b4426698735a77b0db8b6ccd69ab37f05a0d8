@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_c4577127",
+        "filename": "releasenotes/notes/timer-optimization-a6babecaf1c7dab8.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-12T21:54:55Z",
+      "side": 1,
+      "message": "I\u0027m not sure this release note is necessary.  I think our threshold should be whether a user may change behavior because of a change.  This makes an internal process more efficient.  It\u0027s a good and important change, but I doubt people were avoiding using the timer driver because of the inefficiency.",
+      "revId": "6e1b4426698735a77b0db8b6ccd69ab37f05a0d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
