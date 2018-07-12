@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_b1b2c795",
+        "filename": "doc/source/user/encryption.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-07-12T12:06:07Z",
+      "side": 0,
+      "message": "This is the correct path in a multi tenant environment. In case of the openstack installation of zuul this is a white labeled deployment that just has one tenant where the url is /api/key/\u003cproject\u003e.pub. Note that your project name is \"openstack/airship-armada\" and not \"airship-armada\"",
+      "range": {
+        "startLine": 18,
+        "startChar": 2,
+        "endLine": 18,
+        "endChar": 40
+      },
+      "revId": "19afda37a3e5fe6189e19bf92f112bcb266a5c2e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
