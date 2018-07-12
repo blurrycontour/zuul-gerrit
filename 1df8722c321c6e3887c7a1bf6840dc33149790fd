@@ -46,6 +46,23 @@
       "revId": "1df8722c321c6e3887c7a1bf6840dc33149790fd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_c75a2050",
+        "filename": "doc/source/user/encryption.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2018-07-12T13:57:55Z",
+      "side": 1,
+      "message": "This is \"generic Zuul\" (the upstream zuul Git repository). The documentation builds of this file get published to the zuul-ci.org Web site. The Zuul project has only recently started to rebrand itself to make it look less OpenStacky but its development is still hosted in the OpenStack community infrastructure.",
+      "revId": "1df8722c321c6e3887c7a1bf6840dc33149790fd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
