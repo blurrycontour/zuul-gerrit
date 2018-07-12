@@ -1,0 +1,28 @@
+- pipeline:
+    name: check
+    manager: independent
+    post-review: true
+    trigger:
+      gerrit:
+        - event: patchset-created
+    success:
+      gerrit:
+        Verified: 1
+    failure:
+      gerrit:
+        Verified: -1
+
+- job:
+    name: base
+    vars:
+      base_var: 'base_var'
+    parent: null
+
+- job:
+    name: timeout
+    run: playbooks/timeout.yaml
+
+- project:
+    check:
+      jobs:
+        - timeout
