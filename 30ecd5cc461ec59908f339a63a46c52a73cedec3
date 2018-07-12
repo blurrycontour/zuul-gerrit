@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_ff21d89f",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 361,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-12T22:00:09Z",
+      "side": 1,
+      "message": "That\u0027s actually the default argument.  (Well, b\u0027\u0027 is the default argument.)",
+      "revId": "30ecd5cc461ec59908f339a63a46c52a73cedec3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
