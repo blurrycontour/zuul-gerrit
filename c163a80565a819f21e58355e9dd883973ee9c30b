@@ -16,6 +16,23 @@
       "revId": "c163a80565a819f21e58355e9dd883973ee9c30b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_295e3e51",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3136,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-12T21:12:57Z",
+      "side": 1,
+      "message": "I think we\u0027ve done the best we can: the original error (the template removal) was detected but suppressed due to an oversight which was corrected in I885a2d3ab6d60402425b879e639c1e597717622a.  So in the future (because of that change, not this one) the error will be reported so that folks can choose not to merge it.\n\nBeyond this error, I\u0027m not sure that we want to catch anything further here.  There are higher-level exception handlers that will log exceptions (they caught this one so I was able to find and fix this easily).  But if a still unknown error happens during reconfiguration, I\u0027m not sure we want to try to continue; I think it may be better to be broken in that case so that we have to make a choice about how to fix the bug.\n\n(This one, for instance, raises some interesting questions about whether it\u0027s safe to proceed with a missing template -- I don\u0027t think it is, which is why the project configuration will return nothing -- essentially de-configuring the project until it\u0027s fixed.)",
+      "revId": "c163a80565a819f21e58355e9dd883973ee9c30b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
