@@ -4258,6 +4258,12 @@ class Layout(object):
                 raise Exception("Job %s does not specify a run playbook" % (
                     frozen_job.name,))
 
+            # default to the max job timeout if not set
+            if not frozen_job.timeout:
+                frozen_job.timeout = self.tenant.max_job_timeout
+            if not frozen_job.post_timeout:
+                frozen_job.post_timeout = self.tenant.max_job_timeout
+
             job_graph.addJob(frozen_job)
 
     def createJobGraph(self, item, ppc, skip_file_matcher=False):

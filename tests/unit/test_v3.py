@@ -4037,7 +4037,7 @@ class TestDiskAccounting(AnsibleZuulTestCase):
 class TestMaxNodesPerJob(AnsibleZuulTestCase):
     tenant_config_file = 'config/multi-tenant/main.yaml'
 
-    def test_max_timeout_exceeded(self):
+    def test_max_nodes_reached(self):
         in_repo_conf = textwrap.dedent(
             """
             - job:
@@ -4076,7 +4076,7 @@ class TestMaxNodesPerJob(AnsibleZuulTestCase):
 class TestMaxTimeout(ZuulTestCase):
     tenant_config_file = 'config/multi-tenant/main.yaml'
 
-    def test_max_nodes_reached(self):
+    def test_max_timeout_exceeded(self):
         in_repo_conf = textwrap.dedent(
             """
             - job:
@@ -4097,6 +4097,19 @@ class TestMaxTimeout(ZuulTestCase):
         self.waitUntilSettled()
         self.assertNotIn("exceeds tenant max-job-timeout", B.messages[0],
                          "B should not fail because of timeout limit")
+
+
+class TestDefaultTimeout(AnsibleZuulTestCase):
+    tenant_config_file = 'config/default-timeout/main.yaml'
+
+    def test_default_timeout_exceeded(self):
+        self.wait_timeout = 120
+        A = self.fake_gerrit.addFakeChange('common-config', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='timeout', result='TIMED_OUT', changes='1,1'),
+        ])
 
 
 class TestAllowedConnection(AnsibleZuulTestCase):
