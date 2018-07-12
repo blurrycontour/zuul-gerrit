@@ -1,0 +1,9 @@
+---
+upgrade:
+  - |
+    So far if the base job didn't specify a timeout no timeout was enforced
+    regardless of :attr:`tenant.max-job-timeout`. This has been changed to
+    default job timeouts to the the tenant's max job timeout if no timeout
+    is set. This means that if no timeout is set anywhere those jobs default
+    to the default max-job-timeout of 10800s. To retain the old behavior
+    the max job timeout setting of the tenant can be set to -1.
