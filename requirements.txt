@@ -27,3 +27,5 @@ paho-mqtt
 cherrypy
 ws4py
 routes
+PyMySQL
+psycopg2-binary
