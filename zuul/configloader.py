@@ -670,6 +670,12 @@ class JobParser(object):
             int(conf['post-timeout']) > self.pcontext.tenant.max_job_timeout):
             raise MaxTimeoutError(job, self.pcontext.tenant)
 
+        # default to the max job timeout if not set
+        if not conf.get('timeout'):
+            conf['timeout'] = self.pcontext.tenant.max_job_timeout
+        if not conf.get('post-timeout'):
+            conf['post-timeout'] = self.pcontext.tenant.max_job_timeout
+
         if 'post-review' in conf:
             if conf['post-review']:
                 job.post_review = True

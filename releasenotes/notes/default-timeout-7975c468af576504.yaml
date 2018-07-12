@@ -1,0 +1,7 @@
+---
+upgrade:
+  - |
+    There was a bug that zuul ignored the tenant's
+    :attr:`tenant.max-job-timeout` for jobs not defining any timeout. This has
+    been fixed but could break existing jobs by now enforcing the tenant's
+    max-job-timeout on all jobs.
