@@ -949,6 +949,7 @@ class AnsibleJob(object):
         self.action_dir_general = os.path.join(plugin_dir, 'actiongeneral')
         self.action_dir_trusted = os.path.join(plugin_dir, 'actiontrusted')
         self.callback_dir = os.path.join(plugin_dir, 'callback')
+        self.strategy_dir = os.path.join(plugin_dir, 'strategy')
         self.lookup_dir = os.path.join(plugin_dir, 'lookup')
         self.filter_dir = os.path.join(plugin_dir, 'filter')
         self.ansible_callbacks = self.executor_server.ansible_callbacks
@@ -1805,6 +1806,16 @@ class AnsibleJob(object):
                 if (api not in args['vars'] and
                     not is_group_var_set(api, name, self.nodeset, args)):
                     python = getattr(node, 'python_path', 'auto')
+
+                    # TODO: Mitogen does not yet support 'auto'. Remove this
+                    #       when it does support it (as soon as v0.2.10)
+                    mitogen = self.arguments.get('mitogen', False)
+                    if python == 'auto' and mitogen:
+                        self.log.debug(
+                            "ansible_version set to auto but "
+                            "overriding to python3 for mitogen")
+                        python = '/usr/bin/python3'
+
                     host_vars.setdefault(api, python)
 
                 username = node.username
@@ -2498,6 +2509,27 @@ class AnsibleJob(object):
             # bump the timeout because busy nodes may take more than
             # 10s to respond
             config.write('timeout = 30\n')
+
+            # Add mitogen as strategy plugin to speed up jobs
+            # TODO(tobiash): Test if this breaks unsupported connections like
+            #                winrm or if we need to disable mitogen in this
+            #                case
+            if self.arguments.get('mitogen', False):
+                ansible_version = self.arguments.get('ansible_version')
+                ansible_manager = self.executor_server.ansible_manager
+                mitogen_supported = ansible_manager.isMitogenSupported(
+                    ansible_version)
+                if mitogen_supported:
+                    # When running ansible with -vvv mitogen emits exxessive
+                    # debug logs that break things so we need to wrap it with
+                    # our own strategy plugin and reset its log level after
+                    # it's loaded.
+                    config.write('strategy_plugins = %s\n' % self.strategy_dir)
+                    config.write('strategy = zuul_mitogen\n')
+                else:
+                    self.log.warning('Requested mitogen but it\'s not '
+                                     'supported with ansible version %s',
+                                     ansible_version)
 
             # We need the general action dir to make the zuul_return plugin
             # available to every job.
