@@ -606,6 +606,7 @@ class JobParser(object):
                       'post-run': to_list(str),
                       'run': to_list(str),
                       'ansible-version': vs.Any(str, float),
+                      'mitogen': bool,
                       '_source_context': model.SourceContext,
                       '_start_mark': ZuulMark,
                       'roles': to_list(role),
@@ -644,6 +645,7 @@ class JobParser(object):
         'success-url',
         'override-branch',
         'override-checkout',
+        'mitogen',
     ]
 
     def __init__(self, pcontext):

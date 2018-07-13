@@ -208,6 +208,7 @@ class ExecutorClient(object):
         params['override_checkout'] = job.override_checkout
         params['repo_state'] = item.current_build_set.repo_state
         params['ansible_version'] = job.ansible_version
+        params['mitogen'] = job.mitogen
 
         def make_playbook(playbook):
             d = playbook.toDict()

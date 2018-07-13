@@ -1165,6 +1165,7 @@ class Job(ConfigObject):
             post_run=(),
             run=(),
             ansible_version=None,
+            mitogen=False,
             semaphore=None,
             attempts=3,
             final=False,
@@ -1263,6 +1264,7 @@ class Job(ConfigObject):
             d['ansible_version'] = self.ansible_version
         else:
             d['ansible_version'] = None
+        d['mitogen'] = self.mitogen
         return d
 
     def __ne__(self, other):
