@@ -14,6 +14,7 @@
 
 import collections
 import datetime
+import importlib.util
 import json
 import logging
 import os
@@ -1412,6 +1413,16 @@ class AnsibleJob(object):
             config.write('stdout_callback = zuul_stream\n')
             config.write('filter_plugins = %s\n'
                          % self.executor_server.filter_dir)
+
+            # Add mitogen as strategy plugin to speed up jobs
+            # FIXME(tobiash): disable if unsupported connection is in the
+            # inventory
+            mitogen = importlib.util.find_spec("ansible_mitogen")
+            mitogen_path = os.path.join(os.path.dirname(mitogen.origin),
+                                        'plugins', 'strategy')
+            config.write('strategy_plugins = %s\n' % mitogen_path)
+            config.write('strategy = mitogen_linear\n')
+
             # bump the timeout because busy nodes may take more than
             # 10s to respond
             config.write('timeout = 30\n')
