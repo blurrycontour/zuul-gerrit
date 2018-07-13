@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Jobs now can be ran optionally using Mitogen (:attr:`job.mitogen`).
+

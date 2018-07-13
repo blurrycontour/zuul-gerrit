@@ -138,6 +138,7 @@ def construct_build_params(uuid, sched, job, item, pipeline,
     params['host_vars'] = job.host_variables
     params['group_vars'] = job.group_variables
     params['secret_vars'] = job.secret_parent_data
+    params['mitogen'] = job.mitogen
     params['zuul'] = zuul_params
     projects = set()
     required_projects = set()
