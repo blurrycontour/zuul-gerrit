@@ -24,6 +24,7 @@ class FunctionalZuulStreamMixIn:
     # This should be overriden in child classes.
     ansible_version = '2.9'
     wait_timeout = 120
+    mitogen = False
 
     def _setUp(self):
         self.log_console_port = 19000 + int(self.ansible_version.split('.')[1])
@@ -47,6 +48,7 @@ class FunctionalZuulStreamMixIn:
                     name: {job_name}
                     run: playbooks/{job_name}.yaml
                     ansible-version: {version}
+                    mitogen: {mitogen}
                     vars:
                       test_console_port: {console_port}
                     roles:
@@ -65,7 +67,8 @@ class FunctionalZuulStreamMixIn:
                 """.format(
                     job_name=job_name,
                     version=self.ansible_version,
-                    console_port=self.log_console_port))
+                    console_port=self.log_console_port,
+                    mitogen=self.mitogen))
         else:
             conf = textwrap.dedent(
                 """
@@ -201,7 +204,7 @@ class FunctionalZuulStreamMixIn:
             text = self._get_job_output(build)
             self.assertLogLine(r'TASK \[Module failure\]', text)
 
-            if self.ansible_version in ('2.5', '2.6'):
+            if self.ansible_version in ('2.5', '2.6') or self.mitogen:
                 regex = r'controller \| MODULE FAILURE: This module is broken'
             else:
                 # Ansible starting with 2.7 emits a different error message
@@ -220,9 +223,17 @@ class TestZuulStream28(AnsibleZuulTestCase, FunctionalZuulStreamMixIn):
         self._setUp()
 
 
+class TestZuulStream28Mitogen(TestZuulStream28):
+    mitogen = True
+
+
 class TestZuulStream29(AnsibleZuulTestCase, FunctionalZuulStreamMixIn):
     ansible_version = '2.9'
 
     def setUp(self):
         super().setUp()
         self._setUp()
+
+
+class TestZuulStream29Mitogen(TestZuulStream28):
+    mitogen = True

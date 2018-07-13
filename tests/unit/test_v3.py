@@ -3406,27 +3406,29 @@ class FunctionalAnsibleMixIn(object):
             dict(name='hello-ansible', result='SUCCESS', changes='1,1'),
         ])
 
-    def _add_job(self, job_name):
+    def _add_job(self, job_name, mitogen):
         conf = textwrap.dedent(
             """
             - job:
                 name: {job_name}
                 run: playbooks/{job_name}.yaml
                 ansible-version: {ansible_version}
+                mitogen: {mitogen}
 
             - project:
                 check:
                   jobs:
                     - {job_name}
             """.format(job_name=job_name,
-                       ansible_version=self.ansible_version))
+                       ansible_version=self.ansible_version,
+                       mitogen=mitogen))
 
         file_dict = {'.zuul.yaml': conf}
         A = self.fake_gerrit.addFakeChange('org/plugin-project', 'master', 'A',
                                            files=file_dict)
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
 
-    def _test_plugins(self, plugin_tests):
+    def _test_plugins(self, plugin_tests, mitogen=False):
         # This test runs a bit long and needs extra time.
         self.wait_timeout = 180
 
@@ -3441,7 +3443,7 @@ class FunctionalAnsibleMixIn(object):
         # Kick off all test jobs in parallel
         for job_name, result in plugin_tests:
             count += 1
-            self._add_job(job_name)
+            self._add_job(job_name, mitogen)
         # Wait for all jobs to complete
         self.waitUntilSettled()
 
@@ -3494,6 +3496,41 @@ class FunctionalAnsibleMixIn(object):
             ('password_read_bad', 'FAILURE'),
         ]
         self._test_plugins(plugin_tests)
+
+    def test_plugins_1_mitogen(self):
+        '''
+        Split plugin tests to avoid timeouts and exceeding subunit
+        report lengths.
+        '''
+        plugin_tests = [
+            ('passwd', 'FAILURE'),
+            ('cartesian', 'SUCCESS'),
+            ('consul_kv', 'FAILURE'),
+            ('credstash', 'FAILURE'),
+            ('csvfile_good', 'SUCCESS'),
+            ('csvfile_bad', 'FAILURE'),
+            ('uri_bad_path', 'FAILURE'),
+            ('uri_bad_scheme', 'FAILURE'),
+        ]
+        self._test_plugins(plugin_tests, True)
+
+    def test_plugins_2_mitogen(self):
+        '''
+        Split plugin tests to avoid timeouts and exceeding subunit
+        report lengths.
+        '''
+        plugin_tests = [
+            ('block_local_override', 'FAILURE'),
+            ('file_local_good', 'SUCCESS'),
+            ('file_local_bad', 'FAILURE'),
+            ('zuul_return', 'SUCCESS'),
+            ('password_create_good', 'SUCCESS'),
+            ('password_null_good', 'SUCCESS'),
+            ('password_read_good', 'SUCCESS'),
+            ('password_create_bad', 'FAILURE'),
+            ('password_read_bad', 'FAILURE'),
+        ]
+        self._test_plugins(plugin_tests, True)
 
 
 class TestAnsible28(AnsibleZuulTestCase, FunctionalAnsibleMixIn):
