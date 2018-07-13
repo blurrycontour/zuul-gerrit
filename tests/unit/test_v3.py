@@ -2660,13 +2660,14 @@ class TestAnsible25(AnsibleZuulTestCase):
             dict(name='hello-ansible', result='SUCCESS', changes='1,1'),
         ])
 
-    def _add_job(self, job_name):
+    def _add_job(self, job_name, mitogen):
         conf = textwrap.dedent(
             """
             - job:
                 name: {job_name}
                 run: playbooks/{job_name}.yaml
                 ansible-version: {ansible_version}
+                mitogen: {mitogen}
 
             - project:
                 name: org/plugin-project
@@ -2674,7 +2675,8 @@ class TestAnsible25(AnsibleZuulTestCase):
                   jobs:
                     - {job_name}
             """.format(job_name=job_name,
-                       ansible_version=self.ansible_version))
+                       ansible_version=self.ansible_version,
+                       mitogen=mitogen))
 
         file_dict = {'.zuul.yaml': conf}
         A = self.fake_gerrit.addFakeChange('org/plugin-project', 'master', 'A',
@@ -2682,7 +2684,7 @@ class TestAnsible25(AnsibleZuulTestCase):
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
-    def test_plugins(self):
+    def _test_plugins(self, mitogen):
         # This test runs a bit long and needs extra time.
         self.wait_timeout = 180
 
@@ -2709,7 +2711,7 @@ class TestAnsible25(AnsibleZuulTestCase):
         ]
         for job_name, result in plugin_tests:
             count += 1
-            self._add_job(job_name)
+            self._add_job(job_name, mitogen)
 
             job = self.getJobFromHistory(job_name)
             with self.jobLog(job):
@@ -2719,6 +2721,12 @@ class TestAnsible25(AnsibleZuulTestCase):
 
         # TODOv3(jeblair): parse the ansible output and verify we're
         # getting the exception we expect.
+
+    def test_plugins(self):
+        self._test_plugins(False)
+
+    def test_plugins_mitogen(self):
+        self._test_plugins(True)
 
 
 class TestAnsible26(TestAnsible25):
