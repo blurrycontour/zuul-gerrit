@@ -614,6 +614,7 @@ class JobParser(Parser):
                       'run': to_list(str),
                       'cleanup-run': to_list(str),
                       'ansible-version': vs.Any(str, float),
+                      'mitogen': bool,
                       '_source_context': model.SourceContext,
                       '_start_mark': ZuulMark,
                       'roles': to_list(role),
@@ -652,6 +653,7 @@ class JobParser(Parser):
         'success-url',
         'override-branch',
         'override-checkout',
+        'mitogen',
         'match-on-config-updates',
     ]
 

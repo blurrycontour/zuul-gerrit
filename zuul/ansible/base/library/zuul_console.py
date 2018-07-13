@@ -24,6 +24,12 @@ import subprocess
 import threading
 import time
 
+try:
+    from mitogen.fork import on_fork
+except ImportError:
+    def on_fork():
+        pass
+
 LOG_STREAM_FILE = '/tmp/console-{log_uuid}.log'
 LOG_STREAM_PORT = 19885
 
@@ -37,6 +43,10 @@ def daemonize():
     if pid > 0:
         return True
 
+    # If we're running on mitogen we need to call on_fork to cleanup global
+    # state before we can mess with things.
+    on_fork()
+
     os.chdir('/')
     os.setsid()
     os.umask(0)
@@ -45,6 +55,7 @@ def daemonize():
     if pid > 0:
         sys.exit(0)
 
+    on_fork()
     sys.stdout.flush()
     sys.stderr.flush()
     i = open('/dev/null', 'r')
