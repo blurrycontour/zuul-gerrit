@@ -24,6 +24,7 @@ import zuul.ansible
 
 from pkg_resources import resource_string
 from zuul.lib.config import get_default
+from functools import lru_cache
 
 
 class ManagedAnsible:
@@ -269,6 +270,21 @@ class AnsibleManager:
 
     def getAnsiblePluginDir(self, version):
         return os.path.join(self.getAnsibleDir(version), 'zuul', 'ansible')
+
+    @lru_cache(maxsize=10)
+    def getAnsibleMitogenDir(self, version):
+        command = [
+            self.getAnsibleCommand(version, command='python'),
+            '-c',
+            'import importlib; '
+            'print(importlib.util.find_spec("ansible_mitogen").origin)',
+        ]
+        result = subprocess.run(command,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE,
+                                check=True)
+        return os.path.join(os.path.dirname(result.stdout.decode()),
+                            'plugins', 'strategy')
 
     def requestVersion(self, version):
         if version not in self._supported_versions:

@@ -717,6 +717,7 @@ class AnsibleJob(object):
         self.action_dir = os.path.join(plugin_dir, 'action')
         self.action_dir_general = os.path.join(plugin_dir, 'actiongeneral')
         self.callback_dir = os.path.join(plugin_dir, 'callback')
+        self.strategy_dir = os.path.join(plugin_dir, 'strategy')
         self.lookup_dir = os.path.join(plugin_dir, 'lookup')
         self.filter_dir = os.path.join(plugin_dir, 'filter')
 
@@ -1764,6 +1765,12 @@ class AnsibleJob(object):
             config.write('stdout_callback = zuul_stream\n')
             config.write('filter_plugins = %s\n'
                          % self.filter_dir)
+
+            # Add mitogen as strategy plugin to speed up jobs
+            # FIXME(tobiash): disable if unsupported connection is in the
+            # inventory
+            config.write('strategy_plugins = %s\n' % self.strategy_dir)
+            config.write('strategy = zuul_mitogen\n')
             # bump the timeout because busy nodes may take more than
             # 10s to respond
             config.write('timeout = 30\n')
