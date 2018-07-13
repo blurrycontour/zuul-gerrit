@@ -1421,7 +1421,7 @@ class AnsibleJob(object):
             mitogen_path = os.path.join(os.path.dirname(mitogen.origin),
                                         'plugins', 'strategy')
             config.write('strategy_plugins = %s\n' % mitogen_path)
-            config.write('strategy = mitogen_linear\n')
+            config.write('strategy = mitogen_linear_foo\n')
 
             # bump the timeout because busy nodes may take more than
             # 10s to respond

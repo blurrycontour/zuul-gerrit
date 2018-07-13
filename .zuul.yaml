@@ -67,39 +67,7 @@
 - project:
     check:
       jobs:
-        - build-sphinx-docs:
-            irrelevant-files:
-              - zuul/cmd/migrate.py
-              - playbooks/zuul-migrate/.*
-            vars:
-              sphinx_python: python3
-        - tox-pep8
-        - tox-py35:
-            irrelevant-files:
-              - zuul/cmd/migrate.py
-              - playbooks/zuul-migrate/.*
-        - tox-py36:
-            nodeset: ubuntu-bionic
-            irrelevant-files:
-              - zuul/cmd/migrate.py
-              - playbooks/zuul-migrate/.*
-        - zuul-build-dashboard
-        - zuul-build-dashboard-multi-tenant
-        - nodejs-npm-run-lint:
-            vars:
-                node_version: 8
-            success-url: 'npm/reports/bundle.html'
-            files:
-              - package.json
-              - tsconfig.json
-              - tslint.json
-              - web/.*
-              - webpack.config.js
-              - yarn.lock
-        - zuul-stream-functional
         - zuul-tox-remote
-        - nodepool-zuul-functional:
-            voting: false
     gate:
       jobs:
         - build-sphinx-docs:
