@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_f7f8184b",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 5005,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-07-13T08:14:27Z",
+      "side": 1,
+      "message": "the project-merge job exists on both projects in the tenant. An extra hardening would be to make them unique and/or to check that the job has run against the correct project.",
+      "revId": "2f520fe720a214569aca431e9f970cc1bca7476f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
