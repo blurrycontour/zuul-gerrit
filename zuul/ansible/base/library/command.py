@@ -125,6 +125,7 @@ start:
 
 import datetime
 import glob
+import logging
 import os
 import shlex
 
@@ -181,6 +182,9 @@ class Console(object):
 
 
 def follow(fd, log_uuid):
+
+    logger = logging.getLogger('foologger')
+
     newline_warning = False
     with Console(log_uuid) as console:
         while True:
@@ -192,6 +196,7 @@ def follow(fd, log_uuid):
                 line += b'\n'
                 newline_warning = True
             console.addLine(line)
+            logger.info(line)
         if newline_warning:
             console.addLine('[Zuul] No trailing newline\n')
 

@@ -15,6 +15,7 @@
 import base64
 import collections
 import datetime
+import importlib.util
 import json
 import logging
 import multiprocessing
@@ -1398,7 +1399,7 @@ class AnsibleJob(object):
         raise ExecutorError("Unable to find playbook %s" % path)
 
     def preparePlaybooks(self, args):
-        self.writeAnsibleConfig(self.jobdir.setup_playbook)
+        self.writeAnsibleConfig(self.jobdir.setup_playbook, args)
 
         for playbook in args['pre_playbooks']:
             jobdir_playbook = self.jobdir.addPrePlaybook()
@@ -1460,7 +1461,7 @@ class AnsibleJob(object):
             jobdir_playbook.secrets_content = yaml.safe_dump(
                 secrets, default_flow_style=False)
 
-        self.writeAnsibleConfig(jobdir_playbook)
+        self.writeAnsibleConfig(jobdir_playbook, args)
 
     def checkoutTrustedProject(self, project, branch):
         root = self.jobdir.getTrustedProject(project.canonical_name,
@@ -1741,7 +1742,7 @@ class AnsibleJob(object):
             job_output_file=self.jobdir.job_output_file)
         logging_config.writeJson(self.jobdir.logging_json)
 
-    def writeAnsibleConfig(self, jobdir_playbook):
+    def writeAnsibleConfig(self, jobdir_playbook, args):
         trusted = jobdir_playbook.trusted
 
         # TODO(mordred) This should likely be extracted into a more generalized
@@ -1769,6 +1770,20 @@ class AnsibleJob(object):
             config.write('stdout_callback = zuul_stream\n')
             config.write('filter_plugins = %s\n'
                          % self.filter_dir)
+
+            # Add mitogen as strategy plugin to speed up jobs
+            # FIXME(tobiash): disable if unsupported connection is in the
+            # inventory
+            # FIXME(tobiash): this won't work with multi-ansible
+            mitogen_path = \
+                self.executor_server.ansible_manager.getAnsibleMitogenDir(
+                    self.arguments.get('ansible_version'))
+            self.log.error("### %s", mitogen_path)
+            # mitogen = importlib.util.find_spec("ansible_mitogen")
+            # mitogen_path = os.path.join(os.path.dirname(mitogen.origin),
+            #                             'plugins', 'strategy')
+            config.write('strategy_plugins = %s\n' % mitogen_path)
+            config.write('strategy = mitogen_linear\n')
             # bump the timeout because busy nodes may take more than
             # 10s to respond
             config.write('timeout = 30\n')

@@ -2,4 +2,6 @@
   tasks:
     - shell: |+
         echo "I am broken"
+        echo "Next line"
+        echo "Third line"
         exit 1
