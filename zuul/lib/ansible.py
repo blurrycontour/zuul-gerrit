@@ -47,6 +47,8 @@ class ManagedAnsible:
             self._ansible_roots.append(runtime_install_root)
 
         self.install_root = self._ansible_roots[-1]
+        self.mitogen_supported = get_default(
+            config, version, 'mitogen_supported')
 
     def ensure_ansible(self, upgrade=False):
         self._ensure_venv()
@@ -269,6 +271,9 @@ class AnsibleManager:
 
     def getAnsiblePluginDir(self, version):
         return os.path.join(self.getAnsibleDir(version), 'zuul', 'ansible')
+
+    def isMitogenSupported(self, version):
+        return self._getAnsible(version).mitogen_supported
 
     def requestVersion(self, version):
         if version not in self._supported_versions:
