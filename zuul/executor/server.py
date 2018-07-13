@@ -761,6 +761,7 @@ class AnsibleJob(object):
         self.action_dir = os.path.join(plugin_dir, 'action')
         self.action_dir_general = os.path.join(plugin_dir, 'actiongeneral')
         self.callback_dir = os.path.join(plugin_dir, 'callback')
+        self.strategy_dir = os.path.join(plugin_dir, 'strategy')
         self.lookup_dir = os.path.join(plugin_dir, 'lookup')
         self.filter_dir = os.path.join(plugin_dir, 'filter')
 
@@ -1849,6 +1850,27 @@ class AnsibleJob(object):
             config.write('stdout_callback = zuul_stream\n')
             config.write('filter_plugins = %s\n'
                          % self.filter_dir)
+
+            # Add mitogen as strategy plugin to speed up jobs
+            # TODO(tobiash): Test if this breaks unsupported connections like
+            #                winrm or if we need to disable mitogen in this
+            #                case
+            if self.arguments.get('mitogen', False):
+                ansible_version = self.arguments.get('ansible_version')
+                ansible_manager = self.executor_server.ansible_manager
+                mitogen_supported = ansible_manager.isMitogenSupported(
+                    ansible_version)
+                if mitogen_supported:
+                    # When running ansible with -vvv mitogen emits exxessive
+                    # debug logs that break things so we need to wrap it with
+                    # our own strategy plugin and reset its log level after
+                    # it's loaded.
+                    config.write('strategy_plugins = %s\n' % self.strategy_dir)
+                    config.write('strategy = zuul_mitogen\n')
+                else:
+                    self.log.warning('Requested mitogen but it\'s not '
+                                     'supported with ansible version %s',
+                                     ansible_version)
             # bump the timeout because busy nodes may take more than
             # 10s to respond
             config.write('timeout = 30\n')

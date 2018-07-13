@@ -926,6 +926,20 @@ Here is an example of two job definitions:
 
       .. program-output:: zuul-manage-ansible -l
 
+   .. attr:: mitogen
+      :default: False
+
+      Use Mitogen_ when running Ansible. This can potentially speed up the
+      job execution and reduce the amount of resources needed during the
+      Ansible run.
+
+      .. _Mitogen: https://networkgenomics.com/ansible/
+
+      .. warning::
+
+         The usage of Mitogen is considered experimental and may not work
+         for every job.
+
    .. attr:: roles
 
       A list of Ansible roles to prepare for the job.  Because a job
