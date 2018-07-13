@@ -1336,6 +1336,7 @@ class Job(ConfigObject):
             run=(),
             ansible_version=None,
             semaphores=(),
+            mitogen=False,
             attempts=3,
             final=False,
             abstract=False,
@@ -1443,6 +1444,7 @@ class Job(ConfigObject):
         else:
             d['ansible_version'] = None
         d['workspace_scheme'] = self.workspace_scheme
+        d['mitogen'] = self.mitogen
         return d
 
     def __ne__(self, other):
