@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_15aed080",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 416,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-07-15T17:54:57Z",
+      "side": 1,
+      "message": "We should handle tenant not found with 404 like in the other handlers now.",
+      "range": {
+        "startLine": 416,
+        "startChar": 8,
+        "endLine": 416,
+        "endChar": 65
+      },
+      "revId": "78a9b3b15b5dfac90d23309fe9c7599804b8c30b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
