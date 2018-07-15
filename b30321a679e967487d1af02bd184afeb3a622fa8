@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_953180f0",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-07-15T16:33:47Z",
+      "side": 1,
+      "message": "Change ids in github are not globally unique as well as there could be more than one gerrit connection with overlapping change ids. Instead we need to do it with project and change id like it was in PS10.",
+      "range": {
+        "startLine": 120,
+        "startChar": 0,
+        "endLine": 121,
+        "endChar": 58
+      },
+      "revId": "b30321a679e967487d1af02bd184afeb3a622fa8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
