@@ -3556,9 +3556,22 @@ class Abide(object):
         return self.unparsed_project_branch_config.get(
             canonical_project_name, {}).get(branch)
 
-    def clearUnparsedConfigCache(self, canonical_project_name):
+    def clearUnparsedConfigCache(self, canonical_project_name, branch=None):
+        removed = False
+
         if canonical_project_name in self.unparsed_project_branch_config:
-            del self.unparsed_project_branch_config[canonical_project_name]
+            project_branch_config = \
+                self.unparsed_project_branch_config[canonical_project_name]
+
+            if branch in project_branch_config:
+                removed = True
+                del project_branch_config[branch]
+
+            if len(project_branch_config) == 0 or branch is None:
+                removed = True
+                del self.unparsed_project_branch_config[canonical_project_name]
+
+        return removed
 
 
 class JobTimeData(object):
