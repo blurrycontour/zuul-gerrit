@@ -10,3 +10,4 @@ HowTos: Recommended Practices
 
    howtos/pti
    howtos/cross-project-gating
+   howtos/logs
