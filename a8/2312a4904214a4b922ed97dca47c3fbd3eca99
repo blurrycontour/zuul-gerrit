@@ -1,0 +1,9 @@
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Tue, 17 Jul 2018 16:57:40 +0000
+Reviewed-on: https://review.openstack.org/579418
+Project: openstack-infra/zuul
+Branch: refs/heads/master
