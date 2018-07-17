@@ -100,6 +100,7 @@ class SQLConnection(BaseConnection):
             end_time = sa.Column(sa.DateTime)
             voting = sa.Column(sa.Boolean)
             log_url = sa.Column(sa.String(255))
+            default_url = sa.Column(sa.String(255))
             node_name = sa.Column(sa.String(255))
 
         class BuildSetModel(Base):

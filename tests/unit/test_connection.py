@@ -159,6 +159,7 @@ class TestSQLConnection(ZuulDBTestCase):
 
             # Check the first result, which should be the project-merge job
             self.assertEqual('project-merge', buildset0_builds[0]['job_name'])
+            self.assertEqual('logs.url?', buildset0_builds[0]['default_url'])
             self.assertEqual("SUCCESS", buildset0_builds[0]['result'])
             self.assertEqual(
                 'finger://{hostname}/{uuid}'.format(
