@@ -66,6 +66,7 @@ class SQLReporter(BaseReporter):
                     # information about the change.
                     continue
 
+                default_url = build.result_data.get('zuul', {}).get('log_url')
                 (result, url) = item.formatJobResult(job)
 
                 start = end = None
@@ -87,6 +88,7 @@ class SQLReporter(BaseReporter):
                     'end_time': end,
                     'voting': build.job.voting,
                     'log_url': url,
+                    'default_url': default_url,
                     'node_name': build.node_name,
                 })
             conn.execute(self.connection.zuul_build_table.insert(),
