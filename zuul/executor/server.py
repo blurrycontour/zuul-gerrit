@@ -1816,6 +1816,11 @@ class ExecutorServer(object):
         self.config = config
         self.keep_jobdir = keep_jobdir
         self.jobdir_root = jobdir_root
+        # Check for stale jobdir_root and always delete it, this protects
+        # against zuul leaking directories.
+        if os.path.exists(self.jobdir_root):
+            shutil.rmtree(self.jobdir_root)
+
         # TODOv3(mordred): make the executor name more unique --
         # perhaps hostname+pid.
         self.hostname = get_default(self.config, 'executor', 'hostname',
