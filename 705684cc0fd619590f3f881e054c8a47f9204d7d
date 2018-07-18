@@ -16,6 +16,23 @@
       "revId": "705684cc0fd619590f3f881e054c8a47f9204d7d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_b1e55e40",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1876,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-18T16:38:23Z",
+      "side": 1,
+      "message": "We expect it to already exist; it\u0027d be bad form to delete something the admin created.",
+      "revId": "705684cc0fd619590f3f881e054c8a47f9204d7d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
