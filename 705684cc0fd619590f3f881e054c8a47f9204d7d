@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_1159b227",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1876,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-07-18T16:34:36Z",
+      "side": 1,
+      "message": "We need to first check fn is a directory, otherwise shutil.rmtree will fail.\n\nRather then looping over all files, could we not delete the top-level directory and recreate it?",
+      "revId": "705684cc0fd619590f3f881e054c8a47f9204d7d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
