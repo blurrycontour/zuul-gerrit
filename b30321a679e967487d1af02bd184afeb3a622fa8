@@ -46,6 +46,23 @@
       "revId": "b30321a679e967487d1af02bd184afeb3a622fa8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_bd2455b3",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 862,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-07-18T14:07:35Z",
+      "side": 1,
+      "message": "PS11, Jonathan Harker left a comment about this code path, we\u0027ll want to address that too.",
+      "revId": "b30321a679e967487d1af02bd184afeb3a622fa8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
