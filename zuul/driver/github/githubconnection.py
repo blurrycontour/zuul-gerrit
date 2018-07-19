@@ -950,6 +950,9 @@ class GithubConnection(BaseConnection):
                         "Rate limit exceeded, using stale branch list")
                 # failed to list branches so use a stale branch list
                 return self._project_branch_cache.get(project.name, [])
+            elif resp.status_code == 404:
+                raise Exception("Got status code 404 when lising branches "
+                                "of project %s" % project.name)
 
             branches.extend([x['name'] for x in resp.json()])
 
