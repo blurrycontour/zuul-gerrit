@@ -951,7 +951,12 @@ class GithubConnection(BaseConnection):
                 # failed to list branches so use a stale branch list
                 return self._project_branch_cache.get(project.name, [])
 
-            branches.extend([x['name'] for x in resp.json()])
+            try:
+                branches.extend([x['name'] for x in resp.json()])
+            except TypeError:
+                self.log.warning(
+                    "Couldn't read branch for project %s", project.name)
+                raise
 
         log_rate_limit(self.log, github)
         self._project_branch_cache[project.name] = branches
