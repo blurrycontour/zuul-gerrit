@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_dce021ce",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 959,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-07-19T06:10:25Z",
+      "side": 1,
+      "message": "Can you check if there is a special status code in the response (I expect you\u0027ll get 404 in this case). If yes, we should check for this instead of running into a TypeError and catching this.",
+      "range": {
+        "startLine": 954,
+        "startChar": 0,
+        "endLine": 959,
+        "endChar": 21
+      },
+      "revId": "a1c3917a9b6d4fc75d1fd267d99758286f294fe8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
