@@ -62,6 +62,24 @@
       "revId": "ae7eed398d062c469717452d1d5489a91c067e88",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_9507ce70",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-07-19T18:32:26Z",
+      "side": 1,
+      "message": "in github project is needed with change as pr numbers are per project there",
+      "parentUuid": "5f7c97a3_cfda931b",
+      "revId": "ae7eed398d062c469717452d1d5489a91c067e88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
