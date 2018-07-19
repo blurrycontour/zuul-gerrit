@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_0fedebb6",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 3673,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-07-19T17:10:39Z",
+      "side": 1,
+      "message": "We don\u0027t appear to be testing --ref here, maybe we should also add one for coverage.",
+      "revId": "ae7eed398d062c469717452d1d5489a91c067e88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_af95d732",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-07-19T17:10:39Z",
+      "side": 1,
+      "message": "Should --tenant be first here?",
+      "range": {
+        "startLine": 119,
+        "startChar": 0,
+        "endLine": 120,
+        "endChar": 47
+      },
+      "revId": "ae7eed398d062c469717452d1d5489a91c067e88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_cfda931b",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-07-19T17:10:39Z",
+      "side": 1,
+      "message": "project seems duplicated if --change is used, possible to make this optional and only used with --ref?",
+      "range": {
+        "startLine": 121,
+        "startChar": 0,
+        "endLine": 122,
+        "endChar": 47
+      },
+      "revId": "ae7eed398d062c469717452d1d5489a91c067e88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
