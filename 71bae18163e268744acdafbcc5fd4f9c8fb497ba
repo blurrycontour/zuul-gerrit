@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_3b49112e",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2018-07-19T14:36:17Z",
+      "side": 1,
+      "message": "the project.source.getChange call that occurs later on requires this object to have oldrev and newrev properties. They can be set to all 0s, I used these values during my manual testing (dequeueing a buildset triggered by the CLI with enqueue-ref and a ref).",
+      "parentUuid": "5f7c97a3_5c709109",
+      "range": {
+        "startLine": 141,
+        "startChar": 0,
+        "endLine": 143,
+        "endChar": 64
+      },
+      "revId": "71bae18163e268744acdafbcc5fd4f9c8fb497ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_1c77790a",
         "filename": "zuul/scheduler.py",
         "patchSetId": 19
@@ -36,6 +60,30 @@
       "writtenOn": "2018-07-19T06:21:32Z",
       "side": 1,
       "message": "Instead of the double break we just could return here. That also would eliminate the need for the change_queue variable.",
+      "range": {
+        "startLine": 880,
+        "startChar": 20,
+        "endLine": 880,
+        "endChar": 25
+      },
+      "revId": "71bae18163e268744acdafbcc5fd4f9c8fb497ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_5b716d76",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 880,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2018-07-19T14:36:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f7c97a3_1c77790a",
       "range": {
         "startLine": 880,
         "startChar": 20,
