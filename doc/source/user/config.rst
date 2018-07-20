@@ -1197,6 +1197,13 @@ pipeline.
          Cherry-picks each change onto the branch rather than
          performing any merges.
 
+   .. attr:: vars
+      :default None:
+
+      A dictionary of variables to be made available for all jobs in
+      all pipelines of this project.  Jobs can reference these values
+      via ``zuul.project.vars`` at run-time.
+
    .. attr:: <pipeline>
 
       Each pipeline that the project participates in should have an
@@ -1238,6 +1245,7 @@ pipeline.
          This should not normally be set, but in situations were it is
          difficult to determine why Zuul did or did not run a certain
          job, the additional information this provides may help.
+
 
 .. _project-template:
 

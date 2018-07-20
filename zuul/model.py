@@ -2657,6 +2657,7 @@ class ProjectConfig(ConfigObject):
         # Pipeline name -> ProjectPipelineConfig
         self.pipelines = {}
         self.branch_matcher = None
+        self.variables = None
         # These represent the values from the config file, but should
         # not be used directly; instead, use the ProjectMetadata to
         # find the computed value from across all project config
@@ -2675,6 +2676,7 @@ class ProjectConfig(ConfigObject):
         r.templates = self.templates
         r.pipelines = self.pipelines
         r.branch_matcher = self.branch_matcher
+        r.variables = self.variables
         r.merge_mode = self.merge_mode
         r.default_branch = self.default_branch
         return r
@@ -2707,7 +2709,7 @@ class ProjectMetadata(object):
     def __init__(self):
         self.merge_mode = None
         self.default_branch = None
-
+        self.variables = None
 
 class ConfigItemNotListError(Exception):
     def __init__(self):
@@ -3118,6 +3120,8 @@ class Layout(object):
         if (md.default_branch is None and
             project_config.default_branch is not None):
             md.default_branch = project_config.default_branch
+        if md.variables is None and project_config.variables is not None:
+            md.variables = project_config.variables
 
     def getProjectConfigs(self, name):
         return self.project_configs.get(name, [])

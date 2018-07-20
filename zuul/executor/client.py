@@ -143,12 +143,17 @@ class ExecutorClient(object):
             "with dependent changes %s" % (
                 job, uuid, nodeset, item.change, dependent_changes))
 
+        metadata = item.layout.getProjectMetadata(
+            item.change.project.canonical_name)
+        project_vars = metadata.variables if metadata else None
+
         project = dict(
             name=item.change.project.name,
             short_name=item.change.project.name.split('/')[-1],
             canonical_hostname=item.change.project.canonical_hostname,
             canonical_name=item.change.project.canonical_name,
             src_dir=os.path.join('src', item.change.project.canonical_name),
+            vars=project_vars,
         )
 
         zuul_params = dict(build=uuid,
@@ -243,15 +248,18 @@ class ExecutorClient(object):
                 project.canonical_name)
             if project_metadata:
                 project_default_branch = project_metadata.default_branch
+                variables = project_metadata.variables
             else:
                 project_default_branch = 'master'
+                variables = None
             connection = project.source.connection
             return dict(connection=connection.connection_name,
                         name=project.name,
                         canonical_name=project.canonical_name,
                         override_branch=override_branch,
                         override_checkout=override_checkout,
-                        default_branch=project_default_branch)
+                        default_branch=project_default_branch,
+                        vars=variables)
 
         if job.required_projects:
             for job_project in job.required_projects.values():
