@@ -1217,6 +1217,11 @@ class Job(ConfigObject):
         self.parent_data = v
         self.variables = Job._deepUpdate(self.parent_data, self.variables)
 
+    def updateProjectVariables(self, project_vars):
+        # Merge "vars:" set on this job's project into variables.  Job
+        # variables override project variables.
+        self.variables = Job._deepUpdate(project_vars, self.variables)
+
     def updateProjects(self, other_projects):
         required_projects = self.required_projects.copy()
         required_projects.update(other_projects)
@@ -2657,6 +2662,7 @@ class ProjectConfig(ConfigObject):
         # Pipeline name -> ProjectPipelineConfig
         self.pipelines = {}
         self.branch_matcher = None
+        self.variables = None
         # These represent the values from the config file, but should
         # not be used directly; instead, use the ProjectMetadata to
         # find the computed value from across all project config
@@ -2675,6 +2681,7 @@ class ProjectConfig(ConfigObject):
         r.templates = self.templates
         r.pipelines = self.pipelines
         r.branch_matcher = self.branch_matcher
+        r.variables = self.variables
         r.merge_mode = self.merge_mode
         r.default_branch = self.default_branch
         return r
@@ -2707,6 +2714,7 @@ class ProjectMetadata(object):
     def __init__(self):
         self.merge_mode = None
         self.default_branch = None
+        self.variables = {}
 
 
 class ConfigItemNotListError(Exception):
@@ -3118,6 +3126,8 @@ class Layout(object):
         if (md.default_branch is None and
             project_config.default_branch is not None):
             md.default_branch = project_config.default_branch
+        if project_config.variables is not None:
+            md.variables.update(project_config.variables)
 
     def getProjectConfigs(self, name):
         return self.project_configs.get(name, [])
@@ -3154,8 +3164,9 @@ class Layout(object):
         # item).
         ppc = ProjectPipelineConfig()
         project_in_pipeline = False
-        for pc in self.getProjectConfigs(item.change.project.canonical_name):
-            if not pc.changeMatches(item.change):
+        change = item.change
+        for pc in self.getProjectConfigs(change.project.canonical_name):
+            if not pc.changeMatches(change):
                 msg = "Project %s did not match" % (pc,)
                 ppc.addDebug(msg)
                 self.log.debug("%s item %s" % (msg, item))
@@ -3168,7 +3179,7 @@ class Layout(object):
                 for template in templates:
                     template_ppc = template.pipelines.get(item.pipeline.name)
                     if template_ppc:
-                        if not template.changeMatches(item.change):
+                        if not template.changeMatches(change):
                             msg = "Project template %s did not match" % (
                                 template,)
                             ppc.addDebug(msg)
@@ -3180,6 +3191,13 @@ class Layout(object):
                         self.log.debug("%s item %s" % (msg, item))
                         project_in_pipeline = True
                         ppc.update(template_ppc)
+                        # Add any variables defined in the template to
+                        # the project's metadata
+                        if template.variables:
+                            metadata = self.getProjectMetadata(
+                                change.project.canonical_name)
+                            metadata.variables.update(template.variables)
+
             project_ppc = pc.pipelines.get(item.pipeline.name)
             if project_ppc:
                 project_in_pipeline = True
@@ -3363,6 +3381,13 @@ class Layout(object):
             if not frozen_job.run:
                 raise Exception("Job %s does not specify a run playbook" % (
                     frozen_job.name,))
+
+            # Merge in variables if set by the job's project
+            metadata = self.getProjectMetadata(change.project.canonical_name)
+            project_vars = metadata.variables if metadata else None
+            if project_vars:
+                frozen_job.updateProjectVariables(project_vars)
+
             job_graph.addJob(frozen_job)
 
     def createJobGraph(self, item, ppc):
