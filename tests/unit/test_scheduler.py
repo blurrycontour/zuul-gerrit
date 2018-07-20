@@ -2621,6 +2621,9 @@ class TestScheduler(ZuulTestCase):
         ], ordered=False)
         j = self.getJobFromHistory('parentjob')
         rp = set([p['name'] for p in j.parameters['projects']])
+        self.assertEqual(j.parameters['zuul']['project']['vars']['int_var'], 1)
+        self.assertListEqual(
+            j.parameters['zuul']['project']['vars']['list_var'], [1, 2, 3])
         self.assertEqual(j.parameters['vars']['override'], 0)
         self.assertEqual(j.parameters['vars']['child1override'], 0)
         self.assertEqual(j.parameters['vars']['parent'], 0)
@@ -2632,6 +2635,9 @@ class TestScheduler(ZuulTestCase):
                                   'org/project0']))
         j = self.getJobFromHistory('child1')
         rp = set([p['name'] for p in j.parameters['projects']])
+        self.assertEqual(j.parameters['zuul']['project']['vars']['int_var'], 1)
+        self.assertListEqual(
+            j.parameters['zuul']['project']['vars']['list_var'], [1, 2, 3])
         self.assertEqual(j.parameters['vars']['override'], 1)
         self.assertEqual(j.parameters['vars']['child1override'], 1)
         self.assertEqual(j.parameters['vars']['parent'], 0)
@@ -2642,6 +2648,9 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(rp, set(['org/project', 'org/project0',
                                   'org/project1']))
         j = self.getJobFromHistory('child2')
+        self.assertEqual(j.parameters['zuul']['project']['vars']['int_var'], 1)
+        self.assertListEqual(
+            j.parameters['zuul']['project']['vars']['list_var'], [1, 2, 3])
         rp = set([p['name'] for p in j.parameters['projects']])
         self.assertEqual(j.parameters['vars']['override'], 2)
         self.assertEqual(j.parameters['vars']['child1override'], 0)
@@ -2653,6 +2662,9 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(rp, set(['org/project', 'org/project0',
                                   'org/project2']))
         j = self.getJobFromHistory('child3')
+        self.assertEqual(j.parameters['zuul']['project']['vars']['int_var'], 1)
+        self.assertListEqual(
+            j.parameters['zuul']['project']['vars']['list_var'], [1, 2, 3])
         rp = set([p['name'] for p in j.parameters['projects']])
         self.assertEqual(j.parameters['vars']['override'], 3)
         self.assertEqual(j.parameters['vars']['child1override'], 0)

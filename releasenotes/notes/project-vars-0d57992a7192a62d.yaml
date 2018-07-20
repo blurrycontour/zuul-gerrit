@@ -1,0 +1,5 @@
+---
+features:
+  - A project may now include global variables via a ``vars``
+    configuration entry.  Jobs can access these at runtime via the
+    ``zuul.project.vars`` variable.

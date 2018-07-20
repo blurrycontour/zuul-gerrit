@@ -67,6 +67,13 @@
 
 - project:
     name: org/project
+    description: test description
+    vars:
+      int_var: 1
+      list_var:
+        - 1
+        - 2
+        - 3
     check:
       jobs:
         - parentjob
