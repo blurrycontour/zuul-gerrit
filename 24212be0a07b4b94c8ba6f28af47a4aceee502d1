@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_f152cc35",
+        "filename": "etc/zuul.conf-sample",
+        "patchSetId": 15
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-07-20T02:27:08Z",
+      "side": 1,
+      "message": "Shouldn\u0027t the admin endpoint be enabled when a JWTsecret is set? It seems like the \u0027enable_admin_endpoints\u0027 option is redundant and the option may be removed.",
+      "revId": "24212be0a07b4b94c8ba6f28af47a4aceee502d1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
