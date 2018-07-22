@@ -1,0 +1,53 @@
+- hosts: all
+  tasks:
+    - name: Execute common-copy role
+      include_role:
+        name: common-copy
+
+    - name: Ensure controller pull directory
+      file:
+        path: /tmp/pull
+        state: directory
+
+    - name: Test pull mode
+      synchronize:
+        dest: /tmp/pull/
+        mode: pull
+        src: "{{ destdir.path }}/"
+        verify_host: true
+      delegate_to: "{{ inventory_hostname }}"
+
+    - name: Validate pull
+      stat:
+        path: /tmp/pull/common-file
+      register: _pull
+
+    - name: Assert pull
+      assert:
+        that:
+          - _pull.stat.exists
+          - _pull.stat.isreg
+
+    - name: Ensure controller push directory
+      file:
+        path: /tmp/push
+        state: directory
+
+    - name: Test push mode
+      synchronize:
+        dest: /tmp/push/
+        mode: push
+        src: "{{ destdir.path }}/"
+        verify_host: true
+      delegate_to: "{{ inventory_hostname }}"
+
+    - name: Validate push
+      stat:
+        path: /tmp/push/common-file
+      register: _push
+
+    - name: Assert push
+      assert:
+        that:
+          - _push.stat.exists
+          - _push.stat.isreg
