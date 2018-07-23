@@ -16,6 +16,24 @@
       "revId": "85291df9639b9f7de934831731b4f00c3c2b6d5b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_373242f5",
+        "filename": "zuul/ansible/action/synchronize.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-07-23T13:27:40Z",
+      "side": 1,
+      "message": "_is_localhost_task does validate of delegate_to where it checks if localhost or not. Unless I am missing something else.",
+      "parentUuid": "5f7c97a3_6120019c",
+      "revId": "85291df9639b9f7de934831731b4f00c3c2b6d5b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
