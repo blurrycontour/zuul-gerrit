@@ -1864,6 +1864,7 @@ class QueueItem(object):
         skipped = True
         for job in self.getJobs():
             if not job.voting:
+                skipped = False
                 continue
             build = self.current_build_set.getBuild(job.name)
             if not build:

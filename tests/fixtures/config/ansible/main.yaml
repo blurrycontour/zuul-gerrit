@@ -6,6 +6,7 @@
           - common-config
         untrusted-projects:
           - org/project
+          - org/project2
           - org/plugin-project
           - bare-role
           - org/ansible

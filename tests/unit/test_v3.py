@@ -2273,6 +2273,18 @@ class TestAnsible(AnsibleZuulTestCase):
             dict(name='hello-ansible', result='SUCCESS', changes='1,1'),
         ])
 
+    def test_non_voting_job_approval(self):
+        A = self.fake_gerrit.addFakeChange('org/project2', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 1,
+                         "A should report success")
+        self.assertHistory([
+            dict(name='python27', result='SUCCESS', changes='1,1'),
+        ])
+        self.assertEqual(A.patchsets[0]['approvals'][0]['value'], "1")
+
     def _add_job(self, job_name):
         conf = textwrap.dedent(
             """
