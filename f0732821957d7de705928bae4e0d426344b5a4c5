@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_57f9fe7f",
+        "filename": "tests/fixtures/config/remote-action-modules/git/org_project/playbooks/synchronize-delegate-good.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-07-23T13:50:15Z",
+      "side": 1,
+      "message": "I\u0027d even leave the path to be decided by the os.",
+      "range": {
+        "startLine": 9,
+        "startChar": 8,
+        "endLine": 9,
+        "endChar": 18
+      },
+      "revId": "f0732821957d7de705928bae4e0d426344b5a4c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
