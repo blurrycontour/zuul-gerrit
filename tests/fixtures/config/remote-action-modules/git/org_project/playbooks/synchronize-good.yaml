@@ -4,6 +4,10 @@
       include_role:
         name: common-copy
 
+    - name: rename destdir variable for readability
+      set_fact:
+        srcdir: "{{ destdir }}"
+
     - name: Ensure executor push directory
       file:
         path: "{{ zuul.executor.log_root }}/push"
@@ -14,7 +18,7 @@
       synchronize:
         dest: "{{ zuul.executor.log_root }}/push"
         mode: pull
-        src: "{{ destdir.path }}/"
+        src: "{{ srcdir.path }}/"
         verify_host: true
 
     - name: Validate push
@@ -31,19 +35,19 @@
 
     - name: Ensure controller pull directory
       file:
-        path: "{{ destdir.path }}/pull"
+        path: "{{ srcdir.path }}/pull"
         state: directory
 
     - name: Test push mode
       synchronize:
-        dest: "{{ destdir.path }}/pull/"
+        dest: "{{ srcdir.path }}/pull/"
         mode: push
         src: "{{ zuul.executor.log_root }}/push"
         verify_host: true
 
     - name: Validate pull
       stat:
-        path: "{{ destdir.path }}/pull/push/common-file"
+        path: "{{ srcdir.path }}/pull/push/common-file"
       register: _pull
 
     - name: Assert pull

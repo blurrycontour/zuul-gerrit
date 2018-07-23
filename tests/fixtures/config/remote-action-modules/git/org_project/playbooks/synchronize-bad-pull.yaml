@@ -4,9 +4,13 @@
       include_role:
         name: common-copy
 
+    - name: rename destdir variable for readability
+      set_fact:
+        srcdir: "{{ destdir }}"
+
     - name: Test pull mode
       synchronize:
         dest: "/tmp"
         mode: pull
-        src: "{{ destdir.path }}/"
+        src: "{{ srcdir.path }}/"
         verify_host: true

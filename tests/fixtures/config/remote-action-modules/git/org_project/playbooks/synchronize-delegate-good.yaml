@@ -4,6 +4,10 @@
       include_role:
         name: common-copy
 
+    - name: rename destdir variable for readability
+      set_fact:
+        srcdir: "{{ destdir }}"
+
     - name: create temporary build directory
       tempfile:
         path: /tmp
@@ -19,7 +23,7 @@
       synchronize:
         dest: "{{ _tmpdir.path }}/pull/"
         mode: pull
-        src: "{{ destdir.path }}/"
+        src: "{{ srcdir.path }}/"
         verify_host: true
       delegate_to: "{{ inventory_hostname }}"
 
@@ -43,7 +47,7 @@
       synchronize:
         dest: "{{ _tmpdir.path }}/push/"
         mode: push
-        src: "{{ destdir.path }}/"
+        src: "{{ srcdir.path }}/"
         verify_host: true
       delegate_to: "{{ inventory_hostname }}"
 
