@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_f6d36301",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 24
+      },
+      "lineNbr": 518,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2018-07-23T20:04:08Z",
+      "side": 1,
+      "message": "How would it work, if possible at all, to add project-scoped actions as routes?\nFor example: api/tenant/{tenant}/project/{project}/enqueue\nAs it is now, the regex would match a non existing project {project}/enqueue instead.",
+      "range": {
+        "startLine": 515,
+        "startChar": 0,
+        "endLine": 518,
+        "endChar": 59
+      },
+      "revId": "170342e5aa99c6b9468790e384c186bcd18f5294",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
