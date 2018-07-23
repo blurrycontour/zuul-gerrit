@@ -718,6 +718,38 @@ class PipelineManager(object):
         self.log.debug("Build %s started" % build)
         return True
 
+    def onBuildPaused(self, build):
+        item = build.build_set.item
+        self.log.debug("Build %s of %s paused" % (build, item.change))
+        item.setResult(build)
+        return True
+
+    def _resumeParents(self, build):
+        """
+        Resumes all parent jobs where all children are finished.
+        """
+        item = build.build_set.item
+        builds = item.current_build_set.builds
+        jobgraph = item.job_graph
+        parent_builds = [builds.get(x.name) for x in
+                         jobgraph.getParentJobsRecursively(
+                             build.job.name, soft=True)]
+        for parent_build in parent_builds:
+            if parent_build and parent_build.paused:
+                # check if all child jobs are finished
+                child_builds = [builds.get(x.name) for x in
+                                jobgraph.getDependentJobsRecursively(
+                                    parent_build.job.name)]
+                all_completed = True
+                for child_build in child_builds:
+                    if not child_build or not child_build.result:
+                        all_completed = False
+                        break
+
+                if all_completed:
+                    self.sched.executor.resumeBuild(parent_build)
+                    parent_build.paused = False
+
     def onBuildCompleted(self, build):
         item = build.build_set.item
 
@@ -731,6 +763,7 @@ class PipelineManager(object):
         if build.retry:
             build.build_set.removeJobNodeSet(build.job.name)
 
+        self._resumeParents(build)
         return True
 
     def onMergeCompleted(self, event):
