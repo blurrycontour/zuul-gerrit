@@ -46,6 +46,30 @@
       "revId": "f0732821957d7de705928bae4e0d426344b5a4c5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_9846e356",
+        "filename": "tests/fixtures/config/remote-action-modules/git/org_project/playbooks/synchronize-delegate-good.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-07-23T15:10:55Z",
+      "side": 1,
+      "message": "Apologies if I wasn\u0027t clear here.\n\nI wanted to keep /tmp as the directory on the remote node, to help ensure we don\u0027t get the following error from the original bug:\n\n  Syncing files from outside the working dir /var/lib/zuul/builds/787aff65cfab44de995f8a6a46aa5d21/work is prohibited\n\nWhile this directory check was to be run on the executor only, zuul was doing it even on the remote node from nodepool. So, if this was in the default tmp directory from zuul today, I don\u0027t believe we\u0027d trigger this error since we whitelist it inside thew work directory?",
+      "parentUuid": "5f7c97a3_371ec2bc",
+      "range": {
+        "startLine": 9,
+        "startChar": 8,
+        "endLine": 9,
+        "endChar": 18
+      },
+      "revId": "f0732821957d7de705928bae4e0d426344b5a4c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
