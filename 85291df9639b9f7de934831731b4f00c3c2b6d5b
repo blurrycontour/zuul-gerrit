@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_6120019c",
+        "filename": "zuul/ansible/action/synchronize.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-07-23T05:35:20Z",
+      "side": 1,
+      "message": "I don\u0027t think this is sufficient as the actual value of delegate_to is not taken into account. What happens if delegate_to is \u0027localhost\u0027? What if it\u0027s \u0027controller-1\u0027? I\u0027m sure the validation must be different for these cases.",
+      "revId": "85291df9639b9f7de934831731b4f00c3c2b6d5b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
