@@ -1,0 +1,14 @@
+- hosts: all
+  tasks:
+    - stat:
+        path: "{{zuul.executor.log_root}}/../../../artifact.txt"
+      register: build_artifact
+
+    - assert:
+        that:
+          - build_artifact.stat.exists
+
+    - assert:
+        that:
+          - compile is defined
+          - compile == 'test'
