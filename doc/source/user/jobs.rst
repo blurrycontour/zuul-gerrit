@@ -624,6 +624,24 @@ zuul.child_jobs is empty, all jobs will be marked as SKIPPED. Invalid child jobs
 are stripped and ignored, if only invalid jobs are listed it is the same as
 providing an empty list to zuul.child_jobs.
 
+**Pausing the job**
+
+A job can be paused after the run phase. In this case the child jobs can start
+and the parent job stays paused until all child jobs are finished. This for
+example can be useful to start a docker registry in a parent job that will be
+used by the child job. To indicate that the job should be paused use
+*zuul_return* to set the **zuul.pause** value. You still can at the same time
+supply any arbitrary data to the child jobs. For example:
+
+.. code-block:: yaml
+
+  tasks:
+    - zuul_return:
+        data:
+          zuul:
+            pause: true
+          registry_ip_address: "{{ hostvars[groups.all[0]].ansible_host }}"
+
 
 .. _build_status:
 
