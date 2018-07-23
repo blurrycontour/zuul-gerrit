@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_e582cb51",
+        "filename": "tests/fixtures/config/remote-action-modules/git/org_project/playbooks/synchronize-bad-pull.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-07-23T17:40:32Z",
+      "side": 1,
+      "message": "I\u0027m still not sure this makes it clearer as we are conflating dest and src here. Could we rename destdir to \"test_workspace_dir\" or similar then set it as the dest or src as appropriate?",
+      "revId": "69285b8c8cd65027b7e2a4dca1299cad3822e7b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
