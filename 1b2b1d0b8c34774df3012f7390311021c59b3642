@@ -100,6 +100,23 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_78cf4728",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-23T15:34:24Z",
+      "side": 1,
+      "message": "Monty looked into this and we discussed it out-of-band.  The process described in (1) is not feasible with kubernetes, but we did come up with a plan for a git mirror system which could reduce or eliminate the need for building custom container images with in-place git repo caches.",
+      "revId": "1b2b1d0b8c34774df3012f7390311021c59b3642",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_17e3eba1",
         "filename": "doc/source/developer/specs/container-build-resources.rst",
         "patchSetId": 4
@@ -408,6 +425,23 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_18d413bc",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-23T15:34:24Z",
+      "side": 1,
+      "message": "k8s is aliased to k8s_raw in 2.6; since we\u0027re still on 2.5, I\u0027m going to leave this as written.  But eventually we\u0027ll need to change our use.",
+      "revId": "1b2b1d0b8c34774df3012f7390311021c59b3642",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_f0d95df0",
         "filename": "doc/source/developer/specs/container-build-resources.rst",
         "patchSetId": 4
@@ -431,6 +465,23 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_38d1cfcb",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-23T15:34:24Z",
+      "side": 1,
+      "message": "I think it\u0027s implied sufficiently, especially for this hand-wavey thing we might possibly do in the future.",
+      "revId": "1b2b1d0b8c34774df3012f7390311021c59b3642",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_b09685ee",
         "filename": "doc/source/developer/specs/container-build-resources.rst",
         "patchSetId": 4
@@ -442,6 +493,23 @@
       "writtenOn": "2018-07-10T05:08:06Z",
       "side": 1,
       "message": "An alternate, or perhaps additional, approach is to consider how to pass arbitrary resources or files around between any jobs, regardless of their buildset.\n\nFor example, a job may build an image or some kind of artifact, which after gating has been completed needs to be uploaded to a central registry. A post job should be able to grab the same verified image.\n\nThis is likely a bit out of the scope of this spec though. I think having the pool resource (as described in this section) shared between child jobs is still necessary. Artifact persistence could be revisited later.",
+      "revId": "1b2b1d0b8c34774df3012f7390311021c59b3642",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_d8dd3bdf",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-23T15:34:24Z",
+      "side": 1,
+      "message": "Yes, that\u0027s a different problem space entirely.",
       "revId": "1b2b1d0b8c34774df3012f7390311021c59b3642",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
