@@ -6,7 +6,7 @@
 
     - name: Test push mode
       synchronize:
-        dest: "{{ destdir.path }}/"
+        dest: "{{ test_workspace_dir.path }}/"
         mode: push
         src: "/tmp"
         verify_host: true

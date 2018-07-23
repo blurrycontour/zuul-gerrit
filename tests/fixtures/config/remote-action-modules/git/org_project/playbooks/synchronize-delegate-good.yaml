@@ -19,7 +19,7 @@
       synchronize:
         dest: "{{ _tmpdir.path }}/pull/"
         mode: pull
-        src: "{{ destdir.path }}/"
+        src: "{{ test_workspace_dir.path }}/"
         verify_host: true
       delegate_to: "{{ inventory_hostname }}"
 
@@ -43,7 +43,7 @@
       synchronize:
         dest: "{{ _tmpdir.path }}/push/"
         mode: push
-        src: "{{ destdir.path }}/"
+        src: "{{ test_workspace_dir.path }}/"
         verify_host: true
       delegate_to: "{{ inventory_hostname }}"
 

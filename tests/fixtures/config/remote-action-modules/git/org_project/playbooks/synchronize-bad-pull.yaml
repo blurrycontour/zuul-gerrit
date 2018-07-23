@@ -8,5 +8,5 @@
       synchronize:
         dest: "/tmp"
         mode: pull
-        src: "{{ destdir.path }}/"
+        src: "{{ test_workspace_dir.path }}/"
         verify_host: true

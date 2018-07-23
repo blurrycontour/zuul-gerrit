@@ -14,7 +14,7 @@
       synchronize:
         dest: "{{ zuul.executor.log_root }}/push"
         mode: pull
-        src: "{{ destdir.path }}/"
+        src: "{{ test_workspace_dir.path }}/"
         verify_host: true
 
     - name: Validate push
@@ -31,19 +31,19 @@
 
     - name: Ensure controller pull directory
       file:
-        path: "{{ destdir.path }}/pull"
+        path: "{{ test_workspace_dir.path }}/pull"
         state: directory
 
     - name: Test push mode
       synchronize:
-        dest: "{{ destdir.path }}/pull/"
+        dest: "{{ test_workspace_dir.path }}/pull/"
         mode: push
         src: "{{ zuul.executor.log_root }}/push"
         verify_host: true
 
     - name: Validate pull
       stat:
-        path: "{{ destdir.path }}/pull/push/common-file"
+        path: "{{ test_workspace_dir.path }}/pull/push/common-file"
       register: _pull
 
     - name: Assert pull

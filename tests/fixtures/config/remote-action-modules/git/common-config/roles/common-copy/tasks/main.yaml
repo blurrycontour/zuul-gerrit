@@ -1,9 +1,9 @@
 - name: Create a destination directory for copied files
   tempfile:
     state: directory
-  register: destdir
+  register: test_workspace_dir
 
 - name: Common copy
   copy:
     src: common-file
-    dest: "{{destdir.path}}/common-file"
+    dest: "{{ test_workspace_dir.path }}/common-file"
