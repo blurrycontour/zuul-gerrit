@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_21f0c992",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-07-23T06:13:02Z",
+      "side": 1,
+      "message": "mixing in testing code should be avoided where possible. It would be a neater implementation by executing the client as a whole system test as James suggests.",
+      "range": {
+        "startLine": 395,
+        "startChar": 23,
+        "endLine": 395,
+        "endChar": 32
+      },
+      "revId": "67ccdb3b809af6e7f9ae2af7b1bd3851703a8bdb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
