@@ -146,6 +146,16 @@ class BuildStartedEvent(ResultEvent):
         self.build = build
 
 
+class BuildPausedEvent(ResultEvent):
+    """A build has been paused.
+
+    :arg Build build: The build which has been paused.
+    """
+
+    def __init__(self, build):
+        self.build = build
+
+
 class BuildCompletedEvent(ResultEvent):
     """A build has completed
 
@@ -365,6 +375,11 @@ class Scheduler(threading.Thread):
     def onBuildStarted(self, build):
         build.start_time = time.time()
         event = BuildStartedEvent(build)
+        self.result_event_queue.put(event)
+        self.wake_event.set()
+
+    def onBuildPaused(self, build):
+        event = BuildPausedEvent(build)
         self.result_event_queue.put(event)
         self.wake_event.set()
 
@@ -998,6 +1013,8 @@ class Scheduler(threading.Thread):
         try:
             if isinstance(event, BuildStartedEvent):
                 self._doBuildStartedEvent(event)
+            elif isinstance(event, BuildPausedEvent):
+                self._doBuildPausedEvent(event)
             elif isinstance(event, BuildCompletedEvent):
                 self._doBuildCompletedEvent(event)
             elif isinstance(event, MergeCompletedEvent):
@@ -1026,6 +1043,19 @@ class Scheduler(threading.Thread):
         except Exception:
             self.log.exception("Exception estimating build time:")
         pipeline.manager.onBuildStarted(event.build)
+
+    def _doBuildPausedEvent(self, event):
+        build = event.build
+        if build.build_set is not build.build_set.item.current_build_set:
+            self.log.warning("Build %s is not in the current build set" %
+                             (build,))
+            return
+        pipeline = build.build_set.item.pipeline
+        if not pipeline:
+            self.log.warning("Build %s is not associated with a pipeline" %
+                             (build,))
+            return
+        pipeline.manager.onBuildPaused(event.build)
 
     def _getAutoholdRequestKey(self, build):
         change = build.build_set.item.change

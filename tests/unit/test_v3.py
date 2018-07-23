@@ -4093,3 +4093,28 @@ class TestNoLog(AnsibleZuulTestCase):
         self.assertNotIn('my-very-secret-password-2', json_log)
         self.assertNotIn('my-very-secret-password-1', text_log)
         self.assertNotIn('my-very-secret-password-2', text_log)
+
+
+class TestJobPause(AnsibleZuulTestCase):
+    tenant_config_file = 'config/job-pause/main.yaml'
+
+    def _get_file(self, build, path):
+        p = os.path.join(build.jobdir.root, path)
+        with open(p) as f:
+            return f.read()
+
+    def test_job_pause(self):
+
+        # Output extra ansible info so we might see errors.
+        self.executor_server.verbose = True
+        self.executor_server.keep_jobdir = True
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='test', result='SUCCESS', changes='1,1'),
+            dict(name='compile', result='SUCCESS', changes='1,1'),
+        ])

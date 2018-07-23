@@ -1,0 +1,11 @@
+- hosts: all
+  tasks:
+    - copy:
+        content: "Built project"
+        dest: "{{zuul.executor.log_root}}/../../../artifact.txt"
+
+    - name: Pause and let child run
+      zuul_return:
+        data:
+          zuul:
+            pause: true

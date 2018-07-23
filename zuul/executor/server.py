@@ -625,8 +625,10 @@ class AnsibleJob(object):
         self.proc_lock = threading.Lock()
         self.running = False
         self.started = False  # Whether playbooks have started running
+        self.paused = False
         self.aborted = False
         self.aborted_reason = None
+        self._resume_event = threading.Event()
         self.thread = None
         self.project_info = {}
         self.private_key_file = get_default(self.executor_server.config,
@@ -652,7 +654,31 @@ class AnsibleJob(object):
     def stop(self, reason=None):
         self.aborted = True
         self.aborted_reason = reason
+
+        # if paused we need to resume the job so it can be stopped
+        self.resume()
         self.abortRunningProc()
+
+    def pause(self):
+        args = json.loads(self.job.arguments)
+        self.log.info(
+            "Pausing job %s for ref %s (change %s)" % (
+                args['zuul']['job'],
+                args['zuul']['ref'],
+                args['zuul']['change_url']))
+        self.paused = True
+        self._sendWorkData()
+        self._resume_event.wait()
+
+    def resume(self):
+        args = json.loads(self.job.arguments)
+        self.log.info(
+            "Resuming job %s for ref %s (change %s)" % (
+                args['zuul']['job'],
+                args['zuul']['ref'],
+                args['zuul']['change_url']))
+        self.paused = False
+        self._resume_event.set()
 
     def wait(self):
         if self.thread:
@@ -798,7 +824,26 @@ class AnsibleJob(object):
         self.prepareAnsibleFiles(args)
         self.writeLoggingConfig()
 
+        self._sendWorkData()
+        self.job.sendWorkStatus(0, 100)
+
+        result = self.runPlaybooks(args)
+
+        # Stop the persistent SSH connections.
+        setup_status, setup_code = self.runAnsibleCleanup(
+            self.jobdir.setup_playbook)
+
+        if self.aborted_reason == self.RESULT_DISK_FULL:
+            result = 'DISK_FULL'
+        data = self.getResultData()
+        result_data = json.dumps(dict(result=result,
+                                      data=data))
+        self.log.debug("Sending result: %s" % (result_data,))
+        self.job.sendWorkComplete(result_data)
+
+    def _sendWorkData(self):
         data = {
+            'paused': self.paused,
             # TODO(mordred) worker_name is needed as a unique name for the
             # client to use for cancelling jobs on an executor. It's defaulting
             # to the hostname for now, but in the future we should allow
@@ -817,23 +862,7 @@ class AnsibleJob(object):
             data['url'] = 'finger://{hostname}/{uuid}'.format(
                 hostname=data['worker_hostname'],
                 uuid=self.job.unique)
-
         self.job.sendWorkData(json.dumps(data))
-        self.job.sendWorkStatus(0, 100)
-
-        result = self.runPlaybooks(args)
-
-        # Stop the persistent SSH connections.
-        setup_status, setup_code = self.runAnsibleCleanup(
-            self.jobdir.setup_playbook)
-
-        if self.aborted_reason == self.RESULT_DISK_FULL:
-            result = 'DISK_FULL'
-        data = self.getResultData()
-        result_data = json.dumps(dict(result=result,
-                                      data=data))
-        self.log.debug("Sending result: %s" % (result_data,))
-        self.job.sendWorkComplete(result_data)
 
     def getResultData(self):
         data = {}
@@ -983,6 +1012,12 @@ class AnsibleJob(object):
                 # The result of the job is indeterminate.  Zuul will
                 # run it again.
                 return None
+
+        # check if we need to pause here
+        result_data = self.getResultData()
+        pause = result_data.get('zuul', {}).get('pause')
+        if pause:
+            self.pause()
 
         post_timeout = args['post_timeout']
         for index, playbook in enumerate(self.jobdir.post_playbooks):
@@ -1976,6 +2011,8 @@ class ExecutorServer(object):
 
     def register(self):
         self.register_work()
+        self.executor_worker.registerFunction("executor:resume:%s" %
+                                              self.hostname)
         self.executor_worker.registerFunction("executor:stop:%s" %
                                               self.hostname)
         self.merger_worker.registerFunction("merger:merge")
@@ -2174,6 +2211,9 @@ class ExecutorServer(object):
             if job.name == 'executor:execute':
                 self.log.debug("Got execute job: %s" % job.unique)
                 self.executeJob(job)
+            elif job.name.startswith('executor:resume'):
+                self.log.debug("Got resume job: %s" % job.unique)
+                self.resumeJob(job)
             elif job.name.startswith('executor:stop'):
                 self.log.debug("Got stop job: %s" % job.unique)
                 self.stopJob(job)
@@ -2241,6 +2281,15 @@ class ExecutorServer(object):
         unique = os.path.basename(jobdir)
         self.stopJobByUnique(unique, reason=AnsibleJob.RESULT_DISK_FULL)
 
+    def resumeJob(self, job):
+        try:
+            args = json.loads(job.arguments)
+            self.log.debug("Resume job with arguments: %s" % (args,))
+            unique = args['uuid']
+            self.resumeJobByUnique(unique)
+        finally:
+            job.sendWorkComplete()
+
     def stopJob(self, job):
         try:
             args = json.loads(job.arguments)
@@ -2249,6 +2298,17 @@ class ExecutorServer(object):
             self.stopJobByUnique(unique)
         finally:
             job.sendWorkComplete()
+
+    def resumeJobByUnique(self, unique):
+        job_worker = self.job_workers.get(unique)
+        if not job_worker:
+            self.log.debug("Unable to find worker for job %s" % (unique,))
+            return
+        try:
+            job_worker.resume()
+        except Exception:
+            self.log.exception("Exception sending resume command "
+                               "to worker:")
 
     def stopJobByUnique(self, unique, reason=None):
         job_worker = self.job_workers.get(unique)
