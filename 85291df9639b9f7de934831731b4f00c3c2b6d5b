@@ -2,6 +2,52 @@
   "comments": [
     {
       "key": {
+        "uuid": "5f7c97a3_d7666ebd",
+        "filename": "tests/fixtures/config/remote-action-modules/git/org_project/playbooks/synchronize-delegate-good.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-07-23T13:37:24Z",
+      "side": 1,
+      "message": "We should use the tempfile module (see copy-test role) here to prevent eventual races or side effects of garbage in /tmp.",
+      "range": {
+        "startLine": 9,
+        "startChar": 14,
+        "endLine": 9,
+        "endChar": 23
+      },
+      "revId": "85291df9639b9f7de934831731b4f00c3c2b6d5b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_f7636aaa",
+        "filename": "tests/fixtures/config/remote-action-modules/git/org_project/playbooks/synchronize-delegate-good.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-07-23T13:37:24Z",
+      "side": 1,
+      "message": "dito",
+      "range": {
+        "startLine": 33,
+        "startChar": 14,
+        "endLine": 33,
+        "endChar": 23
+      },
+      "revId": "85291df9639b9f7de934831731b4f00c3c2b6d5b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_6120019c",
         "filename": "zuul/ansible/action/synchronize.py",
         "patchSetId": 5
@@ -31,6 +77,24 @@
       "side": 1,
       "message": "_is_localhost_task does validate of delegate_to where it checks if localhost or not. Unless I am missing something else.",
       "parentUuid": "5f7c97a3_6120019c",
+      "revId": "85291df9639b9f7de934831731b4f00c3c2b6d5b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_171b861d",
+        "filename": "zuul/ansible/action/synchronize.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-07-23T13:37:24Z",
+      "side": 1,
+      "message": "Oh right, I think I understood this now.",
+      "parentUuid": "5f7c97a3_373242f5",
       "revId": "85291df9639b9f7de934831731b4f00c3c2b6d5b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
