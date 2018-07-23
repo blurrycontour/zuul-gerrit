@@ -22,6 +22,30 @@
       "revId": "f0732821957d7de705928bae4e0d426344b5a4c5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_371ec2bc",
+        "filename": "tests/fixtures/config/remote-action-modules/git/org_project/playbooks/synchronize-delegate-good.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-07-23T13:53:07Z",
+      "side": 1,
+      "message": "I\u0027d like to have something outside of safe_path, for the executor, and /tmp seemed to be the safest one. This helps validate even with using a node from nodepool, we are not checking is_safe_path and failing.",
+      "parentUuid": "5f7c97a3_57f9fe7f",
+      "range": {
+        "startLine": 9,
+        "startChar": 8,
+        "endLine": 9,
+        "endChar": 18
+      },
+      "revId": "f0732821957d7de705928bae4e0d426344b5a4c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
