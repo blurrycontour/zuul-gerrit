@@ -270,14 +270,14 @@ class JobDirPlaybook(object):
         self.ansible_config = os.path.join(self.root, 'ansible.cfg')
         self.project_link = os.path.join(self.root, 'project')
         self.secrets_root = os.path.join(self.root, 'secrets')
-        os.makedirs(self.secrets_root)
+        os.makedirs(self.secrets_root, 0o755)
         self.secrets = os.path.join(self.secrets_root, 'secrets.yaml')
         self.secrets_content = None
 
     def addRole(self):
         count = len(self.roles)
         root = os.path.join(self.root, 'role_%i' % (count,))
-        os.makedirs(root)
+        os.makedirs(root, 0o755)
         self.roles.append(root)
         return root
 
@@ -329,31 +329,31 @@ class JobDir(object):
         self.root = os.path.join(tmpdir, build_uuid)
         os.mkdir(self.root, 0o700)
         self.work_root = os.path.join(self.root, 'work')
-        os.makedirs(self.work_root)
+        os.makedirs(self.work_root, 0o755)
         self.src_root = os.path.join(self.work_root, 'src')
-        os.makedirs(self.src_root)
+        os.makedirs(self.src_root, 0o755)
         self.log_root = os.path.join(self.work_root, 'logs')
-        os.makedirs(self.log_root)
+        os.makedirs(self.log_root, 0o755)
         # Create local tmp directory
         # NOTE(tobiash): This must live within the work root as it can be used
         # by ansible for temporary files which are path checked in untrusted
         # jobs.
         self.local_tmp = os.path.join(self.work_root, 'tmp')
-        os.makedirs(self.local_tmp)
+        os.makedirs(self.local_tmp, 0o755)
         self.ansible_root = os.path.join(self.root, 'ansible')
-        os.makedirs(self.ansible_root)
+        os.makedirs(self.ansible_root, 0o755)
         self.trusted_root = os.path.join(self.root, 'trusted')
-        os.makedirs(self.trusted_root)
+        os.makedirs(self.trusted_root, 0o755)
         self.untrusted_root = os.path.join(self.root, 'untrusted')
-        os.makedirs(self.untrusted_root)
+        os.makedirs(self.untrusted_root, 0o755)
         ssh_dir = os.path.join(self.work_root, '.ssh')
         os.mkdir(ssh_dir, 0o700)
         # Create ansible cache directory
         self.ansible_cache_root = os.path.join(self.root, '.ansible')
         self.fact_cache = os.path.join(self.ansible_cache_root, 'fact-cache')
-        os.makedirs(self.fact_cache)
+        os.makedirs(self.fact_cache, 0o755)
         self.control_path = os.path.join(self.ansible_cache_root, 'cp')
-        os.makedirs(self.control_path)
+        os.makedirs(self.control_path, 0o755)
         localhost_facts = os.path.join(self.fact_cache, 'localhost')
         # NOTE(pabelanger): We do not want to leak zuul-executor facts to other
         # playbooks now that smart fact gathering is enabled by default.  We
@@ -394,7 +394,7 @@ class JobDir(object):
         # methods to write an ansible.cfg as the rest of the Ansible
         # runs.
         setup_root = os.path.join(self.ansible_root, 'setup_playbook')
-        os.makedirs(setup_root)
+        os.makedirs(setup_root, 0o755)
         self.setup_playbook = JobDirPlaybook(setup_root)
         self.setup_playbook.trusted = True
 
@@ -404,7 +404,7 @@ class JobDir(object):
         # in different playbooks.
         count = len(self.trusted_projects)
         root = os.path.join(self.trusted_root, 'project_%i' % (count,))
-        os.makedirs(root)
+        os.makedirs(root, 0o755)
         self.trusted_projects.append(root)
         self.trusted_project_index[(canonical_name, branch)] = root
         return root
@@ -421,7 +421,7 @@ class JobDir(object):
         # the contents of the working dir.
         count = len(self.untrusted_projects)
         root = os.path.join(self.untrusted_root, 'project_%i' % (count,))
-        os.makedirs(root)
+        os.makedirs(root, 0o755)
         self.untrusted_projects.append(root)
         self.untrusted_project_index[(canonical_name, branch)] = root
         return root
@@ -432,7 +432,7 @@ class JobDir(object):
     def addPrePlaybook(self):
         count = len(self.pre_playbooks)
         root = os.path.join(self.ansible_root, 'pre_playbook_%i' % (count,))
-        os.makedirs(root)
+        os.makedirs(root, 0o755)
         playbook = JobDirPlaybook(root)
         self.pre_playbooks.append(playbook)
         return playbook
@@ -440,7 +440,7 @@ class JobDir(object):
     def addPostPlaybook(self):
         count = len(self.post_playbooks)
         root = os.path.join(self.ansible_root, 'post_playbook_%i' % (count,))
-        os.makedirs(root)
+        os.makedirs(root, 0o755)
         playbook = JobDirPlaybook(root)
         self.post_playbooks.append(playbook)
         return playbook
@@ -448,7 +448,7 @@ class JobDir(object):
     def addPlaybook(self):
         count = len(self.playbooks)
         root = os.path.join(self.ansible_root, 'playbook_%i' % (count,))
-        os.makedirs(root)
+        os.makedirs(root, 0o755)
         playbook = JobDirPlaybook(root)
         self.playbooks.append(playbook)
         return playbook
