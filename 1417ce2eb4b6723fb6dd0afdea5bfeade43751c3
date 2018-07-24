@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_00e9d0a9",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2631,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-07-24T23:29:00Z",
+      "side": 1,
+      "message": "The two template vars apply to all jobs running against a project is slightly unintuitive. I would expect them to only apply against the jobs in the template. I\u0027m not sure that this is the correct behavior (it is a project-template afterall), just the more intuitive one (for me at least).",
+      "revId": "1417ce2eb4b6723fb6dd0afdea5bfeade43751c3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
