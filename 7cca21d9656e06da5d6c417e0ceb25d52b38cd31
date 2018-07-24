@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_c02bd82f",
+        "filename": "doc/source/user/jobs.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 401,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-07-24T23:05:14Z",
+      "side": 1,
+      "message": "I like all of the organizational changes made in this change except for bumping up Change Items, Branch Items, et al up a level as they extend the set of variables that every job gets as defined above. I don\u0027t feel super strongly about this but thoughts on keeping these * Items headers under Zuul Variables?",
+      "range": {
+        "startLine": 401,
+        "startChar": 0,
+        "endLine": 401,
+        "endChar": 12
+      },
+      "revId": "7cca21d9656e06da5d6c417e0ceb25d52b38cd31",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
