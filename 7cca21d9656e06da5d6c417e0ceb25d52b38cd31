@@ -22,6 +22,30 @@
       "revId": "7cca21d9656e06da5d6c417e0ceb25d52b38cd31",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_c0b518d1",
+        "filename": "doc/source/user/jobs.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 401,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-07-24T23:14:25Z",
+      "side": 1,
+      "message": "ianw has pointed out that I am just blind and it is indeed this way. ~ vs -. I even read the rendered version wrong.",
+      "parentUuid": "5f7c97a3_c02bd82f",
+      "range": {
+        "startLine": 401,
+        "startChar": 0,
+        "endLine": 401,
+        "endChar": 12
+      },
+      "revId": "7cca21d9656e06da5d6c417e0ceb25d52b38cd31",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
