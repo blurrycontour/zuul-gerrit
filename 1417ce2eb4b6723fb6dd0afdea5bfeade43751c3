@@ -16,6 +16,24 @@
       "revId": "1417ce2eb4b6723fb6dd0afdea5bfeade43751c3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_a05d7c55",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2631,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2018-07-24T23:34:16Z",
+      "side": 1,
+      "message": "yeah, I tried to make this clear in the latest revision of the docs where it says that \"template vars are merged into the project vars where they\u0027re included\".  I feel like the merging is \"zuul-ish\" behaviour; in a similar way that the other parts of the template are being merged into your current project (jobs are merged together, etc)",
+      "parentUuid": "5f7c97a3_00e9d0a9",
+      "revId": "1417ce2eb4b6723fb6dd0afdea5bfeade43751c3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
