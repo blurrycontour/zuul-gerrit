@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_20396c3f",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1867,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-24T23:21:28Z",
+      "side": 1,
+      "message": "What if we skipped this?  That seems weird.\n\nShouldn\u0027t we only set skipped\u003dfalse if we haven\u0027t skipped it?\n\n(Put another way, if all jobs are skipped, and all jobs are non-voting, we should return false.)",
+      "revId": "48faa44e01807887a6637c00a6ec6cd93ed26bfb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
