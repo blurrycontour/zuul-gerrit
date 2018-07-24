@@ -22,6 +22,30 @@
       "revId": "170342e5aa99c6b9468790e384c186bcd18f5294",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_8dc53541",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 24
+      },
+      "lineNbr": 518,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-07-24T01:43:13Z",
+      "side": 1,
+      "message": "IIUC, route_map stop at the first match. So adding a project/{project:.*}/enqueue route before should match that action.",
+      "parentUuid": "5f7c97a3_f6d36301",
+      "range": {
+        "startLine": 515,
+        "startChar": 0,
+        "endLine": 518,
+        "endChar": 59
+      },
+      "revId": "170342e5aa99c6b9468790e384c186bcd18f5294",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
