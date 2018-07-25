@@ -34,6 +34,40 @@
       "revId": "1417ce2eb4b6723fb6dd0afdea5bfeade43751c3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_4db046fe",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2631,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-25T20:47:20Z",
+      "side": 1,
+      "message": "Yeah.  This is a good question, and I think both options make sense.  I lean toward the current implementation.  One thing that the current implementation allows that the other would not is a project-template that *only* set variables.  I.e., it merely changed the behavior of other jobs which were selected to run in other ways.",
+      "revId": "1417ce2eb4b6723fb6dd0afdea5bfeade43751c3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_adb9daeb",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 3199,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-25T20:47:20Z",
+      "side": 1,
+      "message": "This function basically scans all of the project and project-template stanzas, and merges them.  It\u0027s dynamic -- ie, it doesn\u0027t just happen once, it happens every time we try to freeze a job graph.  That\u0027s because, due to branch matchers, we might end up with a different set of matching project/project-templates each time.  However, the ProjectMetadata object is static.  It\u0027s generated once for each project in a layout and doesn\u0027t change.  It\u0027s meant to hold information that can\u0027t reasonably change from one change to the next (the merge mode, or the default branch for a project (if not master)).  We don\u0027t want the variables to behave like that, we want them to behave more like the jobs themselves, so they should be dynamically calculated.\n\nAll of that to say, I think rather than storing the variables on ProjectMetadata, I think they should be stored on the ProjectPipelineConfig, which is the thing this method is building.  Also, when updating the variables on the PPC from the various projects/project-templates, we should use the same deepUpdate logic that job variables use.",
+      "revId": "1417ce2eb4b6723fb6dd0afdea5bfeade43751c3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
