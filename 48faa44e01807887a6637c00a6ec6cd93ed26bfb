@@ -16,6 +16,24 @@
       "revId": "48faa44e01807887a6637c00a6ec6cd93ed26bfb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_83c96aac",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1867,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-07-25T00:15:14Z",
+      "side": 1,
+      "message": "I had to reread this a couple times and found the existing branching of the method to be a bit confusing. Maybe something like this would be easier to understand and fix the bug:\n\n       skipped \u003d True\n       for job in self.getJobs():\n            build \u003d self.current_build_set.getBuild(job.name)\n            if build:\n                # If the build ran, record whether or not it was skipped\n                # and return False if the build was voting and has an\n                # unsuccessful return value\n                if build.result !\u003d \u0027SKIPPED\u0027:\n                    skipped \u003d False\n                if job.voting and build.result not in [\u0027SUCCESS\u0027, \u0027SKIPPED\u0027]:\n                    return False\n            elif job.voting:\n                # If the build failed to run and was voting that is an\n                # unsuccessful build. But we don\u0027t count against it if not\n                # voting.\n                return False",
+      "parentUuid": "5f7c97a3_20396c3f",
+      "revId": "48faa44e01807887a6637c00a6ec6cd93ed26bfb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
