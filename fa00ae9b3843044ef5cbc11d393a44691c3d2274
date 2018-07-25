@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_34f99b4e",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-07-25T18:57:27Z",
+      "side": 1,
+      "message": "Should this be wrapped in a try/except? Looks like dequeue raises an Exception if the change cannot be found.\n\nThe enqueue functions seem to handle errors and report them back over gearman.",
+      "revId": "fa00ae9b3843044ef5cbc11d393a44691c3d2274",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
