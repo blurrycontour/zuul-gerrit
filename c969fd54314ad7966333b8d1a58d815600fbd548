@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_fbe3f038",
+        "filename": "tests/fixtures/config/remote-action-modules/git/common-config/roles/common-copy/tasks/main.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-26T20:34:52Z",
+      "side": 1,
+      "message": "This isn\u0027t clear to me either.  Maybe we could do scratch_dir or something?",
+      "revId": "c969fd54314ad7966333b8d1a58d815600fbd548",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
