@@ -68,6 +68,24 @@
       "revId": "1417ce2eb4b6723fb6dd0afdea5bfeade43751c3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_c450ac62",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 3199,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2018-07-26T03:30:16Z",
+      "side": 1,
+      "message": "\u003e I think they should be stored on the ProjectPipelineConfig\n\u003e we should use the same deepUpdate logic that job variables use.\n\nThanks for the review.  In the following changeset the variables are moved into the ProjectPipelineConfig object and populated into the job from there.  It also uses the same deep update calls",
+      "parentUuid": "5f7c97a3_adb9daeb",
+      "revId": "1417ce2eb4b6723fb6dd0afdea5bfeade43751c3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
