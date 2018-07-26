@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_3e0e523d",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-07-26T00:23:16Z",
+      "side": 1,
+      "message": "As a followup we should consider letting logging do the string format as I believe it optimizes those out if the log level isn\u0027t being logged.",
+      "revId": "c7b55faf4e9dc0dfa47fbe49eb5180a9e18f4f5f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
