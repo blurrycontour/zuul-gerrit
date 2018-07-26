@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_837621d5",
+        "filename": "doc/source/user/jobs.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 592,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-07-26T12:06:52Z",
+      "side": 1,
+      "message": "You can make this an actual subsection with:\n\n  Returning the log url\n  ~~~~~~~~~~~~~~~~~~~~~\n\nThat will get sphinx to generate html anchors for it and stuff.\n\nIn this case it\u0027s not a huge deal, so I\u0027m +2 - but if you feel like respinning...",
+      "range": {
+        "startLine": 592,
+        "startChar": 0,
+        "endLine": 592,
+        "endChar": 25
+      },
+      "revId": "92278dc95321c853ddf1763ab842da3bac8fb14c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
