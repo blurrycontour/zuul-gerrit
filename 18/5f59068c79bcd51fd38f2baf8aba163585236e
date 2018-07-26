@@ -1,0 +1,10 @@
+Code-Review+2: Joshua Hesketh <josh@nitrotech.org>
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Code-Review+2: Paul Belanger <pabelanger@redhat.com>
+Workflow+1: Paul Belanger <pabelanger@redhat.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Thu, 26 Jul 2018 15:04:27 +0000
+Reviewed-on: https://review.openstack.org/574265
+Project: openstack-infra/zuul
+Branch: refs/heads/master
