@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "5f7c97a3_0f29cf38",
+        "filename": "tests/fixtures/config/ansible/git/common-config/playbooks/check-vars.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-07-26T14:25:45Z",
+      "side": 1,
+      "message": "and still the same",
+      "revId": "5e07956aad580b9fae7103aadea73a44c5333560",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_4ffd87b0",
+        "filename": "tests/fixtures/config/ansible/git/common-config/zuul.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-07-26T14:25:45Z",
+      "side": 1,
+      "message": "Sorry, we already tests here. It was orginially set it:\n\n  tests/fixtures/config/ansible/variables.yaml\n\nas vartest_site: vartest_site",
+      "revId": "5e07956aad580b9fae7103aadea73a44c5333560",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_4fb3474f",
         "filename": "zuul/executor/server.py",
         "patchSetId": 4
