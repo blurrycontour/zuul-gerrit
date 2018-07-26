@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_38ee4eb5",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 841,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-26T20:09:31Z",
+      "side": 1,
+      "message": "We actually don\u0027t need to change anything about this.  We don\u0027t need to re-send data unless we\u0027re changing it.  So we can just send a work data packed with \"paused\" alone and nothing else.  We don\u0027t have to recalculate and resend the urls and worker info.",
+      "revId": "63648b8b700316eaca0e5ca6cc18bb4ec93b739b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
