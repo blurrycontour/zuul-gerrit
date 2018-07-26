@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_4fb3474f",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1741,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-07-26T14:20:48Z",
+      "side": 1,
+      "message": "This last extra vars, so it will always win and override what is before.",
+      "range": {
+        "startLine": 1740,
+        "startChar": 0,
+        "endLine": 1741,
+        "endChar": 64
+      },
+      "revId": "5e07956aad580b9fae7103aadea73a44c5333560",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
