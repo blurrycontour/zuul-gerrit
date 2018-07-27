@@ -1,0 +1,11 @@
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Code-Review+1: Matthieu Huin <mhuin@redhat.com>
+Code-Review+2: Ian Wienand <iwienand@redhat.com>
+Code-Review+2: Clark Boylan <cboylan@sapwetik.org>
+Workflow+1: Clark Boylan <cboylan@sapwetik.org>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Fri, 27 Jul 2018 18:36:33 +0000
+Reviewed-on: https://review.openstack.org/582750
+Project: openstack-infra/zuul
+Branch: refs/heads/master
