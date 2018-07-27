@@ -34,6 +34,23 @@
       "revId": "469487fa778c68deb6358bf49aba6cdbec316656",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_f380e2f8",
+        "filename": "doc/source/admin/opensuse_leap15_setup.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-07-27T20:14:47Z",
+      "side": 1,
+      "message": "Bigtop isn\u0027t really an unofficial build repo -- it\u0027s an Apache project that ships other Apache projects (like zookeeper).  I\u0027m pretty comfortable suggesting people use it.",
+      "revId": "469487fa778c68deb6358bf49aba6cdbec316656",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
