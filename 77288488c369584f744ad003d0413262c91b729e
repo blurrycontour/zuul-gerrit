@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_73d8537f",
+        "filename": "tests/fixtures/zuul-gerrit-web.conf",
+        "patchSetId": 10
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-07-27T19:04:43Z",
+      "side": 1,
+      "message": "Jenkins is still chasing us...",
+      "range": {
+        "startLine": 23,
+        "startChar": 5,
+        "endLine": 23,
+        "endChar": 12
+      },
+      "revId": "77288488c369584f744ad003d0413262c91b729e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
