@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_ae51a6d7",
+        "filename": "doc/source/admin/opensuse_leap15_setup.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-07-27T13:18:23Z",
+      "side": 1,
+      "message": "This is actually no longer required as of the latest release of bindep.",
+      "range": {
+        "startLine": 27,
+        "startChar": 42,
+        "endLine": 27,
+        "endChar": 53
+      },
+      "revId": "4158dde1ff39c2e67d799fb312434a2edcb115b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
