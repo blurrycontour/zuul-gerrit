@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_963cfcc0",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 30
+      },
+      "lineNbr": 445,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-07-27T20:52:11Z",
+      "side": 1,
+      "message": "Looks like the 404 handling got lost during rebases.",
+      "revId": "c65981da3f6466385a3f4228fb6fd8da8b6e23a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
