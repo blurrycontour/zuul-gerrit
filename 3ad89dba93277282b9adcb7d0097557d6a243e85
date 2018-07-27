@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_d9e14599",
+        "filename": "doc/source/developer/specs/container-build-resources.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-07-27T23:06:37Z",
+      "side": 1,
+      "message": "Slight nit. This either implies an alternative but I don\u0027t see one. Maybe it should just be \"a new pod based on a base image\" ?",
+      "range": {
+        "startLine": 258,
+        "startChar": 62,
+        "endLine": 258,
+        "endChar": 68
+      },
+      "revId": "3ad89dba93277282b9adcb7d0097557d6a243e85",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
