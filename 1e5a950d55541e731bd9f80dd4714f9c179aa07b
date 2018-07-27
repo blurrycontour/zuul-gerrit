@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_4ee57206",
+        "filename": "bindep.txt",
+        "patchSetId": 7
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-07-27T13:22:14Z",
+      "side": 1,
+      "message": "maybe we should put these into the compile and test profiles as well - and move them up to be with nodejs-npm",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 23
+      },
+      "revId": "1e5a950d55541e731bd9f80dd4714f9c179aa07b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_ee9c7e71",
+        "filename": "doc/source/admin/zuul_install.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-07-27T13:22:14Z",
+      "side": 1,
+      "message": "This should not be necessary. If yarn is installed, pip install . should run npm run build.",
+      "range": {
+        "startLine": 46,
+        "startChar": 5,
+        "endLine": 46,
+        "endChar": 18
+      },
+      "revId": "1e5a950d55541e731bd9f80dd4714f9c179aa07b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
