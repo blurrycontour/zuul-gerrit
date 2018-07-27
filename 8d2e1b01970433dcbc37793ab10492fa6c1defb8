@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_9c65fbe4",
+        "filename": "doc/source/user/jobs.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 708,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-07-27T23:37:37Z",
+      "side": 1,
+      "message": "this feels like maybe it was intended to live after line 642",
+      "range": {
+        "startLine": 703,
+        "startChar": 0,
+        "endLine": 708,
+        "endChar": 27
+      },
+      "revId": "8d2e1b01970433dcbc37793ab10492fa6c1defb8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_dc9cd3bf",
+        "filename": "tests/fixtures/config/gerrit-file-comments/git/org_project/playbooks/file-comments.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-07-27T23:37:37Z",
+      "side": 1,
+      "message": "you have angered the gods of whitespace!!!",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 20
+      },
+      "revId": "8d2e1b01970433dcbc37793ab10492fa6c1defb8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_bca79709",
+        "filename": "tests/unit/test_gerrit.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-07-27T23:37:37Z",
+      "side": 1,
+      "message": "what a strange username for zuul to have ;)",
+      "range": {
+        "startLine": 125,
+        "startChar": 52,
+        "endLine": 125,
+        "endChar": 59
+      },
+      "revId": "8d2e1b01970433dcbc37793ab10492fa6c1defb8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
