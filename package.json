@@ -30,10 +30,10 @@
     "zone.js": "^0.8.26"
   },
   "scripts": {
-    "build": "npm run build:dist",
+    "build": "webpack --env=prod",
     "build:dev": "webpack --env=dev",
     "build:dist": "webpack --env=prod",
-    "build:dist-with-depends": "yarn install && npm run build:dist",
+    "build:dist-with-depends": "yarn install && yarn run build:dist",
     "format": "tslint --project tsconfig.json -c tslint.json --fix",
     "lint": "webpack --env=lint",
     "start": "webpack-dev-server --env=dev --define ZUUL_API_URL=\"'https://zuul.openstack.org'\" --open-page='status.html'",

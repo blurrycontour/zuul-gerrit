@@ -12,7 +12,7 @@
     # results in
     #   return 'https://zuul.openstack.org'
     # in the compiled javascript.
-    - role: npm
-      npm_command: >-
+    - role: yarn
+      yarn_command: >-
         build:dist --
           --define "ZUUL_API_URL='{{ zuul_api_url }}'"

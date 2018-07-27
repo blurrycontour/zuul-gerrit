@@ -166,8 +166,8 @@ Static External
 
 In order to serve the zuul dashboard code from an external static location,
 ``ZUUL_API_URL`` must be set at javascript build time by passing the
-``--define`` flag to the ``npm build:dist`` command.
+``--define`` flag to the ``yarn build:dist`` command.
 
 .. code-block:: bash
 
-  npm build:dist -- --define "ZUUL_API_URL='http://zuul-web.example.com'"
+  yarn build:dist -- --define "ZUUL_API_URL='http://zuul-web.example.com'"

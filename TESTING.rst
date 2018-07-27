@@ -42,7 +42,7 @@ As of zuul v3, a running zookeeper is required to execute tests.
 
 *Build javascript assets*::
 
-  npm run build:dev
+  yarn run build:dev
 
 Run The Tests
 -------------

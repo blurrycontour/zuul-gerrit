@@ -128,17 +128,17 @@ Building the code can be done with:
 
 .. code-block:: bash
 
-  npm run build
+  yarn run build
 
 zuul-web has a ``static`` route defined which serves files from
-``zuul/web/static``. ``npm run build`` will put the build output files
+``zuul/web/static``. ``yarn run build`` will put the build output files
 into the ``zuul/web/static`` directory so that zuul-web can serve them.
 
 There is a also a development-oriented version of that same command:
 
 .. code-block:: bash
 
-  npm run build:dev
+  yarn run build:dev
 
 which will build for the ``dev`` environment. This causes some sample data
 to be bundled and included.
@@ -148,7 +148,7 @@ hot-updating of code. The following:
 
 .. code-block:: bash
 
-  npm run start
+  yarn run start
 
 will build the code and launch the dev server on `localhost:8080`. It will
 be configured to use the API endpoint from OpenStack's Zuul. The
@@ -157,7 +157,7 @@ re-compiles/refresh as needed.
 
 .. code-block:: bash
 
-  npm run start:multi
+  yarn run start:multi
 
 will do the same but will be pointed at the SoftwareFactory Project Zuul, which
 is multi-tenant.
@@ -166,7 +166,7 @@ Arbitrary command line options will be passed through after a ``--`` such as:
 
 .. code-block:: bash
 
-  npm run start -- --open-file='status.html'
+  yarn run start -- --open-file='status.html'
 
 That's kind of annoying though, so additional targets exist for common tasks:
 
@@ -174,19 +174,19 @@ Run status against `basic` built-in demo data.
 
 .. code-block:: bash
 
-  npm run start:basic
+  yarn run start:basic
 
 Run status against `openstack` built-in demo data
 
 .. code-block:: bash
 
-  npm run start:openstack
+  yarn run start:openstack
 
 Run status against `tree` built-in demo data.
 
 .. code-block:: bash
 
-  npm run start:tree
+  yarn run start:tree
 
 Additional run commands can be added in `package.json` in the ``scripts``
 section.
@@ -199,10 +199,10 @@ by zuul-web from its ``static`` route. In order to make sure this works
 properly, the javascript build needs to be performed so that the javascript
 files are in the ``zuul/web/static`` directory. Because the javascript
 build outputs into the ``zuul/web/static`` directory, as long as
-``npm run build`` has been done before ``pip install .`` or
+``yarn run build`` has been done before ``pip install .`` or
 ``python setup.py sdist``, all the files will be where they need to be.
 As long as `yarn`_ is installed, the installation of zuul will run
-``npm run build`` appropriately.
+``yarn run build`` appropriately.
 
 Debugging minified code
 -----------------------
