@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_6d8707b5",
+        "filename": "tests/unit/test_gerrit.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-07-28T08:10:02Z",
+      "side": 1,
+      "message": "Copy paste error? This should probably named test_file_comments or similar.",
+      "range": {
+        "startLine": 110,
+        "startChar": 8,
+        "endLine": 110,
+        "endChar": 29
+      },
+      "revId": "22e8e5b4f4180d5e314ba1a7a4fd9dce9d1c50d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
