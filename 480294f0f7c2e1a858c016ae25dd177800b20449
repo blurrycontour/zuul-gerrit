@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_9d27e21e",
+        "filename": "tests/fixtures/config/job-pause/git/org_project/playbooks/compile1-post.yaml",
+        "patchSetId": 9
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-08-01T16:55:07Z",
+      "side": 1,
+      "message": "maybe use zuul.executor.work_root here, so reduce ../..",
+      "revId": "480294f0f7c2e1a858c016ae25dd177800b20449",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
