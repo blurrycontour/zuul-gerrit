@@ -36,7 +36,7 @@ from zuul.lib.config import get_default
 from zuul.lib.statsd import get_statsd
 import zuul.lib.queue
 
-COMMANDS = ['stop']
+COMMANDS = ['stop', 'graceful', 'pause', 'unpause']
 
 
 class ManagementEvent(object):
@@ -249,6 +249,9 @@ class Scheduler(threading.Thread):
         self.run_handler_lock = threading.Lock()
         self.command_map = dict(
             stop=self.stop,
+            graceful=self.exit,
+            pause=self.pause,
+            unpause=self.unpause,
         )
         self._pause = False
         self._exit = False
@@ -508,9 +511,17 @@ class Scheduler(threading.Thread):
         event.wait()
         self.log.debug("Enqueue complete")
 
+    def pause(self):
+        self.log.debug("Pausing")
+        self._pause = True
+
+    def unpause(self):
+        self.log.debug("Unpausing")
+        self._pause = False
+        self.wake_event.set()
+
     def exit(self):
         self.log.debug("Prepare to exit")
-        self._pause = True
         self._exit = True
         self.wake_event.set()
         self.log.debug("Waiting for exit")
@@ -580,11 +591,10 @@ class Scheduler(threading.Thread):
         self.log.debug("Resuming queue processing")
         self.wake_event.set()
 
-    def _doPauseEvent(self):
-        if self._exit:
-            self.log.debug("Exiting")
-            self._save_queue()
-            os._exit(0)
+    def _doExitEvent(self):
+        self.log.debug("Exiting")
+        self._save_queue()
+        os._exit(0)
 
     def _checkTenantSourceConf(self, config):
         tenant_config = None
@@ -931,19 +941,23 @@ class Scheduler(threading.Thread):
                        not self._stopped):
                     self.process_management_queue()
 
+                if self._pause:
+                    self.log.debug("Run handler paused")
+                    continue
+
                 # Give result events priority -- they let us stop builds,
                 # whereas trigger events cause us to execute builds.
                 while (not self.result_event_queue.empty() and
                        not self._stopped):
                     self.process_result_queue()
 
-                if not self._pause:
+                if not self._exit:
                     while (not self.trigger_event_queue.empty() and
                            not self._stopped):
                         self.process_event_queue()
 
-                if self._pause and self._areAllBuildsComplete():
-                    self._doPauseEvent()
+                if self._exit and self._areAllBuildsComplete():
+                    self._doExitEvent()
 
                 for tenant in self.abide.tenants.values():
                     for pipeline in tenant.layout.pipelines.values():
@@ -1237,11 +1251,11 @@ class Scheduler(threading.Thread):
         websocket_url = get_default(self.config, 'web', 'websocket_url', None)
 
         if self._pause:
-            ret = '<p><b>Queue only mode:</b> preparing to '
-            if self._exit:
-                ret += 'exit'
-            ret += ', queue length: %s' % self.trigger_event_queue.qsize()
-            ret += '</p>'
+            ret = '<p><b>Paused</b></p>'
+            data['message'] = ret
+
+        if self._exit:
+            ret = '<p><b>Preparing to exit</b></p>'
             data['message'] = ret
 
         data['trigger_event_queue'] = {}
