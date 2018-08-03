@@ -46,6 +46,30 @@
       "revId": "a4d32f92a1422144e2a0474f5e777bc2e6855edd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_0c94d940",
+        "filename": "zuul/model.py",
+        "patchSetId": 22
+      },
+      "lineNbr": 562,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-08-03T03:15:41Z",
+      "side": 1,
+      "message": "I think that would make the most sense. Either that or instead of relying on _keys you construct the dict yourself. Which might be better as the result will always have the same keys then, just some attributes might be None.",
+      "parentUuid": "5f7c97a3_ece87de1",
+      "range": {
+        "startLine": 562,
+        "startChar": 15,
+        "endLine": 562,
+        "endChar": 19
+      },
+      "revId": "a4d32f92a1422144e2a0474f5e777bc2e6855edd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
