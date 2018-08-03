@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_4cbbb10f",
+        "filename": "zuul/model.py",
+        "patchSetId": 22
+      },
+      "lineNbr": 562,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-08-03T03:07:15Z",
+      "side": 1,
+      "message": "If \u0027name\u0027 is in self._keys, this will be overwritten.",
+      "range": {
+        "startLine": 562,
+        "startChar": 15,
+        "endLine": 562,
+        "endChar": 19
+      },
+      "revId": "a4d32f92a1422144e2a0474f5e777bc2e6855edd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
