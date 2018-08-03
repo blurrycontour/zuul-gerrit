@@ -22,6 +22,30 @@
       "revId": "a4d32f92a1422144e2a0474f5e777bc2e6855edd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_ece87de1",
+        "filename": "zuul/model.py",
+        "patchSetId": 22
+      },
+      "lineNbr": 562,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-08-03T03:11:02Z",
+      "side": 1,
+      "message": "oh good call. Should this block be moved below the self._keys loop?",
+      "parentUuid": "5f7c97a3_4cbbb10f",
+      "range": {
+        "startLine": 562,
+        "startChar": 15,
+        "endLine": 562,
+        "endChar": 19
+      },
+      "revId": "a4d32f92a1422144e2a0474f5e777bc2e6855edd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
