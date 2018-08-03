@@ -42,7 +42,8 @@ import zuul.lib.queue
 import zuul.lib.repl
 from zuul.model import Build, HoldRequest, Tenant, TriggerEvent
 
-COMMANDS = ['full-reconfigure', 'smart-reconfigure', 'stop', 'repl', 'norepl']
+COMMANDS = ['full-reconfigure', 'smart-reconfigure', 'stop',
+            'repl', 'norepl', 'graceful', 'pause', 'unpause']
 
 
 class ManagementEvent(object):
@@ -300,8 +301,12 @@ class Scheduler(threading.Thread):
             'smart-reconfigure': self.smartReconfigureCommandHandler,
             'repl': self.start_repl,
             'norepl': self.stop_repl,
+            'graceful': self.exit,
+            'pause': self.pause,
+            'unpause': self.unpause,
         }
-        self._hibernate = False
+        self._pause = False
+        self._exit = False
         self._stopped = False
         self._zuul_app = None
         self.executor = None
@@ -724,9 +729,18 @@ class Scheduler(threading.Thread):
         event.wait()
         self.log.debug("Enqueue complete")
 
+    def pause(self):
+        self.log.debug("Pausing")
+        self._pause = True
+
+    def unpause(self):
+        self.log.debug("Unpausing")
+        self._pause = False
+        self.wake_event.set()
+
     def exit(self):
         self.log.debug("Prepare to exit")
-        self._hibernate = True
+        self._exit = True
         self.wake_event.set()
         self.log.debug("Waiting for exit")
 
@@ -803,12 +817,10 @@ class Scheduler(threading.Thread):
         self.log.debug("Resuming queue processing")
         self.wake_event.set()
 
-    def _doHibernate(self) -> None:
-        # TODO JK: Remove when queues in ZK
-        if self._hibernate:
-            self.log.debug("Exiting")
-            self._save_queue()
-            os._exit(0)
+    def _doExitEvent(self):
+        self.log.debug("Exiting")
+        self._save_queue()
+        os._exit(0)
 
     def _checkTenantSourceConf(self, config):
         tenant_config = None
@@ -1245,19 +1257,23 @@ class Scheduler(threading.Thread):
                        not self._stopped):
                     self.process_management_queue()
 
+                if self._pause:
+                    self.log.debug("Run handler paused")
+                    continue
+
                 # Give result events priority -- they let us stop builds,
                 # whereas trigger events cause us to execute builds.
                 while (not self.result_event_queue.empty() and
                        not self._stopped):
                     self.process_result_queue()
 
-                if not self._hibernate:
+                if not self._exit:
                     while (not self.trigger_event_queue.empty() and
                            not self._stopped):
                         self.process_event_queue()
 
-                if self._hibernate and self._areAllBuildsComplete():
-                    self._doHibernate()
+                if self._exit and self._areAllBuildsComplete():
+                    self._doExitEvent()
 
                 for tenant in self.abide.tenants.values():
                     for pipeline in tenant.layout.pipelines.values():
@@ -1673,10 +1689,13 @@ class Scheduler(threading.Thread):
         data['zuul_version'] = self.zuul_version
         websocket_url = get_default(self.config, 'web', 'websocket_url', None)
 
-        if self._hibernate:
-            data['message'] = 'Queue only mode: preparing to hibernate,' \
-                              ' queue length: %s'\
-                              % self.trigger_event_queue.qsize()
+        if self._pause:
+            ret = '<p><b>Paused</b></p>'
+            data['message'] = ret
+
+        if self._exit:
+            ret = '<p><b>Preparing to exit</b></p>'
+            data['message'] = ret
 
         data['trigger_event_queue'] = {}
         data['trigger_event_queue']['length'] = \
