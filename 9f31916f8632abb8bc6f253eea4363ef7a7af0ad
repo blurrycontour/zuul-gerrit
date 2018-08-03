@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_d698a7cc",
+        "filename": "zuul/model.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 1112,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-08-03T14:37:45Z",
+      "side": 1,
+      "message": "Instead of rendering the Project here, I think we should render the JobProject (self.required_projects is a list of JobProjects).  That will give the user the canonical project name (it\u0027s already been resolved), which is enough to link to the project elsewhere in the system, as well as the override-checkout value.",
+      "revId": "9f31916f8632abb8bc6f253eea4363ef7a7af0ad",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
