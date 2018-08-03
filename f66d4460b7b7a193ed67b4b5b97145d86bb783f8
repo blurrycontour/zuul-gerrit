@@ -84,6 +84,30 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_776afaec",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-08-03T05:49:58Z",
+      "side": 1,
+      "message": "Ah yes, you\u0027re checking if it\u0027s None, not just evaluating to false (which an empty list would)",
+      "parentUuid": "5f7c97a3_374b22b3",
+      "range": {
+        "startLine": 311,
+        "startChar": 43,
+        "endLine": 311,
+        "endChar": 49
+      },
+      "revId": "f66d4460b7b7a193ed67b4b5b97145d86bb783f8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_cc49018e",
         "filename": "zuul/web/__init__.py",
         "patchSetId": 25
