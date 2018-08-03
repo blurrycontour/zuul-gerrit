@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_77599a8b",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-08-03T05:40:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f7c97a3_8c43096c",
+      "revId": "f66d4460b7b7a193ed67b4b5b97145d86bb783f8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_6c654d1c",
         "filename": "zuul/web/__init__.py",
         "patchSetId": 25
@@ -42,6 +60,30 @@
     },
     {
       "key": {
+        "uuid": "5f7c97a3_374b22b3",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-08-03T05:40:19Z",
+      "side": 1,
+      "message": "None is only returned when the tenant doesn\u0027t exists.",
+      "parentUuid": "5f7c97a3_6c654d1c",
+      "range": {
+        "startLine": 311,
+        "startChar": 43,
+        "endLine": 311,
+        "endChar": 49
+      },
+      "revId": "f66d4460b7b7a193ed67b4b5b97145d86bb783f8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_cc49018e",
         "filename": "zuul/web/__init__.py",
         "patchSetId": 25
@@ -53,6 +95,30 @@
       "writtenOn": "2018-08-03T04:05:20Z",
       "side": 1,
       "message": "It could be the tenant doesn\u0027t exist. I think we should possibly have different errors, but I realise that complicates the RPC protocol and this is an okay compromise",
+      "range": {
+        "startLine": 325,
+        "startChar": 22,
+        "endLine": 325,
+        "endChar": 29
+      },
+      "revId": "f66d4460b7b7a193ed67b4b5b97145d86bb783f8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f7c97a3_d7474ea4",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-08-03T05:40:19Z",
+      "side": 1,
+      "message": "That\u0027s ok, other gearman method returns \u0027None\u0027 for unknown tenant.",
+      "parentUuid": "5f7c97a3_cc49018e",
       "range": {
         "startLine": 325,
         "startChar": 22,
