@@ -19,6 +19,7 @@
     nodeset: zuul-functional-temp-master
     pre-run: playbooks/zuul-stream/pre.yaml
     run: playbooks/zuul-stream/functional.yaml
+    garbage: false
     post-run:
       - playbooks/zuul-stream/post.yaml
       - playbooks/zuul-stream/post-ara.yaml
