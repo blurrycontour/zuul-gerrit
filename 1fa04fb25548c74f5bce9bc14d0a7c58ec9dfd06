@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_b273ace7",
+        "filename": ".zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 22348
+      },
+      "writtenOn": "2018-08-06T23:22:52Z",
+      "side": 1,
+      "message": "extra keys not allowed @ data[\u0027garbage\u0027]",
+      "range": {
+        "startLine": 16,
+        "startChar": 2,
+        "endLine": 32,
+        "endChar": 0
+      },
+      "revId": "1fa04fb25548c74f5bce9bc14d0a7c58ec9dfd06",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_5280188c",
+        "filename": ".zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 22348
+      },
+      "writtenOn": "2018-08-06T23:22:52Z",
+      "side": 1,
+      "message": "Job zuul-stream-functional not defined",
+      "range": {
+        "startLine": 68,
+        "startChar": 2,
+        "endLine": 151,
+        "endChar": 0
+      },
+      "revId": "1fa04fb25548c74f5bce9bc14d0a7c58ec9dfd06",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
