@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_f1ffd164",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 823,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-08-07T16:21:30Z",
+      "side": 1,
+      "message": "does this need urllib.parse.quote? stable/rocky?",
+      "range": {
+        "startLine": 823,
+        "startChar": 12,
+        "endLine": 823,
+        "endChar": 25
+      },
+      "revId": "857722401e687abbc00b48a7367f29e615c9d9cf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
