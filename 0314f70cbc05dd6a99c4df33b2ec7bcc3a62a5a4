@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_94d76bee",
+        "filename": "zuul/change_matcher.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-08-07T17:10:03Z",
+      "side": 1,
+      "message": "What\u0027s the desired match for explicit branch matchers at the moment? At least for the implied branch matcher we need to do a fullmatch. See I569db50f05c1b53cb1fb26e84ea0af377e3df73c",
+      "range": {
+        "startLine": 64,
+        "startChar": 26,
+        "endLine": 64,
+        "endChar": 31
+      },
+      "revId": "0314f70cbc05dd6a99c4df33b2ec7bcc3a62a5a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_f4e6dfe8",
+        "filename": "zuul/change_matcher.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-08-07T17:10:03Z",
+      "side": 1,
+      "message": "We should do a fullmatch here. Otherwise we\u0027ll get problems if there are branches like stabe-foo and stable-foo-bar. See I569db50f05c1b53cb1fb26e84ea0af377e3df73c for a similar problem.",
+      "range": {
+        "startLine": 71,
+        "startChar": 30,
+        "endLine": 71,
+        "endChar": 35
+      },
+      "revId": "0314f70cbc05dd6a99c4df33b2ec7bcc3a62a5a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
