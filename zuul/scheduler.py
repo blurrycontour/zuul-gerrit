@@ -643,12 +643,11 @@ class Scheduler(threading.Thread):
             for (project, branch) in event.project_branches:
                 self.abide.clearUnparsedConfigCache(project.canonical_name,
                                                     branch)
-            old_tenant = self.abide.tenants[event.tenant_name]
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger)
             abide = loader.reloadTenant(
                 self._get_project_key_dir(),
-                self.abide, old_tenant)
+                self.abide)
             tenant = abide.tenants[event.tenant_name]
             self._reconfigureTenant(tenant)
             self.abide = abide
