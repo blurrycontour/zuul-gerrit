@@ -411,3 +411,35 @@ class TestRequirementsReject(ZuulTestCase):
     def test_trigger_require_reject(self):
         "Test trigger requirement: rejections absent"
         return self._test_require_reject('org/project2', 'project2-job')
+
+    def test_pipeline_requirement_reject_multi(self):
+        "Test if reject is obeyed if another approval is present"
+
+        # According to _test_require_reject a reject clause shall reject the
+        # change if no approval is available. This might be surprising to
+        # users.
+        A = self.fake_gerrit.addFakeChange('org/project3', 'master', 'A')
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 0)
+
+        # Setting another approval should not change the behavior of the
+        # configured reject. This test step fails at the moment which is even
+        # more surprising.
+        comment = A.addApproval('Approved', 1, username='reviewer_e')
+        self.fake_gerrit.addEvent(comment)
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 0)
+
+        # Setting the approval 'Verified' to a rejected value shall not lead to
+        # a build.
+        comment = A.addApproval('Verified', -1, username='jenkins')
+        self.fake_gerrit.addEvent(comment)
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 0)
+
+        # Setting the approval 'Verified' to an accepted value shall lead to
+        # a build.
+        comment = A.addApproval('Verified', 1, username='jenkins')
+        self.fake_gerrit.addEvent(comment)
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 1)
