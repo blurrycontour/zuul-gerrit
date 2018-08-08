@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_08f485ce",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-08-08T17:45:24Z",
+      "side": 1,
+      "message": "in this case we might be able to just remove that branch from the cache",
+      "revId": "520507fc17831a0bd9a57610592cd0860bfb9a0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_e87d891c",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-08-08T17:45:24Z",
+      "side": 1,
+      "message": "in this case we probably could just add that branch as unprotected to the cache",
+      "revId": "520507fc17831a0bd9a57610592cd0860bfb9a0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
