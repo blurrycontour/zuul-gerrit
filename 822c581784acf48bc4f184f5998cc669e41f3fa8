@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_c8452d45",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1343,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-08-08T17:31:20Z",
+      "side": 0,
+      "message": "tpc.parsed_branch_config was always empty; this never ran.",
+      "revId": "822c581784acf48bc4f184f5998cc669e41f3fa8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
