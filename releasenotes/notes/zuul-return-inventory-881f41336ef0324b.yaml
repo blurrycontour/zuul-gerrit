@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    It is now possible to use zuul_return to update the inventory between job
+    phase.
