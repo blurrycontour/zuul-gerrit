@@ -58,6 +58,9 @@ def main():
     )
 
     p = module.params
+    if p['data'].get('zuul', {}).get('inventory'):
+        module.fail_json(
+            msg="To add zuul inventory, use the add_host action")
     path = p['path']
     if not path:
         path = os.path.join(os.environ['ZUUL_JOBDIR'], 'work',

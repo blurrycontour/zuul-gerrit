@@ -1,0 +1,22 @@
+- hosts: localhost
+  tasks:
+    - add_host:
+        name: "pod"
+        ansible_connection: kubectl
+        ansible_host: project-pod-1
+        update_inventory: yes
+    - add_host:
+        name: "tmppod"
+        ansible_connection: kubectl
+        ansible_host: temp-pod-1
+    - zuul_return:
+        data:
+          zuul:
+            inventory:
+              failpod:
+                ansible_connection: kubectl
+      failed_when: false
+      register: forbidden_zuul_return
+    - assert:
+        that:
+          - forbidden_zuul_return.msg == "To add zuul inventory, use the add_host action"

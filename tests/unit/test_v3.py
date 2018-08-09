@@ -19,6 +19,7 @@ import os
 import textwrap
 import gc
 import time
+import yaml
 from unittest import skip
 
 import zuul.configloader
@@ -3059,6 +3060,23 @@ class TestDataReturn(AnsibleZuulTestCase):
         self.assertIn('child : SKIPPED', A.messages[-1])
         self.assertIn('data-return : SKIPPED', A.messages[-1])
         self.assertIn('Build succeeded', A.messages[-1])
+
+    def test_data_return_inventory(self):
+        self.executor_server.keep_jobdir = True
+        A = self.fake_gerrit.addFakeChange('org/project4', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='data-return-inventory', result='SUCCESS',
+                 changes='1,1'),
+        ])
+        self.assertIn('Build succeeded', A.messages[-1])
+
+        inventory = yaml.safe_load(open(os.path.join(
+            self.history[0].jobdir.root, "ansible", "inventory.yaml")))
+        self.assertIn("pod", inventory["all"]["hosts"])
+        self.assertNotIn("tmppod", inventory["all"]["hosts"])
 
 
 class TestDiskAccounting(AnsibleZuulTestCase):
