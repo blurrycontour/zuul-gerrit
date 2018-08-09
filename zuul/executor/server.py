@@ -1067,8 +1067,33 @@ class AnsibleJob(object):
             timeout = timeout - elapsed
         return timeout
 
+    def updateInventory(self, inventory):
+        # Check for inventory injected by zuul_return
+        zuul_data = self.getResultData().get('zuul', {})
+        inventory_update = False
+        for name, host in zuul_data.get('inventory', {}).items():
+            if host.get('ansible_connection') != 'kubectl':
+                # Only kubectl connection can be injected for now
+                self.log.warning(
+                    "Job tried to add a non kubectl host %s to the inventory",
+                    str(host))
+                continue
+            if name in inventory['all']['hosts']:
+                self.log.warning(
+                    "Job tried to add a duplicated host %s to the inventory",
+                    str(host))
+                continue
+            inventory['all']['hosts'][name] = host
+            inventory_update = True
+        if inventory_update:
+            with open(self.jobdir.inventory, 'w') as inventory_yaml:
+                inventory_yaml.write(yaml.safe_dump(
+                    inventory, default_flow_style=False))
+        return inventory_update
+
     def runPlaybooks(self, args):
         result = None
+        inventory = yaml.safe_load(open(self.jobdir.inventory))
 
         # Run the Ansible 'setup' module on all hosts in the inventory
         # at the start of the job with a 60 second timeout.  If we
@@ -1100,6 +1125,8 @@ class AnsibleJob(object):
                 # zuul try again
                 pre_failed = True
                 break
+            if playbook.trusted:
+                self.updateInventory(inventory)
 
         self.log.debug(
             "Overall ansible cpu times: user=%.2f, system=%.2f, "
@@ -1129,6 +1156,8 @@ class AnsibleJob(object):
                 # The result of the job is indeterminate.  Zuul will
                 # run it again.
                 return None
+            if self.jobdir.playbook.trusted:
+                self.updateInventory(inventory)
 
         # check if we need to pause here
         result_data = self.getResultData()
@@ -1162,6 +1191,8 @@ class AnsibleJob(object):
                     result = 'POST_FAILURE'
                 if (index + 1) == len(self.jobdir.post_playbooks):
                     self._logFinalPlaybookError()
+            if playbook.trusted:
+                self.updateInventory(inventory)
 
         if unreachable:
             return None

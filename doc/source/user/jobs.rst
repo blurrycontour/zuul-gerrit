@@ -767,6 +767,24 @@ supply any arbitrary data to the child jobs. For example:
             pause: true
           registry_ip_address: "{{ hostvars[groups.all[0]].ansible_host }}"
 
+Updating the inventory
+~~~~~~~~~~~~~~~~~~~~~~
+
+A job phase can update the inventory to add newly created ansible host using
+the kubectl connection. This for example can be useful to start a pod in a
+pre run phase that will be used by the run phase. For example:
+
+.. code-block:: yaml
+
+  tasks:
+    - zuul_return:
+        data:
+          zuul:
+            inventory:
+              pod:
+                ansible_connection: kubectl
+                ansible_host: pod-name-id
+
 
 .. _build_status:
 
