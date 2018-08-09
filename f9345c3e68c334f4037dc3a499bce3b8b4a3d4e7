@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_df4f1a32",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-08-09T01:46:31Z",
+      "side": 1,
+      "message": "Do you mean \u0027stable\u0027?",
+      "range": {
+        "startLine": 13,
+        "startChar": 45,
+        "endLine": 13,
+        "endChar": 55
+      },
+      "revId": "f9345c3e68c334f4037dc3a499bce3b8b4a3d4e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
