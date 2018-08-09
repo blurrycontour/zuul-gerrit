@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_4061eaa8",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 975,
+      "author": {
+        "id": 27621
+      },
+      "writtenOn": "2018-08-09T04:49:28Z",
+      "side": 1,
+      "message": "correct the indentation for this line as pep8 failing",
+      "revId": "5e7931434826cd1290f7553e7883cad3bf893aaa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
