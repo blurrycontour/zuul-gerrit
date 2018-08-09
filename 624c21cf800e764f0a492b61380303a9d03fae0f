@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_3c772005",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-08-09T20:30:26Z",
+      "side": 1,
+      "message": "It\u0027s just deprecated so we have the option to remove it in the future. The reason is that there are further variants of reconfig (full cached reconfig) planned which cannot be mapped to just further signals. So the idea is to have one official interface to trigger these functions.",
+      "parentUuid": "3f79a3b5_bcdd7043",
+      "range": {
+        "startLine": 288,
+        "startChar": 37,
+        "endLine": 289,
+        "endChar": 53
+      },
+      "revId": "624c21cf800e764f0a492b61380303a9d03fae0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_7cfa7875",
         "filename": "zuul/scheduler.py",
         "patchSetId": 2
