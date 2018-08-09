@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_bcdd7043",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-08-09T20:26:52Z",
+      "side": 1,
+      "message": "If it isn\u0027t much code we may want to keep sig hup support too because it is a common method of reapplying configuration to unix processes.",
+      "range": {
+        "startLine": 288,
+        "startChar": 37,
+        "endLine": 289,
+        "endChar": 53
+      },
+      "revId": "624c21cf800e764f0a492b61380303a9d03fae0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_7cfa7875",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 442,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-08-09T20:26:52Z",
+      "side": 1,
+      "message": "Noting that the old method effectively had a lock around it due to the way that signal handling works. We don\u0027t appear to need a lock here becuase it is handled via the event queue which is a fifo in a single thread.",
+      "revId": "624c21cf800e764f0a492b61380303a9d03fae0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
