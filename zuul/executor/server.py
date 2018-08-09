@@ -30,6 +30,7 @@ import traceback
 from zuul.lib.yamlutil import yaml
 from zuul.lib.config import get_default
 from zuul.lib.statsd import get_statsd
+from zuul.lib import filecomments
 
 try:
     import ara.plugins.callbacks as ara_callbacks
@@ -793,10 +794,15 @@ class AnsibleJob(object):
                                   project['name'])
             repos[project['canonical_name']] = repo
 
+        # The commit ID of the original item (before merging).  Used
+        # later for line mapping.
+        item_commit = None
+
         merge_items = [i for i in args['items'] if i.get('number')]
         if merge_items:
-            if not self.doMergeChanges(merger, merge_items,
-                                       args['repo_state']):
+            item_commit = self.doMergeChanges(merger, merge_items,
+                                              args['repo_state'])
+            if item_commit is None:
                 # There was a merge conflict and we have already sent
                 # a work complete result, don't run any jobs
                 return
@@ -879,7 +885,10 @@ class AnsibleJob(object):
         if self.aborted_reason == self.RESULT_DISK_FULL:
             result = 'DISK_FULL'
         data = self.getResultData()
+        warnings = []
+        self.mapLines(merger, args, data, item_commit, warnings)
         result_data = json.dumps(dict(result=result,
+                                      warnings=warnings,
                                       data=data))
         self.log.debug("Sending result: %s" % (result_data,))
         self.job.sendWorkComplete(result_data)
@@ -895,6 +904,63 @@ class AnsibleJob(object):
             self.log.exception("Unable to load result data:")
         return data
 
+    def mapLines(self, merger, args, data, commit, warnings):
+        # The data and warnings arguments are mutated in this method.
+
+        # If we received file comments, map the line numbers before
+        # we send the result.
+        fc = data.get('zuul', {}).get('file_comments')
+        if not fc:
+            return
+        disable = data.get('zuul', {}).get('disable_file_comment_line_mapping')
+        if disable:
+            return
+
+        try:
+            filecomments.validate(fc)
+        except Exception as e:
+            warnings.append("Job %s: validation error in file comments: %s" %
+                            (args['zuul']['job'], str(e)))
+            del data['zuul']['file_comments']
+            return
+
+        repo = None
+        for project in args['projects']:
+            if (project['canonical_name'] !=
+                args['zuul']['project']['canonical_name']):
+                continue
+            repo = merger.getRepo(project['connection'],
+                                  project['name'])
+        # If the repo doesn't exist, abort
+        if not repo:
+            return
+
+        # Check out the selected ref again in case the job altered the
+        # repo state.
+        p = args['zuul']['projects'][project['canonical_name']]
+        selected_ref = p['checkout']
+
+        self.log.info("Checking out %s %s for line mapping",
+                      project['canonical_name'], selected_ref)
+        try:
+            repo.checkout(selected_ref)
+        except Exception:
+            # If checkout fails, abort
+            self.log.exception("Error checking out repo for line mapping")
+            warnings.append("Job %s: unable to check out repo "
+                            "for file comments" % (args['zuul']['job']))
+            return
+
+        lines = filecomments.extractLines(fc)
+
+        new_lines = {}
+        for (filename, lineno) in lines:
+            new_lineno = repo.mapLine(commit, filename, lineno)
+            if new_lineno is not None:
+                new_lines[(filename, lineno)] = new_lineno
+
+        filecomments.updateLines(fc, new_lines)
+
     def doMergeChanges(self, merger, items, repo_state):
         try:
             ret = merger.mergeChanges(items, repo_state=repo_state)
@@ -905,24 +971,25 @@ class AnsibleJob(object):
             self.log.exception("Could not fetch refs to merge from remote")
             result = dict(result='ABORTED')
             self.job.sendWorkComplete(json.dumps(result))
-            return False
+            return None
         if not ret:  # merge conflict
             result = dict(result='MERGER_FAILURE')
             if self.executor_server.statsd:
                 base_key = "zuul.executor.{hostname}.merger"
                 self.executor_server.statsd.incr(base_key + ".FAILURE")
             self.job.sendWorkComplete(json.dumps(result))
-            return False
+            return None
 
         if self.executor_server.statsd:
             base_key = "zuul.executor.{hostname}.merger"
             self.executor_server.statsd.incr(base_key + ".SUCCESS")
         recent = ret[3]
+        orig_commit = ret[4]
         for key, commit in recent.items():
             (connection, project, branch) = key
             repo = merger.getRepo(connection, project)
             repo.setRef('refs/heads/' + branch, commit)
-        return True
+        return orig_commit
 
     def resolveBranch(self, project_canonical_name, ref, zuul_branch,
                       job_override_branch, job_override_checkout,
@@ -2403,5 +2470,5 @@ class ExecutorServer(object):
             result['commit'] = result['files'] = result['repo_state'] = None
         else:
             (result['commit'], result['files'], result['repo_state'],
-             recent) = ret
+             recent, orig_commit) = ret
         job.sendWorkComplete(json.dumps(result))
