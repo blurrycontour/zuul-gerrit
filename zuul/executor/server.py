@@ -926,6 +926,8 @@ class AnsibleJob(object):
     def runPlaybooks(self, args):
         result = None
 
+        inventory = yaml.safe_load(open(self.jobdir.inventory))
+
         # Run the Ansible 'setup' module on all hosts in the inventory
         # at the start of the job with a 60 second timeout.  If we
         # aren't able to connect to all the hosts and gather facts
@@ -956,6 +958,22 @@ class AnsibleJob(object):
                 # zuul try again
                 pre_failed = True
                 break
+            if playbook.trusted:
+                # Check for inventory injected by zuul_return
+                zuul_data = self.getResultData().get('zuul', {})
+                inventory_update = False
+                for name, host in zuul_data.get('inventory', {}).items():
+                    if host.get('ansible_connection') != 'kubectl':
+                        # Only kubectl connection can be injected for now
+                        continue
+                    if name in inventory['all']['hosts']:
+                        continue
+                    inventory['all']['hosts'][name] = host
+                    inventory_update = True
+                if inventory_update:
+                    with open(self.jobdir.inventory, 'w') as inventory_yaml:
+                        inventory_yaml.write(yaml.safe_dump(
+                            inventory, default_flow_style=False))
 
         self.log.debug(
             "Overall ansible cpu times: user=%.2f, system=%.2f, "
