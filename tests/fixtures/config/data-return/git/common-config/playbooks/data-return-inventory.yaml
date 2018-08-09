@@ -1,0 +1,7 @@
+- hosts: localhost
+  tasks:
+    - add_host:
+        name: "pod"
+        ansible_connection: kubectl
+        ansible_host: project-pod-1
+        update_inventory: yes

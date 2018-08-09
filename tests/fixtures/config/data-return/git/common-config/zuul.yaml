@@ -41,6 +41,11 @@
     name: child
     run: playbooks/child.yaml
 
+- job:
+    name: data-return-inventory
+    pre-run: playbooks/data-return-inventory.yaml
+    run: playbooks/dyn-inventory.yaml
+
 - project:
     name: org/project
     check:
@@ -84,3 +89,9 @@
         - child:
             dependencies:
               - data-return-skip-all
+
+- project:
+    name: org/project4
+    check:
+      jobs:
+        - data-return-inventory
