@@ -1740,6 +1740,7 @@ class BuildSet(object):
         self.config_errors = []  # list of ConfigurationErrors
         self.failing_reasons = []
         self.debug_messages = []
+        self.warning_messages = []
         self.merge_state = self.NEW
         self.nodesets = {}  # job -> nodeset
         self.node_requests = {}  # job -> reqs
@@ -1917,6 +1918,9 @@ class QueueItem(object):
         else:
             indent = ''
         self.current_build_set.debug_messages.append(indent + msg)
+
+    def warning(self, msg):
+        self.current_build_set.warning_messages.append(msg)
 
     def freezeJobGraph(self):
         """Find or create actual matching jobs for this item's change and

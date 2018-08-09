@@ -2307,11 +2307,13 @@ class ExecutorServer(object):
         with self.merger_lock:
             ret = self.merger.mergeChanges(args['items'], args.get('files'),
                                            args.get('dirs', []),
-                                           args.get('repo_state'))
+                                           args.get('repo_state'),
+                                           args.get('lines'))
         result = dict(merged=(ret is not None))
         if ret is None:
-            result['commit'] = result['files'] = result['repo_state'] = None
+            result['commit'] = result['files'] = result['repo_state'] = \
+                result['lines'] = None
         else:
             (result['commit'], result['files'], result['repo_state'],
-             recent) = ret
+             recent, result['lines']) = ret
         job.sendWorkComplete(json.dumps(result))

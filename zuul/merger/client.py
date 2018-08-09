@@ -109,12 +109,16 @@ class MergeClient(object):
         return job
 
     def mergeChanges(self, items, build_set, files=None, dirs=None,
-                     repo_state=None, precedence=zuul.model.PRECEDENCE_NORMAL):
+                     repo_state=None, lines=None, build=None,
+                     precedence=zuul.model.PRECEDENCE_NORMAL):
         data = dict(items=items,
                     files=files,
                     dirs=dirs,
-                    repo_state=repo_state)
-        self.submitJob('merger:merge', data, build_set, precedence)
+                    repo_state=repo_state,
+                    lines=lines)
+        job = self.submitJob('merger:merge', data, build_set, precedence)
+        job.zuul_build = build
+        return job
 
     def getRepoState(self, items, build_set,
                      precedence=zuul.model.PRECEDENCE_NORMAL):
@@ -153,7 +157,7 @@ class MergeClient(object):
                       (job, merged, job.updated, commit))
         job.setComplete()
         if job.build_set:
-            self.sched.onMergeCompleted(job.build_set,
+            self.sched.onMergeCompleted(job.build_set, job.zuul_build,
                                         merged, job.updated, commit, files,
                                         repo_state)
         # The test suite expects the job to be removed from the

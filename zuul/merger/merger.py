@@ -67,6 +67,9 @@ def timeout_handler(path):
 
 
 class Repo(object):
+    commit_re = re.compile('^commit ([0-9a-f]{40})$')
+    diff_re = re.compile('^@@ -\d+,\d \+(\d+),\d @@$')
+
     def __init__(self, remote, local, email, username, speed_limit, speed_time,
                  sshkey=None, cache_path=None, logger=None, git_timeout=300,
                  retry_attempts=3, retry_interval=30):
@@ -415,6 +418,24 @@ class Repo(object):
         self.remote_url = url
         self._git_set_remote_url(self.createRepoObject(), self.remote_url)
 
+    def mapLine(self, commit, filename, lineno):
+        repo = self.createRepoObject()
+        # Trace the specified line back to the specified commit and
+        # return the line number in that commit.
+        cur_commit = None
+        out = repo.git.log(L='%s,%s:%s' % (lineno, lineno, filename))
+        for l in out.split('\n'):
+            if cur_commit is None:
+                m = self.commit_re.match(l)
+                if m:
+                    if m.group(1) == commit:
+                        cur_commit = commit
+                continue
+            m = self.diff_re.match(l)
+            if m:
+                return int(m.group(1))
+        return None
+
 
 class Merger(object):
     def __init__(self, working_root, connections, email, username,
@@ -605,11 +626,13 @@ class Merger(object):
         recent[key] = commit
         return commit
 
-    def mergeChanges(self, items, files=None, dirs=None, repo_state=None):
+    def mergeChanges(self, items, files=None, dirs=None, repo_state=None,
+                     lines=None):
         # connection+project+branch -> commit
         recent = {}
         commit = None
         read_files = []
+        new_lines = None
         # connection -> project -> ref -> commit
         if repo_state is None:
             repo_state = {}
@@ -627,10 +650,12 @@ class Merger(object):
                     project=item['project'],
                     branch=item['branch'],
                     files=repo_files))
+        if lines:
+            new_lines = self._mapLines(items[-1])
         ret_recent = {}
         for k, v in recent.items():
             ret_recent[k] = v.hexsha
-        return commit.hexsha, read_files, repo_state, ret_recent
+        return commit.hexsha, read_files, repo_state, ret_recent, new_lines
 
     def setRepoState(self, items, repo_state):
         # Sets the repo state for the items
@@ -683,3 +708,14 @@ class Merger(object):
                         tosha=None):
         repo = self.getRepo(connection_name, project_name)
         return repo.getFilesChanges(branch, tosha)
+
+    def _mapLines(self, item, lines):
+        repo = self.getRepo(item['connection'], item['project'])
+        base_commit = repo.repo.refs[item['ref']]
+
+        new_lines = {}
+        for (filename, lineno) in lines:
+            new_lineno = repo.mapLine(base_commit, filename, lineno)
+            if new_lineno is not None:
+                new_lines[(filename, lineno)] = new_lineno
+        return new_lines

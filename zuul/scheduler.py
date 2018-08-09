@@ -188,15 +188,18 @@ class MergeCompletedEvent(ResultEvent):
     """A remote merge operation has completed
 
     :arg BuildSet build_set: The build_set which is ready.
+    :arg Build build: The build associated with the merge job (line mapping).
     :arg bool merged: Whether the merge succeeded (changes with refs).
     :arg bool updated: Whether the repo was updated (changes without refs).
     :arg str commit: The SHA of the merged commit (changes with refs).
     :arg dict repo_state: The starting repo state before the merge.
+    :arg dict lines: The resulting line mapping.
     """
 
-    def __init__(self, build_set, merged, updated, commit,
-                 files, repo_state):
+    def __init__(self, build_set, build, merged, updated, commit,
+                 files, repo_state, lines):
         self.build_set = build_set
+        self.build = build
         self.merged = merged
         self.updated = updated
         self.commit = commit
@@ -441,10 +444,10 @@ class Scheduler(threading.Thread):
         self.result_event_queue.put(event)
         self.wake_event.set()
 
-    def onMergeCompleted(self, build_set, merged, updated,
-                         commit, files, repo_state):
-        event = MergeCompletedEvent(build_set, merged,
-                                    updated, commit, files, repo_state)
+    def onMergeCompleted(self, build_set, build, merged, updated,
+                         commit, files, repo_state, lines):
+        event = MergeCompletedEvent(build_set, build, merged, updated,
+                                    commit, files, repo_state, lines)
         self.result_event_queue.put(event)
         self.wake_event.set()
 

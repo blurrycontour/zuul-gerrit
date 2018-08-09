@@ -17,6 +17,7 @@ import urllib
 from zuul import exceptions
 from zuul import model
 from zuul.lib.dependson import find_dependency_headers
+from zuul.lib import filecomments
 
 
 class DynamicChangeQueueContextManager(object):
@@ -718,15 +719,37 @@ class PipelineManager(object):
         self.log.debug("Build %s started" % build)
         return True
 
+
     def onBuildCompleted(self, build):
         item = build.build_set.item
 
         self.log.debug("Build %s of %s completed" % (build, item.change))
 
-        item.setResult(build)
         item.pipeline.tenant.semaphore_handler.release(item, build.job)
-        self.log.debug("Item %s status is now:\n %s" %
-                       (item, item.formatStatus()))
+
+        # If we received file comments, have the merger map the line
+        # numbers before we set the result.
+        fc = build.result_data.get('zuul', {}).get('file_comments')
+        waiting_for_mapping = False
+        if fc and not build.retry:
+            try:
+                filecomments.validate(fc)
+            except Exception as e:
+                item.warning(str(e))
+            else:
+                lines = filecomments.extractLines(fc)
+                self.sched.merger.mergeChanges(
+                    build.build_set.merger_items, item.current_build_set,
+                    lines=lines, build=build,
+                    precedence=self.pipeline.precedence)
+                self.log.debug("Build %s of %s waiting "
+                               "for file comment mapping" %
+                               (build, item.change))
+                waiting_for_mapping = True
+        if not waiting_for_mapping:
+            item.setResult(build)
+            self.log.debug("Item %s status is now:\n %s" %
+                           (item, item.formatStatus()))
 
         if build.retry:
             build.build_set.removeJobNodeSet(build.job.name)
@@ -734,6 +757,20 @@ class PipelineManager(object):
         return True
 
     def onMergeCompleted(self, event):
+        if event.build:
+            build = event.build
+            # We are continuing a build completed after performing
+            # line mapping.
+            item = build.build_set.item
+            lines = event.item
+            self.log.debug("Build %s of %s file comment mapping "
+                           "complete, result %s" % (build, item.change, lines))
+            fc = build.result_data.get('zuul', {}).get('file_comments')
+            filecomments.updateLines(fc, lines)
+            item.setResult(build)
+            self.log.debug("Item %s status is now:\n %s" %
+                           (item, item.formatStatus()))
+            return
         build_set = event.build_set
         item = build_set.item
         build_set.merge_state = build_set.COMPLETE
