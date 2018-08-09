@@ -832,6 +832,7 @@ class AnsibleJob(object):
         if self.aborted_reason == self.RESULT_DISK_FULL:
             result = 'DISK_FULL'
         data = self.getResultData()
+        data = self.mapLines(args, data)
         result_data = json.dumps(dict(result=result,
                                       data=data))
         self.log.debug("Sending result: %s" % (result_data,))
@@ -847,6 +848,27 @@ class AnsibleJob(object):
         except Exception:
             self.log.exception("Unable to load result data:")
         return data
+
+    def mapLines(self, args, data):
+        for project in args['projects']:
+            if (project['canonical_name'] !=
+                args['zuul']['project']['canonical_name']):
+                continue
+            repo = merger.getRepo(project['connection'],
+                                  project['name'])
+            # If the repo doesn't exist, abort
+            p = args['zuul']['projects'][project['canonical_name']]
+            selected_ref = p['checkout']
+
+            self.log.info("Checking out %s %s %s",
+                          project['canonical_name'], selected_desc,
+                          selected_ref)
+            repo.checkout(selected_ref)
+            # If checkout fails, abort
+
+            # Have the merger map the lines here and update the data
+            # repo.mapLines would look the same as the other patch, as
+            # would filecomments.py.
 
     def doMergeChanges(self, merger, items, repo_state):
         try:
