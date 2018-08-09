@@ -1,0 +1,3 @@
+- hosts: pod
+  gather_facts: false
+  tasks: []
