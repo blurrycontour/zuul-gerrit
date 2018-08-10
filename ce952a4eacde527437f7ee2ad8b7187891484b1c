@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_003f3987",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-08-10T21:08:46Z",
+      "side": 1,
+      "message": "I think this value should actually be the ref parameter given how this function is called later.",
+      "range": {
+        "startLine": 356,
+        "startChar": 35,
+        "endLine": 356,
+        "endChar": 46
+      },
+      "revId": "ce952a4eacde527437f7ee2ad8b7187891484b1c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_80bd8903",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 430,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-08-10T21:08:46Z",
+      "side": 1,
+      "message": "Would it be helpful to constrain the log range to something like orig_commit..commit ? I have a hunch that would speed up processing quite a bit as git will have far less work to do.\n\n(Not a -1).",
+      "revId": "ce952a4eacde527437f7ee2ad8b7187891484b1c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
