@@ -180,6 +180,14 @@ class Repo(object):
                         # the repo and try again immediately.
                         reset_repo_to_head(repo)
                         repo.git.clean('-x', '-f', '-d')
+                    elif 'fatal: not a git repository' in e.stderr:
+                        # If we get here the git.Repo object was happy with its
+                        # lightweight way of checking if this is a valid git
+                        # repository. However if e.g. the .git/HEAD file is
+                        # empty git operations fail. So there is something
+                        # fundamentally broken with the repo and we need to
+                        # delete it before advancing to _ensure_cloned.
+                        shutil.rmtree(self.local_path)
                     else:
                         time.sleep(self.retry_interval)
                     self.log.exception("Retry %s: Fetch %s %s %s" % (
