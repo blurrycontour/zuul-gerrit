@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_f5c8c722",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-08-10T16:15:48Z",
+      "side": 1,
+      "message": "I think we should just delete the branch from the cache instead of deleting the whole cache for that project. In active projects this event can occur many times per hour.",
+      "range": {
+        "startLine": 272,
+        "startChar": 16,
+        "endLine": 272,
+        "endChar": 58
+      },
+      "revId": "a48c9101c6f06a4b0761fa75e0f82a54a619b92b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_159c630d",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-08-10T16:15:48Z",
+      "side": 1,
+      "message": "A brand new branch cannot be protected in github (one must protect it after the creation). So we could just add this branch to the unprotected branch cache.",
+      "range": {
+        "startLine": 277,
+        "startChar": 16,
+        "endLine": 277,
+        "endChar": 58
+      },
+      "revId": "a48c9101c6f06a4b0761fa75e0f82a54a619b92b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_95263315",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1364,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-08-10T16:15:48Z",
+      "side": 1,
+      "message": "We have a clear information about the state of this branch so I\u0027d prefer to only add/remove this branch from the cache instead of clearing the whole cache for this repo. Otherwise we will constantly clear the whole repo in active projects.",
+      "range": {
+        "startLine": 1360,
+        "startChar": 0,
+        "endLine": 1364,
+        "endChar": 58
+      },
+      "revId": "a48c9101c6f06a4b0761fa75e0f82a54a619b92b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
