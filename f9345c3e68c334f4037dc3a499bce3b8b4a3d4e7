@@ -46,6 +46,30 @@
       "revId": "f9345c3e68c334f4037dc3a499bce3b8b4a3d4e7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_0461a6d3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-08-10T02:31:02Z",
+      "side": 1,
+      "message": "Ah okay, I think I follow now. I failed to follow the logic earlier, but this lgtm.",
+      "parentUuid": "3f79a3b5_5c8d3c79",
+      "range": {
+        "startLine": 13,
+        "startChar": 45,
+        "endLine": 13,
+        "endChar": 55
+      },
+      "revId": "f9345c3e68c334f4037dc3a499bce3b8b4a3d4e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
