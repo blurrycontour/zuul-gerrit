@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_c0d14125",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-08-10T21:15:05Z",
+      "side": 1,
+      "message": "ref is \"refs/changes/...\" but I need the actual commit sha since that ref isn\u0027t likely to appear in the final repo.",
+      "revId": "ce952a4eacde527437f7ee2ad8b7187891484b1c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_80bd8903",
         "filename": "zuul/merger/merger.py",
         "patchSetId": 4
@@ -36,6 +53,23 @@
       "writtenOn": "2018-08-10T21:08:46Z",
       "side": 1,
       "message": "Would it be helpful to constrain the log range to something like orig_commit..commit ? I have a hunch that would speed up processing quite a bit as git will have far less work to do.\n\n(Not a -1).",
+      "revId": "ce952a4eacde527437f7ee2ad8b7187891484b1c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_e0cebd80",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 430,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-08-10T21:15:05Z",
+      "side": 1,
+      "message": "Interesting idea, I\u0027ll try it out on a large repo.",
       "revId": "ce952a4eacde527437f7ee2ad8b7187891484b1c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
