@@ -42,6 +42,23 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_a0a765a7",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-08-10T21:18:49Z",
+      "side": 1,
+      "message": "Derp, I misread.  Will fix.",
+      "revId": "ce952a4eacde527437f7ee2ad8b7187891484b1c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_80bd8903",
         "filename": "zuul/merger/merger.py",
         "patchSetId": 4
