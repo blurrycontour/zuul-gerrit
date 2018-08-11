@@ -43,11 +43,13 @@ const appRoutes: Routes = [
   },
   {
     path: 't/:tenant/job.html',
-    component: JobComponent
+    component: JobComponent,
+    runGuardsAndResolvers: 'always'
   },
   {
     path: 'job.html',
-    component: JobComponent
+    component: JobComponent,
+    runGuardsAndResolvers: 'always'
   },
   {
     path: 't/:tenant/jobs.html',
@@ -83,9 +85,13 @@ const appRoutes: Routes = [
   imports: [
     RouterModule.forRoot(
       appRoutes,
-      // Enable router tracing in devel mode. This prints router decisions
-      // to the console.log.
-      { enableTracing: isDevMode() }
+      {
+        // Enable router tracing in devel mode. This prints router decisions
+        // to the console.log.
+        enableTracing: isDevMode(),
+        // When navigating to the same page "reload" the page
+        onSameUrlNavigation: 'reload'
+      }
     )],
   exports: [RouterModule]
 })

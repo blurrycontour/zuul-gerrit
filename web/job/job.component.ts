@@ -12,8 +12,8 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import { Component, OnInit } from '@angular/core'
-import { ActivatedRoute } from '@angular/router'
+import { Component, OnInit, OnDestroy } from '@angular/core'
+import { ActivatedRoute, Router, NavigationEnd } from '@angular/router'
 import { HttpClient, HttpParams } from '@angular/common/http'
 import { DomSanitizer } from '@angular/platform-browser'
 import { Observable } from 'rxjs/Observable'
@@ -25,15 +25,17 @@ import Variant from './variant'
 @Component({
   template: require('./job.component.html')
 })
-export default class JobComponent implements OnInit {
+export default class JobComponent implements OnInit, OnDestroy {
   variants: Variant[]
   job_name: string
   labels_color: Map<string, string>
+  navigationSubscription;
 
   constructor(
     private http: HttpClient, private route: ActivatedRoute,
     private _sanitizer: DomSanitizer,
-    private zuul: ZuulService
+    private zuul: ZuulService,
+    private router: Router
   ) {}
 
   async ngOnInit() {
@@ -44,6 +46,21 @@ export default class JobComponent implements OnInit {
     this.variants = undefined
 
     this.jobFetch()
+
+    this.navigationSubscription = this.router.events.subscribe((e: any) => {
+      if (e instanceof NavigationEnd) {
+        const job_name = this.route.snapshot.queryParamMap.get('job_name') || 'base'
+        if (job_name != this.job_name) {
+          this.jobRefresh(job_name)
+	}
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.navigationSubscription) {
+       this.navigationSubscription.unsubscribe();
+    }
   }
 
   getNodeLabelStyle(node) {

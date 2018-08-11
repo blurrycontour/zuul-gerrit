@@ -29,8 +29,13 @@ under the License.
           </tr>
           <tr *ngIf="variant.parent">
             <td>Parent</td>
-            <td><a (click)="jobRefresh(variant.parent)">
+            <td><a [routerLink]="['../job.html']"
+                   [queryParams]="{job_name: variant.parent}" target="_self">
                 {{ variant.parent }}</a></td>
+          </tr>
+          <tr *ngIf="variant.branches">
+            <td>Branches</td>
+            <td>{{ variant.branches }}</td>
           </tr>
           <tr *ngIf="variant.post_review">
             <td>Post_Review</td>
