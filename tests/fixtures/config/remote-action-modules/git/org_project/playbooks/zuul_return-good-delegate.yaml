@@ -1,0 +1,10 @@
+- hosts: all
+  tasks:
+    - zuul_return:
+      delegate_to: localhost
+        data:
+          zuul:
+            log_url: http://example.com/test/log/url/
+          child:
+            value1: data-return
+            value2: data-return
