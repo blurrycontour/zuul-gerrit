@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_021179ac",
+        "filename": "zuul/ansible/actiongeneral/zuul_return.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-08-11T19:48:14Z",
+      "side": 1,
+      "message": "This was hobbled together via google and looking at existing action plugins.  I didn\u0027t really see any documentation in ansible on how to best write one.",
+      "revId": "6b1ded4a48644642386400f8db83781100218404",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
