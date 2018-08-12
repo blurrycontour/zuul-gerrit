@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "3f79a3b5_6b8b691e",
+        "filename": "zuul/ansible/actiongeneral/zuul_return.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-08-12T06:42:36Z",
+      "side": 1,
+      "message": "This code is racy when having multiple hosts in the inventory (which is done in parallel). We probably need to use Lock from multiprocessing [1]. This is an inherent problem since the beginning but after conversion to an action plugin this should be possible to be fixed. But this might be subject to a follow-up.\n\n[1] https://github.com/ansible/ansible/blob/b845db0169335340355773d14207067b4277b64e/lib/ansible/plugins/cache/memcached.py",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 50,
+        "endChar": 13
+      },
+      "revId": "6b1ded4a48644642386400f8db83781100218404",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_021179ac",
         "filename": "zuul/ansible/actiongeneral/zuul_return.py",
         "patchSetId": 1
