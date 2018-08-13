@@ -143,7 +143,7 @@ class LoadingErrors(object):
         self.error_keys = set()
 
     def addError(self, context, mark, error, short_error=None):
-        e = ConfigurationError(context, mark, error, short_error)
+        e=ConfigurationError(context, mark, error, short_error)
         self.errors.append(e)
         self.error_keys.add(e.key)
 
@@ -219,7 +219,6 @@ class ConfigObject(Freezable):
         super().__init__()
         self.source_context = None
         self.start_mark = None
-
 
 class Pipeline(object):
     """A configuration that ties together triggers, reporters and managers

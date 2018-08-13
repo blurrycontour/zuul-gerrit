@@ -1334,7 +1334,7 @@ class Scheduler(threading.Thread):
         self.log.debug("Change %s has been updated, clearing dependent "
                        "change caches", change)
         for source in self.connections.getSources():
-            for other_change in source.getCachedChanges():
+              for other_change in source.getCachedChanges():
                 if other_change.commit_needs_changes is None:
                     continue
                 for dep in other_change.commit_needs_changes:
