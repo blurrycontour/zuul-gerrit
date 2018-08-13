@@ -1,0 +1,101 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_652e2d93",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 975,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-08-13T07:43:41Z",
+      "side": 1,
+      "message": "(nit) this could probably go in the filecomments lib with the repo passed in as an argument",
+      "range": {
+        "startLine": 954,
+        "startChar": 0,
+        "endLine": 975,
+        "endChar": 47
+      },
+      "revId": "5b91ff0c05063cb26fd4bda640b75cb5e5cdfd33",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_1238ddeb",
+        "filename": "zuul/lib/filecomments.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-08-13T07:43:41Z",
+      "side": 1,
+      "message": "(-1) If start_character was \u00270\u0027, wouldn\u0027t this try to extract at line 0 even though it may not be? Shouldn\u0027t you only be looking at start_line and end_line?",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 49,
+        "endChar": 56
+      },
+      "revId": "5b91ff0c05063cb26fd4bda640b75cb5e5cdfd33",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_e539ddd6",
+        "filename": "zuul/lib/filecomments.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-08-13T07:43:41Z",
+      "side": 1,
+      "message": "Should we be raising a warning if the mapped line isn\u0027t in lines?",
+      "revId": "5b91ff0c05063cb26fd4bda640b75cb5e5cdfd33",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_853269f1",
+        "filename": "zuul/lib/filecomments.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-08-13T07:43:41Z",
+      "side": 1,
+      "message": "(ditto)",
+      "revId": "5b91ff0c05063cb26fd4bda640b75cb5e5cdfd33",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_a5444548",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 433,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-08-13T07:43:41Z",
+      "side": 1,
+      "message": "(nit) rather than using regex, is there a safer way to get the commit sha from the log?",
+      "revId": "5b91ff0c05063cb26fd4bda640b75cb5e5cdfd33",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
