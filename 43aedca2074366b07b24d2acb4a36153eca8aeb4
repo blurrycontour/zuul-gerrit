@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_e366aec1",
+        "filename": "zuul/ansible/actiongeneral/add_host.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-08-13T15:12:42Z",
+      "side": 1,
+      "message": "I am not sure how, but I think we want this change to be optional (false by default). Because as it stands now, any time we use add_host, we\u0027ll add the host into the inventory file.  I can see times, between run phases where we don\u0027t actually want to do that.\n\nMaybe we need to toggle a specific zuul fact to enable updating of inventory, as not to break user facing API for add_host.",
+      "range": {
+        "startLine": 116,
+        "startChar": 0,
+        "endLine": 124,
+        "endChar": 26
+      },
+      "revId": "43aedca2074366b07b24d2acb4a36153eca8aeb4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
