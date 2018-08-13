@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_f4198279",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 975,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-08-13T16:51:51Z",
+      "side": 1,
+      "message": "I like it here, because it\u0027s easy to see what we\u0027re doing to the job\u0027s repo here.  And the filecomments lib remains just a set of functions that operate on special data structures.  This patch is the second attempted implementation of this in Zuul (not counting the role), and I like that I didn\u0027t have to change the filecomments lib between them.",
+      "revId": "5b91ff0c05063cb26fd4bda640b75cb5e5cdfd33",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_1238ddeb",
         "filename": "zuul/lib/filecomments.py",
         "patchSetId": 6
@@ -48,6 +65,23 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_14175e47",
+        "filename": "zuul/lib/filecomments.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-08-13T16:51:51Z",
+      "side": 1,
+      "message": "Yep.",
+      "revId": "5b91ff0c05063cb26fd4bda640b75cb5e5cdfd33",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_e539ddd6",
         "filename": "zuul/lib/filecomments.py",
         "patchSetId": 6
@@ -59,6 +93,23 @@
       "writtenOn": "2018-08-13T07:43:41Z",
       "side": 1,
       "message": "Should we be raising a warning if the mapped line isn\u0027t in lines?",
+      "revId": "5b91ff0c05063cb26fd4bda640b75cb5e5cdfd33",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_b429ca8a",
+        "filename": "zuul/lib/filecomments.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-08-13T16:51:51Z",
+      "side": 1,
+      "message": "To be honest, I don\u0027t know.  It depends on how often this fails and under what circumstances.  For now, I\u0027ve erred on the side of being quiet (and assuming that the actual job report is definitive anyway).  I\u0027m open to changing it (either now or later).",
       "revId": "5b91ff0c05063cb26fd4bda640b75cb5e5cdfd33",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -93,6 +144,23 @@
       "writtenOn": "2018-08-13T07:43:41Z",
       "side": 1,
       "message": "(nit) rather than using regex, is there a safer way to get the commit sha from the log?",
+      "revId": "5b91ff0c05063cb26fd4bda640b75cb5e5cdfd33",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_54115651",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 433,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-08-13T16:51:51Z",
+      "side": 1,
+      "message": "I am unaware of one.",
       "revId": "5b91ff0c05063cb26fd4bda640b75cb5e5cdfd33",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
