@@ -362,21 +362,12 @@ class ZuulWebAPI(object):
         cherrypy.request.ws_handler.zuulweb = self.zuulweb
 
 
-class TenantStaticHandler(object):
+class StaticHandler(object):
     def __init__(self, path):
         self._cp_config = {
             'tools.staticdir.on': True,
             'tools.staticdir.dir': path,
-            'tools.staticdir.index': 'status.html',
-        }
-
-
-class RootStaticHandler(object):
-    def __init__(self, path):
-        self._cp_config = {
-            'tools.staticdir.on': True,
-            'tools.staticdir.dir': path,
-            'tools.staticdir.index': 'tenants.html',
+            'tools.staticdir.index': 'index.html',
         }
 
 
@@ -470,8 +461,6 @@ class ZuulWeb(object):
 
         route_map = cherrypy.dispatch.RoutesDispatcher()
         api = ZuulWebAPI(self)
-        tenant_static = TenantStaticHandler(self.static_path)
-        root_static = RootStaticHandler(self.static_path)
         route_map.connect('api', '/api/info',
                           controller=api, action='info')
         route_map.connect('api', '/api/tenants',
@@ -503,10 +492,15 @@ class ZuulWeb(object):
                     '/api/connection/%s' % connection.connection_name)
 
         # Add fallthrough routes at the end for the static html/js files
-        route_map.connect('root_static', '/{path:.*}',
-                          controller=root_static, action='default')
-        route_map.connect('tenant_static', '/t/{tenant}/{path:.*}',
-                          controller=tenant_static, action='default')
+        idx = 0
+        for route in ("/static/css/", "/static/js/", "/static/media/", "/"):
+            route_map.connect(
+                'root_static%d' % idx,
+                os.path.join(route, '{path:.*}'),
+                controller=StaticHandler(
+                    os.path.join(self.static_path, route[1:])),
+                action='default')
+            idx += 1
 
         conf = {
             '/': {

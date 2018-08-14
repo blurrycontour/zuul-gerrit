@@ -6,9 +6,9 @@ is managed using Javascript toolchains. It is intended to be served by zuul-web
 directly from zuul/web/static in the simple case, or to be published to
 an alternate static web location, such as an Apache server.
 
-The web dashboard is written in `Typescript`_ and `Angular`_ and is
-managed by `yarn`_ and `webpack`_ which in turn both assume a functioning
-and recent `nodejs`_ installation.
+The web dashboard is written in `React`_ and `Patternfly`_ and is
+managed by `create-react-app`_ and `yarn`_ which in turn both assume a
+functioning and recent `nodejs`_ installation.
 
 For the impatient who don't want deal with javascript toolchains
 ----------------------------------------------------------------
@@ -45,7 +45,9 @@ Once yarn is installed, getting dependencies installed is:
 
 .. code-block:: console
 
+  pushd web
   yarn install
+  popd
 
 The ``yarn.lock`` file contains all of the specific versions that were
 installed before. Since this is an application it has been added to the repo.
@@ -98,28 +100,14 @@ conflicts is to first resolve the conflicts, if any, in ``package.json``. Then:
 Which causes yarn to discard the ``yarn.lock`` file, recalculate the
 dependencies and write new content.
 
-webpack asset management
-------------------------
+React Components
+----------------
 
-`webpack`_ takes care of bundling web assets for deployment, including tasks
-such as minifying and transpiling for older browsers. It takes a
-javascript-first approach, and generates a html file that includes the
-appropriate javascript and CSS to get going.
+Each page is a React Component. For instance the status.html page code is
+``web/src/pages/status.jsx``.
 
-The main `webpack`_ config file is ``webpack.config.js``. In the Zuul tree that
-file is a stub file that includes either a dev or a prod environment from
-``web/config/webpack.dev.js`` or ``web/config/webpack.prod.js``. Most of the
-important bits are in ``web/config/webpack.common.js``.
-
-Angular Components
-------------------
-
-Each page has an `Angular Component`_ associated with it. For instance, the
-``status.html`` page has code in ``web/status/status.component.ts`` and the
-relevant HTML can be found in ``web/status/status.component.html``.
-
-Mapping of pages/urls to components can be found in the routing module in
-``web/app-routing.module.ts``.
+Mapping of pages/urls to components can be found in the route list in
+``web/src/routes.js``.
 
 Development
 -----------
@@ -128,68 +116,41 @@ Building the code can be done with:
 
 .. code-block:: bash
 
-  npm run build
+  pushd web
+  yarn build
+  popd
 
 zuul-web has a ``static`` route defined which serves files from
-``zuul/web/static``. ``npm run build`` will put the build output files
-into the ``zuul/web/static`` directory so that zuul-web can serve them.
+``zuul/web/static``. ``yarn build`` doesn't put the build output files into
+the ``zuul/web/static`` directory and it needs to be done manually after build.
 
-There is a also a development-oriented version of that same command:
-
-.. code-block:: bash
-
-  npm run build:dev
-
-which will build for the ``dev`` environment. This causes some sample data
-to be bundled and included.
-
-Webpack includes a development server that handles things like reloading and
-hot-updating of code. The following:
+Development server that handles things like reloading and
+hot-updating of code can be started with:
 
 .. code-block:: bash
 
-  npm run start
+  pushd web
+  yarn start
+  popd
 
-will build the code and launch the dev server on `localhost:8080`. It will
-be configured to use the API endpoint from OpenStack's Zuul. The
-``webpack-dev-server`` watches for changes to the files and
-re-compiles/refresh as needed.
+will build the code and launch the dev server on `localhost:3000`. Fake
+api response needs to be set in the ``web/public/api`` directory.
 
-.. code-block:: bash
-
-  npm run start:multi
-
-will do the same but will be pointed at the SoftwareFactory Project Zuul, which
-is multi-tenant.
-
-Arbitrary command line options will be passed through after a ``--`` such as:
+To use an existing zuul api, uses the REACT_APP_ZUUl_API_ROOT environment
+variable:
 
 .. code-block:: bash
 
-  npm run start -- --open-file='status.html'
+  pushd web
+  # Use openstack zuul's api:
+  yarn start:openstack
 
-That's kind of annoying though, so additional targets exist for common tasks:
+  # Use software-factory multi-tenant zuul's api:
+  yarn start:multi
 
-Run status against `basic` built-in demo data.
+  # Use a custom zuul:
+  REACT_APP_ZUUL_API="https://zuul.example.com/api/" yarn start
 
-.. code-block:: bash
-
-  npm run start:basic
-
-Run status against `openstack` built-in demo data
-
-.. code-block:: bash
-
-  npm run start:openstack
-
-Run status against `tree` built-in demo data.
-
-.. code-block:: bash
-
-  npm run start:tree
-
-Additional run commands can be added in `package.json` in the ``scripts``
-section.
 
 Deploying
 ---------
@@ -224,6 +185,6 @@ our case we use it for both.
 .. _webpack: https://webpack.js.org/
 .. _devtool: https://webpack.js.org/configuration/devtool/#devtool
 .. _nodeenv: https://pypi.org/project/nodeenv
-.. _Angular: https://angular.io
-.. _Angular Component: https://angular.io/guide/architecture-components
-.. _Typescript: https://www.typescriptlang.org/
+.. _React: https://reactjs.org/
+.. _Patternfly: https://www.patternfly.org/
+.. _create-react-app: https://github.com/facebook/create-react-app/blob/master/packages/react-scripts/template/README.md
