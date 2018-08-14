@@ -2,17 +2,17 @@
   roles:
     - revoke-sudo
     - set-zuul-log-path-fact
-    # Both sets of quotes are required.
-    # The "" quotes are for the shell to protect the '' quotes.
-    # We need the '' quotes because defines here are essentially
-    # direct string substitutions. Therefore:
-    #   --define "ZUUL_API_URL='https://zuul.openstack.org'"
-    # with the javascript code:
-    #   return ZUUL_API_URL
-    # results in
-    #   return 'https://zuul.openstack.org'
-    # in the compiled javascript.
     - role: npm
       npm_command: >-
-        build:dist --
+        build --
           --define "ZUUL_API_URL='{{ zuul_api_url }}'"
+      zuul_work_dir: "{{ zuul.project.src_dir }}/web"
+  post_tasks:
+    - name: Copy the build to the javascript content dir
+      command:
+        rsync -a --delete "{{ zuul.project.src_dir }}/web/build/ {{ zuul.project.src_dir }}/{{ javascript_content_dir }}/"
+      synchronize:
+
+      delegate_to: "{{ inventory_hostname }}"
+  environment:
+    REACT_APP_ZUUL_API_ROOT: "{{ zuul_api_url }}/api/"

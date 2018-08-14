@@ -44,12 +44,7 @@
     parent: build-javascript-content
     success-url: 'npm/html/status.html'
     files:
-      - package.json
-      - tsconfig.json
-      - tslint.json
       - web/.*
-      - webpack.config.js
-      - yarn.lock
     vars:
       javascript_content_dir: zuul/web/static
       zuul_api_url: https://zuul.openstack.org
