@@ -1,0 +1,159 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_d3c32b88",
+        "filename": ".zuul.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-08-14T13:53:05Z",
+      "side": 1,
+      "message": "Is the test target also running linters?",
+      "range": {
+        "startLine": 116,
+        "startChar": 10,
+        "endLine": 116,
+        "endChar": 30
+      },
+      "revId": "f57e30fe3cfd76af9623edff163ef9336b074037",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_333a9f98",
+        "filename": ".zuul.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-08-14T13:53:05Z",
+      "side": 1,
+      "message": "you\u0027re gonna need a zuul_work_dir here.",
+      "range": {
+        "startLine": 117,
+        "startChar": 12,
+        "endLine": 117,
+        "endChar": 17
+      },
+      "revId": "f57e30fe3cfd76af9623edff163ef9336b074037",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_9344d348",
+        "filename": "web/src/pages/status.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-08-14T13:53:05Z",
+      "side": 1,
+      "message": "I don\u0027t think it\u0027s a good idea to redesign the status page to be a patternfly table. The current jquery code is presenting that data in a very intentional way. However, rewriting it in pure angular was a \"later\" task, so I\u0027m guessing rewriting it in pure react will also take some time.\n\nInstead, how about we keep the jquery code for now and put it on this page - that\u0027ll make it easier to judge whether this is a good idea or not. You might still be able to rework the jquery to read from the const { pipelines } though.",
+      "revId": "f57e30fe3cfd76af9623edff163ef9336b074037",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_530b9bd4",
+        "filename": "web/src/reducers.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-08-14T13:53:05Z",
+      "side": 1,
+      "message": "Out of curiosity, why not just make this:\n\n  function infoReducer(state, action) { }\n\n?\n\nAlso - you can put a default value on a first parameter without doing so on the second? *weird*",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 43
+      },
+      "revId": "f57e30fe3cfd76af9623edff163ef9336b074037",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_f3f18702",
+        "filename": "web/src/registerServiceWorker.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-08-14T13:53:05Z",
+      "side": 1,
+      "message": "Neat! This was on my TODO-list for the angular code, but hadn\u0027t gotten around to it yet.",
+      "range": {
+        "startLine": 1,
+        "startChar": 3,
+        "endLine": 1,
+        "endChar": 80
+      },
+      "revId": "f57e30fe3cfd76af9623edff163ef9336b074037",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_c1d838f0",
+        "filename": "web/src/registerServiceWorker.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-08-14T13:53:05Z",
+      "side": 1,
+      "message": "https://github.com/facebook/create-react-app/blob/master/packages/react-scripts/template/README.md#making-a-progressive-web-app\n\nurl shorteners make things hard to read",
+      "range": {
+        "startLine": 8,
+        "startChar": 56,
+        "endLine": 8,
+        "endChar": 78
+      },
+      "revId": "f57e30fe3cfd76af9623edff163ef9336b074037",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_d3480b2e",
+        "filename": "web/src/routes.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-08-14T13:53:05Z",
+      "side": 1,
+      "message": "This is remarkably clear. I\u0027m impressed that it works for both single and multi-tenant.",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 22
+      },
+      "revId": "f57e30fe3cfd76af9623edff163ef9336b074037",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
