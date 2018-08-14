@@ -4,11 +4,11 @@
     - name: Make tenant subdir
       file:
         state: directory
-        dest: '{{ zuul.project.src_dir }}/{{ javascript_content_dir }}/t'
+        dest: '{{ zuul.project.src_dir }}/zuul/web/static/t'
 
     - name: Copy the html/javascript content into subdirs
       shell: |
-          CONTENT_DIR="{{ zuul.project.src_dir }}/{{ javascript_content_dir }}"
+          CONTENT_DIR="{{ zuul.project.src_dir }}/zuul/web/static"
           mkdir $CONTENT_DIR/t/{{ item }}
           for f in $(find $CONTENT_DIR -type f -mindepth 1 -maxdepth 1) ; do
               cp $f $CONTENT_DIR/t/{{ item }}

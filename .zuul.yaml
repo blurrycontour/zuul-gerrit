@@ -42,23 +42,19 @@
 - job:
     name: zuul-build-dashboard
     parent: build-javascript-content
-    success-url: 'npm/html/status.html'
+    success-url: 'npm/html/'
     files:
-      - package.json
-      - tsconfig.json
-      - tslint.json
       - web/.*
-      - webpack.config.js
-      - yarn.lock
     vars:
-      javascript_content_dir: zuul/web/static
+      javascript_content_dir: build
+      zuul_work_dir: "{{ zuul.project.src_dir }}/web"
       zuul_api_url: https://zuul.openstack.org
     run: playbooks/dashboard/run.yaml
 
 - job:
     name: zuul-build-dashboard-multi-tenant
     parent: zuul-build-dashboard
-    success-url: 'npm/html/tenants.html'
+    success-url: 'npm/html/'
     post-run: playbooks/dashboard/multi.yaml
     vars:
       zuul_api_url: https://softwarefactory-project.io/zuul
@@ -85,17 +81,12 @@
               - playbooks/zuul-migrate/.*
         - zuul-build-dashboard
         - zuul-build-dashboard-multi-tenant
-        - nodejs-npm-run-lint:
+        - nodejs-npm-run-test:
             vars:
                 node_version: 8
             success-url: 'npm/reports/bundle.html'
             files:
-              - package.json
-              - tsconfig.json
-              - tslint.json
               - web/.*
-              - webpack.config.js
-              - yarn.lock
         - zuul-stream-functional
         - zuul-tox-remote
         - pbrx-build-container-images:
@@ -122,17 +113,12 @@
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
         - zuul-build-dashboard
-        - nodejs-npm-run-lint:
+        - nodejs-npm-run-test:
             vars:
                 node_version: 8
             success-url: 'npm/reports/bundle.html'
             files:
-              - package.json
-              - tsconfig.json
-              - tslint.json
               - web/.*
-              - webpack.config.js
-              - yarn.lock
         - zuul-stream-functional
         - zuul-tox-remote
         - pbrx-build-container-images:
