@@ -61,3 +61,18 @@ class TestTenantValidationClient(BaseTestCase):
         self.assertIn(
             b"expected a dictionary for dictionary", out,
             "Expected error message not found")
+
+        self.config.set(
+            'scheduler', 'tenant_config',
+            os.path.join(FIXTURE_DIR, 'config/tenant-parser/multiple-projects.yaml'))
+        self.config.write(
+            open(os.path.join(self.test_root, 'tenant_multiple.conf'), 'w'))
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             '-c', os.path.join(self.test_root, 'tenant_multiple.conf'),
+             'tenant-conf-check'], stdout=subprocess.PIPE)
+        out, _ = p.communicate()
+        self.assertEqual(p.returncode, 1, "The command must exit 1")
+        self.assertIn(
+            b"expected a dictionary for dictionary", out,
+            "Expected error message not found")
