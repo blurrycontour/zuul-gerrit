@@ -32,7 +32,10 @@ then
 fi
 if [[ ! -f zuul/web/static/status.html ]]
 then
-    yarn install
-    npm run build:dev
+    pushd web/
+      yarn install
+      npm run build:dev
+      rsync -a --delete build/ ../zuul/web/static/
+    popd
 fi
 pip install $*
