@@ -18,6 +18,7 @@ zuul/versioninfo
 dist/
 cover/
 htmlcov/
+web/build
 zuul/web/static
 node_modules
 yarn-error.log
