@@ -66,7 +66,7 @@ class TestDirect(TestWebURLs):
         self.port = self.web.port
 
     def test_status_page(self):
-        self._crawl('/t/tenant-one/status.html')
+        self._crawl('/t/tenant-one/index.html')
 
 
 class TestWhiteLabel(TestWebURLs):
@@ -81,7 +81,7 @@ class TestWhiteLabel(TestWebURLs):
         self.port = self.proxy.port
 
     def test_status_page(self):
-        self._crawl('/status.html')
+        self._crawl('/index.html')
 
 
 class TestWhiteLabelAPI(TestWebURLs):
@@ -115,4 +115,4 @@ class TestSuburl(TestWebURLs):
         self.port = self.proxy.port
 
     def test_status_page(self):
-        self._crawl('/zuul3/t/tenant-one/status.html')
+        self._crawl('/zuul3/t/tenant-one/index.html')
