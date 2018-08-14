@@ -116,6 +116,24 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_7301f7ae",
+        "filename": "zuul/lib/filecomments.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-08-14T13:43:29Z",
+      "side": 1,
+      "message": "Perhaps just logging internally would be helpful for now then?",
+      "parentUuid": "3f79a3b5_b429ca8a",
+      "revId": "5b91ff0c05063cb26fd4bda640b75cb5e5cdfd33",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_853269f1",
         "filename": "zuul/lib/filecomments.py",
         "patchSetId": 6
