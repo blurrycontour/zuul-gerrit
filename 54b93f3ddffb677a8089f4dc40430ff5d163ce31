@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_73efb7e8",
+        "filename": "zuul/lib/filecomments.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-08-14T13:43:29Z",
+      "side": 1,
+      "message": "This will likely fail to be able to map now.",
+      "range": {
+        "startLine": 62,
+        "startChar": 43,
+        "endLine": 62,
+        "endChar": 58
+      },
+      "revId": "54b93f3ddffb677a8089f4dc40430ff5d163ce31",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
