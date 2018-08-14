@@ -95,7 +95,7 @@ Static External
 Sub-URL
   Serve a Zuul dashboard from a location below the root URL as part of
   presenting integration with other application.
-  https://softwarefactory-project.io/zuul3/ is an example of a Zuul dashboard
+  https://softwarefactory-project.io/zuul/ is an example of a Zuul dashboard
   that is being served from a Sub-URL.
 
 None of those make any sense for simple non-production oriented deployments, so
@@ -130,9 +130,11 @@ the web application as the document root and add a simple rewrite rule::
     Require all granted
   </Directory>
   RewriteEngine on
-  RewriteRule ^/t/.*/(.*)$ /$1 [L]
   RewriteRule ^/api/tenant/(.*)/console-stream ws://localhost:9000/api/tenant/$1/console-stream [P]
   RewriteRule ^/api/(.*)$ http://localhost:9000/api/$1 [P]
+  # Backward compatible rewrite
+  RewriteRule ^/t/(.*)/(.*).html(.*) /#/t/$1/$2$3 [R=301,L,NE]
+
 
 White Labeled Tenant
 --------------------
@@ -155,6 +157,9 @@ Assuming the zuul tenant name is "example", the rewrite rules are::
   RewriteRule ^/api/connection/(.*)$ http://localhost:9000/api/connection/$1 [P]
   RewriteRule ^/api/console-stream ws://localhost:9000/api/tenant/example/console-stream [P]
   RewriteRule ^/api/(.*)$ http://localhost:9000/api/tenant/example/$1 [P]
+  # Backward compatible rewrite
+  RewriteRule ^/(.*).html(.*) /#/$1$2 [R=301,L,NE]
+
 
 Static External
 ---------------
@@ -165,9 +170,10 @@ Static External
   dynamic url rewrite rules only works for white-labeled deployments.
 
 In order to serve the zuul dashboard code from an external static location,
-``ZUUL_API_URL`` must be set at javascript build time by passing the
-``--define`` flag to the ``npm build:dist`` command.
+``REACT_APP_ZUUl_API`` must be set at javascript build time:
 
 .. code-block:: bash
 
-  npm build:dist -- --define "ZUUL_API_URL='http://zuul-web.example.com'"
+  pushd web
+  REACT_APP_ZUUL_API='http://zuul-web.example.com' npm run build
+  popd
