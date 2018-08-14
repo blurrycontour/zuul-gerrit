@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_53371b00",
+        "filename": ".zuul.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-08-14T16:54:20Z",
+      "side": 1,
+      "message": "Not by default, the package.json and built system are just the output of the create-react-app script. We can easily add linter to the test command or switch back to webpack using the \"eject\" command. Though we should consider using the default build system and not worry about webpack altoger.",
+      "parentUuid": "3f79a3b5_d3c32b88",
+      "range": {
+        "startLine": 116,
+        "startChar": 10,
+        "endLine": 116,
+        "endChar": 30
+      },
+      "revId": "f57e30fe3cfd76af9623edff163ef9336b074037",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_333a9f98",
         "filename": ".zuul.yaml",
         "patchSetId": 4
@@ -36,6 +60,30 @@
       "writtenOn": "2018-08-14T13:53:05Z",
       "side": 1,
       "message": "you\u0027re gonna need a zuul_work_dir here.",
+      "range": {
+        "startLine": 117,
+        "startChar": 12,
+        "endLine": 117,
+        "endChar": 17
+      },
+      "revId": "f57e30fe3cfd76af9623edff163ef9336b074037",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_f33987f1",
+        "filename": ".zuul.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-08-14T16:54:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f79a3b5_333a9f98",
       "range": {
         "startLine": 117,
         "startChar": 12,
@@ -65,6 +113,24 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_f3442776",
+        "filename": "web/src/pages/status.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-08-14T16:54:20Z",
+      "side": 1,
+      "message": "Agreed we shouldn\u0027t use a table for pipelines representation, the code below is just copied from the other pages.\n\nThough I think it\u0027s worthy to convert the code in React components, it may provide a significant performance boost. I\u0027ll propose an implementation in next PS.",
+      "parentUuid": "3f79a3b5_9344d348",
+      "revId": "f57e30fe3cfd76af9623edff163ef9336b074037",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_530b9bd4",
         "filename": "web/src/reducers.js",
         "patchSetId": 4
@@ -76,6 +142,30 @@
       "writtenOn": "2018-08-14T13:53:05Z",
       "side": 1,
       "message": "Out of curiosity, why not just make this:\n\n  function infoReducer(state, action) { }\n\n?\n\nAlso - you can put a default value on a first parameter without doing so on the second? *weird*",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 43
+      },
+      "revId": "f57e30fe3cfd76af9623edff163ef9336b074037",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_82f23b99",
+        "filename": "web/src/reducers.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-08-14T16:54:20Z",
+      "side": 1,
+      "message": "I also find this weird, but most examples use that syntax so... To be honest, I don\u0027t understand the need for redux and using reducer, this is just boilerplate code that will set the info property on the App component, it could also be done at the ComponentDidMount phase.",
+      "parentUuid": "3f79a3b5_530b9bd4",
       "range": {
         "startLine": 17,
         "startChar": 0,
@@ -111,6 +201,30 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_c24113ab",
+        "filename": "web/src/registerServiceWorker.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-08-14T16:54:20Z",
+      "side": 1,
+      "message": "Note that this code is provided as-is by the create-react-app script.",
+      "parentUuid": "3f79a3b5_f3f18702",
+      "range": {
+        "startLine": 1,
+        "startChar": 3,
+        "endLine": 1,
+        "endChar": 80
+      },
+      "revId": "f57e30fe3cfd76af9623edff163ef9336b074037",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_c1d838f0",
         "filename": "web/src/registerServiceWorker.js",
         "patchSetId": 4
@@ -134,6 +248,30 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_2237a74f",
+        "filename": "web/src/registerServiceWorker.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-08-14T16:54:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f79a3b5_c1d838f0",
+      "range": {
+        "startLine": 8,
+        "startChar": 56,
+        "endLine": 8,
+        "endChar": 78
+      },
+      "revId": "f57e30fe3cfd76af9623edff163ef9336b074037",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_d3480b2e",
         "filename": "web/src/routes.js",
         "patchSetId": 4
@@ -145,6 +283,30 @@
       "writtenOn": "2018-08-14T13:53:05Z",
       "side": 1,
       "message": "This is remarkably clear. I\u0027m impressed that it works for both single and multi-tenant.",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 22
+      },
+      "revId": "f57e30fe3cfd76af9623edff163ef9336b074037",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_c22a73d9",
+        "filename": "web/src/routes.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-08-14T16:54:20Z",
+      "side": 1,
+      "message": "The magic happens in the App.js file:\n\nL80 discover if it\u0027s white label, L83 if it\u0027s multi-tenant and L85 when the info isn\u0027t loaded yet.\n\nThe Route used by the router are adapted accordingly L50 and the links L34.\n\nOnly the items having a title attribute are added to the top-menu.",
+      "parentUuid": "3f79a3b5_d3480b2e",
       "range": {
         "startLine": 20,
         "startChar": 0,
