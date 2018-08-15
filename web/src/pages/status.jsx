@@ -26,15 +26,15 @@ import LineTImage from '../images/line-t.png'
 import { store } from '../reducers'
 
 class ChangePanel extends React.Component {
-  constructor() {
+  constructor () {
     super()
     this.state = { expanded: false }
     this.onClick = this.onClick.bind(this)
   }
-  onClick() {
+  onClick () {
     this.setState({ expanded: !this.state.expanded })
   }
-  time(ms, words) {
+  time (ms, words) {
     if (typeof (words) === 'undefined') {
       words = false
     }
@@ -66,7 +66,7 @@ class ChangePanel extends React.Component {
     }
     return r
   }
-  enqueueTime(ms) {
+  enqueueTime (ms) {
     // Special format case for enqueue time to add style
     let hours = 60 * 60 * 1000
     let now = Date.now()
@@ -80,15 +80,15 @@ class ChangePanel extends React.Component {
     }
     return <span className={status}>{text}</span>
   }
-  renderChangeLink(change) {
+  renderChangeLink (change) {
     let changeId = change.id || 'NA'
     let changeTitle = changeId
-    let changeText = ""
+    let changeText = ''
     if (change.url !== null) {
       let githubId = changeId.match(/^([0-9]+),([0-9a-f]{40})$/)
       if (githubId) {
         changeTitle = githubId
-        changeText = "#" + githubId[1]
+        changeText = '#' + githubId[1]
       }
     } else if (/^[0-9a-f]{40}$/.test(changeId)) {
       changeText = changeId.slice(0, 7)
@@ -96,12 +96,12 @@ class ChangePanel extends React.Component {
     return (
       <small>
         <a href={change.url}>
-          {changeText !== "" ? (
+          {changeText !== '' ? (
             <abbr title={changeTitle}>{changeText}</abbr>) : changeTitle}
         </a>
       </small>)
   }
-  renderProgressBar(change) {
+  renderProgressBar (change) {
     let jobPercent = Math.floor(100 / change.jobs.length)
     return (
       <div className="progress zuul-change-total-result">
@@ -111,7 +111,7 @@ class ChangePanel extends React.Component {
             result = job.url ? 'in progress' : 'queued'
           }
           if (result !== 'queued') {
-            let className = ""
+            let className = ''
             switch (result) {
               case 'success':
                 className = ' progress-bar-success'
@@ -129,19 +129,18 @@ class ChangePanel extends React.Component {
               default:
                 break
             }
-            return <div className={"progress-bar" + className}
-                          key={idx}
-                          title={job.name}
-                          style={{width: jobPercent + '%'}}/>
-          }
-          else {
+            return <div className={'progress-bar' + className}
+              key={idx}
+              title={job.name}
+              style={{width: jobPercent + '%'}}/>
+          } else {
             return ''
           }
         })}
       </div>
     )
   }
-  renderTimer(change) {
+  renderTimer (change) {
     return (
       <React.Fragment>
         <small title="Remaining Time" className="time">
@@ -155,48 +154,48 @@ class ChangePanel extends React.Component {
     )
   }
 
-  renderJobProgressBar(elapsedTime, remainingTime) {
+  renderJobProgressBar (elapsedTime, remainingTime) {
     let progressPercent = 100 * (elapsedTime / (elapsedTime +
                                                 remainingTime))
     return (
       <div className="progress zuul-job-result">
         <div className="progress-bar"
-             role="progressbar"
-             aria-valuenow={progressPercent}
-             aria-valuemin={0}
-             aria-valuemax={100}
-             style={{'width': progressPercent + '%'}}
-             />
+          role="progressbar"
+          aria-valuenow={progressPercent}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          style={{'width': progressPercent + '%'}}
+        />
       </div>
     )
   }
-  renderJobStatusLabel(result) {
+  renderJobStatusLabel (result) {
     let className
     switch (result) {
-    case 'success':
-      className = 'label-success'
-      break
-    case 'failure':
-      className = 'label-danger'
-      break
-    case 'unstable':
-      className = 'label-warning'
-      break
-    case 'skipped':
-      className = 'label-info'
-      break
+      case 'success':
+        className = 'label-success'
+        break
+      case 'failure':
+        className = 'label-danger'
+        break
+      case 'unstable':
+        className = 'label-warning'
+        break
+      case 'skipped':
+        className = 'label-info'
+        break
       // 'in progress' 'queued' 'lost' 'aborted' ...
-    default:
-      className = 'label-default'
+      default:
+        className = 'label-default'
     }
 
     return (
-      <span className={"zuul-job-result label "+className}>{result}</span>
+      <span className={'zuul-job-result label ' + className}>{result}</span>
     )
   }
 
-  renderJob(job) {
-    let name = ""
+  renderJob (job) {
+    let name = ''
     if (job.result !== null) {
       name = <a className="zuul-job-name" href={job.report_url}>{job.name}</a>
     } else if (job.url !== null) {
@@ -206,9 +205,9 @@ class ChangePanel extends React.Component {
         const buildUuid = job.url.split('?')[1].split('&')[0].split('=')[1]
         const state = store.getState()
         if (state.info.tenant) {
-          to = "/stream/" + buildUuid
+          to = '/stream/' + buildUuid
         } else {
-          to = "/t/" + state.tenant + "/stream/" + buildUuid
+          to = '/t/' + state.tenant + '/stream/' + buildUuid
         }
         name = <Link to={to}>{job.name}</Link>
       } else {
@@ -238,7 +237,7 @@ class ChangePanel extends React.Component {
         <div style={{clear: 'both'}} />
       </span>)
   }
-  renderJobList(jobs) {
+  renderJobList (jobs) {
     return (
       <ul className="list-group zuul-patchset-body">
         {jobs.map((job, idx) => (
@@ -248,7 +247,7 @@ class ChangePanel extends React.Component {
         ))}
       </ul>)
   }
-  render() {
+  render () {
     const { expanded } = this.state
     const { change } = this.props
     const header = (
@@ -285,7 +284,7 @@ class ChangePanel extends React.Component {
 }
 
 class Change extends React.Component {
-  renderStatusIcon(change) {
+  renderStatusIcon (change) {
     let iconGlyph = 'pficon pficon-ok'
     let iconTitle = 'Succeeding'
     if (change.active !== true) {
@@ -306,11 +305,11 @@ class Change extends React.Component {
       }
     }
     return (
-      <span className={"zuul-build-status " + iconGlyph}
-           title={iconTitle} />
+      <span className={'zuul-build-status ' + iconGlyph}
+        title={iconTitle} />
     )
   }
-  renderLineImg(change, i) {
+  renderLineImg (change, i) {
     let image = LineTImage
     if (change._tree_branches.indexOf(i) === change._tree_branches.length - 1) {
       // Angle line
@@ -318,27 +317,27 @@ class Change extends React.Component {
     }
     return <img alt="Line" src={image} style={{verticalAlign: 'baseline'}} />
   }
-  render() {
+  render () {
     const { change, queue } = this.props
     let row = []
     let i
     for (i = 0; i < queue._tree_columns; i++) {
-      let className = ""
+      let className = ''
       if (i < change._tree.length && change._tree[i] !== null) {
-        className = " zuul-change-row-line"
+        className = ' zuul-change-row-line'
       }
       row.push(
-        <td key={i} className={"zuul-change-row" + className}>
+        <td key={i} className={'zuul-change-row' + className}>
           {i === change._tree_index ? this.renderStatusIcon(change) : ''}
           {change._tree_branches.indexOf(i) !== -1 ? (
-            this.renderLineImg(change, i)): ''}
+            this.renderLineImg(change, i)) : ''}
         </td>)
     }
     let changeWidth = 360 - 16 * queue._tree_columns
     row.push(
       <td key={i + 1}
-          className="zuul-change-cell"
-          style={{width: changeWidth + 'px'}}>
+        className="zuul-change-cell"
+        style={{width: changeWidth + 'px'}}>
         <ChangePanel change={change} />
       </td>
     )
@@ -353,7 +352,7 @@ class Change extends React.Component {
 }
 
 class ChangeQueue extends React.Component {
-  render() {
+  render () {
     const { queue, pipeline } = this.props
     let shortName = queue.name
     if (shortName.length > 32) {
@@ -374,7 +373,7 @@ class ChangeQueue extends React.Component {
 }
 
 class PipelineTree extends React.Component {
-  createTree(pipeline) {
+  createTree (pipeline) {
     let count = 0
     let pipelineMaxTreeColumns = 1
     pipeline.change_queues.forEach((changeQueue, changeQueueIndex) => {
@@ -434,7 +433,7 @@ class PipelineTree extends React.Component {
     return count
   }
 
-  render() {
+  render () {
     const { pipeline } = this.props
     const count = this.createTree(pipeline)
     return (
@@ -444,35 +443,34 @@ class PipelineTree extends React.Component {
           {pipeline.description ? (
             <small>
               <p>{pipeline.description.split(/\r?\n\r?\n/)}</p>
-            </small> ) : ''}
+            </small>) : ''}
         </div>
         {pipeline.change_queues.filter(item => item.heads.length > 0)
-                               .map((changeQueue, idx) => (
-          <ChangeQueue
-            queue={changeQueue} key={idx} pipeline={pipeline.name} />
-        ))}
+          .map((changeQueue, idx) => (
+            <ChangeQueue
+              queue={changeQueue} key={idx} pipeline={pipeline.name} />
+          ))}
       </div>
     )
   }
 }
 
-
 class StatusPage extends React.Component {
-  constructor() {
+  constructor () {
     super()
 
     this.state = {
-      pipelines: [],
+      pipelines: []
     }
   }
 
-  componentDidMount() {
+  componentDidMount () {
     fetchStatus().then(response => {
       this.setState({pipelines: response.data.pipelines})
     })
   }
 
-  render() {
+  render () {
     const { pipelines } = this.state
     if (pipelines.length === 0) {
       return (<p>Loading...</p>)

@@ -18,27 +18,27 @@ import { Table } from 'patternfly-react'
 import { fetchBuilds } from '../api'
 
 class BuildsPage extends React.Component {
-  constructor() {
+  constructor () {
     super()
 
     this.state = {
-      builds: [],
+      builds: []
     }
   }
 
-  componentDidMount() {
+  componentDidMount () {
     fetchBuilds().then(response => {
       this.setState({builds: response.data})
     })
   }
-  render() {
+  render () {
     const { builds } = this.state
     if (builds.length === 0) {
       return (<p>Loading...</p>)
     }
     const headerFormat = value => <Table.Heading>{value}</Table.Heading>
     const cellFormat = (value, { rowData }) => (
-        <Table.Cell>{value}</Table.Cell>)
+      <Table.Cell>{value}</Table.Cell>)
     const linkCellFormat = (value, { rowData }) => (
       <Table.Cell><a href={value} target="_blank">link</a></Table.Cell>
     )
@@ -70,9 +70,9 @@ class BuildsPage extends React.Component {
       }
       columns.push({
         header: {label: column.charAt(0).toUpperCase() + column.slice(1),
-                 formatters: [headerFormat]},
+          formatters: [headerFormat]},
         property: prop,
-        cell: {formatters: [formatter]},
+        cell: {formatters: [formatter]}
       })
     })
     return (
@@ -80,7 +80,7 @@ class BuildsPage extends React.Component {
         striped
         bordered
         columns={columns}
-        >
+      >
         <Table.Header/>
         <Table.Body
           rows={builds}
@@ -88,9 +88,9 @@ class BuildsPage extends React.Component {
           onRow={(row, { rowIndex }) => {
             switch (row.result) {
               case 'SUCCESS':
-                return { className: 'success' };
+                return { className: 'success' }
               default:
-                return { className: 'warning' };
+                return { className: 'warning' }
             }
           }} />
       </Table.PfProvider>)

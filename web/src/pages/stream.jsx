@@ -12,11 +12,11 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import * as React from 'react';
+import * as React from 'react'
 
 class StreamPage extends React.Component {
-  render() {
+  render () {
     return (<p>TODO: stream the build {this.props.match.params.buildId}</p>)
   }
 }
-export default StreamPage;
+export default StreamPage
