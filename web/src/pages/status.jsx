@@ -96,8 +96,7 @@ class ChangePanel extends React.Component {
     return (
       <small>
         <a href={change.url}>
-          {changeText !== "" ? (
-            <abbr title={changeTitle}>{changeText}</abbr>) : changeTitle}
+          {changeText !== "" ? {changeText} : changeTitle}
         </a>
       </small>)
   }
