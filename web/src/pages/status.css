@@ -72,12 +72,11 @@
 }
 
 .zuul-build-status {
-    margin-top: -6px;
     background: white;
+    font-size: 16px;
 }
 
 .zuul-change-row-line {
     background-image: url('../images/line.png');
     background-repeat: 'repeat-y';
-    background-position: -2px 10px;
 }
