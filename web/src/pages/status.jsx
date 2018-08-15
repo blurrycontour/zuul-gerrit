@@ -293,14 +293,14 @@ class Change extends React.Component {
       iconTitle = 'Waiting until closer to head of queue to' +
         ' start jobs'
     } else if (change.live !== true) {
-      iconGlyph = 'fa fa-refresh'
+      iconGlyph =  'pficon pficon-info'
       iconTitle = 'Dependent change required for testing'
     } else if (change.failing_reasons &&
                change.failing_reasons.length > 0) {
       let reason = change.failing_reasons.join(', ')
       iconTitle = 'Failing because ' + reason
       if (reason.match(/merge conflict/)) {
-        iconGlyph = 'fa fa-ban'
+        iconGlyph = 'pficon pficon-error-circle-o zuul-build-merge-conflict'
       } else {
         iconGlyph = 'pficon pficon-error-circle-o'
       }
