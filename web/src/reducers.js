@@ -20,9 +20,8 @@
 //   info: the info object, tenant is set when white-label api
 //   tenant: the current tenant name, only used with multi-tenant api
 
-import { createStore, applyMiddleware } from 'redux'
+import { createStore, applyMiddleware, combineReducers } from 'redux'
 import thunk from 'redux-thunk'
-import { combineReducers } from 'redux'
 
 const infoReducer = (state = {}, action) => {
   switch (action.type) {
@@ -33,19 +32,19 @@ const infoReducer = (state = {}, action) => {
   }
 }
 
-const tenantReducer = (state= "", action) => {
+const tenantReducer = (state = '', action) => {
   switch (action.type) {
     case 'SET_TENANT':
       return action.name
     default:
-      return ""
+      return ''
   }
 }
 
 const store = createStore(
   combineReducers({
     info: infoReducer,
-    tenant: tenantReducer,
+    tenant: tenantReducer
   }), applyMiddleware(thunk))
 
 export { store }
