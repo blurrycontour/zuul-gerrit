@@ -218,7 +218,7 @@ class ZuulWebAPI(object):
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
         if self.static_cache_expiry:
-            resp.headers['Cache-Control'] = "public, max-age=%d" % \
+            resp.headers['Cache-Control'] = "public, max-age=%s" % \
                 self.static_cache_expiry
         resp.last_modified = self.zuulweb.start_time
         return ret
