@@ -18,46 +18,45 @@ import { Table } from 'patternfly-react'
 
 import { fetchTenants } from '../api'
 
-
 class TenantsPage extends React.Component {
-  constructor() {
+  constructor () {
     super()
 
     this.state = {
-      tenants: [],
+      tenants: []
     }
   }
 
-  componentDidMount() {
+  componentDidMount () {
     fetchTenants().then(response => {
       this.setState({tenants: response.data})
     })
   }
-  render() {
+  render () {
     const { tenants } = this.state
     if (tenants.length === 0) {
       return (<p>Loading...</p>)
     }
     const headerFormat = value => <Table.Heading>{value}</Table.Heading>
     const cellFormat = (value, { rowData }) => (
-        <Table.Cell>{value}</Table.Cell>)
+      <Table.Cell>{value}</Table.Cell>)
     const columns = []
     const myColumns = ['name', 'status', 'jobs', 'builds', 'projects', 'queue']
     myColumns.forEach(column => {
       columns.push({
         header: {label: column,
-                 formatters: [headerFormat]},
+          formatters: [headerFormat]},
         property: column,
-        cell: {formatters: [cellFormat]},
+        cell: {formatters: [cellFormat]}
       })
     })
     tenants.forEach(tenant => {
       tenant.status = (
-          <Link to={"/t/" + tenant.name + "/status"}>Status</Link>)
+        <Link to={'/t/' + tenant.name + '/status'}>Status</Link>)
       tenant.jobs = (
-          <Link to={"/t/" + tenant.name + "/jobs"}>Jobs</Link>)
+        <Link to={'/t/' + tenant.name + '/jobs'}>Jobs</Link>)
       tenant.builds = (
-          <Link to={"/t/" + tenant.name + "/builds"}>Builds</Link>)
+        <Link to={'/t/' + tenant.name + '/builds'}>Builds</Link>)
     })
     return (
       <Table.PfProvider
@@ -65,12 +64,12 @@ class TenantsPage extends React.Component {
         bordered
         hover
         columns={columns}
-        >
+      >
         <Table.Header/>
         <Table.Body
           rows={tenants}
           rowKey="name"
-          />
+        />
       </Table.PfProvider>)
   }
 }

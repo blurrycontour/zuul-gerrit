@@ -25,21 +25,21 @@ const routes = () => [
   {
     title: 'Status',
     to: '/status',
-    component: Status,
+    component: Status
   },
   {
     title: 'Jobs',
     to: '/jobs',
-    component: Jobs,
+    component: Jobs
   },
   {
     title: 'Builds',
     to: '/builds',
-    component: Builds,
+    component: Builds
   },
   {
     to: '/stream/:buildId',
-    component: Stream,
+    component: Stream
   },
   {
     to: '/tenants',
