@@ -15,7 +15,10 @@ import os
 
 def get_default(config, section, option, default=None, expand_user=False):
     if config.has_option(section, option):
-        value = config.get(section, option)
+        if isinstance(default, int):
+            value = config.getint(section, option)
+        else:
+            value = config.get(section, option)
     else:
         value = default
     if expand_user and value:
