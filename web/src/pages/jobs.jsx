@@ -20,20 +20,20 @@ import { store } from '../reducers'
 import { fetchJobs } from '../api'
 
 class JobsPage extends React.Component {
-  constructor() {
+  constructor () {
     super()
 
     this.state = {
-      jobs: [],
+      jobs: []
     }
   }
 
-  componentDidMount() {
+  componentDidMount () {
     fetchJobs().then(response => {
       this.setState({jobs: response.data})
     })
   }
-  render() {
+  render () {
     const { jobs } = this.state
     if (jobs.length === 0) {
       return (<p>Loading...</p>)
@@ -41,9 +41,9 @@ class JobsPage extends React.Component {
     let to
     const state = store.getState()
     if (state.info.tenant) {
-      to = "/builds"
+      to = '/builds'
     } else {
-      to = "/t/" + state.tenant + "/builds"
+      to = '/t/' + state.tenant + '/builds'
     }
 
     const headerFormat = value => <Table.Heading>{value}</Table.Heading>
@@ -51,7 +51,7 @@ class JobsPage extends React.Component {
       <Table.Cell>{value}</Table.Cell>)
     const cellBuildFormat = (value, { rowData }) => (
       <Table.Cell>
-        <Link to={to + "?job_name=" + value}>builds</Link>
+        <Link to={to + '?job_name=' + value}>builds</Link>
       </Table.Cell>)
     const columns = []
     const myColumns = ['name', 'description', 'Last builds']
@@ -64,9 +64,9 @@ class JobsPage extends React.Component {
       }
       columns.push({
         header: {label: column,
-                 formatters: [headerFormat]},
+          formatters: [headerFormat]},
         property: prop,
-        cell: {formatters: [formatter]},
+        cell: {formatters: [formatter]}
       })
     })
     return (
@@ -75,12 +75,12 @@ class JobsPage extends React.Component {
         bordered
         hover
         columns={columns}
-        >
+      >
         <Table.Header/>
         <Table.Body
           rows={jobs}
           rowKey="name"
-          />
+        />
       </Table.PfProvider>)
   }
 }

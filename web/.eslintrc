@@ -1,0 +1,17 @@
+parser: babel-eslint
+plugins:
+  - standard
+  - jest
+rules:
+  no-console: off
+extends:
+  - eslint:recommended
+  - plugin:react/recommended
+  - standard
+  #- ./node_modules/eslint-config-standard/eslintrc.json
+settings:
+  react:
+    version: 16.4
+env:
+  jest/globals: true
+  browser: true

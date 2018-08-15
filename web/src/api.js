@@ -17,32 +17,32 @@ import { store } from './reducers'
 
 const apiUrl = process.env.REACT_APP_ZUUL_API || 'api/'
 
-function getBaseUrl() {
+function getBaseUrl () {
   const state = store.getState()
   if (!state.info.tenant && state.tenant) {
-    return apiUrl + "tenant/" + state.tenant + "/"
+    return apiUrl + 'tenant/' + state.tenant + '/'
   } else {
     return apiUrl
   }
 }
 
-function sleeper(ms) {
-  return function(x) {
+function sleeper (ms) {
+  return function (x) {
     return new Promise(resolve => setTimeout(() => resolve(x), ms))
   }
 }
 
 // Direct APIs
-function fetchTenants() {
+function fetchTenants () {
   return Axios.get(apiUrl + 'tenants')
 }
-function fetchStatus() {
+function fetchStatus () {
   return Axios.get(getBaseUrl() + 'status')
 }
-function fetchBuilds(tenant) {
+function fetchBuilds (tenant) {
   return Axios.get(getBaseUrl() + 'builds')
 }
-function fetchJobs(tenant) {
+function fetchJobs (tenant) {
   return Axios.get(getBaseUrl() + 'jobs')
 }
 
@@ -54,14 +54,14 @@ export const fetchInfoSuccess = (info) => {
   }
 }
 
-function fetchInfo() {
+function fetchInfo () {
   return (dispatch) => {
     return Axios.get(apiUrl + 'info')
       .then(sleeper(2)).then(response => {
         dispatch(fetchInfoSuccess(response.data.info))
       })
       .catch(error => {
-        throw(error)
+        throw (error)
       })
   }
 }
