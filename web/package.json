@@ -29,7 +29,7 @@
     "yarn": "^1.9.4"
   },
   "scripts": {
-    "start:openstack": "REACT_APP_ZUUL_API_ROOT='https://zuul.openstack.org/zuul/api/' react-scripts start",
+    "start:openstack": "REACT_APP_ZUUL_API_ROOT='https://zuul.openstack.org/api/' react-scripts start",
     "start:multi": "REACT_APP_ZUUL_API_ROOT='https://softwarefactory-project.io/zuul/api/' react-scripts start",
     "start": "react-scripts start",
     "build": "react-scripts build",

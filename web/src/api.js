@@ -16,7 +16,7 @@
 import Axios from 'axios'
 import { store } from './reducers'
 
-const apiUrl = process.env.REACT_APP_ZUUL_API || 'api/'
+const apiUrl = process.env.REACT_APP_ZUUL_API_ROOT || 'api/'
 
 function getBaseUrl () {
   const state = store.getState()
