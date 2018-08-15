@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_c2e4903e",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2018-08-15T23:39:45Z",
+      "side": 1,
+      "message": "I take it this is to maintain consistency with ssh, allowing for future tenant-scoped secrets as well?",
+      "revId": "1ce5b2a6f75bf61d167cb71a2a067a7fa9650868",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_e2df4c63",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2018-08-15T23:39:45Z",
+      "side": 1,
+      "message": "Mildly curious why this instead of something based more directly on Zuul\u0027s permission hierarchy model, like:\n\n  key_dir/\n    \u003ctenant\u003e/\n      connection/\n        \u003cconnection\u003e/\n          \u003cproject\u003e/\n            secrets/\n              \u003ckeyid\u003e.pem\n            ssh/\n              \u003ckeyid\u003e.pem\n      ssh/\n        \u003ckeyid\u003e.pem\n\nThough I suppose the convenience of your design is that you can blow away, say, all project-scoped ssh keys using a single recursive delete without risk to other key types?",
+      "revId": "1ce5b2a6f75bf61d167cb71a2a067a7fa9650868",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_82d45849",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2018-08-15T23:39:45Z",
+      "side": 1,
+      "message": "The age old cardinal vs. ordinal debate!",
+      "revId": "1ce5b2a6f75bf61d167cb71a2a067a7fa9650868",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_a2d7144b",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2018-08-15T23:39:45Z",
+      "side": 1,
+      "message": "If you use os.makedirs() here instead you don\u0027t have to explicitly create missing parent directories. I see you use it down at line 105, so I\u0027m probably overlooking an obvious reason to do it this way.",
+      "revId": "1ce5b2a6f75bf61d167cb71a2a067a7fa9650868",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_42cac0a0",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2018-08-15T23:39:45Z",
+      "side": 1,
+      "message": "Not 0.pem? ;)",
+      "revId": "1ce5b2a6f75bf61d167cb71a2a067a7fa9650868",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
