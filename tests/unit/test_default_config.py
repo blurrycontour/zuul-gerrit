@@ -1,3 +1,5 @@
+# Copyright 2018 Red Hat, Inc.
+#
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
 # a copy of the License at
@@ -10,19 +12,19 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import os
+
+from tests.base import ZuulTestCase
+from zuul.lib.config import get_default
 
 
-def get_default(config, section, option, default=None, expand_user=False):
-    if config.has_option(section, option):
-        # Need to be ensured that we get suitable
-        # type from config file by default value
-        if isinstance(default, int):
-            value = config.getint(section, option)
-        else:
-            value = config.get(section, option)
-    else:
-        value = default
-    if expand_user and value:
-        return os.path.expanduser(value)
-    return value
+class TestDefualtConfigValue(ZuulTestCase):
+    config_file = 'zuul.conf'
+
+    def setup_config(self):
+        super(TestDefualtConfigValue, self).setup_config()
+
+    def test_default_config_value(self):
+        default_value = get_default(self.config,
+                                    'web',
+                                    'static_cache_expiry')
+        self.assertEqual(1200, default_value)
