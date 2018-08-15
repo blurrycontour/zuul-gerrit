@@ -2729,6 +2729,8 @@ class ZuulTestCase(BaseTestCase):
         key_root = os.path.join(self.state_root, 'keys')
         for root, dirname, files in os.walk(key_root):
             for fn in files:
+                if fn == '.version':
+                    continue
                 with open(os.path.join(root, fn)) as f:
                     self.assertEqual(test_key, f.read())
 
