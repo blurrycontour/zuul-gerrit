@@ -89,9 +89,9 @@ class ChangePanel extends React.Component {
       if (githubId) {
         changeTitle = githubId
         changeText = "#" + githubId[1]
+      } else if (/^[0-9a-f]{40}$/.test(changeId)) {
+        changeText = changeId.slice(0, 7)
       }
-    } else if (/^[0-9a-f]{40}$/.test(changeId)) {
-      changeText = changeId.slice(0, 7)
     }
     return (
       <small>
