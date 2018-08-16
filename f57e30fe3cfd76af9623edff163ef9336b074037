@@ -178,6 +178,30 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_8801d907",
+        "filename": "web/src/reducers.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-08-16T02:16:04Z",
+      "side": 1,
+      "message": "For class method, the behavior seems differents. When using this construct ([functionName] \u003d ([params]) \u003d\u003e { }) make the function binded to the class and it has access to *this*.\n\nWhen using (functionName(params) { }), then the function is like static, and it needs to be manually binded to access *this* (e.g. using this in the constructor:     this.functionName \u003d this.functionName.bind(this)",
+      "parentUuid": "3f79a3b5_82f23b99",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 43
+      },
+      "revId": "f57e30fe3cfd76af9623edff163ef9336b074037",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_f3f18702",
         "filename": "web/src/registerServiceWorker.js",
         "patchSetId": 4
