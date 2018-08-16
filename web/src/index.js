@@ -17,7 +17,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { HashRouter as Router } from 'react-router-dom'
+import { BrowserRouter as Router } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import 'patternfly/dist/css/patternfly.min.css'
 import 'patternfly/dist/css/patternfly-additions.min.css'
@@ -32,12 +32,10 @@ import { store } from './reducers'
 // with redux and it will update the info prop when fetch succeed.
 store.dispatch(fetchInfo())
 
-// Uncomment to support BrowserRouter
 // Discover where the UI is loaded so that link include sub-paths.
-//const dirName = window.location.pathname
-//      .replace(/\\/g, '/').replace(/\/[^/]*$/, '')
-//const basename = dirName ? dirName + "/" : "/"
-const basename = "/"
+const dirName = window.location.pathname
+      .replace(/\\/g, '/').replace(/\/[^/]*$/, '')
+const basename = dirName ? dirName + "/" : "/"
 
 ReactDOM.render(
   <Provider store={store}>

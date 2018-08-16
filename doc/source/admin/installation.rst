@@ -133,7 +133,7 @@ the web application as the document root and add a simple rewrite rule::
   RewriteRule ^/api/tenant/(.*)/console-stream ws://localhost:9000/api/tenant/$1/console-stream [P]
   RewriteRule ^/api/(.*)$ http://localhost:9000/api/$1 [P]
   # Backward compatible rewrite
-  RewriteRule ^/t/(.*)/(.*).html(.*) /#/t/$1/$2$3 [R=301,L,NE]
+  RewriteRule ^/t/(.*)/(.*).html(.*) /t/$1/$2$3 [R=301,L,NE]
 
 
 White Labeled Tenant
@@ -158,7 +158,7 @@ Assuming the zuul tenant name is "example", the rewrite rules are::
   RewriteRule ^/api/console-stream ws://localhost:9000/api/tenant/example/console-stream [P]
   RewriteRule ^/api/(.*)$ http://localhost:9000/api/tenant/example/$1 [P]
   # Backward compatible rewrite
-  RewriteRule ^/(.*).html(.*) /#/$1$2 [R=301,L,NE]
+  RewriteRule ^/(.*).html(.*) /$1$2 [R=301,L,NE]
 
 
 Static External
