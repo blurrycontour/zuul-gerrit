@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_058052f4",
+        "filename": "web/src/api.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-08-16T01:29:27Z",
+      "side": 1,
+      "message": "actually the variable is REACT_APP_ZUUL_API",
+      "range": {
+        "startLine": 19,
+        "startChar": 45,
+        "endLine": 19,
+        "endChar": 50
+      },
+      "revId": "eec6c0d19965bc06cfda4eb88ebffb6f4d965d96",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
