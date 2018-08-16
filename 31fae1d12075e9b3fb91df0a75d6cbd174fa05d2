@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_e54196a7",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-08-16T01:41:46Z",
+      "side": 1,
+      "message": "flake8 doesn\u0027t seem to mind this.",
+      "revId": "31fae1d12075e9b3fb91df0a75d6cbd174fa05d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_8516a2a7",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-08-16T01:41:46Z",
+      "side": 1,
+      "message": "flake8 is unhappy with this.",
+      "revId": "31fae1d12075e9b3fb91df0a75d6cbd174fa05d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
