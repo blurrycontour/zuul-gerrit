@@ -64,6 +64,13 @@
       zuul_api_url: https://softwarefactory-project.io/zuul
       javascript_copy_links: false
 
+- job:
+    name: zuul-push-container-images
+    parent: pbrx-push-container-images
+    pre-run: playbooks/zuul-containers/pre.yaml
+    secrets:
+      - zuul_docker_login
+
 - project:
     check:
       jobs:
@@ -101,6 +108,10 @@
         - pbrx-build-container-images:
             vars:
               pbrx_prefix: zuul
+        - pbrx-push-container-images:
+            vars:
+              pbrx_prefix: zuul
+            voting: false
         - nodepool-zuul-functional:
             voting: false
     gate:
