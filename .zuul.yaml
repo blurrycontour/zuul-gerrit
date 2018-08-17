@@ -64,6 +64,39 @@
       zuul_api_url: https://softwarefactory-project.io/zuul
       javascript_copy_links: false
 
+- secret:
+    name: zuul_docker_login
+    data:
+      user: !encrypted/pkcs1-oaep
+        - Cd8fTdE707eRwVIeXFVK+dPTrAnJJMeOnt2WuB5kihjmii6IQYaa1MnRkXs60AR6e8xUP
+          s9080rWI/uw39QFqjHGnjIx9BfjR8Vd5JsOqV99+Wts3ToUFxs2z7EdnZclg4bFA695do
+          P2H+ArrcWl5haUFzP1Kx6PGW58ww1l9z4bmDxOwHpwS8UFfhmsIV6WGMvb3anuK2t7l6k
+          wNb7jqIHYoW5ppv7M6hWIwbdsld/EjHPswSL64P4KRNyKV18lkgmOT8BS3+pNzWHNSrHF
+          RPkvIUEtla6BEqrro8Q2Qj8S0lqxCmZ7H123FWUmesxiy7E8026lFMnGX9VhKB/FoBvvg
+          WY6CWGqrZRTma5qUr7w43cBxquhL4WIWKLKTygsLVVjHNi1nH18AnztHqRMm4WIm863yx
+          KS4g8QQhUwur6TkuK/Irf11eAybWTPVqbd58fKE/4oPa7B6q4hcv/cysvr2n79KBbfUb7
+          gk3t2Gf8V42G6CO/AzhcAWN2KQmno2jU6FAK1h8sUx5DFkoUgoNpxpKPjRMT6rhl8GNX4
+          u5is2mnn+HIeRHMy4NWp8Q+csZCFy61/d8sBPqlsLiW27X9SrKv+6Ev3CDRyLB9qqikF0
+          sLjtBnSvxMfVnU+hPkwkbP1cdGdEpJPN5oj4xnPWj3ROt5WMum3M4N00pp6xuE=
+      password: !encrypted/pkcs1-oaep
+        - PIeZMve6M3WwXf9qYh/90AVEfRJ8+5dSskN0vnor+KekK/Dbw5nmm1ES7ilSNOA5tb6Gb
+          R2iOORcejGw8ZkFldhjO5Mco04q/WFaKmfJsxead2qnrHsNRmlGkg9V8x/C7p1DFcp6WP
+          KpLRMRpPkqsKyatqxtpr2upti54YhQ8vu8xTA6GHXyqn5L4fhJiGA54wFWHTg8roKDkj+
+          g5Iab6JbV4yq7EFuzn4QQqaMvpRHD6bKJab6D/QbS0LTThh0rvmw8j+U01gzCkLiRbj0Y
+          MB2l6PArjTuVzsEpCMgKvmylcKZ/ISRm3pPY86e4UtO3JREoU5gWBizEA3icTC/iTu2Ca
+          ghUUbRW/xlLOzStoJCOSlOGk5NgJ08mmp+hd+DV9fkxN1Uhk1S/lebR5z7Owo/dop39wO
+          oJvDzjuycW8vvahlgwFVNO6Zf+mc1FXPeq9vBO3WaXksAbK0jeOS1WAV1Pa4IhxgXrWFO
+          PdXxIXg76NCbM7RGj+fRzsh4ERPdDHjI3nY5gapJGyud7fdIlMJjTR6jjlmkSszsuWTGE
+          R3Amj/0VyBydvFVWwUwgAoU0n5GgGq4mqyj6H52kNtsis9aWyMDaTd0PTSThfyh+roOYn
+          0D8lmXchxSe+YbmqZ59ISXSa0Z/oADYGGBDYvApmZo3KdE5wuPBLqs5SHmCFuA=
+
+- job:
+    name: zuul-push-container-images
+    parent: pbrx-push-container-images
+    pre-run: playbooks/zuul-containers/pre.yaml
+    secrets:
+      - zuul_docker_login
+
 - project:
     check:
       jobs:
@@ -145,6 +178,10 @@
         - publish-openstack-javascript-content:
             vars:
                 node_version: 8
+        - zuul-push-container-images:
+            vars:
+              pbrx_prefix: zuul
+
     release:
       jobs:
         - publish-zuul-docs
