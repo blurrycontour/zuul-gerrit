@@ -64,6 +64,39 @@
       zuul_api_url: https://softwarefactory-project.io/zuul
       javascript_copy_links: false
 
+- secret:
+    name: zuul_docker_login
+    data:
+      user: !encrypted/pkcs1-oaep
+        - kzEV5LU3Zd+HZ58yIPWIqGKVUHLHKd238aaunTCtp/zi7IKntq8DzQIimqPLbL6TzAHFr
+          xSIo42EbKzKG+Y1zRe2/CsvrPCQJyQz8Ize3SqZYV0u/kHNlUE9TCwPpUf5fOe+AfAbCD
+          xcgnVFfOCE6iOP7RemgPdpwPvnm9NqG+v97ZUQvUC8t3pJ1X972zz7GERI899+qZQkYHE
+          wTgoxsC0FzWBMg5ewFjB6KwTupmNRKmvzvP493fPqEG+s5LY89xwyRhXj683Pna0XzsrW
+          VyWHfoXEtIdd35ePti9rVubkSkQf91cF8xUxRNYq5yK184YSSSRsPdHvmr9RnV7ZXg8O+
+          OWIsR3VFmeX1/EOkbKg5HZNTnr8tmc3iEn21+v/euTfJ/Qe+0lL0JPu/npcoAWl3Gk9KX
+          Fe4495tOmSoiJyLwtsyqQCW7U3+wNKE3nvwbJX42ZKkyiA++bFC6+iZN/wlM/dXRhdvia
+          Of843TxuDBLLK1s5C+JSx2r/VTjTU7M2+y5JrTSbbeu+32CVuJcHNzrDuk7RTLLyAEpPB
+          V1pk78oLzEfsDxWK/HcDYqFCsIPyi+J72jY2AsFXBZjftJSKGd8m3czBGkxOhgE3XBoaq
+          uDLVeWMVvas7Hqz6EWPKbJgnSMHl7NcS2GI73CoGaQJGj2/pBEaUIM2QvXGsag=
+      password: !encrypted/pkcs1-oaep
+        - m5QiZPoxCuIIRZ0o82BivWczHwihaH0PKPgSiF7ErQU/BE6H7E+P28JEFipajy8oD2kKx
+          Skkv/JL+T0NRK7yckgmifDt9HITZBL40iVhAoKHqDDi5qiqWhAjj5n6zYpZ066RPTodE5
+          N0POQN0Sn6oqBsiL/RdFzgKnnDV5yn3vzg6icwas2enY3n5QOlSfxsxHyScePjCQ9nLYd
+          wOKI0Xk8ERtICY6CP6rKYyMuimBLXSMWOTDlhrZQxMd4L6Vl5wMjNyhHdUvdDYCwweleZ
+          RpEpfIF9h9P9hg3v6jOTGvSITqH/k9haD8iA8j6aRBtSw+Vzje71C9JX+yzVHPbpDun1A
+          wfZs1BMUVY5JesQJI5xVJvo7ZBdrIfvjZGCmjNAoOh2b/ODfYZpz6s5h2X46i+h1rqDd8
+          jG2aO31WLNvdb1L2bT/1YCNSR3OU1QDJA5BSdHNG8eYLm21Ebg8ciF4fnMZwgCOA5Po2d
+          NnnOR3sVFZXtMfMVTomEU31evcmrLzFReDiMZVmnclyWN1+JsWj3o47sEZunxHRX+HuYw
+          vnsk6jC3izkzfyoGlvqDH/omqBsmCNKH6UOV1QDA4mXMewyleFJH8BE2m4KLJyPfXQfhW
+          5MpC6BML6DwTzbyoV0a4r3WRNv6GhG2PFdUCTYnscvp0Kem/PAl1fiHg9ntwTg=
+
+- job:
+    name: zuul-push-container-images
+    parent: pbrx-push-container-images
+    pre-run: playbooks/zuul-containers/pre.yaml
+    secrets:
+      - zuul_docker_login
+
 - project:
     check:
       jobs:
@@ -101,6 +134,10 @@
         - pbrx-build-container-images:
             vars:
               pbrx_prefix: zuul
+        - zuul-push-container-images:
+            vars:
+              pbrx_prefix: zuul
+            voting: false
         - nodepool-zuul-functional:
             voting: false
     gate:
