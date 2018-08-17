@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_6769d889",
+        "filename": ".zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 22348
+      },
+      "writtenOn": "2018-08-17T18:21:35Z",
+      "side": 1,
+      "message": "Decryption failed.",
+      "range": {
+        "startLine": 94,
+        "startChar": 2,
+        "endLine": 100,
+        "endChar": 0
+      },
+      "revId": "063b4f8ebb3f108196387f6e37b06dd706cdc946",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
