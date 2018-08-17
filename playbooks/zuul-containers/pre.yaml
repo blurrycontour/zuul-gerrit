@@ -1,0 +1,6 @@
+- hosts: all
+  tasks:
+
+    - name: DockerHub login
+      command: docker login -u {{ zuul_docker_login.user }} -p {{ zuul_docker_login.password }}
+      no_log: True
