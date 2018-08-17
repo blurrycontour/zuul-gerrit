@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_67e23832",
+        "filename": ".zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 22348
+      },
+      "writtenOn": "2018-08-17T18:17:06Z",
+      "side": 1,
+      "message": "The secret \"zuul_docker_login\" was not found.",
+      "range": {
+        "startLine": 67,
+        "startChar": 2,
+        "endLine": 73,
+        "endChar": 0
+      },
+      "revId": "0029848ff1c108f442710fe78b5811a16ae80f78",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
