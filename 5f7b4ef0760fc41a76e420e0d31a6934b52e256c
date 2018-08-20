@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_e6be27d3",
+        "filename": ".zuul.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 22348
+      },
+      "writtenOn": "2018-08-20T18:25:17Z",
+      "side": 1,
+      "message": "Job pbrx-push-container-images not defined",
+      "range": {
+        "startLine": 93,
+        "startChar": 2,
+        "endLine": 99,
+        "endChar": 0
+      },
+      "revId": "5f7b4ef0760fc41a76e420e0d31a6934b52e256c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_86b5f3f0",
+        "filename": ".zuul.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 22348
+      },
+      "writtenOn": "2018-08-20T18:25:17Z",
+      "side": 1,
+      "message": "Job openstackzuul-push-container-images not defined",
+      "range": {
+        "startLine": 100,
+        "startChar": 2,
+        "endLine": 187,
+        "endChar": 0
+      },
+      "revId": "5f7b4ef0760fc41a76e420e0d31a6934b52e256c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
