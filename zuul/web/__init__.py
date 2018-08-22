@@ -348,7 +348,7 @@ class ZuulWebAPI(object):
                     v = [v]
                 args['buildset_filters'].setdefault(k, []).extend(v)
         for k in ("uuid", "job_name", "voting", "node_name",
-                  "result"):
+                  "log_url", "result"):
             v = locals()[k]
             if v:
                 if not isinstance(v, list):
