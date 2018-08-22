@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_0ed9bc55",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 506,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-08-22T17:03:50Z",
+      "side": 1,
+      "message": "would be nice to support short uuid though :-)",
+      "range": {
+        "startLine": 506,
+        "startChar": 57,
+        "endLine": 506,
+        "endChar": 61
+      },
+      "revId": "518643a4dbcf48d98ccd1905dde1c90f5c94db38",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_eed32037",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-08-22T17:03:50Z",
+      "side": 1,
+      "message": "perhaps adding a warning if multiple builds are returned would be safer?",
+      "revId": "518643a4dbcf48d98ccd1905dde1c90f5c94db38",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_ee2ec041",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 522,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-08-22T17:03:50Z",
+      "side": 1,
+      "message": "Could we also route \u0027/api/build/{uuid}\u0027 and make the tenant argument of the \u0027build\u0027 action optional?\nThis would be useful for log analysis when tenant name is unknown.",
+      "revId": "518643a4dbcf48d98ccd1905dde1c90f5c94db38",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
