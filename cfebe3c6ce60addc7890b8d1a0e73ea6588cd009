@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_332f2d40",
+        "filename": "tests/fixtures/config/data-return/git/common-config/playbooks/data-return-inventory.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-08-23T04:42:35Z",
+      "side": 1,
+      "message": "this is not breaking the API and you won\u0027t get a syntax error. though it\u0027s a behavior change indeed...",
+      "parentUuid": "3f79a3b5_b15380e2",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 29
+      },
+      "revId": "cfebe3c6ce60addc7890b8d1a0e73ea6588cd009",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_715f28e5",
         "filename": "zuul/ansible/actiongeneral/add_host.py",
         "patchSetId": 5
@@ -36,6 +60,24 @@
       "writtenOn": "2018-08-21T00:36:51Z",
       "side": 1,
       "message": "do we need to vendor the entry add_host logic here? Is it would be possible to use super() then add out zuul specific bits?",
+      "revId": "cfebe3c6ce60addc7890b8d1a0e73ea6588cd009",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_f3245562",
+        "filename": "zuul/ansible/actiongeneral/add_host.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-08-23T04:42:35Z",
+      "side": 1,
+      "message": "that can be done, not sure if it will cause side effect though.",
+      "parentUuid": "3f79a3b5_715f28e5",
       "revId": "cfebe3c6ce60addc7890b8d1a0e73ea6588cd009",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
