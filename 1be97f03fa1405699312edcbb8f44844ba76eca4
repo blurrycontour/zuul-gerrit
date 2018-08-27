@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_21230558",
+        "filename": "bindep.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-08-27T19:43:16Z",
+      "side": 1,
+      "message": "this can be written as\n\n  openssh-client [platform:apk platform:debian]",
+      "range": {
+        "startLine": 49,
+        "startChar": 0,
+        "endLine": 50,
+        "endChar": 29
+      },
+      "revId": "1be97f03fa1405699312edcbb8f44844ba76eca4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
