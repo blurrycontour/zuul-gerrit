@@ -56,6 +56,24 @@
       "revId": "518643a4dbcf48d98ccd1905dde1c90f5c94db38",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_0dcde264",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 522,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-08-27T16:41:04Z",
+      "side": 1,
+      "message": "Actually, a global route would need to check each tenant as they may have different sql connections, so that\u0027s probably not worth it.",
+      "parentUuid": "3f79a3b5_ee2ec041",
+      "revId": "518643a4dbcf48d98ccd1905dde1c90f5c94db38",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
