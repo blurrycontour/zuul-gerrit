@@ -70,6 +70,23 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_fb47e01d",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-08-28T18:13:28Z",
+      "side": 1,
+      "message": "Oh, because connections aren\u0027t per-tenant.",
+      "revId": "1ce5b2a6f75bf61d167cb71a2a067a7fa9650868",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_82d45849",
         "filename": "zuul/lib/keystorage.py",
         "patchSetId": 1
