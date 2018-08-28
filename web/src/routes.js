@@ -14,6 +14,7 @@
 
 import Status from './pages/Status'
 import Jobs from './pages/Jobs'
+import Build from './pages/Build'
 import Builds from './pages/Builds'
 import Tenants from './pages/Tenants'
 import Stream from './pages/Stream'
@@ -41,6 +42,10 @@ const routes = () => [
   {
     to: '/stream/:buildId',
     component: Stream
+  },
+  {
+    to: '/build/:buildId',
+    component: Build
   },
   {
     to: '/tenants',
