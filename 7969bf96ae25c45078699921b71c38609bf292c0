@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_78a62412",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1348,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-08-31T14:55:01Z",
+      "side": 1,
+      "message": "It\u0027s possible for this to be None. Do we need a check for that here?",
+      "range": {
+        "startLine": 1348,
+        "startChar": 35,
+        "endLine": 1348,
+        "endChar": 50
+      },
+      "revId": "7969bf96ae25c45078699921b71c38609bf292c0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
