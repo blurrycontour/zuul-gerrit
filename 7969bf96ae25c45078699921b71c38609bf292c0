@@ -39,6 +39,40 @@
       "revId": "7969bf96ae25c45078699921b71c38609bf292c0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_5feb0a77",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-08-31T17:36:20Z",
+      "side": 1,
+      "message": "In self.verify() we only return False if the version file does not exist. Otherwise we return true if we don\u0027t need to upgrade or raise an exception if the file exists and the written version doesn\u0027t match the current version in zuul.\n\nAll this to say I think you either need to catch the exception here and continue to perform the upgrade (versions don\u0027t match), or better yet return False if the versions don\u0027t match in verify() and save the exception for major issues?\n\nThis works currently beause zuul is going from version 0 without a file present to version 1 with a file present. But this will be buggy going from version 1 to 2 I Think.",
+      "revId": "7969bf96ae25c45078699921b71c38609bf292c0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_1a35a0db",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-08-31T17:36:20Z",
+      "side": 1,
+      "message": "Not a -1, consider another self.verify() here to confirm things are good before we pass control back to our parent which will potentially do a subsequent migration.",
+      "revId": "7969bf96ae25c45078699921b71c38609bf292c0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
