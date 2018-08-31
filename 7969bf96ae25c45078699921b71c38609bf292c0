@@ -22,6 +22,23 @@
       "revId": "7969bf96ae25c45078699921b71c38609bf292c0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_f866b4bb",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1348,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-08-31T15:00:14Z",
+      "side": 1,
+      "message": "self.keystorage should always be set in normal use.  The only time it isn\u0027t set is for the command-line syntax validation, which doesn\u0027t go this far in loading.  If we get to this point, we need self.keystorage to be set, so there\u0027s nothing we\u0027d want to do here except bomb out anyway, so I think letting the normal attribute failure happen in case of a coding error should be fine.",
+      "revId": "7969bf96ae25c45078699921b71c38609bf292c0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
