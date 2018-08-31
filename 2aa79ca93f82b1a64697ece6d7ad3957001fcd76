@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_66c5373d",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2675,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2018-08-31T01:37:45Z",
+      "side": 1,
+      "message": "\"test keys for secrets\" would probably be a little less likely confused with being a typo of \"secret keys\" here",
+      "revId": "2aa79ca93f82b1a64697ece6d7ad3957001fcd76",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
