@@ -34,7 +34,7 @@ class Migration(object):
             data = int(f.read().strip())
             if data == self.version:
                 return True
-        raise Exception("Unknown key storage version")
+        return False
 
     def writeVersion(self, root):
         fn = os.path.join(root, '.version')
@@ -55,6 +55,8 @@ class Migration(object):
         self.writeVersion(root)
         self.log.info("Finished upgrading key storage to version %s" %
                       self.version)
+        if not self.verify(root):
+            raise Exception("Inconsistent result after migration")
 
 
 class MigrationV1(Migration):
