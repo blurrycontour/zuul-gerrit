@@ -22,6 +22,46 @@
       "revId": "6b38b53b61a8f0f553db9876db1b3852984ef710",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_006f72c5",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-08-31T18:24:31Z",
+      "side": 1,
+      "message": "Nit, maybe it should be{\n\n  { \u0027foo project key\u0027: item.change.project.private_ssh_key }\n\nRather than the semi redundant:\n\n  { key: key, value: value }",
+      "revId": "6b38b53b61a8f0f553db9876db1b3852984ef710",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_60866668",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 728,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-08-31T18:24:31Z",
+      "side": 1,
+      "message": "Then here you would pass key.values(). Though reading it in this context the dict is really a stand in for a named tuple because it serializes to json? In that case maybe don\u0027t make the suggested change.",
+      "range": {
+        "startLine": 728,
+        "startChar": 39,
+        "endLine": 728,
+        "endChar": 62
+      },
+      "revId": "6b38b53b61a8f0f553db9876db1b3852984ef710",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
