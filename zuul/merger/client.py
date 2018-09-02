@@ -21,6 +21,12 @@ import gear
 
 import zuul.model
 from zuul.lib.config import get_default
+import zuul.lib.prometheus as prometheus
+
+
+class Metrics:
+    submit_job = prometheus.Summary(
+        'merger_cat_seconds', 'Time spent waiting for merger job')
 
 
 def getJobData(job):
@@ -86,6 +92,8 @@ class MergeClient(object):
         self.log.debug("Waiting for gearman")
         self.gearman.waitForServer()
         self.jobs = set()
+        self.counter = prometheus.Counter(
+            'merger_job_count', 'Merger job executed')
 
     def stop(self):
         self.gearman.shutdown()
@@ -95,8 +103,10 @@ class MergeClient(object):
             return True
         return False
 
+    @Metrics.submit_job.time()
     def submitJob(self, name, data, build_set,
                   precedence=zuul.model.PRECEDENCE_NORMAL):
+        self.counter.inc()
         uuid = str(uuid4().hex)
         job = MergeJob(name,
                        json.dumps(data),

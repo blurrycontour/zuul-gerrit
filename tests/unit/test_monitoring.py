@@ -39,3 +39,7 @@ class TestPrometheus(BaseTestPrometheus):
     def test_prometheus_executors_metrics(self):
         metrics = self.get_metrics()
         self.assertIn("sensor_builds_running", metrics)
+
+    def test_prometheus_scheduler_metrics(self):
+        metrics = self.get_metrics()
+        self.assertIn("sched_reconfigure_seconds", metrics)
