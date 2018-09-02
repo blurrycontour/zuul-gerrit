@@ -693,12 +693,16 @@ class PipelineManager(object):
         # Do whatever needs to be done for each change in the queue
         self.log.debug("Starting queue processor: %s" % self.pipeline.name)
         changed = False
+        self.oldest_change = 0
         for queue in self.pipeline.queues:
             queue_changed = False
             nnfi = None  # Nearest non-failing item
             for item in queue.queue[:]:
                 item_changed, nnfi = self._processOneItem(
                     item, nnfi)
+                if not self.oldest_change or \
+                   item.enqueue_time < self.oldest_change:
+                    self.oldest_change = item.enqueue_time
                 if item_changed:
                     queue_changed = True
                 self.reportStats(item)

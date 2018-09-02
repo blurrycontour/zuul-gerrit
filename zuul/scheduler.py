@@ -41,6 +41,19 @@ COMMANDS = ['full-reconfigure', 'stop']
 
 
 class SchedulerMetrics:
+    reconfigure = prometheus.Summary(
+        'sched_reconfigure_seconds',
+        'Time spent renconfiguring')
+    process_event_queue = prometheus.Summary(
+        'sched_queue_event_seconds',
+        'Time spent processing event queue')
+    process_result_queue = prometheus.Summary(
+        'sched_queue_result_seconds',
+        'Time spent processing result queue')
+    process_management_queue = prometheus.Summary(
+        'sched_queue_management_seconds',
+        'Time spent processing management queue')
+
     def __init__(self):
         self.mergers_online = prometheus.Gauge(
             'mergers_online', 'The number of mergers')
@@ -56,6 +69,8 @@ class SchedulerMetrics:
             'executors_running', 'The number of executors job running')
         self.executors_queued = prometheus.Gauge(
             'executors_queued', 'The number of executors job queued')
+        self.oldest_change = prometheus.Gauge(
+            'oldest_change', 'The oldest change enqueue time')
 
 
 class ManagementEvent(object):
@@ -519,6 +534,7 @@ class Scheduler(threading.Thread):
     def fullReconfigureCommandHandler(self):
         self._zuul_app.fullReconfigure()
 
+    @SchedulerMetrics.reconfigure.time()
     def reconfigure(self, config):
         self.log.debug("Submitting reconfiguration event")
         event = ReconfigureEvent(config)
@@ -1008,11 +1024,20 @@ class Scheduler(threading.Thread):
                 if self._pause and self._areAllBuildsComplete():
                     self._doPauseEvent()
 
+                oldest_change = 0
                 for tenant in self.abide.tenants.values():
                     for pipeline in tenant.layout.pipelines.values():
                         while (pipeline.manager.processQueue() and
                                not self._stopped):
                             pass
+                        if pipeline.manager.oldest_change:
+                            if not oldest_change or \
+                               pipeline.manager.oldest_change < oldest_change:
+                                oldest_change = pipeline.manager.oldest_change
+
+                if self.prometheus and oldest_change:
+                    self.prometheus.oldest_change.set(
+                        time.time() - oldest_change)
 
             except Exception:
                 self.log.exception("Exception in run handler:")
@@ -1038,6 +1063,7 @@ class Scheduler(threading.Thread):
                 "End maintain connection cache for: %s" % connection)
         self.log.debug("Connection cache size: %s" % len(relevant))
 
+    @SchedulerMetrics.process_event_queue.time()
     def process_event_queue(self):
         self.log.debug("Fetching trigger event")
         event = self.trigger_event_queue.get()
@@ -1091,6 +1117,7 @@ class Scheduler(threading.Thread):
         finally:
             self.trigger_event_queue.task_done()
 
+    @SchedulerMetrics.process_management_queue.time()
     def process_management_queue(self):
         self.log.debug("Fetching management event")
         event = self.management_event_queue.get()
@@ -1114,6 +1141,7 @@ class Scheduler(threading.Thread):
             event.exception(sys.exc_info())
         self.management_event_queue.task_done()
 
+    @SchedulerMetrics.process_result_queue.time()
     def process_result_queue(self):
         self.log.debug("Fetching result event")
         event = self.result_event_queue.get()
