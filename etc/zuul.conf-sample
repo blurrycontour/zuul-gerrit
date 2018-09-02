@@ -23,22 +23,27 @@ tenant_config=/etc/zuul/main.yaml
 log_config=/etc/zuul/logging.conf
 pidfile=/var/run/zuul/zuul.pid
 state_dir=/var/lib/zuul
+prometheus_port=9091
+;prometheus_addr=0.0.0.0
 
 [merger]
 git_dir=/var/lib/zuul/git
 ;git_user_email=zuul@example.com
 ;git_user_name=zuul
+prometheus_port=9092
 
 [executor]
 default_username=zuul
 trusted_ro_paths=/opt/zuul-scripts:/var/cache
 trusted_rw_paths=/opt/zuul-logs
+prometheus_port=9093
 
 [web]
 listen_address=127.0.0.1
 port=9000
 static_cache_expiry=0
 status_url=https://zuul.example.com/status
+prometheus_port=9094
 
 [connection gerrit]
 driver=gerrit

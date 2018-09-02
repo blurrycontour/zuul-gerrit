@@ -275,6 +275,16 @@ The following sections of ``zuul.conf`` are used by the scheduler:
 
       Path to directory in which Zuul should save its state.
 
+   .. attr:: prometheus_port
+
+      Set a TCP port to start the prometheus metrics client.
+
+   .. attr:: prometheus_addr
+      :default: 0.0.0.0
+
+      The addr to listen for prometheus metrics poll.
+
+
 Operation
 ~~~~~~~~~
 

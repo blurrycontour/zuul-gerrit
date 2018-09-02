@@ -89,6 +89,7 @@ class Executor(zuul.cmd.ZuulDaemonApp):
             self.job_dir = tempfile.mkdtemp()
 
         self.setup_logging('executor', 'log_config')
+        self.setup_prometheus('executor')
         self.log = logging.getLogger("zuul.Executor")
 
         self.finger_port = int(

@@ -127,6 +127,7 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
             self.start_gear_server()
 
         self.setup_logging('scheduler', 'log_config')
+        self.setup_prometheus('scheduler')
         self.log = logging.getLogger("zuul.Scheduler")
 
         self.sched = zuul.scheduler.Scheduler(self.config)
