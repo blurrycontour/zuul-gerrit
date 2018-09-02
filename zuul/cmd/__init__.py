@@ -29,6 +29,7 @@ import sys
 import traceback
 import threading
 
+prometheus_client = extras.try_import('prometheus_client')
 yappi = extras.try_import('yappi')
 objgraph = extras.try_import('objgraph')
 
@@ -183,6 +184,15 @@ class ZuulDaemonApp(ZuulApp, metaclass=abc.ABCMeta):
         log.debug(
             "Configured logging: {version}".format(
                 version=zuul_version_info.release_string()))
+
+    def setup_prometheus(self, section):
+        if self.config.has_option(section, 'prometheus_port'):
+            if not prometheus_client:
+                raise RuntimeError("prometheus_client library is missing.")
+            port = int(self.config.get(section, 'prometheus_port'))
+            addr = get_default(
+                self.config, section, 'prometheus_addr', '0.0.0.0')
+            prometheus_client.start_http_server(port, addr)
 
     def main(self):
         self.parseArguments()
