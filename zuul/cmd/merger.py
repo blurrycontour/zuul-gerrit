@@ -50,6 +50,7 @@ class Merger(zuul.cmd.ZuulDaemonApp):
         self.configure_connections(source_only=True)
 
         self.setup_logging('merger', 'log_config')
+        self.setup_prometheus('merger')
 
         self.merger = zuul.merger.server.MergeServer(self.config,
                                                      self.connections)
