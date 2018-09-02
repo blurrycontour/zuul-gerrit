@@ -34,9 +34,28 @@ from zuul import rpclistener
 from zuul.lib import commandsocket
 from zuul.lib.config import get_default
 from zuul.lib.statsd import get_statsd
+import zuul.lib.prometheus as prometheus
 import zuul.lib.queue
 
 COMMANDS = ['full-reconfigure', 'stop']
+
+
+class SchedulerMetrics:
+    def __init__(self):
+        self.mergers_online = prometheus.Gauge(
+            'mergers_online', 'The number of mergers')
+        self.mergers_running = prometheus.Gauge(
+            'mergers_jobs_running', 'The number of mergers job running')
+        self.mergers_queued = prometheus.Gauge(
+            'mergers_jobs_queued', 'The number of mergers job queued')
+        self.executors_online = prometheus.Gauge(
+            'executors_online', 'The number of executors')
+        self.executors_accepting = prometheus.Gauge(
+            'executors_accepting', 'The number of executors job accepting')
+        self.executors_running = prometheus.Gauge(
+            'executors_running', 'The number of executors job running')
+        self.executors_queued = prometheus.Gauge(
+            'executors_queued', 'The number of executors job queued')
 
 
 class ManagementEvent(object):
@@ -269,6 +288,10 @@ class Scheduler(threading.Thread):
         self.merger = None
         self.connections = None
         self.statsd = get_statsd(config)
+        if config.has_option("scheduler", "prometheus_port"):
+            self.prometheus = SchedulerMetrics()
+        else:
+            self.prometheus = None
         self.rpc = rpclistener.RPCListener(config, self)
         self.stats_thread = threading.Thread(target=self.runStats)
         self.stats_thread.daemon = True
@@ -371,7 +394,7 @@ class Scheduler(threading.Thread):
                 self.log.exception("Error in periodic stats:")
 
     def _runStats(self):
-        if not self.statsd:
+        if not self.statsd and not self.prometheus:
             return
         functions = self.rpc.getFunctions()
         executors_accepting = 0
@@ -393,13 +416,22 @@ class Scheduler(threading.Thread):
             if name.startswith('merger:'):
                 merge_queue += queued - running
                 merge_running += running
-        self.statsd.gauge('zuul.mergers.online', mergers_online)
-        self.statsd.gauge('zuul.mergers.jobs_running', merge_running)
-        self.statsd.gauge('zuul.mergers.jobs_queued', merge_queue)
-        self.statsd.gauge('zuul.executors.online', executors_online)
-        self.statsd.gauge('zuul.executors.accepting', executors_accepting)
-        self.statsd.gauge('zuul.executors.jobs_running', execute_running)
-        self.statsd.gauge('zuul.executors.jobs_queued', execute_queue)
+        if self.statsd:
+            self.statsd.gauge('zuul.mergers.online', mergers_online)
+            self.statsd.gauge('zuul.mergers.jobs_running', merge_running)
+            self.statsd.gauge('zuul.mergers.jobs_queued', merge_queue)
+            self.statsd.gauge('zuul.executors.online', executors_online)
+            self.statsd.gauge('zuul.executors.accepting', executors_accepting)
+            self.statsd.gauge('zuul.executors.jobs_running', execute_running)
+            self.statsd.gauge('zuul.executors.jobs_queued', execute_queue)
+        if self.prometheus:
+            self.prometheus.mergers_online.set(mergers_online)
+            self.prometheus.mergers_running.set(merge_running)
+            self.prometheus.mergers_queued.set(merge_queue)
+            self.prometheus.executors_online.set(executors_online)
+            self.prometheus.executors_accepting.set(executors_accepting)
+            self.prometheus.executors_running.set(execute_running)
+            self.prometheus.executors_queued.set(execute_queue)
 
     def addEvent(self, event):
         self.trigger_event_queue.put(event)
