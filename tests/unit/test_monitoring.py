@@ -35,3 +35,7 @@ class TestPrometheus(BaseTestPrometheus):
         metrics = self.get_metrics()
         self.assertIn("process_resident_memory_bytes", metrics)
         self.assertIn("process_open_fds", metrics)
+
+    def test_prometheus_executors_metrics(self):
+        metrics = self.get_metrics()
+        self.assertIn("sensor_builds_running", metrics)

@@ -15,6 +15,7 @@
 import logging
 
 from zuul.executor.sensors import SensorInterface
+import zuul.lib.prometheus as prometheus
 
 
 class PauseSensor(SensorInterface):
@@ -22,6 +23,8 @@ class PauseSensor(SensorInterface):
 
     def __init__(self):
         self.pause = False
+        self.gauge = prometheus.Gauge(
+            'sensor_pause', 'The Pause sensor value')
 
     def isOk(self):
         if self.pause:
@@ -35,3 +38,4 @@ class PauseSensor(SensorInterface):
         else:
             value = 0
         statsd.gauge(base_key + '.pause', value)
+        self.gauge.set(value)
