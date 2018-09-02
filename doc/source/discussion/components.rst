@@ -392,6 +392,16 @@ The following sections of ``zuul.conf`` are used by the scheduler:
       If a value higher than ``max_hold_expiration`` is supplied during
       hold request creation, it will be lowered to this value.
 
+   .. attr:: prometheus_port
+
+      Set a TCP port to start the prometheus metrics client.
+
+   .. attr:: prometheus_addr
+      :default: 0.0.0.0
+
+      The addr to listen for prometheus metrics poll.
+
+
 Operation
 ~~~~~~~~~
 
