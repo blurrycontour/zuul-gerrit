@@ -16,6 +16,7 @@ import logging
 import multiprocessing
 
 from zuul.executor.sensors import SensorInterface
+from zuul.lib.prometheus import prometheus_client
 
 
 class StartingBuildsSensor(SensorInterface):
@@ -25,6 +26,13 @@ class StartingBuildsSensor(SensorInterface):
         self.executor = executor
         self.max_starting_builds = max_load_avg * 2
         self.min_starting_builds = max(int(multiprocessing.cpu_count() / 2), 1)
+        if prometheus_client:
+            self.paused_gauge = prometheus_client.Gauge(
+                'sensor_builds_paused', 'The Builds sensor paused value')
+            self.running_gauge = prometheus_client.Gauge(
+                'sensor_builds_running', 'The Builds sensor running value')
+            self.starting_gauge = prometheus_client.Gauge(
+                'sensor_builds_starting', 'The Builds sensor starting value')
 
     def _getStartingBuilds(self):
         starting_builds = 0
@@ -56,6 +64,13 @@ class StartingBuildsSensor(SensorInterface):
         return True, "{} <= {}".format(starting_builds, max_starting_builds)
 
     def reportStats(self, statsd, base_key):
-        statsd.gauge(base_key + '.paused_builds', self._getPausedBuilds())
-        statsd.gauge(base_key + '.running_builds', self._getRunningBuilds())
-        statsd.gauge(base_key + '.starting_builds', self._getStartingBuilds())
+        paused = self._getPausedBuilds()
+        running = self._getRunningBuilds()
+        starting = self._getStartingBuilds()
+        statsd.gauge(base_key + '.paused_builds', paused)
+        statsd.gauge(base_key + '.running_builds', running)
+        statsd.gauge(base_key + '.starting_builds', starting)
+        if prometheus_client:
+            self.paused_gauge.set(paused)
+            self.running_gauge.set(running)
+            self.starting_gauge.set(starting)

@@ -17,6 +17,7 @@ import os
 
 from zuul.executor.sensors import SensorInterface
 from zuul.lib.config import get_default
+from zuul.lib.prometheus import prometheus_client
 
 
 def get_avail_hdd_pct(path):
@@ -35,6 +36,9 @@ class HDDSensor(SensorInterface):
             get_default(config, 'executor', 'min_avail_hdd', '5.0'))
         self.state_dir = get_default(
             config, 'executor', 'state_dir', '/var/lib/zuul', expand_user=True)
+        if prometheus_client:
+            self.gauge = prometheus_client.Gauge(
+                'sensor_hdd', 'The HDD used')
 
     def isOk(self):
         avail_hdd_pct = get_avail_hdd_pct(self.state_dir)
@@ -50,5 +54,8 @@ class HDDSensor(SensorInterface):
 
         # We multiply the percentage by 100 so we can report it to 2 decimal
         # points.
-        statsd.gauge(base_key + '.pct_used_hdd',
-                     int((100.0 - avail_hdd_pct) * 100))
+        value = int((100.0 - avail_hdd_pct) * 100)
+
+        statsd.gauge(base_key + '.pct_used_hdd', value)
+        if prometheus_client:
+            self.gauge.set(value)

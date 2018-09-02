@@ -17,6 +17,7 @@ import psutil
 
 from zuul.executor.sensors import SensorInterface
 from zuul.lib.config import get_default
+from zuul.lib.prometheus import prometheus_client
 
 
 def get_avail_mem_pct():
@@ -30,6 +31,9 @@ class RAMSensor(SensorInterface):
     def __init__(self, config=None):
         self.min_avail_mem = float(get_default(config, 'executor',
                                                'min_avail_mem', '5.0'))
+        if prometheus_client:
+            self.gauge = prometheus_client.Gauge(
+                'sensor_ram', 'The RAM sensor used value')
 
     def isOk(self):
         avail_mem_pct = get_avail_mem_pct()
@@ -42,6 +46,8 @@ class RAMSensor(SensorInterface):
 
     def reportStats(self, statsd, base_key):
         avail_mem_pct = get_avail_mem_pct()
+        value = int((100.0 - avail_mem_pct) * 100)
 
-        statsd.gauge(base_key + '.pct_used_ram',
-                     int((100.0 - avail_mem_pct) * 100))
+        statsd.gauge(base_key + '.pct_used_ram', value)
+        if prometheus_client:
+            self.gauge.set(value)

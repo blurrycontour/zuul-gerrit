@@ -18,6 +18,7 @@ import os
 
 from zuul.executor.sensors import SensorInterface
 from zuul.lib.config import get_default
+from zuul.lib.prometheus import prometheus_client
 
 
 class CPUSensor(SensorInterface):
@@ -27,6 +28,9 @@ class CPUSensor(SensorInterface):
         load_multiplier = float(get_default(config, 'executor',
                                             'load_multiplier', '2.5'))
         self.max_load_avg = multiprocessing.cpu_count() * load_multiplier
+        if prometheus_client:
+            self.gauge = prometheus_client.Gauge(
+                'sensor_cpu', 'The CPU sensor load average')
 
     def isOk(self):
         load_avg = os.getloadavg()[0]
@@ -39,4 +43,8 @@ class CPUSensor(SensorInterface):
 
     def reportStats(self, statsd, base_key):
         load_avg = os.getloadavg()[0]
-        statsd.gauge(base_key + '.load_average', int(load_avg * 100))
+        value = int(load_avg * 100)
+
+        statsd.gauge(base_key + '.load_average', value)
+        if prometheus_client:
+            self.gauge.set(value)
