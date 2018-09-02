@@ -34,10 +34,29 @@ from zuul import rpclistener
 from zuul.lib import commandsocket
 from zuul.lib.config import get_default
 from zuul.lib.statsd import get_statsd
-from zuul.lib.prometheus import prometheus_client
+from zuul.lib.prometheus import prometheus_client, Summary
 import zuul.lib.queue
 
 COMMANDS = ['full-reconfigure', 'stop']
+
+if prometheus_client:
+    RECONFIGURE_TIME = Summary(
+        'reconfigure_seconds',
+        'Time spent reconfiguring')
+    PROCESS_EVENT_QUEUE = Summary(
+        'queue_process_event_seconds',
+        'Time spent processing event queue')
+    PROCESS_RESULT_QUEUE = Summary(
+        'queue_process_result_seconds',
+        'Time spent processing result queue')
+    PROCESS_MANAGEMENT_QUEUE = Summary(
+        'queue_process_management_seconds',
+        'Time spent processing management queue')
+else:
+    RECONFIGURE_TIME = Summary()
+    PROCESS_EVENT_QUEUE = Summary()
+    PROCESS_RESULT_QUEUE = Summary()
+    PROCESS_MANAGEMENT_QUEUE = Summary()
 
 
 class ManagementEvent(object):
@@ -517,6 +536,7 @@ class Scheduler(threading.Thread):
     def fullReconfigureCommandHandler(self):
         self._zuul_app.fullReconfigure()
 
+    @RECONFIGURE_TIME.time()
     def reconfigure(self, config):
         self.log.debug("Submitting reconfiguration event")
         event = ReconfigureEvent(config)
@@ -1036,6 +1056,7 @@ class Scheduler(threading.Thread):
                 "End maintain connection cache for: %s" % connection)
         self.log.debug("Connection cache size: %s" % len(relevant))
 
+    @PROCESS_EVENT_QUEUE.time()
     def process_event_queue(self):
         self.log.debug("Fetching trigger event")
         event = self.trigger_event_queue.get()
@@ -1089,6 +1110,7 @@ class Scheduler(threading.Thread):
         finally:
             self.trigger_event_queue.task_done()
 
+    @PROCESS_MANAGEMENT_QUEUE.time()
     def process_management_queue(self):
         self.log.debug("Fetching management event")
         event = self.management_event_queue.get()
@@ -1112,6 +1134,7 @@ class Scheduler(threading.Thread):
             event.exception(sys.exc_info())
         self.management_event_queue.task_done()
 
+    @PROCESS_RESULT_QUEUE.time()
     def process_result_queue(self):
         self.log.debug("Fetching result event")
         event = self.result_event_queue.get()

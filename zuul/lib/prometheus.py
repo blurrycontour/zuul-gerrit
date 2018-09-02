@@ -14,5 +14,13 @@
 
 try:
     import prometheus_client
+    Summary = prometheus_client.Summary
 except ImportError:
     prometheus_client = None
+
+    def noop(func):
+        return func
+
+    class Summary:
+        def time(self):
+            return noop
