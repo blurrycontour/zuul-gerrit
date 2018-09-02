@@ -52,6 +52,7 @@ class Merger(zuul.cmd.ZuulDaemonApp):
         self.configure_connections(source_only=True)
 
         self.setup_logging('merger', 'log_config')
+        self.setup_prometheus('merger')
 
         zk_client = ZooKeeperClient()
         zookeeper_hosts = get_default(self.config, 'zookeeper', 'hosts', None)
