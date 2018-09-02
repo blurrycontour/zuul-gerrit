@@ -318,3 +318,41 @@ following statsd events:
   * ``zuul.tenant.mytenant.pipeline.gate.project.example_com.myproject.master.job.myjob.SUCCESS`` +1
   * ``zuul.tenant.mytenant.pipeline.gate.project.example_com.myproject.master.job.myjob.SUCCESS``  40 seconds
   * ``zuul.tenant.mytenant.pipeline.gate.all_jobs`` +1
+
+
+.. _prometheus:
+
+Prometheus monitoring
+---------------------
+
+Zuul comes with support to start a prometheus metric server to be added as
+prometheus's target.
+
+Configuration
+~~~~~~~~~~~~~
+
+Prometheus support uses the ``prometheus_client`` python module. Note that support
+is optional and Zuul will starts without the prometheus python module present.
+
+Configuration is in the :attr:`prometheus_port` and :attr:`prometheus_addr`
+per services parameter of ``zuul.conf``.
+
+Metrics
+~~~~~~~
+
+These metrics are exposed by default:
+
+.. stat:: process_virtual_memory_bytes
+   :type: gauge
+
+.. stat:: process_resident_memory_bytes
+   :type: gauge
+
+.. stat:: process_open_fds
+   :type: gauge
+
+.. stat:: process_start_time_seconds
+   :type: gauge
+
+.. stat:: process_cpu_seconds_total
+   :type: counter

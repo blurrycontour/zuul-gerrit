@@ -29,6 +29,7 @@ import sys
 import traceback
 import threading
 
+
 yappi = extras.try_import('yappi')
 objgraph = extras.try_import('objgraph')
 
@@ -39,6 +40,7 @@ pid_file_module = extras.try_imports(['daemon.pidlockfile', 'daemon.pidfile'])
 from zuul.ansible import logconfig
 import zuul.lib.connections
 from zuul.lib.config import get_default
+from zuul.lib.prometheus import prometheus_client
 
 
 def stack_dump_handler(signum, frame):
@@ -183,6 +185,18 @@ class ZuulDaemonApp(ZuulApp, metaclass=abc.ABCMeta):
         log.debug(
             "Configured logging: {version}".format(
                 version=zuul_version_info.release_string()))
+
+    def setup_prometheus(
+            self,
+            section,
+            addr_parameter='prometheus_addr',
+            port_parameter='prometheus_port'):
+        if self.config.has_option(section, port_parameter):
+            if not prometheus_client:
+                raise RuntimeError("prometheus_client library is missing.")
+            addr = get_default(self.config, section, addr_parameter, '0.0.0.0')
+            port = int(self.config.get(section, port_parameter))
+            prometheus_client.start_http_server(port, addr)
 
     def main(self):
         self.parseArguments()
