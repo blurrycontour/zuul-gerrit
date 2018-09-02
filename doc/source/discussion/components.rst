@@ -392,6 +392,17 @@ The following sections of ``zuul.conf`` are used by the scheduler:
       If a value higher than ``max_hold_expiration`` is supplied during
       hold request creation, it will be lowered to this value.
 
+   .. attr:: prometheus_port
+
+      Set a TCP port to start the prometheus metrics client.
+
+   .. attr:: prometheus_addr
+      :default: 0.0.0.0
+
+      The IPv4 addr to listen for prometheus metrics poll.
+      To use IPv6, python>3.8 is required `issue24209 <https://bugs.python.org/issue24209>`_.
+
+
 Operation
 ~~~~~~~~~
 

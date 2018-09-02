@@ -65,6 +65,7 @@ from git.exc import NoSuchPathError
 from git.util import IterableList
 import yaml
 import paramiko
+import prometheus_client.exposition
 
 from zuul.driver.sql.sqlconnection import DatabaseSession
 from zuul.model import Change
@@ -866,6 +867,25 @@ class FakeGerritChange(object):
 
     def setReported(self):
         self.reported += 1
+
+
+class PrometheusServer(object):
+    def start(self):
+        app = prometheus_client.make_wsgi_app(prometheus_client.REGISTRY)
+        self.httpd = prometheus_client.exposition.make_server(
+            "0.0.0.0",
+            0,
+            app,
+            prometheus_client.exposition.ThreadingWSGIServer,
+            handler_class=prometheus_client.exposition._SilentHandler)
+        self.port = self.httpd.socket.getsockname()[1]
+        self.thread = threading.Thread(target=self.httpd.serve_forever)
+        self.thread.daemon = True
+        self.thread.start()
+
+    def stop(self):
+        self.httpd.shutdown()
+        self.thread.join()
 
 
 class GerritWebServer(object):
@@ -4156,6 +4176,10 @@ class ZuulTestCase(BaseTestCase):
         server that all of the Zuul components in this test use to
         communicate with each other.
 
+    :ivar PrometheusServer prometheus_server: An instance of
+        :py:class: ~test.base.PrometheusServer` which is the Prometheus
+        metrics endpoint.
+
     :ivar RecordingExecutorServer executor_server: An instance of
         :py:class:`~tests.base.RecordingExecutorServer` which is the
         Ansible execute server used to run jobs for this test.
@@ -4279,6 +4303,8 @@ class ZuulTestCase(BaseTestCase):
         self.statsd.start()
 
         self.gearman_server = FakeGearmanServer(self.use_ssl)
+        self.prometheus_server = PrometheusServer()
+        self.prometheus_server.start()
 
         self.config.set('gearman', 'port', str(self.gearman_server.port))
         self.log.info("Gearman server on port %s" %
@@ -4673,6 +4699,7 @@ class ZuulTestCase(BaseTestCase):
         self.statsd.join()
         self.rpcclient.shutdown()
         self.gearman_server.shutdown()
+        self.prometheus_server.stop()
         self.fake_nodepool.stop()
         self.zk_client.disconnect()
         self.printHistory()
