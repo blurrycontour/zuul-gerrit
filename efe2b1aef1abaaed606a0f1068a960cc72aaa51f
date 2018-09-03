@@ -16,6 +16,24 @@
       "revId": "efe2b1aef1abaaed606a0f1068a960cc72aaa51f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_0661b839",
+        "filename": "tests/unit/test_gerrit.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 27719
+      },
+      "writtenOn": "2018-09-03T07:40:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f79a3b5_863dc82d",
+      "revId": "efe2b1aef1abaaed606a0f1068a960cc72aaa51f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
