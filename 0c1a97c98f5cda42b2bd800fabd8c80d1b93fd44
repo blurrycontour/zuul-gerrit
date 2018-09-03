@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_f823fba5",
+        "filename": "zuul/lib/config.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2018-09-03T00:52:41Z",
+      "side": 1,
+      "message": "Be nice to document this function while we\u0027re here",
+      "revId": "0c1a97c98f5cda42b2bd800fabd8c80d1b93fd44",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
