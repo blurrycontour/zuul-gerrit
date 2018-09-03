@@ -16,6 +16,23 @@
       "revId": "2aa79ca93f82b1a64697ece6d7ad3957001fcd76",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_0fbea8d3",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-09-03T12:56:16Z",
+      "side": 1,
+      "message": "(nit) this log line should go into _createSSHKey itself",
+      "revId": "2aa79ca93f82b1a64697ece6d7ad3957001fcd76",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
