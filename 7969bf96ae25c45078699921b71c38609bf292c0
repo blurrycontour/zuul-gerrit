@@ -76,6 +76,29 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_f9e77a45",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-09-03T11:23:26Z",
+      "side": 1,
+      "message": "I think this is a bug as self.parent is neither a getter nor a callable. We probably should just do:\n\n  if self.parent:\n    self.parent.verifyAndUpgrade(root)\n\nSince this case cannot be hit in version 1 I think fixing this in a followup is fine.",
+      "range": {
+        "startLine": 47,
+        "startChar": 21,
+        "endLine": 47,
+        "endChar": 34
+      },
+      "revId": "7969bf96ae25c45078699921b71c38609bf292c0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_1a35a0db",
         "filename": "zuul/lib/keystorage.py",
         "patchSetId": 5
