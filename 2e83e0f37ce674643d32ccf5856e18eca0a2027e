@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_c682e000",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 27719
+      },
+      "writtenOn": "2018-09-03T07:22:31Z",
+      "side": 1,
+      "message": "Will do",
+      "parentUuid": "3f79a3b5_607bc6f3",
+      "revId": "2e83e0f37ce674643d32ccf5856e18eca0a2027e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_008212c9",
         "filename": "zuul/driver/gerrit/gerritconnection.py",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2018-08-31T18:59:32Z",
       "side": 1,
       "message": "We could also use a regex for this:  \u0027^[\\x20-\\x7E\\x80-\\xFF]+$\u0027 (that includes making sure it\u0027s at least 1 char long) -- But, I like how readable the code above is, so, maybe just leave it as it is. :)",
+      "revId": "2e83e0f37ce674643d32ccf5856e18eca0a2027e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_66718c44",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 787,
+      "author": {
+        "id": 27719
+      },
+      "writtenOn": "2018-09-03T07:22:31Z",
+      "side": 1,
+      "message": "Well, refname_rules is actually something that shall not match, so I\u0027ll include it in the regex for the sake of speed but I will turn around the rule and choose a better name for the precompiled regex.",
+      "parentUuid": "3f79a3b5_008212c9",
       "revId": "2e83e0f37ce674643d32ccf5856e18eca0a2027e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
