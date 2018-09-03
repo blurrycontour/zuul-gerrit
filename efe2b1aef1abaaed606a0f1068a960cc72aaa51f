@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_863dc82d",
+        "filename": "tests/unit/test_gerrit.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-09-03T07:39:00Z",
+      "side": 1,
+      "message": "Could you reference \u0027man git-check-ref-format\u0027 here as well? Otherwise it\u0027s hard to follow these rules when reading only the test.",
+      "revId": "efe2b1aef1abaaed606a0f1068a960cc72aaa51f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
