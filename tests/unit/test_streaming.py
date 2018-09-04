@@ -107,6 +107,9 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
         self.streaming_data = ''
         self.test_streaming_event = threading.Event()
 
+        # on some systems this test may run longer than 30 seconds
+        self.wait_timeout = 60
+
     def stopStreamer(self):
         self.stop_streamer = True
 
