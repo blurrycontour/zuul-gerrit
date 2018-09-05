@@ -1018,6 +1018,48 @@ class TestGithubUnprotectedBranches(ZuulTestCase):
         # branch
         self.assertLess(old, new)
 
+    # This test verifies that a PR is considered in case it was created for
+    # a branch just has been set to protected before a tenant reconfiguration
+    # took place.
+    def test_reconfigure_on_pr_to_new_protected_branch(self):
+        self.create_branch('org/project2', 'release')
+
+        github = self.fake_github.getGithubClient()
+        repo = github.repo_from_project('org/project2')
+        repo._set_branch_protection('master', True)
+        repo._create_branch('release')
+        repo._create_branch('feature')
+
+        self.sched.reconfigure(self.config)
+        self.waitUntilSettled()
+
+        repo._set_branch_protection('release', True)
+
+        # self.sched.reconfigure(self.config)
+        # self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = True
+
+        A = self.fake_github.openFakePullRequest(
+            'org/project2', 'release', 'A')
+        self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertEqual('SUCCESS',
+                         self.getJobFromHistory('used-job').result)
+
+        job = self.getJobFromHistory('used-job')
+        zuulvars = job.parameters['zuul']
+        self.assertEqual(str(A.number), zuulvars['change'])
+        self.assertEqual(str(A.head_sha), zuulvars['patchset'])
+        self.assertEqual('release', zuulvars['branch'])
+
+        self.assertEqual(1, len(self.history))
+
 
 class TestGithubWebhook(ZuulTestCase):
     config_file = 'zuul-github-driver.conf'
