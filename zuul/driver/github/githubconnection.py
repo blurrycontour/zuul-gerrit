@@ -220,12 +220,20 @@ class GithubEventConnector(threading.Thread):
 
         if event:
             event.delivery = delivery
+            project = self.connection.source.getProject(event.project_name)
             if event.change_number:
-                project = self.connection.source.getProject(event.project_name)
                 self.connection._getChange(project,
                                            event.change_number,
                                            event.patch_number,
                                            refresh=True)
+
+            # If this event references a branch and we're excluding unprotected
+            # branches, we might need to check whether the branch is now
+            # protected.
+            if event.branch:
+                event.branch_protected = self._update_branch_protection_status(
+                    project, event.branch)
+
             event.project_hostname = self.connection.canonical_hostname
             self.connection.logEvent(event)
             self.connection.sched.addEvent(event)
@@ -278,10 +286,8 @@ class GithubEventConnector(threading.Thread):
             else:
                 # An updated branch can be protected or not so we have to ask
                 # GitHub whether it is.
-                b = self.connection.getBranch(event.project_name, event.branch)
-                event.branch_protected = b.get('protected')
-                self.connection.checkBranchCache(project, event.branch,
-                                                 event.branch_protected)
+                event.branch_protected = self._update_branch_protection_status(
+                    project, event.branch)
 
         return event
 
@@ -406,6 +412,12 @@ class GithubEventConnector(threading.Thread):
             # TODO(tobiash): it might be better to plumb in the installation id
             project = body.get('repository', {}).get('full_name')
             return self.connection.getUser(login, project)
+
+    def _update_branch_protection_status(self, project, branch):
+        b = self.connection.getBranch(project.name, branch)
+        branch_protected = b.get('protected')
+        self.connection.checkBranchCache(project, branch, branch_protected)
+        return branch_protected
 
     def run(self):
         while True:
