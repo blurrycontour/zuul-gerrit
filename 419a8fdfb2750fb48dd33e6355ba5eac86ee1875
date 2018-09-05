@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_9a5cff7d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-09-05T17:58:08Z",
+      "side": 1,
+      "message": "s/expose/exposes/",
+      "revId": "419a8fdfb2750fb48dd33e6355ba5eac86ee1875",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_3a55ab50",
+        "filename": "doc/source/admin/monitoring.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-09-05T17:58:08Z",
+      "side": 1,
+      "message": "s/starts/start/",
+      "revId": "419a8fdfb2750fb48dd33e6355ba5eac86ee1875",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_5a52e768",
+        "filename": "doc/source/admin/monitoring.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-09-05T17:58:08Z",
+      "side": 1,
+      "message": "Is this important, since it\u0027s in requirements.txt?",
+      "revId": "419a8fdfb2750fb48dd33e6355ba5eac86ee1875",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_fa4ad3aa",
+        "filename": "etc/zuul.conf-sample",
+        "patchSetId": 4
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-09-05T17:58:08Z",
+      "side": 1,
+      "message": "can we please use ::, it\u0027s 2018",
+      "revId": "419a8fdfb2750fb48dd33e6355ba5eac86ee1875",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_1a48efb0",
+        "filename": "tests/unit/test_monitoring.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-09-05T17:58:08Z",
+      "side": 1,
+      "message": "Shouldn\u0027t we call this file test_prometheus?",
+      "revId": "419a8fdfb2750fb48dd33e6355ba5eac86ee1875",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_bac69b15",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-09-05T17:58:08Z",
+      "side": 1,
+      "message": "Why are we just try_import\u0027ing? if we have it in requirements.txt, can\u0027t we expect it to be present?",
+      "revId": "419a8fdfb2750fb48dd33e6355ba5eac86ee1875",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
