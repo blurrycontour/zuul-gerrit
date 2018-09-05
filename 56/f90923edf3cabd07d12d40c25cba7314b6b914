@@ -1,0 +1,13 @@
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Code-Review+2: David Shrewsbury <shrewsbury.dave@gmail.com>
+Code-Review+2: Paul Belanger <pabelanger@redhat.com>
+Code-Review+2: Clark Boylan <cboylan@sapwetik.org>
+Code-Review+2: Tobias Henkel <tobias.henkel@bmw.de>
+Code-Review+2: Joshua Hesketh <josh@nitrotech.org>
+Workflow+1: David Shrewsbury <shrewsbury.dave@gmail.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Wed, 05 Sep 2018 15:03:03 +0000
+Reviewed-on: https://review.openstack.org/597711
+Project: openstack-infra/zuul
+Branch: refs/heads/master
