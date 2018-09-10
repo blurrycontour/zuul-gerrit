@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_54e58c3d",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1038,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-09-10T07:17:35Z",
+      "side": 1,
+      "message": "Left over debugging comments? Should definitely remove them before this lands as they\u0027re a bit confusing.",
+      "revId": "b4bb42e54d765a9ada3bef0c74d02deb0b6e2e05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
