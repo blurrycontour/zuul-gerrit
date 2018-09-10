@@ -340,7 +340,7 @@ import LineTImage from '../images/line-t.png';
           .addClass('col-xs-8')
           .append($projectSpan, $changeProgressRow)
 
-        let remainingTime = this.time(change.remaining_time, true)
+        let remainingTime = this.time(change.remaining_time, 'undefined')
         let enqueueTime = this.enqueueTime(change.enqueue_time)
         let $remainingTime = $('<small />').addClass('time')
           .attr('title', 'Remaining Time').html(remainingTime)
