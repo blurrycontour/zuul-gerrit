@@ -16,6 +16,24 @@
       "revId": "b4bb42e54d765a9ada3bef0c74d02deb0b6e2e05",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_94bb240e",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1038,
+      "author": {
+        "id": 27719
+      },
+      "writtenOn": "2018-09-10T07:20:56Z",
+      "side": 1,
+      "message": "Ah, sry. Maybe I should just comment that it\u0027s these lines that are now superfluous.",
+      "parentUuid": "3f79a3b5_54e58c3d",
+      "revId": "b4bb42e54d765a9ada3bef0c74d02deb0b6e2e05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
