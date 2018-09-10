@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_ceaeeee5",
+        "filename": "requirements.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-09-10T05:45:46Z",
+      "side": 1,
+      "message": "shouldn\u0027t this be \u0027cherrypy\u003e\u003d18.0.1\u0027?",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 8
+      },
+      "revId": "b901ed9ec1e22113069509724c8556b849ed3746",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
