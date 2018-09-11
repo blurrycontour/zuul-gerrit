@@ -22,6 +22,23 @@
       "revId": "b901ed9ec1e22113069509724c8556b849ed3746",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_2c78a78d",
+        "filename": "requirements.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-09-11T17:37:13Z",
+      "side": 1,
+      "message": "Since things work fine with earlier releases, perhaps \u0027cherrypy!\u003d18.0.0\u0027 ?",
+      "revId": "b901ed9ec1e22113069509724c8556b849ed3746",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
