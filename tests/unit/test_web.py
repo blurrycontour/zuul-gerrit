@@ -13,6 +13,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import datetime
 import json
 import os
 import urllib.parse
@@ -102,6 +103,7 @@ class TestWeb(BaseTestWeb):
         self.waitUntilSettled()
 
         resp = self.get_url("api/tenant/tenant-one/status")
+        now = datetime.datetime.utcnow()
         self.assertIn('Content-Length', resp.headers)
         self.assertIn('Content-Type', resp.headers)
         self.assertEqual(
@@ -109,6 +111,9 @@ class TestWeb(BaseTestWeb):
         self.assertIn('Access-Control-Allow-Origin', resp.headers)
         self.assertIn('Cache-Control', resp.headers)
         self.assertIn('Last-Modified', resp.headers)
+        self.assertEqual(
+            now.strftime('%a, %d %b %Y %X GMT'),
+            resp.headers['Last-Modified'])
 
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
