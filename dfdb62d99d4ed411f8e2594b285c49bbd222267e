@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_3e8e8d79",
+        "filename": "doc/source/admin/ubuntu_bionic_setup.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-09-11T16:32:29Z",
+      "side": 1,
+      "message": "Not an ubuntu package",
+      "range": {
+        "startLine": 40,
+        "startChar": 31,
+        "endLine": 40,
+        "endChar": 46
+      },
+      "revId": "dfdb62d99d4ed411f8e2594b285c49bbd222267e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
