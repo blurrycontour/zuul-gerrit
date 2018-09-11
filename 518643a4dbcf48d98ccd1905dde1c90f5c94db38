@@ -42,6 +42,23 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_b5eb9376",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-09-11T21:35:23Z",
+      "side": 1,
+      "message": "That isn\u0027t possible because we have limit\u003d\u003d1. I kind of wonder why uuid isn\u0027t a unique key though. It\u0027s possible I haven\u0027t thought that through.",
+      "revId": "518643a4dbcf48d98ccd1905dde1c90f5c94db38",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_ee2ec041",
         "filename": "zuul/web/__init__.py",
         "patchSetId": 2
@@ -71,6 +88,23 @@
       "side": 1,
       "message": "Actually, a global route would need to check each tenant as they may have different sql connections, so that\u0027s probably not worth it.",
       "parentUuid": "3f79a3b5_ee2ec041",
+      "revId": "518643a4dbcf48d98ccd1905dde1c90f5c94db38",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_5500ff35",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 522,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-09-11T21:35:23Z",
+      "side": 1,
+      "message": "That is handled by the \"whitelabel\" configuration anyway.",
       "revId": "518643a4dbcf48d98ccd1905dde1c90f5c94db38",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
