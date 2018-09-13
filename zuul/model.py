@@ -2499,6 +2499,9 @@ class Ref(object):
         self.oldrev = None
         self.newrev = None
         self.files = []
+        # Flag indicating if the list of changed files is complete.
+        # Some drivers might not be able to get the complete list.
+        self.incomplete_files = False
 
     def _id(self):
         return self.newrev
@@ -2537,6 +2540,10 @@ class Ref(object):
         return set()
 
     def updatesConfig(self):
+        # Since we don't know if the config was updated it's safer
+        # to assume that this is the case.
+        if self.incomplete_files:
+            return True
         if 'zuul.yaml' in self.files or '.zuul.yaml' in self.files or \
            [True for fn in self.files if fn.startswith("zuul.d/") or
             fn.startswith(".zuul.d/")]:

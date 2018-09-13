@@ -870,6 +870,11 @@ class GithubConnection(BaseConnection):
         change.ref = "refs/pull/%s/head" % change.number
         change.branch = change.pr.get('base').get('ref')
         change.files = change.pr.get('files')
+        # Github's pull requests files API only returns at max
+        # the first 300 changed files of a PR in alphabetical order.
+        # https://developer.github.com/v3/pulls/#list-pull-requests-files
+        if len(change.files) < change.pr.get('changed_files', 0):
+            change.incomplete_files = True
         change.title = change.pr.get('title')
         change.open = change.pr.get('state') == 'open'
         change.is_merged = change.pr.get('merged')
