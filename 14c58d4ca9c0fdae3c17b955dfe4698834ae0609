@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_e6812ea2",
+        "filename": "doc/source/conf.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-09-14T05:22:44Z",
+      "side": 1,
+      "message": "should we remove this block then?",
+      "range": {
+        "startLine": 122,
+        "startChar": 0,
+        "endLine": 124,
+        "endChar": 31
+      },
+      "revId": "14c58d4ca9c0fdae3c17b955dfe4698834ae0609",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
