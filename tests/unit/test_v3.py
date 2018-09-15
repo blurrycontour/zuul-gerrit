@@ -4164,6 +4164,16 @@ class TestNoLog(AnsibleZuulTestCase):
         self.assertNotIn('my-very-secret-password-1', text_log)
         self.assertNotIn('my-very-secret-password-2', text_log)
 
+        # The result must be retry limit because jobs with unreachable nodes
+        # will be retried.
+        self.assertIn('RETRY_LIMIT', A.messages[0])
+        self.assertHistory([
+            dict(name='no-log-unreachable', result=None, changes='1,1'),
+        ])
+        unreachable_log = self._get_file(self.history[0],
+                                         'work/logs/job-output.unreachable')
+        self.assertEqual('fake\n', unreachable_log)
+
 
 class TestJobPause(AnsibleZuulTestCase):
     tenant_config_file = 'config/job-pause/main.yaml'
