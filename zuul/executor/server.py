@@ -1147,6 +1147,8 @@ class AnsibleJob(object):
                 playbook, post_timeout, success, phase='post', index=index)
             if post_status == self.RESULT_ABORTED:
                 return 'ABORTED'
+            if post_status == self.RESULT_UNREACHABLE:
+                return None
             if post_status != self.RESULT_NORMAL or post_code != 0:
                 success = False
                 # If we encountered a pre-failure, that takes
