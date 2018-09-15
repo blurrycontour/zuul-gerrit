@@ -393,6 +393,8 @@ class JobDir(object):
         self.pre_playbooks = []
         self.post_playbooks = []
         self.job_output_file = os.path.join(self.log_root, 'job-output.txt')
+        self.job_unreachable_file = os.path.join(self.log_root,
+                                                 'job-output.unreachable')
         # We need to create the job-output.txt upfront in order to close the
         # gap between url reporting and ansible creating the file. Otherwise
         # there is a period of time where the user can click on the live log
@@ -1790,6 +1792,13 @@ class AnsibleJob(object):
                             now=datetime.datetime.now(),
                             line=line.decode('utf-8').rstrip()))
         elif ret == 4:
+            # Note: Unlike documented ansible wrongly returns 4 on unreachable
+            # too so we have the zuul_unreachable callback module that creates
+            # the file job-output.unreachable in case there were unreachable
+            # nodes.
+            if os.path.exists(self.jobdir.job_unreachable_file):
+                return (self.RESULT_UNREACHABLE, None)
+
             # Ansible could not parse the yaml.
             self.log.debug("Ansible parse error")
             # TODO(mordred) If/when we rework use of logger in ansible-playbook
