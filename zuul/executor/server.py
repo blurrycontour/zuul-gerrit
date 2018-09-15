@@ -393,6 +393,8 @@ class JobDir(object):
         self.pre_playbooks = []
         self.post_playbooks = []
         self.job_output_file = os.path.join(self.log_root, 'job-output.txt')
+        self.job_unreachable_file = os.path.join(self.log_root,
+                                                 'job-output.unreachable')
         # We need to create the job-output.txt upfront in order to close the
         # gap between url reporting and ansible creating the file. Otherwise
         # there is a period of time where the user can click on the live log
@@ -1775,7 +1777,12 @@ class AnsibleJob(object):
 
         if timeout and watchdog.timed_out:
             return (self.RESULT_TIMED_OUT, None)
-        if ret == 3:
+        # Note: Unlike documented ansible currently wrongly returns 4 on
+        # unreachable so we have the zuul_unreachable callback module that
+        # creates the file job-output.unreachable in case there were
+        # unreachable nodes. This can be removed once ansible returns a
+        # distinct value for unreachable.
+        if ret == 3 or os.path.exists(self.jobdir.job_unreachable_file):
             # AnsibleHostUnreachable: We had a network issue connecting to
             # our zuul-worker.
             return (self.RESULT_UNREACHABLE, None)
