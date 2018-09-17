@@ -624,9 +624,8 @@ To start the executor, run ``zuul-executor``.
 There are several commands which can be run to control the executor's
 behavior once it is running.
 
-To stop the executor immediately, aborting all jobs (they may be
-relaunched according to their retry policy), run ``zuul-executor
-stop``.
+To stop the executor immediately, run ``zuul-executor stop``. Jobs that were
+running on the stopped executor will be rescheduled on other executors.
 
 To request that the executor stop executing new jobs,
 run ``zuul-executor pause``. It is adviced to do so and wait for
