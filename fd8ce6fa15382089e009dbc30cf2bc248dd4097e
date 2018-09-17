@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_e4db3f1e",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1785,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-09-17T11:52:36Z",
+      "side": 1,
+      "message": "Should we have\n  if ret \u003d\u003d 3 or (ret \u003d\u003d 4 and os.path.exists(self.jobdir.job_unreachable_file)):",
+      "range": {
+        "startLine": 1785,
+        "startChar": 23,
+        "endLine": 1785,
+        "endChar": 25
+      },
+      "revId": "fd8ce6fa15382089e009dbc30cf2bc248dd4097e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
