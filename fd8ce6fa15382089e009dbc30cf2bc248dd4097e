@@ -46,6 +46,30 @@
       "revId": "fd8ce6fa15382089e009dbc30cf2bc248dd4097e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_e461ff12",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1785,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-09-17T12:03:25Z",
+      "side": 1,
+      "message": "I think we should keep 3 at a minimum because that is the documented expected result and also what we\u0027ll roll back to when the workaround is no longer needed.\n\nThe suggestion of adding \u0027ret \u003d\u003d 4\u0027 is to ensure that the workaround path is hit how we expect it to be and there hasn\u0027t been some other way the job_unreachable_file has been created. Granted, if it has been created we\u0027d likely want to return this result anyway so it\u0027s still mostly correct, but I was being more explicit about how the workaround works.",
+      "parentUuid": "3f79a3b5_244a97ac",
+      "range": {
+        "startLine": 1785,
+        "startChar": 23,
+        "endLine": 1785,
+        "endChar": 25
+      },
+      "revId": "fd8ce6fa15382089e009dbc30cf2bc248dd4097e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
