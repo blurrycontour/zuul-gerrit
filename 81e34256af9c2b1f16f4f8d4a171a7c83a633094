@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_0a9afdc3",
+        "filename": "zuul/ansible/library/zuul_return.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-09-17T17:28:02Z",
+      "side": 1,
+      "message": "nit: The return is unneccessary when doing the merge in-place.",
+      "range": {
+        "startLine": 36,
+        "startChar": 4,
+        "endLine": 36,
+        "endChar": 17
+      },
+      "revId": "81e34256af9c2b1f16f4f8d4a171a7c83a633094",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
