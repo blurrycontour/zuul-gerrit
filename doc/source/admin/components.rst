@@ -628,6 +628,9 @@ To stop the executor immediately, aborting all jobs (they may be
 relaunched according to their retry policy), run ``zuul-executor
 stop``.
 
+It is safe, although not free, to restart executors. If an executor goes
+away the scheduler will reschedule the jobs it was originally running.
+
 To request that the executor stop executing new jobs,
 run ``zuul-executor pause``. It is adviced to do so and wait for
 all jobs to finish before stopping the executor process.
