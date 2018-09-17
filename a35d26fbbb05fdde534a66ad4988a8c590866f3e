@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_24b37750",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1780,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-09-17T11:32:16Z",
+      "side": 1,
+      "message": "(nit) could put this logic here (as an \u0027or\u0027) as this is the path the work-around is meant to execute",
+      "revId": "a35d26fbbb05fdde534a66ad4988a8c590866f3e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
