@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_e5401209",
+        "filename": "tests/fixtures/config/data-return/git/common-config/playbooks/data-return-inventory.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-09-17T18:04:46Z",
+      "side": 1,
+      "message": "++ for using zuul_return as this is clearly an api to influence child jobs (and the only api in zuul to influence child jobs is zuul_return)",
+      "parentUuid": "3f79a3b5_332f2d40",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 29
+      },
+      "revId": "cfebe3c6ce60addc7890b8d1a0e73ea6588cd009",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_715f28e5",
         "filename": "zuul/ansible/actiongeneral/add_host.py",
         "patchSetId": 5
