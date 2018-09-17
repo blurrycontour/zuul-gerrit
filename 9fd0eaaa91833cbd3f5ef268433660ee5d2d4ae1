@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_757597cb",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 628,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2018-09-17T14:00:39Z",
+      "side": 1,
+      "message": "What is this retry policy ? https://zuul-ci.org/docs/zuul/user/config.html#attr-job.attempts ?",
+      "range": {
+        "startLine": 628,
+        "startChar": 24,
+        "endLine": 628,
+        "endChar": 42
+      },
+      "revId": "9fd0eaaa91833cbd3f5ef268433660ee5d2d4ae1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
