@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_c3d139fa",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-09-18T16:10:16Z",
+      "side": 1,
+      "message": "Not sure I love just shoving this off to \"whatever HTTP service\". I\u0027d like the built-in http service to handle auth directly if possible. It\u0027s fine if we want the offload to take it over, but the first priority should be that zuul-web can service this feature.",
+      "revId": "a41431871c095aa5673b9cfbac9e58e686dbe486",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_6304e57e",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-09-18T16:10:16Z",
+      "side": 1,
+      "message": "Seems like having users in two places is asking for confusion. I don\u0027t have a great suggestion yet, other than perhaps having the ability to have parent/child tenant relationships and make a single \"admin\" tenant that owns all the others. But I really dislike having these two things entirely indpendent in entirely different formats.",
+      "revId": "a41431871c095aa5673b9cfbac9e58e686dbe486",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_83090196",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-09-18T16:10:16Z",
+      "side": 1,
+      "message": "You win the internet today.",
+      "revId": "a41431871c095aa5673b9cfbac9e58e686dbe486",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_23fa6d76",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-09-18T16:10:16Z",
+      "side": 1,
+      "message": "I am not OK with that assumption. It complicates peoples deployment significantly and it will create a massively divergent set of zuul deployments all that have different auth types. We need to pick one, and implement it in Zuul. If people want to override with apache modules, that\u0027s fine.",
+      "revId": "a41431871c095aa5673b9cfbac9e58e686dbe486",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
