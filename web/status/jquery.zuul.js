@@ -429,7 +429,7 @@ import LineTImage from '../images/line-t.png';
           .attr('title', iconTitle)
           .css('display', 'block')
 
-        return $icon
+        return {$icon, iconTitle}
       },
 
       change_with_status_tree: function (change, changeQueue) {
@@ -452,8 +452,9 @@ import LineTImage from '../images/line-t.png';
           }
 
           if (i === change._tree_index) {
-            $treeCell.append(
-              this.change_status_icon(change))
+            let {icon, iconTitle} = this.change_status_icon(change)
+            $changeRow.attr('title', iconTitle)
+            $treeCell.append(icon)
           }
           if (change._tree_branches.indexOf(i) !== -1) {
             let $image = $('<img />')
