@@ -1,0 +1,79 @@
+#!/usr/bin/python3
+
+import argparse
+import os
+import shutil
+import subprocess
+import tempfile
+import uuid
+import yaml
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--required-project', nargs='*',
+                        help="required-projects simulator")
+    parser.add_argument('--keep', action='store_true', default=False)
+    parser.add_argument('ansible_args', nargs=argparse.REMAINDER)
+
+    args = parser.parse_args()
+
+    # Write fake zuul var
+    main_project = args.required_project[0]
+    main_project_bn = os.path.basename(main_project)
+    src_dir = os.path.join(os.path.basename(os.getcwd()), main_project_bn)
+    first_project = {
+        "src_dir": src_dir,
+    }
+    projects = {}
+    role_paths = []
+    for project in args.required_project:
+        project_bn = os.path.basename(project)
+        src_dir = os.path.join(os.getcwd(), project_bn)
+        projects[project] = {
+            "src_dir": os.path.join(os.path.basename(os.getcwd()), project_bn)
+        }
+        role_paths.append(os.path.join(src_dir, 'roles'))
+
+    work_root = tempfile.mkdtemp()
+    zuul = dict(zuul={
+        "pipeline": "fake",
+        "build": str(uuid.uuid4()).replace('-',''),
+        "project": first_project,
+        "projects": projects,
+        "timeout": 900,
+        "executor": {
+            "work_root": work_root,
+            "src_root": os.getcwd(),
+        },
+    })
+
+    print("zuul = %s" % zuul)
+
+    try:
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.yaml') as zuul_f:
+            data = yaml.safe_dump(zuul).encode('utf-8')
+            zuul_f.write(data)
+
+        # Run playbook
+        cmd = [
+            'ansible-playbook',
+        ]
+        cmd.extend(args.ansible_args)
+        cmd.extend(('-e', '@%s' % zuul_f.name))
+        cmd.remove('--')
+        env = os.environ.copy()
+        env['ANSIBLE_ROLES_PATH'] = ':'.join(role_paths)
+        print("ANSIBLE_ROLES_PATH=%s" % env['ANSIBLE_ROLES_PATH'])
+        print("Running %s" % ' '.join(cmd))
+        subprocess.call(cmd, env=env)
+    finally:
+        if not args.keep:
+            os.unlink(zuul_f.name)
+            shutil.rmtree(work_root)
+        else:
+            print("kept %s" % zuul_f.name)
+            print("kept %s" % work_root)
+
+if __name__ == '__main__':
+    main()
