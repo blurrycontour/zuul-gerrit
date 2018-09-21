@@ -14,6 +14,8 @@
 
 import StatusPage from './pages/Status'
 import ChangeStatusPage from './pages/ChangeStatus'
+import ProjectPage from './pages/Project'
+import ProjectsPage from './pages/Projects'
 import JobPage from './pages/Job'
 import JobsPage from './pages/Jobs'
 import BuildPage from './pages/Build'
@@ -33,6 +35,11 @@ const routes = () => [
     component: StatusPage
   },
   {
+    title: 'Projects',
+    to: '/projects',
+    component: ProjectsPage
+  },
+  {
     title: 'Jobs',
     to: '/jobs',
     component: JobsPage
@@ -49,6 +56,10 @@ const routes = () => [
   {
     to: '/stream/:buildId',
     component: StreamPage
+  },
+  {
+    to: '/project/:projectName*',
+    component: ProjectPage
   },
   {
     to: '/job/:jobName',
