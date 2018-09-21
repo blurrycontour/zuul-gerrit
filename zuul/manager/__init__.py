@@ -83,6 +83,9 @@ class PipelineManager(object):
                 self.log.debug("Event %s for change %s matched %s "
                                "in pipeline %s" % (event, change, ef, self))
                 return True
+            else:
+                self.log.debug(
+                    'ef: %s not match (%s, %s)' % (ef, event, change))
         return False
 
     def isChangeAlreadyInPipeline(self, change):
