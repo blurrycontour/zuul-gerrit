@@ -380,6 +380,7 @@ class TestWeb(BaseTestWeb):
             {'name': 'check'},
             {'name': 'gate'},
             {'name': 'post'},
+            {'name': 'merge-check'},
         ]
         self.assertEqual(expected_list, data)
 
@@ -402,6 +403,34 @@ class TestWeb(BaseTestWeb):
         # can we fetch project details
         data = self.get_url(
             'api/tenant/tenant-one/project/org/project1').json()
+
+        noop_job = {
+            'abstract': False,
+            'attempts': 3,
+            'branches': [],
+            'dependencies': [],
+            'description': None,
+            'files': [],
+            'final': False,
+            'implied_branch': None,
+            'irrelevant_files': [],
+            'name': 'noop',
+            'parent': 'base',
+            'post_review': None,
+            'protected': None,
+            'required_projects': [],
+            'roles': [],
+            'semaphore': None,
+            'source_context': {
+                'branch': 'master',
+                'path': 'zuul.yaml',
+                'project': 'common-config'
+            },
+            'timeout': None,
+            'variables': {},
+            'variant_description': '',
+            'voting': True
+        }
 
         jobs = [[{'abstract': False,
                   'attempts': 3,
@@ -506,7 +535,7 @@ class TestWeb(BaseTestWeb):
                 'connection_name': 'gerrit',
                 'name': 'org/project1',
                 'configs': [{
-                    'templates': [],
+                    'templates': ['system-required'],
                     'default_branch': 'master',
                     'merge_mode': 'merge-resolve',
                     'pipelines': [{
@@ -518,6 +547,16 @@ class TestWeb(BaseTestWeb):
                         'queue_name': 'integrated',
                         'jobs': jobs,
                     }]
+                }, {
+                    # This is the system-required template...
+                    'templates': [],
+                    'default_branch': None,
+                    'merge_mode': None,
+                    'pipelines': [{
+                        'name': 'merge-check',
+                        'queue_name': None,
+                        'jobs': [[noop_job]]
+                    }],
                 }]
             }, data)
 

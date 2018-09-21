@@ -41,6 +41,19 @@
           ref: ^(?!refs/).*$
     precedence: low
 
+- pipeline:
+    name: merge-check
+    manager: independent
+    ignore-dependencies: true
+    precedence: low
+    trigger: {}
+
+- project-template:
+    name: system-required
+    merge-check:
+      jobs:
+        - noop
+
 - job:
     name: base
     parent: null
@@ -126,6 +139,8 @@
 
 - project:
     name: org/project1
+    templates:
+      - system-required
     check:
       jobs:
         - project-merge
