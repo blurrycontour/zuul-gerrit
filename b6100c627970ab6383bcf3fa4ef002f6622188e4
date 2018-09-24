@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_9cd1f0cf",
+        "filename": "zuul/driver/smtp/smtpconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-09-24T18:04:02Z",
+      "side": 1,
+      "message": "The old version returns strings instead of logging. This change isn\u0027t mentioned in the commit message and doesn\u0027t really make sense to me. Is there a reason you changed it?",
+      "revId": "b6100c627970ab6383bcf3fa4ef002f6622188e4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
