@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_94668bbb",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 632,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2018-09-25T20:11:38Z",
+      "side": 1,
+      "message": "should be \"advised\" as a minimal change ...\n\nBut IMO would probably be a bit more verbose here.\n\n1) move this *before* the stop discussion above; so that the flow is that you read this before the discussion of hard stop.\n\n2) say something like \"under normal circumstances it is best to pause and wait for all currently running jobs to finish before stopping the executor\".  Then the paragraph above follows on with the more aggressive approach.",
+      "range": {
+        "startLine": 632,
+        "startChar": 35,
+        "endLine": 632,
+        "endChar": 42
+      },
+      "revId": "b26ffa0b7cb00403deb60e224d8319f9d22b23e9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
