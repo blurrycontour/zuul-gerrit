@@ -16,6 +16,24 @@
       "revId": "b6100c627970ab6383bcf3fa4ef002f6622188e4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_7ff15cde",
+        "filename": "zuul/driver/smtp/smtpconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 27719
+      },
+      "writtenOn": "2018-09-25T06:35:14Z",
+      "side": 1,
+      "message": "I changed this because returning a string (sometimes...) didn\u0027t really make sense to me plus the returned value wasn\u0027t even used at the call site, so failed send attempts weren\u0027t visible at all. I changed this behavior so that an error is now logged as a warning, so we\u0027re not relying on the caller for the error handling.\n\nI will add this to the commit message, together with this explanation.",
+      "parentUuid": "3f79a3b5_9cd1f0cf",
+      "revId": "b6100c627970ab6383bcf3fa4ef002f6622188e4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
