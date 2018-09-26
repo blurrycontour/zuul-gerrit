@@ -133,3 +133,15 @@ Example::
 
 This command validates the tenant configuration schema. It exits '-1' in
 case of errors detected.
+
+create-web-token
+^^^^^^^^^^^^^^^^
+.. program-output:: zuul create-web-token --help
+
+Example::
+
+  zuul create-web-token --user gozer --tenant openstack --project project1 project2 --expires-in 3600
+
+This commands generates a bearer token (JWT) that can be used to allow third
+parties to perform administration tasks through Zuul's web API. The administration
+endpoints must be enabled in Zuul's configuration.

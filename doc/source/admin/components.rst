@@ -724,6 +724,7 @@ sections of ``zuul.conf`` are used by the web server:
       the algorithms supported by pyJWT, as listed here:
       https://pyjwt.readthedocs.io/en/latest/algorithms.html
 
+
 Operation
 ~~~~~~~~~
 
