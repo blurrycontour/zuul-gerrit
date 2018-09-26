@@ -15,9 +15,11 @@
 import os
 import sys
 import subprocess
+import time
 
 import configparser
 import fixtures
+import jwt
 
 from tests.base import BaseTestCase
 from tests.base import FIXTURE_DIR
@@ -61,3 +63,63 @@ class TestTenantValidationClient(BaseTestCase):
         self.assertIn(
             b"expected a dictionary for dictionary", out,
             "Expected error message not found")
+
+
+class TestWebTokenClient(TestTenantValidationClient):
+    config_file = 'zuul-web.conf'
+
+    def test_create_web_token(self):
+        # admin endpoints are not up
+        self.config.set(
+            'web', 'enable_admin_endpoints', False)
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             'create-web-token',
+             '--user', 'marshmallow_man',
+             '--tenant', 'tenant_one',
+             '--project', 'projectA', 'projectB'],
+            stdout=subprocess.PIPE)
+        out, _ = p.communicate()
+        self.assertEqual(p.returncode, 1, 'The command must exit 1')
+        # Test multiple projects
+        self.config.set(
+            'web', 'enable_admin_endpoints', True)
+        now = time.time()
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             'create-web-token',
+             '--user', 'marshmallow_man',
+             '--tenant', 'tenant_one',
+             '--project', 'projectA', 'projectB'],
+            stdout=subprocess.PIPE)
+        out, _ = p.communicate()
+        self.assertEqual(p.returncode, 0, 'The command must exit 0')
+        self.assertIn("Bearer ", out, out)
+        token = jwt.decode(out[len("Bearer "):],
+                           key='StayPuft',
+                           algorithm='HS256')
+        self.assertEqual('marshmallow_man', token.get('sub'))
+        self.assertEqual('Zuul CLI', token.get('iss'))
+        tenants = token.get('zuul.tenants', {})
+        self.assertTrue('tenant_one' in tenants, tenants)
+        for p in ['projectA', 'projectB']:
+            self.assertTrue(p in tenants['tenant_one'], tenants)
+        # allow one minute for the process to run
+        self.assertTrue(3600 <= int(token['exp']) - now < 3660,
+                        token['exp'])
+        # do not scope to projects, no user either
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             'create-web-token',
+             '--tenant', 'tenant_one'],
+            stdout=subprocess.PIPE)
+        out, _ = p.communicate()
+        self.assertEqual(p.returncode, 0, 'The command must exit 0')
+        self.assertIn("Bearer ", out, out)
+        token = jwt.decode(out[len("Bearer "):],
+                           key='StayPuft',
+                           algorithm='HS256')
+        self.assertEqual(None, token.get('sub'))
+        tenants = token.get('zuul.tenants', {})
+        self.assertTrue('tenant_one' in tenants, tenants)
+        self.assertEqual("*", tenants['tenant_one'], tenants)
