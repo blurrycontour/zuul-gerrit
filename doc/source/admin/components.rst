@@ -724,6 +724,12 @@ sections of ``zuul.conf`` are used by the web server:
       the algorithms supported by pyJWT, as listed here:
       https://pyjwt.readthedocs.io/en/latest/algorithms.html
 
+      .. attr:: JWTexpiry
+         :default: 1800
+
+      The duration in seconds for which a JWT is valid once generated. Defaults
+      to 30 minutes.
+
 Operation
 ~~~~~~~~~
 

@@ -42,6 +42,7 @@ status_url=https://zuul.example.com/status
 enable_admin_endpoints=False
 JWTsecret=NoDanaOnlyZuul
 JWTalgorithm=HS256
+JWTexpiry=1800
 
 [connection gerrit]
 driver=gerrit

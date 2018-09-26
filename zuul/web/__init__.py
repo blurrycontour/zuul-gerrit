@@ -781,7 +781,7 @@ class ZuulWeb(object):
                  static_path=None,
                  enable_admin_endpoints=False,
                  JWTsecret=None,
-                 JWTalgorithm=None):
+                 JWTalgorithm='HS256'):
         self.start_time = time.time()
         self.listen_address = listen_address
         self.listen_port = listen_port
@@ -792,7 +792,6 @@ class ZuulWeb(object):
         self.info = info
         self.static_path = os.path.abspath(static_path or STATIC_DIR)
         self.enable_admin_endpoints = enable_admin_endpoints
-        # TODO(mhu) For now, use HS256 (hardcoded) but this should be a setting
         self.JWTalgorithm = JWTalgorithm
         self.JWTsecret = JWTsecret
         # instanciate handlers

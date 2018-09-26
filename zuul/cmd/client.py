@@ -17,6 +17,7 @@
 import argparse
 import babel.dates
 import datetime
+import jwt
 import logging
 import prettytable
 import sys
@@ -159,6 +160,42 @@ class Client(zuul.cmd.ZuulApp):
             'tenant-conf-check',
             help='validate the tenant configuration')
         cmd_conf_check.set_defaults(func=self.validate)
+
+        cmd_create_jwt = subparsers.add_parser(
+            'create-web-token', help='create a JWT for the web API',
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+            description=textwrap.dedent('''\
+            Create a JWT (JSON Web Token) for the administration web API
+
+            Create a bearer token that can be used to access Zuul's
+            administration web API. This is typically used to delegate
+            privileged actions such as enqueueing and autoholding to
+            third parties, scoped to a single tenant or to specific projects
+            within this tenant.
+            The administration web API must be enabled.'''))
+        cmd_create_jwt.add_argument('--tenant', help='tenant name',
+                                    required=True)
+        cmd_create_jwt.add_argument('--project',
+                                    help=('project(s) name(s), omit or "*" '
+                                          'to scope JWT to all the projects '
+                                          'in the tenant'),
+                                    nargs='+',
+                                    default='[]',
+                                    required=False)
+        cmd_create_jwt.add_argument('--user',
+                                    help=('Optional user name. If set, it '
+                                          'allows traceability in ZuulWeb '
+                                          'logs.'),
+                                    default=None,
+                                    required=False)
+        default_expiry = get_default(self.config, 'web', 'JWTexpiry', 1800)
+        cmd_create_jwt.add_argument('--expires-in',
+                                    help=('Token validity duration in seconds '
+                                          '(default: %s)' % default_expiry),
+                                    type=int,
+                                    default=default_expiry,
+                                    required=False)
+        cmd_create_jwt.set_defaults(func=self.create_jwt)
 
         return parser
 
@@ -440,6 +477,37 @@ class Client(zuul.cmd.ZuulApp):
             err_code = 0
         except Exception as e:
             print("Error when validating tenants config")
+            print(e)
+            err_code = 1
+        finally:
+            sys.exit(err_code)
+
+    def create_jwt(self):
+        enabled = get_default(
+            self.config, 'web', 'enable_admin_endpoints', 'False')
+        if not enabled:
+            print("The admin Web API is not enabled.")
+            sys.exit(1)
+        key = get_default(
+            self.config, 'web', 'JWTsecret', '')
+        algorithm = get_default(
+            self.config, 'web', 'JWTalgorithm', '')
+        projects = self.args.project
+        if projects == []:
+            projects = '*'
+        authz = {'exp': time.time() + self.args.expires_in,
+                 'zuul.tenants': {self.args.tenant: projects},
+                 'iss': 'Zuul CLI'}
+        if self.args.user:
+            authz['sub'] = self.args.user
+        try:
+            token = jwt.encode(authz,
+                               key=key,
+                               algorithm=algorithm).decode('utf-8')
+            print("Bearer %s" % token)
+            err_code = 0
+        except Exception as e:
+            print("Error when generating JWT")
             print(e)
             err_code = 1
         finally:
