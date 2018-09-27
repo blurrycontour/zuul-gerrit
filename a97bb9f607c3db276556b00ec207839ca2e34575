@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_607666a6",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2018-09-27T08:08:45Z",
+      "side": 1,
+      "message": "Should we also add granularity about privileged tasks in the token like: zuul.actions: [\u0027enqueue\u0027, \u0027dequeue\u0027] ? It is handy and I guess not so complex to implement.",
+      "range": {
+        "startLine": 77,
+        "startChar": 52,
+        "endLine": 77,
+        "endChar": 70
+      },
+      "revId": "a97bb9f607c3db276556b00ec207839ca2e34575",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_a05b1e20",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2018-09-27T08:08:45Z",
+      "side": 1,
+      "message": "True",
+      "range": {
+        "startLine": 108,
+        "startChar": 25,
+        "endLine": 108,
+        "endChar": 30
+      },
+      "revId": "a97bb9f607c3db276556b00ec207839ca2e34575",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_80ff02aa",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2018-09-27T08:08:45Z",
+      "side": 1,
+      "message": "The zuul client mostly features actions that rely on the Zuul Gearman bus. I see its usage more dedicated to Zuul Operators that have Zuul cluster access. IMO having a zuul-web-client tool might be useful, especially if it can be installed via pip by Zuul users, to do such authorized privileged actions (+ secrets generation).",
+      "range": {
+        "startLine": 217,
+        "startChar": 0,
+        "endLine": 229,
+        "endChar": 25
+      },
+      "revId": "a97bb9f607c3db276556b00ec207839ca2e34575",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
