@@ -395,6 +395,18 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    def nodesets(self, tenant):
+        job = self.rpc.submitJob('zuul:nodeset_list', {'tenant': tenant})
+        ret = json.loads(job.data[0])
+        if ret is None:
+            raise cherrypy.HTTPError(404, 'Tenant %s does not exist.' % tenant)
+        resp = cherrypy.response
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        return ret
+
+    @cherrypy.expose
+    @cherrypy.tools.save_params()
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def labels(self, tenant):
         job = self.rpc.submitJob('zuul:allowed_labels_get', {'tenant': tenant})
         allowed_labels = json.loads(job.data[0])
