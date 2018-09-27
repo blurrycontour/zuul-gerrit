@@ -27,7 +27,7 @@ def _build_javascript():
     if not os.path.exists('node_modules/.bin/webpack'):
         subprocess.check_call(['yarn', 'install', '-d'])
     if not os.path.exists('zuul/web/static/status.bundle.js'):
-        subprocess.check_call(['npm', 'run', 'build:dist'])
+        subprocess.check_call(['yarn', 'run', 'build:dist'])
 
 
 def _from_git(distribution):
