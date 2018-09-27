@@ -119,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_5abb1174",
+        "filename": "web/src/pages/jobs.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-09-27T12:59:49Z",
+      "side": 1,
+      "message": "yes, it\u0027s equivalent to \"char * const columns\".",
+      "parentUuid": "3f79a3b5_13d3e3d6",
+      "range": {
+        "startLine": 43,
+        "startChar": 4,
+        "endLine": 43,
+        "endChar": 17
+      },
+      "revId": "f57e30fe3cfd76af9623edff163ef9336b074037",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_b358ef87",
         "filename": "web/src/pages/jobs.js",
         "patchSetId": 4
@@ -130,6 +154,30 @@
       "writtenOn": "2018-09-27T12:34:31Z",
       "side": 1,
       "message": "Will JSX let us use \u0027for column of myColumns {\u0027 instead of myColumns.forEach?",
+      "range": {
+        "startLine": 45,
+        "startChar": 4,
+        "endLine": 45,
+        "endChar": 33
+      },
+      "revId": "f57e30fe3cfd76af9623edff163ef9336b074037",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_3ab89573",
+        "filename": "web/src/pages/jobs.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-09-27T12:59:49Z",
+      "side": 1,
+      "message": "maybe?",
+      "parentUuid": "3f79a3b5_b358ef87",
       "range": {
         "startLine": 45,
         "startChar": 4,
