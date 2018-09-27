@@ -11,6 +11,12 @@
       gerrit:
         Verified: -1
 
+- nodeset:
+    name: controller-nodeset
+    nodes:
+      - name: controller
+        label: label1
+
 - pipeline:
     name: gate
     manager: dependent

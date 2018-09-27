@@ -44,6 +44,7 @@ class RPCListener(object):
             'promote',
             'get_running_jobs',
             'get_job_log_stream_address',
+            'nodeset_list',
             'tenant_list',
             'tenant_sql_connection',
             'status_get',
@@ -512,6 +513,17 @@ class RPCListener(object):
                     "driver": trigger.driver.name,
                 })
             output.append({"name": pipeline, "triggers": triggers})
+        job.sendWorkComplete(json.dumps(output))
+
+    def handle_nodeset_list(self, job):
+        args = json.loads(job.arguments)
+        tenant = self.sched.abide.tenants.get(args.get("tenant"))
+        if not tenant:
+            job.sendWorkComplete(json.dumps(None))
+            return
+        output = []
+        for nodeset in tenant.layout.nodesets.values():
+            output.append(nodeset.toDict())
         job.sendWorkComplete(json.dumps(output))
 
     def handle_key_get(self, job):
