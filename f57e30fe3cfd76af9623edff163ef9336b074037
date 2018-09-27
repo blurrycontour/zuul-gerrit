@@ -96,6 +96,52 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_13d3e3d6",
+        "filename": "web/src/pages/jobs.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-09-27T12:34:31Z",
+      "side": 1,
+      "message": "the javascript definition of \u0027const\u0027 is jarring to my brain - as lines 43-46 show. const in js means \u0027no other object will be assigned to this variable\u0027 - whereas in c++ it would mean \"the object assigned to this variable is not modifyable\"\n\nThat\u0027s just me talking out loud though",
+      "range": {
+        "startLine": 43,
+        "startChar": 4,
+        "endLine": 43,
+        "endChar": 17
+      },
+      "revId": "f57e30fe3cfd76af9623edff163ef9336b074037",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_b358ef87",
+        "filename": "web/src/pages/jobs.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-09-27T12:34:31Z",
+      "side": 1,
+      "message": "Will JSX let us use \u0027for column of myColumns {\u0027 instead of myColumns.forEach?",
+      "range": {
+        "startLine": 45,
+        "startChar": 4,
+        "endLine": 45,
+        "endChar": 33
+      },
+      "revId": "f57e30fe3cfd76af9623edff163ef9336b074037",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_9344d348",
         "filename": "web/src/pages/status.js",
         "patchSetId": 4
@@ -190,6 +236,30 @@
       "side": 1,
       "message": "For class method, the behavior seems differents. When using this construct ([functionName] \u003d ([params]) \u003d\u003e { }) make the function binded to the class and it has access to *this*.\n\nWhen using (functionName(params) { }), then the function is like static, and it needs to be manually binded to access *this* (e.g. using this in the constructor:     this.functionName \u003d this.functionName.bind(this)",
       "parentUuid": "3f79a3b5_82f23b99",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 43
+      },
+      "revId": "f57e30fe3cfd76af9623edff163ef9336b074037",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_3f1c2b12",
+        "filename": "web/src/reducers.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-09-27T12:34:31Z",
+      "side": 1,
+      "message": "Ah. Ok. TIL",
+      "parentUuid": "3f79a3b5_8801d907",
       "range": {
         "startLine": 17,
         "startChar": 0,
