@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_98b6fc3d",
+        "filename": "playbooks/dashboard/run.yaml",
+        "patchSetId": 12
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-09-27T12:34:31Z",
+      "side": 1,
+      "message": "We actually have a yarn role now that I was gonna get things switched to using:\n\n  https://review.openstack.org/#/c/586552/1/playbooks/dashboard/run.yaml\n\nMaybe just go ahead and do that and I\u0027ll abandon 586552 since you\u0027ve updated the docs to day yarn here.",
+      "range": {
+        "startLine": 5,
+        "startChar": 12,
+        "endLine": 6,
+        "endChar": 18
+      },
+      "revId": "f1c516690b22b6d351c4bb2c0a5df81a49dae243",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_78ee8022",
+        "filename": "tools/pip.sh",
+        "patchSetId": 12
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-09-27T12:34:31Z",
+      "side": 1,
+      "message": "oh no! the whitespace gods will be unhappy!",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 4
+      },
+      "revId": "f1c516690b22b6d351c4bb2c0a5df81a49dae243",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_d8c79495",
+        "filename": "web/package.json",
+        "patchSetId": 12
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-09-27T12:34:31Z",
+      "side": 1,
+      "message": "Maybe we should change this to \"Zuul Developers\" ? I really dislike these author fields ... they map so poorly to collaborative projects.",
+      "range": {
+        "startLine": 6,
+        "startChar": 13,
+        "endLine": 6,
+        "endChar": 28
+      },
+      "revId": "f1c516690b22b6d351c4bb2c0a5df81a49dae243",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_98e4bc3d",
+        "filename": "web/package.json",
+        "patchSetId": 12
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-09-27T12:34:31Z",
+      "side": 1,
+      "message": "How about https://zuul-ci.org ?",
+      "range": {
+        "startLine": 8,
+        "startChar": 14,
+        "endLine": 8,
+        "endChar": 19
+      },
+      "revId": "f1c516690b22b6d351c4bb2c0a5df81a49dae243",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
