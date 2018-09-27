@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_2084ee0a",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2018-09-27T08:25:29Z",
+      "side": 1,
+      "message": "The tasks form a logical set:\n- if you enqueue a buildset manually, you\u0027re likely to also want to autohold nodes if one of the triggered jobs fails\n- you may want to dequeue a buildset because of a problem with resources or the contents of a job itself, but you\u0027ll want to reenqueue it once the problem is fixed\n\nThat\u0027s why I thought task granularity was overkill. On the other hand more privileged tasks might be added later, and more granularity might make more sense then.",
+      "parentUuid": "3f79a3b5_607666a6",
+      "range": {
+        "startLine": 77,
+        "startChar": 52,
+        "endLine": 77,
+        "endChar": 70
+      },
+      "revId": "a97bb9f607c3db276556b00ec207839ca2e34575",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_a05b1e20",
         "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
         "patchSetId": 3
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_e0759634",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2018-09-27T08:25:29Z",
+      "side": 1,
+      "message": "Deactivated by default maybe?",
+      "parentUuid": "3f79a3b5_a05b1e20",
+      "range": {
+        "startLine": 108,
+        "startChar": 25,
+        "endLine": 108,
+        "endChar": 30
+      },
+      "revId": "a97bb9f607c3db276556b00ec207839ca2e34575",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_80ff02aa",
         "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
         "patchSetId": 3
@@ -59,6 +107,30 @@
       "writtenOn": "2018-09-27T08:08:45Z",
       "side": 1,
       "message": "The zuul client mostly features actions that rely on the Zuul Gearman bus. I see its usage more dedicated to Zuul Operators that have Zuul cluster access. IMO having a zuul-web-client tool might be useful, especially if it can be installed via pip by Zuul users, to do such authorized privileged actions (+ secrets generation).",
+      "range": {
+        "startLine": 217,
+        "startChar": 0,
+        "endLine": 229,
+        "endChar": 25
+      },
+      "revId": "a97bb9f607c3db276556b00ec207839ca2e34575",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_a0eb1ea2",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2018-09-27T08:25:29Z",
+      "side": 1,
+      "message": "the Zuul CLI consumes a config file, that\u0027s where the gearman specifics are defined. I was thinking that in the case the config file is missing a \"gearman\" section but has a \"web\" section with the URL of a Zuul server, the subcommands that have a web API equivalent could be executed over this channel. This would be the case for third parties. However I\u0027m also fine with a specific client for non operators.\n\n+1 for the CLI being distributable and covering more user needs!",
+      "parentUuid": "3f79a3b5_80ff02aa",
       "range": {
         "startLine": 217,
         "startChar": 0,
