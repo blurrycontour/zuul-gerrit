@@ -510,6 +510,28 @@ class TestWeb(BaseTestWeb):
         ]
         self.assertEqual(expected_list, data)
 
+    def test_web_nodeset_list(self):
+        # can we fetch the list of nodesets
+        data = self.get_url('api/tenant/tenant-one/nodesets').json()
+
+        expected_list = [
+            {
+                'name': 'controller-nodeset',
+                'nodes': [
+                    {
+                        'aliases': [],
+                        'comment': None,
+                        'hold_job': None,
+                        'state': 'unknown',
+                        'name': 'controller',
+                        'label': 'label1'
+                    }
+                ],
+                'groups': []
+            }
+        ]
+        self.assertEqual(expected_list, data)
+
     def test_web_project_list(self):
         # can we fetch the list of projects
         data = self.get_url('api/tenant/tenant-one/projects').json()

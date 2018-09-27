@@ -513,6 +513,7 @@ class ZuulWebAPI(object):
                                    'project/{project:.*}/branch/{branch:.*}/'
                                    'freeze-jobs',
             'pipelines': '/api/tenant/{tenant}/pipelines',
+            'nodesets': '/api/tenant/{tenant}/nodesets',
             'labels': '/api/tenant/{tenant}/labels',
             'nodes': '/api/tenant/{tenant}/nodes',
             'key': '/api/tenant/{tenant}/key/{project:.*}.pub',
@@ -687,6 +688,18 @@ class ZuulWebAPI(object):
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def pipelines(self, tenant):
         job = self.rpc.submitJob('zuul:pipeline_list', {'tenant': tenant})
+        ret = json.loads(job.data[0])
+        if ret is None:
+            raise cherrypy.HTTPError(404, 'Tenant %s does not exist.' % tenant)
+        resp = cherrypy.response
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        return ret
+
+    @cherrypy.expose
+    @cherrypy.tools.save_params()
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    def nodesets(self, tenant):
+        job = self.rpc.submitJob('zuul:nodeset_list', {'tenant': tenant})
         ret = json.loads(job.data[0])
         if ret is None:
             raise cherrypy.HTTPError(404, 'Tenant %s does not exist.' % tenant)
@@ -1116,6 +1129,8 @@ class ZuulWeb(object):
         )
         route_map.connect('api', '/api/tenant/{tenant}/pipelines',
                           controller=api, action='pipelines')
+        route_map.connect('api', '/api/tenant/{tenant}/nodesets',
+                          controller=api, action='nodesets')
         route_map.connect('api', '/api/tenant/{tenant}/labels',
                           controller=api, action='labels')
         route_map.connect('api', '/api/tenant/{tenant}/nodes',
