@@ -637,6 +637,238 @@ class TestWeb(BaseTestWeb):
         resp = self.get_url("api/tenant/non-tenant/jobs")
         self.assertEqual(404, resp.status_code)
 
+    def test_project_freeze_jobs(self):
+        # Test can get a list of the jobs and playbooks for a given project+
+        # pipeline+branch.
+        resp = self.get_url(
+            "api/tenant/tenant-one/freeze_jobs/org/project1/check/master")
+
+        source_ctx = {
+            'branch': 'master',
+            'path': 'zuul.yaml',
+            'project': 'common-config',
+        }
+
+        def expected_pb(path):
+            return {
+                'path': path,
+                'roles': [{
+                    'implicit': True,
+                    'project_canonical_name':
+                    'review.example.com/common-config',
+                    'target_name': 'common-config',
+                    'type': 'zuul'
+                }],
+                'secrets': [],
+                'source_context': source_ctx,
+            }
+
+        frozen_jobs = [{
+            'name': 'project-merge',
+            'branches': [],
+            'files': [],
+            'irrelevant_files': [],
+            'variant_description': '',
+            'implied_branch': None,
+            'source_context': source_ctx,
+            'description': None,
+            'required_projects': [],
+            'semaphore': None,
+            'variables': {},
+            'final': False,
+            'abstract': False,
+            'protected': None,
+            'voting': True,
+            'timeout': None,
+            'attempts': 3,
+            'roles': [{
+                'target_name': 'common-config',
+                'type': 'zuul',
+                'project_canonical_name': 'review.example.com/common-config',
+                'implicit': True,
+            }],
+            'post_review': None,
+            'parent': None,
+            'dependencies': [],
+            'nodeset': {'name': '', 'nodes': [{
+                'state': 'unknown',
+                'hold_job': None,
+                'comment': None,
+                'name': 'controller',
+                'aliases': [],
+                'label': 'label1',
+            }], 'groups': []},
+            'pre_run': [],
+            'run': [expected_pb('playbooks/project-merge.yaml')],
+            'post_run': [],
+        }, {
+            'name': 'project-test1',
+            'branches': [],
+            'files': [],
+            'irrelevant_files': [],
+            'variant_description': '',
+            'implied_branch': None,
+            'source_context': source_ctx,
+            'description': None,
+            'required_projects': [],
+            'semaphore': None,
+            'variables': {},
+            'final': False,
+            'abstract': False,
+            'protected': None,
+            'voting': True,
+            'timeout': None,
+            'attempts': 4,
+            'roles': [{
+                'target_name': 'common-config',
+                'type': 'zuul',
+                'project_canonical_name': 'review.example.com/common-config',
+                'implicit': True,
+            }],
+            'post_review': None,
+            'parent': None,
+            'dependencies': ['project-merge'],
+            'nodeset': {'name': '', 'nodes': [{
+                'state': 'unknown',
+                'hold_job': None,
+                'comment': None,
+                'name': 'controller',
+                'aliases': [],
+                'label': 'label1',
+            }], 'groups': []},
+            'pre_run': [],
+            'run': [expected_pb('playbooks/project-test1.yaml')],
+            'post_run': [],
+        }, {
+            'name': 'project-test2',
+            'branches': [],
+            'files': [],
+            'irrelevant_files': [],
+            'variant_description': '',
+            'implied_branch': None,
+            'source_context': source_ctx,
+            'description': None,
+            'required_projects': [],
+            'semaphore': None,
+            'variables': {},
+            'final': False,
+            'abstract': False,
+            'protected': None,
+            'voting': True,
+            'timeout': None,
+            'attempts': 3,
+            'roles': [{
+                'target_name': 'common-config',
+                'type': 'zuul',
+                'project_canonical_name': 'review.example.com/common-config',
+                'implicit': True,
+            }],
+            'post_review': None,
+            'parent': None,
+            'dependencies': ['project-merge'],
+            'nodeset': {'name': '', 'nodes': [{
+                'state': 'unknown',
+                'hold_job': None,
+                'comment': None,
+                'name': 'controller',
+                'aliases': [],
+                'label': 'label1',
+            }], 'groups': []},
+            'pre_run': [],
+            'run': [expected_pb('playbooks/project-test2.yaml')],
+            'post_run': [],
+        }, {
+            'name': 'project1-project2-integration',
+            'branches': [],
+            'files': [],
+            'irrelevant_files': [],
+            'variant_description': '',
+            'implied_branch': None,
+            'source_context': source_ctx,
+            'description': None,
+            'required_projects': [],
+            'semaphore': None,
+            'variables': {},
+            'final': False,
+            'abstract': False,
+            'protected': None,
+            'voting': True,
+            'timeout': None,
+            'attempts': 3,
+            'roles': [{
+                'target_name': 'common-config',
+                'type': 'zuul',
+                'project_canonical_name': 'review.example.com/common-config',
+                'implicit': True,
+            }],
+            'post_review': None,
+            'parent': None,
+            'dependencies': ['project-merge'],
+            'nodeset': {'name': '', 'nodes': [{
+                'state': 'unknown',
+                'hold_job': None,
+                'comment': None,
+                'name': 'controller',
+                'aliases': [],
+                'label': 'label1',
+            }], 'groups': []},
+            'pre_run': [],
+            'run': [expected_pb(
+                'playbooks/project1-project2-integration.yaml')],
+            'post_run': [],
+        }]
+        self.assertEqual(frozen_jobs, resp.json())
+
+    def test_frozen_job_set_includes_all_jobs(self):
+        # When freezing a job set we want to include all jobs even if they
+        # have certain matcher requirements (such as required files) since we
+        # can't otherwise evaluate them.
+
+        resp = self.get_url(
+            "api/tenant/tenant-one/freeze_jobs/org/project/gate/master")
+        expected = {
+            'abstract': False,
+            'attempts': 3,
+            'branches': [],
+            'dependencies': ['project-merge'],
+            'description': None,
+            # The frozen job version doesn't have the _files attribute.
+            'files': [],
+            'final': False,
+            'implied_branch': None,
+            'irrelevant_files': [],
+            'name': 'project-testfile',
+            'parent': None,
+            'post_review': None,
+            'post_run': [],
+            'pre_run': [],
+            'protected': None,
+            'required_projects': [],
+            'roles': [{'implicit': True,
+                       'project_canonical_name':
+                       'review.example.com/common-config',
+                       'target_name': 'common-config',
+                       'type': 'zuul'}],
+            'run': [{'path': 'playbooks/project-testfile.yaml',
+                     'roles': [{'implicit': True,
+                                'project_canonical_name':
+                                'review.example.com/common-config',
+                                'target_name': 'common-config',
+                                'type': 'zuul'}],
+                     'secrets': [],
+                     'source_context': {'branch': 'master',
+                                        'path': 'zuul.yaml',
+                                        'project': 'common-config'}}],
+            'semaphore': None,
+            'source_context': {'branch': 'master',
+                               'path': 'zuul.yaml',
+                               'project': 'common-config'},
+            'timeout': None,
+            'variables': {},
+            'variant_description': '',
+            'voting': True}
+        self.assertIn(expected, resp.json())
+
 
 class TestWebSecrets(BaseTestWeb):
     tenant_config_file = 'config/secrets/main.yaml'
@@ -644,6 +876,14 @@ class TestWebSecrets(BaseTestWeb):
     def test_web_find_job_secret(self):
         data = self.get_url('api/tenant/tenant-one/job/project1-secret').json()
         run = data[0]['run']
+        self.assertEqual([{'name': 'project1_secret'}], run[0]['secrets'])
+
+    def test_project_freeze_job_secret(self):
+        # Test that secrets are redacted from any jobs
+
+        resp = self.get_url(
+            "api/tenant/tenant-one/freeze_jobs/org/project1/check/master")
+        run = resp.json()[0]['run']
         self.assertEqual([{'name': 'project1_secret'}], run[0]['secrets'])
 
 
