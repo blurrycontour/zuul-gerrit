@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_980d1542",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2018-09-28T14:21:07Z",
+      "side": 1,
+      "message": "Looks like time needs to be imported at the top of the file. Given only the pep8 job complained, I guess that means tests aren\u0027t exercising the bool(build.end_time) \u003d\u003d False case?",
+      "revId": "0c685e76b2467da9424948ad7ca6140652aaee8b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
