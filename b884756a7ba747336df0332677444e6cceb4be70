@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_e7b596ee",
+        "filename": "tests/base.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1060,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-09-28T03:20:11Z",
+      "side": 1,
+      "message": "(nit) It\u0027s unclear why you renamed this?",
+      "revId": "b884756a7ba747336df0332677444e6cceb4be70",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
