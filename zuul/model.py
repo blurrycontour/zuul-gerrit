@@ -933,11 +933,14 @@ class PlaybookContext(ConfigObject):
             secrets.append(decrypted_secret)
         self.decrypted_secrets = tuple(secrets)
 
-    def toDict(self):
+    def toDict(self, redact_secrets=False):
         # Render to a dict to use in passing json to the executor
         secrets = {}
         for secret in self.decrypted_secrets:
-            secrets[secret.name] = secret.secret_data
+            if redact_secrets:
+                secrets[secret.name] = 'REDACTED'
+            else:
+                secrets[secret.name] = secret.secret_data
         return dict(
             connection=self.source_context.project.connection_name,
             project=self.source_context.project.name,
