@@ -989,6 +989,96 @@ class TestWeb(BaseTestWeb):
         }
         self.assertIn(expected, resp.json())
 
+    def test_freeze_job(self):
+
+        resp = self.get_url(
+            "api/tenant/tenant-one/pipeline/check"
+            "/project/org/project1/branch/master/freeze-job/"
+            "project-test1")
+
+        job_params = {
+            'job': 'project-test1',
+            'ansible_version': '2.9',
+            'timeout': None,
+            'post_timeout': None,
+            'items': [],
+            'projects': [],
+            'branch': 'master',
+            'cleanup_playbooks': [],
+            'groups': [],
+            'nodes': [{
+                'comment': None,
+                'hold_job': None,
+                'label': 'label1',
+                'name': ['controller'],
+                'state': 'unknown'
+            }],
+            'override_branch': None,
+            'override_checkout': None,
+            'repo_state': {},
+            'playbooks': [{
+                'connection': 'gerrit',
+                'project': 'common-config',
+                'branch': 'master',
+                'trusted': True,
+                'roles': [{
+                    'target_name': 'common-config',
+                    'type': 'zuul',
+                    'project_canonical_name':
+                        'review.example.com/common-config',
+                    'implicit': True,
+                    'project_default_branch': 'master',
+                    'connection': 'gerrit',
+                    'project': 'common-config',
+                }],
+                'secrets': {},
+                'path': 'playbooks/project-test1.yaml',
+            }],
+            'pre_playbooks': [],
+            'post_playbooks': [],
+            'ssh_keys': [],
+            'vars': {},
+            'extra_vars': {},
+            'host_vars': {},
+            'group_vars': {},
+            'zuul': {
+                '_inheritance_path': [
+                    '<Job base branches: None source: '
+                    'common-config/zuul.yaml@master#53>',
+                    '<Job project-test1 branches: None source: '
+                    'common-config/zuul.yaml@master#66>',
+                    '<Job project-test1 branches: None source: '
+                    'common-config/zuul.yaml@master#138>',
+                    '<Job project-test1 branches: None source: '
+                    'common-config/zuul.yaml@master#53>'],
+                'build': '00000000000000000000000000000000',
+                'buildset': None,
+                'branch': 'master',
+                'ref': None,
+                'pipeline': 'check',
+                'post_review': False,
+                'job': 'project-test1',
+                'voting': True,
+                'project': {
+                    'name': 'org/project1',
+                    'short_name': 'project1',
+                    'canonical_hostname': 'review.example.com',
+                    'canonical_name': 'review.example.com/org/project1',
+                    'src_dir': 'src/review.example.com/org/project1',
+                },
+                'tenant': 'tenant-one',
+                'timeout': None,
+                'jobtags': [],
+                'branch': 'master',
+                'projects': {},
+                'items': [],
+                'child_jobs': [],
+                'event_id': None,
+            },
+        }
+
+        self.assertEqual(job_params, resp.json())
+
 
 class TestWebMultiTenant(BaseTestWeb):
     tenant_config_file = 'config/multi-tenant/main.yaml'
@@ -1014,6 +1104,16 @@ class TestWebSecrets(BaseTestWeb):
         run = data[0]['run']
         secret = {'name': 'project1_secret', 'alias': 'secret_name'}
         self.assertEqual([secret], run[0]['secrets'])
+
+    def test_freeze_job_redacted(self):
+        # Test that ssh_keys and secrets are redacted
+        resp = self.get_url(
+            "api/tenant/tenant-one/pipeline/check"
+            "/project/org/project1/branch/master/freeze-job/"
+            "project1-secret").json()
+        self.assertEqual(
+            {'secret_name': 'REDACTED'}, resp['playbooks'][0]['secrets'])
+        self.assertEqual('REDACTED', resp['ssh_keys'][0]['key'])
 
 
 class TestInfo(ZuulDBTestCase, BaseTestWeb):
