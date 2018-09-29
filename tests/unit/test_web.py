@@ -870,6 +870,93 @@ class TestWeb(BaseTestWeb):
             'voting': True}
         self.assertIn(expected, resp.json())
 
+    def test_frozen_job(self):
+
+        resp = self.get_url(
+            "api/tenant/tenant-one/frozen_job/org/project1/check/master/"
+            "project-test1")
+
+        inheritance_path = [
+            '<Job base branches: None source: common-config/zuul.yaml'
+            '@master#44>',
+            '<Job project-test1 branches: None source: common-config/zuul.yaml'
+            '@master#57>',
+            '<Job project-test1 branches: None source: common-config/zuul.yaml'
+            '@master#127>',
+            '<Job project-test1 branches: None source: common-config/zuul.yaml'
+            '@master#44>'
+        ]
+
+        job_params = {
+            'job': 'project-test1',
+            'timeout': None,
+            'post_timeout': None,
+            'items': [],
+            'projects': [],
+            'branch': 'master',
+            'groups': [],
+            'nodes': [{
+                'comment': None,
+                'hold_job': None,
+                'label': 'label1',
+                'name': ['controller'],
+                'state': 'unknown'
+            }],
+            'override_branch': None,
+            'override_checkout': None,
+            'repo_state': {},
+            'playbooks': [{
+                'connection': 'gerrit',
+                'project': 'common-config',
+                'branch': 'master',
+                'trusted': True,
+                'roles': [{
+                    'target_name': 'common-config',
+                    'type': 'zuul',
+                    'project_canonical_name':
+                        'review.example.com/common-config',
+                    'implicit': True,
+                    'project_default_branch': 'master',
+                    'connection': 'gerrit',
+                    'project': 'common-config',
+                }],
+                'secrets': {},
+                'path': 'playbooks/project-test1.yaml',
+            }],
+            'pre_playbooks': [],
+            'post_playbooks': [],
+            'ssh_keys': [],
+            'vars': {},
+            'extra_vars': {},
+            'host_vars': {},
+            'group_vars': {},
+            'zuul': {
+                'build': '00000000000000000000000000000000',
+                'buildset': None,
+                'ref': None,
+                'pipeline': 'check',
+                'job': 'project-test1',
+                'voting': True,
+                'project': {
+                    'name': 'org/project1',
+                    'short_name': 'project1',
+                    'canonical_hostname': 'review.example.com',
+                    'canonical_name': 'review.example.com/org/project1',
+                    'src_dir': 'src/review.example.com/org/project1',
+                },
+                'tenant': 'tenant-one',
+                'timeout': None,
+                'jobtags': [],
+                '_inheritance_path': inheritance_path,
+                'branch': 'master',
+                'projects': {},
+                'items': [],
+                'child_jobs': [],
+            },
+        }
+
+        self.assertEqual(job_params, resp.json())
+
 
 class TestWebSecrets(BaseTestWeb):
     tenant_config_file = 'config/secrets/main.yaml'
@@ -888,6 +975,15 @@ class TestWebSecrets(BaseTestWeb):
         run = resp.json()[0]['run']
         secret = {'name': 'project1_secret', 'alias': 'secret_name'}
         self.assertEqual([secret], run[0]['secrets'])
+
+    def test_frozen_job_redacted(self):
+        # Test that ssh_keys and secrets are redacted
+        resp = self.get_url(
+            "api/tenant/tenant-one/frozen_job/org/project1/check/master/"
+            "project1-secret").json()
+        self.assertEqual(
+            {'secret_name': 'REDACTED'}, resp['playbooks'][0]['secrets'])
+        self.assertEqual('REDACTED', resp['ssh_keys'][0]['key'])
 
 
 class TestInfo(BaseTestWeb):
