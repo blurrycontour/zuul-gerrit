@@ -467,6 +467,30 @@ class ZuulWebAPI(object):
         resp.headers['Access-Control-Allow-Origin'] = '*'
         return ret
 
+    @cherrypy.expose
+    @cherrypy.tools.save_params()
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    def project_frozen_job(self, tenant, project, pipeline, branch, job):
+        # TODO(jhesketh): Allow a canonical change/item to be passed in which
+        # would return the job with any in-change modifications.
+
+        job = self.rpc.submitJob(
+            'zuul:project_frozen_job',
+            {
+                'tenant': tenant,
+                'project': project,
+                'pipeline': pipeline,
+                'branch': branch,
+                'job': job
+            }
+        )
+        ret = json.loads(job.data[0])
+        if not ret:
+            raise cherrypy.HTTPError(404)
+        resp = cherrypy.response
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        return ret
+
 
 class TenantStaticHandler(object):
     def __init__(self, path):
@@ -601,6 +625,12 @@ class ZuulWeb(object):
             '/api/tenant/{tenant}/freeze_jobs/{project:.*}/{pipeline}/'
             '{branch}',
             controller=api, action='project_freeze_jobs'
+        )
+        route_map.connect(
+            'api',
+            '/api/tenant/{tenant}/frozen_job/{project:.*}/{pipeline}/'
+            '{branch}/{job}',
+            controller=api, action='project_frozen_job'
         )
         route_map.connect('api', '/api/tenant/{tenant}/pipelines',
                           controller=api, action='pipelines')
