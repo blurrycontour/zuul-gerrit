@@ -20,6 +20,8 @@ import traceback
 
 import gear
 
+import zuul.executor.common
+
 from zuul import model
 from zuul.connection import BaseConnection
 from zuul.lib import encryption
@@ -71,6 +73,7 @@ class RPCListener(object):
         self.worker.registerFunction("zuul:project_get")
         self.worker.registerFunction("zuul:project_list")
         self.worker.registerFunction("zuul:project_freeze_jobs")
+        self.worker.registerFunction("zuul:project_freeze_job")
         self.worker.registerFunction("zuul:pipeline_list")
         self.worker.registerFunction("zuul:key_get")
         self.worker.registerFunction("zuul:config_errors_list")
@@ -474,6 +477,41 @@ class RPCListener(object):
             })
 
         gear_job.sendWorkComplete(json.dumps(output))
+
+    def handle_project_freeze_job(self, gear_job):
+        args = json.loads(gear_job.arguments)
+        tenant = self.sched.abide.tenants.get(args.get("tenant"))
+        project = None
+        pipeline = None
+        if tenant:
+            (trusted, project) = tenant.getProject(args.get("project"))
+            pipeline = tenant.layout.pipelines.get(args.get("pipeline"))
+        if not project or not pipeline:
+            gear_job.sendWorkComplete(json.dumps(None))
+            return
+
+        change = model.Branch(project)
+        change.branch = args.get("branch", "master")
+        queue = model.ChangeQueue(pipeline)
+        item = model.QueueItem(queue, change)
+        item.layout = tenant.layout
+        item.freezeJobGraph(skip_file_matcher=True)
+
+        job = item.job_graph.jobs.get(args.get("job"))
+        if not job:
+            gear_job.sendWorkComplete(json.dumps(None))
+            return
+
+        # TODO: check if this is frozen?
+        nodeset = job.nodeset
+        job.setBase(tenant.layout)
+
+        uuid = '0' * 32
+        params = zuul.executor.common.construct_gearman_params(
+            uuid, self.sched, nodeset,
+            job, item, pipeline)
+
+        gear_job.sendWorkComplete(json.dumps(params, cls=MappingProxyEncoder))
 
     def handle_allowed_labels_get(self, job):
         args = json.loads(job.arguments)

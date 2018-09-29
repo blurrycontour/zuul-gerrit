@@ -1024,11 +1024,14 @@ class PlaybookContext(ConfigObject):
                        if s.name not in current_names]
         self.decrypted_secrets = self.decrypted_secrets + tuple(new_secrets)
 
-    def toDict(self):
+    def toDict(self, redact_secrets=True):
         # Render to a dict to use in passing json to the executor
         secrets = {}
         for secret in self.decrypted_secrets:
-            secrets[secret.name] = secret.secret_data
+            if redact_secrets:
+                secrets[secret.name] = 'REDACTED'
+            else:
+                secrets[secret.name] = secret.secret_data
         return dict(
             connection=self.source_context.project.connection_name,
             project=self.source_context.project.name,

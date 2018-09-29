@@ -15,11 +15,11 @@
 import gear
 import json
 import logging
-import os
 import time
 import threading
 from uuid import uuid4
 
+import zuul.executor.common
 import zuul.model
 from zuul.lib.config import get_default
 from zuul.lib.gear_utils import getGearmanFunctions
@@ -303,6 +303,8 @@ class ExecutorClient(object):
                 required=(p in required_projects),
             ))
         params['zuul_event_id'] = item.event.zuul_event_id
+        # TODO: deprecate and remove this variable?
+        params["zuul"]["_inheritance_path"] = list(job.inheritance_path)
         build = Build(job, uuid, zuul_event_id=item.event.zuul_event_id)
         build.parameters = params
         build.nodeset = nodeset
@@ -322,8 +324,9 @@ class ExecutorClient(object):
         # availability zone we can get executor_zone from only the first
         # node.
         executor_zone = None
-        if nodes and nodes[0].get('attributes'):
-            executor_zone = nodes[0]['attributes'].get('executor-zone')
+        if params['nodes'] and params['nodes'][0].get('attributes'):
+            executor_zone = \
+                params['nodes'][0]['attributes'].get('executor-zone')
 
         if executor_zone:
             _fname = '%s:%s' % (
