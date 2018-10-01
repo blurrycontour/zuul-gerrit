@@ -16,6 +16,23 @@
       "revId": "0c685e76b2467da9424948ad7ca6140652aaee8b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_da783790",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-10-01T16:01:04Z",
+      "side": 1,
+      "message": "Indeed, that\u0027s a pretty unusual case.  I don\u0027t actually know what would casue it right now.  Maybe it\u0027s not possible.",
+      "revId": "0c685e76b2467da9424948ad7ca6140652aaee8b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
