@@ -448,416 +448,29 @@ class AnsibleJobLogAdapter(logging.LoggerAdapter):
         return msg, kwargs
 
 
-class AnsibleJob(object):
-    RESULT_NORMAL = 1
-    RESULT_TIMED_OUT = 2
-    RESULT_UNREACHABLE = 3
-    RESULT_ABORTED = 4
-    RESULT_DISK_FULL = 5
+class AnsibleJobBase(object):
+    "This class prepares the roles and repositories for an Ansible Job"
 
-    RESULT_MAP = {
-        RESULT_NORMAL: 'RESULT_NORMAL',
-        RESULT_TIMED_OUT: 'RESULT_TIMED_OUT',
-        RESULT_UNREACHABLE: 'RESULT_UNREACHABLE',
-        RESULT_ABORTED: 'RESULT_ABORTED',
-        RESULT_DISK_FULL: 'RESULT_DISK_FULL',
-    }
-
-    def __init__(self, executor_server, job):
-        logger = logging.getLogger("zuul.AnsibleJob")
-        self.log = AnsibleJobLogAdapter(logger, {'job': job.unique})
-        self.executor_server = executor_server
-        self.job = job
-        self.arguments = json.loads(job.arguments)
+    def __init__(self, connections, merger_root):
+        self.log = logging.getLogger("zuul.AnsibleJobBase")
         self.jobdir = None
-        self.proc = None
-        self.proc_lock = threading.Lock()
-        self.running = False
-        self.started = False  # Whether playbooks have started running
-        self.time_starting_build = None
-        self.paused = False
-        self.aborted = False
-        self.aborted_reason = None
-        self._resume_event = threading.Event()
-        self.thread = None
         self.project_info = {}
-        self.private_key_file = get_default(self.executor_server.config,
-                                            'executor', 'private_key_file',
-                                            '~/.ssh/id_rsa')
-        self.winrm_key_file = get_default(self.executor_server.config,
-                                          'executor', 'winrm_cert_key_file',
-                                          '~/.winrm/winrm_client_cert.key')
-        self.winrm_pem_file = get_default(self.executor_server.config,
-                                          'executor', 'winrm_cert_pem_file',
-                                          '~/.winrm/winrm_client_cert.pem')
-        self.winrm_operation_timeout = get_default(
-            self.executor_server.config,
-            'executor',
-            'winrm_operation_timeout_sec')
-        self.winrm_read_timeout = get_default(
-            self.executor_server.config,
-            'executor',
-            'winrm_read_timeout_sec')
-        self.ssh_agent = SshAgent()
+        self.connections = connections
+        self.merge_root = merger_root
 
-        self.executor_variables_file = None
+    def writeAnsibleConfig(self, jobdir_playbook):
+        # TODO(jhesketh)
+        pass
 
-        self.cpu_times = {'user': 0, 'system': 0,
-                          'children_user': 0, 'children_system': 0}
-
-        if self.executor_server.config.has_option('executor', 'variables'):
-            self.executor_variables_file = self.executor_server.config.get(
-                'executor', 'variables')
-
-    def run(self):
-        self.running = True
-        self.thread = threading.Thread(target=self.execute,
-                                       name='build-%s' % self.job.unique)
-        self.thread.start()
-
-    def stop(self, reason=None):
-        self.aborted = True
-        self.aborted_reason = reason
-
-        # if paused we need to resume the job so it can be stopped
-        self.resume()
-        self.abortRunningProc()
-
-    def pause(self):
-        self.log.info(
-            "Pausing job %s for ref %s (change %s)" % (
-                self.arguments['zuul']['job'],
-                self.arguments['zuul']['ref'],
-                self.arguments['zuul']['change_url']))
-        with open(self.jobdir.job_output_file, 'a') as job_output:
-            job_output.write(
-                "{now} |\n"
-                "{now} | Job paused\n".format(now=datetime.datetime.now()))
-
-        self.paused = True
-
-        data = {'paused': self.paused, 'data': self.getResultData()}
-        self.job.sendWorkData(json.dumps(data))
-        self._resume_event.wait()
-
-    def resume(self):
-        if not self.paused:
-            return
-
-        self.log.info(
-            "Resuming job %s for ref %s (change %s)" % (
-                self.arguments['zuul']['job'],
-                self.arguments['zuul']['ref'],
-                self.arguments['zuul']['change_url']))
-        with open(self.jobdir.job_output_file, 'a') as job_output:
-            job_output.write(
-                "{now} | Job resumed\n"
-                "{now} |\n".format(now=datetime.datetime.now()))
-
-        self.paused = False
-        self._resume_event.set()
-
-    def wait(self):
-        if self.thread:
-            self.thread.join()
-
-    def execute(self):
-        try:
-            self.time_starting_build = time.monotonic()
-            self.ssh_agent.start()
-            self.ssh_agent.add(self.private_key_file)
-            for key in self.arguments.get('ssh_keys', []):
-                self.ssh_agent.addData(key['name'], key['key'])
-            self.jobdir = JobDir(self.executor_server.jobdir_root,
-                                 self.executor_server.keep_jobdir,
-                                 str(self.job.unique))
-            self._execute()
-        except ExecutorError as e:
-            result_data = json.dumps(dict(result='ERROR',
-                                          error_detail=e.args[0]))
-            self.log.debug("Sending result: %s" % (result_data,))
-            self.job.sendWorkComplete(result_data)
-        except Exception:
-            self.log.exception("Exception while executing job")
-            self.job.sendWorkException(traceback.format_exc())
-        finally:
-            self.running = False
-            if self.jobdir:
-                try:
-                    self.jobdir.cleanup()
-                except Exception:
-                    self.log.exception("Error cleaning up jobdir:")
-            if self.ssh_agent:
-                try:
-                    self.ssh_agent.stop()
-                except Exception:
-                    self.log.exception("Error stopping SSH agent:")
-            try:
-                self.executor_server.finishJob(self.job.unique)
-            except Exception:
-                self.log.exception("Error finalizing job thread:")
-
-    def _execute(self):
-        args = self.arguments
-        self.log.info(
-            "Beginning job %s for ref %s (change %s)" % (
-                args['zuul']['job'],
-                args['zuul']['ref'],
-                args['zuul']['change_url']))
-        self.log.debug("Job root: %s" % (self.jobdir.root,))
-        tasks = []
-        projects = set()
-
-        # Make sure all projects used by the job are updated...
-        for project in args['projects']:
-            self.log.debug("Updating project %s" % (project,))
-            tasks.append(self.executor_server.update(
-                project['connection'], project['name']))
-            projects.add((project['connection'], project['name']))
-
-        # ...as well as all playbook and role projects.
-        repos = []
-        playbooks = (args['pre_playbooks'] + args['playbooks'] +
-                     args['post_playbooks'])
-        for playbook in playbooks:
-            repos.append(playbook)
-            repos += playbook['roles']
-
-        for repo in repos:
-            self.log.debug("Updating playbook or role %s" % (repo['project'],))
-            key = (repo['connection'], repo['project'])
-            if key not in projects:
-                tasks.append(self.executor_server.update(*key))
-                projects.add(key)
-
-        for task in tasks:
-            task.wait()
-            self.project_info[task.canonical_name] = {
-                'refs': task.refs,
-                'branches': task.branches,
-            }
-
-        self.log.debug("Git updates complete")
-        merger = self.executor_server._getMerger(
-            self.jobdir.src_root,
-            self.executor_server.merge_root,
-            self.log)
-        repos = {}
-        for project in args['projects']:
-            self.log.debug("Cloning %s/%s" % (project['connection'],
-                                              project['name'],))
-            repo = merger.getRepo(project['connection'],
-                                  project['name'])
-            repos[project['canonical_name']] = repo
-
-        # The commit ID of the original item (before merging).  Used
-        # later for line mapping.
-        item_commit = None
-
-        merge_items = [i for i in args['items'] if i.get('number')]
-        if merge_items:
-            item_commit = self.doMergeChanges(merger, merge_items,
-                                              args['repo_state'])
-            if item_commit is None:
-                # There was a merge conflict and we have already sent
-                # a work complete result, don't run any jobs
-                return
-
-        state_items = [i for i in args['items'] if not i.get('number')]
-        if state_items:
-            merger.setRepoState(state_items, args['repo_state'])
-
-        for project in args['projects']:
-            repo = repos[project['canonical_name']]
-            # If this project is the Zuul project and this is a ref
-            # rather than a change, checkout the ref.
-            if (project['canonical_name'] ==
-                args['zuul']['project']['canonical_name'] and
-                (not args['zuul'].get('branch')) and
-                args['zuul'].get('ref')):
-                ref = args['zuul']['ref']
-            else:
-                ref = None
-            selected_ref, selected_desc = self.resolveBranch(
-                project['canonical_name'],
-                ref,
-                args['branch'],
-                args['override_branch'],
-                args['override_checkout'],
-                project['override_branch'],
-                project['override_checkout'],
-                project['default_branch'])
-            self.log.info("Checking out %s %s %s",
-                          project['canonical_name'], selected_desc,
-                          selected_ref)
-            repo.checkout(selected_ref)
-
-            # Update the inventory variables to indicate the ref we
-            # checked out
-            p = args['zuul']['projects'][project['canonical_name']]
-            p['checkout'] = selected_ref
-
-        # Set the URL of the origin remote for each repo to a bogus
-        # value. Keeping the remote allows tools to use it to determine
-        # which commits are part of the current change.
-        for repo in repos.values():
-            repo.setRemoteUrl('file:///dev/null')
-
-        # This prepares each playbook and the roles needed for each.
-        self.preparePlaybooks(args)
-
-        self.prepareAnsibleFiles(args)
-        self.writeLoggingConfig()
-
-        data = {
-            # TODO(mordred) worker_name is needed as a unique name for the
-            # client to use for cancelling jobs on an executor. It's defaulting
-            # to the hostname for now, but in the future we should allow
-            # setting a per-executor override so that one can run more than
-            # one executor on a host.
-            'worker_name': self.executor_server.hostname,
-            'worker_hostname': self.executor_server.hostname,
-            'worker_log_port': self.executor_server.log_streaming_port
-        }
-        if self.executor_server.log_streaming_port != DEFAULT_FINGER_PORT:
-            data['url'] = "finger://{hostname}:{port}/{uuid}".format(
-                hostname=data['worker_hostname'],
-                port=data['worker_log_port'],
-                uuid=self.job.unique)
-        else:
-            data['url'] = 'finger://{hostname}/{uuid}'.format(
-                hostname=data['worker_hostname'],
-                uuid=self.job.unique)
-
-        self.job.sendWorkData(json.dumps(data))
-        self.job.sendWorkStatus(0, 100)
-
-        result = self.runPlaybooks(args)
-
-        # Stop the persistent SSH connections.
-        setup_status, setup_code = self.runAnsibleCleanup(
-            self.jobdir.setup_playbook)
-
-        if self.aborted_reason == self.RESULT_DISK_FULL:
-            result = 'DISK_FULL'
-        data = self.getResultData()
-        warnings = []
-        self.mapLines(merger, args, data, item_commit, warnings)
-        result_data = json.dumps(dict(result=result,
-                                      warnings=warnings,
-                                      data=data))
-        self.log.debug("Sending result: %s" % (result_data,))
-        self.job.sendWorkComplete(result_data)
-
-    def getResultData(self):
-        data = {}
-        try:
-            with open(self.jobdir.result_data_file) as f:
-                file_data = f.read()
-                if file_data:
-                    data = json.loads(file_data)
-        except Exception:
-            self.log.exception("Unable to load result data:")
-        return data
-
-    def mapLines(self, merger, args, data, commit, warnings):
-        # The data and warnings arguments are mutated in this method.
-
-        # If we received file comments, map the line numbers before
-        # we send the result.
-        fc = data.get('zuul', {}).get('file_comments')
-        if not fc:
-            return
-        disable = data.get('zuul', {}).get('disable_file_comment_line_mapping')
-        if disable:
-            return
-
-        try:
-            filecomments.validate(fc)
-        except Exception as e:
-            warnings.append("Job %s: validation error in file comments: %s" %
-                            (args['zuul']['job'], str(e)))
-            del data['zuul']['file_comments']
-            return
-
-        repo = None
-        for project in args['projects']:
-            if (project['canonical_name'] !=
-                args['zuul']['project']['canonical_name']):
-                continue
-            repo = merger.getRepo(project['connection'],
-                                  project['name'])
-        # If the repo doesn't exist, abort
-        if not repo:
-            return
-
-        # Check out the selected ref again in case the job altered the
-        # repo state.
-        p = args['zuul']['projects'][project['canonical_name']]
-        selected_ref = p['checkout']
-
-        self.log.info("Checking out %s %s for line mapping",
-                      project['canonical_name'], selected_ref)
-        try:
-            repo.checkout(selected_ref)
-        except Exception:
-            # If checkout fails, abort
-            self.log.exception("Error checking out repo for line mapping")
-            warnings.append("Job %s: unable to check out repo "
-                            "for file comments" % (args['zuul']['job']))
-            return
-
-        lines = filecomments.extractLines(fc)
-
-        new_lines = {}
-        for (filename, lineno) in lines:
-            try:
-                new_lineno = repo.mapLine(commit, filename, lineno)
-            except Exception as e:
-                # Log at debug level since it's likely a job issue
-                self.log.debug("Error mapping line:", exc_info=True)
-                if isinstance(e, git.GitCommandError):
-                    msg = e.stderr
-                else:
-                    msg = str(e)
-                warnings.append("Job %s: unable to map line "
-                                "for file comments: %s" %
-                                (args['zuul']['job'], msg))
-                new_lineno = None
-            if new_lineno is not None:
-                new_lines[(filename, lineno)] = new_lineno
-
-        filecomments.updateLines(fc, new_lines)
-
-    def doMergeChanges(self, merger, items, repo_state):
-        try:
-            ret = merger.mergeChanges(items, repo_state=repo_state)
-        except ValueError:
-            # Return ABORTED so that we'll try again. At this point all of
-            # the refs we're trying to merge should be valid refs. If we
-            # can't fetch them, it should resolve itself.
-            self.log.exception("Could not fetch refs to merge from remote")
-            result = dict(result='ABORTED')
-            self.job.sendWorkComplete(json.dumps(result))
-            return None
-        if not ret:  # merge conflict
-            result = dict(result='MERGER_FAILURE')
-            if self.executor_server.statsd:
-                base_key = "zuul.executor.{hostname}.merger"
-                self.executor_server.statsd.incr(base_key + ".FAILURE")
-            self.job.sendWorkComplete(json.dumps(result))
-            return None
-
-        if self.executor_server.statsd:
-            base_key = "zuul.executor.{hostname}.merger"
-            self.executor_server.statsd.incr(base_key + ".SUCCESS")
-        recent = ret[3]
-        orig_commit = ret[4]
-        for key, commit in recent.items():
-            (connection, project, branch) = key
-            repo = merger.getRepo(connection, project)
-            repo.setRef('refs/heads/' + branch, commit)
-        return orig_commit
+    def getMerger(self, root, cache_root=None, logger=None):
+        # TODO(jhesketh): Maybe return a merger directly here
+        email = 'todo'
+        username = 'todo'
+        speed_limit = '1000'
+        speed_time = '1000'
+        return zuul.merger.merger.Merger(
+            root, self.connections, email, username,
+            speed_limit, speed_time, cache_root, logger)
 
     def resolveBranch(self, project_canonical_name, ref, zuul_branch,
                       job_override_branch, job_override_checkout,
@@ -897,230 +510,6 @@ class AnsibleJob(object):
                                 (project_canonical_name,
                                  project_default_branch))
         return (selected_ref, selected_desc)
-
-    def getAnsibleTimeout(self, start, timeout):
-        if timeout is not None:
-            now = time.time()
-            elapsed = now - start
-            timeout = timeout - elapsed
-        return timeout
-
-    def runPlaybooks(self, args):
-        result = None
-
-        # Run the Ansible 'setup' module on all hosts in the inventory
-        # at the start of the job with a 60 second timeout.  If we
-        # aren't able to connect to all the hosts and gather facts
-        # within that timeout, there is likely a network problem
-        # between here and the hosts in the inventory; return them and
-        # reschedule the job.
-        setup_status, setup_code = self.runAnsibleSetup(
-            self.jobdir.setup_playbook)
-        if setup_status != self.RESULT_NORMAL or setup_code != 0:
-            return result
-
-        pre_failed = False
-        success = False
-        if self.executor_server.statsd:
-            key = "zuul.executor.{hostname}.starting_builds"
-            self.executor_server.statsd.timing(
-                key, (time.monotonic() - self.time_starting_build) * 1000)
-
-        self.started = True
-        time_started = time.time()
-        # timeout value is "total" job timeout which accounts for
-        # pre-run and run playbooks. post-run is different because
-        # it is used to copy out job logs and we want to do our best
-        # to copy logs even when the job has timed out.
-        job_timeout = args['timeout']
-        for index, playbook in enumerate(self.jobdir.pre_playbooks):
-            # TODOv3(pabelanger): Implement pre-run timeout setting.
-            ansible_timeout = self.getAnsibleTimeout(time_started, job_timeout)
-            pre_status, pre_code = self.runAnsiblePlaybook(
-                playbook, ansible_timeout, phase='pre', index=index)
-            if pre_status != self.RESULT_NORMAL or pre_code != 0:
-                # These should really never fail, so return None and have
-                # zuul try again
-                pre_failed = True
-                break
-
-        self.log.debug(
-            "Overall ansible cpu times: user=%.2f, system=%.2f, "
-            "children_user=%.2f, children_system=%.2f" %
-            (self.cpu_times['user'], self.cpu_times['system'],
-             self.cpu_times['children_user'],
-             self.cpu_times['children_system']))
-
-        if not pre_failed:
-            ansible_timeout = self.getAnsibleTimeout(time_started, job_timeout)
-            job_status, job_code = self.runAnsiblePlaybook(
-                self.jobdir.playbook, ansible_timeout, phase='run')
-            if job_status == self.RESULT_ABORTED:
-                return 'ABORTED'
-            elif job_status == self.RESULT_TIMED_OUT:
-                # Set the pre-failure flag so this doesn't get
-                # overridden by a post-failure.
-                pre_failed = True
-                result = 'TIMED_OUT'
-            elif job_status == self.RESULT_NORMAL:
-                success = (job_code == 0)
-                if success:
-                    result = 'SUCCESS'
-                else:
-                    result = 'FAILURE'
-            else:
-                # The result of the job is indeterminate.  Zuul will
-                # run it again.
-                return None
-
-        # check if we need to pause here
-        result_data = self.getResultData()
-        pause = result_data.get('zuul', {}).get('pause')
-        if pause:
-            self.pause()
-
-        post_timeout = args['post_timeout']
-        unreachable = False
-        for index, playbook in enumerate(self.jobdir.post_playbooks):
-            # Post timeout operates a little differently to the main job
-            # timeout. We give each post playbook the full post timeout to
-            # do its job because post is where you'll often record job logs
-            # which are vital to understanding why timeouts have happened in
-            # the first place.
-            post_status, post_code = self.runAnsiblePlaybook(
-                playbook, post_timeout, success, phase='post', index=index)
-            if post_status == self.RESULT_ABORTED:
-                return 'ABORTED'
-            if post_status == self.RESULT_UNREACHABLE:
-                # In case we encounter unreachable nodes we need to return None
-                # so the job can be retried. However in the case of post
-                # playbooks we should still try to run all playbooks to get a
-                # chance to upload logs.
-                unreachable = True
-            if post_status != self.RESULT_NORMAL or post_code != 0:
-                success = False
-                # If we encountered a pre-failure, that takes
-                # precedence over the post result.
-                if not pre_failed:
-                    result = 'POST_FAILURE'
-                if (index + 1) == len(self.jobdir.post_playbooks):
-                    self._logFinalPlaybookError()
-
-        if unreachable:
-            return None
-
-        return result
-
-    def _logFinalPlaybookError(self):
-        # Failures in the final post playbook can include failures
-        # uploading logs, which makes diagnosing issues difficult.
-        # Grab the output from the last playbook from the json
-        # file and log it.
-        json_output = self.jobdir.job_output_file.replace('txt', 'json')
-        self.log.debug("Final playbook failed")
-        if not os.path.exists(json_output):
-            self.log.debug("JSON logfile {logfile} is missing".format(
-                logfile=json_output))
-            return
-        try:
-            output = json.load(open(json_output, 'r'))
-            last_playbook = output[-1]
-            # Transform json to yaml - because it's easier to read and given
-            # the size of the data it'll be extra-hard to read this as an
-            # all on one line stringified nested dict.
-            yaml_out = yaml.safe_dump(last_playbook, default_flow_style=False)
-            for line in yaml_out.split('\n'):
-                self.log.debug(line)
-        except Exception:
-            self.log.exception(
-                "Could not decode json from {logfile}".format(
-                    logfile=json_output))
-
-    def getHostList(self, args):
-        hosts = []
-        for node in args['nodes']:
-            # NOTE(mordred): This assumes that the nodepool launcher
-            # and the zuul executor both have similar network
-            # characteristics, as the launcher will do a test for ipv6
-            # viability and if so, and if the node has an ipv6
-            # address, it will be the interface_ip.  force-ipv4 can be
-            # set to True in the clouds.yaml for a cloud if this
-            # results in the wrong thing being in interface_ip
-            # TODO(jeblair): Move this notice to the docs.
-            for name in node['name']:
-                ip = node.get('interface_ip')
-                port = node.get('connection_port', node.get('ssh_port', 22))
-                host_vars = args['host_vars'].get(name, {}).copy()
-                check_varnames(host_vars)
-                host_vars.update(dict(
-                    ansible_host=ip,
-                    ansible_user=self.executor_server.default_username,
-                    ansible_port=port,
-                    nodepool=dict(
-                        label=node.get('label'),
-                        az=node.get('az'),
-                        cloud=node.get('cloud'),
-                        provider=node.get('provider'),
-                        region=node.get('region'),
-                        host_id=node.get('host_id'),
-                        interface_ip=node.get('interface_ip'),
-                        public_ipv4=node.get('public_ipv4'),
-                        private_ipv4=node.get('private_ipv4'),
-                        public_ipv6=node.get('public_ipv6'))))
-
-                username = node.get('username')
-                if username:
-                    host_vars['ansible_user'] = username
-
-                connection_type = node.get('connection_type')
-                if connection_type:
-                    host_vars['ansible_connection'] = connection_type
-                    if connection_type == "winrm":
-                        host_vars['ansible_winrm_transport'] = 'certificate'
-                        host_vars['ansible_winrm_cert_pem'] = \
-                            self.winrm_pem_file
-                        host_vars['ansible_winrm_cert_key_pem'] = \
-                            self.winrm_key_file
-                        # NOTE(tobiash): This is necessary when using default
-                        # winrm self-signed certificates. This is probably what
-                        # most installations want so hard code this here for
-                        # now.
-                        host_vars['ansible_winrm_server_cert_validation'] = \
-                            'ignore'
-                        if self.winrm_operation_timeout is not None:
-                            host_vars['ansible_winrm_operation_timeout_sec'] =\
-                                self.winrm_operation_timeout
-                        if self.winrm_read_timeout is not None:
-                            host_vars['ansible_winrm_read_timeout_sec'] = \
-                                self.winrm_read_timeout
-
-                host_keys = []
-                for key in node.get('host_keys', []):
-                    if port != 22:
-                        host_keys.append("[%s]:%s %s" % (ip, port, key))
-                    else:
-                        host_keys.append("%s %s" % (ip, key))
-
-                hosts.append(dict(
-                    name=name,
-                    host_vars=host_vars,
-                    host_keys=host_keys))
-        return hosts
-
-    def _blockPluginDirs(self, path):
-        '''Prevent execution of playbooks or roles with plugins
-
-        Plugins are loaded from roles and also if there is a plugin
-        dir adjacent to the playbook.  Throw an error if the path
-        contains a location that would cause a plugin to get loaded.
-
-        '''
-        for entry in os.listdir(path):
-            entry = os.path.join(path, entry)
-            if os.path.isdir(entry) and entry.endswith('_plugins'):
-                raise ExecutorError(
-                    "Ansible plugin dir %s found adjacent to playbook %s in "
-                    "non-trusted repo." % (entry, path))
 
     def findPlaybook(self, path, trusted=False):
         if os.path.exists(path):
@@ -1378,6 +767,657 @@ class AnsibleJob(object):
             role_path = root
         self.log.debug("Adding role path %s", role_path)
         jobdir_playbook.roles_path.append(role_path)
+
+    def prepareRepositories(self, update_manager):
+        args = self.arguments
+        tasks = []
+        projects = set()
+
+        # Make sure all projects used by the job are updated...
+        for project in args['projects']:
+            self.log.debug("Updating project %s" % (project,))
+            tasks.append(update_manager(
+                project['connection'], project['name']))
+            projects.add((project['connection'], project['name']))
+
+        # ...as well as all playbook and role projects.
+        repos = []
+        playbooks = (args['pre_playbooks'] + args['playbooks'] +
+                     args['post_playbooks'])
+        for playbook in playbooks:
+            repos.append(playbook)
+            repos += playbook['roles']
+
+        for repo in repos:
+            self.log.debug("Updating playbook or role %s" % (repo['project'],))
+            key = (repo['connection'], repo['project'])
+            if key not in projects:
+                tasks.append(update_manager(*key))
+                projects.add(key)
+
+        for task in tasks:
+            task.wait()
+            self.project_info[task.canonical_name] = {
+                'refs': task.refs,
+                'branches': task.branches,
+            }
+
+        self.log.debug("Git updates complete")
+        merger = self.getMerger(
+            self.jobdir.src_root,
+            self.merge_root,
+            self.log)
+
+        repos = {}
+        for project in args['projects']:
+            self.log.debug("Cloning %s/%s" % (project['connection'],
+                                              project['name'],))
+            repo = merger.getRepo(project['connection'],
+                                  project['name'])
+            repos[project['canonical_name']] = repo
+
+        # The commit ID of the original item (before merging).  Used
+        # later for line mapping.
+        item_commit = None
+
+        merge_items = [i for i in args['items'] if i.get('number')]
+        if merge_items:
+            item_commit = self.doMergeChanges(merger, merge_items,
+                                              args['repo_state'])
+            if item_commit is None:
+                return item_commit, merger
+
+        state_items = [i for i in args['items'] if not i.get('number')]
+        if state_items:
+            merger.setRepoState(state_items, args['repo_state'])
+
+        for project in args['projects']:
+            repo = repos[project['canonical_name']]
+            # If this project is the Zuul project and this is a ref
+            # rather than a change, checkout the ref.
+            if (project['canonical_name'] ==
+                args['zuul']['project']['canonical_name'] and
+                (not args['zuul'].get('branch')) and
+                args['zuul'].get('ref')):
+                ref = args['zuul']['ref']
+            else:
+                ref = None
+            selected_ref, selected_desc = self.resolveBranch(
+                project['canonical_name'],
+                ref,
+                args['branch'],
+                args['override_branch'],
+                args['override_checkout'],
+                project['override_branch'],
+                project['override_checkout'],
+                project['default_branch'])
+            self.log.info("Checking out %s %s %s",
+                          project['canonical_name'], selected_desc,
+                          selected_ref)
+            repo.checkout(selected_ref)
+
+            # Update the inventory variables to indicate the ref we
+            # checked out
+            p = args['zuul']['projects'][project['canonical_name']]
+            p['checkout'] = selected_ref
+
+        # Set the URL of the origin remote for each repo to a bogus
+        # value. Keeping the remote allows tools to use it to determine
+        # which commits are part of the current change.
+        for repo in repos.values():
+            repo.setRemoteUrl('file:///dev/null')
+
+        return item_commit, merger
+
+
+class AnsibleJob(AnsibleJobBase):
+    "This class executes and performs the full Ansible Job"
+    RESULT_NORMAL = 1
+    RESULT_TIMED_OUT = 2
+    RESULT_UNREACHABLE = 3
+    RESULT_ABORTED = 4
+    RESULT_DISK_FULL = 5
+
+    RESULT_MAP = {
+        RESULT_NORMAL: 'RESULT_NORMAL',
+        RESULT_TIMED_OUT: 'RESULT_TIMED_OUT',
+        RESULT_UNREACHABLE: 'RESULT_UNREACHABLE',
+        RESULT_ABORTED: 'RESULT_ABORTED',
+        RESULT_DISK_FULL: 'RESULT_DISK_FULL',
+    }
+
+    def __init__(self, executor_server, job):
+        super(AnsibleJob, self).__init__(
+            executor_server.connections, executor_server.merge_root)
+        logger = logging.getLogger("zuul.AnsibleJob")
+        self.log = AnsibleJobLogAdapter(logger, {'job': job.unique})
+        self.executor_server = executor_server
+        self.job = job
+        self.arguments = json.loads(job.arguments)
+        self.proc = None
+        self.proc_lock = threading.Lock()
+        self.running = False
+        self.started = False  # Whether playbooks have started running
+        self.time_starting_build = None
+        self.paused = False
+        self.aborted = False
+        self.aborted_reason = None
+        self._resume_event = threading.Event()
+        self.thread = None
+        self.private_key_file = get_default(self.executor_server.config,
+                                            'executor', 'private_key_file',
+                                            '~/.ssh/id_rsa')
+        self.winrm_key_file = get_default(self.executor_server.config,
+                                          'executor', 'winrm_cert_key_file',
+                                          '~/.winrm/winrm_client_cert.key')
+        self.winrm_pem_file = get_default(self.executor_server.config,
+                                          'executor', 'winrm_cert_pem_file',
+                                          '~/.winrm/winrm_client_cert.pem')
+        self.winrm_operation_timeout = get_default(
+            self.executor_server.config,
+            'executor',
+            'winrm_operation_timeout_sec')
+        self.winrm_read_timeout = get_default(
+            self.executor_server.config,
+            'executor',
+            'winrm_read_timeout_sec')
+        self.ssh_agent = SshAgent()
+
+        self.executor_variables_file = None
+
+        self.cpu_times = {'user': 0, 'system': 0,
+                          'children_user': 0, 'children_system': 0}
+
+        if self.executor_server.config.has_option('executor', 'variables'):
+            self.executor_variables_file = self.executor_server.config.get(
+                'executor', 'variables')
+
+    def getMerger(self, root, cache_root=None, logger=None):
+        return self.executor_server._getMerger(root, cache_root, logger)
+
+    def run(self):
+        self.running = True
+        self.thread = threading.Thread(target=self.execute,
+                                       name='build-%s' % self.job.unique)
+        self.thread.start()
+
+    def stop(self, reason=None):
+        self.aborted = True
+        self.aborted_reason = reason
+
+        # if paused we need to resume the job so it can be stopped
+        self.resume()
+        self.abortRunningProc()
+
+    def pause(self):
+        self.log.info(
+            "Pausing job %s for ref %s (change %s)" % (
+                self.arguments['zuul']['job'],
+                self.arguments['zuul']['ref'],
+                self.arguments['zuul']['change_url']))
+        with open(self.jobdir.job_output_file, 'a') as job_output:
+            job_output.write(
+                "{now} |\n"
+                "{now} | Job paused\n".format(now=datetime.datetime.now()))
+
+        self.paused = True
+
+        data = {'paused': self.paused, 'data': self.getResultData()}
+        self.job.sendWorkData(json.dumps(data))
+        self._resume_event.wait()
+
+    def resume(self):
+        if not self.paused:
+            return
+
+        self.log.info(
+            "Resuming job %s for ref %s (change %s)" % (
+                self.arguments['zuul']['job'],
+                self.arguments['zuul']['ref'],
+                self.arguments['zuul']['change_url']))
+        with open(self.jobdir.job_output_file, 'a') as job_output:
+            job_output.write(
+                "{now} | Job resumed\n"
+                "{now} |\n".format(now=datetime.datetime.now()))
+
+        self.paused = False
+        self._resume_event.set()
+
+    def wait(self):
+        if self.thread:
+            self.thread.join()
+
+    def execute(self):
+        try:
+            self.time_starting_build = time.monotonic()
+            self.ssh_agent.start()
+            self.ssh_agent.add(self.private_key_file)
+            for key in self.arguments.get('ssh_keys', []):
+                self.ssh_agent.addData(key['name'], key['key'])
+            self.jobdir = JobDir(self.executor_server.jobdir_root,
+                                 self.executor_server.keep_jobdir,
+                                 str(self.job.unique))
+            self._execute()
+        except ExecutorError as e:
+            result_data = json.dumps(dict(result='ERROR',
+                                          error_detail=e.args[0]))
+            self.log.debug("Sending result: %s" % (result_data,))
+            self.job.sendWorkComplete(result_data)
+        except Exception:
+            self.log.exception("Exception while executing job")
+            self.job.sendWorkException(traceback.format_exc())
+        finally:
+            self.running = False
+            if self.jobdir:
+                try:
+                    self.jobdir.cleanup()
+                except Exception:
+                    self.log.exception("Error cleaning up jobdir:")
+            if self.ssh_agent:
+                try:
+                    self.ssh_agent.stop()
+                except Exception:
+                    self.log.exception("Error stopping SSH agent:")
+            try:
+                self.executor_server.finishJob(self.job.unique)
+            except Exception:
+                self.log.exception("Error finalizing job thread:")
+
+    def _execute(self):
+        args = self.arguments
+        self.log.info(
+            "Beginning job %s for ref %s (change %s)" % (
+                args['zuul']['job'],
+                args['zuul']['ref'],
+                args['zuul']['change_url']))
+        self.log.debug("Job root: %s" % (self.jobdir.root,))
+
+        item_commit, merger = self.prepareRepositories(
+            self.executor_server.update)
+        if item_commit is None:
+            # There was a merge conflict and we have already sent
+            # a work complete result, don't run any jobs
+            return
+
+        # This prepares each playbook and the roles needed for each.
+        self.preparePlaybooks(args)
+
+        self.prepareAnsibleFiles(args)
+        self.writeLoggingConfig()
+
+        data = {
+            # TODO(mordred) worker_name is needed as a unique name for the
+            # client to use for cancelling jobs on an executor. It's defaulting
+            # to the hostname for now, but in the future we should allow
+            # setting a per-executor override so that one can run more than
+            # one executor on a host.
+            'worker_name': self.executor_server.hostname,
+            'worker_hostname': self.executor_server.hostname,
+            'worker_log_port': self.executor_server.log_streaming_port
+        }
+        if self.executor_server.log_streaming_port != DEFAULT_FINGER_PORT:
+            data['url'] = "finger://{hostname}:{port}/{uuid}".format(
+                hostname=data['worker_hostname'],
+                port=data['worker_log_port'],
+                uuid=self.job.unique)
+        else:
+            data['url'] = 'finger://{hostname}/{uuid}'.format(
+                hostname=data['worker_hostname'],
+                uuid=self.job.unique)
+
+        self.job.sendWorkData(json.dumps(data))
+        self.job.sendWorkStatus(0, 100)
+
+        result = self.runPlaybooks(args)
+
+        # Stop the persistent SSH connections.
+        setup_status, setup_code = self.runAnsibleCleanup(
+            self.jobdir.setup_playbook)
+
+        if self.aborted_reason == self.RESULT_DISK_FULL:
+            result = 'DISK_FULL'
+        data = self.getResultData()
+        warnings = []
+        self.mapLines(merger, args, data, item_commit, warnings)
+        result_data = json.dumps(dict(result=result,
+                                      warnings=warnings,
+                                      data=data))
+        self.log.debug("Sending result: %s" % (result_data,))
+        self.job.sendWorkComplete(result_data)
+
+    def getResultData(self):
+        data = {}
+        try:
+            with open(self.jobdir.result_data_file) as f:
+                file_data = f.read()
+                if file_data:
+                    data = json.loads(file_data)
+        except Exception:
+            self.log.exception("Unable to load result data:")
+        return data
+
+    def mapLines(self, merger, args, data, commit, warnings):
+        # The data and warnings arguments are mutated in this method.
+
+        # If we received file comments, map the line numbers before
+        # we send the result.
+        fc = data.get('zuul', {}).get('file_comments')
+        if not fc:
+            return
+        disable = data.get('zuul', {}).get('disable_file_comment_line_mapping')
+        if disable:
+            return
+
+        try:
+            filecomments.validate(fc)
+        except Exception as e:
+            warnings.append("Job %s: validation error in file comments: %s" %
+                            (args['zuul']['job'], str(e)))
+            del data['zuul']['file_comments']
+            return
+
+        repo = None
+        for project in args['projects']:
+            if (project['canonical_name'] !=
+                args['zuul']['project']['canonical_name']):
+                continue
+            repo = merger.getRepo(project['connection'],
+                                  project['name'])
+        # If the repo doesn't exist, abort
+        if not repo:
+            return
+
+        # Check out the selected ref again in case the job altered the
+        # repo state.
+        p = args['zuul']['projects'][project['canonical_name']]
+        selected_ref = p['checkout']
+
+        self.log.info("Checking out %s %s for line mapping",
+                      project['canonical_name'], selected_ref)
+        try:
+            repo.checkout(selected_ref)
+        except Exception:
+            # If checkout fails, abort
+            self.log.exception("Error checking out repo for line mapping")
+            warnings.append("Job %s: unable to check out repo "
+                            "for file comments" % (args['zuul']['job']))
+            return
+
+        lines = filecomments.extractLines(fc)
+
+        new_lines = {}
+        for (filename, lineno) in lines:
+            try:
+                new_lineno = repo.mapLine(commit, filename, lineno)
+            except Exception as e:
+                # Log at debug level since it's likely a job issue
+                self.log.debug("Error mapping line:", exc_info=True)
+                if isinstance(e, git.GitCommandError):
+                    msg = e.stderr
+                else:
+                    msg = str(e)
+                warnings.append("Job %s: unable to map line "
+                                "for file comments: %s" %
+                                (args['zuul']['job'], msg))
+                new_lineno = None
+            if new_lineno is not None:
+                new_lines[(filename, lineno)] = new_lineno
+
+        filecomments.updateLines(fc, new_lines)
+
+    def doMergeChanges(self, merger, items, repo_state):
+        try:
+            ret = merger.mergeChanges(items, repo_state=repo_state)
+        except ValueError:
+            # Return ABORTED so that we'll try again. At this point all of
+            # the refs we're trying to merge should be valid refs. If we
+            # can't fetch them, it should resolve itself.
+            self.log.exception("Could not fetch refs to merge from remote")
+            result = dict(result='ABORTED')
+            self.job.sendWorkComplete(json.dumps(result))
+            return None
+        if not ret:  # merge conflict
+            result = dict(result='MERGER_FAILURE')
+            if self.executor_server.statsd:
+                base_key = "zuul.executor.{hostname}.merger"
+                self.executor_server.statsd.incr(base_key + ".FAILURE")
+            self.job.sendWorkComplete(json.dumps(result))
+            return None
+
+        if self.executor_server.statsd:
+            base_key = "zuul.executor.{hostname}.merger"
+            self.executor_server.statsd.incr(base_key + ".SUCCESS")
+        recent = ret[3]
+        orig_commit = ret[4]
+        for key, commit in recent.items():
+            (connection, project, branch) = key
+            repo = merger.getRepo(connection, project)
+            repo.setRef('refs/heads/' + branch, commit)
+        return orig_commit
+
+    def getAnsibleTimeout(self, start, timeout):
+        if timeout is not None:
+            now = time.time()
+            elapsed = now - start
+            timeout = timeout - elapsed
+        return timeout
+
+    def runPlaybooks(self, args):
+        result = None
+
+        # Run the Ansible 'setup' module on all hosts in the inventory
+        # at the start of the job with a 60 second timeout.  If we
+        # aren't able to connect to all the hosts and gather facts
+        # within that timeout, there is likely a network problem
+        # between here and the hosts in the inventory; return them and
+        # reschedule the job.
+        setup_status, setup_code = self.runAnsibleSetup(
+            self.jobdir.setup_playbook)
+        if setup_status != self.RESULT_NORMAL or setup_code != 0:
+            return result
+
+        pre_failed = False
+        success = False
+        if self.executor_server.statsd:
+            key = "zuul.executor.{hostname}.starting_builds"
+            self.executor_server.statsd.timing(
+                key, (time.monotonic() - self.time_starting_build) * 1000)
+
+        self.started = True
+        time_started = time.time()
+        # timeout value is "total" job timeout which accounts for
+        # pre-run and run playbooks. post-run is different because
+        # it is used to copy out job logs and we want to do our best
+        # to copy logs even when the job has timed out.
+        job_timeout = args['timeout']
+        for index, playbook in enumerate(self.jobdir.pre_playbooks):
+            # TODOv3(pabelanger): Implement pre-run timeout setting.
+            ansible_timeout = self.getAnsibleTimeout(time_started, job_timeout)
+            pre_status, pre_code = self.runAnsiblePlaybook(
+                playbook, ansible_timeout, phase='pre', index=index)
+            if pre_status != self.RESULT_NORMAL or pre_code != 0:
+                # These should really never fail, so return None and have
+                # zuul try again
+                pre_failed = True
+                break
+
+        self.log.debug(
+            "Overall ansible cpu times: user=%.2f, system=%.2f, "
+            "children_user=%.2f, children_system=%.2f" %
+            (self.cpu_times['user'], self.cpu_times['system'],
+             self.cpu_times['children_user'],
+             self.cpu_times['children_system']))
+
+        if not pre_failed:
+            ansible_timeout = self.getAnsibleTimeout(time_started, job_timeout)
+            job_status, job_code = self.runAnsiblePlaybook(
+                self.jobdir.playbook, ansible_timeout, phase='run')
+            if job_status == self.RESULT_ABORTED:
+                return 'ABORTED'
+            elif job_status == self.RESULT_TIMED_OUT:
+                # Set the pre-failure flag so this doesn't get
+                # overridden by a post-failure.
+                pre_failed = True
+                result = 'TIMED_OUT'
+            elif job_status == self.RESULT_NORMAL:
+                success = (job_code == 0)
+                if success:
+                    result = 'SUCCESS'
+                else:
+                    result = 'FAILURE'
+            else:
+                # The result of the job is indeterminate.  Zuul will
+                # run it again.
+                return None
+
+        # check if we need to pause here
+        result_data = self.getResultData()
+        pause = result_data.get('zuul', {}).get('pause')
+        if pause:
+            self.pause()
+
+        post_timeout = args['post_timeout']
+        unreachable = False
+        for index, playbook in enumerate(self.jobdir.post_playbooks):
+            # Post timeout operates a little differently to the main job
+            # timeout. We give each post playbook the full post timeout to
+            # do its job because post is where you'll often record job logs
+            # which are vital to understanding why timeouts have happened in
+            # the first place.
+            post_status, post_code = self.runAnsiblePlaybook(
+                playbook, post_timeout, success, phase='post', index=index)
+            if post_status == self.RESULT_ABORTED:
+                return 'ABORTED'
+            if post_status == self.RESULT_UNREACHABLE:
+                # In case we encounter unreachable nodes we need to return None
+                # so the job can be retried. However in the case of post
+                # playbooks we should still try to run all playbooks to get a
+                # chance to upload logs.
+                unreachable = True
+            if post_status != self.RESULT_NORMAL or post_code != 0:
+                success = False
+                # If we encountered a pre-failure, that takes
+                # precedence over the post result.
+                if not pre_failed:
+                    result = 'POST_FAILURE'
+                if (index + 1) == len(self.jobdir.post_playbooks):
+                    self._logFinalPlaybookError()
+
+        if unreachable:
+            return None
+
+        return result
+
+    def _logFinalPlaybookError(self):
+        # Failures in the final post playbook can include failures
+        # uploading logs, which makes diagnosing issues difficult.
+        # Grab the output from the last playbook from the json
+        # file and log it.
+        json_output = self.jobdir.job_output_file.replace('txt', 'json')
+        self.log.debug("Final playbook failed")
+        if not os.path.exists(json_output):
+            self.log.debug("JSON logfile {logfile} is missing".format(
+                logfile=json_output))
+            return
+        try:
+            output = json.load(open(json_output, 'r'))
+            last_playbook = output[-1]
+            # Transform json to yaml - because it's easier to read and given
+            # the size of the data it'll be extra-hard to read this as an
+            # all on one line stringified nested dict.
+            yaml_out = yaml.safe_dump(last_playbook, default_flow_style=False)
+            for line in yaml_out.split('\n'):
+                self.log.debug(line)
+        except Exception:
+            self.log.exception(
+                "Could not decode json from {logfile}".format(
+                    logfile=json_output))
+
+    def getHostList(self, args):
+        hosts = []
+        for node in args['nodes']:
+            # NOTE(mordred): This assumes that the nodepool launcher
+            # and the zuul executor both have similar network
+            # characteristics, as the launcher will do a test for ipv6
+            # viability and if so, and if the node has an ipv6
+            # address, it will be the interface_ip.  force-ipv4 can be
+            # set to True in the clouds.yaml for a cloud if this
+            # results in the wrong thing being in interface_ip
+            # TODO(jeblair): Move this notice to the docs.
+            for name in node['name']:
+                ip = node.get('interface_ip')
+                port = node.get('connection_port', node.get('ssh_port', 22))
+                host_vars = args['host_vars'].get(name, {}).copy()
+                check_varnames(host_vars)
+                host_vars.update(dict(
+                    ansible_host=ip,
+                    ansible_user=self.executor_server.default_username,
+                    ansible_port=port,
+                    nodepool=dict(
+                        label=node.get('label'),
+                        az=node.get('az'),
+                        cloud=node.get('cloud'),
+                        provider=node.get('provider'),
+                        region=node.get('region'),
+                        host_id=node.get('host_id'),
+                        interface_ip=node.get('interface_ip'),
+                        public_ipv4=node.get('public_ipv4'),
+                        private_ipv4=node.get('private_ipv4'),
+                        public_ipv6=node.get('public_ipv6'))))
+
+                username = node.get('username')
+                if username:
+                    host_vars['ansible_user'] = username
+
+                connection_type = node.get('connection_type')
+                if connection_type:
+                    host_vars['ansible_connection'] = connection_type
+                    if connection_type == "winrm":
+                        host_vars['ansible_winrm_transport'] = 'certificate'
+                        host_vars['ansible_winrm_cert_pem'] = \
+                            self.winrm_pem_file
+                        host_vars['ansible_winrm_cert_key_pem'] = \
+                            self.winrm_key_file
+                        # NOTE(tobiash): This is necessary when using default
+                        # winrm self-signed certificates. This is probably what
+                        # most installations want so hard code this here for
+                        # now.
+                        host_vars['ansible_winrm_server_cert_validation'] = \
+                            'ignore'
+                        if self.winrm_operation_timeout is not None:
+                            host_vars['ansible_winrm_operation_timeout_sec'] =\
+                                self.winrm_operation_timeout
+                        if self.winrm_read_timeout is not None:
+                            host_vars['ansible_winrm_read_timeout_sec'] = \
+                                self.winrm_read_timeout
+
+                host_keys = []
+                for key in node.get('host_keys', []):
+                    if port != 22:
+                        host_keys.append("[%s]:%s %s" % (ip, port, key))
+                    else:
+                        host_keys.append("%s %s" % (ip, key))
+
+                hosts.append(dict(
+                    name=name,
+                    host_vars=host_vars,
+                    host_keys=host_keys))
+        return hosts
+
+    def _blockPluginDirs(self, path):
+        '''Prevent execution of playbooks or roles with plugins
+
+        Plugins are loaded from roles and also if there is a plugin
+        dir adjacent to the playbook.  Throw an error if the path
+        contains a location that would cause a plugin to get loaded.
+
+        '''
+        for entry in os.listdir(path):
+            entry = os.path.join(path, entry)
+            if os.path.isdir(entry) and entry.endswith('_plugins'):
+                raise ExecutorError(
+                    "Ansible plugin dir %s found adjacent to playbook %s in "
+                    "non-trusted repo." % (entry, path))
 
     def prepareKubeConfig(self, data):
         kube_cfg_path = os.path.join(self.jobdir.work_root, ".kube", "config")
