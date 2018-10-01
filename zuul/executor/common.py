@@ -564,75 +564,10 @@ class AnsibleJobBase(object):
         if self.jobdir.playbook is None:
             raise ExecutorError("No playbook specified")
 
-    def _execute(self):
-        args = self.arguments
-        self.log.info(
-            "Beginning job %s for ref %s (change %s)" % (
-                args['zuul']['job'],
-                args['zuul']['ref'],
-                args['zuul']['change_url']))
-        self.log.debug("Job root: %s" % (self.jobdir.root,))
-        tasks = []
-        projects = set()
+        for playbook in args['post_playbooks']:
+            jobdir_playbook = self.jobdir.addPostPlaybook()
+            self.preparePlaybook(jobdir_playbook, playbook, args)
 
-        # Make sure all projects used by the job are updated...
-        for project in args['projects']:
-            self.log.debug("Updating project %s" % (project,))
-            tasks.append(self.executor_server.update(
-                project['connection'], project['name']))
-            projects.add((project['connection'], project['name']))
-
-        # ...as well as all playbook and role projects.
-        repos = []
-        playbooks = (args['pre_playbooks'] + args['playbooks'] +
-                     args['post_playbooks'])
-        for playbook in playbooks:
-            repos.append(playbook)
-            repos += playbook['roles']
-
-        for repo in repos:
-            self.log.debug("Updating playbook or role %s" % (repo['project'],))
-            key = (repo['connection'], repo['project'])
-            if key not in projects:
-                tasks.append(self.executor_server.update(*key))
-                projects.add(key)
-
-        for task in tasks:
-            task.wait()
-            self.project_info[task.canonical_name] = {
-                'refs': task.refs,
-                'branches': task.branches,
-            }
-
-        self.log.debug("Git updates complete")
-        merger = self.executor_server._getMerger(
-            self.jobdir.src_root,
-            self.executor_server.merge_root,
-            self.log)
-        repos = {}
-        for project in args['projects']:
-            self.log.debug("Cloning %s/%s" % (project['connection'],
-                                              project['name'],))
-            repo = merger.getRepo(project['connection'],
-                                  project['name'])
-            repos[project['canonical_name']] = repo
-
-        # The commit ID of the original item (before merging).  Used
-        # later for line mapping.
-        item_commit = None
-
-        merge_items = [i for i in args['items'] if i.get('number')]
-        if merge_items:
-            item_commit = self.doMergeChanges(merger, merge_items,
-                                              args['repo_state'])
-            if item_commit is None:
-                # There was a merge conflict and we have already sent
-                # a work complete result, don't run any jobs
-                return
-
-        state_items = [i for i in args['items'] if not i.get('number')]
-        if state_items:
-            merger.setRepoState(state_items, args['repo_state'])
     def preparePlaybook(self, jobdir_playbook, playbook, args):
         # Check out the playbook repo if needed and set the path to
         # the playbook that should be run.
@@ -829,6 +764,109 @@ class AnsibleJobBase(object):
         self.log.debug("Adding role path %s", role_path)
         jobdir_playbook.roles_path.append(role_path)
 
+    def prepareRepositories(self, update_manager):
+        args = self.arguments
+        tasks = []
+        projects = set()
+
+        # Make sure all projects used by the job are updated...
+        for project in args['projects']:
+            self.log.debug("Updating project %s" % (project,))
+            tasks.append(update_manager(
+                project['connection'], project['name']))
+            projects.add((project['connection'], project['name']))
+
+        # ...as well as all playbook and role projects.
+        repos = []
+        playbooks = (args['pre_playbooks'] + args['playbooks'] +
+                     args['post_playbooks'])
+        for playbook in playbooks:
+            repos.append(playbook)
+            repos += playbook['roles']
+
+        for repo in repos:
+            self.log.debug("Updating playbook or role %s" % (repo['project'],))
+            key = (repo['connection'], repo['project'])
+            if key not in projects:
+                tasks.append(update_manager(*key))
+                projects.add(key)
+
+        for task in tasks:
+            task.wait()
+            self.project_info[task.canonical_name] = {
+                'refs': task.refs,
+                'branches': task.branches,
+            }
+
+        self.log.debug("Git updates complete")
+
+        merger = self.getMerger(
+            self.jobdir.src_root,
+            self.merge_root,
+            self.log)
+
+        repos = {}
+        for project in args['projects']:
+            self.log.debug("Cloning %s/%s" % (project['connection'],
+                                              project['name'],))
+            repo = merger.getRepo(project['connection'],
+                                  project['name'])
+            repos[project['canonical_name']] = repo
+
+        # The commit ID of the original item (before merging).  Used
+        # later for line mapping.
+        item_commit = None
+
+        merge_items = [i for i in args['items'] if i.get('number')]
+        if merge_items:
+            item_commit = self.doMergeChanges(merger, merge_items,
+                                              args['repo_state'])
+            if item_commit is None:
+                return False
+
+        state_items = [i for i in args['items'] if not i.get('number')]
+        if state_items:
+            merger.setRepoState(state_items, args['repo_state'])
+
+        for project in args['projects']:
+            repo = repos[project['canonical_name']]
+            # If this project is the Zuul project and this is a ref
+            # rather than a change, checkout the ref.
+            if (project['canonical_name'] ==
+                args['zuul']['project']['canonical_name'] and
+                (not args['zuul'].get('branch')) and
+                args['zuul'].get('ref')):
+                ref = args['zuul']['ref']
+            else:
+                ref = None
+            selected_ref, selected_desc = self.resolveBranch(
+                project['canonical_name'],
+                ref,
+                args['branch'],
+                args['override_branch'],
+                args['override_checkout'],
+                project['override_branch'],
+                project['override_checkout'],
+                project['default_branch'])
+            self.log.info("Checking out %s %s %s",
+                          project['canonical_name'], selected_desc,
+                          selected_ref)
+            repo.checkout(selected_ref)
+
+            # Update the inventory variables to indicate the ref we
+            # checked out
+            p = args['zuul']['projects'][project['canonical_name']]
+            p['checkout'] = selected_ref
+
+        # Set the URL of the origin remote for each repo to a bogus
+        # value. Keeping the remote allows tools to use it to determine
+        # which commits are part of the current change.
+        for repo in repos.values():
+            repo.setRemoteUrl('file:///dev/null')
+
+
+        return True
+
 
 class AnsibleJob(AnsibleJobBase):
     "This class executes and performs the full Ansible Job"
@@ -982,12 +1020,7 @@ class AnsibleJob(AnsibleJobBase):
                 args['zuul']['change_url']))
         self.log.debug("Job root: %s" % (self.jobdir.root,))
 
-        merger = self.executor_server._getMerger(
-            self.jobdir.src_root,
-            self.executor_server.merge_root,
-            self.log)
-
-        result = self.prepareRepositories(self.executor_server.update, merger)
+        result = self.prepareRepositories(self.executor_server.update)
         if not result:
             # There was a merge conflict and we have already sent
             # a work complete result, don't run any jobs
