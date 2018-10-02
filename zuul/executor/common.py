@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import collections
 import datetime
 import json
 import logging
@@ -97,6 +98,67 @@ def make_inventory_dict(nodes, args, all_vars):
             }})
 
     return inventory
+
+
+class UpdateTask(object):
+    def __init__(self, connection_name, project_name):
+        self.connection_name = connection_name
+        self.project_name = project_name
+        self.canonical_name = None
+        self.branches = None
+        self.refs = None
+        self.event = threading.Event()
+
+    def __eq__(self, other):
+        if (other and other.connection_name == self.connection_name and
+            other.project_name == self.project_name):
+            return True
+        return False
+
+    def wait(self):
+        self.event.wait()
+
+    def setComplete(self):
+        self.event.set()
+
+
+class DeduplicateQueue(object):
+    def __init__(self):
+        self.queue = collections.deque()
+        self.condition = threading.Condition()
+
+    def qsize(self):
+        return len(self.queue)
+
+    def put(self, item):
+        # Returns the original item if added, or an equivalent item if
+        # already enqueued.
+        self.condition.acquire()
+        ret = None
+        try:
+            for x in self.queue:
+                if item == x:
+                    ret = x
+            if ret is None:
+                ret = item
+                self.queue.append(item)
+                self.condition.notify()
+        finally:
+            self.condition.release()
+        return ret
+
+    def get(self):
+        self.condition.acquire()
+        try:
+            while True:
+                try:
+                    ret = self.queue.popleft()
+                    return ret
+                except IndexError:
+                    pass
+                self.condition.wait()
+        finally:
+            self.condition.release()
 
 
 class Watchdog(object):
@@ -451,7 +513,8 @@ class AnsibleJobLogAdapter(logging.LoggerAdapter):
 class AnsibleJobBase(object):
     "This class prepares the roles and repositories for an Ansible Job"
 
-    def __init__(self, connections, merger_root):
+    def __init__(self, arguments, connections, merger_root):
+        self.arguments = arguments
         self.log = logging.getLogger("zuul.AnsibleJobBase")
         self.jobdir = None
         self.project_info = {}
@@ -459,8 +522,24 @@ class AnsibleJobBase(object):
         self.merge_root = merger_root
 
     def writeAnsibleConfig(self, jobdir_playbook):
-        # TODO(jhesketh)
-        pass
+        with open(jobdir_playbook.ansible_config, 'w') as config:
+            config.write('[defaults]\n')
+            config.write('inventory = %s\n' % self.jobdir.inventory)
+            config.write('local_tmp = %s\n' % self.jobdir.local_tmp)
+            config.write('retry_files_enabled = False\n')
+            config.write('gathering = smart\n')
+            config.write('fact_caching = jsonfile\n')
+            config.write('fact_caching_connection = %s\n' %
+                         self.jobdir.fact_cache)
+            config.write('library = %s\n'
+                         % self.executor_server.library_dir)
+            config.write('command_warnings = False\n')
+            config.write('filter_plugins = %s\n'
+                         % self.executor_server.filter_dir)
+
+            if jobdir_playbook.roles_path:
+                config.write('roles_path = %s\n' % ':'.join(
+                    jobdir_playbook.roles_path))
 
     def getMerger(self, root, cache_root=None, logger=None):
         # TODO(jhesketh): Maybe return a merger directly here
@@ -887,13 +966,13 @@ class AnsibleJob(AnsibleJobBase):
     }
 
     def __init__(self, executor_server, job):
+        arguments = json.loads(job.arguments)
         super(AnsibleJob, self).__init__(
-            executor_server.connections, executor_server.merge_root)
+            arguments, executor_server.connections, executor_server.merge_root)
         logger = logging.getLogger("zuul.AnsibleJob")
         self.log = AnsibleJobLogAdapter(logger, {'job': job.unique})
         self.executor_server = executor_server
         self.job = job
-        self.arguments = json.loads(job.arguments)
         self.proc = None
         self.proc_lock = threading.Lock()
         self.running = False
