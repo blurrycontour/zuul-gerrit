@@ -92,7 +92,9 @@ class TestZuulJSON(AnsibleZuulTestCase):
 
             json_result = json.loads(text)
             role_name = json_result[0]['plays'][0]['tasks'][0]['role']['name']
-            self.assertEqual('json-role', role_name)
+
+            role_path = json_result[0]['plays'][0]['tasks'][0]['role']['path']
+            self.assertEqual('json-role', os.path.dirname(role_path))
 
     def test_json_time_log(self):
         job = self._run_job('no-log')
