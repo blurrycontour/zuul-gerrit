@@ -1,0 +1,65 @@
+version: '2'
+services:
+  gerrit:
+    build:
+      dockerfile: gerrit-Dockerfile
+      context: ./
+    ports:
+      - "8080:8080"
+      - "29418:29418"
+  gerritconfig:
+    build:
+      dockerfile: ansible-Dockerfile
+      context: ./
+    depends_on:
+      - gerrit
+    volumes:
+      - "sshkey:/var/ssh"
+      - "nodessh:/var/node"
+      - "./playbooks/:/var/playbooks/"
+    command: "ansible-playbook /var/playbooks/setup.yaml"
+  zk:
+     image: zookeeper
+  scheduler:
+    depends_on:
+      - gerritconfig
+      - zk
+    command: "zuul-scheduler -d"
+    image: zuul/zuul
+    volumes:
+      - "./etc_zuul/:/etc/zuul/"
+      - "sshkey:/var/ssh"
+      - /var/lib/zuul
+  web:
+    command: "zuul-web -d"
+    depends_on:
+      - scheduler
+    ports:
+      - "9000:9000"
+    image: zuul/zuul
+    volumes:
+      - "./etc_zuul/:/etc/zuul/"
+  executor:
+    command: "zuul-executor -d"
+    depends_on:
+      - scheduler
+    image: zuul/zuul
+    volumes:
+      - "./etc_zuul/:/etc/zuul/"
+  node:
+    image: rastasheep/ubuntu-sshd
+    volumes:
+      - "nodessh:/root/.ssh"
+  launcher:
+    command: "nodepool-launcher -d"
+    depends_on:
+      - zk
+    image: zuul/nodepool
+    volumes:
+      - "./etc_nodepool/:/etc/nodepool/"
+    ports:
+      - "8022:8022"
+
+volumes:
+  sshkey:
+  nodessh:
