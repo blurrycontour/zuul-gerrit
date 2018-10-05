@@ -1,0 +1,171 @@
+- hosts: localhost
+  tasks:
+    - name: generate admin ssh key
+      command: ssh-keygen -f test_key -N ''
+      args:
+        creates: test_key.pub
+    - name: add admin ssh key to gerrit
+      uri:
+        url: http://localhost:8080/a/accounts/self/sshkeys
+        method: POST
+        user: admin
+        password: secret
+        body: "{{ lookup('file', 'test_key.pub') }}"
+        status_code: 201
+
+    - name: create temp dir for config update
+      shell: mktemp -d
+      register: gerrit_tmp
+    - name: set fact
+      set_fact:
+        all_projects_repo: "{{ gerrit_tmp.stdout }}/All-Projects"
+    - name: checkout all-projects config
+      git:
+        repo: ssh://localhost:29418/All-Projects/
+        ssh_opts: "-o StrictHostKeyChecking=no -i {{ playbook_dir }}/test_key -l admin"
+        dest: "{{ all_projects_repo }}"
+        refspec: '+refs/meta/config:refs/meta/config'
+        version: refs/meta/config
+    - name: copy all-projects config
+      copy:
+        src: "{{ playbook_dir }}/project.config"
+        dest: "{{ all_projects_repo }}/project.config"
+    - name: update all-projects config
+      shell: |
+        git config user.email 'admin@example.com'
+        git commit -a -m 'update config'
+        git push http://admin:secret@localhost:8080/All-Projects +HEAD:refs/meta/config
+      args: 
+        chdir: "{{ all_projects_repo }}"
+        warn: false
+
+    - name: create temp dir for zuul ssh key
+      shell: mktemp -d
+      register: zuul_tmp
+    - name: add scheduler container to inventory
+      add_host:
+        name: scheduler
+        ansible_connection: docker
+        ansible_host: examples_scheduler_1
+    - name: set fact
+      set_fact:
+        zuul_key_file: "{{ zuul_tmp.stdout }}/id_rsa.pub"
+    - name: fetch zuul ssh key
+      delegate_to: scheduler
+      fetch:
+        src: /var/ssh/id_rsa.pub
+        dest: "{{ zuul_key_file }}"
+        flat: true
+    - block:
+        - name: check if zuul user exists
+          uri:
+            url: http://localhost:8080/accounts/zuul
+      rescue:
+        - name: create zuul gerrit account
+          uri:
+            url: http://localhost:8080/a/accounts/zuul
+            method: PUT
+            user: admin
+            password: secret
+            status_code: 201
+            body_format: json
+            body:
+              name: Zuul
+              ssh_key: "{{ lookup('file', zuul_key_file) }}"
+              http_password: secret
+              groups:
+                - "Non-Interactive Users"
+
+    - block:
+        - name: check if zuul-config project exists
+          uri:
+            url: http://localhost:8080/projects/zuul-config
+      rescue:
+        - name: create zuul-config project
+          uri:
+            url: http://localhost:8080/a/projects/zuul-config
+            method: PUT
+            user: admin
+            password: secret
+            status_code: 201
+        - name: create initial commit
+          shell:
+            executable: /bin/bash
+            cmd: |
+              mkdir zuul-config
+              cd zuul-config
+              git init .
+              cat >.gitreview <<EOF 
+              [gerrit]
+              host=localhost
+              port=29418
+              project=zuul-config
+              EOF
+              git add .gitreview
+              git commit -m "Initial commit"
+              git remote add gerrit http://admin:secret@localhost:8080/zuul-config
+              git push -f --set-upstream gerrit +HEAD:master
+              cd ..
+              rm -fr zuul-config
+    - block:
+        - name: check if test1 project exists
+          uri:
+            url: http://localhost:8080/projects/test1
+      rescue:
+        - name: create test1 project
+          uri:
+            url: http://localhost:8080/a/projects/test1
+            method: PUT
+            user: admin
+            password: secret
+            status_code: 201
+        - name: create initial commit
+          shell:
+            executable: /bin/bash
+            cmd: |
+              mkdir test1
+              cd test1
+              git init .
+              cat >.gitreview <<EOF 
+              [gerrit]
+              host=localhost
+              port=29418
+              project=test1
+              EOF
+              git add .gitreview
+              git commit -m "Initial commit"
+              git remote add gerrit http://admin:secret@localhost:8080/test1
+              git push -f --set-upstream gerrit +HEAD:master
+              cd ..
+              rm -fr test1
+    - block:
+        - name: check if test2 project exists
+          uri:
+            url: http://localhost:8080/projects/test2
+      rescue:
+        - name: create test2 project
+          uri:
+            url: http://localhost:8080/a/projects/test2
+            method: PUT
+            user: admin
+            password: secret
+            status_code: 201
+        - name: create initial commit
+          shell:
+            executable: /bin/bash
+            cmd: |
+              mkdir test2
+              cd test2
+              git init .
+              cat >.gitreview <<EOF 
+              [gerrit]
+              host=localhost
+              port=29418
+              project=test2
+              EOF
+              git add .gitreview
+              git commit -m "Initial commit"
+              git remote add gerrit http://admin:secret@localhost:8080/test2
+              git push -f --set-upstream gerrit +HEAD:master
+              cd ..
+              rm -fr test2

@@ -1,0 +1,37 @@
+version: '2'
+services:
+  sshkeygen:
+    image: zuul/zuul
+    command: "ssh-keygen -f /var/ssh/id_rsa -N ''"
+    volumes:
+      - "sshkey:/var/ssh"
+  gerrit:
+    build:
+      dockerfile: gerrit-Dockerfile
+      context: ./
+    ports:
+      - "8080:8080"
+      - "29418:29418"
+    volumes:
+      - "sshkey:/var/ssh"
+  zk:
+     image: zookeeper
+  scheduler:
+    depends_on:
+      - sshkeygen
+    command: "zuul-scheduler -d"
+    image: zuul/zuul
+    volumes:
+      - "./etc_zuul/:/etc/zuul/"
+      - "sshkey:/var/ssh"
+      - /var/lib/zuul
+  web:
+    command: "zuul-web -d"
+    ports:
+      - "9000:9000"
+    image: zuul/zuul
+    volumes:
+      - "./etc_zuul/:/etc/zuul/"
+
+volumes:
+  sshkey:
