@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_4eeb90a3",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2018-10-07T14:25:04Z",
+      "side": 1,
+      "message": "Reading ssh_config(5) it seems like you want accept-new here instead of no:\n\n    If this flag is set to “accept-new” then ssh will automatically\n    add new host keys to the user known hosts files, but will not\n    permit connections to hosts with changed host keys. If this flag\n    is set to “no” or “off”, ssh will automatically add new host keys\n    to the user known hosts files and allow connections to hosts with\n    changed hostkeys to proceed, subject to some restrictions.",
+      "revId": "b31dbb3426994630d874900caceeb2215bbf742d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
