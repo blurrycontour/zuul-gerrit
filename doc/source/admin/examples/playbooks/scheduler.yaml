@@ -1,0 +1,12 @@
+# The Zuul scheduler needs to be able to connect to the remote systems
+# in order to start.  Because v2 docker-compose files don't have
+# health checks, we use this playbook to delay the scheduler start
+# until after Gerrit has started.  Once we require v2.1 docker-compose
+# files we should be able to remove this.
+
+- hosts: localhost
+  tasks:
+    - name: wait for gerrit to start
+      wait_for:
+        host: gerrit
+        port: 29418
