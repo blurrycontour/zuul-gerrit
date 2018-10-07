@@ -82,8 +82,10 @@ class Repo(object):
             'GIT_HTTP_LOW_SPEED_TIME': speed_time,
         }
         self.git_timeout = git_timeout
+        cmd = 'ssh -o StrictHostKeyChecking=no'
         if sshkey:
-            self.env['GIT_SSH_COMMAND'] = 'ssh -i %s' % (sshkey,)
+            cmd += '-i %s' % (sshkey,)
+        self.env['GIT_SSH_COMMAND'] = cmd
 
         self.remote_url = remote
         self.local_path = local
