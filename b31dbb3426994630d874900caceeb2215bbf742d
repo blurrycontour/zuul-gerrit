@@ -39,6 +39,23 @@
       "revId": "b31dbb3426994630d874900caceeb2215bbf742d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_c5052f17",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-10-08T14:35:53Z",
+      "side": 1,
+      "message": "That\u0027s been here for a long time... do we need to revert to the wrapper script?",
+      "revId": "b31dbb3426994630d874900caceeb2215bbf742d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
