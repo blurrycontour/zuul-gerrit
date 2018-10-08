@@ -16,6 +16,29 @@
       "revId": "b31dbb3426994630d874900caceeb2215bbf742d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_ca3b09c7",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-10-08T01:47:48Z",
+      "side": 1,
+      "message": "Note that this doesn\u0027t work with git-1.8 (the default on centos7).",
+      "range": {
+        "startLine": 88,
+        "startChar": 18,
+        "endLine": 88,
+        "endChar": 33
+      },
+      "revId": "b31dbb3426994630d874900caceeb2215bbf742d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
