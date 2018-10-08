@@ -4,6 +4,10 @@ services:
     build:
       dockerfile: gerrit-Dockerfile
       context: ./
+      args:
+        http_proxy: "${http_proxy}"
+        https_proxy: "${http_proxy}"
+        no_proxy: "${no_proxy}"
     ports:
       - "8080:8080"
       - "29418:29418"
@@ -11,6 +15,10 @@ services:
     build:
       dockerfile: ansible-Dockerfile
       context: ./
+      args:
+        http_proxy: "${http_proxy}"
+        https_proxy: "${http_proxy}"
+        no_proxy: "${no_proxy}"
     depends_on:
       - gerrit
     volumes:
@@ -55,6 +63,10 @@ services:
     build:
       dockerfile: node-Dockerfile
       context: ./
+      args:
+        http_proxy: "${http_proxy}"
+        https_proxy: "${http_proxy}"
+        no_proxy: "${no_proxy}"
     volumes:
       - "nodessh:/root/.ssh"
   launcher:
