@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_10503c2c",
+        "filename": "doc/source/admin/examples/docker-compose.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-10-08T20:28:44Z",
+      "side": 1,
+      "message": "Yes, version 2 is what is in ubuntu xenial, which is what my laptop was running when I started this.  It seems like a reasonable version to support so that folks don\u0027t have to install extra packages.  As soon as we can upgrade to 2.1 this gets a lot nicer though.",
+      "revId": "f26850c75cf095b6970cd1b1cba659edbfacaff4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_70097082",
         "filename": "doc/source/admin/examples/docker-compose.yaml",
         "patchSetId": 6
