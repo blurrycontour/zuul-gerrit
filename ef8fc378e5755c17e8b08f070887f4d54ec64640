@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_0b41f136",
+        "filename": "doc/source/admin/examples/ansible-Dockerfile",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 12323
+      },
+      "writtenOn": "2018-10-08T20:36:06Z",
+      "side": 1,
+      "message": "Not going this deep on the version numbers will only cause heartache later on.\n\nI suggest centos:7.4 or centos:7.",
+      "revId": "ef8fc378e5755c17e8b08f070887f4d54ec64640",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_2baaadd2",
+        "filename": "doc/source/admin/examples/gerrit-Dockerfile",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 12323
+      },
+      "writtenOn": "2018-10-08T20:36:06Z",
+      "side": 1,
+      "message": "I suggest centos:7 or centos:7.4 for your future selves.",
+      "revId": "ef8fc378e5755c17e8b08f070887f4d54ec64640",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_2b938da6",
+        "filename": "doc/source/admin/examples/node-Dockerfile",
+        "patchSetId": 7
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 12323
+      },
+      "writtenOn": "2018-10-08T20:36:06Z",
+      "side": 1,
+      "message": "\u0026\u0026 \\\napt-get clean \u0026\u0026 \\\nrm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/log/*log /var/log/apt/* /var/lib/dpkg/*-old /var/cache/debconf/*-old",
+      "revId": "ef8fc378e5755c17e8b08f070887f4d54ec64640",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
