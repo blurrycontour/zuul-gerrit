@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_1fcccf60",
+        "filename": "doc/source/admin/examples/docker-compose.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-10-08T17:32:56Z",
+      "side": 1,
+      "message": "Since we\u0027re overriding the command, there\u0027s not much point to using the individual images, so I simplified it slightly.",
+      "revId": "f049a3c8b025a813be5b978203ed94db58fb0a39",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_df8c1782",
         "filename": "doc/source/admin/examples/docker-compose.yaml",
         "patchSetId": 5
