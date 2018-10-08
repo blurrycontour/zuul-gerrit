@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_9fe45f44",
+        "filename": "doc/source/admin/examples/docker-compose.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-10-08T17:15:38Z",
+      "side": 1,
+      "message": "zuul/zuul-scheduler",
+      "range": {
+        "startLine": 28,
+        "startChar": 11,
+        "endLine": 28,
+        "endChar": 20
+      },
+      "revId": "f049a3c8b025a813be5b978203ed94db58fb0a39",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_df8c1782",
+        "filename": "doc/source/admin/examples/docker-compose.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-10-08T17:15:38Z",
+      "side": 1,
+      "message": "zuul/zuul-web",
+      "range": {
+        "startLine": 39,
+        "startChar": 10,
+        "endLine": 39,
+        "endChar": 20
+      },
+      "revId": "f049a3c8b025a813be5b978203ed94db58fb0a39",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_bf827b50",
+        "filename": "doc/source/admin/examples/docker-compose.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-10-08T17:15:38Z",
+      "side": 1,
+      "message": "zuul/zuul-executor",
+      "range": {
+        "startLine": 46,
+        "startChar": 11,
+        "endLine": 46,
+        "endChar": 20
+      },
+      "revId": "f049a3c8b025a813be5b978203ed94db58fb0a39",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_bf991bd0",
+        "filename": "doc/source/admin/examples/docker-compose.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-10-08T17:15:38Z",
+      "side": 1,
+      "message": "zuul/nodepool-launcher",
+      "range": {
+        "startLine": 58,
+        "startChar": 11,
+        "endLine": 58,
+        "endChar": 24
+      },
+      "revId": "f049a3c8b025a813be5b978203ed94db58fb0a39",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
