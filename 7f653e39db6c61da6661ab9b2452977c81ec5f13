@@ -224,6 +224,46 @@
       "revId": "7f653e39db6c61da6661ab9b2452977c81ec5f13",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_89c2d401",
+        "filename": "doc/source/admin/new-quickstart.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-10-09T17:12:44Z",
+      "side": 1,
+      "message": "After running \u0027git review\u0027, this would be a good time to explicitly point out that this command makes the change show up in gerrit. Although it is implied in the following steps, this isn\u0027t obvious to users not familiar with this workflow.",
+      "revId": "7f653e39db6c61da6661ab9b2452977c81ec5f13",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_29faa043",
+        "filename": "doc/source/admin/new-quickstart.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-10-09T17:12:44Z",
+      "side": 1,
+      "message": "+2 (Looks good to me, approved), +2 (Verified), +1 (Approved)",
+      "range": {
+        "startLine": 201,
+        "startChar": 5,
+        "endLine": 201,
+        "endChar": 13
+      },
+      "revId": "7f653e39db6c61da6661ab9b2452977c81ec5f13",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
