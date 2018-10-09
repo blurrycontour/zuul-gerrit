@@ -282,6 +282,69 @@
       "revId": "7f653e39db6c61da6661ab9b2452977c81ec5f13",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_696bb8ef",
+        "filename": "doc/source/admin/new-quickstart.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-10-09T17:29:52Z",
+      "side": 1,
+      "message": "TODO: Make sure the user cd\u0027s out of zuul-config repo before running the commands below.",
+      "revId": "7f653e39db6c61da6661ab9b2452977c81ec5f13",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_69441874",
+        "filename": "doc/source/admin/new-quickstart.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-10-09T17:29:52Z",
+      "side": 1,
+      "message": "Just pointing out that .zuul.yaml is named differently from the example zuul.yaml.",
+      "range": {
+        "startLine": 227,
+        "startChar": 11,
+        "endLine": 227,
+        "endChar": 21
+      },
+      "revId": "7f653e39db6c61da6661ab9b2452977c81ec5f13",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_2904e018",
+        "filename": "doc/source/admin/new-quickstart.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-10-09T17:29:52Z",
+      "side": 1,
+      "message": "jobs2.yaml",
+      "range": {
+        "startLine": 251,
+        "startChar": 25,
+        "endLine": 251,
+        "endChar": 34
+      },
+      "revId": "7f653e39db6c61da6661ab9b2452977c81ec5f13",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
