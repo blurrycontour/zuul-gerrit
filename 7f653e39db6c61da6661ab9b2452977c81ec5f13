@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_69fe586b",
+        "filename": "doc/source/admin/new-quickstart.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-10-09T17:02:13Z",
+      "side": 1,
+      "message": "Fixed.",
+      "revId": "7f653e39db6c61da6661ab9b2452977c81ec5f13",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_895bb4f7",
         "filename": "doc/source/admin/new-quickstart.rst",
         "patchSetId": 12
@@ -42,6 +59,23 @@
         "endLine": 168,
         "endChar": 26
       },
+      "revId": "7f653e39db6c61da6661ab9b2452977c81ec5f13",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_09f56484",
+        "filename": "doc/source/admin/new-quickstart.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-10-09T17:02:13Z",
+      "side": 1,
+      "message": "Agreed -- maybe I can combine the next paragraph into this to make that more clear.",
       "revId": "7f653e39db6c61da6661ab9b2452977c81ec5f13",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -71,6 +105,23 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_29f06092",
+        "filename": "doc/source/admin/new-quickstart.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-10-09T17:02:13Z",
+      "side": 1,
+      "message": "It should, that\u0027s very strange; I\u0027ve run this many times.  The only reason it wouldn\u0027t add the yaml files is if they weren\u0027t in zuul.d, or if you had .yaml in .gitignore.",
+      "revId": "7f653e39db6c61da6661ab9b2452977c81ec5f13",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_49d83c51",
         "filename": "doc/source/admin/new-quickstart.rst",
         "patchSetId": 12
@@ -88,6 +139,23 @@
         "endLine": 187,
         "endChar": 13
       },
+      "revId": "7f653e39db6c61da6661ab9b2452977c81ec5f13",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_c9ee8cb4",
+        "filename": "doc/source/admin/new-quickstart.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-10-09T17:02:13Z",
+      "side": 1,
+      "message": "Ok.",
       "revId": "7f653e39db6c61da6661ab9b2452977c81ec5f13",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
