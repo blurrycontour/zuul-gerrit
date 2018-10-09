@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_ae29d6f1",
+        "filename": "doc/source/admin/new-quickstart.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-10-09T16:18:56Z",
+      "side": 1,
+      "message": "For a better experience, shouldn\u0027t the debug logging turned off?",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 60
+      },
+      "revId": "499cf8775bffb283a0e35c166c4be402dddc726b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
