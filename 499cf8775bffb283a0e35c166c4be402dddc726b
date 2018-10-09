@@ -22,6 +22,23 @@
       "revId": "499cf8775bffb283a0e35c166c4be402dddc726b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_099ec454",
+        "filename": "doc/source/admin/new-quickstart.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-10-09T16:57:14Z",
+      "side": 1,
+      "message": "Some of it, yes.  But I don\u0027t want people to have to make logging config files, so after this, I\u0027d like to improve the default logging options in Zuul.  Ideally, we can start zuul in the foreground at info level by default, then add options to daemonize and switch to debug level.",
+      "revId": "499cf8775bffb283a0e35c166c4be402dddc726b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
