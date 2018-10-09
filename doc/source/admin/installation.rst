@@ -126,31 +126,27 @@ proxying them to the REST layer, register the location where you unpacked
 the web application as the document root and add rewrite rules::
 
   <Directory /usr/share/zuul>
+    DirectoryIndex index.html
     Require all granted
   </Directory>
   Alias / /usr/share/zuul/
-  <Location />
-    RewriteEngine on
-    RewriteBase /
-    # Rewrite api to the zuul-web endpoint
-    RewriteRule api/tenant/(.*)/console-stream ws://localhost:9000/api/tenant/$1/console-stream [P,L]
-    RewriteRule api/(.*)$ http://localhost:9000/api/$1 [P,L]
-    # Backward compatible rewrite
-    RewriteRule t/(.*)/(.*).html(.*) /t/$1/$2$3 [R=301,L,NE]
+  RewriteEngine on
+  RewriteRule ^/api/tenant/(.*)/console-stream$ ws://localhost:9000/api/tenant/$1/console-stream [P,L]
+  RewriteRule ^/api/(.*)$ http://localhost:9000/api/$1 [P,L]
 
-    # Don't rewrite files or directories
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule . /index.html [L]
-  </Location>
+  # Don't rewrite files or directories
+  RewriteCond /usr/share/zuul/%{REQUEST_FILENAME} !-f
+  RewriteCond /usr/share/zuul/%{REQUEST_FILENAME} !-d
+  RewriteRule ^/.*$ /usr/share/zuul/index.html [L]
 
 
 Sub directory serving
 ---------------------
 
 The web application needs to be rebuild to update the internal location of
-the static files. Set the homepage setting in the package.json to an
-absolute path or url. For example, to deploy the web interface through a
+the static files. Set the homepage setting in the package.json or set the
+PUBLIC_URL environment to an absolute path or url.
+For example, to deploy the web interface through a
 '/zuul/' sub directory:
 
 .. note::
@@ -161,30 +157,24 @@ absolute path or url. For example, to deploy the web interface through a
 
 .. code-block:: bash
 
-  sed -e 's#"homepage": "/"#"homepage": "/zuul/"#' -i package.json
-  yarn build
+  PUBLIC_URL="/zuul/" yarn build
 
 Then assuming the web application is unpacked in /usr/share/zuul,
 add the following rewrite rules::
 
   <Directory /usr/share/zuul>
+    DirectoryIndex index.html
     Require all granted
   </Directory>
   Alias /zuul /usr/share/zuul/
-  <Location /zuul>
-    RewriteEngine on
-    RewriteBase /zuul
-    # Rewrite api to the zuul-web endpoint
-    RewriteRule api/tenant/(.*)/console-stream ws://localhost:9000/api/tenant/$1/console-stream [P,L]
-    RewriteRule api/(.*)$ http://localhost:9000/api/$1 [P,L]
-    # Backward compatible rewrite
-    RewriteRule t/(.*)/(.*).html(.*) /t/$1/$2$3 [R=301,L,NE]
+  # Rewrite api to the zuul-web endpoint
+  RewriteRule ^/zuul/api/tenant/(.*)/console-stream$ ws://localhost:9000/api/tenant/$1/console-stream [P,L]
+  RewriteRule ^/zuul/api/(.*)$ http://localhost:9000/api/$1 [P,L]
 
-    # Don't rewrite files or directories
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule . /zuul/index.html [L]
-  </Location>
+  # Don't rewrite files or directories
+  RewriteCond /usr/share/%{REQUEST_FILENAME} !-f
+  RewriteCond /usr/share/%{REQUEST_FILENAME} !-d
+  RewriteRule ^/zuul/.*$ /usr/share/zuul/index.html [L]
 
 
 White Labeled Tenant
@@ -201,25 +191,20 @@ rule to ensure connection webhooks don't try to get put into the tenant scope.
 Assuming the zuul tenant name is "example", the rewrite rules are::
 
   <Directory /usr/share/zuul>
+    DirectoryIndex index.html
     Require all granted
   </Directory>
   Alias / /usr/share/zuul/
   <Location />
-    RewriteEngine on
-    RewriteBase /
-    # Rewrite api to the zuul-web endpoint
-    RewriteRule api/connection/(.*)$ http://localhost:9000/api/connection/$1 [P,L]
-    RewriteRule api/console-stream ws://localhost:9000/api/tenant/example/console-stream [P,L]
-    RewriteRule api/(.*)$ http://localhost:9000/api/tenant/example/$1 [P,L]
-    # Backward compatible rewrite
-    RewriteRule t/(.*)/(.*).html(.*) /t/$1/$2$3 [R=301,L,NE]
+  # Rewrite api to the zuul-web endpoint
+  RewriteRule ^/zuul/api/connection/(.*)$ http://localhost:9000/api/connection/$1 [P,L]
+  RewriteRule ^/zuul/api/console-stream$ ws://localhost:9000/api/tenant/example/console-stream [P,L]
+  RewriteRule ^/zuul/api/(.*)$ http://localhost:9000/api/tenant/example/$1 [P,L]
 
-    # Don't rewrite files or directories
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule . /index.html [L]
-  </Location>
-
+  # Don't rewrite files or directories
+  RewriteCond /usr/share/zuul/%{REQUEST_FILENAME} !-f
+  RewriteCond /usr/share/zuul/%{REQUEST_FILENAME} !-d
+  RewriteRule ^/.*$ /usr/share/zuul/index.html [L]
 
 
 Static External
