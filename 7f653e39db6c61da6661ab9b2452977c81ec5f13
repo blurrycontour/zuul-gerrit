@@ -140,6 +140,24 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_098484b1",
+        "filename": "doc/source/admin/new-quickstart.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-10-09T17:15:41Z",
+      "side": 1,
+      "message": "Another user error here. I had the yaml files one level up.",
+      "parentUuid": "3f79a3b5_89741406",
+      "revId": "7f653e39db6c61da6661ab9b2452977c81ec5f13",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_49d83c51",
         "filename": "doc/source/admin/new-quickstart.rst",
         "patchSetId": 12
