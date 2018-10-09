@@ -122,6 +122,24 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_89741406",
+        "filename": "doc/source/admin/new-quickstart.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-10-09T17:06:03Z",
+      "side": 1,
+      "message": "Don\u0027t have that in my .gitignore. Strange indeed, but I had to use the alternative command I supplied.",
+      "parentUuid": "3f79a3b5_29f06092",
+      "revId": "7f653e39db6c61da6661ab9b2452977c81ec5f13",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_49d83c51",
         "filename": "doc/source/admin/new-quickstart.rst",
         "patchSetId": 12
@@ -173,6 +191,30 @@
       "writtenOn": "2018-10-09T16:51:15Z",
       "side": 1,
       "message": "For me, this results in:\n\n   shrews@wilddog:~/t/zuul-config$ git review\n   Could not connect to gerrit.\n   Enter your gerrit username: shrews\n   Trying again with ssh://shrews@localhost:29418/zuul-config\n   We don\u0027t know where your gerrit is. Please manually add a \n   push-url to the \u0027origin\u0027 remote and try again.\n   Could not connect to gerrit at \n   ssh://shrews@localhost:29418/zuul-config",
+      "range": {
+        "startLine": 188,
+        "startChar": 2,
+        "endLine": 188,
+        "endChar": 13
+      },
+      "revId": "7f653e39db6c61da6661ab9b2452977c81ec5f13",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_c91c4cc4",
+        "filename": "doc/source/admin/new-quickstart.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-10-09T17:06:03Z",
+      "side": 1,
+      "message": "Nevermind. This was an issue with the known_hosts file on my local machine.",
+      "parentUuid": "3f79a3b5_e9e6e813",
       "range": {
         "startLine": 188,
         "startChar": 2,
