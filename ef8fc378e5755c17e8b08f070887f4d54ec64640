@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_d5ee21b4",
+        "filename": "doc/source/admin/examples/ansible-Dockerfile",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-10-09T14:25:55Z",
+      "side": 1,
+      "message": "Done.",
+      "revId": "ef8fc378e5755c17e8b08f070887f4d54ec64640",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_2baaadd2",
         "filename": "doc/source/admin/examples/gerrit-Dockerfile",
         "patchSetId": 7
@@ -36,6 +53,23 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_35f0b592",
+        "filename": "doc/source/admin/examples/gerrit-Dockerfile",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-10-09T14:25:55Z",
+      "side": 1,
+      "message": "This file is gone now.",
+      "revId": "ef8fc378e5755c17e8b08f070887f4d54ec64640",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_2b938da6",
         "filename": "doc/source/admin/examples/node-Dockerfile",
         "patchSetId": 7
@@ -47,6 +81,23 @@
       "writtenOn": "2018-10-08T20:36:06Z",
       "side": 1,
       "message": "\u0026\u0026 \\\napt-get clean \u0026\u0026 \\\nrm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/log/*log /var/log/apt/* /var/lib/dpkg/*-old /var/cache/debconf/*-old",
+      "revId": "ef8fc378e5755c17e8b08f070887f4d54ec64640",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_f5e9ddaa",
+        "filename": "doc/source/admin/examples/node-Dockerfile",
+        "patchSetId": 7
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-10-09T14:25:55Z",
+      "side": 1,
+      "message": "Normally I would agree -- though I expect that once this image is booted, users will install packages on the running container (ie, jobs can do whatever they want on nodes including installing packages).  Since this is a local build anyway, why not keep the cache around to speed that up?",
       "revId": "ef8fc378e5755c17e8b08f070887f4d54ec64640",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
