@@ -22,6 +22,98 @@
       "revId": "7f653e39db6c61da6661ab9b2452977c81ec5f13",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_895bb4f7",
+        "filename": "doc/source/admin/new-quickstart.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-10-09T16:51:15Z",
+      "side": 1,
+      "message": "I think it would be helpful to comment this in the projects.yaml just to clearly identify where that\u0027s happening and what that is doing as new users look at the contents of that file.",
+      "range": {
+        "startLine": 167,
+        "startChar": 30,
+        "endLine": 168,
+        "endChar": 26
+      },
+      "revId": "7f653e39db6c61da6661ab9b2452977c81ec5f13",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_2918601d",
+        "filename": "doc/source/admin/new-quickstart.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-10-09T16:51:15Z",
+      "side": 1,
+      "message": "This did not add the yaml files. Perhaps just:\n\n   git add .",
+      "range": {
+        "startLine": 186,
+        "startChar": 3,
+        "endLine": 186,
+        "endChar": 17
+      },
+      "revId": "7f653e39db6c61da6661ab9b2452977c81ec5f13",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_49d83c51",
+        "filename": "doc/source/admin/new-quickstart.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-10-09T16:51:15Z",
+      "side": 1,
+      "message": "Might be easiest for those not used to git to use:\n\n   git commit -m First commit",
+      "range": {
+        "startLine": 187,
+        "startChar": 3,
+        "endLine": 187,
+        "endChar": 13
+      },
+      "revId": "7f653e39db6c61da6661ab9b2452977c81ec5f13",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_e9e6e813",
+        "filename": "doc/source/admin/new-quickstart.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-10-09T16:51:15Z",
+      "side": 1,
+      "message": "For me, this results in:\n\n   shrews@wilddog:~/t/zuul-config$ git review\n   Could not connect to gerrit.\n   Enter your gerrit username: shrews\n   Trying again with ssh://shrews@localhost:29418/zuul-config\n   We don\u0027t know where your gerrit is. Please manually add a \n   push-url to the \u0027origin\u0027 remote and try again.\n   Could not connect to gerrit at \n   ssh://shrews@localhost:29418/zuul-config",
+      "range": {
+        "startLine": 188,
+        "startChar": 2,
+        "endLine": 188,
+        "endChar": 13
+      },
+      "revId": "7f653e39db6c61da6661ab9b2452977c81ec5f13",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
