@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_2e6dc600",
+        "filename": "doc/source/admin/new-quickstart.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2018-10-09T16:31:33Z",
+      "side": 1,
+      "message": "zuul/doc/source/admin/examples",
+      "range": {
+        "startLine": 40,
+        "startChar": 6,
+        "endLine": 40,
+        "endChar": 30
+      },
+      "revId": "7f653e39db6c61da6661ab9b2452977c81ec5f13",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
