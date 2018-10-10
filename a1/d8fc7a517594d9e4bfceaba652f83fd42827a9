@@ -1,0 +1,9 @@
+Code-Review+2: David Shrewsbury <shrewsbury.dave@gmail.com>
+Code-Review+2: Clark Boylan <cboylan@sapwetik.org>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Wed, 10 Oct 2018 23:06:07 +0000
+Reviewed-on: https://review.openstack.org/609432
+Project: openstack-infra/zuul
+Branch: refs/heads/master
