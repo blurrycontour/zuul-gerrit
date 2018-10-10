@@ -26,7 +26,7 @@ const fakeChange = {
   project: 'org-project',
   jobs: [{
     name: 'job-name',
-    url: 'stream.html?build=42',
+    url: 'stream/42',
     result: null
   }]
 }
