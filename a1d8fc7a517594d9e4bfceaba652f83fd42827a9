@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_ea00f302",
+        "filename": "doc/source/admin/centos7_setup.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-10-10T22:35:20Z",
+      "side": 1,
+      "message": "Should this be shell too?",
+      "range": {
+        "startLine": 61,
+        "startChar": 16,
+        "endLine": 61,
+        "endChar": 23
+      },
+      "revId": "a1d8fc7a517594d9e4bfceaba652f83fd42827a9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
