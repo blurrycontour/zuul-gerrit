@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_04dd26dd",
+        "filename": "doc/source/admin/examples/playbooks/executor.yaml",
+        "patchSetId": 13
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-10-10T21:30:13Z",
+      "side": 1,
+      "message": "gather_facts: no to avoid weird interactions with fact discovery finding host info.",
+      "revId": "8571b52ba80e103d2e2886d19baa688ab424fcc8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_64d41abc",
+        "filename": "doc/source/admin/examples/playbooks/scheduler.yaml",
+        "patchSetId": 13
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-10-10T21:30:13Z",
+      "side": 1,
+      "message": "gather_facts: no to avoid weird interactions with fact discovery finding host info.",
+      "revId": "8571b52ba80e103d2e2886d19baa688ab424fcc8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_44d79ec1",
+        "filename": "doc/source/admin/examples/playbooks/setup.yaml",
+        "patchSetId": 13
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-10-10T21:30:13Z",
+      "side": 1,
+      "message": "gather_facts: no to avoid weird interactions with fact discovery finding host info.",
+      "revId": "8571b52ba80e103d2e2886d19baa688ab424fcc8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_64665a58",
+        "filename": "doc/source/admin/tutorial.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-10-10T21:30:13Z",
+      "side": 1,
+      "message": "This command needs to be run with sudo.",
+      "revId": "8571b52ba80e103d2e2886d19baa688ab424fcc8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
