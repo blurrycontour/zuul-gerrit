@@ -85,6 +85,23 @@
       "revId": "a4394e9f839daf30fd506cebec129f1098eedaf5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_cb916747",
+        "filename": "playbooks/quick-start/run.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-10-11T17:29:38Z",
+      "side": 1,
+      "message": "We do have those mirrors, and I think we\u0027re going to configure them in this job in https://review.openstack.org/609763 so we can probably ignore this for now.",
+      "revId": "a4394e9f839daf30fd506cebec129f1098eedaf5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
