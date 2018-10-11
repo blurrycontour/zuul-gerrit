@@ -22,30 +22,40 @@ with GitHub.
 Start Zuul Containers
 ---------------------
 
-Before you start, ensure that some needed packages are installed.
-
-.. code-block:: shell
-
-   # Debian / Ubuntu:
-
-   sudo apt-get install docker-compose git git-review
-
-   # Red Hat / Fedora / SUSE:
-
-   sudo yum install docker-compose git git-review
-
 Clone the Zuul repository:
 
 .. code-block:: shell
 
    git clone https://git.zuul-ci.org/zuul
 
-Then cd into the directory containing this document, and run
-docker-compose in order to start Zuul, Nodepool and Gerrit.
+Then cd into the directory containing this document and use
+*bindep* program to install the required binary dependencies.
 
 .. code-block:: shell
 
    cd zuul/doc/source/admin/examples
+
+   # All:
+   sudo pip3 install bindep
+
+   # For Fedora and CentOS:
+   $ sudo yum -y install $(bindep -b compile)
+
+   # For Ubuntu:
+   $ sudo apt-get -y install $(bindep -b compile)
+
+   # For OpenSuse:
+   $ zypper install -y $(bindep -b compile)
+
+   # Start and Enable the docker service om Fedora/CentOS/OpenSuse
+   $ sudo systemctl enable docker.service
+   $ sudo systemctl start docker.service
+
+
+and run docker-compose in order to start Zuul, Nodepool and Gerrit.
+
+.. code-block:: shell
+
    docker-compose up
 
 All of the services will be started with debug-level logging sent to
