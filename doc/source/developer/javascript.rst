@@ -196,3 +196,7 @@ As long as `yarn`_ is installed, the installation of zuul will run
 In some cases there is the need to disable the service worker which does
 advanced caching. In order to do that set the environment variable
 ``REACT_APP_DISABLE_SERVICE_WORKER=true`` during installation.
+
+The update interval in mscan be changed by setting the environment
+variable ``REACT_APP_UPDATE_INTERVAL`` during installation. The default is
+5000.

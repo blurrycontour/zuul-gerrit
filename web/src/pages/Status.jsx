@@ -60,6 +60,11 @@ class StatusPage extends React.Component {
     this.filterLoaded = false
     this.timer = null
     this.visible = true
+    this.updateInterval = 5000
+
+    if (typeof process.env.REACT_APP_UPDATE_INTERVAL !== 'undefined') {
+      this.updateInterval = parseInt(process.env.REACT_APP_UPDATE_INTERVAL, 10)
+    }
 
     // Stop refresh when page is not visible
     if (typeof document.hidden !== 'undefined') {
@@ -108,7 +113,7 @@ class StatusPage extends React.Component {
       this.timer = null
     }
     if (this.state.autoReload) {
-      this.timer = setTimeout(this.updateData, 5000)
+      this.timer = setTimeout(this.updateData, this.updateInterval)
     }
   }
 
