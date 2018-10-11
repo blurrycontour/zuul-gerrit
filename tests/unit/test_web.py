@@ -841,6 +841,10 @@ class TestInfo(BaseTestWeb):
 
     def test_info(self):
         info = self.get_url("api/info").json()
+        self.assertIn('version', info['info'])
+        self.assertEquals(
+            ['scheduler', 'web'], sorted(list(info['info']['version'].keys())))
+        del info['info']['version']
         self.assertEqual(
             info, {
                 "info": {
@@ -858,6 +862,8 @@ class TestInfo(BaseTestWeb):
 
     def test_tenant_info(self):
         info = self.get_url("api/tenant/tenant-one/info").json()
+        self.assertIn('version', info['info'])
+        del info['info']['version']
         self.assertEqual(
             info, {
                 "info": {

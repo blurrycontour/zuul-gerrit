@@ -75,6 +75,7 @@ class RPCListener(object):
         self.worker.registerFunction("zuul:key_get")
         self.worker.registerFunction("zuul:config_errors_list")
         self.worker.registerFunction("zuul:connection_list")
+        self.worker.registerFunction("zuul:version_get")
 
     def stop(self):
         self.log.debug("Stopping")
@@ -546,3 +547,6 @@ class RPCListener(object):
         for source in self.sched.connections.getSources():
             output.append(source.connection.toDict())
         job.sendWorkComplete(json.dumps(output))
+
+    def handle_version_get(self, job):
+        job.sendWorkComplete(json.dumps(self.sched.zuul_version))

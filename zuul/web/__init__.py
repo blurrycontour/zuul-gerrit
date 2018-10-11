@@ -202,6 +202,7 @@ class ZuulWebAPI(object):
         self.rpc = zuulweb.rpc
         self.zk = zuulweb.zk
         self.zuulweb = zuulweb
+        self.scheduler_version = None
         self.cache = {}
         self.cache_time = {}
         self.cache_expiry = 1
@@ -253,7 +254,12 @@ class ZuulWebAPI(object):
         return self._handleInfo(info)
 
     def _handleInfo(self, info):
-        ret = {'info': info.toDict()}
+        # Look for scheduler version
+        now = time.time()
+        if not self.scheduler_version or now > self.scheduler_version[1]:
+            job = self.rpc.submitJob('zuul:version_get', {})
+            self.scheduler_version = [json.loads(job.data[0]), now + 3600]
+        ret = {'info': info.toDict(self.scheduler_version[0])}
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
         if self.static_cache_expiry:
