@@ -28,13 +28,15 @@ def _build_javascript():
         r = subprocess.Popen(['yarn', 'install', '-d'], cwd="web/").wait()
         if r:
             raise RuntimeError("Yarn install failed")
-    if not os.path.exists('web/build/index.html'):
+    if not os.path.exists('zuul/web/static/index.html'):
         r = subprocess.Popen(['yarn', 'build'], cwd="web/").wait()
         if r:
             raise RuntimeError("Yarn build failed")
     # Touch the static paths so that bdist_wheel includes them
     for path in ('', 'static', 'static/js', 'static/css', 'static/media'):
-        with open(os.path.join('web/build', path, '__init__.py'), 'w'):
+        init_path = os.path.join('zuul/web/static', path, '__init__.py')
+        print("Making {init_path}".format(init_path=init_path))
+        with open(init_path, 'w'):
             pass
 
 
