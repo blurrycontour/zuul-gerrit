@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_5f8bd5bf",
+        "filename": "playbooks/quick-start/main.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-10-11T15:06:52Z",
+      "side": 1,
+      "message": "They include export statements.  And this worked locally.  I\u0027m adding a -v to try to figure out what the error is this time.",
+      "revId": "a4394e9f839daf30fd506cebec129f1098eedaf5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_ca9177f9",
         "filename": "playbooks/quick-start/run.yaml",
         "patchSetId": 6
@@ -30,6 +47,23 @@
       "writtenOn": "2018-10-10T23:26:34Z",
       "side": 1,
       "message": "Might want to configure docker to use our in region caching proxies as that should result in more reliable image downloads.",
+      "revId": "a4394e9f839daf30fd506cebec129f1098eedaf5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_bf8229a4",
+        "filename": "playbooks/quick-start/run.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-10-11T15:06:52Z",
+      "side": 1,
+      "message": "How do we do that?",
       "revId": "a4394e9f839daf30fd506cebec129f1098eedaf5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
