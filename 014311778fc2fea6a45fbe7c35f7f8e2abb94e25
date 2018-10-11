@@ -22,6 +22,53 @@
       "revId": "014311778fc2fea6a45fbe7c35f7f8e2abb94e25",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_b0fd763c",
+        "filename": "doc/source/admin/quick-start.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-10-11T16:56:09Z",
+      "side": 1,
+      "message": "I think I\u0027d vote that we leave it out of the list for debian/ubuntu because of the package naming mess - and instead let docker-compose handle depending on the right name.",
+      "parentUuid": "3f79a3b5_1011caaf",
+      "range": {
+        "startLine": 31,
+        "startChar": 24,
+        "endLine": 31,
+        "endChar": 30
+      },
+      "revId": "014311778fc2fea6a45fbe7c35f7f8e2abb94e25",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_506f4228",
+        "filename": "doc/source/admin/quick-start.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-10-11T16:56:09Z",
+      "side": 1,
+      "message": "I think these are only needed for Red Hat, Fedora, OpenSuse right? On Debian/Ubuntu installing the package should start the service.",
+      "range": {
+        "startLine": 41,
+        "startChar": 3,
+        "endLine": 44,
+        "endChar": 38
+      },
+      "revId": "014311778fc2fea6a45fbe7c35f7f8e2abb94e25",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
