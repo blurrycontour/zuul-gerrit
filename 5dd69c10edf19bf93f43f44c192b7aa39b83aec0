@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_90c87a56",
+        "filename": ".zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 22348
+      },
+      "writtenOn": "2018-10-11T16:45:40Z",
+      "side": 1,
+      "message": "expected a dictionary @ data[\u0027roles\u0027][0]",
+      "range": {
+        "startLine": 60,
+        "startChar": 2,
+        "endLine": 69,
+        "endChar": 0
+      },
+      "revId": "5dd69c10edf19bf93f43f44c192b7aa39b83aec0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_b0c5763f",
+        "filename": ".zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 22348
+      },
+      "writtenOn": "2018-10-11T16:45:40Z",
+      "side": 1,
+      "message": "Job zuul-quick-start not defined",
+      "range": {
+        "startLine": 70,
+        "startChar": 2,
+        "endLine": 152,
+        "endChar": 0
+      },
+      "revId": "5dd69c10edf19bf93f43f44c192b7aa39b83aec0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
