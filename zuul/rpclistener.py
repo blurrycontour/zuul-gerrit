@@ -76,6 +76,7 @@ class RPCListener(object):
         self.worker.registerFunction("zuul:pipeline_list")
         self.worker.registerFunction("zuul:key_get")
         self.worker.registerFunction("zuul:config_errors_list")
+        self.worker.registerFunction("zuul:version_get")
 
     def stop(self):
         self.log.debug("Stopping")
@@ -462,3 +463,6 @@ class RPCListener(object):
                 'source_context': err.key.context.toDict(),
                 'error': err.error})
         job.sendWorkComplete(json.dumps(output))
+
+    def handle_version_get(self, job):
+        job.sendWorkComplete(json.dumps(self.sched.zuul_version))

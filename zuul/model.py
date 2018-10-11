@@ -26,6 +26,7 @@ import textwrap
 import types
 
 from zuul import change_matcher
+from zuul import version as zuul_version
 from zuul.lib.config import get_default
 
 MERGER_MERGE = 1          # "git merge"
@@ -4075,6 +4076,11 @@ class WebInfo(object):
         self.stats_url = stats_url
         self.tenant = None
         self.websocket_url = websocket_url
+        if zuul_version.is_release is False:
+            self.version = "%s %s" % (zuul_version.release_string,
+                                      zuul_version.git_version)
+        else:
+            self.version = zuul_version.release_string
 
     def __repr__(self):
         return '<WebInfo 0x%x capabilities=%s>' % (
@@ -4097,8 +4103,9 @@ class WebInfo(object):
             websocket_url=get_default(config, 'web', 'websocket_url', None),
         )
 
-    def toDict(self):
+    def toDict(self, scheduler_version="unknown"):
         d = dict()
+        d['version'] = {"web": self.version, "scheduler": scheduler_version}
         d['capabilities'] = self.capabilities.toDict()
         d['websocket_url'] = self.websocket_url
         stats = dict()
