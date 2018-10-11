@@ -32,6 +32,7 @@ import Pipeline from '../containers/status/Pipeline'
 
 class StatusPage extends React.Component {
   static propTypes = {
+    info: PropTypes.object,
     location: PropTypes.object,
     tenant: PropTypes.object
   }
@@ -59,6 +60,11 @@ class StatusPage extends React.Component {
 
     this.timer = null
     this.visible = true
+    this.updateInterval = 5000
+
+    if (typeof this.props.info.status.updateInterval !== 'undefined') {
+      this.updateInterval = parseInt(this.props.info.status.updateInterval, 10)
+    }
 
     // Stop refresh when page is not visible
     if (typeof document.hidden !== 'undefined') {
@@ -107,7 +113,7 @@ class StatusPage extends React.Component {
       this.timer = null
     }
     if (this.state.autoReload) {
-      this.timer = setTimeout(this.updateData, 5000)
+      this.timer = setTimeout(this.updateData, this.updateInterval)
     }
   }
 
@@ -286,4 +292,7 @@ class StatusPage extends React.Component {
   }
 }
 
-export default connect(state => ({tenant: state.tenant}))(StatusPage)
+export default connect(state => ({
+  info: state.info,
+  tenant: state.tenant
+}))(StatusPage)
