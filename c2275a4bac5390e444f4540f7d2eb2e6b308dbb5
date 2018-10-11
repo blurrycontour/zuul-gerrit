@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_2cb58ed0",
+        "filename": "playbooks/quick-start/run.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-10-11T22:22:42Z",
+      "side": 1,
+      "message": "It appears there is a bug in install-docker with the use_upstream_docker: false flag trying to install the wrong package. I\u0027m looking into fixing it.",
+      "revId": "c2275a4bac5390e444f4540f7d2eb2e6b308dbb5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
