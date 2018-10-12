@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_0ef3e3a0",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4228,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2018-10-12T05:46:06Z",
+      "side": 1,
+      "message": "Not quite sure if this is the best way to make the node request fail. The other option would be to extend the fake nodepool to allow failing a request based on a label.",
+      "revId": "8f9aff7ca9795dcea3d20cabd7ac5c96962cd87e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
