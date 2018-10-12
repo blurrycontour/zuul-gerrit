@@ -169,6 +169,8 @@
         - zuul-tox-docs
         - tox-pep8
         - tox-py35:
+            pre-run: playbooks/dstat/pre.yaml
+            post-run: playbooks/dstat/post.yaml
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
