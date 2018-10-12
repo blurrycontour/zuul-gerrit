@@ -17,6 +17,7 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import {
+  Button,
   Checkbox,
   Icon,
   Form,
@@ -27,6 +28,7 @@ import {
 import { fetchStatusIfNeeded } from '../actions/status'
 import Pipeline from '../containers/status/Pipeline'
 import Refreshable from '../containers/Refreshable'
+import PipelinesGraph from '../containers/status/PipelinesGraph'
 
 
 class StatusPage extends Refreshable {
@@ -40,7 +42,7 @@ class StatusPage extends Refreshable {
   state = {
     filter: null,
     expanded: false,
-    autoReload: true
+    showGraph: false
   }
 
   visibilityListener = () => {
@@ -226,10 +228,39 @@ class StatusPage extends Refreshable {
         </FormGroup>
       </Form>
     )
+    let statusRender
+    if (status && this.state.showGraph) {
+      statusRender = (
+        <PipelinesGraph
+          pipelines={status.pipelines}
+          filter={filter} />
+      )
+    } else if (status) {
+      statusRender = (<React.Fragment>
+        {status.pipelines.map(item => (
+          <Pipeline
+            pipeline={item}
+            filter={filter}
+            expanded={expanded}
+            key={item.name}
+            />
+        ))}
+       </React.Fragment>
+      )
+    }
     return (
       <React.Fragment>
         <div className="pull-right" style={{display: 'flex'}}>
           {this.renderSpinner()}
+          <Button onClick={() => {
+              this.setState({
+                showGraph: !this.state.showGraph,
+                autoReload: false
+              })
+              clearTimeout(this.timer)
+            }}>
+            graph
+          </Button>
           <Checkbox
             defaultChecked={autoReload}
             onChange={(e) => {this.setState({autoReload: e.target.checked})}}
@@ -237,18 +268,10 @@ class StatusPage extends Refreshable {
             auto reload
           </Checkbox>
         </div>
-
         {status && this.renderStatusHeader(status)}
         {statusControl}
         <div className='row'>
-          {status && status.pipelines.map(item => (
-            <Pipeline
-              pipeline={item}
-              filter={filter}
-              expanded={expanded}
-              key={item.name}
-              />
-          ))}
+          {statusRender}
         </div>
         {status && this.renderStatusFooter(status)}
       </React.Fragment>)
