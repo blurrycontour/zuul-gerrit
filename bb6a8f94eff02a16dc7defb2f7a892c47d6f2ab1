@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_e428d8ee",
+        "filename": "web/src/pages/Builds.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-10-15T14:22:43Z",
+      "side": 1,
+      "message": "Link to\u003d is for navigating internally. I think here you actually just want \u003ca href\u003d instead of Link. (the generated html in this case is incorrect)",
+      "range": {
+        "startLine": 77,
+        "startChar": 8,
+        "endLine": 77,
+        "endChar": 17
+      },
+      "revId": "bb6a8f94eff02a16dc7defb2f7a892c47d6f2ab1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
