@@ -54,10 +54,8 @@ class SQLConnection(BaseConnection):
                 self.dburi,
                 poolclass=sqlalchemy.pool.QueuePool,
                 pool_recycle=self.connection_config.get('pool_recycle', 1))
-            self._migrate()
             self.zuul_buildset_table, self.zuul_build_table \
                 = self._setup_models()
-            self.tables_established = True
         except sa.exc.NoSuchModuleError:
             self.log.exception(
                 "The required module for the dburi dialect isn't available. "
@@ -84,6 +82,19 @@ class SQLConnection(BaseConnection):
             # leverage that to tell the upgrade scripts about the table prefix.
             tag = {'table_prefix': self.table_prefix}
             alembic.command.upgrade(config, 'head', tag=tag)
+
+    def onLoad(self):
+        try:
+            self._migrate()
+            self.tables_established = True
+        except sa.exc.NoSuchModuleError:
+            self.log.exception(
+                "The required module for the dburi dialect isn't available. "
+                "SQL connection %s will be unavailable." % connection_name)
+        except sa.exc.OperationalError:
+            self.log.exception(
+                "Unable to connect to the database or establish the required "
+                "tables. Reporter %s is disabled" % self)
 
     def _setup_models(self):
         Base = declarative_base(metadata=sa.MetaData())
