@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_3556b82d",
+        "filename": "doc/source/admin/examples/docker-compose.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-10-17T20:52:52Z",
+      "side": 1,
+      "message": "For sshkey, I get permission error. See paste:\n\n  http://paste.openstack.org/show/732381/\n\nIf I do everything else you suggest, it seems to be working",
+      "parentUuid": "3f79a3b5_353238f5",
+      "revId": "c597330356d4782d155080976c07230f64078192",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_d52e648c",
         "filename": "doc/source/admin/examples/docker-compose.yaml",
         "patchSetId": 1
