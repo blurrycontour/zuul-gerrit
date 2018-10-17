@@ -51,7 +51,7 @@ class BuildsPage extends TableFilters {
   }
 
   componentDidMount () {
-    document.title = 'Zuul Builds'
+    document.title = 'Zuul Build'
     if (this.props.tenant.name) {
       this.updateData(this.getFilterFromUrl())
     }
@@ -67,40 +67,47 @@ class BuildsPage extends TableFilters {
     const headerFormat = value => <Table.Heading>{value}</Table.Heading>
     const cellFormat = (value) => (
       <Table.Cell>{value}</Table.Cell>)
-    const linkBuildFormat = (value, rowdata) => (
+    const linkCellFormat = (value) => (
       <Table.Cell>
-        <Link to={this.props.tenant.linkPrefix + '/build/' + rowdata.rowData.uuid}>{value}</Link>
+        <a href={value} target='_blank' rel='noopener noreferrer'>link</a>
       </Table.Cell>
     )
-    const linkChangeFormat = (value, rowdata) => (
+    const linkBuildFormat = (value) => (
       <Table.Cell>
-        <a href={rowdata.rowData.ref_url}>{value ? rowdata.rowData.change+','+rowdata.rowData.patchset : rowdata.rowData.newrev.substring(7,1)}</a>
+        <Link to={this.props.tenant.linkPrefix + '/build/' + value}>link</Link>
       </Table.Cell>
     )
     this.columns = []
     this.filterTypes = []
     const myColumns = [
+      'build',
       'job',
       'project',
       'branch',
       'pipeline',
       'change',
       'duration',
+      'log',
       'start time',
       'result']
     myColumns.forEach(column => {
       let prop = column
       let formatter = cellFormat
       // Adapt column name and property name
+      if (column === 'build') {
+        prop = 'uuid'
+        formatter = linkBuildFormat
+      }
       if (column === 'job') {
         prop = 'job_name'
       } else if (column === 'start time') {
         prop = 'start_time'
       } else if (column === 'change') {
-        prop = 'change'
-        formatter = linkChangeFormat
-      } else if (column === 'result') {
-        formatter = linkBuildFormat
+        prop = 'ref_url'
+        formatter = linkCellFormat
+      } else if (column === 'log') {
+        prop = 'log_url'
+        formatter = linkCellFormat
       }
       const label = column.charAt(0).toUpperCase() + column.slice(1)
       this.columns.push({
