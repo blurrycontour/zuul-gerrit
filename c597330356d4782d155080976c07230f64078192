@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_353238f5",
+        "filename": "doc/source/admin/examples/docker-compose.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-10-17T20:05:06Z",
+      "side": 1,
+      "message": "Try omitting the :z for sshkey and nodessh.",
+      "revId": "c597330356d4782d155080976c07230f64078192",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_d52e648c",
+        "filename": "doc/source/admin/examples/docker-compose.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-10-17T20:05:06Z",
+      "side": 1,
+      "message": "Try omitting :z for sshkey.",
+      "revId": "c597330356d4782d155080976c07230f64078192",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_f52b6079",
+        "filename": "doc/source/admin/examples/docker-compose.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-10-17T20:05:06Z",
+      "side": 1,
+      "message": "Try omitting :z for sshkey and logs.",
+      "revId": "c597330356d4782d155080976c07230f64078192",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_9546ac56",
+        "filename": "doc/source/admin/examples/docker-compose.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-10-17T20:05:06Z",
+      "side": 1,
+      "message": "Try omitting :z for nodessh.",
+      "revId": "c597330356d4782d155080976c07230f64078192",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_b54ba85c",
+        "filename": "doc/source/admin/examples/docker-compose.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-10-17T20:05:06Z",
+      "side": 1,
+      "message": "Try omitting :z for logs.",
+      "revId": "c597330356d4782d155080976c07230f64078192",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_7520b09b",
+        "filename": "doc/source/admin/examples/playbooks/executor.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-10-17T20:05:06Z",
+      "side": 1,
+      "message": "This doesn\u0027t make sense.  Can you paste the output that caused you to add this?  Also, the exact image versions used?",
+      "revId": "c597330356d4782d155080976c07230f64078192",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_1535bcdc",
+        "filename": "doc/source/admin/examples/playbooks/setup.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-10-17T20:05:06Z",
+      "side": 1,
+      "message": "Same here.",
+      "revId": "c597330356d4782d155080976c07230f64078192",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
