@@ -4,6 +4,10 @@
 - hosts: localhost
   gather_facts: false
   tasks:
+    - name: Ensure ssh-keygen package exists
+      package:
+        name: openssh-client
+        state: present
     - name: Wait for gerrit to start
       wait_for:
         host: gerrit
