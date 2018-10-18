@@ -16,11 +16,13 @@
 import logging
 import os
 import time
+import shutil
 from unittest import mock
 
 import zuul.executor.server
 import zuul.model
 import gear
+import git
 
 from tests.base import (
     ZuulTestCase,
@@ -644,3 +646,86 @@ class TestLineMapping(AnsibleZuulTestCase):
                                        'name': 'Zuul',
                                        'username': 'jenkins'}}
         )
+
+
+class TestFishyBranch(ZuulTestCase):
+    config_file = 'zuul-connections-gerrit-and-github.conf'
+    tenant_config_file = 'config/fishy-branch/main.yaml'
+
+    def test_config_loading_with_fishy_branch_name(self):
+        # Create two branches, one named arbitrarily, the other one is named
+        # the same but with "origin/" in front.
+        repo_path = os.path.join(self.upstream_root, 'org/project')
+        repo = git.Repo(repo_path)
+        self.create_branch('org/project', 'fakebranch')
+        github_client = self.fake_github.getGithubClient()
+        github_repo = github_client.repository('org', 'project')
+        github_repo._create_branch('fakebranch')
+        github_repo._set_branch_protection('fakebranch', True)
+        self.create_branch('org/project', 'origin/fakebranch')
+        github_repo._create_branch('origin/fakebranch')
+        repo.head.reference = repo.heads['fakebranch']
+        old_commit = repo.heads['fakebranch'].commit
+
+        push_event = self.fake_github.getPushEvent(
+            'org/project',
+            'refs/heads/fakebranch',
+            old_rev=None,
+            new_rev=str(old_commit))
+        self.fake_github.emitEvent(push_event)
+        push_event = self.fake_github.getPushEvent(
+            'org/project',
+            'refs/heads/origin/fakebranch',
+            old_rev=None,
+            new_rev=str(repo.heads['origin/fakebranch'].commit))
+        self.fake_github.emitEvent(push_event)
+        self.waitUntilSettled()
+
+        # Now modify the branch by adding a playbook
+        old_playbook_path = os.path.join(
+            repo_path, 'playbooks', 'project-test1.yaml')
+        new_playbook_path = os.path.join(
+            repo_path, 'playbooks', 'test1-new.yaml')
+        shutil.copy(old_playbook_path, new_playbook_path)
+        repo.index.add(['playbooks/test1-new.yaml'])
+        new_commit = repo.index.commit('Create playbook')
+        repo.heads['fakebranch'].commit = new_commit
+
+        repo.head.reference = repo.heads['master']
+
+        push_event = self.fake_github.getPushEvent(
+            'org/project',
+            'refs/heads/fakebranch',
+            old_rev=str(old_commit),
+            new_rev=str(new_commit),
+            added_files=['playbooks/test1-new.yaml'])
+        self.fake_github.emitEvent(push_event)
+        self.waitUntilSettled()
+
+        # Now create a PR based on the branch before the playbook was added
+        # that uses the playbook that has been created before.
+        # Due to the git checkout mechanics the playbook will not be found as
+        # the PR will be merged to the wrong (outdated) branch.
+        new_zuul_config = """
+- job:
+    name: project-test1
+    run: playbooks/project-test1.yaml
+
+- job:
+    name: test1-new
+    run: playbooks/test1-new.yaml
+
+- project:
+    check:
+      jobs:
+      - test1-new
+"""
+        A = self.fake_github.openFakePullRequest(
+            'org/project',
+            'fakebranch',
+            'A',
+            files={'zuul.yaml': new_zuul_config})
+        self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(self.getJobFromHistory('test1-new').result,
+                         'SUCCESS')

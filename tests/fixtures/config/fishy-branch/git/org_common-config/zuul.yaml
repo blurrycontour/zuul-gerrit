@@ -1,0 +1,29 @@
+- project:
+    check:
+      jobs:
+      - noop
+
+- job:
+    name: base
+    parent: null
+    nodeset:
+      nodes:
+        - name: node
+          label: label1
+
+- pipeline:
+    name: check
+    manager: independent
+    trigger:
+      github:
+      - event: pull_request
+        action:
+        - opened
+    success:
+      github:
+        comment: true
+        status: success
+    failure:
+      github:
+        comment: true
+        status: failure
