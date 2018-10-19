@@ -656,7 +656,7 @@ class GerritConnection(BaseConnection):
                 needed_by_changes.add(dep)
         change.compat_needed_by_changes = compat_needed_by_changes
 
-        self.sched.onChangeUpdated(change)
+        self.sched.on_change_updated(change)
 
         return change
 

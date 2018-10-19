@@ -362,7 +362,7 @@ class RPCListener(object):
 
     def handle_status_get(self, job):
         args = json.loads(job.arguments)
-        output = self.sched.formatStatusJSON(args.get("tenant"))
+        output = self.sched.format_status_json(args.get("tenant"))
         job.sendWorkComplete(output)
 
     def handle_job_get(self, gear_job):

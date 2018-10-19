@@ -229,7 +229,7 @@ class NodesProvisionedEvent(ResultEvent):
 class Scheduler(threading.Thread):
     """The engine of Zuul.
 
-    The Scheduler is reponsible for recieving events and dispatching
+    The Scheduler is responsible for receiving events and dispatching
     them to appropriate components (including pipeline managers,
     mergers and executors).
 
@@ -250,6 +250,16 @@ class Scheduler(threading.Thread):
     log = logging.getLogger("zuul.Scheduler")
     _stats_interval = 30
 
+    # TODO(iremizov): move constants to defaults module
+    DEFAULT_SCHEDULER_COMMAND_SOCKET = '/var/lib/zuul/scheduler.socket'
+    DEFAULT_SCHEDULE_STATE_DIR = '/var/lib/zuul'
+    DEFAULT_WEB_WEBSOCKET_URL = None
+
+    @property
+    def command_socket_address(self):
+        return get_default(self.config, 'scheduler', 'command_socket',
+                           self.DEFAULT_SCHEDULER_COMMAND_SOCKET)
+
     def __init__(self, config, testonly=False):
         threading.Thread.__init__(self)
         self.daemon = True
@@ -257,20 +267,26 @@ class Scheduler(threading.Thread):
         self.wake_event = threading.Event()
         self.layout_lock = threading.Lock()
         self.run_handler_lock = threading.Lock()
+        self.command_thread = None
+        # maps commands received from socket to instance methods
         self.command_map = {
             'stop': self.stop,
-            'full-reconfigure': self.fullReconfigureCommandHandler,
+            'full-reconfigure': self.full_reconfigure_command_handler,
         }
+        # scheduler states
+        self._command_running = False
         self._pause = False
         self._exit = False
         self._stopped = False
         self._zuul_app = None
+        self.nodepool = None
+        self.zk = None
         self.executor = None
         self.merger = None
         self.connections = None
         self.statsd = get_statsd(config)
         self.rpc = rpclistener.RPCListener(config, self)
-        self.stats_thread = threading.Thread(target=self.runStats)
+        self.stats_thread = threading.Thread(target=self.run_stats)
         self.stats_thread.daemon = True
         self.stats_stop = threading.Event()
         # TODO(jeblair): fix this
@@ -289,13 +305,10 @@ class Scheduler(threading.Thread):
         self.unparsed_abide = model.UnparsedAbideConfig()
 
         if not testonly:
-            time_dir = self._get_time_database_dir()
-            self.time_database = model.TimeDataBase(time_dir)
+            self.time_database = model.TimeDataBase(self.time_database_dir)
 
-        command_socket = get_default(
-            self.config, 'scheduler', 'command_socket',
-            '/var/lib/zuul/scheduler.socket')
-        self.command_socket = commandsocket.CommandSocket(command_socket)
+        self.command_socket = commandsocket.CommandSocket(
+            self.command_socket_address)
 
         if zuul_version.is_release is False:
             self.zuul_version = "%s %s" % (zuul_version.release_string,
@@ -311,7 +324,7 @@ class Scheduler(threading.Thread):
         self._command_running = True
         self.log.debug("Starting command processor")
         self.command_socket.start()
-        self.command_thread = threading.Thread(target=self.runCommand,
+        self.command_thread = threading.Thread(target=self.run_command,
                                                name='command')
         self.command_thread.daemon = True
         self.command_thread.start()
@@ -322,7 +335,7 @@ class Scheduler(threading.Thread):
     def stop(self):
         self._stopped = True
         self.stats_stop.set()
-        self.stopConnections()
+        self.stop_connections()
         self.wake_event.set()
         self.stats_thread.join()
         self.rpc.stop()
@@ -330,7 +343,7 @@ class Scheduler(threading.Thread):
         self._command_running = False
         self.command_socket.stop()
 
-    def runCommand(self):
+    def run_command(self):
         while self._command_running:
             try:
                 command = self.command_socket.get().decode('utf8')
@@ -339,38 +352,38 @@ class Scheduler(threading.Thread):
             except Exception:
                 self.log.exception("Exception while processing command")
 
-    def registerConnections(self, connections, load=True):
+    def register_connections(self, connections, load=True):
         # load: whether or not to trigger the onLoad for the connection. This
         # is useful for not doing a full load during layout validation.
         self.connections = connections
         self.connections.registerScheduler(self, load)
 
-    def stopConnections(self):
+    def stop_connections(self):
         self.connections.stop()
 
-    def setZuulApp(self, app):
+    def set_zuul_app(self, app):
         self._zuul_app = app
 
-    def setExecutor(self, executor):
+    def set_executor(self, executor):
         self.executor = executor
 
-    def setMerger(self, merger):
+    def set_merger(self, merger):
         self.merger = merger
 
-    def setNodepool(self, nodepool):
+    def set_nodepool(self, nodepool):
         self.nodepool = nodepool
 
-    def setZooKeeper(self, zk):
+    def set_zoo_keeper(self, zk):
         self.zk = zk
 
-    def runStats(self):
+    def run_stats(self):
         while not self.stats_stop.wait(self._stats_interval):
             try:
-                self._runStats()
+                self._run_stats()
             except Exception:
                 self.log.exception("Error in periodic stats:")
 
-    def _runStats(self):
+    def _run_stats(self):
         if not self.statsd:
             return
         functions = self.rpc.getFunctions()
@@ -401,23 +414,26 @@ class Scheduler(threading.Thread):
         self.statsd.gauge('zuul.executors.jobs_running', execute_running)
         self.statsd.gauge('zuul.executors.jobs_queued', execute_queue)
 
+    # FIXME(iremizov): convert to snake_case
+    # The problem here is that codebase has a lot of addEvent methods. So it's
+    # safer to rename them all at once.
     def addEvent(self, event):
         self.trigger_event_queue.put(event)
         self.wake_event.set()
 
-    def onBuildStarted(self, build):
+    def on_build_started(self, build):
         build.start_time = time.time()
         event = BuildStartedEvent(build)
         self.result_event_queue.put(event)
         self.wake_event.set()
 
-    def onBuildPaused(self, build, result_data):
+    def on_build_paused(self, build, result_data):
         build.result_data = result_data
         event = BuildPausedEvent(build)
         self.result_event_queue.put(event)
         self.wake_event.set()
 
-    def onBuildCompleted(self, build, result, result_data, warnings):
+    def on_build_completed(self, build, result, result_data, warnings):
         build.end_time = time.time()
         build.result_data = result_data
         build.build_set.warning_messages.extend(warnings)
@@ -463,19 +479,19 @@ class Scheduler(threading.Thread):
         self.result_event_queue.put(event)
         self.wake_event.set()
 
-    def onMergeCompleted(self, build_set, merged, updated,
-                         commit, files, repo_state):
+    def on_merge_completed(self, build_set, merged, updated,
+                           commit, files, repo_state):
         event = MergeCompletedEvent(build_set, merged,
                                     updated, commit, files, repo_state)
         self.result_event_queue.put(event)
         self.wake_event.set()
 
-    def onNodesProvisioned(self, req):
+    def on_nodes_provisioned(self, req):
         event = NodesProvisionedEvent(req)
         self.result_event_queue.put(event)
         self.wake_event.set()
 
-    def reconfigureTenant(self, tenant, project, event):
+    def reconfigure_tenant(self, tenant, project, event):
         self.log.debug("Submitting tenant reconfiguration event for "
                        "%s due to event %s in project %s",
                        tenant.name, event, project)
@@ -484,7 +500,7 @@ class Scheduler(threading.Thread):
         self.management_event_queue.put(event)
         self.wake_event.set()
 
-    def fullReconfigureCommandHandler(self):
+    def full_reconfigure_command_handler(self):
         self._zuul_app.fullReconfigure()
 
     def reconfigure(self, config):
@@ -540,23 +556,25 @@ class Scheduler(threading.Thread):
         self.wake_event.set()
         self.log.debug("Waiting for exit")
 
-    def _get_queue_pickle_file(self):
-        state_dir = get_default(self.config, 'scheduler', 'state_dir',
-                                '/var/lib/zuul', expand_user=True)
-        return os.path.join(state_dir, 'queue.pickle')
+    @property
+    def state_dir(self):
+        return get_default(self.config, 'scheduler', 'state_dir',
+                           self.DEFAULT_SCHEDULE_STATE_DIR, expand_user=True)
 
-    def _get_time_database_dir(self):
-        state_dir = get_default(self.config, 'scheduler', 'state_dir',
-                                '/var/lib/zuul', expand_user=True)
-        d = os.path.join(state_dir, 'times')
+    @property
+    def queue_pickle_file(self):
+        return os.path.join(self.state_dir, 'queue.pickle')
+
+    @property
+    def time_database_dir(self):
+        d = os.path.join(self.state_dir, 'times')
         if not os.path.exists(d):
             os.mkdir(d)
         return d
 
-    def _get_key_dir(self):
-        state_dir = get_default(self.config, 'scheduler', 'state_dir',
-                                '/var/lib/zuul', expand_user=True)
-        key_dir = os.path.join(state_dir, 'keys')
+    @property
+    def key_dir(self):
+        key_dir = os.path.join(self.state_dir, 'keys')
         if not os.path.exists(key_dir):
             os.mkdir(key_dir, 0o700)
         st = os.stat(key_dir)
@@ -567,17 +585,16 @@ class Scheduler(threading.Thread):
         return key_dir
 
     def _save_queue(self):
-        pickle_file = self._get_queue_pickle_file()
         events = []
         while not self.trigger_event_queue.empty():
             events.append(self.trigger_event_queue.get())
         self.log.debug("Queue length is %s" % len(events))
         if events:
             self.log.debug("Saving queue")
-            pickle.dump(events, open(pickle_file, 'wb'))
+            pickle.dump(events, open(self.queue_pickle_file, 'wb'))
 
     def _load_queue(self):
-        pickle_file = self._get_queue_pickle_file()
+        pickle_file = self.queue_pickle_file
         if os.path.exists(pickle_file):
             self.log.debug("Loading queue")
             events = pickle.load(open(pickle_file, 'rb'))
@@ -588,7 +605,7 @@ class Scheduler(threading.Thread):
             self.log.debug("No queue file found")
 
     def _delete_queue(self):
-        pickle_file = self._get_queue_pickle_file()
+        pickle_file = self.queue_pickle_file
         if os.path.exists(pickle_file):
             self.log.debug("Deleting saved queue")
             os.unlink(pickle_file)
@@ -605,21 +622,19 @@ class Scheduler(threading.Thread):
         self.log.debug("Resuming queue processing")
         self.wake_event.set()
 
-    def _doPauseEvent(self):
+    def _do_pause_event(self):
         if self._exit:
             self.log.debug("Exiting")
             self._save_queue()
             os._exit(0)
 
-    def _checkTenantSourceConf(self, config):
+    def check_tenant_source_conf(self):
         tenant_config = None
         script = False
-        if self.config.has_option(
-            'scheduler', 'tenant_config'):
+        if self.config.has_option('scheduler', 'tenant_config'):
             tenant_config = self.config.get(
                 'scheduler', 'tenant_config')
-        if self.config.has_option(
-            'scheduler', 'tenant_config_script'):
+        if self.config.has_option('scheduler', 'tenant_config_script'):
             if tenant_config:
                 raise Exception(
                     "tenant_config and tenant_config_script options "
@@ -633,12 +648,11 @@ class Scheduler(threading.Thread):
                 "is missing from the configuration.")
         return tenant_config, script
 
-    def _doReconfigureEvent(self, event):
+    def _do_reconfigure_event(self, event):
         # This is called in the scheduler loop after another thread submits
         # a request
-        self.layout_lock.acquire()
-        self.config = event.config
-        try:
+        with self.layout_lock:
+            self.config = event.config
             self.log.info("Full reconfiguration beginning")
             for connection in self.connections.connections.values():
                 self.log.debug("Clear branch cache for: %s" % connection)
@@ -646,23 +660,20 @@ class Scheduler(threading.Thread):
 
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger,
-                self._get_key_dir())
-            tenant_config, script = self._checkTenantSourceConf(self.config)
+                self.key_dir)
+            tenant_config, script = self.check_tenant_source_conf()
             self.unparsed_abide = loader.readConfig(
                 tenant_config, from_script=script)
             abide = loader.loadConfig(self.unparsed_abide)
             for tenant in abide.tenants.values():
-                self._reconfigureTenant(tenant)
+                self._reconfigure_tenant(tenant)
             self.abide = abide
-        finally:
-            self.layout_lock.release()
         self.log.info("Full reconfiguration complete")
 
-    def _doTenantReconfigureEvent(self, event):
+    def _do_tenant_reconfigure_event(self, event):
         # This is called in the scheduler loop after another thread submits
         # a request
-        self.layout_lock.acquire()
-        try:
+        with self.layout_lock:
             self.log.info("Tenant reconfiguration beginning for %s due to "
                           "projects %s",
                           event.tenant_name, event.project_branches)
@@ -676,17 +687,16 @@ class Scheduler(threading.Thread):
             old_tenant = self.abide.tenants[event.tenant_name]
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger,
-                self._get_key_dir())
+                self.key_dir)
             abide = loader.reloadTenant(
                 self.abide, old_tenant)
             tenant = abide.tenants[event.tenant_name]
-            self._reconfigureTenant(tenant)
+            self._reconfigure_tenant(tenant)
             self.abide = abide
-        finally:
-            self.layout_lock.release()
         self.log.info("Tenant reconfiguration complete")
 
-    def _reenqueueGetProject(self, tenant, item):
+    @staticmethod
+    def _reenqueue_get_project(tenant, item):
         project = item.change.project
         # Attempt to get the same project as the one passed in.  If
         # the project is now found on a different connection, return
@@ -721,7 +731,7 @@ class Scheduler(threading.Thread):
                 return new_project
         return None
 
-    def _reenqueueTenant(self, old_tenant, tenant):
+    def _reenqueue_tenant(self, old_tenant, tenant):
         for name, new_pipeline in tenant.layout.pipelines.items():
             old_pipeline = old_tenant.layout.pipelines.get(name)
             if not old_pipeline:
@@ -760,7 +770,7 @@ class Scheduler(threading.Thread):
                         last_head = item
                     item.pipeline = None
                     item.queue = None
-                    item.change.project = self._reenqueueGetProject(
+                    item.change.project = self._reenqueue_get_project(
                         tenant, item)
                     # If the old item ahead made it in, re-enqueue
                     # this one behind it.
@@ -819,8 +829,8 @@ class Scheduler(threading.Thread):
                     tenant.semaphore_handler.release(
                         build.build_set.item, build.job)
 
-    def _reconfigureTenant(self, tenant):
-        # This is called from _doReconfigureEvent while holding the
+    def _reconfigure_tenant(self, tenant):
+        # This is called from _do_reconfigure_event while holding the
         # layout lock
         old_tenant = self.abide.tenants.get(tenant.name)
 
@@ -829,10 +839,10 @@ class Scheduler(threading.Thread):
             # held semaphores.
             tenant.semaphore_handler = old_tenant.semaphore_handler
 
-            self._reenqueueTenant(old_tenant, tenant)
+            self._reenqueue_tenant(old_tenant, tenant)
 
         # TODOv3(jeblair): update for tenants
-        # self.maintainConnectionCache()
+        # self.maintain_connection_cache()
         self.connections.reconfigureDrivers(tenant)
 
         # TODOv3(jeblair): remove postconfig calls?
@@ -855,7 +865,7 @@ class Scheduler(threading.Thread):
                 self.log.exception("Exception reporting initial "
                                    "pipeline stats:")
 
-    def _doPromoteEvent(self, event):
+    def _do_promote_event(self, event):
         tenant = self.abide.tenants.get(event.tenant_name)
         pipeline = tenant.layout.pipelines[event.pipeline_name]
         change_ids = [c.split(',') for c in event.change_ids]
@@ -895,7 +905,7 @@ class Scheduler(threading.Thread):
                 quiet=True,
                 ignore_requirements=True)
 
-    def _doDequeueEvent(self, event):
+    def _do_dequeue_event(self, event):
         tenant = self.abide.tenants.get(event.tenant_name)
         pipeline = tenant.layout.pipelines[event.pipeline_name]
         (trusted, project) = tenant.getProject(event.project_name)
@@ -912,7 +922,7 @@ class Scheduler(threading.Thread):
                         (event.project_name,
                          event.change or event.ref))
 
-    def _doEnqueueEvent(self, event):
+    def _do_enqueue_event(self, event):
         tenant = self.abide.tenants.get(event.tenant_name)
         full_project_name = ('/'.join([event.project_hostname,
                                        event.project_name]))
@@ -923,7 +933,7 @@ class Scheduler(threading.Thread):
                        "to pipeline %s" % (event, change, self))
         pipeline.manager.addChange(change, ignore_requirements=True)
 
-    def _areAllBuildsComplete(self):
+    def are_all_builds_complete(self):
         self.log.debug("Checking if all builds are complete")
         if self.merger.areMergesOutstanding():
             self.log.debug("Waiting on merger")
@@ -972,8 +982,8 @@ class Scheduler(threading.Thread):
                            not self._stopped):
                         self.process_event_queue()
 
-                if self._pause and self._areAllBuildsComplete():
-                    self._doPauseEvent()
+                if self._pause and self.are_all_builds_complete():
+                    self._do_pause_event()
 
                 for tenant in self.abide.tenants.values():
                     for pipeline in tenant.layout.pipelines.values():
@@ -988,7 +998,7 @@ class Scheduler(threading.Thread):
             finally:
                 self.run_handler_lock.release()
 
-    def maintainConnectionCache(self):
+    def maintain_connection_cache(self):
         # TODOv3(jeblair): update for tenants
         relevant = set()
         for tenant in self.abide.tenants.values():
@@ -1047,7 +1057,7 @@ class Scheduler(threading.Thread):
                     # or a branch was just created or deleted.  Clear
                     # out cached data for this project and perform a
                     # reconfiguration.
-                    self.reconfigureTenant(tenant, change.project, event)
+                    self.reconfigure_tenant(tenant, change.project, event)
                 for pipeline in tenant.layout.pipelines.values():
                     if event.isPatchsetCreated():
                         pipeline.manager.removeOldVersionsOfChange(change)
@@ -1064,15 +1074,15 @@ class Scheduler(threading.Thread):
         self.log.debug("Processing management event %s" % event)
         try:
             if isinstance(event, ReconfigureEvent):
-                self._doReconfigureEvent(event)
+                self._do_reconfigure_event(event)
             elif isinstance(event, TenantReconfigureEvent):
-                self._doTenantReconfigureEvent(event)
+                self._do_tenant_reconfigure_event(event)
             elif isinstance(event, PromoteEvent):
-                self._doPromoteEvent(event)
+                self._do_promote_event(event)
             elif isinstance(event, DequeueEvent):
-                self._doDequeueEvent(event)
+                self._do_dequeue_event(event)
             elif isinstance(event, EnqueueEvent):
-                self._doEnqueueEvent(event.trigger_event)
+                self._do_enqueue_event(event.trigger_event)
             else:
                 self.log.error("Unable to handle event %s" % event)
             event.done()
@@ -1087,21 +1097,21 @@ class Scheduler(threading.Thread):
         self.log.debug("Processing result event %s" % event)
         try:
             if isinstance(event, BuildStartedEvent):
-                self._doBuildStartedEvent(event)
+                self._do_build_started_event(event)
             elif isinstance(event, BuildPausedEvent):
-                self._doBuildPausedEvent(event)
+                self._do_build_paused_event(event)
             elif isinstance(event, BuildCompletedEvent):
-                self._doBuildCompletedEvent(event)
+                self._do_build_completed_event(event)
             elif isinstance(event, MergeCompletedEvent):
-                self._doMergeCompletedEvent(event)
+                self._do_merge_completed_event(event)
             elif isinstance(event, NodesProvisionedEvent):
-                self._doNodesProvisionedEvent(event)
+                self._do_nodes_provisioned_event(event)
             else:
                 self.log.error("Unable to handle event %s" % event)
         finally:
             self.result_event_queue.task_done()
 
-    def _doBuildStartedEvent(self, event):
+    def _do_build_started_event(self, event):
         build = event.build
         if build.build_set is not build.build_set.item.current_build_set:
             self.log.warning("Build %s is not in the current build set" %
@@ -1117,9 +1127,9 @@ class Scheduler(threading.Thread):
                 build))
         except Exception:
             self.log.exception("Exception estimating build time:")
-        pipeline.manager.onBuildStarted(event.build)
+        pipeline.manager.on_build_started(event.build)
 
-    def _doBuildPausedEvent(self, event):
+    def _do_build_paused_event(self, event):
         build = event.build
         if build.build_set is not build.build_set.item.current_build_set:
             self.log.warning("Build %s is not in the current build set" %
@@ -1132,7 +1142,7 @@ class Scheduler(threading.Thread):
             return
         pipeline.manager.onBuildPaused(event.build)
 
-    def _getAutoholdRequestKey(self, build):
+    def _get_autohold_request_key(self, build):
         change = build.build_set.item.change
 
         autohold_key_base = (build.pipeline.tenant.name,
@@ -1195,26 +1205,26 @@ class Scheduler(threading.Thread):
 
         return autohold_key
 
-    def _processAutohold(self, build):
+    def _process_autohold(self, build):
         # We explicitly only want to hold nodes for jobs if they have
         # failed / retry_limit / post_failure and have an autohold request.
         hold_list = ["FAILURE", "RETRY_LIMIT", "POST_FAILURE", "TIMED_OUT"]
         if build.result not in hold_list:
             return
 
-        autohold_key = self._getAutoholdRequestKey(build)
+        autohold_key = self._get_autohold_request_key(build)
         self.log.debug("Got autohold key %s", autohold_key)
         if autohold_key is not None:
             self.nodepool.holdNodeSet(build.nodeset, autohold_key)
 
-    def _doBuildCompletedEvent(self, event):
+    def _do_build_completed_event(self, event):
         build = event.build
 
         # Regardless of any other conditions which might cause us not
         # to pass this on to the pipeline manager, make sure we return
         # the nodes to nodepool.
         try:
-            self._processAutohold(build)
+            self._process_autohold(build)
         except Exception:
             self.log.exception("Unable to process autohold for %s" % build)
         try:
@@ -1239,7 +1249,7 @@ class Scheduler(threading.Thread):
                 self.log.exception("Exception recording build time:")
         pipeline.manager.onBuildCompleted(event.build)
 
-    def _doMergeCompletedEvent(self, event):
+    def _do_merge_completed_event(self, event):
         build_set = event.build_set
         if build_set is not build_set.item.current_build_set:
             self.log.warning("Build set %s is not current" % (build_set,))
@@ -1251,7 +1261,7 @@ class Scheduler(threading.Thread):
             return
         pipeline.manager.onMergeCompleted(event)
 
-    def _doNodesProvisionedEvent(self, event):
+    def _do_nodes_provisioned_event(self, event):
         request = event.request
         request_id = event.request_id
         build_set = request.build_set
@@ -1280,15 +1290,18 @@ class Scheduler(threading.Thread):
             if request.fulfilled:
                 self.nodepool.returnNodeSet(request.nodeset)
             return
-        pipeline.manager.onNodesProvisioned(event)
+        pipeline.manager.on_nodes_provisioned(event)
 
-    def formatStatusJSON(self, tenant_name):
+    @property
+    def websocket_url(self):
+        return get_default(self.config, 'web', 'websocket_url',
+                           self.DEFAULT_WEB_WEBSOCKET_URL)
+
+    def format_status_json(self, tenant_name):
         # TODOv3(jeblair): use tenants
         data = {}
 
         data['zuul_version'] = self.zuul_version
-        websocket_url = get_default(self.config, 'web', 'websocket_url', None)
-
         if self._pause:
             ret = 'Queue only mode: preparing to '
             if self._exit:
@@ -1324,10 +1337,10 @@ class Scheduler(threading.Thread):
                 "code": 204
             })
         for pipeline in tenant.layout.pipelines.values():
-            pipelines.append(pipeline.formatStatusJSON(websocket_url))
+            pipelines.append(pipeline.formatStatusJSON(self.websocket_url))
         return json.dumps(data)
 
-    def onChangeUpdated(self, change):
+    def on_change_updated(self, change):
         """Remove stale dependency references on change update.
 
         When a change is updated with a new patchset, other changes in
