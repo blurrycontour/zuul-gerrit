@@ -66,7 +66,7 @@ class Nodepool(object):
         else:
             self.log.info("Fulfilling empty node request %s" % (req,))
             req.state = model.STATE_FULFILLED
-            self.sched.onNodesProvisioned(req)
+            self.sched.on_nodes_provisioned(req)
             del self.requests[req.uid]
         return req
 
@@ -199,7 +199,7 @@ class Nodepool(object):
             self.log.info("Node request %s %s" % (request, request.state))
 
             # Give our results to the scheduler.
-            self.sched.onNodesProvisioned(request)
+            self.sched.on_nodes_provisioned(request)
             del self.requests[request.uid]
 
             self.emitStats(request)

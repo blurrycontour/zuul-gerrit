@@ -428,10 +428,10 @@ class Client(zuul.cmd.ZuulApp):
         from zuul import configloader
         sched = scheduler.Scheduler(self.config, testonly=True)
         self.configure_connections(source_only=True)
-        sched.registerConnections(self.connections, load=False)
+        sched.register_connections(self.connections, load=False)
         loader = configloader.ConfigLoader(
             sched.connections, sched, None, None)
-        tenant_config, script = sched._checkTenantSourceConf(self.config)
+        tenant_config, script = sched.check_tenant_source_conf()
         unparsed_abide = loader.readConfig(tenant_config, from_script=script)
         try:
             for conf_tenant in unparsed_abide.tenants:

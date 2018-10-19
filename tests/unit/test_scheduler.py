@@ -705,7 +705,7 @@ class TestScheduler(ZuulTestCase):
         self.waitUntilSettled()
         time.sleep(2)
 
-        data = json.loads(self.sched.formatStatusJSON('tenant-one'))
+        data = json.loads(self.sched.format_status_json('tenant-one'))
         found_job = None
         for pipeline in data['pipelines']:
             if pipeline['name'] != 'gate':
@@ -2395,7 +2395,7 @@ class TestScheduler(ZuulTestCase):
         self.waitUntilSettled()
 
         self.assertEqual(len(self.gearman_server.getQueue()), 0)
-        self.assertTrue(self.sched._areAllBuildsComplete())
+        self.assertTrue(self.sched.are_all_builds_complete())
         self.assertEqual(len(self.history), 0)
         self.assertEqual(A.data['status'], 'MERGED')
         self.assertEqual(A.reported, 2)
@@ -2546,7 +2546,7 @@ class TestScheduler(ZuulTestCase):
         self.waitUntilSettled()
         # asserting that project-merge is removed from queue
         self.assertEqual(len(self.gearman_server.getQueue()), 0)
-        self.assertTrue(self.sched._areAllBuildsComplete())
+        self.assertTrue(self.sched.are_all_builds_complete())
 
         self.assertEqual(len(self.history), 1)
         self.assertEqual(self.history[0].name, 'gate-noop')
@@ -2866,10 +2866,10 @@ class TestScheduler(ZuulTestCase):
         self.sched.run_handler_lock.acquire()
         self.assertEqual(self.sched.management_event_queue.qsize(), 0)
 
-        self.sched.reconfigureTenant(tenant, project, None)
+        self.sched.reconfigure_tenant(tenant, project, None)
         self.assertEqual(self.sched.management_event_queue.qsize(), 1)
 
-        self.sched.reconfigureTenant(tenant, project, None)
+        self.sched.reconfigure_tenant(tenant, project, None)
         # The second event should have been combined with the first
         # so we should still only have one entry.
         self.assertEqual(self.sched.management_event_queue.qsize(), 1)
@@ -5140,8 +5140,8 @@ For CI problems and help debugging, contact ci@example.org"""
         self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
         # Reconfigure while we still have an outstanding merge job
-        self.sched.reconfigureTenant(self.sched.abide.tenants['tenant-one'],
-                                     None, None)
+        self.sched.reconfigure_tenant(self.sched.abide.tenants['tenant-one'],
+                                      None, None)
         self.waitUntilSettled()
         # Verify the merge job is still running and that the item is
         # in the pipeline

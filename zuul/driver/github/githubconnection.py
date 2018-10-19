@@ -896,7 +896,7 @@ class GithubConnection(BaseConnection):
         ]
 
         if self.sched:
-            self.sched.onChangeUpdated(change)
+            self.sched.on_change_updated(change)
 
         return change
 

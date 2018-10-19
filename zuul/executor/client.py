@@ -302,8 +302,8 @@ class ExecutorClient(object):
         item.addBuild(build)
 
         if job.name == 'noop':
-            self.sched.onBuildStarted(build)
-            self.sched.onBuildCompleted(build, 'SUCCESS', {}, [])
+            self.sched.on_build_started(build)
+            self.sched.on_build_completed(build, 'SUCCESS', {}, [])
             return build
 
         gearman_job = gear.TextJob('executor:execute', json_dumps(params),
@@ -419,7 +419,7 @@ class ExecutorClient(object):
             # track of which results are non-final.
             if build.retry:
                 result = None
-            self.sched.onBuildCompleted(build, result, result_data, warnings)
+            self.sched.on_build_completed(build, result, result_data, warnings)
             # The test suite expects the build to be removed from the
             # internal dict after it's added to the report queue.
             del self.builds[job.unique]
@@ -442,12 +442,12 @@ class ExecutorClient(object):
                 build.paused = data['paused']
                 if build.paused:
                     result_data = data.get('data', {})
-                    self.sched.onBuildPaused(build, result_data)
+                    self.sched.on_build_paused(build, result_data)
 
             if not started:
                 self.log.info("Build %s started" % job)
                 build.__gearman_worker = data.get('worker_name')
-                self.sched.onBuildStarted(build)
+                self.sched.on_build_started(build)
         else:
             self.log.error("Unable to find build %s" % job.unique)
 
@@ -474,7 +474,7 @@ class ExecutorClient(object):
             # Since this isn't otherwise going to get a build complete
             # event, send one to the scheduler so that it can unlock
             # the nodes.
-            self.sched.onBuildCompleted(build, 'CANCELED', {}, [])
+            self.sched.on_build_completed(build, 'CANCELED', {}, [])
             return True
         return False
 

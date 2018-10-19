@@ -2397,7 +2397,7 @@ class ZuulTestCase(BaseTestCase):
         gerritconnection.GerritEventConnector.delay = 0.0
 
         self.sched = zuul.scheduler.Scheduler(self.config)
-        self.sched.setZuulApp(self)
+        self.sched.set_zuul_app(self)
         self.sched._stats_interval = 1
 
         self.event_queues = [
@@ -2407,7 +2407,7 @@ class ZuulTestCase(BaseTestCase):
         ]
 
         self.configure_connections()
-        self.sched.registerConnections(self.connections)
+        self.sched.register_connections(self.connections)
 
         self.executor_server = RecordingExecutorServer(
             self.config, self.connections,
@@ -2433,10 +2433,10 @@ class ZuulTestCase(BaseTestCase):
             self.zk_chroot_fixture.zookeeper_port,
             self.zk_chroot_fixture.zookeeper_chroot)
 
-        self.sched.setExecutor(self.executor_client)
-        self.sched.setMerger(self.merge_client)
-        self.sched.setNodepool(self.nodepool)
-        self.sched.setZooKeeper(self.zk)
+        self.sched.set_executor(self.executor_client)
+        self.sched.set_merger(self.merge_client)
+        self.sched.set_nodepool(self.nodepool)
+        self.sched.set_zoo_keeper(self.zk)
 
         self.sched.start()
         self.executor_client.gearman.waitForServer()
