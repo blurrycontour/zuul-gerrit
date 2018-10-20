@@ -26,7 +26,7 @@ class Merger(zuul.cmd.ZuulDaemonApp):
     app_description = 'A standalone Zuul merger.'
 
     def createParser(self):
-        parser = super(Merger, self).createParser()
+        parser = super(Merger, self).create_parser()
         parser.add_argument('command',
                             choices=zuul.merger.server.COMMANDS,
                             nargs='?')

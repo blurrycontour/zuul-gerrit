@@ -36,7 +36,7 @@ class FingerGatewayApp(zuul.cmd.ZuulDaemonApp):
         self.gateway = None
 
     def createParser(self):
-        parser = super(FingerGatewayApp, self).createParser()
+        parser = super(FingerGatewayApp, self).create_parser()
         parser.add_argument('command',
                             choices=zuul.lib.fingergw.COMMANDS,
                             nargs='?')
@@ -78,7 +78,7 @@ class FingerGatewayApp(zuul.cmd.ZuulDaemonApp):
             (host, port),
             user,
             cmdsock,
-            self.getPidFile(),
+            self.get_pid_file(),
         )
 
         self.log.info('Starting Zuul finger gateway app')

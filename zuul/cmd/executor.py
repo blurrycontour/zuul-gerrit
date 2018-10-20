@@ -31,7 +31,7 @@ class Executor(zuul.cmd.ZuulDaemonApp):
     app_description = 'A standalone Zuul executor.'
 
     def createParser(self):
-        parser = super(Executor, self).createParser()
+        parser = super(Executor, self).create_parser()
         parser.add_argument('--keep-jobdir', dest='keep_jobdir',
                             action='store_true',
                             help='keep local jobdirs after run completes')

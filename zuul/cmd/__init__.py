@@ -106,7 +106,7 @@ class ZuulApp(object):
         from zuul.version import version_info as zuul_version_info
         return "Zuul version: %s" % zuul_version_info.release_string()
 
-    def createParser(self):
+    def create_parser(self):
         parser = argparse.ArgumentParser(description=self.app_description)
         parser.add_argument('-c', dest='config',
                             help='specify the config file')
@@ -116,7 +116,7 @@ class ZuulApp(object):
         return parser
 
     def parseArguments(self, args=None):
-        parser = self.createParser()
+        parser = self.create_parser()
         self.args = parser.parse_args(args)
         return parser
 
@@ -156,15 +156,18 @@ class ZuulApp(object):
 
 
 class ZuulDaemonApp(ZuulApp, metaclass=abc.ABCMeta):
-    def createParser(self):
-        parser = super(ZuulDaemonApp, self).createParser()
+    PID_FILE_TEMPLATE = '/var/run/zuul/%s.pid'
+    SOCKET_FILE_TEMPLATE = '/var/lib/zuul/%s.socket'
+
+    def create_parser(self):
+        parser = super(ZuulDaemonApp, self).create_parser()
         parser.add_argument('-d', dest='nodaemon', action='store_true',
                             help='do not run as a daemon')
         return parser
 
-    def getPidFile(self):
+    def get_pid_file(self):
         pid_fn = get_default(self.config, self.app_name, 'pidfile',
-                             '/var/run/zuul/%s.pid' % self.app_name,
+                             self.PID_FILE_TEMPLATE % self.app_name,
                              expand_user=True)
         return pid_fn
 
@@ -188,7 +191,7 @@ class ZuulDaemonApp(ZuulApp, metaclass=abc.ABCMeta):
         self.parseArguments()
         self.readConfig()
 
-        pid_fn = self.getPidFile()
+        pid_fn = self.get_pid_file()
         pid = pid_file_module.TimeoutPIDLockFile(pid_fn, 10)
 
         # Early register the stack dump handler for all zuul apps. This makes
@@ -209,7 +212,7 @@ class ZuulDaemonApp(ZuulApp, metaclass=abc.ABCMeta):
     def send_command(self, cmd):
         command_socket = get_default(
             self.config, self.app_name, 'command_socket',
-            '/var/lib/zuul/%s.socket' % self.app_name)
+            self.SOCKET_FILE_TEMPLATE % self.app_name)
         s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         s.connect(command_socket)
         cmd = '%s\n' % cmd

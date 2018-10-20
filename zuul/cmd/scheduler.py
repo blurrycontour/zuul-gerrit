@@ -39,7 +39,7 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         self.gear_server_pid = None
 
     def createParser(self):
-        parser = super(Scheduler, self).createParser()
+        parser = super(Scheduler, self).create_parser()
         parser.add_argument('command',
                             choices=zuul.scheduler.COMMANDS,
                             nargs='?')

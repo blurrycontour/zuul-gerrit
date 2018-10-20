@@ -35,7 +35,7 @@ class Client(zuul.cmd.ZuulApp):
     log = logging.getLogger("zuul.Client")
 
     def createParser(self):
-        parser = super(Client, self).createParser()
+        parser = super(Client, self).create_parser()
         parser.add_argument('-v', dest='verbose', action='store_true',
                             help='verbose output')
 
