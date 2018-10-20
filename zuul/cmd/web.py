@@ -30,32 +30,28 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
     app_name = 'web'
     app_description = 'A standalone Zuul web server.'
 
+    # FIXME(iremizov): move to separate module with defaults
+    DEFAULT_WEB_LISTEN_ADDRESS = '127.0.0.1'
+    DEFAULT_WEB_PORT = 9000
+    DEFAULT_WEB_STATIC_CACHE_EXPIRY = 3600
+    DEFAULT_WEB_STATIC_PATH = None
+    DEFAULT_GEARMAN_SERVER = None
+    DEFAULT_GEARMAN_PORT = 4730
+    DEFAULT_GEARMAN_SSL_KEY = None
+    DEFAULT_GEARMAN_SSL_CERT = None
+    DEFAULT_GEARMAN_SSL_CA = None
+
+    @property
+    def log(self):
+        return logging.getLogger("zuul.WebServer")
+
     def exit_handler(self, signum, frame):
+        self.log.debug("Signal received: %s %s" % (signum, frame))
         self.web.stop()
 
     def _run(self):
         info = zuul.model.WebInfo.fromConfig(self.config)
 
-        params = dict()
-
-        params['info'] = info
-        params['listen_address'] = get_default(self.config,
-                                               'web', 'listen_address',
-                                               '127.0.0.1')
-        params['listen_port'] = get_default(self.config, 'web', 'port', 9000)
-        params['static_cache_expiry'] = get_default(self.config, 'web',
-                                                    'static_cache_expiry',
-                                                    3600)
-        params['static_path'] = get_default(self.config,
-                                            'web', 'static_path',
-                                            None)
-        params['gear_server'] = get_default(self.config, 'gearman', 'server')
-        params['gear_port'] = get_default(self.config, 'gearman', 'port', 4730)
-        params['ssl_key'] = get_default(self.config, 'gearman', 'ssl_key')
-        params['ssl_cert'] = get_default(self.config, 'gearman', 'ssl_cert')
-        params['ssl_ca'] = get_default(self.config, 'gearman', 'ssl_ca')
-
-        params['connections'] = self.connections
         # Validate config here before we spin up the ZuulWeb object
         for conn_name, connection in self.connections.connections.items():
             try:
@@ -65,7 +61,37 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
                 sys.exit(1)
 
         try:
-            self.web = zuul.web.ZuulWeb(**params)
+            self.web = zuul.web.ZuulWeb(
+                info=info,
+                listen_address=get_default(
+                    self.config, 'web', 'listen_address',
+                    self.DEFAULT_WEB_LISTEN_ADDRESS),
+                listen_port=get_default(
+                    self.config, 'web', 'port',
+                    self.DEFAULT_WEB_PORT),
+                static_cache_expiry=get_default(
+                    self.config, 'web', 'static_cache_expiry',
+                    self.DEFAULT_WEB_STATIC_CACHE_EXPIRY),
+                static_path=get_default(
+                    self.config, 'web', 'static_path',
+                    self.DEFAULT_WEB_STATIC_PATH),
+                gear_server=get_default(
+                    self.config, 'gearman', 'server',
+                    self.DEFAULT_GEARMAN_SERVER),
+                gear_port=get_default(
+                    self.config, 'gearman', 'port',
+                    self.DEFAULT_GEARMAN_PORT),
+                ssl_key=get_default(
+                    self.config, 'gearman', 'ssl_key',
+                    self.DEFAULT_GEARMAN_SSL_KEY),
+                ssl_cert= get_default(
+                    self.config, 'gearman', 'ssl_cert',
+                    self.DEFAULT_GEARMAN_SSL_CERT),
+                ssl_ca= get_default(
+                    self.config, 'gearman', 'ssl_ca',
+                    self.DEFAULT_GEARMAN_SSL_CA),
+                connections=self.connections
+            )
         except Exception as e:
             self.log.exception("Error creating ZuulWeb:")
             sys.exit(1)
@@ -87,7 +113,6 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
 
     def run(self):
         self.setup_logging('web', 'log_config')
-        self.log = logging.getLogger("zuul.WebServer")
 
         self.configure_connections(
             include_drivers=[zuul.driver.sql.SQLDriver,
