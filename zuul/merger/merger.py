@@ -82,6 +82,7 @@ class Repo(object):
             'GIT_HTTP_LOW_SPEED_TIME': speed_time,
         }
         self.git_timeout = git_timeout
+        self.sshkey = sshkey
         if sshkey:
             self.env['GIT_SSH_COMMAND'] = 'ssh -i %s' % (sshkey,)
 
@@ -94,11 +95,33 @@ class Repo(object):
         self.retry_attempts = retry_attempts
         self.retry_interval = retry_interval
         try:
+            self._setup_known_hosts()
+        except Exception:
+            self.log.exception("Unable to set up known_hosts for %s" % remote)
+        try:
             self._ensure_cloned()
             self._git_set_remote_url(
                 git.Repo(self.local_path), self.remote_url)
         except Exception:
             self.log.exception("Unable to initialize repo for %s" % remote)
+
+    def _setup_known_hosts(self):
+        url = urlib.parse(self.remote_url)
+        if 'ssh' not in url.scheme:
+            return
+        if url.port:
+            port = url.port
+        else:
+            port = 22
+
+        client = paramiko.SSHClient()
+        client.load_system_host_keys()
+        client.set_missing_host_key_policy(paramiko.WarningPolicy())
+
+        client.connect(url.hostname,
+                       username=self.username,
+                       port=port,
+                       key_filename=self.sshkey)
 
     def _ensure_cloned(self):
         repo_is_cloned = os.path.exists(os.path.join(self.local_path, '.git'))
