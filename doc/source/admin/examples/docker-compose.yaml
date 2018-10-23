@@ -44,6 +44,8 @@ services:
       no_proxy: "${no_proxy},gerrit"
     command: "sh -c 'ansible-playbook /var/playbooks/wait-to-start.yaml; zuul-scheduler -d'"
     image: zuul/zuul-scheduler
+    environment:
+      ZUUL_MYSQL_PASSWORD: secret
     volumes:
       - "./etc_zuul/:/etc/zuul/:z"
       - "./playbooks/:/var/playbooks/:z"
@@ -57,12 +59,15 @@ services:
     ports:
       - "9000:9000"
     image: zuul/zuul-web
+    environment:
+      ZUUL_MYSQL_PASSWORD: secret
     volumes:
       - "./etc_zuul/:/etc/zuul/:z"
   executor:
     privileged: true
     environment:
       no_proxy: "${no_proxy},gerrit"
+      ZUUL_MYSQL_PASSWORD: secret
     command: "zuul-executor -d"
     depends_on:
       - scheduler
