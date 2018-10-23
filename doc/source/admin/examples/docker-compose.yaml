@@ -44,6 +44,8 @@ services:
       no_proxy: "${no_proxy},gerrit"
     command: "sh -c 'ansible-playbook /var/playbooks/scheduler.yaml; zuul-scheduler -d'"
     image: zuul/zuul-scheduler
+    environment:
+      ZUUL_MYSQL_PASSWORD: secret
     volumes:
       - "./etc_zuul/:/etc/zuul/:z"
       - "./playbooks/:/var/playbooks/:z"
