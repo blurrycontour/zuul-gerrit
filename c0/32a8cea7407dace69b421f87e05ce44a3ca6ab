@@ -1,0 +1,10 @@
+Code-Review+1: Ivan Remizov <iremizov@gmail.com>
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Tue, 23 Oct 2018 15:03:13 +0000
+Reviewed-on: https://review.openstack.org/611990
+Project: openstack-infra/zuul
+Branch: refs/heads/master
