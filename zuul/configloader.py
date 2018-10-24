@@ -31,7 +31,7 @@ import zuul.manager.independent
 import zuul.manager.supercedent
 from zuul.lib import encryption
 from zuul.lib.keystorage import KeyStorage
-
+from zuul.source import NonExistentProjectError
 
 # Several forms accept either a single item or a list, this makes
 # specifying that in the schema easy (and explicit).
@@ -711,9 +711,10 @@ class JobParser(object):
                     project_override_branch = None
                     project_override_checkout = None
                 (trusted, project) = self.pcontext.tenant.getProject(
-                    project_name)
+                        project_name)
                 if project is None:
-                    raise Exception("Unknown project %s" % (project_name,))
+                    project = self.pcontext.getForeignProject(
+                        project_name, job.source_context.project.source)
                 job_project = model.JobProject(project.canonical_name,
                                                project_override_branch,
                                                project_override_checkout)
@@ -1211,6 +1212,47 @@ class ParseContext(object):
         if source_context.implied_branches is not None:
             return source_context.implied_branches
         return [source_context.branch]
+
+    def getForeignProject(self, name, hint_source):
+        """Return a project given its name.
+
+        :arg str name: The name of the project.  It may be fully
+            qualified (E.g., "git.example.com/subpath/project") or may
+            contain only the project name name may be supplied (E.g.,
+            "subpath/project").
+
+        :arg Source hint_source: Search this source first.
+        """
+
+        path = name.split('/', 1)
+        if path[0] in self.tenant.canonical_hostnames:
+            hostname = path[0]
+            project_name = path[1]
+        else:
+            hostname = None
+            project_name = name
+
+        conf_tenant = self.tenant.unparsed_config
+        other_sources = []
+        name_source = None
+
+        for source_name, conf_source in conf_tenant.get('source', {}).items():
+            source = self.connections.getSource(source_name)
+            if hostname and source.canonical_hostname == hostname:
+                name_source = source
+            elif (hint_source.connection.connection_name ==
+                  source.connection.connection_name):
+                pass
+            else:
+                other_sources.append(source)
+
+        for source in [name_source, hint_source] + other_sources:
+            if source:
+                try:
+                    return source.getProject(project_name)
+                except NonExistentProjectError:
+                    pass
+        raise NonExistentProjectError(project_name)
 
 
 class TenantParser(object):
