@@ -602,6 +602,7 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         self.change_number = 0
         self.changes = changes_db
         self.queries = []
+        self._fake_project_list = []
         self.upstream_root = upstream_root
 
     def addFakeChange(self, project, branch, subject, status='NEW',
@@ -753,6 +754,12 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         else:
             results = self._simpleQuery(query)
         return results
+
+    def _getProjectList(self):
+        return self._fake_project_list
+
+    def addFakeProject(self, name):
+        self._fake_project_list.append(name)
 
     def _start_watcher_thread(self, *args, **kw):
         pass
@@ -2455,12 +2462,40 @@ class ZuulTestCase(BaseTestCase):
         except Exception:
             self.log.exception("Reconfiguration failed:")
 
+    def readTenantConfig(self):
+        if self.config.has_option('scheduler', 'tenant_config_script'):
+            path = self.config.get('scheduler', 'tenant_config_script')
+            ret = subprocess.run(
+                [path], stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE)
+            ret.check_returncode()
+            data = yaml.safe_load(ret.stdout)
+        else:
+            path = self.config.get('scheduler', 'tenant_config')
+            with open(path) as f:
+                data = yaml.safe_load(f)
+        return data
+
     def configure_connections(self, source_only=False):
         # Set up gerrit related fakes
         # Set a changes database so multiple FakeGerrit's can report back to
         # a virtual canonical database given by the configured hostname
         self.gerrit_changes_dbs = {}
         self.github_changes_dbs = {}
+
+        def getConnectionProjects(con):
+            tenant_config = self.readTenantConfig()
+            projects = []
+            for tenant in tenant_config:
+                sources = tenant['tenant']['source']
+                conf = sources.get(con.source.name)
+                if not conf:
+                    continue
+
+                projects.extend(conf.get('config-projects', []))
+                projects.extend(conf.get('untrusted-projects', []))
+
+            return projects
 
         def getGerritConnection(driver, name, config):
             db = self.gerrit_changes_dbs.setdefault(config['server'], {})
@@ -2471,6 +2506,7 @@ class ZuulTestCase(BaseTestCase):
                 self.addCleanup(con.web_server.stop)
 
             self.event_queues.append(con.event_queue)
+            con._fake_project_list = getConnectionProjects(con)
             setattr(self, 'fake_' + name, con)
             return con
 
@@ -2479,26 +2515,15 @@ class ZuulTestCase(BaseTestCase):
             getGerritConnection))
 
         def registerGithubProjects(con):
-            path = self.config.get('scheduler', 'tenant_config')
-            with open(os.path.join(FIXTURE_DIR, path)) as f:
-                tenant_config = yaml.safe_load(f.read())
-            for tenant in tenant_config:
-                sources = tenant['tenant']['source']
-                conf = sources.get(con.source.name)
-                if not conf:
-                    return
-
-                projects = conf.get('config-projects', [])
-                projects.extend(conf.get('untrusted-projects', []))
-
-                client = con.getGithubClient(None)
-                for project in projects:
-                    if isinstance(project, dict):
-                        # This can be a dict with the project as the only key
-                        client.addProjectByName(
-                            list(project.keys())[0])
-                    else:
-                        client.addProjectByName(project)
+            projects = getConnectionProjects(con)
+            client = con.getGithubClient(None)
+            for project in projects:
+                if isinstance(project, dict):
+                    # This can be a dict with the project as the only key
+                    client.addProjectByName(
+                        list(project.keys())[0])
+                else:
+                    client.addProjectByName(project)
 
         def getGithubConnection(driver, name, config):
             server = config.get('server', 'github.com')
@@ -2646,9 +2671,7 @@ class ZuulTestCase(BaseTestCase):
         if self.create_project_keys:
             return
 
-        path = self.config.get('scheduler', 'tenant_config')
-        with open(os.path.join(FIXTURE_DIR, path)) as f:
-            tenant_config = yaml.safe_load(f.read())
+        tenant_config = self.readTenantConfig()
         for tenant in tenant_config:
             sources = tenant['tenant']['source']
             for source, conf in sources.items():

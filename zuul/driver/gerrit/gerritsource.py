@@ -17,7 +17,7 @@ import urllib
 import logging
 import voluptuous as vs
 from urllib.parse import urlparse
-from zuul.source import BaseSource
+from zuul.source import BaseSource, NonExistentProjectError
 from zuul.model import Project
 from zuul.driver.gerrit.gerritmodel import GerritRefFilter
 from zuul.driver.util import scalar_or_list, to_list
@@ -115,8 +115,11 @@ class GerritSource(BaseSource):
     def getProject(self, name):
         p = self.connection.getProject(name)
         if not p:
-            p = Project(name, self)
-            self.connection.addProject(p)
+            if self.connection._doesProjectExist(name):
+                p = Project(name, self)
+                self.connection.addProject(p)
+            else:
+                raise NonExistentProjectError(name)
         return p
 
     def getProjectOpenChanges(self, project):

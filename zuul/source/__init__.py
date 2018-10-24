@@ -15,6 +15,12 @@
 import abc
 
 
+class NonExistentProjectError(Exception):
+    def __init__(self, name, *args, **kw):
+        super(NonExistentProjectError, self).__init__(
+            'Unknown project %s' % (name,), *args, **kw)
+
+
 class BaseSource(object, metaclass=abc.ABCMeta):
     """Base class for sources.
 
