@@ -713,6 +713,10 @@ class JobParser(object):
                 (trusted, project) = self.pcontext.tenant.getProject(
                     project_name)
                 if project is None:
+                    project = self.pcontext.tenant_parser.getForeignProject(
+                        self.pcontext.tenant, project_name,
+                        job.source_context.source):
+                if project is None:
                     raise Exception("Unknown project %s" % (project_name,))
                 job_project = model.JobProject(project.canonical_name,
                                                project_override_branch,
@@ -1396,6 +1400,43 @@ class TenantParser(object):
         with open(project.private_secrets_key_file, "rb") as f:
             (project.private_secrets_key, project.public_secrets_key) = \
                 encryption.deserialize_rsa_keypair(f.read())
+
+    def getForeignProject(self, tenant, name, hint_source):
+        """Return a project given its name.
+
+        :arg str name: The name of the project.  It may be fully
+            qualified (E.g., "git.example.com/subpath/project") or may
+            contain only the project name name may be supplied (E.g.,
+            "subpath/project").
+
+        :arg Source hint_source: Search this source first.
+        """
+
+        path = name.split('/', 1)
+        if path[0] in tenant.canonical_hostnames:
+            hostname = path[0]
+            project_name = path[1]
+        else:
+            hostname = None
+            project_name = name
+
+        conf_tenant = tenant.unparsed_config
+        other_sources = []
+        name_source = None
+
+        for source_name, conf_source in conf_tenant.get('source', {}).items():
+            source = self.connections.getSource(source_name)
+            if hostname and source.canonical_hostname == hostname:
+                name_source = source
+            elif (hint_source.connection.connection_name ==
+                  source.connection.connection_name):
+                pass
+            else:
+                sources.append(source)
+
+        for source in [name_source, hint_source] + sources:
+            project = source.getProject(project_name)
+            return project
 
     @staticmethod
     def _getProject(source, conf, current_include):
