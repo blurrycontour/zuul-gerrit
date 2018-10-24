@@ -18,9 +18,10 @@ from testtools.matchers import MatchesRegex, StartsWith
 import urllib
 import socket
 import time
-from unittest import skip
+from unittest import mock, skip
 
 import git
+import github3.exceptions
 
 from tests.base import ZuulTestCase, simple_layout, random_sha1
 from tests.base import ZuulWebFixture
@@ -112,6 +113,18 @@ class TestGithubDriver(ZuulTestCase):
 
         self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
         self.waitUntilSettled()
+        self.assertEqual(1, len(self.history))
+
+    @simple_layout('layouts/files-github.yaml', driver='github')
+    def test_pull_github_files_error(self):
+        A = self.fake_github.openFakePullRequest(
+            'org/project', 'master', 'A',
+            files={'random.txt': 'test', 'build-requires': 'test'})
+
+        with mock.patch("tests.fakegithub.FakePull.files") as files_mock:
+            files_mock.side_effect = github3.exceptions.ServerError(mock.MagicMock())
+            self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
+            self.waitUntilSettled()
         self.assertEqual(1, len(self.history))
 
     @simple_layout('layouts/basic-github.yaml', driver='github')
