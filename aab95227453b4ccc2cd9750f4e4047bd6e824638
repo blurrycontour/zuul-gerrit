@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_70a11e92",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1049,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-10-24T11:55:21Z",
+      "side": 1,
+      "message": "I think github failing to calculate the diff is not a reason for having an exception in the zuul log as this is \u0027normal behavior\u0027 of github. \n\nI\u0027d consider having exceptions in the log as a reason to trigger an alert as this should indicate erratic zuul behavior. This however is some legit workflow so we should only emit an info or warning (I tend to use info as we have no chance to influence or fix that behavior).\n\nBut then I think we should filter this more precisely to that use case (we should keep a trace on other errors).",
+      "revId": "aab95227453b4ccc2cd9750f4e4047bd6e824638",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
