@@ -1,0 +1,4 @@
+- hosts: all
+  roles:
+    - sar-logging-stop-and-convert
+    - fetch-sar-output
