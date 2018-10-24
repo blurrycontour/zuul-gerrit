@@ -329,6 +329,8 @@ class GerritConnection(BaseConnection):
         self.gitweb_url_template = url_template
 
         self._change_cache = {}
+        self._project_name_cache = set()
+        self._project_name_cache_time = 0
         self.projects = {}
         self.gerrit_event_connector = None
         self.source = driver.getSource(self)
@@ -394,6 +396,24 @@ class GerritConnection(BaseConnection):
             del self._project_branch_cache[project.name]
         except KeyError:
             pass
+
+    def _getProjectList(self):
+        out, err = self._ssh('gerrit ls-projects')
+        if not out:
+            return False
+        lines = out.split('\n')
+        if not lines:
+            return False
+        return lines
+
+    def _doesProjectExist(self, name):
+        if name in self._project_name_cache:
+            return True
+        if time.time() - self._project_name_cache_time < 120:
+            return False
+        self._project_name_cache = self._getProjectList()
+        self._project_name_cache_time = time.time()
+        return name in self._project_name_cache
 
     def maintainCache(self, relevant):
         # This lets the user supply a list of change objects that are
