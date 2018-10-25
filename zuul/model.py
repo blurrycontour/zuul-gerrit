@@ -2158,6 +2158,8 @@ class QueueItem(object):
             build = build_set.getBuild(job.name)
             if build and (build.result == 'SUCCESS' or build.paused):
                 successful_job_names.add(job.name)
+            elif build and build.result == 'SKIPPED':
+                pass
             else:
                 nodeset = build_set.getJobNodeSet(job.name)
                 if nodeset is None:
@@ -2167,9 +2169,7 @@ class QueueItem(object):
 
         # Attempt to request nodes for jobs in the order jobs appear
         # in configuration.
-        for job in self.job_graph.getJobs():
-            if job not in jobs_not_requested:
-                continue
+        for job in jobs_not_requested:
             all_parent_jobs_successful = True
             for parent_job in self.job_graph.getParentJobsRecursively(
                     job.name):
