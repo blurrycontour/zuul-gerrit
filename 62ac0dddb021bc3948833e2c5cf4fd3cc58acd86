@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_fac0934d",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2173,
+      "author": {
+        "id": 28845
+      },
+      "writtenOn": "2018-10-25T10:46:53Z",
+      "side": 1,
+      "message": "same but different but still same",
+      "range": {
+        "startLine": 2173,
+        "startChar": 0,
+        "endLine": 2173,
+        "endChar": 38
+      },
+      "revId": "62ac0dddb021bc3948833e2c5cf4fd3cc58acd86",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
