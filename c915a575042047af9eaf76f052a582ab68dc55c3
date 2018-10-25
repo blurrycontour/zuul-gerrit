@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_49654348",
+        "filename": "zuul/driver/pagure/paguremodel.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 10384
+      },
+      "writtenOn": "2018-10-25T14:14:04Z",
+      "side": 1,
+      "message": "Shouldn\u0027t it be PagureEventFilter",
+      "revId": "c915a575042047af9eaf76f052a582ab68dc55c3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
