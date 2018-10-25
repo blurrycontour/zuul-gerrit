@@ -189,14 +189,14 @@ success, the pipeline reports back to Gerrit with ``Verified`` vote of
       .. value:: supercedent
 
          This is like an independent pipeline, in that every item is
-         distinct, except that items are grouped by project and ref,
-         and only one item for each project-ref is processed at a
+         distinct, except that items are grouped by project and branch,
+         and only one item for each project-branch is processed at a
          time.  If more than one additional item is enqueued for the
-         project-ref, previously enqueued items which have not started
+         project-branch, previously enqueued items which have not started
          processing are removed.
 
          In other words, this pipeline manager will only run jobs for
-         the most recent item enqueued for a given project-ref.
+         the most recent item enqueued for a given project-branch.
 
          This may be useful for post-merge pipelines which perform
          artifact builds where only the latest version is of use.  In
