@@ -1,3 +1,5 @@
+.. _github_driver:
+
 :title: GitHub Driver
 
 GitHub
