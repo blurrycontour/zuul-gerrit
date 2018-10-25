@@ -5,6 +5,9 @@
       gerrit:
         - event: ref-updated
           ref: ^(?!refs/).*$
+      github:
+        - event: pull_request
+          action: closed
 
 - job:
     name: base
@@ -15,7 +18,7 @@
     name: post-job
 
 - project:
-    name: org/project
+    name: ^org/project.*$
     post:
       jobs:
         - post-job
