@@ -16,6 +16,24 @@
       "revId": "c915a575042047af9eaf76f052a582ab68dc55c3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_e1c9b423",
+        "filename": "zuul/driver/pagure/paguremodel.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2018-10-26T07:37:12Z",
+      "side": 1,
+      "message": "Yes it should, copy/pasta :) I\u0027ll fix next PS.",
+      "parentUuid": "3f79a3b5_49654348",
+      "revId": "c915a575042047af9eaf76f052a582ab68dc55c3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
