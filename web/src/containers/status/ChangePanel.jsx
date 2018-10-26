@@ -106,13 +106,25 @@ class ChangePanel extends React.Component {
     } else if (changeId.length === 40) {
       changeText = changeId.slice(0, 7)
     }
-    return (
-      <small>
-        <a href={change.url}>
-          {changeText !== '' ? (
-            <abbr title={changeTitle}>{changeText}</abbr>) : changeTitle}
-        </a>
-      </small>)
+    if (change.id !== null) {
+      const to = '/status/change/' + change.id
+      return (
+        <small>
+          <Link to={to}>
+            {changeText !== '' ? (
+              <abbr title={changeTitle}>{changeText}</abbr>) : changeTitle}
+          </Link>
+        </small>
+      )
+    } else {
+      return (
+        <small>
+          <a href={change.url}>
+            {changeText !== '' ? (
+              <abbr title={changeTitle}>{changeText}</abbr>) : changeTitle}
+          </a>
+        </small>)
+    }
   }
 
   renderProgressBar (change) {
