@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_d8757b01",
+        "filename": "tools/reenqueue.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2018-10-26T19:46:14Z",
+      "side": 1,
+      "message": "This should likely be expanded to other trigger types before merging, but I don\u0027t have an easy means of testing them.",
+      "revId": "72a2e24c6abd7479ae84035c1c00ae41825405da",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
