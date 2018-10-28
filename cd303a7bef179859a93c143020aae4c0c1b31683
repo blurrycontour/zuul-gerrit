@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_59a6430f",
+        "filename": "tests/base.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2718,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2018-10-28T15:37:32Z",
+      "side": 1,
+      "message": "Just typing it rb\u0027...\u0027 should work here, no need to separately recast with bytes().",
+      "revId": "cd303a7bef179859a93c143020aae4c0c1b31683",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
