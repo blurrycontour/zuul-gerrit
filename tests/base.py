@@ -2715,7 +2715,8 @@ class ZuulTestCase(BaseTestCase):
                     content = f.read()
                     # dynamically create symlinks if the content is of the form
                     # symlink: <target>
-                    match = re.match(b'symlink: ([^\s]+)', content)
+                    match = re.match(bytes(r'symlink: ([^\s]+)', 'utf-8'),
+                                     content)
                     if match:
                         content = SymLink(match.group(1))
 
