@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_1fb0968c",
+        "filename": "tools/node_usage.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-10-30T05:14:49Z",
+      "side": 1,
+      "message": "That makes me think whether zuul is the right repo for this script? As this looks quite openstack specific project-config might be the better place for this?",
+      "range": {
+        "startLine": 89,
+        "startChar": 19,
+        "endLine": 89,
+        "endChar": 53
+      },
+      "revId": "0261e342122e1e796641753b9c9918cd158e5a8a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_1f9736ec",
+        "filename": "tools/node_usage.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-10-30T05:14:49Z",
+      "side": 1,
+      "message": "Zuul is not OpenStack centric anymore ;)",
+      "range": {
+        "startLine": 113,
+        "startChar": 7,
+        "endLine": 113,
+        "endChar": 50
+      },
+      "revId": "0261e342122e1e796641753b9c9918cd158e5a8a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
