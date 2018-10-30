@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_5324c5b1",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2163,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-10-30T09:23:50Z",
+      "side": 1,
+      "message": "This variable is not really used so this elif is just used to not go into the else branch. This we could also just add a \u0027pass\u0027 in here.\n\nFurther I need to understand what happens for jobs that have a different build result (like FAILURE or POST_FAILURE). If that happens for them too we might just skip if there is any build result.",
+      "range": {
+        "startLine": 2163,
+        "startChar": 16,
+        "endLine": 2163,
+        "endChar": 33
+      },
+      "revId": "6caeeb949c551e26d435f53d814f3a72533bf406",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
