@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_627251b2",
+        "filename": "tools/node_usage.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-10-30T05:35:16Z",
+      "side": 1,
+      "message": "I think we should feed this by argument into the script. And also document the expected structure of this file (doesn\u0027t look like a tenant config?). I don\u0027t want to block this because of this so I\u0027m fine fixing this as a followup.",
+      "parentUuid": "3f79a3b5_1fb0968c",
+      "range": {
+        "startLine": 89,
+        "startChar": 19,
+        "endLine": 89,
+        "endChar": 53
+      },
+      "revId": "0261e342122e1e796641753b9c9918cd158e5a8a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_1f9736ec",
         "filename": "tools/node_usage.py",
         "patchSetId": 3
@@ -36,6 +60,30 @@
       "writtenOn": "2018-10-30T05:14:49Z",
       "side": 1,
       "message": "Zuul is not OpenStack centric anymore ;)",
+      "range": {
+        "startLine": 113,
+        "startChar": 7,
+        "endLine": 113,
+        "endChar": 50
+      },
+      "revId": "0261e342122e1e796641753b9c9918cd158e5a8a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_829a0dc1",
+        "filename": "tools/node_usage.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-10-30T05:35:16Z",
+      "side": 1,
+      "message": "We should probably just make this string more generic. We also should also make the distinction between project and repo clear (in zuul there is no difference but this script seems to make one).",
+      "parentUuid": "3f79a3b5_1f9736ec",
       "range": {
         "startLine": 113,
         "startChar": 7,
