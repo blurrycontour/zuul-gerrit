@@ -46,6 +46,30 @@
       "revId": "6caeeb949c551e26d435f53d814f3a72533bf406",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_a3dce4e2",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2163,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-10-30T15:01:15Z",
+      "side": 1,
+      "message": "Ah I was blind, it only occurs if the nodeset is None (which isn\u0027t the case on failed jobs).",
+      "parentUuid": "3f79a3b5_636ecccc",
+      "range": {
+        "startLine": 2163,
+        "startChar": 16,
+        "endLine": 2163,
+        "endChar": 33
+      },
+      "revId": "6caeeb949c551e26d435f53d814f3a72533bf406",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
