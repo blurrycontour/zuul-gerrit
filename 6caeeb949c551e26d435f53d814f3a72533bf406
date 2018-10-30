@@ -22,6 +22,30 @@
       "revId": "6caeeb949c551e26d435f53d814f3a72533bf406",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_636ecccc",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2163,
+      "author": {
+        "id": 28845
+      },
+      "writtenOn": "2018-10-30T14:41:34Z",
+      "side": 1,
+      "message": "Will do for the pass\nTell me if I\u0027m wrong but I think the issue occurs only when a job is in a SKIPPED status because it\u0027s the only status which can occurs before the job\u0027s run.",
+      "parentUuid": "3f79a3b5_5324c5b1",
+      "range": {
+        "startLine": 2163,
+        "startChar": 16,
+        "endLine": 2163,
+        "endChar": 33
+      },
+      "revId": "6caeeb949c551e26d435f53d814f3a72533bf406",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
