@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_4f088724",
+        "filename": "zuul/reporter/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-10-31T02:07:43Z",
+      "side": 1,
+      "message": "perhaps the comment left for the file should also be reported?",
+      "revId": "9efe95ff3ce7f3ab9007cfbdd3420bbfb00a2fa6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
