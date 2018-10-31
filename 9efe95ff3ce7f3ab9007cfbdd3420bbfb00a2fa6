@@ -16,6 +16,23 @@
       "revId": "9efe95ff3ce7f3ab9007cfbdd3420bbfb00a2fa6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_9e31e1f1",
+        "filename": "zuul/reporter/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-10-31T16:05:58Z",
+      "side": 1,
+      "message": "That\u0027s probably a good idea.",
+      "revId": "9efe95ff3ce7f3ab9007cfbdd3420bbfb00a2fa6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
