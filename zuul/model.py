@@ -688,7 +688,7 @@ class NodeSet(ConfigObject):
 class NodeRequest(object):
     """A request for a set of nodes."""
 
-    def __init__(self, requestor, build_set, job, nodeset):
+    def __init__(self, requestor, build_set, job, nodeset, relative_priority):
         self.requestor = requestor
         self.build_set = build_set
         self.job = job
@@ -696,8 +696,10 @@ class NodeRequest(object):
         self._state = STATE_REQUESTED
         self.requested_time = time.time()
         self.state_time = time.time()
+        self.created_time = None
         self.stat = None
         self.uid = uuid4().hex
+        self.relative_priority = relative_priority
         self.id = None
         # Zuul internal flags (not stored in ZK so they are not
         # overwritten).
@@ -737,6 +739,8 @@ class NodeRequest(object):
         d['requestor'] = self.requestor
         d['state'] = self.state
         d['state_time'] = self.state_time
+        d['created_time'] = self.created_time
+        d['relative_priority'] = self.relative_priority
         return d
 
     def updateFromDict(self, data):
@@ -2244,6 +2248,9 @@ class QueueItem(object):
             fakebuild = Build(job, None)
             fakebuild.result = 'SKIPPED'
             self.addBuild(fakebuild)
+
+    def getNodePriority(self):
+        return self.pipeline.manager.getNodePriority(self)
 
     def formatUrlPattern(self, url_pattern, job=None, build=None):
         url = None
