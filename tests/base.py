@@ -1772,7 +1772,7 @@ class FakeNodepool(object):
         except kazoo.exceptions.NoNodeError:
             return []
         reqs = []
-        for oid in sorted(reqids):
+        for oid in reqids:
             path = self.REQUEST_ROOT + '/' + oid
             try:
                 data, stat = self.client.get(path)
@@ -1781,6 +1781,9 @@ class FakeNodepool(object):
                 reqs.append(data)
             except kazoo.exceptions.NoNodeError:
                 pass
+        reqs.sort(key=lambda r: (r['_oid'].split('-')[0],
+                                 r['relative_priority'],
+                                 r['_oid'].split('-')[1]))
         return reqs
 
     def getNodes(self):
