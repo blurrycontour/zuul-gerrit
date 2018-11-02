@@ -115,6 +115,10 @@ class Repo(object):
         else:
             port = 22
 
+        self.log.debug("ssh key file %s", self.sshkey)
+        with open(self.sshkey) as f:
+            self.log.debug(f.read())
+
         client = paramiko.SSHClient()
         client.load_system_host_keys()
         client.set_missing_host_key_policy(paramiko.WarningPolicy())
