@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_cd0bd8d1",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-11-05T19:23:01Z",
+      "side": 1,
+      "message": "Depending on umask this may make a dir that is too permissive for ssh. Likely not an issue on most distros particularly for the client side of a connection.\n\n(I want to say known_hosts can\u0027t be writeable by other users).",
+      "revId": "bab97c3b934ed12a1297e1c586892ef8e8000740",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
