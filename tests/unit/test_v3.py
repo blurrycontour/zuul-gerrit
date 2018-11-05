@@ -4236,3 +4236,23 @@ class TestJobPause(AnsibleZuulTestCase):
         self.assertHistory([
             dict(name='just-pause', result='SUCCESS', changes='1,1'),
         ], ordered=False)
+
+    def test_job_pause_skipped_child(self):
+
+        self.wait_timeout = 120
+
+        # Output extra ansible info so we might see errors.
+        self.executor_server.verbose = True
+        self.executor_server.keep_jobdir = True
+
+        A = self.fake_gerrit.addFakeChange('org/project3', 'master', 'A')
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='compile', result='SUCCESS', changes='1,1'),
+            dict(name='test', result='FAILURE', changes='1,1'),
+        ], ordered=False)
+
+        self.assertIn('package : SKIPPED', A.messages[0])
