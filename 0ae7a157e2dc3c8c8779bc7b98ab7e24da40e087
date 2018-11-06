@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_81759d35",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-11-06T10:12:21Z",
+      "side": 1,
+      "message": "Might be worth adding a note here similar to the commit message that this needs updating once streaming is reworked",
+      "revId": "0ae7a157e2dc3c8c8779bc7b98ab7e24da40e087",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
