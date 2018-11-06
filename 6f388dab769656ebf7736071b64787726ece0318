@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_19b7bdfa",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2018-11-06T14:52:52Z",
+      "side": 1,
+      "message": "What constraints? Are you talking about OpenStack constraints? Zuul is not an OpenStack project.",
+      "revId": "6f388dab769656ebf7736071b64787726ece0318",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
