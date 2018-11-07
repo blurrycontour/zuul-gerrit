@@ -93,7 +93,6 @@ class TestNodepoolIntegration(BaseTestCase):
         self.assertEqual(len(self.provisioned_requests), 1)
         self.assertEqual(request.state, model.STATE_FAILED)
 
-    @skip("Disabled until nodepool is ready")
     def test_node_request_disconnect(self):
         # Test that node requests are re-submitted after disconnect
 
@@ -111,7 +110,6 @@ class TestNodepoolIntegration(BaseTestCase):
         self.assertEqual(len(self.provisioned_requests), 1)
         self.assertEqual(request.state, model.STATE_FULFILLED)
 
-    @skip("Disabled until nodepool is ready")
     def test_node_request_canceled(self):
         # Test that node requests can be canceled
 
