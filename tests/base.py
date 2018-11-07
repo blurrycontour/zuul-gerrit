@@ -1748,6 +1748,7 @@ class FakeNodepool(object):
         self.thread.start()
         self.fail_requests = set()
         self.remote_ansible = False
+        self.resources = None
 
     def stop(self):
         self._running = False
@@ -1833,6 +1834,8 @@ class FakeNodepool(object):
                     host_keys=host_keys,
                     executor='fake-nodepool',
                     hold_expiration=None)
+        if self.resources:
+            data['resources'] = self.resources
         if self.remote_ansible:
             data['connection_type'] = 'ssh'
         if 'fakeuser' in node_type:
