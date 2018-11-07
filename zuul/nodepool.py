@@ -15,12 +15,30 @@ import logging
 from zuul import model
 
 
+def add_resources(target, source):
+    for key, value in source.items():
+        if key in target:
+            target[key] += value
+        else:
+            target[key] = value
+
+
+def subtract_resources(target, source):
+    for key, value in source.items():
+        if key in target:
+            target[key] -= value
+        else:
+            target[key] = - value
+
+
 class Nodepool(object):
     log = logging.getLogger('zuul.nodepool')
 
     def __init__(self, scheduler):
         self.requests = {}
         self.sched = scheduler
+        self.current_resources_by_tenant = {}
+        self.current_resources_by_project = {}
 
     def emitStats(self, request):
         if not self.sched.statsd:
@@ -50,6 +68,37 @@ class Nodepool(object):
         if dt:
             statsd.timing(key + '.size.%s' % len(request.nodeset.nodes), dt)
         statsd.gauge('zuul.nodepool.current_requests', len(self.requests))
+
+    def emitStatsResources(self):
+        if not self.sched.statsd:
+            return
+        statsd = self.sched.statsd
+
+        for tenant, resources in self.current_resources_by_tenant.items():
+            for resource, value in resources:
+                key = 'zuul.nodepool.resources.tenant.' \
+                      '{tenant}.{resource}.current'
+                statsd.gauge(key, value, tenant=tenant, resource=resource)
+        for project, resources in self.current_resources_by_project.items():
+            for resource, value in resources:
+                key = 'zuul.nodepool.resources.project.' \
+                      '{project}.{resource}.current'
+                statsd.gauge(key, value, project=project, resource=resource)
+
+    def emitStatsResourceCounters(self, tenant, project, resources, duration):
+        if not self.sched.statsd:
+            return
+        statsd = self.sched.statsd
+
+        for resource, value in resources.items():
+            key = 'zuul.nodepool.resources.tenant.{tenant}.{resource}.counter'
+            statsd.incr(key, value * duration,
+                        tenant=tenant, resource=resource)
+        for resource, value in resources.items():
+            key = 'zuul.nodepool.resources.project.' \
+                  '{project}.{resource}.counter'
+            statsd.incr(key, value * duration,
+                        project=project, resource=resource)
 
     def requestNodes(self, build_set, job):
         # Create a copy of the nodeset to represent the actual nodes
@@ -112,27 +161,53 @@ class Nodepool(object):
             self.log.debug("Removing autohold for %s", autohold_key)
             del self.sched.autohold_requests[autohold_key]
 
-    def useNodeSet(self, nodeset):
+    def useNodeSet(self, nodeset, build_set=None):
         self.log.info("Setting nodeset %s in use" % (nodeset,))
+        resources = {}
         for node in nodeset.getNodes():
             if node.lock is None:
                 raise Exception("Node %s is not locked" % (node,))
             node.state = model.STATE_IN_USE
             self.sched.zk.storeNode(node)
+            if node.resources:
+                add_resources(resources, node.resources)
+        if build_set:
+            # we have a buildset and thus also tenant and project so we
+            # can emit project specific resource usage stats
+            tenant_name = build_set.item.layout.tenant.name
+            project_name = build_set.item.change.project.canonical_name
+
+            if tenant_name not in self.current_resources_by_tenant:
+                self.current_resources_by_tenant[tenant_name] = {}
+            if project_name not in self.current_resources_by_project:
+                self.current_resources_by_project[project_name] = {}
+
+            add_resources(self.current_resources_by_tenant[tenant_name],
+                          resources)
+            add_resources(self.current_resources_by_project[project_name],
+                          resources)
+            self.emitStatsResources()
 
     def returnNodeSet(self, nodeset, build=None):
         self.log.info("Returning nodeset %s" % (nodeset,))
+        resources = {}
+        duration = None
+        project = None
+        tenant = None
         if (build and build.start_time and build.end_time and
             build.build_set and build.build_set.item and
             build.build_set.item.change and
             build.build_set.item.change.project):
             duration = build.end_time - build.start_time
             project = build.build_set.item.change.project
+            tenant = build.build_set.item.pipeline.tenant.name
             self.log.info("Nodeset %s with %s nodes was in use "
                           "for %s seconds for build %s for project %s",
                           nodeset, len(nodeset.nodes), duration, build,
                           project)
         for node in nodeset.getNodes():
+            if node.resources:
+                add_resources(resources, node.resources)
             if node.lock is None:
                 self.log.error("Node %s is not locked" % (node,))
             else:
@@ -144,6 +219,21 @@ class Nodepool(object):
                     self.log.exception("Exception storing node %s "
                                        "while unlocking:" % (node,))
         self._unlockNodes(nodeset.getNodes())
+
+        # When returning a nodeset we need to update the gauges if we have a
+        # build. Further we calculate resource^duration and increment their
+        # tenant or project specific counters. With that we have both the
+        # current value and also counters to be able to perform accounting.
+        if tenant and project and duration:
+            project_name = project.canonical_name
+            subtract_resources(
+                self.current_resources_by_tenant[tenant], resources)
+            subtract_resources(
+                self.current_resources_by_project[project_name], resources)
+            self.emitStatsResources()
+
+            self.emitStatsResourceCounters(
+                tenant, project_name, resources, duration)
 
     def unlockNodeSet(self, nodeset):
         self._unlockNodes(nodeset.getNodes())
