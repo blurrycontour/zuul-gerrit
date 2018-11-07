@@ -1800,9 +1800,11 @@ class AnsibleJob(object):
             # Received abort request.
             return (self.RESULT_ABORTED, None)
         elif ret == 1:
-            if syntax_buffer[0].startswith(b'ERROR!'):
-                with open(self.jobdir.job_output_file, 'a') as job_output:
-                    for line in syntax_buffer:
+            with open(self.jobdir.job_output_file, 'a') as job_output:
+                error_found = False
+                for line in syntax_buffer:
+                    if error_found or line.startswith(b'ERROR!'):
+                        error_found = True
                         job_output.write("{now} | {line}\n".format(
                             now=datetime.datetime.now(),
                             line=line.decode('utf-8').rstrip()))
