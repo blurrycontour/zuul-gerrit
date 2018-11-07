@@ -1,0 +1,18 @@
+---
+features:
+  - |
+    Zuul now reports resource usage statistics if they are provided by nodepool.
+
+    The following statistics are emitted:
+ 
+    - `zuul.nodepool.resources.tenant.{tenant}.{resource}.current`:
+      Gauge with the currently used resources by tenant
+
+    - `zuul.nodepool.resources.tenant.{project}.{resource}.current`:
+      Gauge with the currently used resources by project
+
+    - `zuul.nodepool.resources.tenant.{tenant}.{resource}.counter`:
+      Counter with the summed usage by tenant. e.g. cpu seconds
+
+    - `zuul.nodepool.resources.project.{project}.{resource}.counter`:
+      Counter with the summed usage by project. e.g. cpu seconds
