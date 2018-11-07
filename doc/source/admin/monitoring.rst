@@ -266,6 +266,39 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
 
       The number of outstanding nodepool requests from Zuul.
 
+   .. stat:: resources
+
+      Holds metrics about resource usage by tenant or project if resources
+      of nodes are reported by nodepool.
+
+      .. stat:: tenant
+
+         Holds resource usage metrics by tenant.
+
+         .. stat:: <tenant>.<resource>.current
+         :type: gauge
+
+         Gauge with the currently used resources by tenant.
+
+         .. stat:: <tenant>.<resource>.counter
+         :type: counter
+
+         Counter with the summed usage by tenant as <resource> seconds.
+
+      .. stat:: project
+
+         Holds resource usage metrics by project.
+
+         .. stat:: <project>.<resource>.current
+         :type: gauge
+
+         Gauge with the currently used resources by project.
+
+         .. stat:: <project>.<resource>.counter
+         :type: counter
+
+         Counter with the summed usage by project as <resource> seconds.
+
 .. stat:: zuul.mergers
 
    Holds metrics related to Zuul mergers.
