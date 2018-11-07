@@ -6004,7 +6004,7 @@ class TestSemaphore(ZuulTestCase):
         # Simulate a single zk error in useNodeSet
         orig_useNodeSet = self.nodepool.useNodeSet
 
-        def broken_use_nodeset(nodeset):
+        def broken_use_nodeset(nodeset, build_set=None):
             # restore original useNodeSet
             self.nodepool.useNodeSet = orig_useNodeSet
             raise NoNodeError()
