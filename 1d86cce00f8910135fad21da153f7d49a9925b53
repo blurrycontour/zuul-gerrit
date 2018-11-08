@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_db4ee76b",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-11-08T14:24:54Z",
+      "side": 1,
+      "message": "missing .items()",
+      "range": {
+        "startLine": 78,
+        "startChar": 35,
+        "endLine": 78,
+        "endChar": 45
+      },
+      "revId": "1d86cce00f8910135fad21da153f7d49a9925b53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_fb51630d",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-11-08T14:24:54Z",
+      "side": 1,
+      "message": "dito",
+      "range": {
+        "startLine": 83,
+        "startChar": 35,
+        "endLine": 83,
+        "endChar": 45
+      },
+      "revId": "1d86cce00f8910135fad21da153f7d49a9925b53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
