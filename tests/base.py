@@ -1268,9 +1268,10 @@ class FakeGithubConnection(githubconnection.GithubConnection):
         pull_request = self.pull_requests[int(pr_number)]
         pull_request.addComment(message)
 
-    def mergePull(self, project, pr_number, commit_message='', sha=None):
+    def mergePull(self, project, pr_number, commit_message='', sha=None,
+                  method='merge'):
         # record that this got reported
-        self.reports.append((project, pr_number, 'merge'))
+        self.reports.append((project, pr_number, 'merge', method))
         pull_request = self.pull_requests[int(pr_number)]
         if self.merge_failure:
             raise Exception('Pull request was not merged')
