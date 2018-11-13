@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_8f245f61",
+        "filename": "doc/source/admin/tenants.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-11-13T20:13:53Z",
+      "side": 1,
+      "message": "The default is actually \u0027None\u0027 or \u0027[]\u0027 right?",
+      "range": {
+        "startLine": 238,
+        "startChar": 16,
+        "endLine": 238,
+        "endChar": 31
+      },
+      "revId": "478459bcf6a21ebb6d96d11c814268b07dd2020a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_efb63327",
+        "filename": "doc/source/admin/tenants.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-11-13T20:13:53Z",
+      "side": 1,
+      "message": "We should note that this does regex matching.",
+      "range": {
+        "startLine": 240,
+        "startChar": 0,
+        "endLine": 242,
+        "endChar": 58
+      },
+      "revId": "478459bcf6a21ebb6d96d11c814268b07dd2020a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_0ff7efd3",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-11-13T20:13:53Z",
+      "side": 1,
+      "message": "I\u0027m not sure if \u0027Unknown label\u0027 fits here correctly into my brain. Normally for really unknown labels we get node_failure on a job. So this is something completely different and we might want to raise a LabelForbiddenError instead. This also probably should contain the allowed matches in the message so the users don\u0027t get confused.",
+      "range": {
+        "startLine": 77,
+        "startChar": 8,
+        "endLine": 77,
+        "endChar": 27
+      },
+      "revId": "478459bcf6a21ebb6d96d11c814268b07dd2020a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_4f688788",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 459,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-11-13T20:13:53Z",
+      "side": 1,
+      "message": "We should use re2 here as this is a user supplied regex. We use re2 for every user supplied regex for security and performance reasons.",
+      "range": {
+        "startLine": 459,
+        "startChar": 24,
+        "endLine": 459,
+        "endChar": 26
+      },
+      "revId": "478459bcf6a21ebb6d96d11c814268b07dd2020a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
