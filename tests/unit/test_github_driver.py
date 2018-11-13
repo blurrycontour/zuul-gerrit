@@ -1097,6 +1097,32 @@ class TestGithubDriver(ZuulTestCase):
             MatchesRegex(r'.*\[project-test2 \]\(.*\).*', re.DOTALL))
         self.assertEqual(2, len(self.history))
 
+    @simple_layout('layouts/gate-github-rebase.yaml', driver='github')
+    def test_merge_method_configuration(self):
+        github = self.fake_github.getGithubClient()
+        github._data.required_contexts[('org/project', 'master')] = [
+            'tenant-one/check',
+            'tenant-one/gate']
+
+        A = self.fake_github.openFakePullRequest('org/project', 'master', 'A')
+        self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        repo = github.repo_from_project('org/project')
+        repo.create_status(A.head_sha, 'success', 'example.com', 'description',
+                           'tenant-one/check')
+
+        self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        # the change should have entered the gate
+        self.assertEqual(2, len(self.history))
+
+        # now check if the merge was done via rebase
+        merges = [report for report in self.fake_github.reports
+                  if report[2] == 'merge']
+        assert(len(merges) == 1 and merges[0][3] == 'rebase')
+
 
 class TestGithubUnprotectedBranches(ZuulTestCase):
     config_file = 'zuul-github-driver.conf'

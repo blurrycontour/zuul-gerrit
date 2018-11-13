@@ -341,8 +341,22 @@ itself. Status name, description, and context is taken from the pipeline.
    .. attr:: merge
       :default: false
 
-      Boolean value that determines if the reporter should merge the
-      pull reqeust. Only used for Pull Request based items.
+      Determines if the reporter should merge the pull request. If this value
+      is a boolean, true indicates that the PR should be merged using a merge
+      commit. This parameter can also contain a dictionary instead of a bool.
+      This allows for a finer control over how the PR is merged to the base
+      branch. See below for a list of possible subparameters. Only used for
+      Pull Request based items.
+
+      .. attr:: method
+
+         If :attr:`pipeline.merge` is a dictionary,
+         this attribute allows to control the merge method GitHub uses to bring
+         the PR into the base branch. Currently, GitHub allows the following
+         methods:
+         ``merge`` (use a merge commit),
+         ``rebase`` (rebase the commits on top of the base branch) and
+         ``squash`` (squashes all commits of the PR into one single commit).
 
    .. attr:: label
 

@@ -32,7 +32,11 @@ class GithubReporter(BaseReporter):
         super(GithubReporter, self).__init__(driver, connection, config)
         self._commit_status = self.config.get('status', None)
         self._create_comment = self.config.get('comment', True)
-        self._merge = self.config.get('merge', False)
+        merge = self.config.get('merge', None)
+        if isinstance(merge, dict):
+            self._merge = merge['method']
+        else:
+            self._merge = 'merge' if merge else None
         self._labels = self.config.get('label', [])
         if not isinstance(self._labels, list):
             self._labels = [self._labels]
@@ -74,7 +78,7 @@ class GithubReporter(BaseReporter):
                 self.setLabels(item)
             if self._review:
                 self.addReview(item)
-            if (self._merge):
+            if self._merge is not None:
                 self.mergePull(item)
                 if not item.change.is_merged:
                     msg = self._formatItemReportMergeFailure(item)
@@ -141,7 +145,9 @@ class GithubReporter(BaseReporter):
 
         for i in [1, 2]:
             try:
-                self.connection.mergePull(project, pr_number, message, sha)
+                self.connection.mergePull(
+                    project, pr_number, commit_message=message, sha=sha,
+                    method=self._merge)
                 item.change.is_merged = True
                 return
             except MergeFailure:
@@ -230,7 +236,8 @@ def getSchema():
         'status': v.Any('pending', 'success', 'failure'),
         'status-url': str,
         'comment': bool,
-        'merge': bool,
+        'merge': v.Any(
+            bool, {v.Required('method'): v.Any('merge', 'squash', 'rebase')}),
         'label': scalar_or_list(str),
         'unlabel': scalar_or_list(str),
         'review': v.Any('approve', 'request-changes', 'comment'),
