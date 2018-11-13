@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_0ac8444c",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-11-13T15:23:56Z",
+      "side": 1,
+      "message": "One of the advantages of JWT is that other systems exist which can generate them.  For example, dex could be used to generate JWT based on oauth/openid connect logins: https://github.com/dexidp/dex\n\nWe should mention that here (and in the docs) so it\u0027s clear that even though Zuul has a utility to generate JWT, that isn\u0027t the only way -- that having another authentication mechanism generate JWT is probably the preferred way.",
+      "revId": "bb7b9a28ac02fa779c52517803d71ab30e8da343",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
