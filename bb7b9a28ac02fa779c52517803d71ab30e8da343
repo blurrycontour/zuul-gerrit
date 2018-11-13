@@ -16,6 +16,24 @@
       "revId": "bb7b9a28ac02fa779c52517803d71ab30e8da343",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_00bd8303",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2018-11-13T16:24:05Z",
+      "side": 1,
+      "message": "I want to concur. Zuul should not (ideally) implement it\u0027s own Identity Provider. Zuul should be a service provider that consumes JWT from an IDP.\n\nThe base installation may include a JWT provider internally to zuul, but it should be made as generic as possible to make it possible to consume (easily) JWT from a separate provider.\n\nIt is useful for at least testing/example purposes to have something internal. I also do want to warn/raise a concern that implementation of something internal often is not used solely for example and tends (especially) if it is the default need to grow to support many production cases.\n\nI hope the documentation will encourage/direct to use an external IDP generate JWT as the best production-scale mechanism.",
+      "parentUuid": "3f79a3b5_0ac8444c",
+      "revId": "bb7b9a28ac02fa779c52517803d71ab30e8da343",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
