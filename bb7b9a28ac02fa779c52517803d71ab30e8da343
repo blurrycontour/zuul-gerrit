@@ -34,6 +34,115 @@
       "revId": "bb7b9a28ac02fa779c52517803d71ab30e8da343",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_805753cd",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2018-11-13T16:36:46Z",
+      "side": 1,
+      "message": "Is there an expected \u0027aud\u0027 that will indicate it is for Zuul?\n\nI worry this JWT content might be a bit minimal.",
+      "revId": "bb7b9a28ac02fa779c52517803d71ab30e8da343",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_c0e78b10",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2018-11-13T16:36:46Z",
+      "side": 1,
+      "message": "As someone who has spent a serious amount of time dealing with using decorators for \"validation\" and/or \"authentication\", I highly recommend that this be avoided. Decorators are great in principal, but there ends up to be many cases where you need to handle ENFORCE outside of \"before\" or \"after\" the method/function. \n\nSuggest implementing a call that can be made directly in the function/method to avoid the long term pattern where callbacks or other complex methods are needed to ensure enforcement is flexible enough based upon the data in the JWT.\n\nDecorators in this case tend to be too simplistic in nature.",
+      "range": {
+        "startLine": 133,
+        "startChar": 0,
+        "endLine": 135,
+        "endChar": 29
+      },
+      "revId": "bb7b9a28ac02fa779c52517803d71ab30e8da343",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_60b23708",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2018-11-13T16:36:46Z",
+      "side": 1,
+      "message": "What is the case where the JWT is valid but the user doesn\u0027t have authorization?\n\nKeep in mind HTTP 401 (Unauthorized) is an indicator that the user is unauthenticated. If the user is forbidden a 403 might be more correct.\n\nPlease ensure a WWW-Authenticate (with appropriate data) header is emitted with a 401.",
+      "range": {
+        "startLine": 225,
+        "startChar": 58,
+        "endLine": 225,
+        "endChar": 61
+      },
+      "revId": "bb7b9a28ac02fa779c52517803d71ab30e8da343",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_c0954b40",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2018-11-13T16:36:46Z",
+      "side": 1,
+      "message": "Are you planning on limiting the TTL for the JWT by default?\n\nI would go as far and indicate that the default mode should be as narrow as possible, and extended time/scope should be extra (clearly indicated in the tool[s])",
+      "range": {
+        "startLine": 288,
+        "startChar": 0,
+        "endLine": 291,
+        "endChar": 61
+      },
+      "revId": "bb7b9a28ac02fa779c52517803d71ab30e8da343",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_2072ff4c",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2018-11-13T16:36:46Z",
+      "side": 1,
+      "message": "I would expand on the concerns with nodepool and autohold interactions (at least in documentation) as it stands it would be hard for an operator to identify the concerns.",
+      "range": {
+        "startLine": 293,
+        "startChar": 0,
+        "endLine": 295,
+        "endChar": 57
+      },
+      "revId": "bb7b9a28ac02fa779c52517803d71ab30e8da343",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
