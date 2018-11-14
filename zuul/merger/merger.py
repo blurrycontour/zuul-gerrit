@@ -115,7 +115,8 @@ class Repo(object):
         username = url.username or self.username
 
         path = os.path.expanduser('~/.ssh')
-        os.makedirs(path)
+        if not os.path.exists(path):
+            os.makedirs(path)
         path = os.path.expanduser('~/.ssh/known_hosts')
         if not os.path.exists(path):
             with open(path, 'w'):
