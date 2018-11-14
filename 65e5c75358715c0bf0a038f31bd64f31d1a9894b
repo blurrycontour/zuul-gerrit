@@ -16,6 +16,24 @@
       "revId": "65e5c75358715c0bf0a038f31bd64f31d1a9894b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_e15638ce",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 27898
+      },
+      "writtenOn": "2018-11-14T16:50:07Z",
+      "side": 1,
+      "message": "only at python3 I think",
+      "parentUuid": "3f79a3b5_1b872314",
+      "revId": "65e5c75358715c0bf0a038f31bd64f31d1a9894b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
