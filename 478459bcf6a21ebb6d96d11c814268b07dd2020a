@@ -96,6 +96,30 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_5be83ba6",
+        "filename": "doc/source/admin/tenants.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-11-14T15:47:29Z",
+      "side": 1,
+      "message": "oops, sorry, overlooked that...",
+      "parentUuid": "3f79a3b5_463389f9",
+      "range": {
+        "startLine": 240,
+        "startChar": 0,
+        "endLine": 242,
+        "endChar": 58
+      },
+      "revId": "478459bcf6a21ebb6d96d11c814268b07dd2020a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_0ff7efd3",
         "filename": "zuul/configloader.py",
         "patchSetId": 2
