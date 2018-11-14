@@ -34,6 +34,23 @@
       "revId": "65e5c75358715c0bf0a038f31bd64f31d1a9894b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_87fbd447",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2018-11-14T19:51:00Z",
+      "side": 1,
+      "message": "Correct, 3.2 or later. Zuul requires Python 3.5 or later (as of Zuul v3 it doesn\u0027t support running under Python 2.7 at all). See the setup-requires metadata in its setup.cfg or the README.rst in this repo for details.",
+      "revId": "65e5c75358715c0bf0a038f31bd64f31d1a9894b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
