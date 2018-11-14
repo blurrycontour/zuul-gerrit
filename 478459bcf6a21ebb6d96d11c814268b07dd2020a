@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_8619a177",
+        "filename": "doc/source/admin/tenants.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-11-14T10:05:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f79a3b5_8f245f61",
+      "range": {
+        "startLine": 238,
+        "startChar": 16,
+        "endLine": 238,
+        "endChar": 31
+      },
+      "revId": "478459bcf6a21ebb6d96d11c814268b07dd2020a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_efb63327",
         "filename": "doc/source/admin/tenants.rst",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2018-11-13T20:13:53Z",
       "side": 1,
       "message": "We should note that this does regex matching.",
+      "range": {
+        "startLine": 240,
+        "startChar": 0,
+        "endLine": 242,
+        "endChar": 58
+      },
+      "revId": "478459bcf6a21ebb6d96d11c814268b07dd2020a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_463389f9",
+        "filename": "doc/source/admin/tenants.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-11-14T10:05:03Z",
+      "side": 1,
+      "message": "it does says that it\u0027s a list of labels regexp.",
+      "parentUuid": "3f79a3b5_efb63327",
       "range": {
         "startLine": 240,
         "startChar": 0,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_468f0977",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-11-14T10:05:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f79a3b5_0ff7efd3",
+      "range": {
+        "startLine": 77,
+        "startChar": 8,
+        "endLine": 77,
+        "endChar": 27
+      },
+      "revId": "478459bcf6a21ebb6d96d11c814268b07dd2020a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_4f688788",
         "filename": "zuul/configloader.py",
         "patchSetId": 2
@@ -82,6 +154,30 @@
       "writtenOn": "2018-11-13T20:13:53Z",
       "side": 1,
       "message": "We should use re2 here as this is a user supplied regex. We use re2 for every user supplied regex for security and performance reasons.",
+      "range": {
+        "startLine": 459,
+        "startChar": 24,
+        "endLine": 459,
+        "endChar": 26
+      },
+      "revId": "478459bcf6a21ebb6d96d11c814268b07dd2020a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_663565d3",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 459,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-11-14T10:05:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f79a3b5_4f688788",
       "range": {
         "startLine": 459,
         "startChar": 24,
