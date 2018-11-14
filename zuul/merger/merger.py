@@ -115,7 +115,7 @@ class Repo(object):
         username = url.username or self.username
 
         path = os.path.expanduser('~/.ssh')
-        os.makedirs(path)
+        os.makedirs(path, exist_ok=True)
         path = os.path.expanduser('~/.ssh/known_hosts')
         if not os.path.exists(path):
             with open(path, 'w'):
@@ -495,8 +495,7 @@ class Merger(object):
             self.log = logger
         self.repos = {}
         self.working_root = working_root
-        if not os.path.exists(working_root):
-            os.makedirs(working_root)
+        os.makedirs(working_root, exist_ok=True)
         self.connections = connections
         self.email = email
         self.username = username
