@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_4a0cd995",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-11-15T12:20:04Z",
+      "side": 1,
+      "message": "shouldn\u0027t this be \"exist_ok\" ?",
+      "range": {
+        "startLine": 118,
+        "startChar": 26,
+        "endLine": 118,
+        "endChar": 35
+      },
+      "revId": "f50d422ff69ed8aa9733db7244730354f42483a1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
