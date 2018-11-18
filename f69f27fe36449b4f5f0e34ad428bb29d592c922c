@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_4d585657",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1075,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-11-18T19:44:55Z",
+      "side": 1,
+      "message": "Can we log this case? Could indicate users that are either 1) confused and need help or 2) trying something dangerous.",
+      "revId": "f69f27fe36449b4f5f0e34ad428bb29d592c922c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
