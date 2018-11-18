@@ -1,0 +1,95 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_cd5b065f",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1553,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-11-18T19:43:00Z",
+      "side": 1,
+      "message": "Nit, this seems to actually be about writing the correct kubectl config? Within the context of zuul prepareNodeSecret could mean something else (like decrypting zuul secrets). Maybe rename this function to be more specific.",
+      "range": {
+        "startLine": 1553,
+        "startChar": 8,
+        "endLine": 1553,
+        "endChar": 25
+      },
+      "revId": "336c0dbbc4a5524504847ad7770cb2a42d349abe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_8d650e1f",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1562,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-11-18T19:43:00Z",
+      "side": 1,
+      "message": "If oc uses a kube_cfg too do we need to use a different tool and a different code path to configure it? Can we rely on the fact that openshift is k8s under the covers here to simplify configuration setup?",
+      "revId": "336c0dbbc4a5524504847ad7770cb2a42d349abe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_8d3e6ee1",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1616,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-11-18T19:43:00Z",
+      "side": 1,
+      "message": "Note that we are overriding this value which was hardcoded because python3 did not work in the past. As a followup maybe we should drop this setting entirely?",
+      "revId": "336c0dbbc4a5524504847ad7770cb2a42d349abe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_0d79fec4",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1632,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-11-18T19:43:00Z",
+      "side": 1,
+      "message": "Do we want to write the kubectl resources into the resource_var dict? It appears we expect kubectl to go into the inventory directly but not the other types?",
+      "revId": "336c0dbbc4a5524504847ad7770cb2a42d349abe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_2d74facc",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 2057,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-11-18T19:43:00Z",
+      "side": 1,
+      "message": "We should document this new variables file and why/how it is used.",
+      "revId": "336c0dbbc4a5524504847ad7770cb2a42d349abe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
