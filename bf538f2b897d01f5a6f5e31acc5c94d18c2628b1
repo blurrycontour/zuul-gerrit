@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_97067b74",
+        "filename": ".zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 22348
+      },
+      "writtenOn": "2018-11-18T01:50:07Z",
+      "side": 1,
+      "message": "Job publish-zuul-python-branch-tarball not defined",
+      "range": {
+        "startLine": 73,
+        "startChar": 2,
+        "endLine": 155,
+        "endChar": 0
+      },
+      "revId": "bf538f2b897d01f5a6f5e31acc5c94d18c2628b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
