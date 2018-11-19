@@ -36,7 +36,7 @@
         method: POST
         user: admin
         password: secret
-        body: "{{ lookup('file', '/var/ssh/admin.pub') }}"
+        body: "{{ lookup('file', '/var/ssh/admin.pub').split()[1] }}"
         status_code: 201
 
     - name: Create temp dir for Gerrit config update
