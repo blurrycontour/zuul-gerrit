@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_8eb3c5eb",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1553,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-11-19T07:19:33Z",
+      "side": 1,
+      "message": "Good point, next PS renames it prepareKubeConfig",
+      "parentUuid": "3f79a3b5_cd5b065f",
+      "range": {
+        "startLine": 1553,
+        "startChar": 8,
+        "endLine": 1553,
+        "endChar": 25
+      },
+      "revId": "336c0dbbc4a5524504847ad7770cb2a42d349abe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_8d650e1f",
         "filename": "zuul/executor/server.py",
         "patchSetId": 10
@@ -36,6 +60,24 @@
       "writtenOn": "2018-11-18T19:43:00Z",
       "side": 1,
       "message": "If oc uses a kube_cfg too do we need to use a different tool and a different code path to configure it? Can we rely on the fact that openshift is k8s under the covers here to simplify configuration setup?",
+      "revId": "336c0dbbc4a5524504847ad7770cb2a42d349abe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_6e5ae985",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1562,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-11-19T07:19:33Z",
+      "side": 1,
+      "message": "Good point, though the \u0027project\u0027 vs \u0027namespace\u0027 naming may be an issue. Next PS refactor this part to manually generate the kube_cfg file without using any tool.",
+      "parentUuid": "3f79a3b5_8d650e1f",
       "revId": "336c0dbbc4a5524504847ad7770cb2a42d349abe",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -59,6 +101,24 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_6e442977",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1616,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-11-19T07:19:33Z",
+      "side": 1,
+      "message": "Probably, iirc next version of ansible will be able to auto-discover the interpreter.",
+      "parentUuid": "3f79a3b5_8d3e6ee1",
+      "revId": "336c0dbbc4a5524504847ad7770cb2a42d349abe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_0d79fec4",
         "filename": "zuul/executor/server.py",
         "patchSetId": 10
@@ -76,6 +136,24 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_8e47457a",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1632,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-11-19T07:19:33Z",
+      "side": 1,
+      "message": "Good point, we actually don\u0027t need the whole resources information. Next PS sets context and namespace name for project, and pod name for kubectl.",
+      "parentUuid": "3f79a3b5_0d79fec4",
+      "revId": "336c0dbbc4a5524504847ad7770cb2a42d349abe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_2d74facc",
         "filename": "zuul/executor/server.py",
         "patchSetId": 10
@@ -87,6 +165,24 @@
       "writtenOn": "2018-11-18T19:43:00Z",
       "side": 1,
       "message": "We should document this new variables file and why/how it is used.",
+      "revId": "336c0dbbc4a5524504847ad7770cb2a42d349abe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_ee57d927",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 2057,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-11-19T07:19:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f79a3b5_2d74facc",
       "revId": "336c0dbbc4a5524504847ad7770cb2a42d349abe",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
