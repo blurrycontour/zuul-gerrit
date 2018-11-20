@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_78292b81",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-11-20T16:19:54Z",
+      "side": 1,
+      "message": "This docstring looks like copy paste from elsewhere. SHould be updated.",
+      "range": {
+        "startLine": 80,
+        "startChar": 8,
+        "endLine": 80,
+        "endChar": 75
+      },
+      "revId": "4f1df2774db0ef5576efdb18a23890614c32410a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_f8521b11",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 686,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-11-20T16:19:54Z",
+      "side": 1,
+      "message": "Does this check need to change? The test here isn\u0027t using zones so the job name remains \u0027executor:execute\u0027 right?",
+      "revId": "4f1df2774db0ef5576efdb18a23890614c32410a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_759ff4f5",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-11-20T16:19:54Z",
+      "side": 1,
+      "message": "We may want to have an else clause here that logs the fact that the specified node zone is not a valid executor zone.\n\nAlso we may want to treat that as an error as running in the wrong zone could have other consequences relating to security.",
+      "revId": "4f1df2774db0ef5576efdb18a23890614c32410a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_b5010c0b",
+        "filename": "zuul/lib/gear_utils.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-11-20T16:19:54Z",
+      "side": 1,
+      "message": "Might be worth putting something like this into gear proper.",
+      "revId": "4f1df2774db0ef5576efdb18a23890614c32410a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
