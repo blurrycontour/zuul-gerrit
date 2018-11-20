@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_12f81616",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 621,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-11-20T14:56:28Z",
+      "side": 1,
+      "message": "Since nodepool supports availability zones in the \u0027pool\u0027 stanza, the original story suggested that we add a field to nodepool in the provider or pool stanzas and let users put an arbitrary value there.  I think we may still want to do that.  That facilitates at least two things I can think of off the top of my head:\n\n1) Assigning zuul zones to individual availability zones.\n2) Combining different clouds/regions/availability zones into one zuul zone (eg, a VPN is available in all of them).",
+      "revId": "5880dc9500aaef4370903fb3a7713d7ff63ca43c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_8cfbb014",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-11-20T14:56:28Z",
+      "side": 1,
+      "message": "It\u0027s not an assumption, that\u0027s behavior according to spec.  They will all be from the same provider, region, and availability zone.  I\u0027d suggest rewording this comment to indicate that we rely on that behavior, without suggesting that it\u0027s somehowe precarious.  :)",
+      "revId": "5880dc9500aaef4370903fb3a7713d7ff63ca43c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
