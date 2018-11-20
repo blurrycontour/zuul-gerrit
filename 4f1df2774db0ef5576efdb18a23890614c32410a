@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_fb7e95e0",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-11-20T17:23:01Z",
+      "side": 1,
+      "message": "agree",
+      "parentUuid": "3f79a3b5_78292b81",
+      "range": {
+        "startLine": 80,
+        "startChar": 8,
+        "endLine": 80,
+        "endChar": 75
+      },
+      "revId": "4f1df2774db0ef5576efdb18a23890614c32410a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_f8521b11",
         "filename": "tests/unit/test_scheduler.py",
         "patchSetId": 16
@@ -36,6 +60,24 @@
       "writtenOn": "2018-11-20T16:19:54Z",
       "side": 1,
       "message": "Does this check need to change? The test here isn\u0027t using zones so the job name remains \u0027executor:execute\u0027 right?",
+      "revId": "4f1df2774db0ef5576efdb18a23890614c32410a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_db7b99f0",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 686,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-11-20T17:23:01Z",
+      "side": 1,
+      "message": "Yah, this was from the original patch, will revert.",
+      "parentUuid": "3f79a3b5_f8521b11",
       "revId": "4f1df2774db0ef5576efdb18a23890614c32410a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -59,6 +101,24 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_5b6f8928",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-11-20T17:23:01Z",
+      "side": 1,
+      "message": "Good call, will update",
+      "parentUuid": "3f79a3b5_759ff4f5",
+      "revId": "4f1df2774db0ef5576efdb18a23890614c32410a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_b5010c0b",
         "filename": "zuul/lib/gear_utils.py",
         "patchSetId": 16
@@ -70,6 +130,24 @@
       "writtenOn": "2018-11-20T16:19:54Z",
       "side": 1,
       "message": "Might be worth putting something like this into gear proper.",
+      "revId": "4f1df2774db0ef5576efdb18a23890614c32410a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_fb577558",
+        "filename": "zuul/lib/gear_utils.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2018-11-20T17:23:01Z",
+      "side": 1,
+      "message": "+1, don\u0027t mind proposing a patch as follow up, then removing this.",
+      "parentUuid": "3f79a3b5_b5010c0b",
       "revId": "4f1df2774db0ef5576efdb18a23890614c32410a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
