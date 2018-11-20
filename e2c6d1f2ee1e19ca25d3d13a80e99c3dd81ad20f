@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_f12d5bfc",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 14
+      },
+      "lineNbr": 617,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-11-20T13:50:59Z",
+      "side": 1,
+      "message": "Maybe we want to make it clearer that if this is set this executor *exclusively* executes *all* jobs that have nodes of the specified provider.",
+      "range": {
+        "startLine": 617,
+        "startChar": 6,
+        "endLine": 617,
+        "endChar": 58
+      },
+      "revId": "e2c6d1f2ee1e19ca25d3d13a80e99c3dd81ad20f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
