@@ -23,6 +23,7 @@ import zuul.web
 import zuul.driver.sql
 import zuul.driver.github
 import zuul.lib.auth
+import zuul.zk_auth
 
 from zuul.lib.config import get_default
 
@@ -86,6 +87,8 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
             self.config, 'zookeeper', 'hosts', None)
         if not params["zk_hosts"]:
             raise Exception("The zookeeper hosts config value is required")
+
+        params["zk_auth"] = zuul.zk_auth.from_config(self.config)
 
         try:
             self.web = zuul.web.ZuulWeb(**params)

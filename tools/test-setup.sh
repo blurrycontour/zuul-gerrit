@@ -18,6 +18,21 @@ if [[ -n "${ZUUL_TEST_ROOT:-}" ]]; then
     sudo mount -t tmpfs -o noatime,nodev,nosuid,size=64M none "$ZUUL_TEST_ROOT"
 fi
 
+# Setup Zookeeper auth
+grep -q sasl /etc/zookeeper/conf/zoo.cfg || {
+    (
+        echo requireClientAuthScheme=sasl
+        echo authProvider.1=org.apache.zookeeper.server.auth.SASLAuthenticationProvider
+    ) | sudo tee -a /etc/zookeeper/conf/zoo.cfg
+}
+sudo cp tests/fixtures/auth/zookeeper.conf /etc/zookeeper/auth.conf
+grep -q auth.login.config /etc/default/zookeeper || {
+    (
+        echo 'JVMFLAGS="${JVMFLAGS} -Djava.security.auth.login.config=/etc/zookeeper/auth.conf"'
+        echo 'JAVA_OPTS="${JAVA_OPTS} -Djava.security.auth.login.config=/etc/zookeeper/auth.conf"'
+    ) | sudo tee -a /etc/default/zookeeper
+}
+
 # Be sure mysql and zookeeper are started.
 sudo service mysql start
 sudo service postgresql start
