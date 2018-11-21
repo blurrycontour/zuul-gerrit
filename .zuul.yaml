@@ -48,6 +48,8 @@
 - job:
     name: zuul-tox-remote
     parent: tox
+    required-projects:
+      - opendev/gear
     vars:
       tox_envlist: remote
       tox_environment:
@@ -166,11 +168,15 @@
               - playbooks/zuul-migrate/.*
             nodeset: ubuntu-xenial
             timeout: 2700  # 45 minutes
+            required-projects:
+              - opendev/gear
         - tox-py36:
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
             timeout: 2700  # 45 minutes
+            required-projects:
+              - opendev/gear
         - zuul-build-dashboard
         - zuul-build-dashboard-multi-tenant
         - nodejs-npm-run-lint:
