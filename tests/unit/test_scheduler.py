@@ -5751,7 +5751,9 @@ For CI problems and help debugging, contact ci@example.org"""
         self.waitUntilSettled()
 
         self.zk.client.stop()
-        self.zk.client.start()
+        self.zk.client.close()
+        self.zk.client = None
+        self.zk.connect(self.zk_config, auth_data=self.zk_auth)
         self.fake_nodepool.unpause()
         self.waitUntilSettled()
 
@@ -5787,7 +5789,9 @@ For CI problems and help debugging, contact ci@example.org"""
         # The request is fulfilled, but the scheduler hasn't processed
         # it yet.  Reconnect ZK.
         self.zk.client.stop()
-        self.zk.client.start()
+        self.zk.client.close()
+        self.zk.client = None
+        self.zk.connect(self.zk_config, auth_data=self.zk_auth)
 
         # Allow the scheduler to continue and process the (now
         # out-of-date) notification that nodes are ready.

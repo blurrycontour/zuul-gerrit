@@ -16,6 +16,7 @@
 import time
 
 import zuul.zk
+import zuul.zk_auth
 import zuul.nodepool
 from zuul import model
 
@@ -38,8 +39,10 @@ class TestNodepool(BaseTestCase):
             self.zk_chroot_fixture.zookeeper_chroot)
 
         self.zk = zuul.zk.ZooKeeper(enable_cache=True)
+        self.zk_auth = zuul.zk_auth.ZKAuth(dict(
+            username="super", password="adminsecret"))
         self.addCleanup(self.zk.disconnect)
-        self.zk.connect(self.zk_config)
+        self.zk.connect(self.zk_config, auth_data=self.zk_auth)
         self.hostname = 'nodepool-test-hostname'
 
         self.provisioned_requests = []
@@ -50,7 +53,9 @@ class TestNodepool(BaseTestCase):
         self.fake_nodepool = FakeNodepool(
             self.zk_chroot_fixture.zookeeper_host,
             self.zk_chroot_fixture.zookeeper_port,
-            self.zk_chroot_fixture.zookeeper_chroot)
+            self.zk_chroot_fixture.zookeeper_chroot,
+            self.zk_auth,
+        )
         self.addCleanup(self.fake_nodepool.stop)
 
     def waitForRequests(self):
@@ -106,7 +111,9 @@ class TestNodepool(BaseTestCase):
         self.fake_nodepool.pause()
         request = self.nodepool.requestNodes(None, job, 0)
         self.zk.client.stop()
-        self.zk.client.start()
+        self.zk.client.close()
+        self.zk.client = None
+        self.zk.connect(self.zk_config, auth_data=self.zk_auth)
         self.fake_nodepool.unpause()
         self.waitForRequests()
         self.assertEqual(len(self.provisioned_requests), 1)

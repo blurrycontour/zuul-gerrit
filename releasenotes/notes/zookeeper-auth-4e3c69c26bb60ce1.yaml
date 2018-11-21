@@ -1,0 +1,10 @@
+---
+features:
+  - |
+    Zookeeper authentication can be configured using the username and
+    password options.
+upgrade:
+  - |
+    After changing zookeeper authentication, use the zuul-update-zk-auth script
+    to update node acls. Both Nodepool and Zuul needs to be restarted after
+    setting zookeeper authentication.
