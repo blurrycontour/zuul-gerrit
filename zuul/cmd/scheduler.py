@@ -25,6 +25,7 @@ import zuul.merger.client
 import zuul.nodepool
 import zuul.scheduler
 import zuul.zk
+import zuul.zk_auth
 
 from zuul.lib.config import get_default
 from zuul.lib.statsd import get_statsd_config
@@ -152,7 +153,10 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         zookeeper_timeout = float(get_default(self.config, 'zookeeper',
                                               'session_timeout', 10.0))
 
-        zookeeper.connect(zookeeper_hosts, timeout=zookeeper_timeout)
+        zookeeper.connect(
+            zookeeper_hosts,
+            timeout=zookeeper_timeout,
+            auth_data=zuul.zk_auth.from_config(self.config))
 
         self.configure_connections()
         self.sched.setExecutor(gearman)

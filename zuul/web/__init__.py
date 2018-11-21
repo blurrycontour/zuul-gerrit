@@ -1076,6 +1076,7 @@ class ZuulWeb(object):
                  info=None,
                  static_path=None,
                  zk_hosts=None,
+                 zk_auth=None,
                  authenticators=None,
                  command_socket=None,
                  ):
@@ -1094,7 +1095,7 @@ class ZuulWeb(object):
                                             client_id='Zuul Web Server')
         self.zk = zuul.zk.ZooKeeper(enable_cache=True)
         if zk_hosts:
-            self.zk.connect(hosts=zk_hosts, read_only=True)
+            self.zk.connect(hosts=zk_hosts, read_only=True, auth_data=zk_auth)
         self.connections = connections
         self.authenticators = authenticators
         self.stream_manager = StreamManager()
