@@ -10,6 +10,8 @@ server=127.0.0.1
 
 [zookeeper]
 hosts=127.0.0.1:2181
+;auth_scheme=sasl
+;auth_credential=nodepool:supersecret
 
 [gearman_server]
 start=true
