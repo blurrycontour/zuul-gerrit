@@ -18,6 +18,7 @@ from kazoo.client import KazooClient, KazooState
 from kazoo import exceptions as kze
 from kazoo.handlers.threading import KazooTimeoutError
 from kazoo.recipe.lock import Lock
+import kazoo.security
 
 import zuul.model
 
@@ -99,7 +100,7 @@ class ZooKeeper(object):
             self.log.warning("Retrying zookeeper connection")
             self._last_retry_log = now
 
-    def connect(self, hosts, read_only=False, timeout=10.0):
+    def connect(self, hosts, read_only=False, timeout=10.0, auth_data=None):
         '''
         Establish a connection with ZooKeeper cluster.
 
@@ -111,10 +112,21 @@ class ZooKeeper(object):
         :param bool read_only: If True, establishes a read-only connection.
         :param float timeout: The ZooKeeper session timeout, in
             seconds (default: 10.0).
+        :param tuple auth_data: authentication data ("scheme", "credential")
         '''
         if self.client is None:
-            self.client = KazooClient(hosts=hosts, read_only=read_only,
-                                      timeout=timeout)
+            if auth_data:
+                acl = kazoo.security.make_acl(
+                    auth_data[0], auth_data[1], all=True)
+                auth_data = (auth_data,)
+            else:
+                acl = None
+            self.client = KazooClient(
+                hosts=hosts,
+                read_only=read_only,
+                timeout=timeout,
+                auth_data=auth_data,
+                default_acl=acl)
             self.client.add_listener(self._connection_listener)
             # Manually retry initial connection attempt
             while True:
