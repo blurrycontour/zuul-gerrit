@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Zookeeper authentication can be configured using the auth_scheme and
+    auth_credential options.
