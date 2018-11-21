@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_e18ed1d5",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2329,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-11-21T18:16:33Z",
+      "side": 1,
+      "message": "The other keys are always present and have None if not applicable; can we do that here too?",
+      "revId": "32b1cb63458ff8036b45f62b127079852cafb2cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
