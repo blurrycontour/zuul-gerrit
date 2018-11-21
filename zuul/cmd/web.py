@@ -87,6 +87,14 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
         if not params["zk_hosts"]:
             raise Exception("The zookeeper hosts config value is required")
 
+        zookeeper_auth_scheme = get_default(
+            self.config, 'zookeeper', 'auth_scheme', '')
+        zookeeper_auth_credential = get_default(
+            self.config, 'zookeeper', 'auth_credential', '')
+        params["zk_auth"] = None
+        if zookeeper_auth_scheme and zookeeper_auth_credential:
+            params["zk_auth"] = (zookeeper_auth_scheme, zookeeper_auth_credential)
+
         try:
             self.web = zuul.web.ZuulWeb(**params)
         except Exception:

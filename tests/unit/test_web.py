@@ -56,7 +56,8 @@ class BaseTestWeb(ZuulTestCase):
                 self.config,
                 self.test_root,
                 info=zuul.model.WebInfo.fromConfig(self.zuul_ini_config),
-                zk_hosts=self.zk_config))
+                zk_hosts=self.zk_config,
+                zk_auth=("sasl", "super:adminsecret")))
 
         self.executor_server.hold_jobs_in_build = True
 
