@@ -161,6 +161,14 @@ The following sections of ``zuul.conf`` are used by all Zuul components:
 
       The ZooKeeper session timeout, in seconds.
 
+   .. attr:: auth_scheme
+
+      The authentication scheme, can be "digest" or "sasl".
+
+   .. attr:: auth_credential
+
+      The authentication credential.
+
 
 .. _scheduler:
 

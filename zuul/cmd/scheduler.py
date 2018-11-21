@@ -142,7 +142,18 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         zookeeper_timeout = float(get_default(self.config, 'zookeeper',
                                               'session_timeout', 10.0))
 
-        zookeeper.connect(zookeeper_hosts, timeout=zookeeper_timeout)
+        zookeeper_auth_scheme = get_default(
+            self.config, 'zookeeper', 'auth_scheme', '')
+        zookeeper_auth_credential = get_default(
+            self.config, 'zookeeper', 'auth_credential', '')
+        zookeeper_auth = None
+        if zookeeper_auth_scheme and zookeeper_auth_credential:
+            zookeeper_auth = (zookeeper_auth_scheme, zookeeper_auth_credential)
+
+        zookeeper.connect(
+            zookeeper_hosts,
+            timeout=zookeeper_timeout,
+            auth_data=zookeeper_auth)
 
         self.configure_connections()
         self.sched.setExecutor(gearman)
