@@ -35,7 +35,9 @@ class TestZK(BaseTestCase):
 
         self.zk = zuul.zk.ZooKeeper(enable_cache=True)
         self.addCleanup(self.zk.disconnect)
-        self.zk.connect(self.zk_config)
+        self.zk.connect(
+            self.zk_config, auth_data=zuul.zk_auth.ZKAuth(dict(
+                username="super", password="adminsecret")))
 
     def _createRequest(self):
         req = model.HoldRequest()

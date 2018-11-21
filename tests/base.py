@@ -85,6 +85,7 @@ import zuul.merger.server
 import zuul.model
 import zuul.nodepool
 import zuul.rpcclient
+import zuul.zk_auth
 import zuul.zk
 import zuul.configloader
 from zuul.lib.config import get_default
@@ -2820,11 +2821,13 @@ class FakeNodepool(object):
 
     log = logging.getLogger("zuul.test.FakeNodepool")
 
-    def __init__(self, host, port, chroot):
+    def __init__(self, host, port, chroot, zk_auth):
         self.complete_event = threading.Event()
         self.host_keys = None
         self.client = kazoo.client.KazooClient(
-            hosts='%s:%s%s' % (host, port, chroot))
+            hosts='%s:%s%s' % (host, port, chroot),
+            auth_data=zk_auth.getAuthData(),
+            default_acl=zk_auth.getACL())
         self.client.start()
         self.registerLauncher()
         self._running = True
@@ -3059,8 +3062,13 @@ class FakeNodepool(object):
 
 
 class ChrootedKazooFixture(fixtures.Fixture):
-    def __init__(self, test_id):
+    def __init__(self, test_id, zk_auth=None):
         super(ChrootedKazooFixture, self).__init__()
+
+        if zk_auth is None:
+            zk_auth = zuul.zk_auth.ZKAuth(dict(
+                username="super", password="adminsecret"))
+        self.zk_auth = zk_auth
 
         if 'ZOOKEEPER_2181_TCP' in os.environ:
             # prevent any nasty hobbits^H^H^H suprises
@@ -3104,7 +3112,9 @@ class ChrootedKazooFixture(fixtures.Fixture):
 
         # Ensure the chroot path exists and clean up any pre-existing znodes.
         _tmp_client = kazoo.client.KazooClient(
-            hosts='%s:%s' % (self.zookeeper_host, self.zookeeper_port))
+            hosts='%s:%s' % (self.zookeeper_host, self.zookeeper_port),
+            auth_data=self.zk_auth.getAuthData(),
+            default_acl=self.zk_auth.getACL())
         _tmp_client.start()
 
         if _tmp_client.exists(self.zookeeper_chroot):
@@ -3118,7 +3128,9 @@ class ChrootedKazooFixture(fixtures.Fixture):
         '''Remove the chroot path.'''
         # Need a non-chroot'ed client to remove the chroot path
         _tmp_client = kazoo.client.KazooClient(
-            hosts='%s:%s' % (self.zookeeper_host, self.zookeeper_port))
+            hosts='%s:%s' % (self.zookeeper_host, self.zookeeper_port),
+            auth_data=self.zk_getAuthData(),
+            default_acl=self.zk_auth.getACL())
         _tmp_client.start()
         _tmp_client.delete(self.zookeeper_chroot, recursive=True)
         _tmp_client.stop()
@@ -3166,7 +3178,7 @@ class WebProxyFixture(fixtures.Fixture):
 
 class ZuulWebFixture(fixtures.Fixture):
     def __init__(self, gearman_server_port, config, test_root, info=None,
-                 zk_hosts=None):
+                 zk_hosts=None, zk_auth=None):
         super(ZuulWebFixture, self).__init__()
         self.gearman_server_port = gearman_server_port
         self.connections = zuul.lib.connections.ConnectionRegistry()
@@ -3182,7 +3194,11 @@ class ZuulWebFixture(fixtures.Fixture):
             self.info = zuul.model.WebInfo()
         else:
             self.info = info
+        if zk_auth is None:
+            zk_auth = zuul.zk_auth.ZKAuth(dict(
+                username="super", password="adminsecret"))
         self.zk_hosts = zk_hosts
+        self.zk_auth = zk_auth
         self.test_root = test_root
 
     def _setUp(self):
@@ -3193,6 +3209,7 @@ class ZuulWebFixture(fixtures.Fixture):
             info=self.info,
             connections=self.connections,
             zk_hosts=self.zk_hosts,
+            zk_auth=self.zk_auth,
             command_socket=os.path.join(self.test_root, 'web.socket'),
             authenticators=self.authenticators)
         self.web.start()
@@ -3419,6 +3436,7 @@ class SymLink(object):
 
 class SchedulerTestApp:
     def __init__(self, log: Logger, config: ConfigParser, zk_config: str,
+                 zk_auth: zuul.zk_auth.ZKAuth,
                  connections: ConnectionRegistry):
         self.log = log
         self.config = config
@@ -3441,7 +3459,7 @@ class SchedulerTestApp:
         self.merge_client = RecordingMergeClient(self.config, self.sched)
         self.nodepool = zuul.nodepool.Nodepool(self.sched)
         self.zk = zuul.zk.ZooKeeper(enable_cache=True)
-        self.zk.connect(self.zk_config, timeout=60.0)
+        self.zk.connect(self.zk_config, timeout=60.0, auth_data=zk_auth)
 
         self.sched.setExecutor(self.executor_client)
         self.sched.setMerger(self.merge_client)
@@ -3552,7 +3570,9 @@ class ZuulTestCase(BaseTestCase):
         self.fake_nodepool = FakeNodepool(
             self.zk_chroot_fixture.zookeeper_host,
             self.zk_chroot_fixture.zookeeper_port,
-            self.zk_chroot_fixture.zookeeper_chroot)
+            self.zk_chroot_fixture.zookeeper_chroot,
+            self.zk_auth,
+        )
 
         if not KEEP_TEMPDIRS:
             tmp_root = self.useFixture(fixtures.TempDir(
@@ -3662,6 +3682,7 @@ class ZuulTestCase(BaseTestCase):
 
         self.sched_app = SchedulerTestApp(self.log, self.config,
                                           self.zk_config,
+                                          self.zk_auth,
                                           self.connections)
         self.sched = self.sched_app.sched
         self.event_queues = self.sched_app.event_queues + self.event_queues
@@ -3970,6 +3991,8 @@ class ZuulTestCase(BaseTestCase):
             self.zk_chroot_fixture.zookeeper_host,
             self.zk_chroot_fixture.zookeeper_port,
             self.zk_chroot_fixture.zookeeper_chroot)
+        self.zk_auth = zuul.zk_auth.ZKAuth(dict(
+            username="super", password="adminsecret"))
 
     def copyDirToRepo(self, project, source_path):
         self.init_repo(project)
