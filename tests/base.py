@@ -52,12 +52,14 @@ import gear
 import fixtures
 import kazoo.client
 import kazoo.exceptions
+import kazoo.security
 import pymysql
 import psycopg2
 import psycopg2.extensions
 import testtools
 import testtools.content
 import testtools.content_type
+from typing import Iterable, Tuple
 from git.exc import NoSuchPathError
 import yaml
 import paramiko
@@ -3113,12 +3115,16 @@ class ChrootedKazooFixture(fixtures.Fixture):
 
         rand_test_path = '%s_%s_%s' % (random_bits, os.getpid(), self.test_id)
         self.zookeeper_chroot = "/nodepool_test/%s" % rand_test_path
-
+        acl = (kazoo.security.make_acl(
+            "sasl", "super:adminsecret", all=True),)
+        auth_data = (("sasl", "super:adminsecret"),)
         self.addCleanup(self._cleanup)
 
         # Ensure the chroot path exists and clean up any pre-existing znodes.
         _tmp_client = kazoo.client.KazooClient(
-            hosts='%s:%s' % (self.zookeeper_host, self.zookeeper_port))
+            hosts='%s:%s' % (self.zookeeper_host, self.zookeeper_port),
+            auth_data=auth_data,
+            default_acl=acl)
         _tmp_client.start()
 
         if _tmp_client.exists(self.zookeeper_chroot):
@@ -3131,8 +3137,13 @@ class ChrootedKazooFixture(fixtures.Fixture):
     def _cleanup(self):
         '''Remove the chroot path.'''
         # Need a non-chroot'ed client to remove the chroot path
+        acl = (kazoo.security.make_acl(
+            "sasl", "super:adminsecret", all=True),)
+        auth_data = (("sasl", "super:adminsecret"),)
         _tmp_client = kazoo.client.KazooClient(
-            hosts='%s:%s' % (self.zookeeper_host, self.zookeeper_port))
+            hosts='%s:%s' % (self.zookeeper_host, self.zookeeper_port),
+            auth_data=auth_data,
+            default_acl=acl)
         _tmp_client.start()
         _tmp_client.delete(self.zookeeper_chroot, recursive=True)
         _tmp_client.stop()
@@ -3433,6 +3444,7 @@ class SymLink(object):
 
 class SchedulerTestApp:
     def __init__(self, log: Logger, config: ConfigParser, zk_config: str,
+                 zk_auth: Tuple[str, str],
                  connections: ConnectionRegistry):
         self.log = log
         self.config = config
@@ -3455,7 +3467,7 @@ class SchedulerTestApp:
         self.merge_client = RecordingMergeClient(self.config, self.sched)
         self.nodepool = zuul.nodepool.Nodepool(self.sched)
         self.zk = zuul.zk.ZooKeeper(enable_cache=True)
-        self.zk.connect(self.zk_config, timeout=30.0)
+        self.zk.connect(self.zk_config, timeout=30.0, auth_data=zk_auth)
 
         self.sched.setExecutor(self.executor_client)
         self.sched.setMerger(self.merge_client)
@@ -3676,6 +3688,7 @@ class ZuulTestCase(BaseTestCase):
 
         self.sched_app = SchedulerTestApp(self.log, self.config,
                                           self.zk_config,
+                                          self.zk_auth,
                                           self.connections)
         self.sched = self.sched_app.sched
         self.event_queues = self.sched_app.event_queues + self.event_queues
@@ -3981,6 +3994,7 @@ class ZuulTestCase(BaseTestCase):
             self.zk_chroot_fixture.zookeeper_host,
             self.zk_chroot_fixture.zookeeper_port,
             self.zk_chroot_fixture.zookeeper_chroot)
+        self.zk_auth = ("sasl", "super:adminsecret")
 
     def copyDirToRepo(self, project, source_path):
         self.init_repo(project)
