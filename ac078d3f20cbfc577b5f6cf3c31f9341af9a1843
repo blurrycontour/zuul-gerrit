@@ -22,6 +22,30 @@
       "revId": "ac078d3f20cbfc577b5f6cf3c31f9341af9a1843",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_dc412190",
+        "filename": "tests/unit/test_gerrit_crd.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 29485
+      },
+      "writtenOn": "2018-11-23T09:54:42Z",
+      "side": 1,
+      "message": "Oops, will do.",
+      "parentUuid": "3f79a3b5_51e41aa7",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 56,
+        "endChar": 22
+      },
+      "revId": "ac078d3f20cbfc577b5f6cf3c31f9341af9a1843",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
