@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_33713fac",
+        "filename": "releasenotes/notes/resource-usage-stats-bfcd6765ef4a9c86.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-11-26T19:53:23Z",
+      "side": 1,
+      "message": "Trailing whitespace",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 1
+      },
+      "revId": "25016f81e75f330247acb91c6cf8651816f156a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_d336cbdf",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-11-26T19:53:23Z",
+      "side": 1,
+      "message": "Get tenant and project independent of start and end time. They are needed in any case if build is not None.",
+      "range": {
+        "startLine": 202,
+        "startChar": 0,
+        "endLine": 203,
+        "endChar": 62
+      },
+      "revId": "25016f81e75f330247acb91c6cf8651816f156a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_33237fac",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-11-26T19:53:23Z",
+      "side": 1,
+      "message": "resource\u0026duration",
+      "range": {
+        "startLine": 224,
+        "startChar": 46,
+        "endLine": 224,
+        "endChar": 47
+      },
+      "revId": "25016f81e75f330247acb91c6cf8651816f156a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_33485f60",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-11-26T19:53:23Z",
+      "side": 1,
+      "message": "This must be independent from duration. Otherwise the stats will get an offset for every aborted build.",
+      "range": {
+        "startLine": 229,
+        "startChar": 0,
+        "endLine": 233,
+        "endChar": 37
+      },
+      "revId": "25016f81e75f330247acb91c6cf8651816f156a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
