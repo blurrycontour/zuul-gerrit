@@ -54,6 +54,10 @@ class ActionModule(normal.ActionModule):
         '''Allow zuul_return module on localhost.'''
         pass
 
+    def handle_fetch_vault_secrets(self):
+        '''Allow fetch_vault_secrets module on localhost.'''
+        pass
+
     def handle_stat(self):
         '''Allow stat module on localhost if it doesn't touch unsafe files.
 
