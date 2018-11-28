@@ -2325,6 +2325,7 @@ class ZuulTestCase(BaseTestCase):
         self.state_root = os.path.join(self.test_root, "lib")
         self.merger_state_root = os.path.join(self.test_root, "merger-lib")
         self.executor_state_root = os.path.join(self.test_root, "executor-lib")
+        self.jobdir_root = os.path.join(self.test_root, "builds")
 
         if os.path.exists(self.test_root):
             shutil.rmtree(self.test_root)
@@ -2333,6 +2334,7 @@ class ZuulTestCase(BaseTestCase):
         os.makedirs(self.state_root)
         os.makedirs(self.merger_state_root)
         os.makedirs(self.executor_state_root)
+        os.makedirs(self.jobdir_root)
 
         # Make per test copy of Configuration.
         self.setup_config()
@@ -2415,7 +2417,7 @@ class ZuulTestCase(BaseTestCase):
 
         self.executor_server = RecordingExecutorServer(
             self.config, self.connections,
-            jobdir_root=self.test_root,
+            jobdir_root=self.jobdir_root,
             _run_ansible=self.run_ansible,
             _test_root=self.test_root,
             keep_jobdir=KEEP_TEMPDIRS)
