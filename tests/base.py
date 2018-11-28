@@ -2801,7 +2801,8 @@ class ZuulTestCase(BaseTestCase):
         # before noticing they should exit, but they should exit on their own.
         # Further the pydevd threads also need to be whitelisted so debugging
         # e.g. in PyCharm is possible without breaking shutdown.
-        whitelist = ['watchdog',
+        whitelist = ['command',
+                     'watchdog',
                      'pydevd.CommandThread',
                      'pydevd.Reader',
                      'pydevd.Writer',
