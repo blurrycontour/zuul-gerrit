@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_6b3477f9",
+        "filename": "web/src/pages/Builds.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2018-11-28T14:08:44Z",
+      "side": 1,
+      "message": "I think we want only 6 characters here as before? Or is seven a better number?",
+      "revId": "365ba836b8372fc9c4bdf1a342c79f7e29a3bf97",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
