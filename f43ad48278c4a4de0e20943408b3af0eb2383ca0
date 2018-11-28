@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_658a701e",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-11-28T00:21:44Z",
+      "side": 1,
+      "message": "The comment says we need to expire objects when the session calls commit, but the argument expire_on_commit is set to False. The default is True which will expire commits and \"will load from the most recent database state.\"\n\nI\u0027m not sure if the code or the comment is wrong here, but want to point out the discrepancy.",
+      "revId": "f43ad48278c4a4de0e20943408b3af0eb2383ca0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
