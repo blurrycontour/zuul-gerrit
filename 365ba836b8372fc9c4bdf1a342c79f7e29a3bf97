@@ -16,6 +16,24 @@
       "revId": "365ba836b8372fc9c4bdf1a342c79f7e29a3bf97",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_7184640e",
+        "filename": "web/src/pages/Builds.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-11-28T15:01:57Z",
+      "side": 1,
+      "message": "7 is usually the size of short git hash",
+      "parentUuid": "3f79a3b5_6b3477f9",
+      "revId": "365ba836b8372fc9c4bdf1a342c79f7e29a3bf97",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
