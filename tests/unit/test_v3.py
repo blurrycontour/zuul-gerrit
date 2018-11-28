@@ -3320,7 +3320,7 @@ class TestProjectKeys(ZuulTestCase):
 
 class RoleTestCase(ZuulTestCase):
     def _getRolesPaths(self, build, playbook):
-        path = os.path.join(self.test_root, build.uuid,
+        path = os.path.join(self.jobdir_root, build.uuid,
                             'ansible', playbook, 'ansible.cfg')
         roles_paths = []
         with open(path) as f:
