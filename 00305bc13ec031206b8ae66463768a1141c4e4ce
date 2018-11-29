@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_2974358a",
+        "filename": "tests/unit/test_gerrit_crd.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 29485
+      },
+      "writtenOn": "2018-11-29T09:28:02Z",
+      "side": 1,
+      "message": "This is kind of annoying.. once I realised there could be more than 1 test broken by the URL schema I wanted to just instantiate the whole class and run everything with all 3 schemata.. but then I was like am I getting into the whole \"let\u0027s develop a generic system for running tests under a n-ary matrix of parameter values\" thing.. any thoughts?\n\nCould move the URL info into the fake_gerrit thing maybe.",
+      "revId": "00305bc13ec031206b8ae66463768a1141c4e4ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
