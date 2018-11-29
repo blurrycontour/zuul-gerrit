@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "3f79a3b5_da6c5336",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-11-29T20:25:08Z",
+      "side": 1,
+      "message": "This is likely to create a lot of extra info level debugging since every time a change merges in gate queue or reports back in check queue the node requests for all changes remaining in the pipeline will update right? Basically its a shift.\n\nPerhaps this would be better at debug level?",
+      "range": {
+        "startLine": 105,
+        "startChar": 21,
+        "endLine": 105,
+        "endChar": 25
+      },
+      "revId": "157568c85d152303e9eff90d8b2de1ca0a8fe528",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_0cd85deb",
         "filename": "zuul/zk.py",
         "patchSetId": 4
