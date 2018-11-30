@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_0d3ff423",
+        "filename": "zuul/zk.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-11-30T00:28:33Z",
+      "side": 1,
+      "message": "Should this line be moved into self.updateNode()?",
+      "range": {
+        "startLine": 235,
+        "startChar": 12,
+        "endLine": 235,
+        "endChar": 40
+      },
+      "revId": "5ae024ecb88c71c986b933009c31b751cba266a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
