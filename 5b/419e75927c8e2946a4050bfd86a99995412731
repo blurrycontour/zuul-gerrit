@@ -1,0 +1,9 @@
+Code-Review+2: Tobias Henkel <tobias.henkel@bmw.de>
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Workflow+1: Monty Taylor <mordred@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Fri, 30 Nov 2018 17:24:51 +0000
+Reviewed-on: https://review.openstack.org/620989
+Project: openstack-infra/zuul
+Branch: refs/heads/master
