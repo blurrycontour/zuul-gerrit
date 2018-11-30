@@ -22,6 +22,23 @@
       "revId": "5ae024ecb88c71c986b933009c31b751cba266a7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_4d63ac47",
+        "filename": "zuul/zk.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-11-30T00:30:07Z",
+      "side": 1,
+      "message": "Oh, I intended te remove the nodeid argument from updateNode actually.",
+      "revId": "5ae024ecb88c71c986b933009c31b751cba266a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
