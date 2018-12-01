@@ -589,6 +589,11 @@ class TestWeb(BaseTestWeb):
         resp = self.get_url("api/tenant/non-tenant/jobs")
         self.assertEqual(404, resp.status_code)
 
+    def test_tenant_config(self):
+        info = self.get_url("api/tenant/tenant-one/config").json()
+        self.assertEqual(info['name'], 'tenant-one')
+        self.assertEqual(len(info['projects']), 4)
+
 
 class TestInfo(BaseTestWeb):
 
