@@ -602,6 +602,11 @@ class TestWeb(BaseTestWeb):
         resp = self.get_url("api/tenant/non-tenant/jobs")
         self.assertEqual(404, resp.status_code)
 
+    def test_tenant_config(self):
+        info = self.get_url("api/tenant/tenant-one/config").json()
+        self.assertEqual(info['name'], 'tenant-one')
+        self.assertEqual(len(info['projects']), 4)
+
 
 class TestWebSecrets(BaseTestWeb):
     tenant_config_file = 'config/secrets/main.yaml'
@@ -610,6 +615,11 @@ class TestWebSecrets(BaseTestWeb):
         data = self.get_url('api/tenant/tenant-one/job/project1-secret').json()
         run = data[0]['run']
         self.assertEqual(run[0]['secrets'], [{'name': 'project1_secret'}])
+
+    def test_web_tenant_config_secret(self):
+        info = self.get_url("api/tenant/tenant-one/config").json()
+        self.assertNotIn(
+            'test-password', json.dumps(info), "secret found in config")
 
 
 class TestInfo(BaseTestWeb):
