@@ -276,6 +276,19 @@ class TestWeb(BaseTestWeb):
             'path': 'zuul.yaml',
             'project': 'common-config',
         }
+        run = [{'branch': 'master',
+                'connection': 'gerrit',
+                'path': 'playbooks/project-test1.yaml',
+                'project': 'common-config',
+                'roles': [{
+                    'implicit': True,
+                    'project_canonical_name':
+                    'review.example.com/common-config',
+                    'target_name': 'common-config',
+                    'type': 'zuul'
+                }],
+                'secrets': {},
+                'trusted': True}]
         self.assertEqual([
             {
                 'name': 'project-test1',
@@ -303,6 +316,9 @@ class TestWeb(BaseTestWeb):
                 'protected': None,
                 'required_projects': [],
                 'roles': [common_config_role],
+                'run': run,
+                'pre_run': [],
+                'post_run': [],
                 'semaphore': None,
                 'source_context': source_ctx,
                 'timeout': None,
@@ -335,6 +351,9 @@ class TestWeb(BaseTestWeb):
                 'protected': None,
                 'required_projects': [],
                 'roles': [common_config_role],
+                'run': run,
+                'pre_run': [],
+                'post_run': [],
                 'semaphore': None,
                 'source_context': source_ctx,
                 'timeout': None,
@@ -344,6 +363,7 @@ class TestWeb(BaseTestWeb):
             }], data)
 
         data = self.get_url('api/tenant/tenant-one/job/test-job').json()
+        run[0]['path'] = 'playbooks/project-merge.yaml'
         self.assertEqual([
             {
                 'abstract': False,
@@ -364,6 +384,9 @@ class TestWeb(BaseTestWeb):
                      'override_checkout': None,
                      'project_name': 'review.example.com/org/project'}],
                 'roles': [common_config_role],
+                'run': run,
+                'pre_run': [],
+                'post_run': [],
                 'semaphore': None,
                 'source_context': source_ctx,
                 'timeout': None,
@@ -418,6 +441,9 @@ class TestWeb(BaseTestWeb):
                   'protected': None,
                   'required_projects': [],
                   'roles': [],
+                  'run': [],
+                  'pre_run': [],
+                  'post_run': [],
                   'semaphore': None,
                   'source_context': {
                       'branch': 'master',
@@ -442,6 +468,9 @@ class TestWeb(BaseTestWeb):
                   'protected': None,
                   'required_projects': [],
                   'roles': [],
+                  'run': [],
+                  'pre_run': [],
+                  'post_run': [],
                   'semaphore': None,
                   'source_context': {
                       'branch': 'master',
@@ -466,6 +495,9 @@ class TestWeb(BaseTestWeb):
                   'protected': None,
                   'required_projects': [],
                   'roles': [],
+                  'run': [],
+                  'pre_run': [],
+                  'post_run': [],
                   'semaphore': None,
                   'source_context': {
                       'branch': 'master',
@@ -490,6 +522,9 @@ class TestWeb(BaseTestWeb):
                   'protected': None,
                   'required_projects': [],
                   'roles': [],
+                  'run': [],
+                  'pre_run': [],
+                  'post_run': [],
                   'semaphore': None,
                   'source_context': {
                       'branch': 'master',
