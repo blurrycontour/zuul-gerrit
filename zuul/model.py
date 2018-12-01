@@ -888,6 +888,14 @@ class PlaybookContext(ConfigObject):
         self.secrets = secrets
         self.decrypted_secrets = ()
 
+    def toDict(self):
+        return {
+            'source_context': self.source_context.toDict(),
+            'path': self.path,
+            'roles': list(map(lambda x: x.toDict(), self.roles)),
+            'secrets': [{'name': x.name} for x in self.secrets],
+        }
+
     def __repr__(self):
         return '<PlaybookContext %s %s>' % (self.source_context,
                                             self.path)
@@ -1134,6 +1142,9 @@ class Job(ConfigObject):
         d['timeout'] = self.timeout
         d['attempts'] = self.attempts
         d['roles'] = list(map(lambda x: x.toDict(), self.roles))
+        d['run'] = list(map(lambda x: x.toDict(), self.run))
+        d['pre_run'] = list(map(lambda x: x.toDict(), self.pre_run))
+        d['post_run'] = list(map(lambda x: x.toDict(), self.post_run))
         d['post_review'] = self.post_review
         if self.isBase():
             d['parent'] = None
