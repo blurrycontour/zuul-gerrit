@@ -768,6 +768,57 @@ class TestWeb(BaseTestWeb):
         }
         self.assertIn(expected, resp.json())
 
+    def test_tenant_config_schema(self):
+        info = self.get_url("api/tenant/tenant-one/config").json()
+        self.assertEqual(
+            ['generatedAt', 'layout', 'name', 'projects'],
+            sorted(list(info.keys())))
+        self.assertEqual(int, type(info['generatedAt']))
+        self.assertEqual('tenant-one', info['name'])
+
+        def validateConfigProjects(projects):
+            # Project structure is already tested in other jobs
+            self.assertEqual(4, len(projects))
+
+        def validateConfigJobs(jobs):
+            # Job structure is already tested in other jobs
+            self.assertEqual(9, len(jobs))
+
+        def validateNodesets(nodesets):
+            expected = {
+                'groups': [],
+                'name': 'test-nodeset',
+                'nodes': [{
+                    'aliases': [],
+                    'comment': None,
+                    'hold_job': None,
+                    'label': 'centos-7',
+                    'name': 'controller',
+                    'state': 'unknown'
+                }]
+            }
+            self.assertEqual([expected], nodesets)
+
+        def validatePipelines(pipelines):
+            # Pipeline structure is already tested in other jobs
+            self.assertEqual(4, len(pipelines))
+
+        def validateSecrets(secrets):
+            self.assertEqual([{'name': 'test-secret'}], secrets)
+
+        def validateSemaphores(semaphores):
+            self.assertEqual([{'name': 'test-semaphore'}], semaphores)
+
+        validateConfigProjects(info['projects'])
+        self.assertEqual(
+            ['jobs', 'nodesets', 'pipelines', 'secrets', 'semaphores'],
+            sorted(list(info['layout'].keys())))
+        validateConfigJobs(info['layout']['jobs'])
+        validateNodesets(info['layout']['nodesets'])
+        validatePipelines(info['layout']['pipelines'])
+        validateSecrets(info['layout']['secrets'])
+        validateSemaphores(info['layout']['semaphores'])
+
 
 class TestWebSecrets(BaseTestWeb):
     tenant_config_file = 'config/secrets/main.yaml'
@@ -777,6 +828,11 @@ class TestWebSecrets(BaseTestWeb):
         run = data[0]['run']
         secret = {'name': 'project1_secret', 'alias': 'secret_name'}
         self.assertEqual([secret], run[0]['secrets'])
+
+    def test_web_tenant_config_secret(self):
+        info = self.get_url("api/tenant/tenant-one/config").json()
+        self.assertNotIn(
+            'test-password', json.dumps(info), "secret found in config")
 
 
 class TestInfo(BaseTestWeb):
