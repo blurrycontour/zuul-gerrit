@@ -57,7 +57,8 @@ class BaseTestWeb(ZuulTestCase):
 
         self.executor_server.hold_jobs_in_build = True
 
-        if self.tenant_config_file != 'config/broken/main.yaml':
+        if self.tenant_config_file not in (
+                'config/broken/main.yaml', 'config/secrets/main.yaml'):
             A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
             A.addApproval('Code-Review', 2)
             self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
@@ -277,6 +278,17 @@ class TestWeb(BaseTestWeb):
             'path': 'zuul.yaml',
             'project': 'common-config',
         }
+        run = [{
+            'path': 'playbooks/project-test1.yaml',
+            'roles': [{
+                'implicit': True,
+                'project_canonical_name': 'review.example.com/common-config',
+                'target_name': 'common-config',
+                'type': 'zuul'
+            }],
+            'secrets': [],
+            'source_context': source_ctx,
+        }]
         self.assertEqual([
             {
                 'name': 'project-test1',
@@ -304,6 +316,9 @@ class TestWeb(BaseTestWeb):
                 'protected': None,
                 'required_projects': [],
                 'roles': [common_config_role],
+                'run': run,
+                'pre_run': [],
+                'post_run': [],
                 'semaphore': None,
                 'source_context': source_ctx,
                 'timeout': None,
@@ -336,6 +351,9 @@ class TestWeb(BaseTestWeb):
                 'protected': None,
                 'required_projects': [],
                 'roles': [common_config_role],
+                'run': run,
+                'pre_run': [],
+                'post_run': [],
                 'semaphore': None,
                 'source_context': source_ctx,
                 'timeout': None,
@@ -345,6 +363,7 @@ class TestWeb(BaseTestWeb):
             }], data)
 
         data = self.get_url('api/tenant/tenant-one/job/test-job').json()
+        run[0]['path'] = 'playbooks/project-merge.yaml'
         self.assertEqual([
             {
                 'abstract': False,
@@ -365,6 +384,9 @@ class TestWeb(BaseTestWeb):
                      'override_checkout': None,
                      'project_name': 'review.example.com/org/project'}],
                 'roles': [common_config_role],
+                'run': run,
+                'pre_run': [],
+                'post_run': [],
                 'semaphore': None,
                 'source_context': source_ctx,
                 'timeout': None,
@@ -432,6 +454,9 @@ class TestWeb(BaseTestWeb):
                   'protected': None,
                   'required_projects': [],
                   'roles': [],
+                  'run': [],
+                  'pre_run': [],
+                  'post_run': [],
                   'semaphore': None,
                   'source_context': {
                       'branch': 'master',
@@ -456,6 +481,9 @@ class TestWeb(BaseTestWeb):
                   'protected': None,
                   'required_projects': [],
                   'roles': [],
+                  'run': [],
+                  'pre_run': [],
+                  'post_run': [],
                   'semaphore': None,
                   'source_context': {
                       'branch': 'master',
@@ -480,6 +508,9 @@ class TestWeb(BaseTestWeb):
                   'protected': None,
                   'required_projects': [],
                   'roles': [],
+                  'run': [],
+                  'pre_run': [],
+                  'post_run': [],
                   'semaphore': None,
                   'source_context': {
                       'branch': 'master',
@@ -504,6 +535,9 @@ class TestWeb(BaseTestWeb):
                   'protected': None,
                   'required_projects': [],
                   'roles': [],
+                  'run': [],
+                  'pre_run': [],
+                  'post_run': [],
                   'semaphore': None,
                   'source_context': {
                       'branch': 'master',
@@ -567,6 +601,15 @@ class TestWeb(BaseTestWeb):
 
         resp = self.get_url("api/tenant/non-tenant/jobs")
         self.assertEqual(404, resp.status_code)
+
+
+class TestWebSecrets(BaseTestWeb):
+    tenant_config_file = 'config/secrets/main.yaml'
+
+    def test_web_find_job_secret(self):
+        data = self.get_url('api/tenant/tenant-one/job/project1-secret').json()
+        run = data[0]['run']
+        self.assertEqual(run[0]['secrets'], [{'name': 'project1_secret'}])
 
 
 class TestInfo(BaseTestWeb):
