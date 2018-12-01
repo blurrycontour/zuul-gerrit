@@ -298,6 +298,19 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    def config(self, tenant):
+        config_errors = self.rpc.submitJob(
+            'zuul:config_get', {'tenant': tenant})
+        ret = json.loads(config_errors.data[0])
+        if ret is None:
+            raise cherrypy.HTTPError(404, 'Tenant %s does not exist.' % tenant)
+        resp = cherrypy.response
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        return ret
+
+    @cherrypy.expose
+    @cherrypy.tools.save_params()
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def job(self, tenant, job_name):
         job = self.rpc.submitJob(
             'zuul:job_get', {'tenant': tenant, 'job': job_name})
@@ -656,6 +669,8 @@ class ZuulWeb(object):
                           controller=api, action='build')
         route_map.connect('api', '/api/tenant/{tenant}/config-errors',
                           controller=api, action='config_errors')
+        route_map.connect('api', '/api/tenant/{tenant}/config',
+                          controller=api, action='config')
 
         for connection in connections.connections.values():
             controller = connection.getWebController(self)
