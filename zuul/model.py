@@ -980,6 +980,16 @@ class PlaybookContext(ConfigObject):
             secrets=secrets,
             path=self.path)
 
+    def toSchemaDict(self):
+        # Render to a dict to use in REST api
+        return {
+            'source_context': self.source_context.toDict(),
+            'path': self.path,
+            'roles': list(map(lambda x: x.toDict(), self.roles)),
+            'secrets': [{'name': secret.name, 'alias': secret.alias}
+                        for secret in self.secrets],
+        }
+
 
 class Role(ConfigObject, metaclass=abc.ABCMeta):
     """A reference to an ansible role."""
@@ -1160,6 +1170,9 @@ class Job(ConfigObject):
         d['timeout'] = self.timeout
         d['attempts'] = self.attempts
         d['roles'] = list(map(lambda x: x.toDict(), self.roles))
+        d['run'] = list(map(lambda x: x.toSchemaDict(), self.run))
+        d['pre_run'] = list(map(lambda x: x.toSchemaDict(), self.pre_run))
+        d['post_run'] = list(map(lambda x: x.toSchemaDict(), self.post_run))
         d['post_review'] = self.post_review
         if self.isBase():
             d['parent'] = None
