@@ -702,7 +702,7 @@ class PipelineManager(object):
             priority = item.getNodePriority()
             for node_request in item.current_build_set.node_requests.values():
                 if node_request.relative_priority != priority:
-                    self.sched.nodepool.reviseNodeRequest(
+                    self.sched.nodepool.reviseRequest(
                         node_request, priority)
         return (changed, nnfi)
 
