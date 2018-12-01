@@ -638,6 +638,56 @@ class TestWebApi(BaseTestWeb):
             expected_pb("playbooks/post-run-02.yaml")
         ], data[0]['post_run'])
 
+    def test_tenant_config_structure(self):
+        info = self.get_url("api/tenant/tenant-one/config").json()
+        self.assertEqual(
+            ['generatedAt', 'layout', 'name', 'projects'],
+            sorted(list(info.keys())))
+        self.assertEqual(int, type(info['generatedAt']))
+        self.assertEqual('tenant-one', info['name'])
+        self.assertConfigProjects(info['projects'])
+        self.assertEqual(
+            ['jobs', 'nodesets', 'pipelines', 'secrets', 'semaphores'],
+            sorted(list(info['layout'].keys())))
+        self.assertConfigJobs(info['layout']['jobs'])
+        self.assertNodesets(info['layout']['nodesets'])
+        self.assertPipelines(info['layout']['pipelines'])
+        self.assertSecrets(info['layout']['secrets'])
+        self.assertSemaphores(info['layout']['semaphores'])
+
+    def assertConfigProjects(self, projects):
+        # Project structure is already tested in other jobs
+        self.assertEqual(4, len(projects))
+
+    def assertConfigJobs(self, jobs):
+        # Job structure is already tested in other jobs
+        self.assertEqual(9, len(jobs))
+
+    def assertNodesets(self, nodesets):
+        expected = {
+            'groups': [],
+            'name': 'test-nodeset',
+            'nodes': [{
+                'aliases': [],
+                'comment': None,
+                'hold_job': None,
+                'label': 'centos-7',
+                'name': 'controller',
+                'state': 'unknown'
+            }]
+        }
+        self.assertEqual([expected], nodesets)
+
+    def assertPipelines(self, pipelines):
+        # Pipeline structure is already tested in other jobs
+        self.assertEqual(3, len(pipelines))
+
+    def assertSecrets(self, secrets):
+        self.assertEqual([{'name': 'test-secret'}], secrets)
+
+    def assertSemaphores(self, semaphores):
+        self.assertEqual([{'name': 'test-semaphore'}], semaphores)
+
 
 class TestWebSecrets(BaseTestWeb):
     skip_build_provisioning = True
@@ -647,6 +697,11 @@ class TestWebSecrets(BaseTestWeb):
         data = self.get_url('api/tenant/tenant-one/job/project1-secret').json()
         run = data[0]['run']
         self.assertEqual(run[0]['secrets'], [{'name': 'project1_secret'}])
+
+    def test_web_tenant_config_secret(self):
+        info = self.get_url("api/tenant/tenant-one/config").json()
+        self.assertNotIn(
+            'test-password', json.dumps(info), "secret found in config")
 
 
 class TestInfo(BaseTestWeb):
