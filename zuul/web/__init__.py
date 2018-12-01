@@ -207,6 +207,8 @@ class ZuulWebAPI(object):
         self.cache_expiry = 1
         self.static_cache_expiry = zuulweb.static_cache_expiry
         self.status_lock = threading.Lock()
+        self.config_cache = {}
+        self.config_lock = threading.Lock()
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
@@ -335,6 +337,31 @@ class ZuulWebAPI(object):
         ret = json.loads(config_errors.data[0])
         if ret is None:
             raise cherrypy.HTTPError(404, 'Tenant %s does not exist.' % tenant)
+        resp = cherrypy.response
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        return ret
+
+    @cherrypy.expose
+    @cherrypy.tools.save_params()
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    def config(self, tenant):
+        now = time.time()
+        with self.config_lock:
+            if tenant not in self.config_cache or \
+               now > self.config_cache[tenant]["ttl"]:
+                data = self.rpc.submitJob(
+                    'zuul:config_get', {'tenant': tenant}).data[0]
+                config = json.loads(data)
+                if config is None:
+                    raise cherrypy.HTTPError(
+                        404, 'Tenant %s does not exist.' % tenant)
+                config["generatedAt"] = int(now)
+                self.config_cache[tenant] = {
+                    "config": config,
+                    # Expire after 1 hour per MB, up to one day
+                    "ttl": now + min(3600 * 24, 3600 * len(data) / 2 ** 20)
+                }
+        ret = self.config_cache[tenant]["config"]
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
         return ret
@@ -798,6 +825,8 @@ class ZuulWeb(object):
                           controller=api, action='buildset')
         route_map.connect('api', '/api/tenant/{tenant}/config-errors',
                           controller=api, action='config_errors')
+        route_map.connect('api', '/api/tenant/{tenant}/config',
+                          controller=api, action='config')
 
         for connection in connections.connections.values():
             controller = connection.getWebController(self)

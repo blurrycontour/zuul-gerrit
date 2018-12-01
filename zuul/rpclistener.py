@@ -75,6 +75,7 @@ class RPCListener(object):
         self.worker.registerFunction("zuul:key_get")
         self.worker.registerFunction("zuul:config_errors_list")
         self.worker.registerFunction("zuul:connection_list")
+        self.worker.registerFunction("zuul:config_get")
 
     def stop(self):
         self.log.debug("Stopping")
@@ -406,24 +407,8 @@ class RPCListener(object):
             gear_job.sendWorkComplete(json.dumps({}))
             return
         result = project.toDict()
-        result['configs'] = []
-        configs = tenant.layout.getAllProjectConfigs(project.canonical_name)
-        for config_obj in configs:
-            config = config_obj.toDict()
-            config['pipelines'] = []
-            for pipeline_name, pipeline_config in sorted(
-                    config_obj.pipelines.items()):
-                pipeline = pipeline_config.toDict()
-                pipeline['name'] = pipeline_name
-                pipeline['jobs'] = []
-                for jobs in pipeline_config.job_list.jobs.values():
-                    job_list = []
-                    for job in jobs:
-                        job_list.append(job.toDict(tenant))
-                    pipeline['jobs'].append(job_list)
-                config['pipelines'].append(pipeline)
-            result['configs'].append(config)
-
+        result['configs'] = tenant.layout.getAllProjectConfigsJson(
+            project.canonical_name)
         gear_job.sendWorkComplete(json.dumps(result, cls=ZuulJSONEncoder))
 
     def handle_project_list(self, job):
@@ -546,3 +531,12 @@ class RPCListener(object):
         for source in self.sched.connections.getSources():
             output.append(source.connection.toDict())
         job.sendWorkComplete(json.dumps(output))
+
+    def handle_config_get(self, job):
+        args = json.loads(job.arguments)
+        tenant = self.sched.abide.tenants.get(args.get("tenant"))
+        if not tenant:
+            job.sendWorkComplete(json.dumps(None))
+            return
+        job.sendWorkComplete(
+            json.dumps(tenant.toDict(), cls=ZuulJSONEncoder))
