@@ -41,6 +41,7 @@ class FakeConfig(object):
 class BaseTestWeb(ZuulTestCase):
     tenant_config_file = 'config/single-tenant/main.yaml'
     config_ini_data = {}
+    skip_build_provisioning = False
 
     def setUp(self):
         super(BaseTestWeb, self).setUp()
@@ -57,7 +58,7 @@ class BaseTestWeb(ZuulTestCase):
 
         self.executor_server.hold_jobs_in_build = True
 
-        if self.tenant_config_file != 'config/broken/main.yaml':
+        if not self.skip_build_provisioning:
             A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
             A.addApproval('Code-Review', 2)
             self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
@@ -262,117 +263,6 @@ class TestWeb(BaseTestWeb):
         self.assertEqual(1, len(data), data)
         self.assertEqual("org/project1", data[0]['project'], data)
 
-    def test_web_find_job(self):
-        # can we fetch the variants for a single job
-        data = self.get_url('api/tenant/tenant-one/job/project-test1').json()
-
-        common_config_role = {
-            'implicit': True,
-            'project_canonical_name': 'review.example.com/common-config',
-            'target_name': 'common-config',
-            'type': 'zuul',
-        }
-        source_ctx = {
-            'branch': 'master',
-            'path': 'zuul.yaml',
-            'project': 'common-config',
-        }
-        self.assertEqual([
-            {
-                'name': 'project-test1',
-                'abstract': False,
-                'attempts': 4,
-                'branches': [],
-                'dependencies': [],
-                'description': None,
-                'files': [],
-                'irrelevant_files': [],
-                'final': False,
-                'implied_branch': None,
-                'nodeset': {
-                    'groups': [],
-                    'name': '',
-                    'nodes': [{'comment': None,
-                               'hold_job': None,
-                               'label': 'label1',
-                               'name': 'controller',
-                               'aliases': [],
-                               'state': 'unknown'}],
-                },
-                'parent': 'base',
-                'post_review': None,
-                'protected': None,
-                'required_projects': [],
-                'roles': [common_config_role],
-                'semaphore': None,
-                'source_context': source_ctx,
-                'timeout': None,
-                'variables': {},
-                'variant_description': '',
-                'voting': True
-            }, {
-                'name': 'project-test1',
-                'abstract': False,
-                'attempts': 3,
-                'branches': ['stable'],
-                'dependencies': [],
-                'description': None,
-                'files': [],
-                'irrelevant_files': [],
-                'final': False,
-                'implied_branch': None,
-                'nodeset': {
-                    'groups': [],
-                    'name': '',
-                    'nodes': [{'comment': None,
-                               'hold_job': None,
-                               'label': 'label2',
-                               'name': 'controller',
-                               'aliases': [],
-                               'state': 'unknown'}],
-                },
-                'parent': 'base',
-                'post_review': None,
-                'protected': None,
-                'required_projects': [],
-                'roles': [common_config_role],
-                'semaphore': None,
-                'source_context': source_ctx,
-                'timeout': None,
-                'variables': {},
-                'variant_description': 'stable',
-                'voting': True
-            }], data)
-
-        data = self.get_url('api/tenant/tenant-one/job/test-job').json()
-        self.assertEqual([
-            {
-                'abstract': False,
-                'attempts': 3,
-                'branches': [],
-                'dependencies': [],
-                'description': None,
-                'files': [],
-                'final': False,
-                'implied_branch': None,
-                'irrelevant_files': [],
-                'name': 'test-job',
-                'parent': 'base',
-                'post_review': None,
-                'protected': None,
-                'required_projects': [
-                    {'override_branch': None,
-                     'override_checkout': None,
-                     'project_name': 'review.example.com/org/project'}],
-                'roles': [common_config_role],
-                'semaphore': None,
-                'source_context': source_ctx,
-                'timeout': None,
-                'variables': {},
-                'variant_description': '',
-                'voting': True
-            }], data)
-
     def test_web_nodes_list(self):
         # can we fetch the nodes list
         data = self.get_url('api/tenant/tenant-one/nodes').json()
@@ -432,6 +322,9 @@ class TestWeb(BaseTestWeb):
                   'protected': None,
                   'required_projects': [],
                   'roles': [],
+                  'run': [],
+                  'pre_run': [],
+                  'post_run': [],
                   'semaphore': None,
                   'source_context': {
                       'branch': 'master',
@@ -456,6 +349,9 @@ class TestWeb(BaseTestWeb):
                   'protected': None,
                   'required_projects': [],
                   'roles': [],
+                  'run': [],
+                  'pre_run': [],
+                  'post_run': [],
                   'semaphore': None,
                   'source_context': {
                       'branch': 'master',
@@ -480,6 +376,9 @@ class TestWeb(BaseTestWeb):
                   'protected': None,
                   'required_projects': [],
                   'roles': [],
+                  'run': [],
+                  'pre_run': [],
+                  'post_run': [],
                   'semaphore': None,
                   'source_context': {
                       'branch': 'master',
@@ -504,6 +403,9 @@ class TestWeb(BaseTestWeb):
                   'protected': None,
                   'required_projects': [],
                   'roles': [],
+                  'run': [],
+                  'pre_run': [],
+                  'post_run': [],
                   'semaphore': None,
                   'source_context': {
                       'branch': 'master',
@@ -569,6 +471,184 @@ class TestWeb(BaseTestWeb):
         self.assertEqual(404, resp.status_code)
 
 
+class TestWebApi(BaseTestWeb):
+    skip_build_provisioning = True
+
+    def test_web_find_job(self):
+        # can we fetch the variants for a single job
+        data = self.get_url('api/tenant/tenant-one/job/project-test1').json()
+
+        common_config_role = {
+            'implicit': True,
+            'project_canonical_name': 'review.example.com/common-config',
+            'target_name': 'common-config',
+            'type': 'zuul',
+        }
+        source_ctx = {
+            'branch': 'master',
+            'path': 'zuul.yaml',
+            'project': 'common-config',
+        }
+        run = [{
+            'path': 'playbooks/project-test1.yaml',
+            'roles': [{
+                'implicit': True,
+                'project_canonical_name': 'review.example.com/common-config',
+                'target_name': 'common-config',
+                'type': 'zuul'
+            }],
+            'secrets': [],
+            'source_context': source_ctx,
+        }]
+        self.assertEqual([
+            {
+                'name': 'project-test1',
+                'abstract': False,
+                'attempts': 4,
+                'branches': [],
+                'dependencies': [],
+                'description': None,
+                'files': [],
+                'irrelevant_files': [],
+                'final': False,
+                'implied_branch': None,
+                'nodeset': {
+                    'groups': [],
+                    'name': '',
+                    'nodes': [{'comment': None,
+                               'hold_job': None,
+                               'label': 'label1',
+                               'name': 'controller',
+                               'aliases': [],
+                               'state': 'unknown'}],
+                },
+                'parent': 'base',
+                'post_review': None,
+                'protected': None,
+                'required_projects': [],
+                'roles': [common_config_role],
+                'run': run,
+                'pre_run': [],
+                'post_run': [],
+                'semaphore': None,
+                'source_context': source_ctx,
+                'timeout': None,
+                'variables': {},
+                'variant_description': '',
+                'voting': True
+            }, {
+                'name': 'project-test1',
+                'abstract': False,
+                'attempts': 3,
+                'branches': ['stable'],
+                'dependencies': [],
+                'description': None,
+                'files': [],
+                'irrelevant_files': [],
+                'final': False,
+                'implied_branch': None,
+                'nodeset': {
+                    'groups': [],
+                    'name': '',
+                    'nodes': [{'comment': None,
+                               'hold_job': None,
+                               'label': 'label2',
+                               'name': 'controller',
+                               'aliases': [],
+                               'state': 'unknown'}],
+                },
+                'parent': 'base',
+                'post_review': None,
+                'protected': None,
+                'required_projects': [],
+                'roles': [common_config_role],
+                'run': run,
+                'pre_run': [],
+                'post_run': [],
+                'semaphore': None,
+                'source_context': source_ctx,
+                'timeout': None,
+                'variables': {},
+                'variant_description': 'stable',
+                'voting': True
+            }], data)
+
+        data = self.get_url('api/tenant/tenant-one/job/test-job').json()
+        run[0]['path'] = 'playbooks/project-merge.yaml'
+        self.assertEqual([
+            {
+                'abstract': False,
+                'attempts': 3,
+                'branches': [],
+                'dependencies': [],
+                'description': None,
+                'files': [],
+                'final': False,
+                'implied_branch': None,
+                'irrelevant_files': [],
+                'name': 'test-job',
+                'parent': 'base',
+                'post_review': None,
+                'protected': None,
+                'required_projects': [
+                    {'override_branch': None,
+                     'override_checkout': None,
+                     'project_name': 'review.example.com/org/project'}],
+                'roles': [common_config_role],
+                'run': run,
+                'pre_run': [],
+                'post_run': [],
+                'semaphore': None,
+                'source_context': source_ctx,
+                'timeout': None,
+                'variables': {},
+                'variant_description': '',
+                'voting': True
+            }], data)
+
+    def test_web_find_job_complete_playbooks(self):
+        # can we fetch the variants for a single job
+        data = self.get_url('api/tenant/tenant-one/job/complete-job').json()
+
+        def expected_pb(path):
+            return {
+                'path': path,
+                'roles': [{
+                    'implicit': True,
+                    'project_canonical_name':
+                    'review.example.com/common-config',
+                    'target_name': 'common-config',
+                    'type': 'zuul'
+                }],
+                'secrets': [],
+                'source_context': {
+                    'branch': 'master',
+                    'path': 'zuul.yaml',
+                    'project': 'common-config',
+                }
+            }
+        self.assertEqual([
+            expected_pb("playbooks/run.yaml")
+        ], data[0]['run'])
+        self.assertEqual([
+            expected_pb("playbooks/pre-run.yaml")
+        ], data[0]['pre_run'])
+        self.assertEqual([
+            expected_pb("playbooks/post-run-01.yaml"),
+            expected_pb("playbooks/post-run-02.yaml")
+        ], data[0]['post_run'])
+
+
+class TestWebSecrets(BaseTestWeb):
+    skip_build_provisioning = True
+    tenant_config_file = 'config/secrets/main.yaml'
+
+    def test_web_find_job_secret(self):
+        data = self.get_url('api/tenant/tenant-one/job/project1-secret').json()
+        run = data[0]['run']
+        self.assertEqual(run[0]['secrets'], [{'name': 'project1_secret'}])
+
+
 class TestInfo(BaseTestWeb):
 
     def setUp(self):
@@ -616,7 +696,7 @@ class TestInfo(BaseTestWeb):
 
 
 class TestTenantInfoConfigBroken(BaseTestWeb):
-
+    skip_build_provisioning = True
     tenant_config_file = 'config/broken/main.yaml'
 
     def test_tenant_info_broken_config(self):
