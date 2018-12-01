@@ -203,6 +203,8 @@ class ZuulWebAPI(object):
         self.cache_expiry = 1
         self.static_cache_expiry = zuulweb.static_cache_expiry
         self.status_lock = threading.Lock()
+        self.config_cache = {}
+        self.config_lock = threading.Lock()
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
@@ -289,6 +291,28 @@ class ZuulWebAPI(object):
         config_errors = self.rpc.submitJob(
             'zuul:config_errors_list', {'tenant': tenant})
         ret = json.loads(config_errors.data[0])
+        if ret is None:
+            raise cherrypy.HTTPError(404, 'Tenant %s does not exist.' % tenant)
+        resp = cherrypy.response
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        return ret
+
+    @cherrypy.expose
+    @cherrypy.tools.save_params()
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    def config(self, tenant):
+        with self.config_lock:
+            if tenant not in self.config_cache or \
+               time.time() > self.config_cache[tenant]["ttl"]:
+                config_data = self.rpc.submitJob(
+                    'zuul:config_get', {'tenant': tenant}).data[0]
+                self.config_cache[tenant] = {
+                    "config": json.loads(config_data),
+                    # Expire after 1 hour per MB, up to one day
+                    "ttl": time.time() + min(3600 * 24,
+                                             3600 * len(config_data) / 2 ** 20)
+                }
+        ret = self.config_cache[tenant]["config"]
         if ret is None:
             raise cherrypy.HTTPError(404, 'Tenant %s does not exist.' % tenant)
         resp = cherrypy.response
@@ -656,6 +680,8 @@ class ZuulWeb(object):
                           controller=api, action='build')
         route_map.connect('api', '/api/tenant/{tenant}/config-errors',
                           controller=api, action='config_errors')
+        route_map.connect('api', '/api/tenant/{tenant}/config',
+                          controller=api, action='config')
 
         for connection in connections.connections.values():
             controller = connection.getWebController(self)
