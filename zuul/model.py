@@ -3537,6 +3537,31 @@ class Layout(object):
         self.semaphores = {}
         self.loading_errors = LoadingErrors()
 
+    def toDict(self):
+        d = {
+            'pipelines': [],
+            'jobs': [],
+            'nodesets': [],
+            'secrets': [],
+            'semaphores': [],
+        }
+        for pipeline in self.pipelines.keys():
+            d['pipelines'].append({'name': pipeline})
+        for job_name in sorted(self.jobs):
+            if job_name == "noop":
+                continue
+            dj = []
+            for job in self.jobs[job_name]:
+                dj.append(job.toDict(self.tenant))
+            d['jobs'].append(dj)
+        for nodeset in sorted(self.nodesets):
+            d['nodesets'].append(self.nodesets[nodeset].toDict())
+        for secret in sorted(self.secrets):
+            d['secrets'].append({'name': secret})
+        for semaphore in sorted(self.semaphores):
+            d['semaphores'].append({'name': semaphore})
+        return d
+
     def getJob(self, name):
         if name in self.jobs:
             return self.jobs[name][0]
@@ -3705,6 +3730,28 @@ class Layout(object):
         except TemplateNotFoundError as e:
             self.log.warning("%s for project %s" % (e, name))
             return []
+
+    def getAllProjectConfigsJson(self, name):
+        ret = []
+        configs = self.getAllProjectConfigs(name)
+        for config_obj in configs:
+            config = config_obj.toDict()
+            config['pipelines'] = []
+            for pipeline_name, pipeline_config in sorted(
+                    config_obj.pipelines.items()):
+                pipeline = pipeline_config.toDict()
+                pipeline['name'] = pipeline_name
+                pipeline['jobs'] = []
+                for job_name, jobs in pipeline_config.job_list.jobs.items():
+                    if job_name == "noop":
+                        continue
+                    job_list = []
+                    for job in jobs:
+                        job_list.append(job.toDict(self.tenant))
+                    pipeline['jobs'].append(job_list)
+                config['pipelines'].append(pipeline)
+            ret.append(config)
+        return ret
 
     def getProjectMetadata(self, name):
         if name in self.project_metadata:
@@ -4140,6 +4187,25 @@ class Tenant(object):
                             (project,))
         hostname_dict[project.canonical_hostname] = project
         self.project_configs[project.canonical_name] = tpc
+
+    def toDict(self):
+        d = {
+            'name': self.name,
+            'projects': [],
+            'layout': self.layout.toDict(),
+        }
+        for project in self.config_projects:
+            dp = project.toDict()
+            dp['type'] = "config"
+            d['projects'].append(dp)
+        for project in self.untrusted_projects:
+            dp = project.toDict()
+            dp['type'] = "untrusted"
+            d['projects'].append(dp)
+        for project in d['projects']:
+            project['configs'] = self.layout.getAllProjectConfigsJson(
+                project['canonical_name'])
+        return d
 
     def getProject(self, name):
         """Return a project given its name.
