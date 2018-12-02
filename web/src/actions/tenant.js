@@ -12,6 +12,8 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
+export const SET_TENANT = 'SET_TENANT'
+
 export function setTenantAction (name, whiteLabel) {
   let apiPrefix = ''
   let linkPrefix = ''
@@ -24,7 +26,7 @@ export function setTenantAction (name, whiteLabel) {
     defaultRoute = '/tenants'
   }
   return {
-    type: 'SET_TENANT',
+    type: SET_TENANT,
     tenant: {
       name: name,
       whiteLabel: whiteLabel,

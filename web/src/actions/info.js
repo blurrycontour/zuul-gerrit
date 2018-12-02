@@ -12,16 +12,43 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import { fetchInfo } from '../api'
+import * as API from '../api'
 
-export function fetchInfoAction () {
-  return (dispatch) => {
-    return fetchInfo()
-      .then(response => {
-        dispatch({type: 'FETCH_INFO_SUCCESS', info: response.data.info})
-      })
-      .catch(error => {
-        throw (error)
-      })
+export const REQUEST_INFO = 'REQUEST_INFO'
+export const RECEIVE_INFO = 'RECEIVE_INFO'
+
+export const requestInfo = () => ({
+  type: REQUEST_INFO
+})
+
+export const receiveInfo = json => ({
+  type: RECEIVE_INFO,
+  info: json.info,
+  receivedAt: Date.now()
+})
+
+const fetchInfo = () => dispatch => {
+  dispatch(requestInfo())
+  return API.fetchInfo()
+    .then(response => dispatch(receiveInfo(response.data)))
+    .catch(error => {
+      throw (error)
+    })
+}
+
+const shouldFetchInfo = state => {
+  const info = state.info
+  if (!info) {
+    return true
+  }
+  if (info.isFetching) {
+    return false
+  }
+  return true
+}
+
+export const fetchInfoIfNeeded = () => (dispatch, getState) => {
+  if (shouldFetchInfo(getState())) {
+    return dispatch(fetchInfo())
   }
 }

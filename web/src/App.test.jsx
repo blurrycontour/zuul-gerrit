@@ -19,7 +19,7 @@ import ReactDOM from 'react-dom'
 import { Link, BrowserRouter as Router } from 'react-router-dom'
 import { Provider } from 'react-redux'
 
-import { fetchInfoAction } from './actions/info'
+import { fetchInfoIfNeeded } from './actions/info'
 import createZuulStore from './store'
 import App from './App'
 import TenantsPage from './pages/Tenants'
@@ -54,7 +54,7 @@ it('renders multi tenant', () => {
   const application = ReactTestUtils.renderIntoDocument(
     <Provider store={store}><Router><App /></Router></Provider>
   )
-  store.dispatch(fetchInfoAction()).then(() => {
+  store.dispatch(fetchInfoIfNeeded()).then(() => {
     // Link should be tenant scoped
     const topMenuLinks = ReactTestUtils.scryRenderedComponentsWithType(
       application, Link)
@@ -63,7 +63,7 @@ it('renders multi tenant', () => {
     // Location should be /tenants
     expect(location.pathname).toEqual('/tenants')
     // Info should tell multi tenants
-    expect(store.getState().info.tenant).toEqual(undefined)
+    expect(store.getState().info.info.tenant).toEqual(undefined)
     // Tenants list has been rendered
     expect(ReactTestUtils.findRenderedComponentWithType(
       application, TenantsPage)).not.toEqual(null)
@@ -86,7 +86,7 @@ it('renders single tenant', () => {
     <Provider store={store}><Router><App /></Router></Provider>
   )
 
-  store.dispatch(fetchInfoAction()).then(() => {
+  store.dispatch(fetchInfoIfNeeded()).then(() => {
     // Link should be white-label scoped
     const topMenuLinks = ReactTestUtils.scryRenderedComponentsWithType(
       application, Link)
@@ -95,7 +95,7 @@ it('renders single tenant', () => {
     // Location should be /status
     expect(location.pathname).toEqual('/status')
     // Info should tell white label tenant openstack
-    expect(store.getState().info.tenant).toEqual('openstack')
+    expect(store.getState().info.info.tenant).toEqual('openstack')
     // Status page has been rendered
     expect(ReactTestUtils.findRenderedComponentWithType(
       application, StatusPage)).not.toEqual(null)

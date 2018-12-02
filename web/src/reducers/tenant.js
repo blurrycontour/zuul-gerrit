@@ -12,9 +12,11 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-export default (state = {}, action) => {
+import { SET_TENANT } from '../actions/tenant'
+
+export default (state = {name: null}, action) => {
   switch (action.type) {
-    case 'SET_TENANT':
+    case SET_TENANT:
       return action.tenant
     default:
       return state
