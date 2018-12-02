@@ -13,6 +13,7 @@
 // under the License.
 
 import * as API from '../api'
+import { addApiError } from './errors'
 
 export const REQUEST_INFO = 'REQUEST_INFO'
 export const RECEIVE_INFO = 'RECEIVE_INFO'
@@ -32,7 +33,8 @@ const fetchInfo = () => dispatch => {
   return API.fetchInfo()
     .then(response => dispatch(receiveInfo(response.data)))
     .catch(error => {
-      throw (error)
+      dispatch(addApiError(error))
+      setTimeout(() => {dispatch(fetchInfo())}, 5000)
     })
 }
 
