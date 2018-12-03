@@ -295,6 +295,27 @@ class GithubEventConnector(threading.Thread):
 
         return event
 
+    def _event_delete(self, body):
+        base_repo = body.get('repository')
+
+        event = GithubTriggerEvent()
+        event.trigger_name = 'github'
+        event.project_name = base_repo.get('full_name')
+        event.type = 'delete'
+        event.branch_updated = True
+
+        # Special case event translation for deleted branch or tag events.
+        event.ref = body.get('ref')
+        event.oldrev = EMPTY_GIT_REF
+        event.newrev = EMPTY_GIT_REF
+        event.branch_created = False
+        event.branch_deleted = True
+
+        project = self.connection.source.getProject(event.project_name)
+        self.connection._clearBranchCache(project)
+
+        return event
+
     def _event_pull_request(self, body):
         action = body.get('action')
         pr_body = body.get('pull_request')
