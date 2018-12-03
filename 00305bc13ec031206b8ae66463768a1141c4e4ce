@@ -16,6 +16,24 @@
       "revId": "00305bc13ec031206b8ae66463768a1141c4e4ce",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_16cd945a",
+        "filename": "tests/unit/test_gerrit_crd.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-12-03T13:09:52Z",
+      "side": 1,
+      "message": "Fwiw, there\u0027s actually such a system, although we\u0027re not currently using it in zuul. It\u0027s called testscenarios. You can see an example of its use here http://git.openstack.org/cgit/openstack/openstacksdk/tree/openstack/tests/unit/test__adapter.py\n\nBut I think for now, what you\u0027ve got here is fine.",
+      "parentUuid": "3f79a3b5_2974358a",
+      "revId": "00305bc13ec031206b8ae66463768a1141c4e4ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
