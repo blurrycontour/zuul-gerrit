@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_b1bce0b6",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-12-03T22:42:14Z",
+      "side": 1,
+      "message": "Non-leaders could watch both the incoming and outgoing stream, keep a running history of the last X minutes of events which haven\u0027t made it into zookeeper, and, if they become leader, report those from the backlog.\n\nIt\u0027s a lot like B, but storing the data in memory twice (in the ingestor processes) instead of in ZK twice.",
+      "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_d1b71cd1",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-12-03T22:42:14Z",
+      "side": 1,
+      "message": "We could consider not supporting multiple ingestors, and instead make them standalone processes which are very small and quick to restart.  I think this would be acceptable, but if we can do A or B, we should.  They degrade to this case anyway if you only run one.",
+      "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_71d408f1",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-12-03T22:42:14Z",
+      "side": 1,
+      "message": "This is where the biggest unanswered questions are.\n\nAre you suggesting we store the parsed config as a single object, or is that just the root, and under there we would have \".../jobs/...\" etc?\n\nWe can still store the parsed branch config globally.  When a change happens, we can just lock the global config and whoever gets the lock gets to update it.\n\nIf we only store the global config, should we also store per-tenant configs?  Should they reference global config objects \"by reference\" (eg, znode ids?).\n\nSame question for dynamic layouts (ie, per-change configs).\n\nIn general, these suggest two ends of a spectrum: storing a lot of config in zk, or storing very little.  If we store the global parsed config, per-tenant layout, and (where necessary) per-change layout, we\u0027ll be storing a lot in ZK.\n\nIf we wanted to store as little as possible, I\u0027d suggest only storing the global parsed config in zk, and then have each scheduler process generate its own copy of the per-tenant config (whenever the underlying objects or configuration changed).  The zuul-web process could do the same so that it sees the same view of the data.  And whenever a dynamic layout is needed, the scheduler which is processing that pipeline at the time can generate the dynamic layout, keep it in memory until it has finished the pipeline, then discard it (after having recorded the frozen jobs in ZK).\n\nThe middle ground is probably closer to what you describe -- keep both the global and per-tenant configs in zk (perhaps with objects by reference), but don\u0027t store dynamic layouts in ZK.  That has the best scaling performance too (in that it doesn\u0027t cause ZK to scale eponentially with change volume).",
+      "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_91d764f4",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-12-03T22:42:14Z",
+      "side": 1,
+      "message": "Or, we could make the SQL database integrated (ie, not a reporter) and drop the times database.",
+      "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_31de900f",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-12-03T22:42:14Z",
+      "side": 1,
+      "message": "It\u0027s possible that everything you wrote here could apply to \"pipelines\" rather than tenants.  I think we should seek to have parallel pipeline processors within a tenant, not just parallel tenant processing.  Fortunately, I think that\u0027s not a big change from this.\n\nWe might accomplish this by having the trigger event processor dispatch to tenant+pipeline rather than just tenant.",
+      "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
