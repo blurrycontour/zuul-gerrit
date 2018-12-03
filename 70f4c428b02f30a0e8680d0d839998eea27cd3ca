@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_926769ed",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-12-03T18:32:39Z",
+      "side": 1,
+      "message": "This is already handled by the push event (just verified, github really sends a push event and delete event for that) here.",
+      "range": {
+        "startLine": 277,
+        "startChar": 0,
+        "endLine": 278,
+        "endChar": 39
+      },
+      "revId": "70f4c428b02f30a0e8680d0d839998eea27cd3ca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
