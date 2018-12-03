@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "3f79a3b5_1289196f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-12-03T18:35:45Z",
+      "side": 1,
+      "message": "Deleting via web ui sends the same events. Github sends just both in any case.",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 41
+      },
+      "revId": "70f4c428b02f30a0e8680d0d839998eea27cd3ca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_926769ed",
         "filename": "zuul/driver/github/githubconnection.py",
         "patchSetId": 1
