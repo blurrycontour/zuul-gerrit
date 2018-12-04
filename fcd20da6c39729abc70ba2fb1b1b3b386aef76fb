@@ -19,6 +19,40 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_966add4d",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-12-04T18:26:44Z",
+      "side": 1,
+      "message": "I was thinking the same thing, and I like it. But I\u0027m also concerned we\u0027re over-valueing 100% ingestion.",
+      "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_3687490d",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-12-04T18:26:44Z",
+      "side": 1,
+      "message": "Dedupe by hash is actually the perfect strategy. Don\u0027t even store an event if it already exists. Ordering them can be a bit complex though, as the receivers will need to keep track of which event they got previously and assign an order counter when they write, but if they don\u0027t write because the record already exists, they need to ensure that they adapt their ordering properly. I believe we\u0027ve *almost* reimplemented Kafka at that point.",
+      "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_d1b71cd1",
         "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 2
@@ -30,6 +64,57 @@
       "writtenOn": "2018-12-03T22:42:14Z",
       "side": 1,
       "message": "We could consider not supporting multiple ingestors, and instead make them standalone processes which are very small and quick to restart.  I think this would be acceptable, but if we can do A or B, we should.  They degrade to this case anyway if you only run one.",
+      "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_568a0512",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-12-04T18:26:44Z",
+      "side": 1,
+      "message": "Is the stream implemented as a safe messaging system? IIRC, it\u0027s just a stream, and as such, messages will be sent if there are subscribers, and if not, they just go into the bit bucket. As such I\u0027d say it\u0027s got to be expected that we might miss messages (such as when the ingestors are partitioned from Gerrit), and so just keeping the ingestor light, reliable, and consistent with a very low leader election/lock timeout would be the simplest course.",
+      "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_f690f143",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-12-04T18:26:44Z",
+      "side": 1,
+      "message": "s/Guthub/Github/",
+      "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_16948d34",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-12-04T18:26:44Z",
+      "side": 1,
+      "message": "Did you mean to remove the \"it won\u0027t harm\" phrase here?",
       "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +138,23 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_b69a795e",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-12-04T18:26:44Z",
+      "side": 1,
+      "message": "I think as little as possible should be in ZK. If it can be re-calculated in a small amount of time, it should just be in memory, but if it\u0027s something large like the global config, it makes sense to maintain a consistent cache for schedulers to share and not have to re-fetch all the git trees.",
+      "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_91d764f4",
         "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 2
@@ -70,6 +172,23 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_d695b530",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-12-04T18:26:44Z",
+      "side": 1,
+      "message": "+1 for that, I think it\u0027s clear that the DB isn\u0027t quite in the right place as a reporter anyway.",
+      "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_31de900f",
         "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 2
@@ -81,6 +200,23 @@
       "writtenOn": "2018-12-03T22:42:14Z",
       "side": 1,
       "message": "It\u0027s possible that everything you wrote here could apply to \"pipelines\" rather than tenants.  I think we should seek to have parallel pipeline processors within a tenant, not just parallel tenant processing.  Fortunately, I think that\u0027s not a big change from this.\n\nWe might accomplish this by having the trigger event processor dispatch to tenant+pipeline rather than just tenant.",
+      "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_76a4e1a4",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-12-04T18:26:44Z",
+      "side": 1,
+      "message": "IMO it\u0027s not enough to have auth and TLS. We will need to keep those secrets encrypted in ZK, since writing anything to ZK means it will be in the ZK transaction log, unlike gearman which keeps the queues in memory. We can have the executors place a public key into ZK, and schedulers then re-encrypt job secrets to that key upon an executor claiming the job.",
       "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
