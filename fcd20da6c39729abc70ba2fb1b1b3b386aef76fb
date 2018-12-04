@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_8c841059",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-12-04T20:01:36Z",
+      "side": 1,
+      "message": "How about we start with pure leader election and support a standalong ingestor? That way we have most of the time ingestion and could later extend that to the 100% variant if we want to.\n\nThinking more about that, in case of connection drops and reconnects whithout a crash of the ingestor we can loose events. So if we want 100% ingestion we would also need to cancel leadership instead of a reconnect.",
+      "parentUuid": "3f79a3b5_966add4d",
+      "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_3687490d",
         "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 2
@@ -104,6 +122,24 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_0ceec01f",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-12-04T20:01:36Z",
+      "side": 1,
+      "message": "oops",
+      "parentUuid": "3f79a3b5_f690f143",
+      "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_16948d34",
         "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 2
@@ -115,6 +151,24 @@
       "writtenOn": "2018-12-04T18:26:44Z",
       "side": 1,
       "message": "Did you mean to remove the \"it won\u0027t harm\" phrase here?",
+      "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_ec38249f",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-12-04T20:01:36Z",
+      "side": 1,
+      "message": "I think I can remove the whole sentence as this was written under the assumption that the receiver performs deduplication where it\u0027s actually better to do this on the writer side.",
+      "parentUuid": "3f79a3b5_16948d34",
       "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -155,6 +209,24 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_0cb1e000",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-12-04T20:01:36Z",
+      "side": 1,
+      "message": "My thinking was that we store the per branch parsed config (which you are referring to as global config?) as json blobs under this path. This way we can quickly recalculate the layout of a tenant without having to save too much data in zk which we should avoid. I suggested to store this under a tenant specific path in order to not having to care about race conditions when reconfiguring several tenants sharing a few shared at the same time. I\u0027m not sure if that\u0027s a problem so that\u0027s just pure precaution. We also can keep that really global and protect the updates with locks per project. That way we don\u0027t serialize reconfigurations of several tenants.\n\nThe per tenant config (current non dynamic layout) could be easily cached in memory and updated by each scheduler based on the version and cversion (child version) of each project that is part of the tenant. In case a version or cversion changed, we would need to inject a tenant reconfiguration (possibly without asking the mergers) to rebuild the layout of the tenant.\n\nRegarding the dynamic layout. I also thought that we should just store the frozen jobs in zk as part of the pipeline state. After that we probably don\u0027t need the dynamic layout so there should be no need to store it in zk.",
+      "parentUuid": "3f79a3b5_b69a795e",
+      "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_91d764f4",
         "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 2
@@ -189,6 +261,24 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_4cb91879",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-12-04T20:01:36Z",
+      "side": 1,
+      "message": "+1 for moving sql reporting into zuul itself. But I\u0027m not sure if we should move the times database into sql. I hadn\u0027t yet a really close look into how it exactly works yet. I just saw that the times database consists of small binary files per project/branch/job.",
+      "parentUuid": "3f79a3b5_d695b530",
+      "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_31de900f",
         "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 2
@@ -206,6 +296,24 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_ac38eccb",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-12-04T20:01:36Z",
+      "side": 1,
+      "message": "Right, I\u0027ll change that. This makes the management events slightly more complex but I think that\u0027s ok. These events like reconfigure or tenant-reconfigure typically operate on tenant level. So we might need an rw lock on the tenant and a normal lock on the pipeline. A pipeline would lock both, a management event would only lock the tenant lock.",
+      "parentUuid": "3f79a3b5_31de900f",
+      "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_76a4e1a4",
         "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 2
@@ -217,6 +325,24 @@
       "writtenOn": "2018-12-04T18:26:44Z",
       "side": 1,
       "message": "IMO it\u0027s not enough to have auth and TLS. We will need to keep those secrets encrypted in ZK, since writing anything to ZK means it will be in the ZK transaction log, unlike gearman which keeps the queues in memory. We can have the executors place a public key into ZK, and schedulers then re-encrypt job secrets to that key upon an executor claiming the job.",
+      "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_512c4fb0",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-12-04T20:01:36Z",
+      "side": 1,
+      "message": "Interesting point, but this assumes that you can trust your zookeeper less than your scheduler (as it stores the private keys unencrypted)? Is that really a problem (as we do trust the disks of the scheduler)?",
+      "parentUuid": "3f79a3b5_76a4e1a4",
       "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
