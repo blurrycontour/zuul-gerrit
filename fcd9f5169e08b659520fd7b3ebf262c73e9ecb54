@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_aade943a",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 532,
+      "author": {
+        "id": 27898
+      },
+      "writtenOn": "2018-12-04T16:23:53Z",
+      "side": 1,
+      "message": "Thanks !",
+      "parentUuid": "3f79a3b5_95965a4a",
+      "revId": "fcd9f5169e08b659520fd7b3ebf262c73e9ecb54",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_b5911653",
         "filename": "zuul/model.py",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2018-12-04T15:33:03Z",
       "side": 1,
       "message": "This should be: data.get(\u0027relative_priority\u0027, 0)",
+      "revId": "fcd9f5169e08b659520fd7b3ebf262c73e9ecb54",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_cad99053",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 753,
+      "author": {
+        "id": 27898
+      },
+      "writtenOn": "2018-12-04T16:23:53Z",
+      "side": 1,
+      "message": "Fixed with a False.",
+      "parentUuid": "3f79a3b5_b5911653",
       "revId": "fcd9f5169e08b659520fd7b3ebf262c73e9ecb54",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
