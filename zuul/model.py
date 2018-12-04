@@ -529,6 +529,7 @@ class Node(ConfigObject):
         self.region = None
         self.username = None
         self.hold_expiration = None
+        self.relative_priority = False
 
     @property
     def state(self):
