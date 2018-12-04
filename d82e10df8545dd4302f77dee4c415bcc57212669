@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_d29cdebf",
+        "filename": "doc/source/admin/monitoring.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-12-04T20:17:09Z",
+      "side": 1,
+      "message": "Ok, I can change that. I just have to note that this crashes statsd_exporter if you have no special mathing rules (as those metrics arrive under the same path there). It\u0027s just graphite that separates them by default.\n\nBut since https://github.com/prometheus/statsd_exporter/pull/136 we can get around this.",
+      "parentUuid": "3f79a3b5_71b06b42",
+      "revId": "d82e10df8545dd4302f77dee4c415bcc57212669",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_91abc7d2",
         "filename": "doc/source/admin/monitoring.rst",
         "patchSetId": 9
