@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_bb3824cc",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 752,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-12-04T17:44:24Z",
+      "side": 1,
+      "message": "This object is the node request itself and the priority is an int. So the default really needs to be 0 here.",
+      "revId": "c588ce5f927f4959a6a5ac689b8f83e81ebae150",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
