@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_71470ba6",
+        "filename": "doc/source/governance.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2018-12-04T19:14:14Z",
+      "side": 1,
+      "message": "\"In general, approval [...]\" ?",
+      "range": {
+        "startLine": 27,
+        "startChar": 30,
+        "endLine": 27,
+        "endChar": 39
+      },
+      "revId": "0d48da027b948549310359e02f319c621edbff93",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
