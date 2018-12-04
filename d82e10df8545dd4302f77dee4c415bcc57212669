@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "3f79a3b5_71b06b42",
+        "filename": "doc/source/admin/monitoring.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-12-04T18:51:34Z",
+      "side": 1,
+      "message": "With statsd, I don\u0027t think we need separate current/counter keys -- they have different statsd roots.  So we could just put them under one key and note that they are gauge/counter types.",
+      "revId": "d82e10df8545dd4302f77dee4c415bcc57212669",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_91abc7d2",
+        "filename": "doc/source/admin/monitoring.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-12-04T18:51:34Z",
+      "side": 1,
+      "message": "Same.",
+      "revId": "d82e10df8545dd4302f77dee4c415bcc57212669",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_f93fa820",
         "filename": "zuul/nodepool.py",
         "patchSetId": 9
