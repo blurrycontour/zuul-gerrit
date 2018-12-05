@@ -22,6 +22,23 @@
       "revId": "22c834eb799eb6a43adac904a324526e0543bc8e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_f92beb2e",
+        "filename": "doc/source/user/vulnerabilities.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2018-12-05T14:48:07Z",
+      "side": 1,
+      "message": "I can\u0027t personally add more contacts and keys to this change (mine is already included), but we eventually need more than just two people here in my opinion. If the TODO comment is a concern we can try to find some other way to track this reminder, but not having documentation for this seems worse to me than having documentation which could be improved.",
+      "revId": "22c834eb799eb6a43adac904a324526e0543bc8e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
