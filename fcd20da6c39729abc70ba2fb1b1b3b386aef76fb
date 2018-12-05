@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "3f79a3b5_e8bec27b",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-12-05T08:18:10Z",
+      "side": 1,
+      "message": "Why would the active event gathering go into zuul-web? (Seems more appropriate for the passive one).",
+      "range": {
+        "startLine": 125,
+        "startChar": 33,
+        "endLine": 125,
+        "endChar": 42
+      },
+      "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_b1bce0b6",
         "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 2
@@ -175,6 +198,29 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_e3f6e32c",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-12-05T08:18:10Z",
+      "side": 1,
+      "message": "by a?",
+      "range": {
+        "startLine": 179,
+        "startChar": 40,
+        "endLine": 179,
+        "endChar": 50
+      },
+      "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_71d408f1",
         "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 2
@@ -279,6 +325,24 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_636173d5",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-12-05T08:18:10Z",
+      "side": 1,
+      "message": "I agree. I think for a while we\u0027ve known that we\u0027ll likely require some kind of database to run zuul. We may even choose something that isn\u0027t SQL, but that is a topic for another spec. I think it would be safe to assume for this spec that some sort of database is both required and available. I also think that this change should be part of v4.",
+      "parentUuid": "3f79a3b5_4cb91879",
+      "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_31de900f",
         "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 2
@@ -308,6 +372,24 @@
       "side": 1,
       "message": "Right, I\u0027ll change that. This makes the management events slightly more complex but I think that\u0027s ok. These events like reconfigure or tenant-reconfigure typically operate on tenant level. So we might need an rw lock on the tenant and a normal lock on the pipeline. A pipeline would lock both, a management event would only lock the tenant lock.",
       "parentUuid": "3f79a3b5_31de900f",
+      "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_c33ba797",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2018-12-05T08:18:10Z",
+      "side": 1,
+      "message": "+1 for locking on the pipeline.",
+      "parentUuid": "3f79a3b5_ac38eccb",
       "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
