@@ -39,6 +39,24 @@
       "revId": "22c834eb799eb6a43adac904a324526e0543bc8e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_f949ab8c",
+        "filename": "doc/source/user/vulnerabilities.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-12-05T15:11:41Z",
+      "side": 1,
+      "message": "Granted, we probably should just land this now and ask a few more people to add their contact info afterwards.",
+      "parentUuid": "3f79a3b5_f92beb2e",
+      "revId": "22c834eb799eb6a43adac904a324526e0543bc8e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
