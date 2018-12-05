@@ -346,6 +346,23 @@
       "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_0687780c",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2018-12-05T00:13:45Z",
+      "side": 1,
+      "message": "I\u0027d like for the scheduler to also encrypt the keys on disk so I don\u0027t have to use encrypted volumes. But that\u0027s a story for another day. Suffice to say that you\u0027re right, the trust levels are the same, but I\u0027m holding new development to a higher standard.",
+      "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
