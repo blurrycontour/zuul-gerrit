@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_3ecdd05a",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-12-05T09:15:33Z",
+      "side": 1,
+      "message": "You\u0027re right, while this would be a possible lazy choice, the schedulers are probably the better place if one doesn\u0027t want to start a separate service for this. So I think we should leave this as a deployment choice if the user wants this inside the scheduler(s) or as separate services.",
+      "parentUuid": "3f79a3b5_e8bec27b",
+      "range": {
+        "startLine": 125,
+        "startChar": 33,
+        "endLine": 125,
+        "endChar": 42
+      },
+      "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_b1bce0b6",
         "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 2
@@ -209,6 +233,30 @@
       "writtenOn": "2018-12-05T08:18:10Z",
       "side": 1,
       "message": "by a?",
+      "range": {
+        "startLine": 179,
+        "startChar": 40,
+        "endLine": 179,
+        "endChar": 50
+      },
+      "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_9ef7448f",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-12-05T09:15:33Z",
+      "side": 1,
+      "message": "will fix",
+      "parentUuid": "3f79a3b5_e3f6e32c",
       "range": {
         "startLine": 179,
         "startChar": 40,
@@ -442,6 +490,24 @@
       "writtenOn": "2018-12-05T00:13:45Z",
       "side": 1,
       "message": "I\u0027d like for the scheduler to also encrypt the keys on disk so I don\u0027t have to use encrypted volumes. But that\u0027s a story for another day. Suffice to say that you\u0027re right, the trust levels are the same, but I\u0027m holding new development to a higher standard.",
+      "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_1e19f4d0",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-12-05T09:15:33Z",
+      "side": 1,
+      "message": "Ok, so we should at least encrypt the secrets inside zk with a symmetric cipher (e.g. aes?). I think using public keys will be complicated as this involves a lot of additional round trips when we have multiple schedulers and exeuctors that need secrets or private keys.",
+      "parentUuid": "3f79a3b5_0687780c",
       "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
