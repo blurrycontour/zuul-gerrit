@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_1a4b325e",
+        "filename": "web/package.json",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-12-05T18:49:38Z",
+      "side": 1,
+      "message": "side question: just noticed, is there a reason why we are at exactly 1.1.4 while 2.1.1 is available?",
+      "range": {
+        "startLine": 23,
+        "startChar": 22,
+        "endLine": 23,
+        "endChar": 28
+      },
+      "revId": "f312f68ec6024d40ccc38b9aa955d1c525ef8783",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
