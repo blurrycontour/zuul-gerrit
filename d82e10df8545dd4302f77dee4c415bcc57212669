@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_bdd54e4a",
+        "filename": "doc/source/admin/monitoring.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-12-06T07:34:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f79a3b5_d29cdebf",
+      "revId": "d82e10df8545dd4302f77dee4c415bcc57212669",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_91abc7d2",
         "filename": "doc/source/admin/monitoring.rst",
         "patchSetId": 9
@@ -54,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_ddd28a5f",
+        "filename": "doc/source/admin/monitoring.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-12-06T07:34:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f79a3b5_91abc7d2",
+      "revId": "d82e10df8545dd4302f77dee4c415bcc57212669",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_f93fa820",
         "filename": "zuul/nodepool.py",
         "patchSetId": 9
@@ -65,6 +101,24 @@
       "writtenOn": "2018-12-03T16:14:29Z",
       "side": 1,
       "message": "I wonder if collections.defaultdict would be a good thing to use here ?",
+      "revId": "d82e10df8545dd4302f77dee4c415bcc57212669",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_5de75a46",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-12-06T07:34:50Z",
+      "side": 1,
+      "message": "TIL about collections.defaultdict :)",
+      "parentUuid": "3f79a3b5_f93fa820",
       "revId": "d82e10df8545dd4302f77dee4c415bcc57212669",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
