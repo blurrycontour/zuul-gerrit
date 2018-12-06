@@ -1,0 +1,10 @@
+Code-Review+1: Artem Goncharov <artem.goncharov@gmail.com>
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Code-Review+2: Tobias Henkel <tobias.henkel@bmw.de>
+Workflow+1: Monty Taylor <mordred@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Thu, 06 Dec 2018 19:35:16 +0000
+Reviewed-on: https://review.openstack.org/621386
+Project: openstack-infra/zuul
+Branch: refs/heads/master
