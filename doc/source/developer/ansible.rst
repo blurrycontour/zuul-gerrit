@@ -54,13 +54,15 @@ exposes that log stream over a websocket connection as part of
 .. autoclass:: zuul.web.LogStreamHandler
 .. autoclass:: zuul.web.ZuulWeb
 
-In addition to real-time streaming, Zuul also installs another callback module,
-:py:mod:`zuul.ansible.base.callback.zuul_json.CallbackModule` that collects all
-of the information about a given run into a json file which is written to the
-work dir so that it can be published along with build logs. Since the streaming
+In addition to real-time streaming, Zuul also installs two more callback module,
+:py:mod:`zuul.ansible.base.callback.zuul_json.CallbackModule` and
+:py:mod:`zuul.ansible.base.callback.zuul_yaml.CallbackModule` that collect all
+of the information about a given run into a json and a yaml file which is written
+to the work dir so that it can be published along with build logs. Since the streaming
 log is by necessity a single text stream, choices have to be made for
-readability about what data is shown and what is not shown. The json log file
-is intended to allow for a richer more interactive set of data to be displayed
+readability about what data is shown and what is not shown. The json and yaml log files
+are intended to allow for a richer more interactive set of data to be displayed
 to the user.
 
 .. autoclass:: zuul.ansible.base.callback.zuul_json.CallbackModule
+.. autoclass:: zuul.ansible.base.callback.zuul_yaml.CallbackModule
