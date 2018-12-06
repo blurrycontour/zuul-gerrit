@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_8ebb7372",
+        "filename": "zuul/ansible/callback/zuul_json.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-12-06T16:49:41Z",
+      "side": 1,
+      "message": "Could also use a local variable instead so it goes out of scope more quickly. (Though at this point in the job run that is likely to happen quickly anyway).",
+      "range": {
+        "startLine": 176,
+        "startChar": 12,
+        "endLine": 176,
+        "endChar": 23
+      },
+      "revId": "394914ea29c6bd259c40df1e4818f7c7e76c7210",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
