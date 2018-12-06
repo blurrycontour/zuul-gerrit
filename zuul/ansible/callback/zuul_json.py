@@ -63,11 +63,6 @@ class CallbackModule(CallbackBase):
         self.output_path = os.path.splitext(
             logging_config.job_output_file)[0] + '.json'
 
-        # For now, just read in the old file and write it all out again
-        # This may well not scale from a memory perspective- but let's see how
-        # it goes.
-        if os.path.exists(self.output_path):
-            self.output = json.load(open(self.output_path, 'r'))
         self._playbook_name = None
 
     def _new_playbook(self, play):
@@ -173,6 +168,12 @@ class CallbackModule(CallbackBase):
 
         self.playbook['plays'] = self.results
         self.playbook['stats'] = summary
+
+        # For now, just read in the old file and write it all out again
+        # This may well not scale from a memory perspective- but let's see how
+        # it goes.
+        if os.path.exists(self.output_path):
+            self.output = json.load(open(self.output_path, 'r'))
         self.output.append(self.playbook)
 
         json.dump(self.output, open(self.output_path, 'w'),
