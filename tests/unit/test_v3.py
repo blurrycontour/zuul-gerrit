@@ -22,6 +22,7 @@ import time
 from unittest import skip
 
 import paramiko
+import yaml
 
 import zuul.configloader
 from zuul.lib import encryption
@@ -4149,6 +4150,12 @@ class TestJobOutput(AnsibleZuulTestCase):
                                       'work/logs/job-output.json'))
         self.assertEqual(token,
                          j[0]['plays'][0]['tasks'][0]
+                         ['hosts']['localhost']['stdout'])
+
+        jy = list(yaml.load_all(
+            self._get_file(self.history[0], 'work/logs/job-output.yaml')))
+        self.assertEqual(token,
+                         jy[0]['plays'][0]['tasks'][0]
                          ['hosts']['localhost']['stdout'])
 
         self.log.info(self._get_file(self.history[0],
