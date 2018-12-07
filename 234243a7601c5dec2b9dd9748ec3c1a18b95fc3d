@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "3f79a3b5_55938dfe",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-12-07T19:22:19Z",
+      "side": 1,
+      "message": "The expected hostname is checked here.",
+      "range": {
+        "startLine": 164,
+        "startChar": 0,
+        "endLine": 168,
+        "endChar": 73
+      },
+      "revId": "234243a7601c5dec2b9dd9748ec3c1a18b95fc3d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_77e331a0",
         "filename": "zuul/executor/server.py",
         "patchSetId": 2
@@ -13,6 +36,24 @@
       "writtenOn": "2018-12-07T17:14:09Z",
       "side": 1,
       "message": "This is missing a format.",
+      "revId": "234243a7601c5dec2b9dd9748ec3c1a18b95fc3d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_15fc353e",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1097,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-12-07T19:22:19Z",
+      "side": 1,
+      "message": "This is intentionally as the executors statsd object inserts this centrally.",
+      "parentUuid": "3f79a3b5_77e331a0",
       "revId": "234243a7601c5dec2b9dd9748ec3c1a18b95fc3d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
