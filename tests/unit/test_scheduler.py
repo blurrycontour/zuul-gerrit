@@ -164,6 +164,8 @@ class TestScheduler(ZuulTestCase):
         exec_key = 'zuul.executor.%s' % self.executor_server.hostname.replace(
             '.', '_')
         self.assertReportedStat(exec_key + '.builds', value='1', kind='c')
+        self.assertReportedStat(exec_key + '.starting_builds', kind='g')
+        self.assertReportedStat(exec_key + '.starting_builds', kind='ms')
         self.assertReportedStat('zuul.nodepool.requested', value='1', kind='c')
         self.assertReportedStat('zuul.nodepool.requested.label.label1',
                                 value='1', kind='c')

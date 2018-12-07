@@ -145,10 +145,11 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
       Incremented each time the executor starts a build.
 
    .. stat:: starting_builds
-      :type: gauge
+      :type: gauge, timer
 
-      The number of builds starting on this executor.  These are
-      builds which have not yet begun their first pre-playbook.
+      The number of builds starting on this executor and a timer containing
+      how long jobs were in this state. These are builds which have not yet
+      begun their first pre-playbook.
 
    .. stat:: running_builds
       :type: gauge
