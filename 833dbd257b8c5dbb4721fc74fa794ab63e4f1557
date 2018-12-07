@@ -22,6 +22,30 @@
       "revId": "833dbd257b8c5dbb4721fc74fa794ab63e4f1557",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_e54a3dac",
+        "filename": "web/src/actions/status.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-12-07T00:49:14Z",
+      "side": 1,
+      "message": "It\u0027s a very convenient promise, it can probably be used in test to ensure the spinner is spinning. I\u0027ll try that in a follow-up.",
+      "parentUuid": "3f79a3b5_da9e1ab5",
+      "range": {
+        "startLine": 37,
+        "startChar": 0,
+        "endLine": 42,
+        "endChar": 3
+      },
+      "revId": "833dbd257b8c5dbb4721fc74fa794ab63e4f1557",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
