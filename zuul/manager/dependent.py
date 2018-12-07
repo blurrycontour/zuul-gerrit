@@ -28,56 +28,6 @@ class DependentPipelineManager(PipelineManager):
     def __init__(self, *args, **kwargs):
         super(DependentPipelineManager, self).__init__(*args, **kwargs)
 
-    def _postConfig(self, layout):
-        super(DependentPipelineManager, self)._postConfig(layout)
-        self.buildChangeQueues(layout)
-
-    def buildChangeQueues(self, layout):
-        self.log.debug("Building shared change queues")
-        change_queues = {}
-        tenant = self.pipeline.tenant
-        layout_project_configs = layout.project_configs
-
-        for project_name, project_configs in layout_project_configs.items():
-            (trusted, project) = tenant.getProject(project_name)
-            queue_name = None
-            project_in_pipeline = False
-            for project_config in layout.getAllProjectConfigs(project_name):
-                project_pipeline_config = project_config.pipelines.get(
-                    self.pipeline.name)
-                if project_pipeline_config is None:
-                    continue
-                project_in_pipeline = True
-                queue_name = project_pipeline_config.queue_name
-                if queue_name:
-                    break
-            if not project_in_pipeline:
-                continue
-            if queue_name and queue_name in change_queues:
-                change_queue = change_queues[queue_name]
-            else:
-                p = self.pipeline
-                change_queue = model.ChangeQueue(
-                    p,
-                    window=p.window,
-                    window_floor=p.window_floor,
-                    window_increase_type=p.window_increase_type,
-                    window_increase_factor=p.window_increase_factor,
-                    window_decrease_type=p.window_decrease_type,
-                    window_decrease_factor=p.window_decrease_factor,
-                    name=queue_name)
-                if queue_name:
-                    # If this is a named queue, keep track of it in
-                    # case it is referenced again.  Otherwise, it will
-                    # have a name automatically generated from its
-                    # constituent projects.
-                    change_queues[queue_name] = change_queue
-                self.pipeline.addQueue(change_queue)
-                self.log.debug("Created queue: %s" % change_queue)
-            change_queue.addProject(project)
-            self.log.debug("Added project %s to queue: %s" %
-                           (project, change_queue))
-
     def getChangeQueue(self, change, existing=None):
         if existing:
             return StaticChangeQueueContextManager(existing)

@@ -2789,11 +2789,6 @@ class ZuulTestCase(BaseTestCase):
         self.assertEmptyQueues()
         self.assertNodepoolState()
         self.assertNoGeneratedKeys()
-        ipm = zuul.manager.independent.IndependentPipelineManager
-        for tenant in self.sched.abide.tenants.values():
-            for pipeline in tenant.layout.pipelines.values():
-                if isinstance(pipeline.manager, ipm):
-                    self.assertEqual(len(pipeline.queues), 0)
 
     def shutdown(self):
         self.log.debug("Shutting down after tests")
