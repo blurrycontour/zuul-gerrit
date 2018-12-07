@@ -22,6 +22,23 @@
       "revId": "0d48da027b948549310359e02f319c621edbff93",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_0878b02b",
+        "filename": "doc/source/governance.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2018-12-07T02:04:13Z",
+      "side": 1,
+      "message": "Have I missed discussion of the spec process, that seems like it should be in here?\n\nCalling it out as the \"next level up\" in decision making for more major additions and noting it would usually consolidate more free-flowing mailing list or in-person discussions into something actionable.\n\nPerhaps to Josh\u0027s veto point:\n\na) a maintainer who feels strongly about a significant change that has appeared outside the umbrella of an approved spec could request one (essentially a temporary veto), where a spec can formally address the issues\nb) specs should only be finally approved by the project leader?  that\u0027s an effective final veto.  \nc) maintainers are expected to respect the outcome of the spec process\n\nIt seems like a) would be very unlikely (e.g. see current work on zookeeper/etcd/gearman) but could be possible if a third party, say, developed something major out of tree and then decided to \"dump\" the code back into the project.",
+      "revId": "0d48da027b948549310359e02f319c621edbff93",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
