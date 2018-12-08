@@ -166,8 +166,8 @@ be able to invoke the ``gerrit stream-events`` command over SSH.
       :default: true
 
       When a branch is deleted, a ref-updated event is emitted with a
-      newrev of all zeros specified. The ``ignore-deletes`` field is a
-      boolean value that describes whether or not these newrevs
+      newer of all zeros specified. The ``ignore-deletes`` field is a
+      boolean value that describes whether or not these newer
       trigger ref-updated events.
 
    .. attr:: approval
