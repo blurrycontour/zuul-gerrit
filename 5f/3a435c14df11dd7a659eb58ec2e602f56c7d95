@@ -1,0 +1,9 @@
+Code-Review+2: Clark Boylan <cboylan@sapwetik.org>
+Code-Review+2: Paul Belanger <pabelanger@redhat.com>
+Workflow+1: Paul Belanger <pabelanger@redhat.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Sat, 08 Dec 2018 02:13:11 +0000
+Reviewed-on: https://review.openstack.org/623598
+Project: openstack-infra/zuul
+Branch: refs/heads/master
