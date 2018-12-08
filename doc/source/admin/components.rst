@@ -111,7 +111,7 @@ The following sections of ``zuul.conf`` are used by all Zuul components:
    .. attr:: ssl_ca
 
       An openssl file containing a set of concatenated “certification
-      authority” certificates in PEM formet.
+      authority” certificates in PEM format.
 
    .. attr:: ssl_cert
 
@@ -224,7 +224,7 @@ The following sections of ``zuul.conf`` are used by the scheduler:
    .. attr:: ssl_ca
 
       An openssl file containing a set of concatenated “certification
-      authority” certificates in PEM formet.
+      authority” certificates in PEM format.
 
    .. attr:: ssl_cert
 
