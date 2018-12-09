@@ -166,10 +166,10 @@ class StatusPage extends Refreshable {
       <p>
         Queue lengths: <span>{status.trigger_event_queue ?
                               status.trigger_event_queue.length : '0'
-          }</span> events,
+          }</span> events, 
         <span>{status.management_event_queue ?
                status.management_event_queue.length : '0'
-          }</span> management events,
+          }</span> management events, 
         <span>{status.result_event_queue ?
                status.result_event_queue.length : '0'
           }</span> results.
