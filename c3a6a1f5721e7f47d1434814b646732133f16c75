@@ -22,6 +22,30 @@
       "revId": "c3a6a1f5721e7f47d1434814b646732133f16c75",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_423183ba",
+        "filename": "zuul/zk.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-12-09T14:14:01Z",
+      "side": 1,
+      "message": "The znodes update procedure is marked as WIP in the nodepool change: https://review.openstack.org/619155 . Should I copy the procedure in Zuul with the upgrade note?\n\nAFAIU, security is enforced per node acl, which has to be provided by the client. Nodepool and Zuul would have to be upgraded simultaneously using the same set of credentials.",
+      "parentUuid": "3f79a3b5_87632dac",
+      "range": {
+        "startLine": 128,
+        "startChar": 16,
+        "endLine": 128,
+        "endChar": 31
+      },
+      "revId": "c3a6a1f5721e7f47d1434814b646732133f16c75",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
