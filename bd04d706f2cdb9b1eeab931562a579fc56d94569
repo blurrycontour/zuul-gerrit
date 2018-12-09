@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_8711edfb",
+        "filename": "zuul/ansible/actiongeneral/zuul_return.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-12-09T11:37:23Z",
+      "side": 1,
+      "message": "Do we actually need to be able to specify the path in the task? I think this is even a security flaw because we don\u0027t validate the path to be safe.",
+      "range": {
+        "startLine": 76,
+        "startChar": 8,
+        "endLine": 76,
+        "endChar": 42
+      },
+      "revId": "bd04d706f2cdb9b1eeab931562a579fc56d94569",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
