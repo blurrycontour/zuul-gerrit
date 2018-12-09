@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_079b9dc6",
+        "filename": "web/src/containers/status/Pipeline.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-12-09T10:56:24Z",
+      "side": 1,
+      "message": "Also adding \u0027col-sm-6\u0027 would make scale down to one column smoother when narrowing down the window by adding a size where it uses two columns.",
+      "revId": "f519308394f191d976fb1527ffb7845960cd89e4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
