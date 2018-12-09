@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_c7a845db",
+        "filename": "tests/unit/test_default_config.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-12-09T11:08:47Z",
+      "side": 1,
+      "message": "TestDefaultConfigValue",
+      "range": {
+        "startLine": 24,
+        "startChar": 6,
+        "endLine": 24,
+        "endChar": 28
+      },
+      "revId": "21eb52e22582d8550887410805a1cb10ce2f4676",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
