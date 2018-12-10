@@ -39,6 +39,23 @@
       "revId": "0d48da027b948549310359e02f319c621edbff93",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_983623b2",
+        "filename": "doc/source/governance.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 308
+      },
+      "writtenOn": "2018-12-10T09:46:06Z",
+      "side": 1,
+      "message": "The project lead is also the default point of contact for the project, which leads to a lot of external-facing communication work -- might be good to spell it out here as a natural expectation of the role.",
+      "revId": "0d48da027b948549310359e02f319c621edbff93",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
