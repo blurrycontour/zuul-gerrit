@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_3066fc57",
+        "filename": "doc/source/user/jobs.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-12-10T16:19:14Z",
+      "side": 1,
+      "message": "Since we already have a \u0027zuul\u0027 key at the top level, how about we turn that \u0027_\u0027 into a \u0027.\u0027?\n\nThis is currently keyed by label, however labels aren\u0027t unique in a nodeset, so we should probably key it by node name.\n\nSo how about: zuul.resources[\u0027node-name\u0027].context ?",
+      "revId": "4c9bc7a5086b67d9e98f72d6287aa7123605161d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_5061383b",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1622,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2018-12-10T16:19:14Z",
+      "side": 1,
+      "message": "Can you elaborate on this comment?",
+      "revId": "4c9bc7a5086b67d9e98f72d6287aa7123605161d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
