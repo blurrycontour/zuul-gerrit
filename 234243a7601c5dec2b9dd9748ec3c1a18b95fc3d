@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "3f79a3b5_d8eee2b4",
+        "filename": "doc/source/admin/monitoring.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2018-12-10T01:12:37Z",
+      "side": 1,
+      "message": "I\u0027m not quite at -1, but I *really* think that when we\u0027re adding new stats, we should be much more explicit about how to actually use the stats.  For example, in \n\nhttps://review.openstack.org/#/c/620285/2/doc/source/admin/monitoring.rst\n\nI\u0027ve tried to add a paragraph to modified values explaining what a sensible output for the values is (should it be low, should it be high, if it\u0027s trending up/down what does that mean, etc).\n\nIn this change, there\u0027s excellent points from jeblair and yourself in the comments here about interpreting this value which would be great to have captured in the documentation.",
+      "revId": "234243a7601c5dec2b9dd9748ec3c1a18b95fc3d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_55938dfe",
         "filename": "tests/unit/test_scheduler.py",
         "patchSetId": 2
