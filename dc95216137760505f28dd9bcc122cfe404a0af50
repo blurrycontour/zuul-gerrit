@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_2eaa026b",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2192,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-12-11T18:50:21Z",
+      "side": 1,
+      "message": "This change is unneccessary and the reason for the test failures (it changes the ordering).",
+      "range": {
+        "startLine": 2192,
+        "startChar": 0,
+        "endLine": 2192,
+        "endChar": 38
+      },
+      "revId": "dc95216137760505f28dd9bcc122cfe404a0af50",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
