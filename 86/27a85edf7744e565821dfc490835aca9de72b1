@@ -1,0 +1,9 @@
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Code-Review+2: Joshua Hesketh <josh@nitrotech.org>
+Workflow+1: Joshua Hesketh <josh@nitrotech.org>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Tue, 11 Dec 2018 07:37:41 +0000
+Reviewed-on: https://review.openstack.org/623960
+Project: openstack-infra/zuul
+Branch: refs/heads/master
