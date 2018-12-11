@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_ad02ae6f",
+        "filename": "doc/source/user/jobs.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-12-11T06:48:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f79a3b5_3066fc57",
+      "revId": "4c9bc7a5086b67d9e98f72d6287aa7123605161d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_5061383b",
         "filename": "zuul/executor/server.py",
         "patchSetId": 13
@@ -30,6 +48,24 @@
       "writtenOn": "2018-12-10T16:19:14Z",
       "side": 1,
       "message": "Can you elaborate on this comment?",
+      "revId": "4c9bc7a5086b67d9e98f72d6287aa7123605161d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_0df3a2a1",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1622,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-12-11T06:48:36Z",
+      "side": 1,
+      "message": "Since we are storing cluster access credentials in zookeeper, we may want to encrypt them. But it seems like we\u0027ll need a global scheduler public key to do that...",
+      "parentUuid": "3f79a3b5_5061383b",
       "revId": "4c9bc7a5086b67d9e98f72d6287aa7123605161d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
