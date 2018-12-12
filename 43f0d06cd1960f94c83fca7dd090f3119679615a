@@ -46,6 +46,53 @@
       "revId": "43f0d06cd1960f94c83fca7dd090f3119679615a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_9bea6c74",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-12-12T04:27:23Z",
+      "side": 1,
+      "message": "Alright, then I\u0027ll guess we\u0027ll have to bundle the supported ansible versions in the zuul-executor package.",
+      "parentUuid": "3f79a3b5_7d122058",
+      "range": {
+        "startLine": 70,
+        "startChar": 15,
+        "endLine": 71,
+        "endChar": 75
+      },
+      "revId": "43f0d06cd1960f94c83fca7dd090f3119679615a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_bbf2c869",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-12-12T04:27:23Z",
+      "side": 1,
+      "message": "We might not want to have a fully-fledge virtualenv per ansible version. Could we make zuul-executor just starts ansible-root/\u003cminor-version\u003e/bin/ansible-playbook with PYTHON_PATH\u003dansible-root/\u003cminor-version\u003e/python\u003cpython-version\u003e/site-packages/ansible?\n\nLike that we can still share the common libraries with the host site packages.",
+      "range": {
+        "startLine": 76,
+        "startChar": 35,
+        "endLine": 76,
+        "endChar": 45
+      },
+      "revId": "43f0d06cd1960f94c83fca7dd090f3119679615a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
