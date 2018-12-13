@@ -12,11 +12,14 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
+import Axios from 'axios'
+
 import * as API from '../api'
 
 export const BUILD_FETCH_REQUEST = 'BUILD_FETCH_REQUEST'
 export const BUILD_FETCH_SUCCESS = 'BUILD_FETCH_SUCCESS'
 export const BUILD_FETCH_FAIL = 'BUILD_FETCH_FAIL'
+export const BUILD_RESULT_FETCH_SUCCESS = 'BUILD_RESULT_FETCH_SUCCESS'
 
 export const requestBuild = () => ({
   type: BUILD_FETCH_REQUEST
@@ -28,6 +31,12 @@ export const receiveBuild = json => ({
   receivedAt: Date.now()
 })
 
+const receiveBuildResult = json => ({
+  type: BUILD_RESULT_FETCH_SUCCESS,
+  result: json,
+  receivedAt: Date.now()
+})
+
 const failedBuild = error => ({
   type: BUILD_FETCH_FAIL,
   error
@@ -36,7 +45,20 @@ const failedBuild = error => ({
 const fetchBuild = (tenant, build) => dispatch => {
   dispatch(requestBuild())
   return API.fetchBuild(tenant.apiPrefix, build)
-    .then(response => dispatch(receiveBuild(response.data)))
+    .then(response => {
+      dispatch(receiveBuild(response.data))
+      if (response.data.log_url) {
+        const url = response.data.log_url.substr(
+          0, response.data.log_url.lastIndexOf('/') + 1)
+        Axios.get(url + 'job-output.json.gz')
+          .then(response => dispatch(receiveBuildResult(response.data)))
+          .catch(error => {
+            // Try without compression
+            Axios.get(url + 'job-output.json')
+              .then(response => dispatch(receiveBuildResult(response.data)))
+          })
+      }
+    })
     .catch(error => dispatch(failedBuild(error)))
 }
 
