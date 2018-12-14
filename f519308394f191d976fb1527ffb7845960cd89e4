@@ -16,6 +16,24 @@
       "revId": "f519308394f191d976fb1527ffb7845960cd89e4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_562473c4",
+        "filename": "web/src/containers/status/Pipeline.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-12-14T05:37:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f79a3b5_079b9dc6",
+      "revId": "f519308394f191d976fb1527ffb7845960cd89e4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
