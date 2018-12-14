@@ -15,10 +15,12 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+import { Button } from 'react-bootstrap'
 
 import { fetchJobsIfNeeded } from '../actions/jobs'
 import Refreshable from '../containers/Refreshable'
 import Jobs from '../containers/jobs/Jobs'
+import JobsGraph from '../containers/jobs/JobsGraph'
 
 
 class JobsPage extends Refreshable {
@@ -26,6 +28,10 @@ class JobsPage extends Refreshable {
     tenant: PropTypes.object,
     remoteData: PropTypes.object,
     dispatch: PropTypes.func
+  }
+
+  state = {
+    showGraph: false
   }
 
   updateData (force) {
@@ -37,18 +43,27 @@ class JobsPage extends Refreshable {
     super.componentDidMount()
   }
 
+  renderJobs (jobs) {
+    if (this.state.showGraph) {
+      return <JobsGraph jobs={jobs} width={1600} height={1060} />
+    } else {
+      return <Jobs jobs={jobs} />
+    }
+  }
+
   render () {
     const { remoteData } = this.props
     const jobs = remoteData.jobs[this.props.tenant.name]
     return (
       <React.Fragment>
+        <Button
+          onClick={() => this.setState({showGraph: !this.state.showGraph})}>
+          Show graph
+        </Button>
         <div style={{float: 'right'}}>
           {this.renderSpinner()}
         </div>
-        {jobs && jobs.length > 0 &&
-          <Jobs
-              jobs={jobs}
-              />}
+        {jobs && jobs.length > 0 && this.renderJobs(jobs)}
       </React.Fragment>)
   }
 }
