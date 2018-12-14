@@ -126,3 +126,11 @@ p.zuulstreamline {
     margin: 0px 0px;
     line-height: 1.4;
 }
+
+/* Graph */
+.link {
+    fill: none;
+    stroke: black;
+    stroke-opacity: 0.5;
+    stroke-width: 1px;
+}
