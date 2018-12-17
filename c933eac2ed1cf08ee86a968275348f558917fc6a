@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_6f95f192",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 932,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2018-12-17T13:21:01Z",
+      "side": 0,
+      "message": "nit: the `getFilesChanges()` method is no longer needed",
+      "revId": "c933eac2ed1cf08ee86a968275348f558917fc6a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_8fdded6f",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1289,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2018-12-17T13:21:01Z",
+      "side": 1,
+      "message": "Format arguments should be passed to the log function instead of always doing the str format.",
+      "revId": "4321e97305ef8a7bcd41c93792e1ca8e5949bf5f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_afd8e97c",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1293,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2018-12-17T13:21:01Z",
+      "side": 1,
+      "message": "same here",
+      "revId": "4321e97305ef8a7bcd41c93792e1ca8e5949bf5f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
