@@ -929,10 +929,11 @@ class GithubConnection(BaseConnection):
             self.log.warning("Got only %s files but PR has %s files.",
                              len(change.files),
                              change.pr.get('changed_files', 0))
-            change.files = self.getFilesChanges(
-                change.project.name,
-                change.ref,
-                change.branch)
+            # In this case explicitly set change.files to None to signalize
+            # that we need to ask the mergers later in pipeline processing.
+            # We cannot query the files here using the mergers because this
+            # can slow down the github event queue considerably.
+            change.files = None
         change.title = change.pr.get('title')
         change.open = change.pr.get('state') == 'open'
         change.is_merged = change.pr.get('merged')
