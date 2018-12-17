@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_ef134102",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1289,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-12-17T13:26:26Z",
+      "side": 1,
+      "message": "correct, will fix",
+      "parentUuid": "3f79a3b5_8fdded6f",
+      "revId": "4321e97305ef8a7bcd41c93792e1ca8e5949bf5f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_afd8e97c",
         "filename": "zuul/scheduler.py",
         "patchSetId": 1
