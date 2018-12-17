@@ -904,18 +904,6 @@ class GithubConnection(BaseConnection):
 
         return changes
 
-    def getFilesChanges(self, project_name, head, base):
-        job = self.sched.merger.getFilesChanges(self.connection_name,
-                                                project_name,
-                                                head, base)
-        self.log.debug("Waiting for fileschanges job %s", job)
-        job.wait()
-        if not job.updated:
-            raise Exception("Fileschanges job {} failed".format(job))
-        self.log.debug("Fileschanges job %s got changes on files %s",
-                       job, job.files)
-        return job.files
-
     def _updateChange(self, change):
         self.log.info("Updating %s" % (change,))
         change.pr = self.getPull(change.project.name, change.number)
@@ -929,10 +917,11 @@ class GithubConnection(BaseConnection):
             self.log.warning("Got only %s files but PR has %s files.",
                              len(change.files),
                              change.pr.get('changed_files', 0))
-            change.files = self.getFilesChanges(
-                change.project.name,
-                change.ref,
-                change.branch)
+            # In this case explicitly set change.files to None to signalize
+            # that we need to ask the mergers later in pipeline processing.
+            # We cannot query the files here using the mergers because this
+            # can slow down the github event queue considerably.
+            change.files = None
         change.title = change.pr.get('title')
         change.open = change.pr.get('state') == 'open'
         change.is_merged = change.pr.get('merged')
