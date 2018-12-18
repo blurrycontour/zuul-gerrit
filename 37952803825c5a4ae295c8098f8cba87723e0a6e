@@ -2,6 +2,52 @@
   "comments": [
     {
       "key": {
+        "uuid": "3f79a3b5_1ab572cf",
+        "filename": "doc/source/user/jobs.rst",
+        "patchSetId": 14
+      },
+      "lineNbr": 469,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-12-18T22:40:34Z",
+      "side": 1,
+      "message": "I think this needs to be dedented one level",
+      "range": {
+        "startLine": 466,
+        "startChar": 18,
+        "endLine": 469,
+        "endChar": 76
+      },
+      "revId": "37952803825c5a4ae295c8098f8cba87723e0a6e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_3ab94ec5",
+        "filename": "doc/source/user/jobs.rst",
+        "patchSetId": 14
+      },
+      "lineNbr": 478,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2018-12-18T22:40:34Z",
+      "side": 1,
+      "message": "I think this needs to be dedented one level.",
+      "range": {
+        "startLine": 478,
+        "startChar": 20,
+        "endLine": 478,
+        "endChar": 30
+      },
+      "revId": "37952803825c5a4ae295c8098f8cba87723e0a6e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_9f19748c",
         "filename": "tests/fixtures/config/container-build-resources/git/common-config/playbooks/container-machine.yaml",
         "patchSetId": 14
