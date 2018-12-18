@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_9f19748c",
+        "filename": "tests/fixtures/config/container-build-resources/git/common-config/playbooks/container-machine.yaml",
+        "patchSetId": 14
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-12-18T22:13:07Z",
+      "side": 1,
+      "message": "nit: expect?",
+      "range": {
+        "startLine": 3,
+        "startChar": 9,
+        "endLine": 3,
+        "endChar": 15
+      },
+      "revId": "37952803825c5a4ae295c8098f8cba87723e0a6e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_5f1f5c6d",
+        "filename": "tests/fixtures/config/container-build-resources/git/common-config/playbooks/container-native.yaml",
+        "patchSetId": 14
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-12-18T22:13:07Z",
+      "side": 1,
+      "message": "nit: expect?",
+      "range": {
+        "startLine": 3,
+        "startChar": 9,
+        "endLine": 3,
+        "endChar": 15
+      },
+      "revId": "37952803825c5a4ae295c8098f8cba87723e0a6e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
