@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_ed86cd15",
+        "filename": "zuul/driver/pagure/__init__.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-12-18T14:30:46Z",
+      "side": 1,
+      "message": "Could you please also put the copyright header in this file?",
+      "revId": "6b96ee5edabf93b15cadefbc2aedf93b04a9a19f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
