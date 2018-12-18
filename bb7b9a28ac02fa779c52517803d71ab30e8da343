@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_9f02d40c",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2018-12-18T22:20:56Z",
+      "side": 1,
+      "message": "I\u0027d like Zuul to maintain control over the claims in the JWT. This is desirable as it allows the format described below with authorized actions, which could be used by a web client and spare multiple calls to an authorization endpoint.\n\nDo services such as dex allow for overriding their JWTs with custom claims? I\u0027ve looked at the doc but didn\u0027t find any similar use cases.",
+      "parentUuid": "3f79a3b5_00bd8303",
+      "revId": "bb7b9a28ac02fa779c52517803d71ab30e8da343",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_805753cd",
         "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
         "patchSetId": 4
@@ -54,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "3f79a3b5_3a294e83",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2018-12-18T22:20:56Z",
+      "side": 1,
+      "message": "it is implicit from the \"zuul.actions\" claim but \"aud\" can be added. I didn\u0027t want to tie it to a URI for a specific instance, reasoning that Zuul might get a distributed architecture; you\u0027d then want the JWT to be consumable by every node of the distributed architecture.",
+      "parentUuid": "3f79a3b5_805753cd",
+      "revId": "bb7b9a28ac02fa779c52517803d71ab30e8da343",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_c0e78b10",
         "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
         "patchSetId": 4
@@ -65,6 +101,30 @@
       "writtenOn": "2018-11-13T16:36:46Z",
       "side": 1,
       "message": "As someone who has spent a serious amount of time dealing with using decorators for \"validation\" and/or \"authentication\", I highly recommend that this be avoided. Decorators are great in principal, but there ends up to be many cases where you need to handle ENFORCE outside of \"before\" or \"after\" the method/function. \n\nSuggest implementing a call that can be made directly in the function/method to avoid the long term pattern where callbacks or other complex methods are needed to ensure enforcement is flexible enough based upon the data in the JWT.\n\nDecorators in this case tend to be too simplistic in nature.",
+      "range": {
+        "startLine": 133,
+        "startChar": 0,
+        "endLine": 135,
+        "endChar": 29
+      },
+      "revId": "bb7b9a28ac02fa779c52517803d71ab30e8da343",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_5a268ab5",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2018-12-18T22:20:56Z",
+      "side": 1,
+      "message": "Fair enough, I\u0027ll remove that in the next patch",
+      "parentUuid": "3f79a3b5_c0e78b10",
       "range": {
         "startLine": 133,
         "startChar": 0,
@@ -111,6 +171,30 @@
       "writtenOn": "2018-11-13T16:36:46Z",
       "side": 1,
       "message": "Are you planning on limiting the TTL for the JWT by default?\n\nI would go as far and indicate that the default mode should be as narrow as possible, and extended time/scope should be extra (clearly indicated in the tool[s])",
+      "range": {
+        "startLine": 288,
+        "startChar": 0,
+        "endLine": 291,
+        "endChar": 61
+      },
+      "revId": "bb7b9a28ac02fa779c52517803d71ab30e8da343",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f79a3b5_7a3826cb",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2018-12-18T22:20:56Z",
+      "side": 1,
+      "message": "If the JWT is generated somewhere else, do we have control on this?",
+      "parentUuid": "3f79a3b5_c0954b40",
       "range": {
         "startLine": 288,
         "startChar": 0,
