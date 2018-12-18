@@ -2067,7 +2067,8 @@ class QueueItem(object):
             if not job.voting:
                 continue
             build = self.current_build_set.getBuild(job.name)
-            if build and build.result and (build.result != 'SUCCESS'):
+            if (build and build.result and
+                    build.result not in ['SUCCESS', 'SKIPPED']):
                 return True
         return False
 
