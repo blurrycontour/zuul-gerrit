@@ -1,0 +1,11 @@
+Code-Review+2: Joshua Hesketh <josh@nitrotech.org>
+Code-Review+2: Tobias Henkel <tobias.henkel@bmw.de>
+Code-Review+1: Artem Goncharov <artem.goncharov@gmail.com>
+Code-Review+2: Clint 'SpamapS' Byrum <clint@fewbar.com>
+Workflow+1: Clint 'SpamapS' Byrum <clint@fewbar.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Wed, 19 Dec 2018 20:02:31 +0000
+Reviewed-on: https://review.openstack.org/622010
+Project: openstack-infra/zuul
+Branch: refs/heads/master
