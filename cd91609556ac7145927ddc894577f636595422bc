@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f79a3b5_b0c49662",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2060,
+      "author": {
+        "id": 29171
+      },
+      "writtenOn": "2018-12-19T08:45:52Z",
+      "side": 1,
+      "message": "Nitpick: docstring is now outdated",
+      "range": {
+        "startLine": 2060,
+        "startChar": 8,
+        "endLine": 2060,
+        "endChar": 54
+      },
+      "revId": "cd91609556ac7145927ddc894577f636595422bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
