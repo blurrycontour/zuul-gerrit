@@ -18,6 +18,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Checkbox, Form, FormGroup } from 'patternfly-react'
 import Sockette from 'sockette'
+import Ansi from 'ansi-to-react'
 
 import { getStreamUrl } from '../api'
 
@@ -73,7 +74,7 @@ class StreamPage extends React.Component {
     // Create dom elements
     const lineDom = document.createElement('p')
     lineDom.className = 'zuulstreamline'
-    lineDom.appendChild(document.createTextNode(line))
+    lineDom.appendChild(<Ansi>{document.createTextNode(line)}</Ansi>)
     this.lines.push(lineDom)
   }
 
