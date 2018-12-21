@@ -114,15 +114,15 @@ a.refresh {
     color: black;
 }
 
-pre#zuulstreamcontent {
+.zuulstreamcontent {
     font-family: monospace;
-    white-space: pre;
+    white-space: pre-wrap;
     margin: 0px 10px;
     background-color: black;
     color: lightgrey;
     border: none;
 }
-p.zuulstreamline {
+.zuulstreamline {
     margin: 0px 0px;
     line-height: 1.4;
 }

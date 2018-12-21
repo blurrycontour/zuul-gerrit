@@ -18,6 +18,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Checkbox, Form, FormGroup } from 'patternfly-react'
 import Sockette from 'sockette'
+import Ansi from 'ansi-to-react'
 
 import { getStreamUrl } from '../api'
 
@@ -31,32 +32,15 @@ class StreamPage extends React.Component {
 
   state = {
     autoscroll: true,
+    lines: [],
   }
 
   constructor() {
     super()
     this.receiveBuffer = ''
-    this.displayRef = React.createRef()
-    this.lines = []
+    this.messagesEnd = React.createRef()
   }
 
-  refreshLoop = () => {
-    if (this.displayRef.current) {
-      let newLine = false
-      this.lines.forEach(line => {
-        newLine = true
-        this.displayRef.current.appendChild(line)
-      })
-      this.lines = []
-      if (newLine) {
-        const { autoscroll } = this.state
-        if (autoscroll) {
-          this.messagesEnd.scrollIntoView({ behavior: 'instant' })
-        }
-      }
-    }
-    this.timer = setTimeout(this.refreshLoop, 250)
-  }
 
   componentWillUnmount () {
     if (this.timer) {
@@ -70,11 +54,9 @@ class StreamPage extends React.Component {
   }
 
   onLine = (line) => {
-    // Create dom elements
-    const lineDom = document.createElement('p')
-    lineDom.className = 'zuulstreamline'
-    lineDom.appendChild(document.createTextNode(line))
-    this.lines.push(lineDom)
+    this.setState(prevState => ({
+      lines: [...prevState.lines, line]
+    }))
   }
 
   onMessage = (message) => {
@@ -92,7 +74,6 @@ class StreamPage extends React.Component {
     } else {
       this.receiveBuffer = lastLine
     }
-    this.refreshLoop()
   }
 
   componentDidMount() {
@@ -136,6 +117,9 @@ class StreamPage extends React.Component {
   }
 
   render () {
+    const lines = this.state.lines.map((line, linecount) => {
+      return(<Ansi className='zuulstreamcontent' key={linecount}>{line + '\n'}</Ansi>)
+    })
     return (
       <React.Fragment>
         <Form inline id='zuulstreamoverlay'>
@@ -147,12 +131,21 @@ class StreamPage extends React.Component {
             </Checkbox>
           </FormGroup>
         </Form>
-        <pre id='zuulstreamcontent' ref={this.displayRef} />
-        <div ref={(el) => { this.messagesEnd = el }} />
+        <div className='zuulstreamcontent'>
+          <div className='zuulstreamline'>
+              {lines}
+          </div>
+          <div ref={this.messagesEnd} />
+        </div>
       </React.Fragment>
     )
   }
-}
 
+  componentDidUpdate() {
+    if (this.state.autoscroll) {
+      this.messagesEnd.current.scrollIntoView({ behavior: 'instant' })
+    }
+  }
+}
 
 export default connect(state => ({tenant: state.tenant}))(StreamPage)
