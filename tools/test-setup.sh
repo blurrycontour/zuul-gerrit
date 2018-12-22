@@ -12,6 +12,10 @@ sudo service zookeeper stop
 DATADIR=$(sed -n -e 's/^dataDir=//p' /etc/zookeeper/conf/zoo.cfg)
 sudo mount -t tmpfs -o nodev,nosuid,size=500M none $DATADIR
 
+# Config postgres to run on tmpfs
+sudo service postgresql stop
+sudo mount -t tmpfs -o nodev,nosuid,size=500M none /var/lib/postgresql
+
 # Be sure mysql and zookeeper are started.
 sudo service mysql start
 sudo service postgresql start
