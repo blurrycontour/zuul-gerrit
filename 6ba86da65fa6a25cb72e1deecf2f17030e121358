@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f769fc5_ed964995",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2018-12-23T10:11:22Z",
+      "side": 1,
+      "message": "I think we probably end up storing the unparsed config too(or only). This is needed for efficient tenant reconfigurations which will be done distributed.",
+      "range": {
+        "startLine": 156,
+        "startChar": 23,
+        "endLine": 156,
+        "endChar": 78
+      },
+      "revId": "6ba86da65fa6a25cb72e1deecf2f17030e121358",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
