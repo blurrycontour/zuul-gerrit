@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f769fc5_48872bd9",
+        "filename": "tools/test-setup.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2018-12-24T00:12:20Z",
+      "side": 1,
+      "message": "You may want to restore the content in the tmpfs after mounting. Also shouldn\u0027t we preemptively umount?",
+      "revId": "e4c757283a3a58db97edd6f9cdb488cb280118a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
