@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f769fc5_0cab5d89",
+        "filename": "bindep.txt",
+        "patchSetId": 4
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-12-29T14:23:32Z",
+      "side": 1,
+      "message": "let\u0027s put this into the [test] profile - firefox isn\u0027t needed to install zuul",
+      "range": {
+        "startLine": 48,
+        "startChar": 0,
+        "endLine": 48,
+        "endChar": 7
+      },
+      "revId": "5c2138d54bd9feeb8a0fb3f7169bb1427e423903",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
