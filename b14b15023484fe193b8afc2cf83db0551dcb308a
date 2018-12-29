@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f7c97a3_1c47077a",
+        "filename": "bindep.txt",
+        "patchSetId": 3
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2018-12-29T14:23:32Z",
+      "side": 1,
+      "message": "would be good to add [test] here",
+      "revId": "b14b15023484fe193b8afc2cf83db0551dcb308a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
