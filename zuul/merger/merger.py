@@ -21,6 +21,7 @@ import re
 import shutil
 import time
 
+import pygit2
 import git
 import gitdb
 import paramiko
@@ -485,27 +486,39 @@ class Repo(object):
                 return True
         return False
 
-    def getFiles(self, files, dirs=[], branch=None, commit=None,
-                 zuul_event_id=None):
+    def _traverse_tree(self, repo, tree_entry, path=None):
+        if not path:
+            if hasattr(tree_entry, 'name'):
+                path = [tree_entry.name]
+            else:
+                path = []
+        tree = repo[tree_entry.id]
+        for entry in tree:
+            abspath = path + [entry.name]
+            if entry.type_str == 'blob':
+                yield '/'.join(abspath), entry
+            elif entry.type_str == 'tree':
+                yield from self._traverse_tree(repo, entry, path=abspath)
+
+    def getFiles(self, files, dirs=[], branch=None, commit=None):
         ret = {}
-        repo = self.createRepoObject(zuul_event_id)
+        repo = pygit2.Repository(self.local_path)
         if branch:
-            tree = repo.heads[branch].commit.tree
+            tree = repo.revparse_single(branch).tree
         else:
-            tree = repo.commit(commit).tree
+            tree = repo.revparse_single(commit.hexsha).tree
         for fn in files:
             if fn in tree:
-                ret[fn] = tree[fn].data_stream.read().decode('utf8')
+                ret[fn] = repo[tree[fn].id].data.decode('utf8')
             else:
                 ret[fn] = None
         if dirs:
             for dn in dirs:
                 if dn not in tree:
                     continue
-                for blob in tree[dn].traverse():
-                    if blob.path.endswith(".yaml"):
-                        ret[blob.path] = blob.data_stream.read().decode(
-                            'utf-8')
+                for path, entry in self._traverse_tree(repo, tree[dn]):
+                    if path.endswith(".yaml"):
+                        ret[path] = repo[entry.id].data.decode('utf8')
         return ret
 
     def getFilesChanges(self, branch, tosha=None, zuul_event_id=None):
