@@ -3734,7 +3734,6 @@ class TestScheduler(ZuulTestCase):
 
     @simple_layout('layouts/repo-deleted.yaml')
     def test_repo_deleted(self):
-        self.init_repo("org/delete-project")
         A = self.fake_gerrit.addFakeChange('org/delete-project', 'master', 'A')
 
         A.addApproval('Code-Review', 2)
@@ -6735,7 +6734,6 @@ class TestSchedulerSuccessURL(ZuulTestCase):
     def test_success_url(self):
         "Ensure bad build params are ignored"
         self.sched.reconfigure(self.config)
-        self.init_repo('org/docs')
 
         A = self.fake_gerrit.addFakeChange('org/docs', 'master', 'A')
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))

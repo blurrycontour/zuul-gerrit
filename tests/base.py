@@ -49,6 +49,7 @@ import gear
 import fixtures
 import kazoo.client
 import kazoo.exceptions
+import pygit2
 import pymysql
 import psycopg2
 import psycopg2.extensions
@@ -3784,20 +3785,24 @@ class ZuulTestCase(BaseTestCase):
         if not os.path.exists(path):
             os.makedirs(path)
         path = os.path.join(self.upstream_root, project)
-        repo = git.Repo.init(path)
+        repo = pygit2.init_repository(path)
 
-        with repo.config_writer() as config_writer:
-            config_writer.set_value('user', 'email', 'user@example.com')
-            config_writer.set_value('user', 'name', 'User Name')
+        repo.config['user.email'] = 'user@example.com'
+        repo.config['user.name'] = 'User Name'
 
-        repo.index.commit('initial commit')
-        master = repo.create_head('master')
+        tree = repo.TreeBuilder().write()
+        author = pygit2.Signature('User Name', 'user@example.com')
+        repo.create_commit('refs/heads/master', author, author,
+                           'initial commit', tree, [])
+        repo.set_head('refs/heads/master')
+
         if tag:
-            repo.create_tag(tag)
+            repo.create_reference('refs/tags/%s' % tag, repo.head.target)
 
-        repo.head.reference = master
-        zuul.merger.merger.reset_repo_to_head(repo)
-        repo.git.clean('-x', '-f', '-d')
+        repo.checkout_head(strategy=pygit2.GIT_CHECKOUT_FORCE |
+                           pygit2.GIT_CHECKOUT_REMOVE_IGNORED |
+                           pygit2.GIT_CHECKOUT_REMOVE_UNTRACKED)
+
 
     def create_branch(self, project, branch, commit_filename='README'):
         path = os.path.join(self.upstream_root, project)
