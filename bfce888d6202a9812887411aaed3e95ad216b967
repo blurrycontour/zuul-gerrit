@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f769fc5_eb827ec8",
+        "filename": "web/src/pages/Stream.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-01-01T13:43:48Z",
+      "side": 1,
+      "message": "this seems to be causing issues when clicking an in-progress job with lots of backlog.",
+      "revId": "bfce888d6202a9812887411aaed3e95ad216b967",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f769fc5_6b766e09",
+        "filename": "web/src/pages/Stream.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-01-01T13:43:48Z",
+      "side": 1,
+      "message": "i think this result in the \u003cAnsi\u003e wrapper to be applied to all lines on each render. why not storing the line in the list with the wrapper directly?",
+      "revId": "bfce888d6202a9812887411aaed3e95ad216b967",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
