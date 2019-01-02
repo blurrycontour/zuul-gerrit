@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f769fc5_216097a5",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 606,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2019-01-02T02:33:46Z",
+      "side": 1,
+      "message": "I think it\u0027d be useful to evaluate the rest of the layout returned by this endpoint. I specifically want to ensure we aren\u0027t leaking secrets or anything unexpected.",
+      "revId": "bd78eacd6bb6ea6e0ccb57d6a89afa0ea9993ee7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
