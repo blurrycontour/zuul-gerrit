@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "1f769fc5_419a7314",
+        "filename": "web/src/pages/Stream.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-01-02T04:35:01Z",
+      "side": 1,
+      "message": "Can you be more clear about the issue?",
+      "revId": "bfce888d6202a9812887411aaed3e95ad216b967",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f769fc5_6b766e09",
         "filename": "web/src/pages/Stream.jsx",
         "patchSetId": 4
@@ -30,6 +47,23 @@
       "writtenOn": "2019-01-01T13:43:48Z",
       "side": 1,
       "message": "i think this result in the \u003cAnsi\u003e wrapper to be applied to all lines on each render. why not storing the line in the list with the wrapper directly?",
+      "revId": "bfce888d6202a9812887411aaed3e95ad216b967",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f769fc5_e19e1f06",
+        "filename": "web/src/pages/Stream.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-01-02T04:35:01Z",
+      "side": 1,
+      "message": "Didn\u0027t think of doing it the other way. ;)",
       "revId": "bfce888d6202a9812887411aaed3e95ad216b967",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
