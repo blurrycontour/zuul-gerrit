@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "1f769fc5_61076f1e",
+        "filename": "web/src/pages/Stream.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-01-02T05:17:40Z",
+      "side": 1,
+      "message": "the page loads cpu to 100% and seems to hang.",
+      "parentUuid": "1f769fc5_419a7314",
+      "revId": "bfce888d6202a9812887411aaed3e95ad216b967",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f769fc5_6b766e09",
         "filename": "web/src/pages/Stream.jsx",
         "patchSetId": 4
