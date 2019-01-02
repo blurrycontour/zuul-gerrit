@@ -16,6 +16,7 @@ import datetime
 import logging
 import time
 import voluptuous as v
+import urllib.parse
 
 from zuul.reporter import BaseReporter
 
@@ -103,10 +104,21 @@ class SQLReporter(BaseReporter):
                 if self.validateArtifactSchema(build.result_data):
                     artifacts = build.result_data.get('zuul', {}).get(
                         'artifacts', [])
+                    default_url = build.result_data.get('zuul', {}).get(
+                        'log_url')
                     for artifact in artifacts:
+                        url = artifact['url']
+                        try:
+                            parsed_url = urllib.parse.urlparse(url)
+                            if not parsed_url.scheme and default_url:
+                                # We have a relative url.  Combine it with our
+                                # default url.
+                                url = urllib.parse.urljoin(default_url, url)
+                        except Exception:
+                            self.log.debug("Error parsing URL:", exc_info=1)
                         db_build.createArtifact(
                             name=artifact['name'],
-                            url=artifact['url'],
+                            url=url,
                         )
 
 
