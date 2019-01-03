@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "ffd0ebdf_b8e2c12e",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-01-03T02:28:15Z",
+      "side": 1,
+      "message": "Should we even support on-demand installation? That doesn\u0027t looks very stable for a CI system where operators likely wants stability and reproducibility...",
+      "parentUuid": "1f769fc5_18c61c4a",
+      "revId": "43f0d06cd1960f94c83fca7dd090f3119679615a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_a25e57df",
         "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
         "patchSetId": 1
@@ -125,6 +143,30 @@
       "side": 1,
       "message": "One virtualenv for each ansible version is a must, but sharing common libs would be achieable by creating these venvs with --use-sytem-site-packages.\n\nDifferent versions of ansible are likely to have conficting requirements, clearly not doable in another way. We may even use different python interpreters for each python version.",
       "parentUuid": "3f79a3b5_bbf2c869",
+      "range": {
+        "startLine": 76,
+        "startChar": 35,
+        "endLine": 76,
+        "endChar": 45
+      },
+      "revId": "43f0d06cd1960f94c83fca7dd090f3119679615a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffd0ebdf_d8a1c597",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-01-03T02:28:15Z",
+      "side": 1,
+      "message": "I hope we\u0027ll be able to use shared dependencies with a single python interpreters, it seems suboptimal if zuul-executors requires different python version and multiple copies of the same libraries...\n\nMy concern with a virtualenv is that it copies the pythonX.Y binary executables, in which case the default location should be /usr or /opt.",
+      "parentUuid": "1f769fc5_ef9281f6",
       "range": {
         "startLine": 76,
         "startChar": 35,
