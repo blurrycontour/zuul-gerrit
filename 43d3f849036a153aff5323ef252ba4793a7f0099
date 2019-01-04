@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ffd0ebdf_2ef0a090",
+        "filename": "doc/source/user/jobs.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 758,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-01-04T21:59:19Z",
+      "side": 1,
+      "message": "This is not relative so maybe a bad example?",
+      "range": {
+        "startLine": 758,
+        "startChar": 21,
+        "endLine": 758,
+        "endChar": 22
+      },
+      "revId": "43d3f849036a153aff5323ef252ba4793a7f0099",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
