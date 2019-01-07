@@ -45,6 +45,40 @@
       "revId": "6ba86da65fa6a25cb72e1deecf2f17030e121358",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfd5e7cf_9288df1f",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-01-07T22:35:17Z",
+      "side": 1,
+      "message": "As mentioned on PS2 (but after you updated to PS4), I think we should only store the global project-branch config in ZK.  I don\u0027t think we need to do so per-tenant.  I think if we just use it as a cache of JSON representing the YAML in files, then each component can generate per-tenant configs from the ZK data.  We can use locking to avoid race conditions.  This lets us store the minimum necessary in ZK.",
+      "revId": "6ba86da65fa6a25cb72e1deecf2f17030e121358",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfd5e7cf_327d731c",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-01-07T22:35:17Z",
+      "side": 1,
+      "message": "We need to move the time database out of the filesystem, so let\u0027s make \"drop the time database and require SQL\" part of this effort.  I don\u0027t think we should use zk for it.",
+      "revId": "6ba86da65fa6a25cb72e1deecf2f17030e121358",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
