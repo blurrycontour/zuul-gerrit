@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "dfd5e7cf_525cb74a",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-01-07T23:35:14Z",
+      "side": 1,
+      "message": "Thinking out loud would another option be to avoid leader election and allow every active event gatherer process to listen for and write events. We would then dedup via a hash of each event whcih could be locked for before writing the event data.\n\nOne drawback to this appraoch is it is computationally more expensive, but should avoid losing any events if you restart one process at a time.",
+      "revId": "6ba86da65fa6a25cb72e1deecf2f17030e121358",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f769fc5_ed964995",
         "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 4
@@ -65,6 +82,24 @@
     },
     {
       "key": {
+        "uuid": "dfd5e7cf_9218df81",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-01-07T23:35:14Z",
+      "side": 1,
+      "message": "I believe that the way kafka does this is to only record journal type data in zookeeper and refer to the external source of truth as necessary to roll things through the system.\n\nApplying a similar appraoch to Zuul I think we could record canonical repo locations and branch/sha1 data in zk to represent the most up to date config and if a local scheduler\u0027s config is behind that sha1 we update to it.\n\nFor updates we would have events (driven by the active and passive event handling above) that would update the sha1 in zk.\n\nI don\u0027t know that this is necessarily better than what is proposed above but would minimize the data stored in zk.",
+      "parentUuid": "dfd5e7cf_9288df1f",
+      "revId": "6ba86da65fa6a25cb72e1deecf2f17030e121358",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dfd5e7cf_327d731c",
         "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 4
@@ -76,6 +111,75 @@
       "writtenOn": "2019-01-07T22:35:17Z",
       "side": 1,
       "message": "We need to move the time database out of the filesystem, so let\u0027s make \"drop the time database and require SQL\" part of this effort.  I don\u0027t think we should use zk for it.",
+      "revId": "6ba86da65fa6a25cb72e1deecf2f17030e121358",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfd5e7cf_6d08fa27",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-01-07T23:35:14Z",
+      "side": 1,
+      "message": "Is it feasible to require SQL db for time db, but continue to make the SQL db optional?",
+      "parentUuid": "dfd5e7cf_327d731c",
+      "revId": "6ba86da65fa6a25cb72e1deecf2f17030e121358",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfd5e7cf_ad4ca276",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-01-07T23:35:14Z",
+      "side": 1,
+      "message": "We may want to capture how we expect to recover in the event of losing an executor. If that happens the running job state is lost and we need to restart the jobs with new nodesets.\n\nI think this means we need to have watches for the executor locks on the schedulers? And handle that lock going away without job completed data in the data structure? And then we want to be able to handle this in multiple schedulers? Anyways it seems sufficiently complicated that we may want something written down here about how we can handle it.",
+      "revId": "6ba86da65fa6a25cb72e1deecf2f17030e121358",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfd5e7cf_8d82fe4e",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-01-07T23:35:14Z",
+      "side": 1,
+      "message": "This depth first approach may also starve other pipelines and tenants. Do we need to rotate in a breadth first fashion instead to ensure events coming in sufficiently quickly prevent us from processing another tenant or pipeline?",
+      "revId": "6ba86da65fa6a25cb72e1deecf2f17030e121358",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfd5e7cf_8da99ee0",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-01-07T23:35:14Z",
+      "side": 1,
+      "message": "Setting things up in the kafka model as described above may simplify this? We wouldn\u0027t need to store any secrets in zk, but would need to share keys.",
       "revId": "6ba86da65fa6a25cb72e1deecf2f17030e121358",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
