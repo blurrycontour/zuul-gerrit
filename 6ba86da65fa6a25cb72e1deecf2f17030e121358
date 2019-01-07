@@ -100,6 +100,23 @@
     },
     {
       "key": {
+        "uuid": "dfd5e7cf_0dbcce03",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-01-07T23:42:53Z",
+      "side": 1,
+      "message": "Clark, asking for the content from the mergers is time-consuming and not something that every component should need to do, which is why I think that at least (but also, at most) we should store the read zuul.yaml data (the global project-branch config) in ZK.  It\u0027s not clear to me whether you support that or not, but I think it\u0027s important.\n\nBeyond that, yes, I imagine essentially a checkpoint system (was this tenant config generated from the current global config sequence number, or a previous one? if previous, it\u0027s invalid, need to update) would work well.",
+      "revId": "6ba86da65fa6a25cb72e1deecf2f17030e121358",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dfd5e7cf_327d731c",
         "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 4
@@ -129,6 +146,23 @@
       "side": 1,
       "message": "Is it feasible to require SQL db for time db, but continue to make the SQL db optional?",
       "parentUuid": "dfd5e7cf_327d731c",
+      "revId": "6ba86da65fa6a25cb72e1deecf2f17030e121358",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfd5e7cf_ad36e2b3",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-01-07T23:42:53Z",
+      "side": 1,
+      "message": "Everything is worse without SQL.  We should just use it.",
       "revId": "6ba86da65fa6a25cb72e1deecf2f17030e121358",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
