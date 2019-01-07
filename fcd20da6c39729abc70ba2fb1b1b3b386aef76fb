@@ -363,6 +363,23 @@
     },
     {
       "key": {
+        "uuid": "dfd5e7cf_52ccb788",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-01-07T22:30:09Z",
+      "side": 1,
+      "message": "It sounds like we\u0027re pretty close to agreement on this.  Yes, when I said \"global parsed config\" I did mean the \"per branch parsed config\".  That is -- the thing where we read in the YAML from every repo and store it as a python dictionary (obviously, that turns into a ZK json blob).  But there is no tenant information and it hasn\u0027t been turned into zuul.model objects yet.  It\u0027s more or less just a cache of what\u0027s in the repos.\n\nI think it would be okay to store one copy of this -- I don\u0027t think we need to store a copy for each tenant.  We can \"lock\" the global config when someone is updating it so that if anyone needs to generate a tenant config, they will wait until the update is complete.  Then, obviously, once it is updated and unlocked, all components should regenerate their tenant config(s).",
+      "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_91d764f4",
         "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 2
@@ -427,6 +444,23 @@
       "side": 1,
       "message": "I agree. I think for a while we\u0027ve known that we\u0027ll likely require some kind of database to run zuul. We may even choose something that isn\u0027t SQL, but that is a topic for another spec. I think it would be safe to assume for this spec that some sort of database is both required and available. I also think that this change should be part of v4.",
       "parentUuid": "3f79a3b5_4cb91879",
+      "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfd5e7cf_f2c84b75",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-01-07T22:30:09Z",
+      "side": 1,
+      "message": "The SQL database can accomplish what the time database is used for.  It would just be a very simple query to get the last 10 runtimes for successful runs of a tenant-project-branch-job.",
       "revId": "fcd20da6c39729abc70ba2fb1b1b3b386aef76fb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
