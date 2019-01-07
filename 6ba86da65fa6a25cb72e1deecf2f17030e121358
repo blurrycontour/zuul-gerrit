@@ -117,6 +117,24 @@
     },
     {
       "key": {
+        "uuid": "dfd5e7cf_2df8b2c2",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-01-07T23:47:17Z",
+      "side": 1,
+      "message": "I was mostly brainstorming ways to avoid storing much data in zk and was semi familiar with how kafka does it (I mean at a high level I\u0027ve never read the code).\n\nIf we think the cost of many git merges is worse than zk storing some data (likely is given git mergers are computations) then this setup with checkpoints off of the yaml data would work well.",
+      "parentUuid": "dfd5e7cf_0dbcce03",
+      "revId": "6ba86da65fa6a25cb72e1deecf2f17030e121358",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dfd5e7cf_327d731c",
         "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 4
