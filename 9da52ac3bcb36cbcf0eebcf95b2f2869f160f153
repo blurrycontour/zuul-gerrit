@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dfd5e7cf_02a82a1d",
+        "filename": "doc/requirements.txt",
+        "patchSetId": 7
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-07T11:41:23Z",
+      "side": 1,
+      "message": "I think we should not import dependencies from specific git sha\u0027s except if it\u0027s needed temporarily.\n\nIs there a released version we can use? If not, we at least need to add a todo comment describing why we need this revision right now and that this should be replaced by a released version as soon as it is available.",
+      "revId": "9da52ac3bcb36cbcf0eebcf95b2f2869f160f153",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
