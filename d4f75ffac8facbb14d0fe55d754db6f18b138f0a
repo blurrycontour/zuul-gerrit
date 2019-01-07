@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dfd5e7cf_d293c74e",
+        "filename": "doc/source/admin/monitoring.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2019-01-07T22:37:55Z",
+      "side": 1,
+      "message": "Thanks, reading something like that is so helpful!",
+      "revId": "d4f75ffac8facbb14d0fe55d754db6f18b138f0a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
