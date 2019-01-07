@@ -16,6 +16,24 @@
       "revId": "9da52ac3bcb36cbcf0eebcf95b2f2869f160f153",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfd5e7cf_ee738d4c",
+        "filename": "doc/requirements.txt",
+        "patchSetId": 7
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-01-07T14:38:36Z",
+      "side": 1,
+      "message": "Release is pending, see https://github.com/sphinx-contrib/openapi/pull/17#issuecomment-445110402",
+      "parentUuid": "dfd5e7cf_02a82a1d",
+      "revId": "9da52ac3bcb36cbcf0eebcf95b2f2869f160f153",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
