@@ -60,6 +60,24 @@
     },
     {
       "key": {
+        "uuid": "dfd5e7cf_60dc7374",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-08T16:08:25Z",
+      "side": 1,
+      "message": "Yes, I had this in the first version as an option. But I think it\u0027s much more complex than simple leader election and could be an enhancement after the scale out implementation. So I think this doesn\u0027t need to be in the scope of this spec.",
+      "parentUuid": "dfd5e7cf_2dd0b2f7",
+      "revId": "6ba86da65fa6a25cb72e1deecf2f17030e121358",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f769fc5_ed964995",
         "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 4
@@ -153,6 +171,24 @@
     },
     {
       "key": {
+        "uuid": "dfd5e7cf_003327ad",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-08T16:08:25Z",
+      "side": 1,
+      "message": "Ok, that makes sense. So we could store the global config per project and branch in distinct objects (because the max blob size is by default 1MB) but lock and checkpoint the complete global config.",
+      "parentUuid": "dfd5e7cf_2df8b2c2",
+      "revId": "6ba86da65fa6a25cb72e1deecf2f17030e121358",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dfd5e7cf_327d731c",
         "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 4
@@ -205,6 +241,24 @@
     },
     {
       "key": {
+        "uuid": "dfd5e7cf_40184f1c",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-08T16:08:25Z",
+      "side": 1,
+      "message": "ok, that makes sense. I\u0027ll change that.",
+      "parentUuid": "dfd5e7cf_ad36e2b3",
+      "revId": "6ba86da65fa6a25cb72e1deecf2f17030e121358",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dfd5e7cf_ad4ca276",
         "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 4
@@ -216,6 +270,24 @@
       "writtenOn": "2019-01-07T23:35:14Z",
       "side": 1,
       "message": "We may want to capture how we expect to recover in the event of losing an executor. If that happens the running job state is lost and we need to restart the jobs with new nodesets.\n\nI think this means we need to have watches for the executor locks on the schedulers? And handle that lock going away without job completed data in the data structure? And then we want to be able to handle this in multiple schedulers? Anyways it seems sufficiently complicated that we may want something written down here about how we can handle it.",
+      "revId": "6ba86da65fa6a25cb72e1deecf2f17030e121358",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfd5e7cf_40edafed",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-08T16:08:25Z",
+      "side": 1,
+      "message": "I\u0027ll think more about that and extend this.",
+      "parentUuid": "dfd5e7cf_ad4ca276",
       "revId": "6ba86da65fa6a25cb72e1deecf2f17030e121358",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -239,6 +311,24 @@
     },
     {
       "key": {
+        "uuid": "dfd5e7cf_209e6b63",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-08T16:08:25Z",
+      "side": 1,
+      "message": "The event loop is expected to loop fast as it is already the case. Further I\u0027d expect multiple pipeline processor threads per scheduler so that might be less of a problem. But we could add a max processing time as a safety net that forces switching to the next tenant after some threshold.",
+      "parentUuid": "dfd5e7cf_8d82fe4e",
+      "revId": "6ba86da65fa6a25cb72e1deecf2f17030e121358",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dfd5e7cf_8da99ee0",
         "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 4
@@ -250,6 +340,24 @@
       "writtenOn": "2019-01-07T23:35:14Z",
       "side": 1,
       "message": "Setting things up in the kafka model as described above may simplify this? We wouldn\u0027t need to store any secrets in zk, but would need to share keys.",
+      "revId": "6ba86da65fa6a25cb72e1deecf2f17030e121358",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfd5e7cf_404ccfc6",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-08T16:08:25Z",
+      "side": 1,
+      "message": "That\u0027s exactly the case here. We share keys to decrypt the secret stuff (like secrets or kubernetes credentials from nodepool). Not everything will be necessarily somewhere in git. Further doing cat operations for every dereference is much more complicated and expensive.",
+      "parentUuid": "dfd5e7cf_8da99ee0",
       "revId": "6ba86da65fa6a25cb72e1deecf2f17030e121358",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
