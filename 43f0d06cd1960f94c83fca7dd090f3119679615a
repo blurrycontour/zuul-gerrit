@@ -108,6 +108,52 @@
     },
     {
       "key": {
+        "uuid": "dfd5e7cf_ad2a62e4",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-01-08T00:23:10Z",
+      "side": 1,
+      "message": "We probably want to use the python3 venv module, https://docs.python.org/3/library/venv.html, and not the virtualenv tool for this. Reduces dependencies and virtualenv as a tool seems to be getting less attention as we near the python2 EOL date.",
+      "range": {
+        "startLine": 71,
+        "startChar": 64,
+        "endLine": 71,
+        "endChar": 74
+      },
+      "revId": "43f0d06cd1960f94c83fca7dd090f3119679615a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfd5e7cf_cd0a4689",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-01-08T00:23:10Z",
+      "side": 1,
+      "message": "Small nit, we probably want to scope this to zuul specifically. Executor is generic enough that this may be confusing or result in collisions later.\n\nPerhaps zuul-executor-ansible or use /var/lib/zuul/executor-ansible. This second choice matches the existing dir structure in /var/lib/ for zuul.",
+      "range": {
+        "startLine": 75,
+        "startChar": 29,
+        "endLine": 75,
+        "endChar": 45
+      },
+      "revId": "43f0d06cd1960f94c83fca7dd090f3119679615a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_bbf2c869",
         "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
         "patchSetId": 1
@@ -173,6 +219,40 @@
         "endLine": 76,
         "endChar": 45
       },
+      "revId": "43f0d06cd1960f94c83fca7dd090f3119679615a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfd5e7cf_2d275215",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-01-08T00:23:10Z",
+      "side": 1,
+      "message": "I think this clarifies the meaning of on-demand installation as specified above. Basically it is on demand at executor startup and not left for later (like when the first job that needs that version of ansible runs). I don\u0027t think we should wait until a job runs to on demand install ansible, but installing ansible on executor startup (as well as upgrading them) seems fine.",
+      "revId": "43f0d06cd1960f94c83fca7dd090f3119679615a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfd5e7cf_4d3bb637",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-01-08T00:23:10Z",
+      "side": 1,
+      "message": "Python setuptools has in the past broken on symlinks inside python packages. We should test that these don\u0027t pose a problem when we set them up ( I want to say they are fine in modern setuptools so would only be a very old setuptools problem ).",
       "revId": "43f0d06cd1960f94c83fca7dd090f3119679615a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
