@@ -37,6 +37,29 @@
     },
     {
       "key": {
+        "uuid": "dfd5e7cf_2592fdf7",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2019-01-08T15:40:56Z",
+      "side": 1,
+      "message": "This seems potentially very dangerous, and forces us to stay on top of ansible changes very closely (not arguing against it, just pointing it out). For example, ansible deprecates/removes a config option that we are currently writing out to ansible.cfg, and we are suddenly broken if we aren\u0027t staying ahead of the changes.",
+      "range": {
+        "startLine": 52,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 31
+      },
+      "revId": "43f0d06cd1960f94c83fca7dd090f3119679615a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_a25e57df",
         "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
         "patchSetId": 1
