@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "dfd5e7cf_db0432c9",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-08T16:25:31Z",
+      "side": 1,
+      "message": "On-demand (aka on startup installation) is probably the easiest way for zuul quick starters. However we also could just provide a script or zuul command that does this that needs to be called before startup.\n\nI think this script would also be the way to install ansible during a container image build. Monty will kill me, but I\u0027m also in favour of plain old Dockerfiles as that\u0027s a de-facto standard of building docker images.",
+      "parentUuid": "ffd0ebdf_b8e2c12e",
+      "revId": "43f0d06cd1960f94c83fca7dd090f3119679615a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dfd5e7cf_2592fdf7",
         "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
         "patchSetId": 1
