@@ -42,6 +42,24 @@
     },
     {
       "key": {
+        "uuid": "dfd5e7cf_2dd0b2f7",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-01-08T00:11:06Z",
+      "side": 1,
+      "message": "Thinking about this more I\u0027m not sure how feasible this is as we\u0027d need to keep a record of every event processed for some potentially long period of time in order to check in the future if some event we\u0027ve received is a duplicate.\n\nWe might be able to avoid that issue with hashes if we can guarantee that all of the events we are receiving already come with some monotonically increasing identifier value (then its a simple \u003c or \u003e comparison). I don\u0027t know that we can rely on that for all potential event inputs so the leader election design may be simplest.",
+      "parentUuid": "dfd5e7cf_525cb74a",
+      "revId": "6ba86da65fa6a25cb72e1deecf2f17030e121358",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f769fc5_ed964995",
         "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 4
