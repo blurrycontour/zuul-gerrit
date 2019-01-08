@@ -60,6 +60,30 @@
     },
     {
       "key": {
+        "uuid": "dfd5e7cf_a0a49b09",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-08T15:46:44Z",
+      "side": 1,
+      "message": "Maybe there was a misunderstanding. I meant that at at some point in time we need to define and proper communicate we\u0027ll manually switch the default version to a newer (the newest at that point in time) version of ansible that is supported by zuul.\n\nOr alternatively we could make the default version configurable so we don\u0027t have to synchronize that step with the world (and if no default version is configured it needs some default value like the latest supported version).",
+      "parentUuid": "dfd5e7cf_2592fdf7",
+      "range": {
+        "startLine": 52,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 31
+      },
+      "revId": "43f0d06cd1960f94c83fca7dd090f3119679615a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_a25e57df",
         "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
         "patchSetId": 1
