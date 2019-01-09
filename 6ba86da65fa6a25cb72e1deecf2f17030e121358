@@ -311,6 +311,23 @@
     },
     {
       "key": {
+        "uuid": "dfd5e7cf_2c93b3a5",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-09T09:50:00Z",
+      "side": 1,
+      "message": "Thinking more about that I think we\u0027ll still need an execution request similar to the node requests in nodepool as a queue at a specific location. Otherwise all executors will have to do permanent searches over all pipelines. Further in order to keep the event based approach the executor probably needs to add finished/updated events to the respective pipeline event queues.",
+      "revId": "6ba86da65fa6a25cb72e1deecf2f17030e121358",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dfd5e7cf_8d82fe4e",
         "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 4
