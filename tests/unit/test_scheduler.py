@@ -5413,6 +5413,16 @@ For CI problems and help debugging, contact ci@example.org"""
             dict(name='irr-job', result='SUCCESS', changes='6,1'),
         ], ordered=False)
 
+    @simple_layout('layouts/job-dependency.yaml')
+    def test_dependent_job_without_parent(self):
+        "Test that a child job is skipped if its parent doesn't match"
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='child-job', result='SKIPPED', changes='1,1'),
+        ])
+
     def test_trusted_project_dep_on_non_live_untrusted_project(self):
         # Test we get a layout for trusted projects when they depend on
         # non live untrusted projects. This checks against a bug where
