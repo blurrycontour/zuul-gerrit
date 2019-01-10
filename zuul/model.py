@@ -1485,6 +1485,10 @@ class Job(ConfigObject):
         if other._get('tags') is not None:
             self.tags = frozenset(self.tags.union(other.tags))
 
+        if other._get('dependencies') is not None:
+            self.dependencies = frozenset(
+                self.dependencies.union(other.dependencies))
+
         self.inheritance_path = self.inheritance_path + (repr(other),)
 
     def changeMatchesBranch(self, change, override_branch=None):
