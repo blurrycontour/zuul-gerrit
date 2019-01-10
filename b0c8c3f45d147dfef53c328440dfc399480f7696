@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dfd5e7cf_11f3560c",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 658,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2019-01-10T06:15:01Z",
+      "side": 1,
+      "message": "These methods don\u0027t really make sense as \"asserts\". It implies they could be used in future tests in this class or a subclass. Perhaps they could just be moved inside of test_tenant_config_structure?",
+      "range": {
+        "startLine": 658,
+        "startChar": 8,
+        "endLine": 658,
+        "endChar": 28
+      },
+      "revId": "b0c8c3f45d147dfef53c328440dfc399480f7696",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
