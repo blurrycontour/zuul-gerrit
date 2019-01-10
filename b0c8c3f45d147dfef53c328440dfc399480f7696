@@ -22,6 +22,30 @@
       "revId": "b0c8c3f45d147dfef53c328440dfc399480f7696",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfd5e7cf_b1992a7a",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 658,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-01-10T06:37:40Z",
+      "side": 1,
+      "message": "Agreed, how about renamed in \"validateObject\". Later we could make part of the content as argument so that they could be re-use for different endpoints.",
+      "parentUuid": "dfd5e7cf_11f3560c",
+      "range": {
+        "startLine": 658,
+        "startChar": 8,
+        "endLine": 658,
+        "endChar": 28
+      },
+      "revId": "b0c8c3f45d147dfef53c328440dfc399480f7696",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
