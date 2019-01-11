@@ -22,6 +22,7 @@ import LabelsPage from './pages/Labels'
 import NodesPage from './pages/Nodes'
 import BuildPage from './pages/Build'
 import BuildsPage from './pages/Builds'
+import BuildsetPage from './pages/Buildset'
 import BuildsetsPage from './pages/Buildsets'
 import ConfigErrorsPage from './pages/ConfigErrors'
 import TenantsPage from './pages/Tenants'
@@ -86,6 +87,10 @@ const routes = () => [
   {
     to: '/build/:buildId',
     component: BuildPage
+  },
+  {
+    to: '/buildset/:buildsetId',
+    component: BuildsetPage
   },
   {
     to: '/config-errors',
