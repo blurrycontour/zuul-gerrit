@@ -1012,8 +1012,7 @@ class GithubConnection(BaseConnection):
                                        'branches')
 
         headers = {'Accept': 'application/vnd.github.loki-preview+json'}
-        protected = 1 if exclude_unprotected else 0
-        params = {'per_page': 100, 'protected': protected}
+        params = {'per_page': 100}
 
         branches = []
         while url:
@@ -1031,7 +1030,13 @@ class GithubConnection(BaseConnection):
                         "Rate limit exceeded, using empty branch list")
                 return []
 
-            branches.extend([x['name'] for x in resp.json()])
+            for branch in resp.json():
+                if exclude_unprotected:
+                    detail = self.getBranch(project.name, branch['name'])
+                    if detail and detail['protected']:
+                        branches.append(branch['name'])
+                else:
+                    branches.append(branch['name'])
 
         self.log_rate_limit(self.log, github)
         cache[project.name] = branches
