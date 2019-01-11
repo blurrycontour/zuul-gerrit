@@ -56,6 +56,7 @@ class SQLReporter(BaseReporter):
 
         with self.connection.getSession() as db:
             db_buildset = db.createBuildSet(
+                uuid=item.uuid,
                 tenant=item.pipeline.tenant.name,
                 pipeline=item.pipeline.name,
                 project=item.change.project.name,
