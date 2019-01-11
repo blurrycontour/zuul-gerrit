@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfdaf3ff_7cee7789",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1035,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-11T16:21:44Z",
+      "side": 1,
+      "message": "This will have a bad effect on loading performance with many projects and many branches. E.g. in our deployment this will create hundreds to thousands of additional requests during startup or reconfiguration.\n\nCan you double check (maybe post an example request) that this returns the protection information? If yes we should think about whether it makes sense to query first with the protected flag and if that doesn\u0027t work fall back to this approach.",
+      "revId": "b5c22b72aaf63aa853b58a9103e3e6ebe3c12c9b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
