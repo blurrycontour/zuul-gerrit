@@ -556,6 +556,20 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    def buildset(self, tenant, uuid):
+        connection = self._get_connection(tenant)
+
+        data = connection.getBuildsets(tenant=tenant, uuid=uuid, limit=1)
+        if not data:
+            raise cherrypy.HTTPError(404, "Build not found")
+        data = self.buildsetToDict(data[0])
+        resp = cherrypy.response
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        return data
+
+    @cherrypy.expose
+    @cherrypy.tools.save_params()
     @cherrypy.tools.websocket(handler_cls=LogStreamHandler)
     def console_stream(self, tenant):
         cherrypy.request.ws_handler.zuulweb = self.zuulweb
@@ -712,6 +726,8 @@ class ZuulWeb(object):
                           controller=api, action='build')
         route_map.connect('api', '/api/tenant/{tenant}/buildsets',
                           controller=api, action='buildsets')
+        route_map.connect('api', '/api/tenant/{tenant}/buildset/{uuid}',
+                          controller=api, action='buildset')
         route_map.connect('api', '/api/tenant/{tenant}/config-errors',
                           controller=api, action='config_errors')
 
