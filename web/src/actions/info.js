@@ -25,6 +25,7 @@ export const fetchInfoRequest = () => ({
 export const fetchInfoSuccess = json => ({
   type: INFO_FETCH_SUCCESS,
   tenant: json.info.tenant,
+  version: json.info.version,
 })
 
 const fetchInfoFail = error => ({

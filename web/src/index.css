@@ -103,6 +103,11 @@ a.refresh {
     background-repeat: 'repeat-y';
 }
 
+.zuul-about {
+    color: black;
+    padding: 1px 10px;
+}
+
 /* Stream page */
 #zuulstreamoverlay {
     float: right;

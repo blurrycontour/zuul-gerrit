@@ -33,6 +33,7 @@ export default (state = {
       return {
         isFetching: false,
         tenant: action.tenant,
+        version: action.version,
         ready: true
       }
     default:

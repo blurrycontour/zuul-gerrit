@@ -23,6 +23,7 @@ import { connect } from 'react-redux'
 import {
   Icon,
   Masthead,
+  MenuItem,
   Notification,
   NotificationDrawer,
   TimedToastNotification,
@@ -231,7 +232,7 @@ class App extends React.Component {
 
   render() {
     const { menuCollapsed, showErrors } = this.state
-    const { errors, configErrors, tenant } = this.props
+    const { errors, configErrors, info, tenant } = this.props
 
     return (
       <React.Fragment>
@@ -267,6 +268,23 @@ class App extends React.Component {
                   </Link>
                 </li>
               )}
+              <Masthead.Dropdown
+                id="about"
+                noCaret
+                disabled={false}
+                title={<Icon type="pf" name="help" />}>
+                {info.version && (
+                  <React.Fragment>
+                    <MenuItem header>Versions</MenuItem>
+                    <div className="zuul-about">
+                      <strong>Scheduler:</strong> {info.version.scheduler}
+                    </div>
+                    <div className="zuul-about">
+                      <strong>Web:</strong> {info.version.web}
+                    </div>
+                  </React.Fragment>
+                )}
+              </Masthead.Dropdown>
             </ul>
             {showErrors && this.renderConfigErrors(configErrors)}
           </div>
