@@ -128,6 +128,9 @@ function fetchBuilds (apiPrefix, queryString) {
   }
   return Axios.get(apiUrl + apiPrefix + path)
 }
+function fetchBuildset (apiPrefix, buildsetId) {
+  return Axios.get(apiUrl + apiPrefix + 'buildset/' + buildsetId)
+}
 function fetchBuildsets (apiPrefix, queryString) {
   let path = 'buildsets'
   if (queryString) {
@@ -162,6 +165,7 @@ export {
   fetchStatus,
   fetchBuild,
   fetchBuilds,
+  fetchBuildset,
   fetchBuildsets,
   fetchProject,
   fetchProjects,
