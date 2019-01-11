@@ -1015,6 +1015,14 @@ class GithubConnection(BaseConnection):
         protected = 1 if exclude_unprotected else 0
         params = {'per_page': 100, 'protected': protected}
 
+        # NOTES: If we set protected=1 to list branched, but no repository
+        # admin permission, github API will raise 404. Params impact paging
+        # next link, so we have to try and decide it before go into paging
+        # logic.
+        resp = github.session.get(url, headers=headers, params=params)
+        if exclude_unprotected and resp.status_code == 404:
+            params['protected'] = 0
+
         branches = []
         while url:
             resp = github.session.get(
@@ -1031,7 +1039,14 @@ class GithubConnection(BaseConnection):
                         "Rate limit exceeded, using empty branch list")
                 return []
 
-            branches.extend([x['name'] for x in resp.json()])
+            # Fall back to use combo querying to get protected branches
+            if exclude_unprotected and params['protected'] == 0:
+                for branch in resp.json():
+                    detail = self.getBranch(project.name, branch['name'])
+                    if detail and detail['protected']:
+                        branches.append(branch['name'])
+            else:
+                branches.extend([x['name'] for x in resp.json()])
 
         self.log_rate_limit(self.log, github)
         cache[project.name] = branches
