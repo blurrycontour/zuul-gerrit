@@ -1020,9 +1020,6 @@ class GithubConnection(BaseConnection):
             resp = github.session.get(
                 url, headers=headers, params=params)
 
-            # check if we need to do further paged calls
-            url = resp.links.get('next', {}).get('url')
-
             if resp.status_code == 403:
                 self.log.error(str(resp))
                 rate_limit = github.rate_limit()
@@ -1031,7 +1028,25 @@ class GithubConnection(BaseConnection):
                         "Rate limit exceeded, using empty branch list")
                 return []
 
-            branches.extend([x['name'] for x in resp.json()])
+            # NOTES: If we set protected=1 to list branches, but no repository
+            # admin permission, github API will raise 404. So we try again
+            # with no filter and filter ourselves.
+            if resp.status_code == 404 and params['protected']:
+                params['protected'] = 0
+                resp = github.session.get(
+                    url, headers=headers, params=params)
+
+            # Fall back to use combo querying to get protected branches.
+            if exclude_unprotected and params['protected'] == 0:
+                for branch in resp.json():
+                    detail = self.getBranch(project.name, branch['name'])
+                    if detail and detail['protected']:
+                        branches.append(branch['name'])
+            else:
+                branches.extend([x['name'] for x in resp.json()])
+
+            # check if we need to do further paged calls
+            url = resp.links.get('next', {}).get('url')
 
         self.log_rate_limit(self.log, github)
         cache[project.name] = branches

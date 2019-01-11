@@ -1119,6 +1119,39 @@ class TestGithubUnprotectedBranches(ZuulTestCase):
         self.assertIn('master', tpc1.parsed_branch_config.keys())
         self.assertIn('master', tpc2.parsed_branch_config.keys())
 
+    def test_protected_branches_without_admin_permission(self):
+        # now enable branch protection and trigger reload
+        github = self.fake_github.getGithubClient()
+        repo = github.repo_from_project('org/project2')
+        repo._set_branch_protection('master', True)
+        self.sched.reconfigure(self.config)
+        self.waitUntilSettled()
+
+        tenant = self.sched.abide.tenants.get('tenant-one')
+        project1 = tenant.untrusted_projects[0]
+        project2 = tenant.untrusted_projects[1]
+        tpc1 = tenant.project_configs[project1.canonical_name]
+        tpc2 = tenant.project_configs[project2.canonical_name]
+
+        # project1 and project2 should have parsed master now, with admin
+        # permission by default
+        self.assertIn('master', tpc1.parsed_branch_config.keys())
+        self.assertIn('master', tpc2.parsed_branch_config.keys())
+
+        # now disable admin permission for project and trigger reload
+        repo._set_admin_permission(False)
+        self.sched.reconfigure(self.config)
+        self.waitUntilSettled()
+
+        tenant = self.sched.abide.tenants.get('tenant-one')
+        tpc1 = tenant.project_configs[project1.canonical_name]
+        tpc2 = tenant.project_configs[project2.canonical_name]
+
+        # project1 and project2 should have parsed master now, without admin
+        # permission
+        self.assertIn('master', tpc1.parsed_branch_config.keys())
+        self.assertIn('master', tpc2.parsed_branch_config.keys())
+
     def test_unprotected_push(self):
         """Test that unprotected pushes don't cause tenant reconfigurations"""
 

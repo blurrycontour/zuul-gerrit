@@ -104,6 +104,8 @@ class FakeRepository(object):
 
         # fail the next commit requests with 404
         self.fail_not_found = 0
+        # have admin permission by default
+        self._admin_permission = True
 
     def branches(self, protected=False):
         if protected:
@@ -116,6 +118,9 @@ class FakeRepository(object):
             if branch.name == branch_name:
                 branch.protected = protected
                 return
+
+    def _set_admin_permission(self, is_admin):
+        self._admin_permission = is_admin
 
     def _build_url(self, *args, **kwargs):
         path_args = ['repos', self.name]
@@ -204,6 +209,12 @@ class FakeRepository(object):
             exclude_unprotected = True
         else:
             exclude_unprotected = False
+
+        # NOTES: If we set protected=1 to list branches, but no repository
+        # admin permission, github API will raise 404.
+        if not self._admin_permission and exclude_unprotected:
+            return FakeResponse(None, 404)
+
         branches = [x.as_dict() for x in self.branches(exclude_unprotected)]
 
         return FakeResponse(branches, 200)
