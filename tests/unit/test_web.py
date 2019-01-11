@@ -726,6 +726,10 @@ class TestBuildInfo(ZuulDBTestCase, BaseTestWeb):
         buildsets = self.get_url("api/tenant/tenant-one/buildsets").json()
         self.assertEqual(2, len(buildsets))
 
+        buildset = self.get_url(
+            "api/tenant/tenant-one/buildset/%s" % buildsets[0]['uuid']).json()
+        self.assertEqual(3, len(buildset["builds"]))
+
 
 class TestArtifacts(ZuulDBTestCase, BaseTestWeb, AnsibleZuulTestCase):
     config_file = 'zuul-sql-driver.conf'
