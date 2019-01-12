@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfdaf3ff_e0d5ceba",
+        "filename": "doc/source/admin/quick-start.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-01-12T20:10:26Z",
+      "side": 0,
+      "message": "I think what we want here is -E - the original goal was preserving http_proxy related env vars.",
+      "range": {
+        "startLine": 65,
+        "startChar": 8,
+        "endLine": 65,
+        "endChar": 11
+      },
+      "revId": "b107af0c059017e25398e05fc6dc53f5f0037247",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
