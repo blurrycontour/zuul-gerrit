@@ -154,7 +154,7 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
 
         zookeeper.connect(zookeeper_hosts, timeout=zookeeper_timeout)
 
-        self.configure_connections()
+        self.configure_connections(require_sql=True)
         self.sched.setExecutor(gearman)
         self.sched.setMerger(merger)
         self.sched.setNodepool(nodepool)
