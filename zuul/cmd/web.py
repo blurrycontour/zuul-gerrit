@@ -94,7 +94,8 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
 
         self.configure_connections(
             include_drivers=[zuul.driver.sql.SQLDriver,
-                             zuul.driver.github.GithubDriver])
+                             zuul.driver.github.GithubDriver],
+            require_sql=True)
 
         try:
             self._run()
