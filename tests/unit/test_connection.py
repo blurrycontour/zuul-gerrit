@@ -11,12 +11,16 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
+import configparser
+import os
+import re
 import textwrap
 
 import sqlalchemy as sa
 
-from tests.base import ZuulTestCase, ZuulDBTestCase
+import zuul
+from tests.base import ZuulTestCase, BaseTestCase, FIXTURE_DIR, \
+    PostgresqlSchemaFixture, MySQLSchemaFixture
 
 
 def _get_reporter_from_connection_name(reporters, connection_name):
@@ -59,7 +63,7 @@ class TestConnections(ZuulTestCase):
                          'civoter')
 
 
-class TestSQLConnection(ZuulDBTestCase):
+class TestSQLConnection(ZuulTestCase):
     config_file = 'zuul-sql-driver.conf'
     tenant_config_file = 'config/sql-driver/main.yaml'
     expected_table_prefix = ''
@@ -300,7 +304,72 @@ class TestSQLConnectionPrefix(TestSQLConnection):
     expected_table_prefix = 'prefix_'
 
 
-class TestConnectionsBadSQL(ZuulDBTestCase):
+class TestRequiredSQLConnection(BaseTestCase):
+    config = None
+    connections = None
+
+    def setUp(self):
+        super(TestRequiredSQLConnection, self).setUp()
+        self.addCleanup(self.stop_connection)
+
+    def setup_connection(self, config_file):
+        self.config = configparser.ConfigParser()
+        self.config.read(os.path.join(FIXTURE_DIR, config_file))
+
+        # Setup databases
+        for section_name in self.config.sections():
+            con_match = re.match(r'^connection ([\'\"]?)(.*)(\1)$',
+                                 section_name, re.I)
+            if not con_match:
+                continue
+
+            if self.config.get(section_name, 'driver') == 'sql':
+                if (self.config.get(section_name, 'dburi') ==
+                        '$MYSQL_FIXTURE_DBURI$'):
+                    f = MySQLSchemaFixture()
+                    self.useFixture(f)
+                    self.config.set(section_name, 'dburi', f.dburi)
+                elif (self.config.get(section_name, 'dburi') ==
+                      '$POSTGRESQL_FIXTURE_DBURI$'):
+                    f = PostgresqlSchemaFixture()
+                    self.useFixture(f)
+                    self.config.set(section_name, 'dburi', f.dburi)
+
+        self.connections = zuul.lib.connections.ConnectionRegistry()
+
+    def stop_connection(self):
+        self.connections.stop()
+
+    def test_sql_multiple_primary_connection(self):
+        exception = None
+        self.setup_connection('zuul-sql-driver-multiple-primary.conf')
+        try:
+            self.connections.configure(self.config, source_only=False,
+                                       require_sql=True)
+        except Exception as e:
+            exception = e
+
+        self.assertEquals(Exception, type(exception), "Wrong exception")
+        self.assertEqual(1, len(exception.args))
+        self.assertEquals("2 of 4 primary SQL connections (1 needed)",
+                          exception.args[0], "Wrong exception message")
+
+    def test_sql_multiple_without_primary_connection(self):
+        exception = None
+        self.setup_connection('zuul-sql-driver-multiple-primary-default.conf')
+        try:
+            self.connections.configure(self.config, source_only=False,
+                                       require_sql=True)
+        except Exception as e:
+            exception = e
+
+        self.assertEquals(Exception, type(exception), "Wrong exception")
+        self.assertEqual(1, len(exception.args))
+        self.assertEquals("0 of 4 primary SQL connections (1 needed)",
+                          exception.args[0], "Wrong exception message")
+
+
+class TestConnectionsBadSQL(ZuulTestCase):
     config_file = 'zuul-sql-driver-bad.conf'
     tenant_config_file = 'config/sql-driver/main.yaml'
 
@@ -410,8 +479,9 @@ class TestConnectionsMerger(ZuulTestCase):
     config_file = 'zuul-connections-merger.conf'
     tenant_config_file = 'config/single-tenant/main.yaml'
 
-    def configure_connections(self):
-        super(TestConnectionsMerger, self).configure_connections(True)
+    def configure_connections(self, source_only=False, require_sql=True):
+        super(TestConnectionsMerger, self).configure_connections(
+            True, require_sql=False)
 
     def test_connections_merger(self):
         "Test merger only configures source connections"
