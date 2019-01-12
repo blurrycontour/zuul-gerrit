@@ -25,7 +25,7 @@ import requests
 import zuul.web
 import zuul.rpcclient
 
-from tests.base import ZuulTestCase, ZuulDBTestCase, AnsibleZuulTestCase
+from tests.base import ZuulTestCase, AnsibleZuulTestCase
 from tests.base import ZuulWebFixture, FIXTURE_DIR, iterate_timeout
 
 
@@ -1070,7 +1070,7 @@ class TestGraphiteUrl(TestInfo):
     }
 
 
-class TestBuildInfo(ZuulDBTestCase, BaseTestWeb):
+class TestBuildInfo(BaseTestWeb):
     config_file = 'zuul-sql-driver.conf'
     tenant_config_file = 'config/sql-driver/main.yaml'
 
@@ -1127,7 +1127,7 @@ class TestBuildInfo(ZuulDBTestCase, BaseTestWeb):
         self.assertEqual('SUCCESS', project_merge_build['result'])
 
 
-class TestArtifacts(ZuulDBTestCase, BaseTestWeb, AnsibleZuulTestCase):
+class TestArtifacts(BaseTestWeb, AnsibleZuulTestCase):
     config_file = 'zuul-sql-driver.conf'
     tenant_config_file = 'config/sql-driver/main.yaml'
 
