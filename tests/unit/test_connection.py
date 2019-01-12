@@ -16,7 +16,7 @@ import textwrap
 
 import sqlalchemy as sa
 
-from tests.base import ZuulTestCase, ZuulDBTestCase
+from tests.base import ZuulTestCase
 
 
 def _get_reporter_from_connection_name(reporters, connection_name):
@@ -59,7 +59,7 @@ class TestConnections(ZuulTestCase):
                          'civoter')
 
 
-class TestSQLConnection(ZuulDBTestCase):
+class TestSQLConnection(ZuulTestCase):
     config_file = 'zuul-sql-driver.conf'
     tenant_config_file = 'config/sql-driver/main.yaml'
     expected_table_prefix = ''
@@ -300,7 +300,49 @@ class TestSQLConnectionPrefix(TestSQLConnection):
     expected_table_prefix = 'prefix_'
 
 
-class TestConnectionsBadSQL(ZuulDBTestCase):
+class TestSQLConnectionMutliplePrimary(ZuulTestCase):
+    config_file = 'zuul-sql-driver-multiple-primary.conf'
+    tenant_config_file = 'config/sql-driver/main.yaml'
+    expected_table_prefix = ''
+    expected_exception = None
+
+    def setUp(self):
+        try:
+            super(TestSQLConnectionMutliplePrimary, self).setUp()
+        except Exception as e:
+            self.expected_exception = e
+
+    def test_sql_mutliple_primary_connection(self):
+        self.assertEquals(Exception, type(self.expected_exception),
+                          "Wrong exception")
+        self.assertEqual(1, len(self.expected_exception.args))
+        self.assertEquals("2 of 4 primary SQL connections (1 needed)",
+                          self.expected_exception.args[0],
+                          "Wrong exception message")
+
+
+class TestSQLConnectionMutlipleWithoutPrimary(ZuulTestCase):
+    config_file = 'zuul-sql-driver-multiple-primary-default.conf'
+    tenant_config_file = 'config/sql-driver/main.yaml'
+    expected_table_prefix = ''
+    expected_exception = None
+
+    def setUp(self):
+        try:
+            super(TestSQLConnectionMutlipleWithoutPrimary, self).setUp()
+        except Exception as e:
+            self.expected_exception = e
+
+    def test_sql_mutliple_without_primary_connection(self):
+        self.assertEquals(Exception, type(self.expected_exception),
+                          "Wrong exception")
+        self.assertEqual(1, len(self.expected_exception.args))
+        self.assertEquals("0 of 4 primary SQL connections (1 needed)",
+                          self.expected_exception.args[0],
+                          "Wrong exception message")
+
+
+class TestConnectionsBadSQL(ZuulTestCase):
     config_file = 'zuul-sql-driver-bad.conf'
     tenant_config_file = 'config/sql-driver/main.yaml'
 
@@ -410,8 +452,9 @@ class TestConnectionsMerger(ZuulTestCase):
     config_file = 'zuul-connections-merger.conf'
     tenant_config_file = 'config/single-tenant/main.yaml'
 
-    def configure_connections(self):
-        super(TestConnectionsMerger, self).configure_connections(True)
+    def configure_connections(self, source_only=False, require_sql=True):
+        super(TestConnectionsMerger, self).configure_connections(
+            True, require_sql=False)
 
     def test_connections_merger(self):
         "Test merger only configures source connections"

@@ -81,7 +81,8 @@ class ConnectionRegistry(object):
         for driver in self.drivers.values():
             driver.stop()
 
-    def configure(self, config, source_only=False, include_drivers=None):
+    def configure(self, config, source_only=False, include_drivers=None,
+                  require_sql=False):
         # Register connections from the config
         connections = OrderedDict()
 
@@ -155,6 +156,21 @@ class ConnectionRegistry(object):
                 if not hasattr(driver, 'getConnection'):
                     connections[driver.name] = DefaultConnection(
                         driver, driver.name, {})
+
+        if require_sql:
+            sql_connections = [
+                c for c in connections.values()
+                if isinstance(c.driver, zuul.driver.sql.SQLDriver)]
+            if not sql_connections:
+                raise Exception("At least one sql connection is required")
+
+            primary_connections = sql_connections if len(sql_connections) == 1\
+                else list(filter(lambda c: c.primary, sql_connections))
+
+            if len(primary_connections) != 1:
+                raise Exception("%d of %d primary SQL connections (1 needed)"
+                                % (len(primary_connections),
+                                   len(sql_connections)))
 
         self.connections = connections
 
