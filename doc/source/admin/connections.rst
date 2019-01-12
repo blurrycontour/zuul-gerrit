@@ -42,6 +42,9 @@ to satisfy unique reporting requirements) be sure to list the primary
 connection first as that is what Zuul will use to look up all changes
 for that server.
 
+The components zuul-scheduler and zuul-web require at least one configured
+sql connection.
+
 .. _drivers:
 
 Drivers

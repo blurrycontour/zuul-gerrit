@@ -1,0 +1,5 @@
+---
+upgrade:
+  - |
+    The components zuul-scheduler and zuul-web now require at least one
+    configured sql connection.
