@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfdaf3ff_e0ee2e87",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1127,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-01-12T20:15:56Z",
+      "side": 1,
+      "message": "I think source_context should always be in the dict. (The dict should be the dict) Howe about same as semaphore below:\n\n  if self.source_context:\n      d[\u0027source_context\u0027] \u003d self.source_context.toDict()\n  else:\n      d[\u0027source_context\u0027] \u003d None",
+      "range": {
+        "startLine": 1126,
+        "startChar": 0,
+        "endLine": 1127,
+        "endChar": 62
+      },
+      "revId": "29c4ad35db9ece544e78b243b8f0e7317b284ae5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
