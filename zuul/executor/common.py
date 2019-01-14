@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import collections
 import datetime
 import json
 import logging
@@ -28,6 +29,8 @@ import git
 from urllib.parse import urlsplit
 
 import zuul.ansible.logconfig
+import zuul.merger.merger
+
 from zuul.lib.config import get_default
 from zuul.lib.yamlutil import yaml
 from zuul.lib import filecomments
@@ -97,6 +100,67 @@ def make_inventory_dict(nodes, args, all_vars):
             }})
 
     return inventory
+
+
+class UpdateTask(object):
+    def __init__(self, connection_name, project_name):
+        self.connection_name = connection_name
+        self.project_name = project_name
+        self.canonical_name = None
+        self.branches = None
+        self.refs = None
+        self.event = threading.Event()
+
+    def __eq__(self, other):
+        if (other and other.connection_name == self.connection_name and
+            other.project_name == self.project_name):
+            return True
+        return False
+
+    def wait(self):
+        self.event.wait()
+
+    def setComplete(self):
+        self.event.set()
+
+
+class DeduplicateQueue(object):
+    def __init__(self):
+        self.queue = collections.deque()
+        self.condition = threading.Condition()
+
+    def qsize(self):
+        return len(self.queue)
+
+    def put(self, item):
+        # Returns the original item if added, or an equivalent item if
+        # already enqueued.
+        self.condition.acquire()
+        ret = None
+        try:
+            for x in self.queue:
+                if item == x:
+                    ret = x
+            if ret is None:
+                ret = item
+                self.queue.append(item)
+                self.condition.notify()
+        finally:
+            self.condition.release()
+        return ret
+
+    def get(self):
+        self.condition.acquire()
+        try:
+            while True:
+                try:
+                    ret = self.queue.popleft()
+                    return ret
+                except IndexError:
+                    pass
+                self.condition.wait()
+        finally:
+            self.condition.release()
 
 
 class Watchdog(object):
@@ -458,12 +522,31 @@ class AnsibleJobBase(object):
         self.project_info = {}
         self.connections = connections
         self.merge_root = merger_root
+        self.executor_server = None
 
     def writeAnsibleConfig(self, jobdir_playbook):
-        # TODO(jhesketh)
-        pass
+        with open(jobdir_playbook.ansible_config, 'w') as config:
+            config.write('[defaults]\n')
+            config.write('inventory = %s\n' % self.jobdir.inventory)
+            config.write('local_tmp = %s\n' % self.jobdir.local_tmp)
+            config.write('retry_files_enabled = False\n')
+            config.write('gathering = smart\n')
+            config.write('fact_caching = jsonfile\n')
+            config.write('fact_caching_connection = %s\n' %
+                         self.jobdir.fact_cache)
+            if self.executor_server:
+                config.write('library = %s\n'
+                             % self.executor_server.library_dir)
+                config.write('filter_plugins = %s\n'
+                             % self.executor_server.filter_dir)
+            config.write('command_warnings = False\n')
 
-    def getMerger(self, root, cache_root=None, logger=None):
+            if jobdir_playbook.roles_path:
+                config.write('roles_path = %s\n' % ':'.join(
+                    jobdir_playbook.roles_path))
+
+    def getMerger(
+            self, root, cache_root=None, logger=None, execution_context=None):
         # TODO(jhesketh): Maybe return a merger directly here
         email = 'todo'
         username = 'todo'
@@ -579,7 +662,7 @@ class AnsibleJobBase(object):
         self.log.debug("Prepare playbook repo for %s: %s@%s" %
                        (playbook['trusted'] and 'trusted' or 'untrusted',
                         playbook['project'], playbook['branch']))
-        source = self.executor_server.connections.getSource(
+        source = self.connections.getSource(
             playbook['connection'])
         project = source.getProject(playbook['project'])
         branch = playbook['branch']
@@ -624,9 +707,9 @@ class AnsibleJobBase(object):
                                                  branch)
             self.log.debug("Cloning %s@%s into new trusted space %s",
                            project, branch, root)
-            merger = self.executor_server._getMerger(
+            merger = self.getMerger(
                 root,
-                self.executor_server.merge_root,
+                self.merge_root,
                 self.log)
             merger.checkoutBranch(project.connection_name, project.name,
                                   branch)
@@ -661,9 +744,9 @@ class AnsibleJobBase(object):
                     break
 
             if merger is None:
-                merger = self.executor_server._getMerger(
+                merger = self.getMerger(
                     root,
-                    self.executor_server.merge_root,
+                    self.merge_root,
                     self.log)
 
             self.log.debug("Cloning %s@%s into new untrusted space %s",
@@ -708,7 +791,7 @@ class AnsibleJobBase(object):
     def prepareZuulRole(self, jobdir_playbook, role, args, root):
         self.log.debug("Prepare zuul role for %s" % (role,))
         # Check out the role repo if needed
-        source = self.executor_server.connections.getSource(
+        source = self.connections.getSource(
             role['connection'])
         project = source.getProject(role['project'])
         name = role['target_name']
@@ -871,6 +954,21 @@ class AnsibleJobBase(object):
             repo.setRemoteUrl('file:///dev/null')
 
         return item_commit, merger
+
+    def _blockPluginDirs(self, path):
+        '''Prevent execution of playbooks or roles with plugins
+
+        Plugins are loaded from roles and also if there is a plugin
+        dir adjacent to the playbook.  Throw an error if the path
+        contains a location that would cause a plugin to get loaded.
+
+        '''
+        for entry in os.listdir(path):
+            entry = os.path.join(path, entry)
+            if os.path.isdir(entry) and entry.endswith('_plugins'):
+                raise ExecutorError(
+                    "Ansible plugin dir %s found adjacent to playbook %s in "
+                    "non-trusted repo." % (entry, path))
 
 
 class AnsibleJob(AnsibleJobBase):
@@ -1407,21 +1505,6 @@ class AnsibleJob(AnsibleJobBase):
                     host_vars=host_vars,
                     host_keys=host_keys))
         return hosts
-
-    def _blockPluginDirs(self, path):
-        '''Prevent execution of playbooks or roles with plugins
-
-        Plugins are loaded from roles and also if there is a plugin
-        dir adjacent to the playbook.  Throw an error if the path
-        contains a location that would cause a plugin to get loaded.
-
-        '''
-        for entry in os.listdir(path):
-            entry = os.path.join(path, entry)
-            if os.path.isdir(entry) and entry.endswith('_plugins'):
-                raise ExecutorError(
-                    "Ansible plugin dir %s found adjacent to playbook %s in "
-                    "non-trusted repo." % (entry, path))
 
     def prepareKubeConfig(self, data):
         kube_cfg_path = os.path.join(self.jobdir.work_root, ".kube", "config")

@@ -12,7 +12,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import collections
 import json
 import logging
 import os
@@ -31,6 +30,7 @@ import gear
 import zuul.merger.merger
 import zuul.ansible.logconfig
 from zuul.executor.common import AnsibleJob, DEFAULT_FINGER_PORT
+from zuul.executor.common import DeduplicateQueue, UpdateTask
 from zuul.executor.sensors.cpu import CPUSensor
 from zuul.executor.sensors.hdd import HDDSensor
 from zuul.executor.sensors.pause import PauseSensor
@@ -127,67 +127,6 @@ class DiskAccountant(object):
         # We join here to avoid whitelisting the thread -- if it takes more
         # than 5s to stop in tests, there's a problem.
         self.thread.join(timeout=5)
-
-
-class UpdateTask(object):
-    def __init__(self, connection_name, project_name):
-        self.connection_name = connection_name
-        self.project_name = project_name
-        self.canonical_name = None
-        self.branches = None
-        self.refs = None
-        self.event = threading.Event()
-
-    def __eq__(self, other):
-        if (other and other.connection_name == self.connection_name and
-            other.project_name == self.project_name):
-            return True
-        return False
-
-    def wait(self):
-        self.event.wait()
-
-    def setComplete(self):
-        self.event.set()
-
-
-class DeduplicateQueue(object):
-    def __init__(self):
-        self.queue = collections.deque()
-        self.condition = threading.Condition()
-
-    def qsize(self):
-        return len(self.queue)
-
-    def put(self, item):
-        # Returns the original item if added, or an equivalent item if
-        # already enqueued.
-        self.condition.acquire()
-        ret = None
-        try:
-            for x in self.queue:
-                if item == x:
-                    ret = x
-            if ret is None:
-                ret = item
-                self.queue.append(item)
-                self.condition.notify()
-        finally:
-            self.condition.release()
-        return ret
-
-    def get(self):
-        self.condition.acquire()
-        try:
-            while True:
-                try:
-                    ret = self.queue.popleft()
-                    return ret
-                except IndexError:
-                    pass
-                self.condition.wait()
-        finally:
-            self.condition.release()
 
 
 def _copy_ansible_files(python_module, target_dir):
