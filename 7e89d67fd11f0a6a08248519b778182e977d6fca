@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfdaf3ff_1e4dbc71",
+        "filename": "zuul/ansible/actiongeneral/zuul_return.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-14T16:59:17Z",
+      "side": 1,
+      "message": "zuul_return writes to this path so allow_trusted must be false.",
+      "revId": "7e89d67fd11f0a6a08248519b778182e977d6fca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
