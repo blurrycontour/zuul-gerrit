@@ -104,6 +104,7 @@ class CallbackModule(CallbackBase):
             'task': {
                 'name': task.name,
                 'id': str(task._uuid),
+                'action': task.action,
                 'duration': {
                     'start': current_time()
                 }
