@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfdaf3ff_42edb7ed",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1024,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-14T06:50:59Z",
+      "side": 1,
+      "message": "This still causes one extra request per project in the normal case. I think it\u0027s possible to do this fallback directly in the while loop (see below).",
+      "revId": "95e732aff6e348f3a3535c433ccd1929af9be751",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfdaf3ff_e2bb8be2",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1041,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-14T06:50:59Z",
+      "side": 1,
+      "message": "Something like this here:\n\n if params[\u0027protected\u0027] and resp.status_code \u003d\u003d 404:\n     params[\u0027protected\u0027] \u003d 0\n     resp \u003d github.session.get(...)\n     url \u003d resp.links.get(...)",
+      "revId": "95e732aff6e348f3a3535c433ccd1929af9be751",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
