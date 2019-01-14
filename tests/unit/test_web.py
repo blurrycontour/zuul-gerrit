@@ -57,15 +57,6 @@ class BaseTestWeb(ZuulTestCase):
 
         self.executor_server.hold_jobs_in_build = True
 
-        if self.tenant_config_file != 'config/broken/main.yaml':
-            A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-            A.addApproval('Code-Review', 2)
-            self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
-            B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
-            B.addApproval('Code-Review', 2)
-            self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
-            self.waitUntilSettled()
-
         self.host = 'localhost'
         self.port = self.web.port
         # Wait until web server is started
@@ -77,6 +68,15 @@ class BaseTestWeb(ZuulTestCase):
                 pass
         self.base_url = "http://{host}:{port}".format(
             host=self.host, port=self.port)
+
+    def add_base_changes(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
 
     def get_url(self, url, *args, **kwargs):
         return requests.get(
@@ -93,6 +93,7 @@ class TestWeb(BaseTestWeb):
 
     def test_web_status(self):
         "Test that we can retrieve JSON status info"
+        self.add_base_changes()
         self.executor_server.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         A.addApproval('Code-Review', 2)
@@ -194,6 +195,7 @@ class TestWeb(BaseTestWeb):
 
     def test_web_tenants(self):
         "Test that we can retrieve JSON status info"
+        self.add_base_changes()
         self.executor_server.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         A.addApproval('Code-Review', 2)
@@ -252,6 +254,7 @@ class TestWeb(BaseTestWeb):
 
     def test_web_find_change(self):
         # can we filter by change id
+        self.add_base_changes()
         data = self.get_url("api/tenant/tenant-one/status/change/1,1").json()
 
         self.assertEqual(1, len(data), data)
@@ -664,6 +667,7 @@ class TestBuildInfo(ZuulDBTestCase, BaseTestWeb):
 
     def test_web_list_builds(self):
         # Generate some build records in the db.
+        self.add_base_changes()
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
         self.waitUntilSettled()
