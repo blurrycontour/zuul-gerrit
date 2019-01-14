@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfdaf3ff_04a57804",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1034,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-14T10:08:30Z",
+      "side": 1,
+      "message": "I\u0027d find it much easier to read if we structure it like this:\n\n  while url:\n      resp \u003d github.session.get(\n          url, headers\u003dheaders, params\u003dparams)\n\n\n      if resp.status_code \u003d\u003d 403:\n          self.log.error(str(resp))\n          rate_limit \u003d github.rate_limit()\n          if rate_limit[\u0027resources\u0027][\u0027core\u0027][\u0027remaining\u0027] \u003d\u003d 0:\n              self.log.warning(\n                  \"Rate limit exceeded, using empty branch list\")\n          return []\n\n\n      # NOTES: If we set protected\u003d1 to list branched, but no\n      # repository admin permission, github API will raise 404 so we try\n      # again with no filter and filter ourselve.\n      if resp.status_code \u003d\u003d 404 and params[\u0027protected\u0027]:\n          params[\u0027protected\u0027] \u003d 0\n          resp \u003d github.session.get(\n              url, headers\u003dheaders, params\u003dparams)\n\n\n      # Fall back to use combo querying to get protected branches.\n      if exclude_unprotected and params[\u0027protected\u0027] \u003d\u003d 0:\n          for branch in resp.json():\n              detail \u003d self.getBranch(project.name, branch[\u0027name\u0027])\n              if detail and detail[\u0027protected\u0027]:\n                  branches.append(branch[\u0027name\u0027])\n      else:\n          branches.extend([x[\u0027name\u0027] for x in resp.json()])\n\n\n      # check if we need to do further paged calls\n      url \u003d resp.links.get(\u0027next\u0027, {}).get(\u0027url\u0027)",
+      "revId": "e3fdd7a853dba5453ab8b5fe4b67a511c0ca38b8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
