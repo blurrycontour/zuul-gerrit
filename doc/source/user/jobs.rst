@@ -728,7 +728,8 @@ To set the log URL for a build, use *zuul_return* to set the
 .. code-block:: yaml
 
   tasks:
-    - zuul_return:
+    - delegate_to: localhost
+      zuul_return:
         data:
           zuul:
             log_url: http://logs.example.com/path/to/build/logs
@@ -748,7 +749,8 @@ under the **zuul.artifacts** dictionary.  For example:
 .. code-block:: yaml
 
   tasks:
-    - zuul_return:
+    - delegate_to: localhost
+      zuul_return:
         data:
           zuul:
             artifacts:
@@ -769,7 +771,8 @@ To skip a child job for the current build, use *zuul_return* to set the
 .. code-block:: yaml
 
   tasks:
-    - zuul_return:
+    - delegate_to: localhost
+      zuul_return:
         data:
           zuul:
             child_jobs:
@@ -791,7 +794,8 @@ change, set the **zuul.file_comments** value.  For example:
 .. code-block:: yaml
 
   tasks:
-    - zuul_return:
+    - delegate_to: localhost
+      zuul_return:
         data:
           zuul:
             file_comments:
@@ -833,7 +837,8 @@ supply any arbitrary data to the child jobs. For example:
 .. code-block:: yaml
 
   tasks:
-    - zuul_return:
+    - delegate_to: localhost
+      zuul_return:
         data:
           zuul:
             pause: true
