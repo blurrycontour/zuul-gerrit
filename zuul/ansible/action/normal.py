@@ -79,6 +79,11 @@ class ActionModule(normal.ActionModule):
             if dest:
                 paths._fail_if_unsafe(dest)
 
+    def handle_known_hosts(self):
+        '''Allow known_hosts on localhost'''
+        if paths._is_localhost_task(self):
+            self.handle_file()
+
     def handle_uri(self):
         '''Allow uri module on localhost if it doesn't touch unsafe files.
 
