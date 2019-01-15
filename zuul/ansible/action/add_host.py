@@ -24,7 +24,7 @@ class ActionModule(add_host.ActionModule):
             'ansible_connection',
             'ansible_host',
             'ansible_port',
-            'ansible_user'
+            'ansible_user',
             'ansible_password',
             'ansible_ssh_host',
             'ansible_ssh_port'
