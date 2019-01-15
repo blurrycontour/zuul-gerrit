@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfdaf3ff_42ccbe60",
+        "filename": "zuul/ansible/action/add_host.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2019-01-15T05:19:33Z",
+      "side": 1,
+      "message": "I think I\u0027m understanding the implication here correctly saying that this didn\u0027t allow through arguments that were actually safe, as opposed to the alternative that it could allow through arguments that are considered *unsafe*?",
+      "revId": "6bca46fca23373e6766f0b1b7f12fcfd0f54cabf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
