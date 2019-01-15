@@ -178,7 +178,7 @@ class GitConnection(BaseConnection):
         refs = {}
         client = git.cmd.Git()
         output = client.ls_remote(
-            os.path.join(self.baseurl, project))
+            urllib.parse.urljoin(self.baseurl, project))
         for line in output.splitlines():
             sha, ref = line.split('\t')
             if ref.startswith('refs/'):
@@ -231,8 +231,7 @@ class GitConnection(BaseConnection):
         return branches
 
     def getGitUrl(self, project):
-        url = '%s/%s' % (self.baseurl, project.name)
-        return url
+        return urllib.parse.urljoin(self.baseurl, project.name)
 
     def onLoad(self):
         self.log.debug("Starting Git Watcher")
