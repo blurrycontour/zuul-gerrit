@@ -15,9 +15,10 @@
 
 import logging
 import os
+import sys
 import tempfile
 import threading
-import sys
+import uuid
 
 import requests
 
@@ -26,7 +27,7 @@ import zuul.merger.merger
 import zuul.lib.connections
 
 from zuul.executor.common import JobDir, AnsibleJobBase, DeduplicateQueue
-from zuul.executor.common import UpdateTask
+from zuul.executor.common import UpdateTask, SshAgent
 
 
 class Runner(zuul.cmd.ZuulApp):
@@ -62,6 +63,28 @@ class Runner(zuul.cmd.ZuulApp):
         cmd_prep_workspace.add_argument(
             '--dir', '--directory', default=None,
             help='the directory to prepare inside of. Defaults to a temp dir')
+
+        cmd_execute = subparsers.add_parser(
+            'execute',
+            help='Execute a job locally, prepare-workspace if needed')
+        cmd_execute.set_defaults(func=self.execute_job)
+        cmd_execute.add_argument(
+            '--dir', '--directory', default=None,
+            help='the directory to prepare inside of. Defaults to a temp dir')
+
+        self.job_params = None
+        self.hostname = 'localhost'
+        self.default_username = 'zuul-runner'
+        self.verbose = False
+        self.executor_variables_file = None
+        self.ansible_dir = None
+        self.statsd = None
+        self.library_dir = os.path.realpath(
+            os.path.join(__file__, "..", "..", "ansible", "library"))
+        self.filter_dir = os.path.realpath(
+            os.path.join(__file__, "..", "..", "ansible", "filter"))
+        self.callback_dir = os.path.realpath(
+            os.path.join(__file__, "..", "..", "ansible", "callback"))
 
         # TODO(jhesketh):
         #  - Allow setting the zuul instance endpoint from params or env vars
@@ -146,24 +169,74 @@ class Runner(zuul.cmd.ZuulApp):
         self.update_thread.daemon = True
         self.update_thread.start()
 
-    def prep_workspace(self):
-        job_params = self._grab_frozen_job()
+    def prep_environment(self):
+        self.job_params = self._grab_frozen_job()
         self.connections = self._constructConnections()
+        if self.args.dir:
+            root = self.args.dir
+            os.makedirs(root, exist_ok=True)
+            exist_ok = True
+        else:
+            root = tempfile.mkdtemp()
+            exist_ok = False
+        uid = str(uuid.uuid4().hex)
+        # TODO(tristanC): enable uuid cli argument
+        uid = "test"
+        self.merger_root = os.path.join(root, uid, "work", "src")
+        self.job = AnsibleJobBase(
+            self, self.job_params)
+        self.jobdir = JobDir(
+            root, keep=True, build_uuid=uid, exist_ok=exist_ok)
+        self.job.jobdir = self.jobdir
+        print("Working dir: %s" % self.job.jobdir.root)
+
+    def prep_workspace(self):
+        if not self.job_params:
+            self.prep_environment()
         self.merger_lock = threading.Lock()
-        self.merge_root = tempfile.mkdtemp()
-        job = AnsibleJobBase(job_params, self.connections, self.merge_root)
-        self.merger = job.getMerger(
-            self.merge_root, logger=None, execution_context=True)
+        self.merger = self.job.getMerger(
+            self.merger_root, logger=None, execution_context=True)
         self.start_update_thread()
         # TODO(jhesketh):
-        #  - Allow working dir to be set
         #  - Give options to clean up working dir
         #  - figure out what to do with build_uuid's
-        root = tempfile.mkdtemp()
-        print("Working dir: %s" % root)
-        job.jobdir = JobDir(root, keep=False, build_uuid="aaa")
-        job.prepareRepositories(self.update)
-        job.preparePlaybooks(job_params)
+        self.job.prepareRepositories(self.update, exists_ok=True)
+
+    def execute_job(self):
+        if not self.job_params:
+            self.prep_environment()
+
+        self.prep_workspace()
+        self.execution_wrapper = self.connections.drivers["bubblewrap"]
+
+        # TODO(tristanC):
+        #  - first enable user provided inventory
+        #  - later user could provide nodepool.configuration and let the runner
+        #    manage resources lifecycle...
+        nodesets = {
+            "name": "test-nodeset",
+            "nodes": [{
+                'name': ['test-instance'],
+                'interface_ip': '127.0.0.1',
+                'connection_port': 22,
+                'connection_type': 'ssh',
+                'username': 'zuul-worker'
+            }],
+            "groups": [],
+        }
+        self.job_params.update(nodesets)
+        self.job.preparePlaybooks(self.job_params)
+        self.job.prepareAnsibleFiles(self.job_params)
+        self.job.writeLoggingConfig()
+
+        self.job.ssh_agent = SshAgent()
+        try:
+            self.job.ssh_agent.start()
+            # TODO: enable custom key
+            self.job.ssh_agent.add(os.path.expanduser("~/.ssh/id_rsa"))
+            print(self.job.runPlaybooks(self.job_params))
+        finally:
+            self.job.ssh_agent.stop()
 
     def main(self):
         self.parseArguments()
