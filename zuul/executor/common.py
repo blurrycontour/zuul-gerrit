@@ -209,7 +209,7 @@ class RoleNotFoundError(ExecutorError):
 
 
 class JobDirPlaybook(object):
-    def __init__(self, root):
+    def __init__(self, root, exist_ok=False):
         self.root = root
         self.trusted = None
         self.project_canonical_name = None
@@ -221,7 +221,7 @@ class JobDirPlaybook(object):
         self.ansible_config = os.path.join(self.root, 'ansible.cfg')
         self.project_link = os.path.join(self.root, 'project')
         self.secrets_root = os.path.join(self.root, 'secrets')
-        os.makedirs(self.secrets_root)
+        os.makedirs(self.secrets_root, exist_ok=exist_ok)
         self.secrets = os.path.join(self.secrets_root, 'secrets.yaml')
         self.secrets_content = None
 
@@ -234,7 +234,7 @@ class JobDirPlaybook(object):
 
 
 class JobDir(object):
-    def __init__(self, root, keep, build_uuid):
+    def __init__(self, root, keep, build_uuid, exist_ok=False):
         '''
         :param str root: Root directory for the individual job directories.
             Can be None to use the default system temp root directory.
@@ -279,35 +279,35 @@ class JobDir(object):
         else:
             tmpdir = tempfile.gettempdir()
         self.root = os.path.join(tmpdir, build_uuid)
-        os.mkdir(self.root, 0o700)
+        os.makedirs(self.root, 0o700, exist_ok=exist_ok)
         self.work_root = os.path.join(self.root, 'work')
-        os.makedirs(self.work_root)
+        os.makedirs(self.work_root, exist_ok=exist_ok)
         self.src_root = os.path.join(self.work_root, 'src')
-        os.makedirs(self.src_root)
+        os.makedirs(self.src_root, exist_ok=exist_ok)
         self.log_root = os.path.join(self.work_root, 'logs')
-        os.makedirs(self.log_root)
+        os.makedirs(self.log_root, exist_ok=exist_ok)
         # Create local tmp directory
         # NOTE(tobiash): This must live within the work root as it can be used
         # by ansible for temporary files which are path checked in untrusted
         # jobs.
         self.local_tmp = os.path.join(self.work_root, 'tmp')
-        os.makedirs(self.local_tmp)
+        os.makedirs(self.local_tmp, exist_ok=exist_ok)
         self.ansible_root = os.path.join(self.root, 'ansible')
-        os.makedirs(self.ansible_root)
+        os.makedirs(self.ansible_root, exist_ok=exist_ok)
         self.trusted_root = os.path.join(self.root, 'trusted')
-        os.makedirs(self.trusted_root)
+        os.makedirs(self.trusted_root, exist_ok=exist_ok)
         self.untrusted_root = os.path.join(self.root, 'untrusted')
-        os.makedirs(self.untrusted_root)
+        os.makedirs(self.untrusted_root, exist_ok=exist_ok)
         ssh_dir = os.path.join(self.work_root, '.ssh')
-        os.mkdir(ssh_dir, 0o700)
+        os.makedirs(ssh_dir, 0o700, exist_ok=exist_ok)
         # Create ansible cache directory
         self.ansible_cache_root = os.path.join(self.root, '.ansible')
         self.fact_cache = os.path.join(self.ansible_cache_root, 'fact-cache')
-        os.makedirs(self.fact_cache)
+        os.makedirs(self.fact_cache, exist_ok=exist_ok)
         self.control_path = os.path.join(self.ansible_cache_root, 'cp')
         self.job_unreachable_file = os.path.join(self.ansible_cache_root,
                                                  'nodes.unreachable')
-        os.makedirs(self.control_path)
+        os.makedirs(self.control_path, exist_ok=exist_ok)
         localhost_facts = os.path.join(self.fact_cache, 'localhost')
         # NOTE(pabelanger): We do not want to leak zuul-executor facts to other
         # playbooks now that smart fact gathering is enabled by default.  We
@@ -349,8 +349,8 @@ class JobDir(object):
         # methods to write an ansible.cfg as the rest of the Ansible
         # runs.
         setup_root = os.path.join(self.ansible_root, 'setup_playbook')
-        os.makedirs(setup_root)
-        self.setup_playbook = JobDirPlaybook(setup_root)
+        os.makedirs(setup_root, exist_ok=exist_ok)
+        self.setup_playbook = JobDirPlaybook(setup_root, exist_ok)
         self.setup_playbook.trusted = True
 
     def addTrustedProject(self, canonical_name, branch):
@@ -515,14 +515,34 @@ class AnsibleJobLogAdapter(logging.LoggerAdapter):
 class AnsibleJobBase(object):
     "This class prepares the roles and repositories for an Ansible Job"
 
-    def __init__(self, arguments, connections, merger_root):
+    RESULT_NORMAL = 1
+    RESULT_TIMED_OUT = 2
+    RESULT_UNREACHABLE = 3
+    RESULT_ABORTED = 4
+    RESULT_DISK_FULL = 5
+
+    RESULT_MAP = {
+        RESULT_NORMAL: 'RESULT_NORMAL',
+        RESULT_TIMED_OUT: 'RESULT_TIMED_OUT',
+        RESULT_UNREACHABLE: 'RESULT_UNREACHABLE',
+        RESULT_ABORTED: 'RESULT_ABORTED',
+        RESULT_DISK_FULL: 'RESULT_DISK_FULL',
+    }
+
+    def __init__(self, job_runner, arguments):
         self.log = logging.getLogger("zuul.AnsibleJobBase")
         self.arguments = arguments
         self.jobdir = None
         self.project_info = {}
-        self.connections = connections
-        self.merge_root = merger_root
-        self.executor_server = None
+        self.executor_server = job_runner
+        self.executor_variables_file = None
+        self.connections = job_runner.connections
+        self.merge_root = job_runner.merge_root
+        self.ansible_dir = None
+        self.proc_lock = threading.Lock()
+        self.aborted = False
+        self.cpu_times = {'user': 0, 'system': 0,
+                          'children_user': 0, 'children_system': 0}
 
     def writeAnsibleConfig(self, jobdir_playbook):
         with open(jobdir_playbook.ansible_config, 'w') as config:
@@ -535,10 +555,14 @@ class AnsibleJobBase(object):
             config.write('fact_caching_connection = %s\n' %
                          self.jobdir.fact_cache)
             if self.executor_server:
+                config.write('stdout_callback = zuul_stream\n')
                 config.write('library = %s\n'
                              % self.executor_server.library_dir)
+                config.write('callback_plugins = %s\n'
+                             % self.executor_server.callback_dir)
                 config.write('filter_plugins = %s\n'
                              % self.executor_server.filter_dir)
+
             config.write('command_warnings = False\n')
 
             if jobdir_playbook.roles_path:
@@ -737,6 +761,7 @@ class AnsibleJobBase(object):
                     p['name'] == project.name):
                     # We already have this repo prepared
                     self.log.debug("Found workdir repo for untrusted project")
+                    # NOTE(tristanC): only valid for executor server context
                     merger = self.executor_server._getMerger(
                         root,
                         self.jobdir.src_root,
@@ -852,7 +877,7 @@ class AnsibleJobBase(object):
         self.log.debug("Adding role path %s", role_path)
         jobdir_playbook.roles_path.append(role_path)
 
-    def prepareRepositories(self, update_manager):
+    def prepareRepositories(self, update_manager, exists_ok=True):
         args = self.arguments
         tasks = []
         projects = set()
@@ -906,6 +931,7 @@ class AnsibleJobBase(object):
 
         merge_items = [i for i in args['items'] if i.get('number')]
         if merge_items:
+            # NOTE(tristanC): this is only valid for executor server context
             item_commit = self.doMergeChanges(merger, merge_items,
                                               args['repo_state'])
             if item_commit is None:
@@ -970,39 +996,674 @@ class AnsibleJobBase(object):
                     "Ansible plugin dir %s found adjacent to playbook %s in "
                     "non-trusted repo." % (entry, path))
 
+    def getAnsibleTimeout(self, start, timeout):
+        if timeout is not None:
+            now = time.time()
+            elapsed = now - start
+            timeout = timeout - elapsed
+        return timeout
+
+    def prepareKubeConfig(self, data):
+        kube_cfg_path = os.path.join(self.jobdir.work_root, ".kube", "config")
+        if os.path.exists(kube_cfg_path):
+            kube_cfg = yaml.safe_load(open(kube_cfg_path))
+        else:
+            os.makedirs(os.path.dirname(kube_cfg_path), exist_ok=True)
+            kube_cfg = {
+                'apiVersion': 'v1',
+                'kind': 'Config',
+                'preferences': {},
+                'users': [],
+                'clusters': [],
+                'contexts': [],
+                'current-context': None,
+            }
+        # Add cluster
+        cluster_name = urlsplit(data['host']).netloc.replace('.', '-')
+        cluster = {
+            'server': data['host'],
+        }
+        if data.get('ca_crt'):
+            cluster['certificate-authority-data'] = data['ca_crt']
+        if data['skiptls']:
+            cluster['insecure-skip-tls-verify'] = True
+        kube_cfg['clusters'].append({
+            'name': cluster_name,
+            'cluster': cluster,
+        })
+
+        # Add user
+        user_name = "%s:%s" % (data['namespace'], data['user'])
+        kube_cfg['users'].append({
+            'name': user_name,
+            'user': {
+                'token': data['token'],
+            },
+        })
+
+        # Add context
+        data['context_name'] = "%s/%s" % (user_name, cluster_name)
+        kube_cfg['contexts'].append({
+            'name': data['context_name'],
+            'context': {
+                'user': user_name,
+                'cluster': cluster_name,
+                'namespace': data['namespace']
+            }
+        })
+        if not kube_cfg['current-context']:
+            kube_cfg['current-context'] = data['context_name']
+
+        with open(kube_cfg_path, "w") as of:
+            of.write(yaml.safe_dump(kube_cfg, default_flow_style=False))
+
+    def prepareAnsibleFiles(self, args):
+        all_vars = args['vars'].copy()
+        check_varnames(all_vars)
+        # TODO(mordred) Hack to work around running things with python3
+        all_vars['ansible_python_interpreter'] = '/usr/bin/python2'
+        all_vars['zuul'] = args['zuul'].copy()
+        all_vars['zuul']['executor'] = dict(
+            hostname=self.executor_server.hostname,
+            src_root=self.jobdir.src_root,
+            log_root=self.jobdir.log_root,
+            work_root=self.jobdir.work_root,
+            result_data_file=self.jobdir.result_data_file,
+            inventory_file=self.jobdir.inventory)
+
+        resources_nodes = []
+        all_vars['zuul']['resources'] = {}
+        for node in args['nodes']:
+            if node.get('connection_type') in (
+                    'namespace', 'project', 'kubectl'):
+                # TODO: decrypt resource data using scheduler key
+                data = node['connection_port']
+                # Setup kube/config file
+                self.prepareKubeConfig(data)
+                # Convert connection_port in kubectl connection parameters
+                node['connection_port'] = None
+                node['kubectl_namespace'] = data['namespace']
+                node['kubectl_context'] = data['context_name']
+                # Add node information to zuul_resources
+                all_vars['zuul']['resources'][node['name'][0]] = {
+                    'namespace': data['namespace'],
+                    'context': data['context_name'],
+                }
+                if node['connection_type'] in ('project', 'namespace'):
+                    # Project are special nodes that are not the inventory
+                    resources_nodes.append(node)
+                else:
+                    # Add the real pod name to the resources_var
+                    all_vars['zuul']['resources'][
+                        node['name'][0]]['pod'] = data['pod']
+        # Remove resource node from nodes list
+        for node in resources_nodes:
+            args['nodes'].remove(node)
+
+        nodes = self.getHostList(args)
+        setup_inventory = make_setup_inventory_dict(nodes)
+        inventory = make_inventory_dict(nodes, args, all_vars)
+
+        with open(self.jobdir.setup_inventory, 'w') as setup_inventory_yaml:
+            setup_inventory_yaml.write(
+                yaml.safe_dump(setup_inventory, default_flow_style=False))
+
+        print("Writting", self.jobdir.inventory)
+        with open(self.jobdir.inventory, 'w') as inventory_yaml:
+            inventory_yaml.write(
+                yaml.safe_dump(inventory, default_flow_style=False))
+
+        with open(self.jobdir.known_hosts, 'w') as known_hosts:
+            for node in nodes:
+                for key in node['host_keys']:
+                    known_hosts.write('%s\n' % key)
+
+        with open(self.jobdir.extra_vars, 'w') as extra_vars:
+            extra_vars.write(
+                yaml.safe_dump(args['extra_vars'], default_flow_style=False))
+
+    def writeLoggingConfig(self):
+        self.log.debug("Writing logging config for job %s %s",
+                       self.jobdir.job_output_file,
+                       self.jobdir.logging_json)
+        logging_config = zuul.ansible.logconfig.JobLoggingConfig(
+            job_output_file=self.jobdir.job_output_file)
+        logging_config.writeJson(self.jobdir.logging_json)
+
+    def getHostList(self, args):
+        hosts = []
+        for node in args['nodes']:
+            # NOTE(mordred): This assumes that the nodepool launcher
+            # and the zuul executor both have similar network
+            # characteristics, as the launcher will do a test for ipv6
+            # viability and if so, and if the node has an ipv6
+            # address, it will be the interface_ip.  force-ipv4 can be
+            # set to True in the clouds.yaml for a cloud if this
+            # results in the wrong thing being in interface_ip
+            # TODO(jeblair): Move this notice to the docs.
+            for name in node['name']:
+                ip = node.get('interface_ip')
+                port = node.get('connection_port', node.get('ssh_port', 22))
+                host_vars = args['host_vars'].get(name, {}).copy()
+                check_varnames(host_vars)
+                host_vars.update(dict(
+                    ansible_host=ip,
+                    ansible_user=self.executor_server.default_username,
+                    ansible_port=port,
+                    nodepool=dict(
+                        label=node.get('label'),
+                        az=node.get('az'),
+                        cloud=node.get('cloud'),
+                        provider=node.get('provider'),
+                        region=node.get('region'),
+                        host_id=node.get('host_id'),
+                        interface_ip=node.get('interface_ip'),
+                        public_ipv4=node.get('public_ipv4'),
+                        private_ipv4=node.get('private_ipv4'),
+                        public_ipv6=node.get('public_ipv6'))))
+
+                username = node.get('username')
+                if username:
+                    host_vars['ansible_user'] = username
+
+                connection_type = node.get('connection_type')
+                if connection_type:
+                    host_vars['ansible_connection'] = connection_type
+                    if connection_type == "winrm":
+                        host_vars['ansible_winrm_transport'] = 'certificate'
+                        host_vars['ansible_winrm_cert_pem'] = \
+                            self.winrm_pem_file
+                        host_vars['ansible_winrm_cert_key_pem'] = \
+                            self.winrm_key_file
+                        # NOTE(tobiash): This is necessary when using default
+                        # winrm self-signed certificates. This is probably what
+                        # most installations want so hard code this here for
+                        # now.
+                        host_vars['ansible_winrm_server_cert_validation'] = \
+                            'ignore'
+                        if self.winrm_operation_timeout is not None:
+                            host_vars['ansible_winrm_operation_timeout_sec'] =\
+                                self.winrm_operation_timeout
+                        if self.winrm_read_timeout is not None:
+                            host_vars['ansible_winrm_read_timeout_sec'] = \
+                                self.winrm_read_timeout
+
+                host_keys = []
+                for key in node.get('host_keys', []):
+                    if port != 22:
+                        host_keys.append("[%s]:%s %s" % (ip, port, key))
+                    else:
+                        host_keys.append("%s %s" % (ip, key))
+
+                hosts.append(dict(
+                    name=name,
+                    host_vars=host_vars,
+                    host_keys=host_keys))
+        return hosts
+
+    def _ansibleTimeout(self, msg):
+        self.log.warning(msg)
+        self.abortRunningProc()
+
+    def runAnsible(self, cmd, timeout, playbook, wrapped=True):
+        config_file = playbook.ansible_config
+        env_copy = os.environ.copy()
+        env_copy.update(self.ssh_agent.env)
+        if ara_callbacks:
+            env_copy['ARA_LOG_CONFIG'] = self.jobdir.logging_json
+        env_copy['ZUUL_JOB_LOG_CONFIG'] = self.jobdir.logging_json
+        env_copy['ZUUL_JOBDIR'] = self.jobdir.root
+        env_copy['TMP'] = self.jobdir.local_tmp
+        pythonpath = env_copy.get('PYTHONPATH')
+        if pythonpath:
+            pythonpath = [pythonpath]
+        else:
+            pythonpath = []
+        if self.ansible_dir:
+            pythonpath = [self.ansible_dir] + pythonpath
+        env_copy['PYTHONPATH'] = os.path.pathsep.join(pythonpath)
+
+        if playbook.trusted:
+            opt_prefix = 'trusted'
+        else:
+            opt_prefix = 'untrusted'
+        ro_paths = get_default(self.executor_server.config, 'executor',
+                               '%s_ro_paths' % opt_prefix)
+        rw_paths = get_default(self.executor_server.config, 'executor',
+                               '%s_rw_paths' % opt_prefix)
+        ro_paths = ro_paths.split(":") if ro_paths else []
+        rw_paths = rw_paths.split(":") if rw_paths else []
+
+        if self.executor_server.ansible_dir:
+            ro_paths.append(self.executor_server.ansible_dir)
+        ro_paths.append(self.jobdir.ansible_root)
+        ro_paths.append(self.jobdir.trusted_root)
+        ro_paths.append(self.jobdir.untrusted_root)
+        ro_paths.append(playbook.root)
+
+        rw_paths.append(self.jobdir.ansible_cache_root)
+
+        if self.executor_variables_file:
+            ro_paths.append(self.executor_variables_file)
+
+        secrets = {}
+        if playbook.secrets_content:
+            secrets[playbook.secrets] = playbook.secrets_content
+
+        if wrapped:
+            wrapper = self.executor_server.execution_wrapper
+        else:
+            wrapper = self.connections.drivers['nullwrap']
+
+        context = wrapper.getExecutionContext(ro_paths, rw_paths, secrets)
+
+        popen = context.getPopen(
+            work_dir=self.jobdir.work_root,
+            ssh_auth_sock=env_copy.get('SSH_AUTH_SOCK'))
+
+        env_copy['ANSIBLE_CONFIG'] = config_file
+        # NOTE(pabelanger): Default HOME variable to jobdir.work_root, as it is
+        # possible we don't bind mount current zuul user home directory.
+        env_copy['HOME'] = self.jobdir.work_root
+
+        with self.proc_lock:
+            if self.aborted:
+                return (self.RESULT_ABORTED, None)
+            self.log.debug("Ansible command: ANSIBLE_CONFIG=%s %s",
+                           config_file, " ".join(shlex.quote(c) for c in cmd))
+            self.proc = popen(
+                cmd,
+                cwd=self.jobdir.work_root,
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                preexec_fn=os.setsid,
+                env=env_copy,
+            )
+
+        syntax_buffer = []
+        ret = None
+        if timeout:
+            watchdog = Watchdog(timeout, self._ansibleTimeout,
+                                ("Ansible timeout exceeded",))
+            watchdog.start()
+        try:
+            # Use manual idx instead of enumerate so that RESULT lines
+            # don't count towards BUFFER_LINES_FOR_SYNTAX
+            idx = 0
+            for line in iter(self.proc.stdout.readline, b''):
+                if line.startswith(b'RESULT'):
+                    # TODO(mordred) Process result commands if sent
+                    continue
+                else:
+                    idx += 1
+                if idx < BUFFER_LINES_FOR_SYNTAX:
+                    syntax_buffer.append(line)
+                line = line[:1024].rstrip()
+                self.log.debug("Ansible output: %s" % (line,))
+            self.log.debug("Ansible output terminated")
+            cpu_times = self.proc.cpu_times()
+            self.log.debug("Ansible cpu times: user=%.2f, system=%.2f, "
+                           "children_user=%.2f, "
+                           "children_system=%.2f" %
+                           (cpu_times.user, cpu_times.system,
+                            cpu_times.children_user,
+                            cpu_times.children_system))
+            self.cpu_times['user'] += cpu_times.user
+            self.cpu_times['system'] += cpu_times.system
+            self.cpu_times['children_user'] += cpu_times.children_user
+            self.cpu_times['children_system'] += cpu_times.children_system
+            ret = self.proc.wait()
+            self.log.debug("Ansible exit code: %s" % (ret,))
+        finally:
+            if timeout:
+                watchdog.stop()
+                self.log.debug("Stopped watchdog")
+            self.log.debug("Stopped disk job killer")
+
+        with self.proc_lock:
+            self.proc = None
+
+        if timeout and watchdog.timed_out:
+            return (self.RESULT_TIMED_OUT, None)
+        # Note: Unlike documented ansible currently wrongly returns 4 on
+        # unreachable so we have the zuul_unreachable callback module that
+        # creates the file job-output.unreachable in case there were
+        # unreachable nodes. This can be removed once ansible returns a
+        # distinct value for unreachable.
+        if ret == 3 or os.path.exists(self.jobdir.job_unreachable_file):
+            # AnsibleHostUnreachable: We had a network issue connecting to
+            # our zuul-worker.
+            return (self.RESULT_UNREACHABLE, None)
+        elif ret == -9:
+            # Received abort request.
+            return (self.RESULT_ABORTED, None)
+        elif ret == 1:
+            with open(self.jobdir.job_output_file, 'a') as job_output:
+                found_marker = False
+                for line in syntax_buffer:
+                    if line.startswith(b'ERROR!'):
+                        found_marker = True
+                    if not found_marker:
+                        continue
+                    job_output.write("{now} | {line}\n".format(
+                        now=datetime.datetime.now(),
+                        line=line.decode('utf-8').rstrip()))
+        elif ret == 4:
+            # Ansible could not parse the yaml.
+            self.log.debug("Ansible parse error")
+            # TODO(mordred) If/when we rework use of logger in ansible-playbook
+            # we'll want to change how this works to use that as well. For now,
+            # this is what we need to do.
+            # TODO(mordred) We probably want to put this into the json output
+            # as well.
+            with open(self.jobdir.job_output_file, 'a') as job_output:
+                job_output.write("{now} | ANSIBLE PARSE ERROR\n".format(
+                    now=datetime.datetime.now()))
+                for line in syntax_buffer:
+                    job_output.write("{now} | {line}\n".format(
+                        now=datetime.datetime.now(),
+                        line=line.decode('utf-8').rstrip()))
+        elif ret == 250:
+            # Unexpected error from ansible
+            with open(self.jobdir.job_output_file, 'a') as job_output:
+                job_output.write("{now} | UNEXPECTED ANSIBLE ERROR\n".format(
+                    now=datetime.datetime.now()))
+                found_marker = False
+                for line in syntax_buffer:
+                    if line.startswith(b'ERROR! Unexpected Exception'):
+                        found_marker = True
+                    if not found_marker:
+                        continue
+                    job_output.write("{now} | {line}\n".format(
+                        now=datetime.datetime.now(),
+                        line=line.decode('utf-8').rstrip()))
+
+        return (self.RESULT_NORMAL, ret)
+
+    def runPlaybooks(self, args):
+        result = None
+
+        # Run the Ansible 'setup' module on all hosts in the inventory
+        # at the start of the job with a 60 second timeout.  If we
+        # aren't able to connect to all the hosts and gather facts
+        # within that timeout, there is likely a network problem
+        # between here and the hosts in the inventory; return them and
+        # reschedule the job.
+        setup_status, setup_code = self.runAnsibleSetup(
+            self.jobdir.setup_playbook)
+        if setup_status != self.RESULT_NORMAL or setup_code != 0:
+            return result
+
+        pre_failed = False
+        success = False
+        if self.executor_server.statsd:
+            key = "zuul.executor.{hostname}.starting_builds"
+            self.executor_server.statsd.timing(
+                key, (time.monotonic() - self.time_starting_build) * 1000)
+
+        self.started = True
+        time_started = time.time()
+        # timeout value is "total" job timeout which accounts for
+        # pre-run and run playbooks. post-run is different because
+        # it is used to copy out job logs and we want to do our best
+        # to copy logs even when the job has timed out.
+        job_timeout = args['timeout']
+        for index, playbook in enumerate(self.jobdir.pre_playbooks):
+            # TODOv3(pabelanger): Implement pre-run timeout setting.
+            ansible_timeout = self.getAnsibleTimeout(time_started, job_timeout)
+            pre_status, pre_code = self.runAnsiblePlaybook(
+                playbook, ansible_timeout, phase='pre', index=index)
+            if pre_status != self.RESULT_NORMAL or pre_code != 0:
+                # These should really never fail, so return None and have
+                # zuul try again
+                pre_failed = True
+                break
+
+        self.log.debug(
+            "Overall ansible cpu times: user=%.2f, system=%.2f, "
+            "children_user=%.2f, children_system=%.2f" %
+            (self.cpu_times['user'], self.cpu_times['system'],
+             self.cpu_times['children_user'],
+             self.cpu_times['children_system']))
+
+        if not pre_failed:
+            ansible_timeout = self.getAnsibleTimeout(time_started, job_timeout)
+            job_status, job_code = self.runAnsiblePlaybook(
+                self.jobdir.playbook, ansible_timeout, phase='run')
+            if job_status == self.RESULT_ABORTED:
+                return 'ABORTED'
+            elif job_status == self.RESULT_TIMED_OUT:
+                # Set the pre-failure flag so this doesn't get
+                # overridden by a post-failure.
+                pre_failed = True
+                result = 'TIMED_OUT'
+            elif job_status == self.RESULT_NORMAL:
+                success = (job_code == 0)
+                if success:
+                    result = 'SUCCESS'
+                else:
+                    result = 'FAILURE'
+            else:
+                # The result of the job is indeterminate.  Zuul will
+                # run it again.
+                return None
+
+        # check if we need to pause here
+        result_data = self.getResultData()
+        pause = result_data.get('zuul', {}).get('pause')
+        if pause:
+            self.pause()
+
+        post_timeout = args['post_timeout']
+        unreachable = False
+        for index, playbook in enumerate(self.jobdir.post_playbooks):
+            # Post timeout operates a little differently to the main job
+            # timeout. We give each post playbook the full post timeout to
+            # do its job because post is where you'll often record job logs
+            # which are vital to understanding why timeouts have happened in
+            # the first place.
+            post_status, post_code = self.runAnsiblePlaybook(
+                playbook, post_timeout, success, phase='post', index=index)
+            if post_status == self.RESULT_ABORTED:
+                return 'ABORTED'
+            if post_status == self.RESULT_UNREACHABLE:
+                # In case we encounter unreachable nodes we need to return None
+                # so the job can be retried. However in the case of post
+                # playbooks we should still try to run all playbooks to get a
+                # chance to upload logs.
+                unreachable = True
+            if post_status != self.RESULT_NORMAL or post_code != 0:
+                success = False
+                # If we encountered a pre-failure, that takes
+                # precedence over the post result.
+                if not pre_failed:
+                    result = 'POST_FAILURE'
+                if (index + 1) == len(self.jobdir.post_playbooks):
+                    self._logFinalPlaybookError()
+
+        if unreachable:
+            return None
+
+        return result
+
+    def runAnsibleSetup(self, playbook):
+        if self.executor_server.verbose:
+            verbose = '-vvv'
+        else:
+            verbose = '-v'
+
+        cmd = ['ansible', '*', verbose, '-m', 'setup',
+               '-i', self.jobdir.setup_inventory,
+               '-a', 'gather_subset=!all']
+        if self.executor_variables_file is not None:
+            cmd.extend(['-e@%s' % self.executor_variables_file])
+
+        result, code = self.runAnsible(
+            cmd=cmd, timeout=60, playbook=playbook,
+            wrapped=False)
+        self.log.debug("Ansible complete, result %s code %s" % (
+            self.RESULT_MAP[result], code))
+        if self.executor_server.statsd:
+            base_key = "zuul.executor.{hostname}.phase.setup"
+            self.executor_server.statsd.incr(base_key + ".%s" %
+                                             self.RESULT_MAP[result])
+        return result, code
+
+    def runAnsibleCleanup(self, playbook):
+        # TODO(jeblair): This requires a bugfix in Ansible 2.4
+        # Once this is used, increase the controlpersist timeout.
+        return (self.RESULT_NORMAL, 0)
+
+        if self.executor_server.verbose:
+            verbose = '-vvv'
+        else:
+            verbose = '-v'
+
+        cmd = ['ansible', '*', verbose, '-m', 'meta',
+               '-a', 'reset_connection']
+
+        result, code = self.runAnsible(
+            cmd=cmd, timeout=60, playbook=playbook,
+            wrapped=False)
+        self.log.debug("Ansible complete, result %s code %s" % (
+            self.RESULT_MAP[result], code))
+        if self.executor_server.statsd:
+            base_key = "zuul.executor.{hostname}.phase.cleanup"
+            self.executor_server.statsd.incr(base_key + ".%s" %
+                                             self.RESULT_MAP[result])
+        return result, code
+
+    def emitPlaybookBanner(self, playbook, step, phase, result=None):
+        # This is used to print a header and a footer, respectively at the
+        # beginning and the end of each playbook execution.
+        # We are doing it from the executor rather than from a callback because
+        # the parameters are not made available to the callback until it's too
+        # late.
+        phase = phase or ''
+        trusted = playbook.trusted
+        trusted = 'trusted' if trusted else 'untrusted'
+        branch = playbook.branch
+        playbook = playbook.canonical_name_and_path
+
+        if phase and phase != 'run':
+            phase = '{phase}-run'.format(phase=phase)
+        phase = phase.upper()
+
+        if result is not None:
+            result = self.RESULT_MAP[result]
+            msg = "{phase} {step} {result}: [{trusted} : {playbook}@{branch}]"
+            msg = msg.format(phase=phase, step=step, result=result,
+                             trusted=trusted, playbook=playbook, branch=branch)
+        else:
+            msg = "{phase} {step}: [{trusted} : {playbook}@{branch}]"
+            msg = msg.format(phase=phase, step=step, trusted=trusted,
+                             playbook=playbook, branch=branch)
+
+        with open(self.jobdir.job_output_file, 'a') as job_output:
+            job_output.write("{now} | {msg}\n".format(
+                now=datetime.datetime.now(),
+                msg=msg))
+
+    def runAnsiblePlaybook(self, playbook, timeout, success=None,
+                           phase=None, index=None):
+        if self.executor_server.verbose:
+            verbose = '-vvv'
+        else:
+            verbose = '-v'
+
+        cmd = ['ansible-playbook', verbose, playbook.path]
+        if playbook.secrets_content:
+            cmd.extend(['-e', '@' + playbook.secrets])
+
+        cmd.extend(['-e', '@' + self.jobdir.extra_vars])
+
+        if success is not None:
+            cmd.extend(['-e', 'zuul_success=%s' % str(bool(success))])
+
+        if phase:
+            cmd.extend(['-e', 'zuul_execution_phase=%s' % phase])
+
+        if index is not None:
+            cmd.extend(['-e', 'zuul_execution_phase_index=%s' % index])
+
+        cmd.extend(['-e', 'zuul_execution_trusted=%s' % str(playbook.trusted)])
+        cmd.extend([
+            '-e',
+            'zuul_execution_canonical_name_and_path=%s'
+            % playbook.canonical_name_and_path])
+        cmd.extend(['-e', 'zuul_execution_branch=%s' % str(playbook.branch)])
+
+        if self.executor_variables_file is not None:
+            cmd.extend(['-e@%s' % self.executor_variables_file])
+
+        self.emitPlaybookBanner(playbook, 'START', phase)
+
+        result, code = self.runAnsible(
+            cmd=cmd, timeout=timeout, playbook=playbook)
+        self.log.debug("Ansible complete, result %s code %s" % (
+            self.RESULT_MAP[result], code))
+        if self.executor_server.statsd:
+            base_key = "zuul.executor.{hostname}.phase.{phase}"
+            self.executor_server.statsd.incr(
+                base_key + ".{result}",
+                result=self.RESULT_MAP[result],
+                phase=phase or 'unknown')
+
+        self.emitPlaybookBanner(playbook, 'END', phase, result=result)
+        return result, code
+
+    def getResultData(self):
+        data = {}
+        try:
+            with open(self.jobdir.result_data_file) as f:
+                file_data = f.read()
+                if file_data:
+                    data = json.loads(file_data)
+        except Exception:
+            self.log.exception("Unable to load result data:")
+        return data
+
+    def _logFinalPlaybookError(self):
+        # Failures in the final post playbook can include failures
+        # uploading logs, which makes diagnosing issues difficult.
+        # Grab the output from the last playbook from the json
+        # file and log it.
+        json_output = self.jobdir.job_output_file.replace('txt', 'json')
+        self.log.debug("Final playbook failed")
+        if not os.path.exists(json_output):
+            self.log.debug("JSON logfile {logfile} is missing".format(
+                logfile=json_output))
+            return
+        try:
+            output = json.load(open(json_output, 'r'))
+            last_playbook = output[-1]
+            # Transform json to yaml - because it's easier to read and given
+            # the size of the data it'll be extra-hard to read this as an
+            # all on one line stringified nested dict.
+            yaml_out = yaml.safe_dump(last_playbook, default_flow_style=False)
+            for line in yaml_out.split('\n'):
+                self.log.debug(line)
+        except Exception:
+            self.log.exception(
+                "Could not decode json from {logfile}".format(
+                    logfile=json_output))
+
 
 class AnsibleJob(AnsibleJobBase):
     "This class executes and performs the full Ansible Job"
-    RESULT_NORMAL = 1
-    RESULT_TIMED_OUT = 2
-    RESULT_UNREACHABLE = 3
-    RESULT_ABORTED = 4
-    RESULT_DISK_FULL = 5
-
-    RESULT_MAP = {
-        RESULT_NORMAL: 'RESULT_NORMAL',
-        RESULT_TIMED_OUT: 'RESULT_TIMED_OUT',
-        RESULT_UNREACHABLE: 'RESULT_UNREACHABLE',
-        RESULT_ABORTED: 'RESULT_ABORTED',
-        RESULT_DISK_FULL: 'RESULT_DISK_FULL',
-    }
 
     def __init__(self, executor_server, job):
         super(AnsibleJob, self).__init__(
-            json.loads(job.arguments),
-            executor_server.connections,
-            executor_server.merge_root)
+            executor_server, json.loads(job.arguments))
         logger = logging.getLogger("zuul.AnsibleJob")
         self.log = AnsibleJobLogAdapter(logger, {'job': job.unique})
-        self.executor_server = executor_server
         self.job = job
         self.proc = None
-        self.proc_lock = threading.Lock()
         self.running = False
         self.started = False  # Whether playbooks have started running
         self.time_starting_build = None
         self.paused = False
-        self.aborted = False
         self.aborted_reason = None
         self._resume_event = threading.Event()
         self.thread = None
@@ -1024,11 +1685,6 @@ class AnsibleJob(AnsibleJobBase):
             'executor',
             'winrm_read_timeout_sec')
         self.ssh_agent = SshAgent()
-
-        self.executor_variables_file = None
-
-        self.cpu_times = {'user': 0, 'system': 0,
-                          'children_user': 0, 'children_system': 0}
 
         if self.executor_server.config.has_option('executor', 'variables'):
             self.executor_variables_file = self.executor_server.config.get(
@@ -1187,17 +1843,6 @@ class AnsibleJob(AnsibleJobBase):
         self.log.debug("Sending result: %s" % (result_data,))
         self.job.sendWorkComplete(result_data)
 
-    def getResultData(self):
-        data = {}
-        try:
-            with open(self.jobdir.result_data_file) as f:
-                file_data = f.read()
-                if file_data:
-                    data = json.loads(file_data)
-        except Exception:
-            self.log.exception("Unable to load result data:")
-        return data
-
     def mapLines(self, merger, args, data, commit, warnings):
         # The data and warnings arguments are mutated in this method.
 
@@ -1297,341 +1942,6 @@ class AnsibleJob(AnsibleJobBase):
             repo.setRef('refs/heads/' + branch, commit)
         return orig_commit
 
-    def getAnsibleTimeout(self, start, timeout):
-        if timeout is not None:
-            now = time.time()
-            elapsed = now - start
-            timeout = timeout - elapsed
-        return timeout
-
-    def runPlaybooks(self, args):
-        result = None
-
-        # Run the Ansible 'setup' module on all hosts in the inventory
-        # at the start of the job with a 60 second timeout.  If we
-        # aren't able to connect to all the hosts and gather facts
-        # within that timeout, there is likely a network problem
-        # between here and the hosts in the inventory; return them and
-        # reschedule the job.
-        setup_status, setup_code = self.runAnsibleSetup(
-            self.jobdir.setup_playbook)
-        if setup_status != self.RESULT_NORMAL or setup_code != 0:
-            return result
-
-        pre_failed = False
-        success = False
-        if self.executor_server.statsd:
-            key = "zuul.executor.{hostname}.starting_builds"
-            self.executor_server.statsd.timing(
-                key, (time.monotonic() - self.time_starting_build) * 1000)
-
-        self.started = True
-        time_started = time.time()
-        # timeout value is "total" job timeout which accounts for
-        # pre-run and run playbooks. post-run is different because
-        # it is used to copy out job logs and we want to do our best
-        # to copy logs even when the job has timed out.
-        job_timeout = args['timeout']
-        for index, playbook in enumerate(self.jobdir.pre_playbooks):
-            # TODOv3(pabelanger): Implement pre-run timeout setting.
-            ansible_timeout = self.getAnsibleTimeout(time_started, job_timeout)
-            pre_status, pre_code = self.runAnsiblePlaybook(
-                playbook, ansible_timeout, phase='pre', index=index)
-            if pre_status != self.RESULT_NORMAL or pre_code != 0:
-                # These should really never fail, so return None and have
-                # zuul try again
-                pre_failed = True
-                break
-
-        self.log.debug(
-            "Overall ansible cpu times: user=%.2f, system=%.2f, "
-            "children_user=%.2f, children_system=%.2f" %
-            (self.cpu_times['user'], self.cpu_times['system'],
-             self.cpu_times['children_user'],
-             self.cpu_times['children_system']))
-
-        if not pre_failed:
-            ansible_timeout = self.getAnsibleTimeout(time_started, job_timeout)
-            job_status, job_code = self.runAnsiblePlaybook(
-                self.jobdir.playbook, ansible_timeout, phase='run')
-            if job_status == self.RESULT_ABORTED:
-                return 'ABORTED'
-            elif job_status == self.RESULT_TIMED_OUT:
-                # Set the pre-failure flag so this doesn't get
-                # overridden by a post-failure.
-                pre_failed = True
-                result = 'TIMED_OUT'
-            elif job_status == self.RESULT_NORMAL:
-                success = (job_code == 0)
-                if success:
-                    result = 'SUCCESS'
-                else:
-                    result = 'FAILURE'
-            else:
-                # The result of the job is indeterminate.  Zuul will
-                # run it again.
-                return None
-
-        # check if we need to pause here
-        result_data = self.getResultData()
-        pause = result_data.get('zuul', {}).get('pause')
-        if pause:
-            self.pause()
-
-        post_timeout = args['post_timeout']
-        unreachable = False
-        for index, playbook in enumerate(self.jobdir.post_playbooks):
-            # Post timeout operates a little differently to the main job
-            # timeout. We give each post playbook the full post timeout to
-            # do its job because post is where you'll often record job logs
-            # which are vital to understanding why timeouts have happened in
-            # the first place.
-            post_status, post_code = self.runAnsiblePlaybook(
-                playbook, post_timeout, success, phase='post', index=index)
-            if post_status == self.RESULT_ABORTED:
-                return 'ABORTED'
-            if post_status == self.RESULT_UNREACHABLE:
-                # In case we encounter unreachable nodes we need to return None
-                # so the job can be retried. However in the case of post
-                # playbooks we should still try to run all playbooks to get a
-                # chance to upload logs.
-                unreachable = True
-            if post_status != self.RESULT_NORMAL or post_code != 0:
-                success = False
-                # If we encountered a pre-failure, that takes
-                # precedence over the post result.
-                if not pre_failed:
-                    result = 'POST_FAILURE'
-                if (index + 1) == len(self.jobdir.post_playbooks):
-                    self._logFinalPlaybookError()
-
-        if unreachable:
-            return None
-
-        return result
-
-    def _logFinalPlaybookError(self):
-        # Failures in the final post playbook can include failures
-        # uploading logs, which makes diagnosing issues difficult.
-        # Grab the output from the last playbook from the json
-        # file and log it.
-        json_output = self.jobdir.job_output_file.replace('txt', 'json')
-        self.log.debug("Final playbook failed")
-        if not os.path.exists(json_output):
-            self.log.debug("JSON logfile {logfile} is missing".format(
-                logfile=json_output))
-            return
-        try:
-            output = json.load(open(json_output, 'r'))
-            last_playbook = output[-1]
-            # Transform json to yaml - because it's easier to read and given
-            # the size of the data it'll be extra-hard to read this as an
-            # all on one line stringified nested dict.
-            yaml_out = yaml.safe_dump(last_playbook, default_flow_style=False)
-            for line in yaml_out.split('\n'):
-                self.log.debug(line)
-        except Exception:
-            self.log.exception(
-                "Could not decode json from {logfile}".format(
-                    logfile=json_output))
-
-    def getHostList(self, args):
-        hosts = []
-        for node in args['nodes']:
-            # NOTE(mordred): This assumes that the nodepool launcher
-            # and the zuul executor both have similar network
-            # characteristics, as the launcher will do a test for ipv6
-            # viability and if so, and if the node has an ipv6
-            # address, it will be the interface_ip.  force-ipv4 can be
-            # set to True in the clouds.yaml for a cloud if this
-            # results in the wrong thing being in interface_ip
-            # TODO(jeblair): Move this notice to the docs.
-            for name in node['name']:
-                ip = node.get('interface_ip')
-                port = node.get('connection_port', node.get('ssh_port', 22))
-                host_vars = args['host_vars'].get(name, {}).copy()
-                check_varnames(host_vars)
-                host_vars.update(dict(
-                    ansible_host=ip,
-                    ansible_user=self.executor_server.default_username,
-                    ansible_port=port,
-                    nodepool=dict(
-                        label=node.get('label'),
-                        az=node.get('az'),
-                        cloud=node.get('cloud'),
-                        provider=node.get('provider'),
-                        region=node.get('region'),
-                        host_id=node.get('host_id'),
-                        interface_ip=node.get('interface_ip'),
-                        public_ipv4=node.get('public_ipv4'),
-                        private_ipv4=node.get('private_ipv4'),
-                        public_ipv6=node.get('public_ipv6'))))
-
-                username = node.get('username')
-                if username:
-                    host_vars['ansible_user'] = username
-
-                connection_type = node.get('connection_type')
-                if connection_type:
-                    host_vars['ansible_connection'] = connection_type
-                    if connection_type == "winrm":
-                        host_vars['ansible_winrm_transport'] = 'certificate'
-                        host_vars['ansible_winrm_cert_pem'] = \
-                            self.winrm_pem_file
-                        host_vars['ansible_winrm_cert_key_pem'] = \
-                            self.winrm_key_file
-                        # NOTE(tobiash): This is necessary when using default
-                        # winrm self-signed certificates. This is probably what
-                        # most installations want so hard code this here for
-                        # now.
-                        host_vars['ansible_winrm_server_cert_validation'] = \
-                            'ignore'
-                        if self.winrm_operation_timeout is not None:
-                            host_vars['ansible_winrm_operation_timeout_sec'] =\
-                                self.winrm_operation_timeout
-                        if self.winrm_read_timeout is not None:
-                            host_vars['ansible_winrm_read_timeout_sec'] = \
-                                self.winrm_read_timeout
-
-                host_keys = []
-                for key in node.get('host_keys', []):
-                    if port != 22:
-                        host_keys.append("[%s]:%s %s" % (ip, port, key))
-                    else:
-                        host_keys.append("%s %s" % (ip, key))
-
-                hosts.append(dict(
-                    name=name,
-                    host_vars=host_vars,
-                    host_keys=host_keys))
-        return hosts
-
-    def prepareKubeConfig(self, data):
-        kube_cfg_path = os.path.join(self.jobdir.work_root, ".kube", "config")
-        if os.path.exists(kube_cfg_path):
-            kube_cfg = yaml.safe_load(open(kube_cfg_path))
-        else:
-            os.makedirs(os.path.dirname(kube_cfg_path), exist_ok=True)
-            kube_cfg = {
-                'apiVersion': 'v1',
-                'kind': 'Config',
-                'preferences': {},
-                'users': [],
-                'clusters': [],
-                'contexts': [],
-                'current-context': None,
-            }
-        # Add cluster
-        cluster_name = urlsplit(data['host']).netloc.replace('.', '-')
-        cluster = {
-            'server': data['host'],
-        }
-        if data.get('ca_crt'):
-            cluster['certificate-authority-data'] = data['ca_crt']
-        if data['skiptls']:
-            cluster['insecure-skip-tls-verify'] = True
-        kube_cfg['clusters'].append({
-            'name': cluster_name,
-            'cluster': cluster,
-        })
-
-        # Add user
-        user_name = "%s:%s" % (data['namespace'], data['user'])
-        kube_cfg['users'].append({
-            'name': user_name,
-            'user': {
-                'token': data['token'],
-            },
-        })
-
-        # Add context
-        data['context_name'] = "%s/%s" % (user_name, cluster_name)
-        kube_cfg['contexts'].append({
-            'name': data['context_name'],
-            'context': {
-                'user': user_name,
-                'cluster': cluster_name,
-                'namespace': data['namespace']
-            }
-        })
-        if not kube_cfg['current-context']:
-            kube_cfg['current-context'] = data['context_name']
-
-        with open(kube_cfg_path, "w") as of:
-            of.write(yaml.safe_dump(kube_cfg, default_flow_style=False))
-
-    def prepareAnsibleFiles(self, args):
-        all_vars = args['vars'].copy()
-        check_varnames(all_vars)
-        # TODO(mordred) Hack to work around running things with python3
-        all_vars['ansible_python_interpreter'] = '/usr/bin/python2'
-        all_vars['zuul'] = args['zuul'].copy()
-        all_vars['zuul']['executor'] = dict(
-            hostname=self.executor_server.hostname,
-            src_root=self.jobdir.src_root,
-            log_root=self.jobdir.log_root,
-            work_root=self.jobdir.work_root,
-            result_data_file=self.jobdir.result_data_file,
-            inventory_file=self.jobdir.inventory)
-
-        resources_nodes = []
-        all_vars['zuul']['resources'] = {}
-        for node in args['nodes']:
-            if node.get('connection_type') in (
-                    'namespace', 'project', 'kubectl'):
-                # TODO: decrypt resource data using scheduler key
-                data = node['connection_port']
-                # Setup kube/config file
-                self.prepareKubeConfig(data)
-                # Convert connection_port in kubectl connection parameters
-                node['connection_port'] = None
-                node['kubectl_namespace'] = data['namespace']
-                node['kubectl_context'] = data['context_name']
-                # Add node information to zuul_resources
-                all_vars['zuul']['resources'][node['name'][0]] = {
-                    'namespace': data['namespace'],
-                    'context': data['context_name'],
-                }
-                if node['connection_type'] in ('project', 'namespace'):
-                    # Project are special nodes that are not the inventory
-                    resources_nodes.append(node)
-                else:
-                    # Add the real pod name to the resources_var
-                    all_vars['zuul']['resources'][
-                        node['name'][0]]['pod'] = data['pod']
-        # Remove resource node from nodes list
-        for node in resources_nodes:
-            args['nodes'].remove(node)
-
-        nodes = self.getHostList(args)
-        setup_inventory = make_setup_inventory_dict(nodes)
-        inventory = make_inventory_dict(nodes, args, all_vars)
-
-        with open(self.jobdir.setup_inventory, 'w') as setup_inventory_yaml:
-            setup_inventory_yaml.write(
-                yaml.safe_dump(setup_inventory, default_flow_style=False))
-
-        with open(self.jobdir.inventory, 'w') as inventory_yaml:
-            inventory_yaml.write(
-                yaml.safe_dump(inventory, default_flow_style=False))
-
-        with open(self.jobdir.known_hosts, 'w') as known_hosts:
-            for node in nodes:
-                for key in node['host_keys']:
-                    known_hosts.write('%s\n' % key)
-
-        with open(self.jobdir.extra_vars, 'w') as extra_vars:
-            extra_vars.write(
-                yaml.safe_dump(args['extra_vars'], default_flow_style=False))
-
-    def writeLoggingConfig(self):
-        self.log.debug("Writing logging config for job %s %s",
-                       self.jobdir.job_output_file,
-                       self.jobdir.logging_json)
-        logging_config = zuul.ansible.logconfig.JobLoggingConfig(
-            job_output_file=self.jobdir.job_output_file)
-        logging_config.writeJson(self.jobdir.logging_json)
-
     def writeAnsibleConfig(self, jobdir_playbook):
         trusted = jobdir_playbook.trusted
 
@@ -1712,10 +2022,6 @@ class AnsibleJob(AnsibleJobBase):
                 "-o UserKnownHostsFile=%s" % self.jobdir.known_hosts
             config.write('ssh_args = %s\n' % ssh_args)
 
-    def _ansibleTimeout(self, msg):
-        self.log.warning(msg)
-        self.abortRunningProc()
-
     def abortRunningProc(self):
         with self.proc_lock:
             if not self.proc:
@@ -1728,306 +2034,6 @@ class AnsibleJob(AnsibleJobBase):
                 os.killpg(pgid, signal.SIGKILL)
             except Exception:
                 self.log.exception("Exception while killing ansible process:")
-
-    def runAnsible(self, cmd, timeout, playbook, wrapped=True):
-        config_file = playbook.ansible_config
-        env_copy = os.environ.copy()
-        env_copy.update(self.ssh_agent.env)
-        if ara_callbacks:
-            env_copy['ARA_LOG_CONFIG'] = self.jobdir.logging_json
-        env_copy['ZUUL_JOB_LOG_CONFIG'] = self.jobdir.logging_json
-        env_copy['ZUUL_JOBDIR'] = self.jobdir.root
-        env_copy['TMP'] = self.jobdir.local_tmp
-        pythonpath = env_copy.get('PYTHONPATH')
-        if pythonpath:
-            pythonpath = [pythonpath]
-        else:
-            pythonpath = []
-        pythonpath = [self.executor_server.ansible_dir] + pythonpath
-        env_copy['PYTHONPATH'] = os.path.pathsep.join(pythonpath)
-
-        if playbook.trusted:
-            opt_prefix = 'trusted'
-        else:
-            opt_prefix = 'untrusted'
-        ro_paths = get_default(self.executor_server.config, 'executor',
-                               '%s_ro_paths' % opt_prefix)
-        rw_paths = get_default(self.executor_server.config, 'executor',
-                               '%s_rw_paths' % opt_prefix)
-        ro_paths = ro_paths.split(":") if ro_paths else []
-        rw_paths = rw_paths.split(":") if rw_paths else []
-
-        ro_paths.append(self.executor_server.ansible_dir)
-        ro_paths.append(self.jobdir.ansible_root)
-        ro_paths.append(self.jobdir.trusted_root)
-        ro_paths.append(self.jobdir.untrusted_root)
-        ro_paths.append(playbook.root)
-
-        rw_paths.append(self.jobdir.ansible_cache_root)
-
-        if self.executor_variables_file:
-            ro_paths.append(self.executor_variables_file)
-
-        secrets = {}
-        if playbook.secrets_content:
-            secrets[playbook.secrets] = playbook.secrets_content
-
-        if wrapped:
-            wrapper = self.executor_server.execution_wrapper
-        else:
-            wrapper = self.executor_server.connections.drivers['nullwrap']
-
-        context = wrapper.getExecutionContext(ro_paths, rw_paths, secrets)
-
-        popen = context.getPopen(
-            work_dir=self.jobdir.work_root,
-            ssh_auth_sock=env_copy.get('SSH_AUTH_SOCK'))
-
-        env_copy['ANSIBLE_CONFIG'] = config_file
-        # NOTE(pabelanger): Default HOME variable to jobdir.work_root, as it is
-        # possible we don't bind mount current zuul user home directory.
-        env_copy['HOME'] = self.jobdir.work_root
-
-        with self.proc_lock:
-            if self.aborted:
-                return (self.RESULT_ABORTED, None)
-            self.log.debug("Ansible command: ANSIBLE_CONFIG=%s %s",
-                           config_file, " ".join(shlex.quote(c) for c in cmd))
-            self.proc = popen(
-                cmd,
-                cwd=self.jobdir.work_root,
-                stdin=subprocess.DEVNULL,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                preexec_fn=os.setsid,
-                env=env_copy,
-            )
-
-        syntax_buffer = []
-        ret = None
-        if timeout:
-            watchdog = Watchdog(timeout, self._ansibleTimeout,
-                                ("Ansible timeout exceeded",))
-            watchdog.start()
-        try:
-            # Use manual idx instead of enumerate so that RESULT lines
-            # don't count towards BUFFER_LINES_FOR_SYNTAX
-            idx = 0
-            for line in iter(self.proc.stdout.readline, b''):
-                if line.startswith(b'RESULT'):
-                    # TODO(mordred) Process result commands if sent
-                    continue
-                else:
-                    idx += 1
-                if idx < BUFFER_LINES_FOR_SYNTAX:
-                    syntax_buffer.append(line)
-                line = line[:1024].rstrip()
-                self.log.debug("Ansible output: %s" % (line,))
-            self.log.debug("Ansible output terminated")
-            cpu_times = self.proc.cpu_times()
-            self.log.debug("Ansible cpu times: user=%.2f, system=%.2f, "
-                           "children_user=%.2f, "
-                           "children_system=%.2f" %
-                           (cpu_times.user, cpu_times.system,
-                            cpu_times.children_user,
-                            cpu_times.children_system))
-            self.cpu_times['user'] += cpu_times.user
-            self.cpu_times['system'] += cpu_times.system
-            self.cpu_times['children_user'] += cpu_times.children_user
-            self.cpu_times['children_system'] += cpu_times.children_system
-            ret = self.proc.wait()
-            self.log.debug("Ansible exit code: %s" % (ret,))
-        finally:
-            if timeout:
-                watchdog.stop()
-                self.log.debug("Stopped watchdog")
-            self.log.debug("Stopped disk job killer")
-
-        with self.proc_lock:
-            self.proc = None
-
-        if timeout and watchdog.timed_out:
-            return (self.RESULT_TIMED_OUT, None)
-        # Note: Unlike documented ansible currently wrongly returns 4 on
-        # unreachable so we have the zuul_unreachable callback module that
-        # creates the file job-output.unreachable in case there were
-        # unreachable nodes. This can be removed once ansible returns a
-        # distinct value for unreachable.
-        if ret == 3 or os.path.exists(self.jobdir.job_unreachable_file):
-            # AnsibleHostUnreachable: We had a network issue connecting to
-            # our zuul-worker.
-            return (self.RESULT_UNREACHABLE, None)
-        elif ret == -9:
-            # Received abort request.
-            return (self.RESULT_ABORTED, None)
-        elif ret == 1:
-            with open(self.jobdir.job_output_file, 'a') as job_output:
-                found_marker = False
-                for line in syntax_buffer:
-                    if line.startswith(b'ERROR!'):
-                        found_marker = True
-                    if not found_marker:
-                        continue
-                    job_output.write("{now} | {line}\n".format(
-                        now=datetime.datetime.now(),
-                        line=line.decode('utf-8').rstrip()))
-        elif ret == 4:
-            # Ansible could not parse the yaml.
-            self.log.debug("Ansible parse error")
-            # TODO(mordred) If/when we rework use of logger in ansible-playbook
-            # we'll want to change how this works to use that as well. For now,
-            # this is what we need to do.
-            # TODO(mordred) We probably want to put this into the json output
-            # as well.
-            with open(self.jobdir.job_output_file, 'a') as job_output:
-                job_output.write("{now} | ANSIBLE PARSE ERROR\n".format(
-                    now=datetime.datetime.now()))
-                for line in syntax_buffer:
-                    job_output.write("{now} | {line}\n".format(
-                        now=datetime.datetime.now(),
-                        line=line.decode('utf-8').rstrip()))
-        elif ret == 250:
-            # Unexpected error from ansible
-            with open(self.jobdir.job_output_file, 'a') as job_output:
-                job_output.write("{now} | UNEXPECTED ANSIBLE ERROR\n".format(
-                    now=datetime.datetime.now()))
-                found_marker = False
-                for line in syntax_buffer:
-                    if line.startswith(b'ERROR! Unexpected Exception'):
-                        found_marker = True
-                    if not found_marker:
-                        continue
-                    job_output.write("{now} | {line}\n".format(
-                        now=datetime.datetime.now(),
-                        line=line.decode('utf-8').rstrip()))
-
-        return (self.RESULT_NORMAL, ret)
-
-    def runAnsibleSetup(self, playbook):
-        if self.executor_server.verbose:
-            verbose = '-vvv'
-        else:
-            verbose = '-v'
-
-        cmd = ['ansible', '*', verbose, '-m', 'setup',
-               '-i', self.jobdir.setup_inventory,
-               '-a', 'gather_subset=!all']
-        if self.executor_variables_file is not None:
-            cmd.extend(['-e@%s' % self.executor_variables_file])
-
-        result, code = self.runAnsible(
-            cmd=cmd, timeout=60, playbook=playbook,
-            wrapped=False)
-        self.log.debug("Ansible complete, result %s code %s" % (
-            self.RESULT_MAP[result], code))
-        if self.executor_server.statsd:
-            base_key = "zuul.executor.{hostname}.phase.setup"
-            self.executor_server.statsd.incr(base_key + ".%s" %
-                                             self.RESULT_MAP[result])
-        return result, code
-
-    def runAnsibleCleanup(self, playbook):
-        # TODO(jeblair): This requires a bugfix in Ansible 2.4
-        # Once this is used, increase the controlpersist timeout.
-        return (self.RESULT_NORMAL, 0)
-
-        if self.executor_server.verbose:
-            verbose = '-vvv'
-        else:
-            verbose = '-v'
-
-        cmd = ['ansible', '*', verbose, '-m', 'meta',
-               '-a', 'reset_connection']
-
-        result, code = self.runAnsible(
-            cmd=cmd, timeout=60, playbook=playbook,
-            wrapped=False)
-        self.log.debug("Ansible complete, result %s code %s" % (
-            self.RESULT_MAP[result], code))
-        if self.executor_server.statsd:
-            base_key = "zuul.executor.{hostname}.phase.cleanup"
-            self.executor_server.statsd.incr(base_key + ".%s" %
-                                             self.RESULT_MAP[result])
-        return result, code
-
-    def emitPlaybookBanner(self, playbook, step, phase, result=None):
-        # This is used to print a header and a footer, respectively at the
-        # beginning and the end of each playbook execution.
-        # We are doing it from the executor rather than from a callback because
-        # the parameters are not made available to the callback until it's too
-        # late.
-        phase = phase or ''
-        trusted = playbook.trusted
-        trusted = 'trusted' if trusted else 'untrusted'
-        branch = playbook.branch
-        playbook = playbook.canonical_name_and_path
-
-        if phase and phase != 'run':
-            phase = '{phase}-run'.format(phase=phase)
-        phase = phase.upper()
-
-        if result is not None:
-            result = self.RESULT_MAP[result]
-            msg = "{phase} {step} {result}: [{trusted} : {playbook}@{branch}]"
-            msg = msg.format(phase=phase, step=step, result=result,
-                             trusted=trusted, playbook=playbook, branch=branch)
-        else:
-            msg = "{phase} {step}: [{trusted} : {playbook}@{branch}]"
-            msg = msg.format(phase=phase, step=step, trusted=trusted,
-                             playbook=playbook, branch=branch)
-
-        with open(self.jobdir.job_output_file, 'a') as job_output:
-            job_output.write("{now} | {msg}\n".format(
-                now=datetime.datetime.now(),
-                msg=msg))
-
-    def runAnsiblePlaybook(self, playbook, timeout, success=None,
-                           phase=None, index=None):
-        if self.executor_server.verbose:
-            verbose = '-vvv'
-        else:
-            verbose = '-v'
-
-        cmd = ['ansible-playbook', verbose, playbook.path]
-        if playbook.secrets_content:
-            cmd.extend(['-e', '@' + playbook.secrets])
-
-        cmd.extend(['-e', '@' + self.jobdir.extra_vars])
-
-        if success is not None:
-            cmd.extend(['-e', 'zuul_success=%s' % str(bool(success))])
-
-        if phase:
-            cmd.extend(['-e', 'zuul_execution_phase=%s' % phase])
-
-        if index is not None:
-            cmd.extend(['-e', 'zuul_execution_phase_index=%s' % index])
-
-        cmd.extend(['-e', 'zuul_execution_trusted=%s' % str(playbook.trusted)])
-        cmd.extend([
-            '-e',
-            'zuul_execution_canonical_name_and_path=%s'
-            % playbook.canonical_name_and_path])
-        cmd.extend(['-e', 'zuul_execution_branch=%s' % str(playbook.branch)])
-
-        if self.executor_variables_file is not None:
-            cmd.extend(['-e@%s' % self.executor_variables_file])
-
-        self.emitPlaybookBanner(playbook, 'START', phase)
-
-        result, code = self.runAnsible(
-            cmd=cmd, timeout=timeout, playbook=playbook)
-        self.log.debug("Ansible complete, result %s code %s" % (
-            self.RESULT_MAP[result], code))
-        if self.executor_server.statsd:
-            base_key = "zuul.executor.{hostname}.phase.{phase}"
-            self.executor_server.statsd.incr(
-                base_key + ".{result}",
-                result=self.RESULT_MAP[result],
-                phase=phase or 'unknown')
-
-        self.emitPlaybookBanner(playbook, 'END', phase, result=result)
-        return result, code
 
 
 def construct_gearman_params(uuid, sched, job, item, pipeline,
