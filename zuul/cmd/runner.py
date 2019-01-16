@@ -14,13 +14,17 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import configparser
 import logging
 import os
 import tempfile
 import threading
+import socket
 import sys
 import uuid
+import yaml
 
+import paramiko.transport
 import requests
 
 import zuul.cmd
@@ -28,7 +32,19 @@ import zuul.merger.merger
 import zuul.lib.connections
 
 from zuul.executor.common import JobDir, AnsibleJobBase, DeduplicateQueue
-from zuul.executor.common import UpdateTask
+from zuul.executor.common import UpdateTask, SshAgent
+
+
+def get_host_key(node):
+    addrinfo = socket.getaddrinfo(
+        node["interface_ip"], node["connection_port"])[0]
+    sock = socket.socket(addrinfo[0], socket.SOCK_STREAM)
+    sock.settimeout(10)
+    sock.connect(addrinfo[4])
+    t = paramiko.transport.Transport(sock)
+    t.start_client(timeout=10)
+    key = t.get_remote_server_key()
+    return "%s %s %s" % (node["hostname"], key.get_name(), key.get_base64())
 
 
 class Runner(zuul.cmd.ZuulApp):
@@ -58,6 +74,11 @@ class Runner(zuul.cmd.ZuulApp):
                             help='the zuul project\'s branch name')
         parser.add_argument('-g', '--git-dir', default='~/.cache/zuul/git',
                             help='the git merger dir')
+        parser.add_argument('-s', '--secrets', help='secrets subsitution map')
+        parser.add_argument(
+            '-n', '--nodes',
+            default='ssh:zuul-worker:instance-ip:/home/zuul-worker',
+            help='the node to use')
 
         subparsers = parser.add_subparsers(title='commands',
                                            description='valid commands')
@@ -71,6 +92,20 @@ class Runner(zuul.cmd.ZuulApp):
             '--dir', '--directory', default=None,
             help='the directory to prepare inside of. Defaults to a temp dir')
 
+        cmd_execute = subparsers.add_parser(
+            'execute',
+            help='Execute a job locally, prepare-workspace if needed')
+        cmd_execute.set_defaults(func=self.execute_job)
+        cmd_execute.add_argument(
+            '--dir', '--directory', default=None,
+            help='the directory to prepare inside of. Defaults to a temp dir')
+
+        self.job_params = None
+        self.hostname = 'localhost'
+        self.default_username = 'zuul-runner'
+        self.verbose = False
+        self.executor_variables_file = None
+        self.statsd = None
         # TODO(jhesketh):
         #  - Enable command line argument override from environ
         #  - Allow supplying the job via either raw input or zuul endpoint
@@ -97,7 +132,55 @@ class Runner(zuul.cmd.ZuulApp):
                 self.args.branch)
         if self.args.job:
             url = os.path.join(url, self.args.job)
-        return requests.get(url).json()
+
+        job = requests.get(url).json()
+
+        # Substitute nodeset with provided node
+        local_nodes = self.args.nodes.split(';')
+        if job["nodes"]:
+            if len(local_nodes) != len(job["nodes"]):
+                self.log.error("Not enough nodes provided to run %s",
+                               job["nodes"])
+                exit(1)
+
+            for idx in range(len(local_nodes)):
+                ctype, cuser, hostname, cwd = local_nodes[idx].split(':')
+                node = job["nodes"][idx]
+                node["name"] = node["name"]
+                node["hostname"] = hostname
+                node["interface_ip"] = socket.gethostbyname(hostname)
+                node["connection_type"] = ctype
+                node["connection_port"] = 22
+                node["username"] = cuser
+                node["cwd"] = cwd
+
+        # Check if secrets are defined
+        if self.args.secrets:
+            secrets = yaml.safe_load(open(self.args.secrets))
+        else:
+            secrets = {}
+        for playbook in job[
+                "pre_playbooks"] + job["playbooks"] + job["post_playbooks"]:
+            for secret in playbook["secrets"]:
+                if secret not in secrets:
+                    self.log.warning("Secrets %s is unknown", secret)
+                    # We can fake 'site_' secret with the provided node...
+                    if secret.startswith("site_"):
+                        # TODO: make this optional?
+                        node = job["nodes"][0]
+                        secrets[secret] = {
+                            "fqdn": node["hostname"],
+                            "path": os.path.join(node["cwd"], secret),
+                            "ssh_username": node["username"],
+                            "ssh_private_key": open(os.path.expanduser(
+                                self.args.key)).read(),
+                        }
+                        if node["connection_type"] == "ssh":
+                            secrets[secret]["ssh_known_hosts"] = get_host_key(
+                                node)
+                playbook["secrets"][secret] = secrets.get(secret, "unknown")
+
+        return job
 
     def _constructConnections(self):
         # Rebuild the connections necessary for the job.
@@ -107,6 +190,11 @@ class Runner(zuul.cmd.ZuulApp):
             self.readConfig()
             connections.configure(self.config, source_only=True)
         else:
+            self.config = configparser.ConfigParser()
+            # TODO: make this configurable
+            self.config["executor"] = {}
+            self.config["executor"]["trusted_ro_paths"] = "/opt"
+            self.config["executor"]["untrusted_ro_paths"] = "/opt"
             # Query zuul-web endpoint
             url = os.path.join(self.args.api, "connections")
             conns = {}
@@ -172,15 +260,19 @@ class Runner(zuul.cmd.ZuulApp):
             root, self.connections, email, username,
             speed_limit, speed_time, cache_root, logger)
 
-    def prep_workspace(self):
-        job_params = self._grab_frozen_job()
+    def prep_environment(self):
+        self.job_params = self._grab_frozen_job()
         self.connections = self._constructConnections()
-        self.library_dir = ""
-        self.callback_dir = ""
-        self.filter_dir = ""
-        self.action_dir = ""
-        self.lookup_dir = ""
-        self.action_dir_general = ""
+        # TODO(tristanC): make this configurable?
+        ansible_lib = os.path.realpath(os.path.join(
+            __file__, "..", "..", "ansible"))
+        self.library_dir = os.path.join(ansible_lib, "library")
+        self.callback_dir = os.path.join(ansible_lib, "callback")
+        self.filter_dir = os.path.join(ansible_lib, "filter")
+        self.action_dir = os.path.join(ansible_lib, "action")
+        self.lookup_dir = os.path.join(ansible_lib, "lookup")
+        self.action_dir_general = os.path.join(ansible_lib, "actiongeneral")
+        self.ansible_dir = ansible_lib
         self.merger_lock = threading.Lock()
         if self.args.dir:
             root = self.args.dir
@@ -192,16 +284,21 @@ class Runner(zuul.cmd.ZuulApp):
         else:
             root = tempfile.mkdtemp()
             job_unique = str(uuid.uuid4().hex)
-        job = AnsibleJobBase(self, job_params, job_unique)
+        job = AnsibleJobBase(self, self.job_params, job_unique)
         self.merge_root = os.path.expanduser(self.args.git_dir)
-        self.merger = self._getMerger(self.merge_root)
+        self.merger_lock = threading.Lock()
+        self.merger = self._getMerger(self.merge_root, logger=None)
         self.start_update_thread()
+        job.jobdir = JobDir(root, keep=False, build_uuid=job_unique)
+        return job
+
+    def prep_workspace(self):
+        job = self.prep_environment()
         # TODO(jhesketh):
         #  - Give options to clean up working dir
         #  - figure out what to do with build_uuid's
-        job.jobdir = JobDir(root, keep=False, build_uuid=job_unique)
         job.prepareRepositories(self.update)
-        job.preparePlaybooks(job_params)
+        job.preparePlaybooks(self.job_params)
 
         print("== Pre phase ==")
         for index, playbook in enumerate(job.jobdir.pre_playbooks):
@@ -211,6 +308,30 @@ class Runner(zuul.cmd.ZuulApp):
         print("== Post phase ==")
         for index, playbook in enumerate(job.jobdir.post_playbooks):
             print(playbook.path)
+
+    def execute_job(self):
+        job = self.prep_environment()
+
+        self.execution_wrapper = self.connections.drivers["bubblewrap"]
+
+        # TODO(tristanC):
+        #  - first enable user provided inventory
+        #  - later user could provide nodepool.configuration and let the runner
+        #    manage resources lifecycle...
+
+        job.prepareRepositories(self.update)
+        job.preparePlaybooks(self.job_params)
+        job.prepareAnsibleFiles(self.job_params)
+        job.writeLoggingConfig()
+
+        job.ssh_agent = SshAgent()
+        try:
+            job.ssh_agent.start()
+            # TODO: enable custom key
+            job.ssh_agent.add(os.path.expanduser(self.args.key))
+            print(job.runPlaybooks(self.job_params))
+        finally:
+            job.ssh_agent.stop()
 
     def main(self):
         self.parseArguments()
