@@ -481,6 +481,8 @@ class RPCListener(object):
             uuid, self.sched,
             job, item, pipeline)
 
+        params["nodeset"] = job.toDict(tenant)["nodeset"]
+
         gear_job.sendWorkComplete(json.dumps(params, cls=MappingProxyEncoder))
 
     def handle_pipeline_list(self, job):
