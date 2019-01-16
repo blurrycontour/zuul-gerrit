@@ -532,6 +532,17 @@ class AnsibleJobBase(object):
         self.arguments = arguments
         self.jobdir = None
         self.project_info = {}
+        self.proc = None
+        self.proc_lock = threading.Lock()
+        self.running = False
+        self.started = False  # Whether playbooks have started running
+        self.time_starting_build = None
+        self.paused = False
+        self.aborted = False
+        self.aborted_reason = None
+        self.executor_variables_file = None
+        self.cpu_times = {'user': 0, 'system': 0,
+                          'children_user': 0, 'children_system': 0}
 
     def getResultData(self):
         data = {}
