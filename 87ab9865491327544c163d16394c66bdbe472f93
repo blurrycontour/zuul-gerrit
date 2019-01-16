@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfdaf3ff_d5a59f05",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-01-16T18:24:02Z",
+      "side": 1,
+      "message": "Can you add this to the docs, here: https://zuul-ci.org/docs/zuul/user/jobs.html#change-items",
+      "revId": "87ab9865491327544c163d16394c66bdbe472f93",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
