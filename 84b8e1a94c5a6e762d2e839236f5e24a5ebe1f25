@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfdaf3ff_3ac09a50",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 511,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-01-16T17:52:32Z",
+      "side": 1,
+      "message": "Can you use buildToDict for this?",
+      "revId": "84b8e1a94c5a6e762d2e839236f5e24a5ebe1f25",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
