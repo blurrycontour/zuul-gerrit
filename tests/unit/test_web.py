@@ -927,6 +927,18 @@ class TestWeb(BaseTestWeb):
             }],
             'pre_playbooks': [],
             'post_playbooks': [],
+            'nodeset': {
+                'groups': [],
+                'name': '',
+                'nodes': [{
+                    'aliases': [],
+                    'comment': None,
+                    'hold_job': None,
+                    'label': 'label1',
+                    'name': 'controller',
+                    'state': 'unknown'
+                }]
+            },
             'ssh_keys': [],
             'vars': {},
             'extra_vars': {},
