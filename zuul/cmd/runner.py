@@ -27,7 +27,7 @@ import zuul.merger.merger
 import zuul.lib.connections
 
 from zuul.executor.common import JobDir, AnsibleJobBase, DeduplicateQueue
-from zuul.executor.common import UpdateTask
+from zuul.executor.common import UpdateTask, SshAgent
 
 
 class Runner(zuul.cmd.ZuulApp):
@@ -66,6 +66,20 @@ class Runner(zuul.cmd.ZuulApp):
             '--dir', '--directory', default=None,
             help='the directory to prepare inside of. Defaults to a temp dir')
 
+        cmd_execute = subparsers.add_parser(
+            'execute',
+            help='Execute a job locally, prepare-workspace if needed')
+        cmd_execute.set_defaults(func=self.execute_job)
+        cmd_execute.add_argument(
+            '--dir', '--directory', default=None,
+            help='the directory to prepare inside of. Defaults to a temp dir')
+
+        self.job_params = None
+        self.hostname = 'localhost'
+        self.default_username = 'zuul-runner'
+        self.verbose = False
+        self.executor_variables_file = None
+        self.statsd = None
         # TODO(jhesketh):
         #  - Allow setting the zuul instance endpoint from params or env vars
         #  - Allow supplying the job via either raw input or zuul endpoint
@@ -159,15 +173,19 @@ class Runner(zuul.cmd.ZuulApp):
             root, self.connections, email, username,
             speed_limit, speed_time, cache_root, logger)
 
-    def prep_workspace(self):
-        job_params = self._grab_frozen_job()
+    def prep_environment(self):
+        self.job_params = self._grab_frozen_job()
         self.connections = self._constructConnections()
-        self.library_dir = ""
-        self.callback_dir = ""
-        self.filter_dir = ""
-        self.action_dir = ""
-        self.lookup_dir = ""
-        self.action_dir_general = ""
+        # TODO(tristanC): make this configurable?
+        ansible_lib = os.path.realpath(os.path.join(
+            __file__, "..", "..", "ansible"))
+        self.library_dir = os.path.join(ansible_lib, "library")
+        self.callback_dir = os.path.join(ansible_lib, "callback")
+        self.filter_dir = os.path.join(ansible_lib, "filter")
+        self.action_dir = os.path.join(ansible_lib, "action")
+        self.lookup_dir = os.path.join(ansible_lib, "lookup")
+        self.action_dir_general = os.path.join(ansible_lib, "actiongeneral")
+        self.ansible_dir = ansible_lib
         self.merger_lock = threading.Lock()
         if self.args.dir:
             root = self.args.dir
@@ -179,17 +197,21 @@ class Runner(zuul.cmd.ZuulApp):
         else:
             root = tempfile.mkdtemp()
             job_unique = str(uuid.uuid4().hex)
-        job = AnsibleJobBase(self, job_params, job_unique)
+        job = AnsibleJobBase(self, self.job_params, job_unique)
         self.merge_root = os.path.expanduser(self.args.git_dir)
-        self.merger = self._getMerger(self.merge_root)
+        self.merger_lock = threading.Lock()
+        self.merger = self._getMerger(self.merge_root, logger=None)
         self.start_update_thread()
+        job.jobdir = JobDir(root, keep=False, build_uuid=job_unique)
+        return job
+
+    def prep_workspace(self):
+        job = self.prep_environment()
         # TODO(jhesketh):
-        #  - Allow working dir to be set
         #  - Give options to clean up working dir
         #  - figure out what to do with build_uuid's
-        job.jobdir = JobDir(root, keep=False, build_uuid=job_unique)
         job.prepareRepositories(self.update)
-        job.preparePlaybooks(job_params)
+        job.preparePlaybooks(self.job_params)
 
         print("== Pre phase ==")
         for index, playbook in enumerate(job.jobdir.pre_playbooks):
@@ -199,6 +221,42 @@ class Runner(zuul.cmd.ZuulApp):
         print("== Post phase ==")
         for index, playbook in enumerate(job.jobdir.post_playbooks):
             print(playbook.path)
+
+    def execute_job(self):
+        job = self.prep_environment()
+
+        self.execution_wrapper = self.connections.drivers["bubblewrap"]
+
+        # TODO(tristanC):
+        #  - first enable user provided inventory
+        #  - later user could provide nodepool.configuration and let the runner
+        #    manage resources lifecycle...
+        nodesets = {
+            "name": "test-nodeset",
+            "nodes": [{
+                'name': ['test-instance'],
+                'interface_ip': '127.0.0.1',
+                'connection_port': 22,
+                'connection_type': 'ssh',
+                'username': 'zuul-worker'
+            }],
+            "groups": [],
+        }
+        self.job_params.update(nodesets)
+
+        job.prepareRepositories(self.update)
+        job.preparePlaybooks(self.job_params)
+        job.prepareAnsibleFiles(self.job_params)
+        job.writeLoggingConfig()
+
+        job.ssh_agent = SshAgent()
+        try:
+            job.ssh_agent.start()
+            # TODO: enable custom key
+            job.ssh_agent.add(os.path.expanduser("~/.ssh/id_rsa"))
+            print(job.runPlaybooks(self.job_params))
+        finally:
+            job.ssh_agent.stop()
 
     def main(self):
         self.parseArguments()
