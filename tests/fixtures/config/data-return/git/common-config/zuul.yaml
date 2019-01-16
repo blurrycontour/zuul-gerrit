@@ -90,9 +90,17 @@
         - data-return:
             dependencies:
               - data-return-skip-all
+            nodeset:
+              nodes:
+              - name: linux
+                label: ubuntu-xenial
         - child:
             dependencies:
               - data-return-skip-all
+            nodeset:
+              nodes:
+              - name: linux
+                label: ubuntu-xenial
 
 - project:
     name: org/project4

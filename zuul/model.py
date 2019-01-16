@@ -2201,7 +2201,8 @@ class QueueItem(object):
         jobs_not_requested = set()
         for job in self.job_graph.getJobs():
             build = build_set.getBuild(job.name)
-            if build and (build.result == 'SUCCESS' or build.paused):
+            if build and (build.result in ['SUCCESS', 'SKIPPED']
+                          or build.paused):
                 successful_job_names.add(job.name)
             else:
                 nodeset = build_set.getJobNodeSet(job.name)

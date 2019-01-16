@@ -3118,6 +3118,29 @@ class TestDataReturn(AnsibleZuulTestCase):
         self.assertIn('data-return : SKIPPED', A.messages[-1])
         self.assertIn('Build succeeded', A.messages[-1])
 
+    def test_data_return_skip_all_child_jobs_no_node_request(self):
+        """Make sure no node requests are made for skipped child jobs."""
+        self.fake_nodepool.pause()
+        A = self.fake_gerrit.addFakeChange('org/project3', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        reqs = self.fake_nodepool.getNodeRequests()
+        self.assertEqual(len(reqs), 0)
+        self.fake_nodepool.unpause()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='data-return-skip-all', result='SUCCESS',
+                 changes='1,1'),
+        ])
+        self.assertIn(
+            '- data-return-skip-all http://example.com/test/log/url/',
+            A.messages[-1])
+        self.assertIn('child : SKIPPED', A.messages[-1])
+        self.assertIn('data-return : SKIPPED', A.messages[-1])
+        self.assertIn('Build succeeded', A.messages[-1])
+
 
 class TestDiskAccounting(AnsibleZuulTestCase):
     config_file = 'zuul-disk-accounting.conf'
