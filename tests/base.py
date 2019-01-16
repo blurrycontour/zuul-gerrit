@@ -64,6 +64,7 @@ import zuul.driver.github.githubconnection as githubconnection
 import zuul.driver.github
 import zuul.driver.sql
 import zuul.scheduler
+import zuul.executor.runner
 import zuul.executor.server
 import zuul.executor.client
 import zuul.lib.connections
@@ -2639,6 +2640,13 @@ class ZuulTestCase(BaseTestCase):
         # Register connections from the config using fakes
         self.connections = zuul.lib.connections.ConnectionRegistry()
         self.connections.configure(self.config, source_only=source_only)
+
+    def setup_runner(self, config):
+        config["runner"] = {
+            "job-dir": os.path.join(self.test_root, "job-runner"),
+            "git-dir": self.executor_src_root,
+        }
+        return zuul.executor.runner.Runner(config, self.connections)
 
     def setup_config(self):
         # This creates the per-test configuration object.  It can be
