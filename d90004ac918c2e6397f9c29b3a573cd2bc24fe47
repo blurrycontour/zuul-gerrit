@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfdaf3ff_5adb1e1a",
+        "filename": "zuul/ansible/action/normal.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-01-16T17:59:08Z",
+      "side": 1,
+      "message": "Can you write more about why this is necessary and why it\u0027s safe?  What arguments/conditions are being checked?  The goal is to help us evaluate this change now, as well as determine whether it\u0027s safe to make changes to this in the future.  See some of the other docstrings here.",
+      "revId": "d90004ac918c2e6397f9c29b3a573cd2bc24fe47",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
