@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bfdaf3ff_f53ea3d8",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-16T18:58:58Z",
+      "side": 1,
+      "message": "I like this idea",
+      "parentUuid": "bfdaf3ff_d55cbf7f",
+      "revId": "5e9dea3be7c11fb0826727676907b6e37bd09f48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bfdaf3ff_f55f836f",
         "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 5
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "bfdaf3ff_f570e3de",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-16T18:58:58Z",
+      "side": 1,
+      "message": "The reason was mostly backwards compatibility as today one can choose to report per pipeline. But I\u0027m open to just remove this as this is probably just a hypothetical use case.",
+      "parentUuid": "bfdaf3ff_f55f836f",
+      "revId": "5e9dea3be7c11fb0826727676907b6e37bd09f48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bfdaf3ff_9556375c",
         "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 5
@@ -47,6 +83,24 @@
       "writtenOn": "2019-01-16T18:50:16Z",
       "side": 1,
       "message": "I don\u0027t think we should include the max processing time to start with; I think that will introduce a lot of edge cases we would need to handle and complexity.  If we find we need it we can add it later.",
+      "revId": "5e9dea3be7c11fb0826727676907b6e37bd09f48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfdaf3ff_b5849bb2",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-16T18:58:58Z",
+      "side": 1,
+      "message": "++",
+      "parentUuid": "bfdaf3ff_9556375c",
       "revId": "5e9dea3be7c11fb0826727676907b6e37bd09f48",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
