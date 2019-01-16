@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfdaf3ff_3a097adc",
+        "filename": "zuul/model.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 972,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-01-16T17:48:47Z",
+      "side": 1,
+      "message": "We should have the alias (the second half of the tuple) as part of the secret dict as well (so that users can know what variable it will appear as in the playbooks).  Otherwise, users looking at the dashboard may not be able to connect that \"my-dockerhub-credentials\" shows up as \"credentials\" in playbooks, and they might think there is a problem.",
+      "revId": "b76e062d66e999baa3e96f38d1ec4126e6c56817",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
