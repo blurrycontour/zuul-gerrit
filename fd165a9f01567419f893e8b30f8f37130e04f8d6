@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfdaf3ff_551d2f64",
+        "filename": "releasenotes/notes/default-timeout-7975c468af576504.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-01-16T18:19:27Z",
+      "side": 1,
+      "message": "0: It\u0027s arguably not a bug -- the way to set a timeout on jobs that don\u0027t specify a timeout is to do it in the base job, but I do agree that this change is an improvement (especially in some multi-tenant cases where you might want different values, or where you can\u0027t trust the people managing a config-project to set the value appropriately in their base jobs).  I\u0027m not sure I\u0027d ask you to change anything here, I\u0027m just trying to add context.\n\n-1: However, this is a change in that currenly, if no one says anything at all about timeouts (in main.yaml or in any jobs), there is no timeout, but with this change, we\u0027ll get the default of 10800.  So we should mention in the upgrade note that if you want to maintain the status quo of no timeouts, you should set tenant.max-job-timeout to -1.",
+      "revId": "fd165a9f01567419f893e8b30f8f37130e04f8d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfdaf3ff_b50edb2f",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3625,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-01-16T18:19:27Z",
+      "side": 1,
+      "message": "-1: max_job_timeout can be -1, to mean there is no limit, but if that\u0027s the value, we shouldn\u0027t set it here.",
+      "revId": "fd165a9f01567419f893e8b30f8f37130e04f8d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
