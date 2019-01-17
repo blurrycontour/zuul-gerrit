@@ -52,6 +52,23 @@
       "revId": "9da52ac3bcb36cbcf0eebcf95b2f2869f160f153",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfdaf3ff_765e1d13",
+        "filename": "doc/requirements.txt",
+        "patchSetId": 7
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-01-17T22:52:45Z",
+      "side": 1,
+      "message": "It\u0027s released, updating in new PS.",
+      "revId": "9da52ac3bcb36cbcf0eebcf95b2f2869f160f153",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
