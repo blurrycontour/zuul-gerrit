@@ -82,7 +82,8 @@ class SQLReporter(BaseReporter):
                 if not build.end_time:
                     build.end_time = time.time()
 
-                (result, url) = item.formatJobResult(job)
+                (result, url) = item.formatJobResult(
+                    job, self.connection.sched.config)
                 start = end = None
                 if build.start_time:
                     start = datetime.datetime.fromtimestamp(

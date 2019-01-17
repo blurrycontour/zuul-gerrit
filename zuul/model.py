@@ -318,7 +318,7 @@ class Pipeline(object):
             items.extend(shared_queue.queue)
         return items
 
-    def formatStatusJSON(self, websocket_url=None):
+    def formatStatusJSON(self, config):
         j_pipeline = dict(name=self.name,
                           description=self.description)
         j_queues = []
@@ -335,7 +335,7 @@ class Pipeline(object):
                     if j_changes:
                         j_queue['heads'].append(j_changes)
                     j_changes = []
-                j_changes.append(e.formatJSON(websocket_url))
+                j_changes.append(e.formatJSON(config))
                 if (len(j_changes) > 1 and
                         (j_changes[-2]['remaining_time'] is not None) and
                         (j_changes[-1]['remaining_time'] is not None)):
@@ -2331,7 +2331,7 @@ class QueueItem(object):
 
         return url
 
-    def formatJobResult(self, job):
+    def formatJobResult(self, job, config):
         build = self.current_build_set.getBuild(job.name)
         result = build.result
         pattern = None
@@ -2367,10 +2367,31 @@ class QueueItem(object):
             self.log.exception("Error while parsing url for job %s:"
                                % (job,))
         if not url:
-            url = default_url or build.url or job.name
+            url = default_url
+        if not url:
+            build_url_format = get_default(
+                config, 'web', 'build_url_format',
+                't/{tenant}/build/{build}')
+           if build_url_format:
+               url = urllib.parse.urljoin(
+                   self.formatUrlPattern(
+                       build_url_format.lstrip('/'), job, build))
+            dashboard_url = get_default(config, 'web', 'url', None)
+            if dashboard_url:
+                # if the url in the build_url_format is a full url rather
+                # than just a path, urljoin will return the build_url_format
+                # url and ignore the dashboard_url. If dashboard_url has
+                # zuul on a suburl, it's important to strip the / from the
+                # end so that the build_url_format value is properly
+                # appended to the suburl.
+                url = urllib.parse.urljoin(dashboard_url.rstrip('/'), url)
+
+        if not url
+            url = build.url or job.name
+
         return (result, url)
 
-    def formatJSON(self, websocket_url=None):
+    def formatJSON(self, config):
         ret = {}
         ret['active'] = self.active
         ret['live'] = self.live
@@ -2422,11 +2443,12 @@ class QueueItem(object):
                 # TODO(tobiash): add support for custom web root
                 urlformat = 'stream/{build.uuid}?' \
                             'logfile=console.log'
+                websocket_url = get_default(self.config, 'web', 'websocket_url', None)
                 if websocket_url:
                     urlformat += '&websocket_url={websocket_url}'
                 build_url = urlformat.format(
                     build=build, websocket_url=websocket_url)
-                (unused, report_url) = self.formatJobResult(job)
+                (unused, report_url) = self.formatJobResult(job, config)
                 if build.start_time:
                     if build.end_time:
                         elapsed = int((build.end_time -

@@ -167,7 +167,7 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
         jobs_fields = []
         for job in item.getJobs():
             build = item.current_build_set.getBuild(job.name)
-            (result, url) = item.formatJobResult(job)
+            (result, url) = item.formatJobResult(job, config)
             if not job.voting:
                 voting = ' (non-voting)'
             else:

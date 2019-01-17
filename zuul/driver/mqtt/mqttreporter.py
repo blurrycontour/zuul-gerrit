@@ -56,7 +56,8 @@ class MQTTReporter(BaseReporter):
             build = item.current_build_set.getBuild(job.name)
             if build:
                 # Report build data if available
-                (result, url) = item.formatJobResult(job)
+                (result, url) = item.formatJobResult(
+                    job, self.connection.sched.config)
                 job_informations.update({
                     'uuid': build.uuid,
                     'start_time': build.start_time,

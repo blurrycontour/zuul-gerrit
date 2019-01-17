@@ -1348,7 +1348,6 @@ class Scheduler(threading.Thread):
         data = {}
 
         data['zuul_version'] = self.zuul_version
-        websocket_url = get_default(self.config, 'web', 'websocket_url', None)
 
         if self._pause:
             ret = 'Queue only mode: preparing to '

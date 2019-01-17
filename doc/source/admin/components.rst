@@ -238,12 +238,23 @@ The following sections of ``zuul.conf`` are used by the scheduler:
 
 .. attr:: web
 
+   .. attr:: url
+
+      URL to the Zuul Web dashboard.
+
    .. attr:: status_url
 
       URL that will be posted in Zuul comments made to changes when
       starting jobs for a change.
 
-      .. TODO: is this effectively required?
+   .. attr:: build_url_template
+      :default: '{web.url}/t/{tenant}/build/{build}
+
+      URL with python format string containing a URL to use for returning
+      build urls. The template supports the following python format string
+      substitutions for use in scenarios such as whitelabel installs where
+      the dashboard build page may live at a different url: ``change``,
+      ``pipeline``, ``tenant``, ``buildset``, ``job``, ``build``.
 
 .. attr:: scheduler
 
