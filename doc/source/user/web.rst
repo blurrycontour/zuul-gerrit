@@ -3,4 +3,4 @@
 Rest API
 ========
 
-.. openapi:: ../../../web/public/swagger.json
+.. openapi:: ../../../web/public/swagger.yaml

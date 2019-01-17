@@ -107,7 +107,7 @@ function fetchInfo () {
   return Axios.get(apiUrl + 'info')
 }
 function fetchOpenApi () {
-  return Axios.get(getHomepageUrl () + 'swagger.json')
+  return Axios.get(getHomepageUrl () + 'swagger.yaml')
 }
 function fetchTenants () {
   return Axios.get(apiUrl + 'tenants')

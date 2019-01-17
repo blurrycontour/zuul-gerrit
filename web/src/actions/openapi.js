@@ -13,6 +13,7 @@
 // under the License.
 
 import * as API from '../api'
+import yaml from 'js-yaml'
 
 export const OPENAPI_FETCH_REQUEST = 'OPENAPI_FETCH_REQUEST'
 export const OPENAPI_FETCH_SUCCESS = 'OPENAPI_FETCH_SUCCESS'
@@ -50,7 +51,7 @@ const fetchOpenApiFail = error => ({
 const fetchOpenApi = (whiteLabel) => dispatch => {
   dispatch(fetchOpenApiRequest())
   return API.fetchOpenApi()
-    .then(response => dispatch(fetchOpenApiSuccess(response.data, whiteLabel)))
+    .then(response => dispatch(fetchOpenApiSuccess(yaml.safeLoad(response.data), whiteLabel)))
     .catch(error => {
       dispatch(fetchOpenApiFail(error))
       setTimeout(() => {dispatch(fetchOpenApi())}, 5000)
