@@ -121,6 +121,23 @@
       "revId": "5e9dea3be7c11fb0826727676907b6e37bd09f48",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfdaf3ff_4f4fc933",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-01-17T16:46:16Z",
+      "side": 1,
+      "message": "We should probably add a section on work items.  It would be good to list some of the major steps we need to do, so we can get an idea of how much work will need to be done, whether we can split it up among different authors, and how we should handle merging and releasing.\n\nParticularly, it would be good to figure out whether we want to break it up into a series of moderate changes (such as \"require sql\", \"zk ingestor\", \"zk executor\", \"zk scheduler\"), each of which gets a 3.x release with an upgrade note, or whether we want to maintain a long stack of changes in gerrit with rebasing and land it all then release 4.0, or whether we want to make a feature branch.  I think making the list of work items as a start will help us find the right answer.",
+      "revId": "5e9dea3be7c11fb0826727676907b6e37bd09f48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
