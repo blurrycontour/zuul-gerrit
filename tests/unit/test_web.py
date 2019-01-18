@@ -247,6 +247,16 @@ class TestWeb(BaseTestWeb):
         self.assertEqual(3, data[0]['projects'])
         self.assertEqual(1, data[0]['queue'])
 
+    def test_web_connections_list(self):
+        data = self.get_url('api/connections').json()
+        connection = {
+            'driver': 'gerrit',
+            'name': 'gerrit',
+            'server': 'review.example.com',
+            'user': 'jenkins',
+        }
+        self.assertEqual([connection], data)
+
     def test_web_bad_url(self):
         # do we redirect to index.html
         resp = self.get_url("status/foo")
