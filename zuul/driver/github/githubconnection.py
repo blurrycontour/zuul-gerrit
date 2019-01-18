@@ -540,6 +540,16 @@ class GithubConnection(BaseConnection):
             r"^Depends-On: https://%s/.+/.+/pull/[0-9]+$" % self.server,
             re.MULTILINE | re.IGNORECASE)
 
+    def toDict(self):
+        d = super().toDict()
+        d.update({
+            "baseurl": self.baseurl,
+            "canonical_hostname": self.canonical_hostname,
+            "server": self.server,
+            "verify_ssl": self.verify_ssl,
+        })
+        return d
+
     def onLoad(self):
         self.log.info('Starting GitHub connection: %s' % self.connection_name)
         self.gearman_worker = GithubGearmanWorker(self)
