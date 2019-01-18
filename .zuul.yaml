@@ -70,6 +70,92 @@
       - openstack-infra/nodepool
       - openstack-infra/zuul
 
+# Image building jobs
+- secret:
+    name: zuul-dockerhub
+    data:
+      username: openstackzuul
+      password: !encrypted/pkcs1-oaep
+        - ZTIjviqY7IEtFu/hW9JkMkT/LEvoxGp7tUApaeMTHtYYqI1by5EeRYTrX8MFCDvLiF/0M
+          UD3OudeGhgO4NWj+XrmyrnKEsDXuwUM9JxZNFhVl82jZeFPARKqtrA2HJYCSJDwOzYPxU
+          r6E8UexhbX6faBPWtoeP5W0MfEh5BVwan1aF2bmJCXJ59Yaz2AKKS0VRxxxjpnnQ7Y15q
+          nG2Y2uAr8F+YSXx6kyhk1rJoXoHFtI4Uis6/1AUgCM2qnCV4TISO8JmPxoYlXbgIkDYOy
+          CTuBxIXWVVA6IdmD1o+Rckhg/35uYN5urEZt5niuL2gp1jsdwD1Zh2rw/9nftGZ9kV9TP
+          vOKjCfRIop1Q6N+wjs8b+7FBJrXKoUVDEOPMgqkLfGw2cL2mAwo5bDxqkagmZGWDKGhKF
+          K+KgwnZhNtcTsIRnap1FUsj6pACexbXwtZngJ17fsLMkNd2v4JbIiOe0799ozVLRsyWIe
+          T1BgSzuBIj1MrtlMweuF/SzzwbSDTEym37QwqmYrgc/vqjJ96+J+c7/zK38NEaGpxwCmV
+          hFY/aBwQRBj9YA0n9VMn4WWDhXqmMfEuE2gZ6BazAg34fENVk7KKyB5DMxFGMYm64B4lv
+          sfrbwvpshKsA1wnMP6ANX3XOKrXUGussNkAGvbdtlL2BIB66I4U8+kqLdetp3I=
+
+- job:
+    name: zuul-build-image
+    description: |
+      Build a docker image.
+
+      See the `role documentation
+      <https://zuul-ci.org/docs/zuul-jobs/roles.html#role-build-docker-image>`_
+      for details.
+    allowed-projects: openstack-infra/zuul
+    pre-run: playbooks/build-image/pre.yaml
+    run: playbooks/build-image/run.yaml
+    vars: &zuul_image_vars
+      docker_images:
+        - context: .
+          repository: opendevorg/zuul-base
+        - context: .
+          repository: opendevorg/zuul
+        - context: .
+          repository: opendevorg/zuul-bwrap
+        - context: .
+          repository: opendevorg/zuul-executor
+        - context: .
+          repository: opendevorg/zuul-fingergw
+        - context: .
+          repository: opendevorg/zuul-merger
+        - context: .
+          repository: opendevorg/zuul-migrate
+        - context: .
+          repository: opendevorg/zuul-scheduler
+        - context: .
+          repository: opendevorg/zuul-web
+    files: &zuul_image_files
+      - docker/gitea-init/.*
+
+- job:
+    name: zuul-upload-image
+    parent: zuul-build-image
+    description: |
+      Build and upload a docker image.
+
+      See the `role documentation
+      <https://zuul-ci.org/docs/zuul-jobs/roles.html#role-upload-docker-image>`_
+      for details.
+    allowed-projects: openstack-infra/zuul
+    post-run: playbooks/build-image/upload.yaml
+    secrets:
+      name: docker_credentials
+      secret: zuul-dockerhub
+    vars: *zuul_image_vars
+    files: *zuul_image_files
+
+- job:
+    name: zuul-promote-image
+    description: |
+      Retag a previously-uploaded docker image.
+
+      See the `role documentation
+      <https://zuul-ci.org/docs/zuul-jobs/roles.html#role-promote-docker-image>`_
+      for details.
+    allowed-projects: openstack-infra/zuul
+    run: playbooks/build-image/promote.yaml
+    secrets:
+      name: docker_credentials
+      secret: zuul-dockerhub
+    nodeset:
+      nodes: []
+    vars: *zuul_image_vars
+    files: *zuul_image_files
+
 - project:
     check:
       jobs:
@@ -100,9 +186,6 @@
         - zuul-stream-functional
         - zuul-tox-remote
         - zuul-quick-start
-        - pbrx-build-container-images:
-            vars:
-              pbrx_prefix: zuul
         - nodepool-zuul-functional:
             voting: false
     gate:
@@ -133,9 +216,6 @@
         - zuul-stream-functional
         - zuul-tox-remote
         - zuul-quick-start
-        - pbrx-build-container-images:
-            vars:
-              pbrx_prefix: zuul
     post:
       jobs:
         - publish-zuul-docs
@@ -145,9 +225,6 @@
               node_version: 8
               zuul_work_dir: "{{ zuul.project.src_dir }}/web"
               create_tarball_directory: build
-        - openstackzuul-pbrx-push-container-images:
-            vars:
-              pbrx_prefix: zuul
 
     release:
       jobs:
