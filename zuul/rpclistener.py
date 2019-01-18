@@ -80,6 +80,7 @@ class RPCListener(object):
         self.worker.registerFunction("zuul:pipeline_list")
         self.worker.registerFunction("zuul:key_get")
         self.worker.registerFunction("zuul:config_errors_list")
+        self.worker.registerFunction("zuul:connection_list")
 
     def stop(self):
         self.log.debug("Stopping")
@@ -525,4 +526,19 @@ class RPCListener(object):
             output.append({
                 'source_context': err.key.context.toDict(),
                 'error': err.error})
+        job.sendWorkComplete(json.dumps(output))
+
+    def handle_connection_list(self, job):
+        output = []
+        for source in self.sched.connections.getSources():
+            conn = source.connection
+            connection = {
+                'name': conn.connection_name,
+                'driver': source.driver.name,
+            }
+            for config in ('canonical_hostname', 'baseurl', 'server', 'port',
+                           'baseurl', 'user'):
+                if conn.connection_config.get(config):
+                    connection[config] = conn.connection_config.get(config)
+            output.append(connection)
         job.sendWorkComplete(json.dumps(output))
