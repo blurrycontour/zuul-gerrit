@@ -16,8 +16,10 @@
 
 if type apt-get; then
     # Install https transport - otherwise apt-get HANGS on https urls
+    # Install curl so the curl commands work
+    # Install gnupg2 so that the apt-key add works
     sudo apt-get update
-    sudo apt-get install apt-transport-https
+    sudo apt-get install -y apt-transport-https curl gnupg2
     # Install recent NodeJS repo
     curl -sS https://deb.nodesource.com/gpgkey/nodesource.gpg.key | sudo apt-key add -
     echo "deb https://deb.nodesource.com/node_8.x xenial main" | sudo tee /etc/apt/sources.list.d/nodesource.list
