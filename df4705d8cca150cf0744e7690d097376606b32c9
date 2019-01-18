@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_b503a80f",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1495,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-01-18T20:01:43Z",
+      "side": 1,
+      "message": "This still needs to happen.  :)",
+      "revId": "df4705d8cca150cf0744e7690d097376606b32c9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
