@@ -42,6 +42,10 @@ class Runner(zuul.cmd.ZuulApp):
                             help='verbose output')
         parser.add_argument('-a', '--api', required=True,
                             help='the zuul server api to query against')
+        parser.add_argument('-u', '--user',
+                            help='the source connection user to merge changes')
+        parser.add_argument('-k', '--key', default='~/.ssh/id_rsa',
+                            help='the key to use for ssh connections')
         parser.add_argument('-t', '--tenant',
                             help='the zuul tenant name')
         parser.add_argument('-j', '--job',
@@ -96,16 +100,24 @@ class Runner(zuul.cmd.ZuulApp):
         return requests.get(url).json()
 
     def _constructConnections(self):
-        # Rebuild the connections necessary for the job (specifically
-        # getSource). This may involve querying the zuul server for public
-        # attributes such as baseurl.
-        # TODO
+        # Rebuild the connections necessary for the job.
         connections = zuul.lib.connections.ConnectionRegistry()
 
-        # In the meantime, just load zuul.conf
         if self.args.config:
             self.readConfig()
-        connections.configure(self.config, source_only=True)
+            connections.configure(self.config, source_only=True)
+        else:
+            # Query zuul-web endpoint
+            url = os.path.join(self.args.api, "connections")
+            conns = {}
+            for config in requests.get(url).json():
+                if self.args.user:
+                    config['user'] = self.args.user
+                config['sshkey'] = os.path.expanduser(self.args.key)
+                conns[config['name']] = connections.drivers[
+                    config['driver']].getConnection(config['name'], config)
+            connections.connections = conns
+
         return connections
 
     def _updateLoop(self):
