@@ -22,6 +22,30 @@
       "revId": "29c4ad35db9ece544e78b243b8f0e7317b284ae5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfdaf3ff_98f88b49",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1127,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-01-18T08:32:39Z",
+      "side": 1,
+      "message": "Ok, though note that this won\u0027t affect javascript code.",
+      "parentUuid": "bfdaf3ff_e0ee2e87",
+      "range": {
+        "startLine": 1126,
+        "startChar": 0,
+        "endLine": 1127,
+        "endChar": 62
+      },
+      "revId": "29c4ad35db9ece544e78b243b8f0e7317b284ae5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
