@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_92d9da23",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3876,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-01-18T18:42:39Z",
+      "side": 1,
+      "message": "Consider adding a test for untrusted under trusted to make sure an untrusted child doesn\u0027t inherit the parent\u0027s trusted state. Note I don\u0027t think the code does this as written so should be ok, but having a guard against that behavior changing (and double checking it) is nice.",
+      "revId": "91ed6652dc5a345af4cc1bedef8a2a5718616438",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_32eb4eb1",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1497,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-01-18T18:42:39Z",
+      "side": 1,
+      "message": "May want to break here once post_review is set to True to reduce iterations.",
+      "revId": "91ed6652dc5a345af4cc1bedef8a2a5718616438",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
