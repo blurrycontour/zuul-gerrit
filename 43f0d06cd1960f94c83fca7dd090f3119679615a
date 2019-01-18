@@ -533,6 +533,24 @@
       "revId": "43f0d06cd1960f94c83fca7dd090f3119679615a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfd5e7cf_a1690a26",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2019-01-18T13:31:49Z",
+      "side": 1,
+      "message": "Warnign should be big and red message (maybe even a cowsay one), so it will motivate people to do something about it. \nOtherwise it will be ignored like the tons of deprecation warnigns we have in our jobs that nobody cares about, keep growing and wondering why is so hard to migrate from version N to N+1.\n\nI would also want to see a clear policy regarding adoption of newer version based on Ansible team release policy, one that assures that our default zuul version is always a fully-supported version of Ansible (not one that is only receiving security updates or worse fully unsupported).\n\nThis is important because Ansible team is able to fix bug very fast on supported versions, sometimes even less than two days. They will not backport bugfixes to much older versions.",
+      "parentUuid": "1f769fc5_38c1982f",
+      "revId": "43f0d06cd1960f94c83fca7dd090f3119679615a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
