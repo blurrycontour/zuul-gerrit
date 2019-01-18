@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfdaf3ff_98ee4bb2",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 699,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-18T08:20:39Z",
+      "side": 1,
+      "message": "nit: intentional",
+      "revId": "3b1a6cfb7710d908d088414847ee3f7c87727d6c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfdaf3ff_18033b75",
+        "filename": "tests/fixtures/config/pass-to-parent/git/org_project/zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-18T08:20:39Z",
+      "side": 1,
+      "message": "nit: trailing whitespace",
+      "revId": "3b1a6cfb7710d908d088414847ee3f7c87727d6c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfdaf3ff_b8fb0f77",
+        "filename": "tests/fixtures/config/pass-to-parent/git/org_project/zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-18T08:20:39Z",
+      "side": 1,
+      "message": "nit trailing whitespace",
+      "revId": "3b1a6cfb7710d908d088414847ee3f7c87727d6c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfdaf3ff_d8f8537c",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1491,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-18T08:20:39Z",
+      "side": 1,
+      "message": "nit: pipeline",
+      "revId": "3b1a6cfb7710d908d088414847ee3f7c87727d6c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfdaf3ff_78f12795",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1504,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-18T08:20:39Z",
+      "side": 1,
+      "message": "These three loops could be simplified to one by using:\n\n for pb in itertools.chain(self.pre_run, self.run, self.post_run):\n     ...",
+      "revId": "3b1a6cfb7710d908d088414847ee3f7c87727d6c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
