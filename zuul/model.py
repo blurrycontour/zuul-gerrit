@@ -1495,6 +1495,7 @@ class Job(ConfigObject):
                 pb.addSecrets(decrypted_secrets)
                 if not pb.source_context.trusted:
                     self.post_review = True
+                    break
 
         if other._get('run') is not None:
             other_run = self.freezePlaybooks(other.run, layout)
