@@ -23,3 +23,4 @@ FROM python:slim
 
 COPY --from=builder /output/ /output
 RUN /output/install-from-bindep
+RUN /usr/local/bin/zuul-manage-ansible -v
