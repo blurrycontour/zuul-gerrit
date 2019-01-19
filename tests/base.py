@@ -2408,6 +2408,9 @@ class ZuulTestCase(BaseTestCase):
         self.config.set(
             'merger', 'command_socket',
             os.path.join(self.test_root, 'merger.socket'))
+        ansible_root = os.path.join(
+            sys.exec_prefix, 'lib', 'zuul', 'executor-ansible')
+        self.config.set('executor', 'ansible-root', ansible_root)
 
         self.statsd = FakeStatsd()
         if self.config.has_section('statsd'):
