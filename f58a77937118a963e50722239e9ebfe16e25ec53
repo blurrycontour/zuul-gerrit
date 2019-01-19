@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_f1adbbea",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-01-19T23:59:38Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this be available in the same phase as the ansible-version job attributes is added? Especially for users don\u0027t care about the executor\u0027s ansible version or be compatible with older release.",
+      "range": {
+        "startLine": 57,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 17
+      },
+      "revId": "f58a77937118a963e50722239e9ebfe16e25ec53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
