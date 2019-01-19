@@ -18,6 +18,8 @@ import subprocess
 
 import pbr.packaging
 
+from zuul.lib.ansible import AnsibleManager
+
 _old_from_git = pbr.packaging._from_git
 
 
@@ -36,8 +38,12 @@ def _build_javascript():
 
 def _from_git(distribution):
     _build_javascript()
+
     return _old_from_git(distribution)
 
 
 def setup_hook(config):
     pbr.packaging._from_git = _from_git
+
+    # Install all supported ansible versions
+    AnsibleManager().install(upgrade=True)
