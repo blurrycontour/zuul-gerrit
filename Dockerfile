@@ -23,3 +23,6 @@ FROM python:slim
 
 COPY --from=builder /output/ /output
 RUN /output/install-from-bindep
+
+# TODO: split this into an executor specific image
+RUN /usr/local/bin/zuul-manage-ansible -v
