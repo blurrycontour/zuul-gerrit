@@ -5080,4 +5080,5 @@ class TestAnsibleVersion(AnsibleZuulTestCase):
         self.assertHistory([
             dict(name='ansible-default', result='SUCCESS', changes='1,1'),
             dict(name='ansible-25', result='SUCCESS', changes='1,1'),
+            dict(name='ansible-26', result='SUCCESS', changes='1,1'),
         ], ordered=False)
