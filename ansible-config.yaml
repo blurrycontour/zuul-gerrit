@@ -1,0 +1,7 @@
+# This file describes the currently supported ansible versions
+
+- version: 2.5
+  default: true
+  deprecated: true
+  requirements:
+    - "ansible>=2.5.1,<2.6"
