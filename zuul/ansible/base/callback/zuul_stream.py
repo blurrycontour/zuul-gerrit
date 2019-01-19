@@ -310,7 +310,7 @@ class CallbackModule(default.CallbackModule):
         if result._task.loop and 'results' in result_dict:
             # items have their own events
             pass
-        elif (result_dict.get('msg') == 'MODULE FAILURE'):
+        elif result_dict.get('msg', '').startswith('MODULE FAILURE'):
             if 'module_stdout' in result_dict and result_dict['module_stdout']:
                 self._log_message(
                     result, status='MODULE FAILURE',
@@ -387,7 +387,7 @@ class CallbackModule(default.CallbackModule):
             # items have their own events
             pass
 
-        elif (result_dict.get('msg') == 'MODULE FAILURE'):
+        elif result_dict.get('msg', '').startswith('MODULE FAILURE'):
             if 'module_stdout' in result_dict and result_dict['module_stdout']:
                 self._log_message(
                     result, status='MODULE FAILURE',

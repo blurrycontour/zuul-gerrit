@@ -170,3 +170,7 @@ class TestZuulStream25(AnsibleZuulTestCase):
 
 class TestZuulStream26(TestZuulStream25):
     ansible_version = '2.6'
+
+
+class TestZuulStream27(TestZuulStream25):
+    ansible_version = '2.7'
