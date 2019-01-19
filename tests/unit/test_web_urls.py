@@ -49,8 +49,12 @@ class TestWebURLs(ZuulTestCase):
                 ('a', 'href'),
                 ('img', 'src'),
         ]:
+            print("Finding all tag %s with %s" % (tag, attr))
             for item in page.find_all(tag):
                 suburl = item.get(attr)
+                if not suburl:
+                    print("Item %s doesn't have the attr" % item)
+                    continue
                 if suburl.startswith('/'):
                     suburl = suburl[1:]
                 link = urllib.parse.urljoin(url, suburl)

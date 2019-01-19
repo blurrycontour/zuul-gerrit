@@ -24,7 +24,8 @@ import {
 
 export default (state = [], action) => {
   // Intercept API failure
-  if (action.error && action.type.match(/.*_FETCH_FAIL$/)) {
+  if (action.error && action.error.request && action.error.response &&
+      action.type.match(/.*_FETCH_FAIL$/)) {
     action = addApiError(action.error)
   }
   switch (action.type) {
