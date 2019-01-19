@@ -12,6 +12,7 @@ rules:
   react/no-did-mount-set-state: error
   react/no-did-update-set-state: error
   react/no-deprecated: error
+  jsx-ally/anchor-is-valid: off
 extends:
   - eslint:recommended
   - plugin:react/recommended
