@@ -2401,6 +2401,9 @@ class TestAnsible25(AnsibleZuulTestCase):
         self.waitUntilSettled()
 
     def test_plugins(self):
+        # This test runs a bit long and needs extra time.
+        self.wait_timeout = 120
+
         # Keep the jobdir around so we can inspect contents if an
         # assert fails.
         self.executor_server.keep_jobdir = True
@@ -2434,6 +2437,10 @@ class TestAnsible25(AnsibleZuulTestCase):
 
         # TODOv3(jeblair): parse the ansible output and verify we're
         # getting the exception we expect.
+
+
+class TestAnsible26(TestAnsible25):
+    ansible_version = '2.6'
 
 
 class TestPrePlaybooks(AnsibleZuulTestCase):
@@ -5204,4 +5211,5 @@ class TestAnsibleVersion(AnsibleZuulTestCase):
         self.assertHistory([
             dict(name='ansible-default', result='SUCCESS', changes='1,1'),
             dict(name='ansible-25', result='SUCCESS', changes='1,1'),
+            dict(name='ansible-26', result='SUCCESS', changes='1,1'),
         ], ordered=False)
