@@ -122,6 +122,15 @@ class ManagedAnsibleBase26(ManagedAnsibleBase):
         self._requirements = ['ansible>=2.6<2.7']
 
 
+class ManagedAnsibleBase27(ManagedAnsibleBase):
+    log = logging.getLogger('zuul.manage_ansible.27')
+
+    def __init__(self, ansible_root):
+        super().__init__(ansible_root)
+        self.version = '2.7'
+        self._requirements = ['ansible>=2.7<2.8']
+
+
 class AnsibleManager:
 
     def __init__(self, ansible_root):
@@ -129,6 +138,7 @@ class AnsibleManager:
         self.supported_versions = {
             '2.5': ManagedAnsibleBase25(ansible_root),
             '2.6': ManagedAnsibleBase26(ansible_root),
+            '2.7': ManagedAnsibleBase27(ansible_root),
         }
         self.default_version = '2.5'
         self.deprecated_versions = []
