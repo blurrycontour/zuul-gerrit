@@ -29,6 +29,7 @@ import traceback
 import git
 from urllib.parse import urlsplit
 
+from zuul.lib.ansible import AnsibleManager
 from zuul.lib.yamlutil import yaml
 from zuul.lib.config import get_default
 from zuul.lib.statsd import get_statsd
@@ -1990,7 +1991,10 @@ class AnsibleJob(object):
         else:
             verbose = '-v'
 
-        cmd = ['ansible', '*', verbose, '-m', 'setup',
+        # TODO: select correct ansible version from job
+        ansible = self.executor_server.ansible_manager.getAnsibleCommand(
+            command='ansible')
+        cmd = [ansible, '*', verbose, '-m', 'setup',
                '-i', self.jobdir.setup_inventory,
                '-a', 'gather_subset=!all']
         if self.executor_variables_file is not None:
@@ -2069,7 +2073,9 @@ class AnsibleJob(object):
         else:
             verbose = '-v'
 
-        cmd = ['ansible-playbook', verbose, playbook.path]
+        # TODO: Select ansible version based on job
+        cmd = [self.executor_server.ansible_manager.getAnsibleCommand(),
+               verbose, playbook.path]
         if playbook.secrets_content:
             cmd.extend(['-e', '@' + playbook.secrets])
 
@@ -2258,6 +2264,8 @@ class ExecutorServer(object):
             RAMSensor(config),
             StartingBuildsSensor(self, cpu_sensor.max_load_avg)
         ]
+
+        self.ansible_manager = AnsibleManager()
 
     def _getMerger(self, root, cache_root, logger=None):
         return zuul.merger.merger.Merger(
