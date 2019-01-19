@@ -40,6 +40,12 @@
       zuul_ansible_version: 2.6
 
 - job:
+    name: zuul-stream-functional-2.7
+    parent: zuul-stream-functional
+    vars:
+      zuul_ansible_version: 2.7
+
+- job:
     name: zuul-tox-remote
     parent: tox
     vars:
@@ -204,6 +210,7 @@
               - web/.*
         - zuul-stream-functional-2.5
         - zuul-stream-functional-2.6
+        - zuul-stream-functional-2.7
         - zuul-tox-remote
         - zuul-quick-start
         - nodepool-zuul-functional:
@@ -236,6 +243,7 @@
               - web/.*
         - zuul-stream-functional-2.5
         - zuul-stream-functional-2.6
+        - zuul-stream-functional-2.7
         - zuul-tox-remote
         - zuul-quick-start
         - zuul-upload-image
