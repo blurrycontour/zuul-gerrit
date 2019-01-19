@@ -131,6 +131,17 @@ class ManagedAnsibleBase27(ManagedAnsibleBase):
         self._requirements = ['ansible>=2.7<2.8']
 
 
+class ManagedAnsibleBaseDevel(ManagedAnsibleBase):
+    log = logging.getLogger('zuul.manage_ansible.devel')
+
+    def __init__(self, ansible_root):
+        super().__init__(ansible_root)
+        self.version = 'devel'
+        self._requirements = [
+            'git+https://github.com/ansible/ansible@devel#egg=ansible'
+        ]
+
+
 class AnsibleManager:
 
     def __init__(self, ansible_root):
@@ -139,6 +150,9 @@ class AnsibleManager:
             '2.5': ManagedAnsibleBase25(ansible_root),
             '2.6': ManagedAnsibleBase26(ansible_root),
             '2.7': ManagedAnsibleBase27(ansible_root),
+
+            # Enable devel only for testing
+            # 'devel': ManagedAnsibleBaseDevel(ansible_root),
         }
         self.default_version = '2.5'
         self.deprecated_versions = []
