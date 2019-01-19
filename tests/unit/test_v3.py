@@ -2436,6 +2436,10 @@ class TestAnsible25(AnsibleZuulTestCase):
         # getting the exception we expect.
 
 
+class TestAnsible26(TestAnsible25):
+    ansible_version = '2.6'
+
+
 class TestPrePlaybooks(AnsibleZuulTestCase):
     # A temporary class to hold new tests while others are disabled
 
@@ -5204,4 +5208,5 @@ class TestAnsibleVersion(AnsibleZuulTestCase):
         self.assertHistory([
             dict(name='ansible-default', result='SUCCESS', changes='1,1'),
             dict(name='ansible-25', result='SUCCESS', changes='1,1'),
+            dict(name='ansible-26', result='SUCCESS', changes='1,1'),
         ], ordered=False)
