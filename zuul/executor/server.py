@@ -29,6 +29,7 @@ import traceback
 import git
 from urllib.parse import urlsplit
 
+from zuul.lib.ansible import AnsibleManager
 from zuul.lib.yamlutil import yaml
 from zuul.lib.config import get_default
 from zuul.lib.statsd import get_statsd
@@ -551,7 +552,7 @@ class DeduplicateQueue(object):
 def _copy_ansible_files(python_module, target_dir):
     library_path = os.path.dirname(os.path.abspath(python_module.__file__))
     for fn in os.listdir(library_path):
-        if fn == "__pycache__":
+        if fn in ('__pycache__', 'base'):
             continue
         full_path = os.path.join(library_path, fn)
         if os.path.isdir(full_path):
@@ -683,6 +684,16 @@ class AnsibleJob(object):
         if self.executor_server.config.has_option('executor', 'variables'):
             self.executor_variables_file = self.executor_server.config.get(
                 'executor', 'variables')
+
+        # TODO(tobiash): choose correct ansible version as specified by the job
+        plugin_dir = self.executor_server.ansible_manager.getAnsiblePluginDir(
+            self.executor_server.ansible_plugin_dir_root)
+        self.library_dir = os.path.join(plugin_dir, 'library')
+        self.action_dir = os.path.join(plugin_dir, 'action')
+        self.action_dir_general = os.path.join(plugin_dir, 'actiongeneral')
+        self.callback_dir = os.path.join(plugin_dir, 'callback')
+        self.lookup_dir = os.path.join(plugin_dir, 'lookup')
+        self.filter_dir = os.path.join(plugin_dir, 'filter')
 
     def run(self):
         self.running = True
@@ -1698,10 +1709,10 @@ class AnsibleJob(object):
         #               plugins.
         if ara_callbacks:
             callback_path = '%s:%s' % (
-                self.executor_server.callback_dir,
+                self.callback_dir,
                 os.path.dirname(ara_callbacks.__file__))
         else:
-            callback_path = self.executor_server.callback_dir
+            callback_path = self.callback_dir
         with open(jobdir_playbook.ansible_config, 'w') as config:
             config.write('[defaults]\n')
             config.write('inventory = %s\n' % self.jobdir.inventory)
@@ -1712,23 +1723,23 @@ class AnsibleJob(object):
             config.write('fact_caching_connection = %s\n' %
                          self.jobdir.fact_cache)
             config.write('library = %s\n'
-                         % self.executor_server.library_dir)
+                         % self.library_dir)
             config.write('command_warnings = False\n')
             config.write('callback_plugins = %s\n' % callback_path)
             config.write('stdout_callback = zuul_stream\n')
             config.write('filter_plugins = %s\n'
-                         % self.executor_server.filter_dir)
+                         % self.filter_dir)
             # bump the timeout because busy nodes may take more than
             # 10s to respond
             config.write('timeout = 30\n')
 
             # We need at least the general action dir as this overwrites the
             # command action plugin for log streaming.
-            action_dirs = [self.executor_server.action_dir_general]
+            action_dirs = [self.action_dir_general]
             if not trusted:
-                action_dirs.append(self.executor_server.action_dir)
+                action_dirs.append(self.action_dir)
                 config.write('lookup_plugins = %s\n'
-                             % self.executor_server.lookup_dir)
+                             % self.lookup_dir)
 
             config.write('action_plugins = %s\n'
                          % ':'.join(action_dirs))
@@ -1990,7 +2001,10 @@ class AnsibleJob(object):
         else:
             verbose = '-v'
 
-        cmd = ['ansible', '*', verbose, '-m', 'setup',
+        # TODO: select correct ansible version from job
+        ansible = self.executor_server.ansible_manager.getAnsibleCommand(
+            command='ansible')
+        cmd = [ansible, '*', verbose, '-m', 'setup',
                '-i', self.jobdir.setup_inventory,
                '-a', 'gather_subset=!all']
         if self.executor_variables_file is not None:
@@ -2069,7 +2083,9 @@ class AnsibleJob(object):
         else:
             verbose = '-v'
 
-        cmd = ['ansible-playbook', verbose, playbook.path]
+        # TODO: Select ansible version based on job
+        cmd = [self.executor_server.ansible_manager.getAnsibleCommand(),
+               verbose, playbook.path]
         if playbook.secrets_content:
             cmd.extend(['-e', '@' + playbook.secrets])
 
@@ -2214,18 +2230,10 @@ class ExecutorServer(object):
             shutil.rmtree(ansible_dir)
 
         zuul_dir = os.path.join(ansible_dir, 'zuul')
-        plugin_dir = os.path.join(zuul_dir, 'ansible')
+        self.ansible_plugin_dir_root = os.path.join(zuul_dir, 'ansible')
 
-        os.makedirs(plugin_dir, mode=0o0755)
-
-        self.library_dir = os.path.join(plugin_dir, 'library')
-        self.action_dir = os.path.join(plugin_dir, 'action')
-        self.action_dir_general = os.path.join(plugin_dir, 'actiongeneral')
-        self.callback_dir = os.path.join(plugin_dir, 'callback')
-        self.lookup_dir = os.path.join(plugin_dir, 'lookup')
-        self.filter_dir = os.path.join(plugin_dir, 'filter')
-
-        _copy_ansible_files(zuul.ansible, plugin_dir)
+        os.makedirs(self.ansible_plugin_dir_root, mode=0o0755)
+        _copy_ansible_files(zuul.ansible, self.ansible_plugin_dir_root)
 
         # We're copying zuul.ansible.* into a directory we are going
         # to add to pythonpath, so our plugins can "import
@@ -2258,6 +2266,8 @@ class ExecutorServer(object):
             RAMSensor(config),
             StartingBuildsSensor(self, cpu_sensor.max_load_avg)
         ]
+
+        self.ansible_manager = AnsibleManager()
 
     def _getMerger(self, root, cache_root, logger=None):
         return zuul.merger.merger.Merger(
