@@ -95,6 +95,8 @@
       args:
         chdir: /remote-shelltask/somewhere/that/does/not/exist
       failed_when: false
+    - name: This should never run
+      command: echo bar
 
 - hosts: localhost
   tasks:
@@ -103,3 +105,5 @@
       args:
         chdir: /local-shelltask/somewhere/that/does/not/exist
       failed_when: false
+    - name: This should never run
+      command: echo bar
