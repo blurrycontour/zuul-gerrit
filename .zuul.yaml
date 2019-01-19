@@ -45,6 +45,13 @@
     vars:
       zuul_ansible_version: 2.7
 
+# Uncomment if you want to test with ansible devel
+#- job:
+#    name: zuul-stream-functional-devel
+#    parent: zuul-stream-functional
+#    vars:
+#      zuul_ansible_version: devel
+
 - job:
     name: zuul-tox-remote
     parent: tox
