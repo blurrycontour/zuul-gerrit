@@ -16,7 +16,7 @@ services:
         git config -f /var/gerrit/etc/gerrit.config noteDb.changes.autoMigrate true && \
         /var/gerrit/bin/gerrit.sh run'
   gerritconfig:
-    image: zuul/zuul
+    image: zuul/zuul-executor
     environment:
       no_proxy: "${no_proxy},gerrit"
     depends_on:
@@ -25,7 +25,7 @@ services:
       - "sshkey:/var/ssh:z"
       - "nodessh:/var/node:z"
       - "./playbooks/:/var/playbooks/:z"
-    command: "ansible-playbook /var/playbooks/setup.yaml"
+    command: "/usr/local/lib/zuul/ansible/2.5/ansible/bin/ansible-playbook /var/playbooks/setup.yaml"
   zk:
     image: zookeeper
   mysql:
@@ -42,7 +42,7 @@ services:
       - mysql
     environment:
       no_proxy: "${no_proxy},gerrit"
-    command: "sh -c 'ansible-playbook /var/playbooks/wait-to-start.yaml; zuul-scheduler -d'"
+    command: "sh -c '/usr/local/lib/zuul/ansible/2.5/ansible/bin/ansible-playbook /var/playbooks/wait-to-start.yaml; zuul-scheduler -d'"
     image: zuul/zuul-scheduler
     volumes:
       - "./etc_zuul/:/etc/zuul/:z"
