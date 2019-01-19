@@ -36,6 +36,11 @@ FROM zuul as zuul-executor
 COPY --from=builder /output/ /output
 RUN pip install --cache-dir=/output/wheels -r /output/zuul_executor/requirements.txt \
   && rm -rf /output
+
+# The wheel install method doesn't run the setup hooks as the source based
+# installations do so we have to call zuul-manage-ansible here.
+RUN zuul-manage-ansible
+
 CMD ["/usr/local/bin/zuul-executor"]
 
 FROM zuul as zuul-fingergw
