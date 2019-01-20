@@ -26,3 +26,4 @@ paho-mqtt
 cherrypy
 ws4py
 routes
+virtualenv

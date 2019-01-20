@@ -36,7 +36,18 @@ class ManagedAnsibleBase(metaclass=abc.ABCMeta):
                       upgrade=upgrade)
 
     def _run_pip(self, requirements, upgrade=False):
-        # cmd = [self.python_path, '-m', 'pip', 'install']
+        cmd = [os.path.join(sys.exec_prefix, 'bin', 'pip'), '--version']
+        p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        self.log.info('tox pip version: \n%s\n\n%s' % (p.stdout, p.stderr))
+
+        cmd = [os.path.join(self.venv_path, 'bin', 'pip'), '--version']
+        p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        self.log.info('ansible pip version: \n%s\n\n%s' % (p.stdout, p.stderr))
+
+        cmd = [os.path.join(self.venv_path, 'bin', 'pip'), '--help']
+        p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        self.log.info('pip help: \n%s\n\n%s' % (p.stdout, p.stderr))
+
         cmd = [os.path.join(self.venv_path, 'bin', 'pip'), 'install']
         if upgrade:
             cmd.append('-U')
@@ -71,7 +82,7 @@ class ManagedAnsibleBase(metaclass=abc.ABCMeta):
 
         # We don't use directly the venv module here because its behavior is
         # broken if we're already in a virtual environment.
-        cmd = [python_executable, '-mvenv', self.venv_path]
+        cmd = ['virtualenv', '-p', python_executable, self.venv_path]
         p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         if p.returncode != 0:
