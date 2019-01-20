@@ -37,4 +37,8 @@ then
         yarn build
     popd
 fi
+echo
+echo "$*"
+echo
+exit 1
 pip install $*
