@@ -36,7 +36,14 @@ class ManagedAnsibleBase(metaclass=abc.ABCMeta):
                       upgrade=upgrade)
 
     def _run_pip(self, requirements, upgrade=False):
-        # cmd = [self.python_path, '-m', 'pip', 'install']
+        cmd = [os.path.join(self.venv_path, 'bin', 'pip'), '--version']
+        p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        self.log.info('pip version: \n%s\n\n%s' % (p.stdout, p.stderr))
+
+        cmd = [os.path.join(self.venv_path, 'bin', 'pip'), '--help']
+        p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        self.log.info('pip help: \n%s\n\n%s' % (p.stdout, p.stderr))
+
         cmd = [os.path.join(self.venv_path, 'bin', 'pip'), 'install']
         if upgrade:
             cmd.append('-U')
