@@ -26,3 +26,7 @@
 
     - name: Generate logging config
       command: python3 src/git.openstack.org/openstack-infra/zuul/zuul/ansible/logconfig.py
+
+    - name: Install zuul manged ansible versions
+      command: zuul-manage-ansible -v
+      become: yes
