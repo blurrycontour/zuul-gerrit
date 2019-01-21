@@ -40,6 +40,7 @@ re2-dev [platform:apk]
 re2 [platform:rpm platform:apk]
 yarn [compile test platform:apk]
 nodejs-npm [compile test platform:apk]
+lsb-release [compile test platform:dpkg]
 git
 rsync
 curl
