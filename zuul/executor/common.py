@@ -560,6 +560,7 @@ class AnsibleJobBase(object):
                  statsd=None):
         logger = logging.getLogger("zuul.AnsibleJob")
         self.log = AnsibleJobLogAdapter(logger, {'job': job_unique})
+        self.job = None
         self.connections = connections
         self.ansible_manager = ansible_manager
         self.merge_root = merge_root
@@ -678,14 +679,16 @@ class AnsibleJobBase(object):
             # can't fetch them, it should resolve itself.
             self.log.exception("Could not fetch refs to merge from remote")
             result = dict(result='ABORTED')
-            self.job.sendWorkComplete(json.dumps(result))
+            if self.job:
+                self.job.sendWorkComplete(json.dumps(result))
             return None
         if not ret:  # merge conflict
             result = dict(result='MERGER_FAILURE')
             if self.statsd:
                 base_key = "zuul.executor.{hostname}.merger"
                 self.statsd.incr(base_key + ".FAILURE")
-            self.job.sendWorkComplete(json.dumps(result))
+            if self.job:
+                self.job.sendWorkComplete(json.dumps(result))
             return None
 
         if self.statsd:
