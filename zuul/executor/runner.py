@@ -81,6 +81,7 @@ class RunnerConfiguration(object):
         'connections': [connection],
         'secrets': dict,
         vs.Required('api'): str,
+        'depends-on': [str],
         'tenant': str,
         'project': str,
         'pipeline': str,
@@ -102,8 +103,9 @@ class RunnerConfiguration(object):
         if args:
             for key in self.schema:
                 key = str(key)
-                if getattr(args, key, None):
-                    config[key] = getattr(args, key)
+                args_key = key.replace('-', '_')
+                if getattr(args, args_key, None):
+                    config[key] = getattr(args, args_key)
             if args.directory:
                 config["runner"]["job-dir"] = args.directory
             if args.git_dir:
@@ -131,6 +133,7 @@ class RunnerConfiguration(object):
         self.ssh_key = config["runner"].get("ssh-key", "~/.ssh/id_rsa")
         self.nodes = config.get("nodes", [])
         self.secrets = config.get("secrets", {})
+        self.depends_on = config.get("depends-on", [])
         return config
 
 
@@ -342,7 +345,10 @@ class LocalRunnerContextManager(AnsibleJobContextManager):
         elif url.endswith("freeze-job"):
             raise RuntimeError("You must a job name")
 
-        resp = requests.get(url)
+        if self.runner_config.depends_on:
+            resp = requests.put(url, json=self.runner_config.depends_on)
+        else:
+            resp = requests.get(url)
 
         if resp.status_code == 404:
             raise RuntimeError("%s: returned 404.")
