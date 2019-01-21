@@ -34,9 +34,6 @@ RUN /output/install-from-bindep \
 FROM zuul-base as zuul
 CMD ["/usr/local/bin/zuul"]
 
-FROM zuul-base as zuul-bwrap
-CMD ["/usr/local/bin/zuul-bwrap"]
-
 FROM zuul-base as zuul-executor
 COPY --from=builder /output/ /output
 RUN pip install --cache-dir=/output/wheels -r /output/zuul_executor/requirements.txt \
@@ -48,9 +45,6 @@ CMD ["/usr/local/bin/zuul-fingergw"]
 
 FROM zuul-base as zuul-merger
 CMD ["/usr/local/bin/zuul-merger"]
-
-FROM zuul-base as zuul-migrate
-CMD ["/usr/local/bin/zuul-migrate"]
 
 FROM zuul-base as zuul-scheduler
 CMD ["/usr/local/bin/zuul-scheduler"]
