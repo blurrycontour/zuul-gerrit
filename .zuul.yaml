@@ -46,6 +46,7 @@
     files:
       - web/.*
       - playbooks/dashboard/.*
+      - tools/install-js-tools.sh
     vars:
       javascript_content_dir: "../zuul/web/static"
       zuul_work_dir: "{{ zuul.project.src_dir }}/web"
@@ -55,6 +56,9 @@
 - job:
     name: zuul-build-dashboard-multi-tenant
     parent: zuul-build-dashboard
+    nodeset: fedora-latest
+    files:
+      - tools/install-js-repos-rpm.sh
     vars:
       zuul_api_url: https://softwarefactory-project.io/zuul
 
@@ -162,11 +166,11 @@
         - zuul-build-dashboard-multi-tenant
         - nodejs-npm-run-lint:
             vars:
-              node_version: 8
+              node_version: 10
               zuul_work_dir: "{{ zuul.project.src_dir }}/web"
         - nodejs-npm-run-test:
             vars:
-              node_version: 8
+              node_version: 10
               zuul_work_dir: "{{ zuul.project.src_dir }}/web"
             success-url: 'npm/reports/bundle.html'
             files:
@@ -193,11 +197,11 @@
         - zuul-build-dashboard
         - nodejs-npm-run-lint:
             vars:
-              node_version: 8
+              node_version: 10
               zuul_work_dir: "{{ zuul.project.src_dir }}/web"
         - nodejs-npm-run-test:
             vars:
-              node_version: 8
+              node_version: 10
               zuul_work_dir: "{{ zuul.project.src_dir }}/web"
             success-url: 'npm/reports/bundle.html'
             files:
@@ -212,7 +216,7 @@
         - publish-zuul-python-branch-tarball
         - publish-openstack-javascript-content:
             vars:
-              node_version: 8
+              node_version: 10
               zuul_work_dir: "{{ zuul.project.src_dir }}/web"
               create_tarball_directory: build
     promote:
