@@ -89,15 +89,9 @@
 
 - job:
     name: zuul-build-image
-    description: |
-      Build a docker image.
-
-      See the `role documentation
-      <https://zuul-ci.org/docs/zuul-jobs/roles.html#role-build-docker-image>`_
-      for details.
+    parent: build-docker-image
+    description: Build Docker images.
     allowed-projects: openstack-infra/zuul
-    pre-run: playbooks/build-image/pre.yaml
-    run: playbooks/build-image/run.yaml
     vars: &zuul_image_vars
       docker_images:
         - context: .
@@ -124,38 +118,28 @@
     files: &zuul_image_files
       - Dockerfile
       - tools/install-js-tools.sh
-      - playbooks/build-image/*
 
 - job:
     name: zuul-upload-image
-    parent: zuul-build-image
-    description: |
-      Build and upload a docker image.
-
-      See the `role documentation
-      <https://zuul-ci.org/docs/zuul-jobs/roles.html#role-upload-docker-image>`_
-      for details.
+    parent: upload-docker-image
+    description: Build Docker images and upload to Docker Hub.
     allowed-projects: openstack-infra/zuul
-    post-run: playbooks/build-image/upload.yaml
     secrets:
       name: docker_credentials
       secret: zuul-dockerhub
+      pass-to-parent: true
     vars: *zuul_image_vars
     files: *zuul_image_files
 
 - job:
     name: zuul-promote-image
-    description: |
-      Retag a previously-uploaded docker image.
-
-      See the `role documentation
-      <https://zuul-ci.org/docs/zuul-jobs/roles.html#role-promote-docker-image>`_
-      for details.
+    parent: promote-docker-image
+    description: Promote previously uploaded Docker images.
     allowed-projects: openstack-infra/zuul
-    run: playbooks/build-image/promote.yaml
     secrets:
       name: docker_credentials
       secret: zuul-dockerhub
+      pass-to-parent: true
     nodeset:
       nodes: []
     vars: *zuul_image_vars
