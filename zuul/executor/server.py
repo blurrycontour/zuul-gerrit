@@ -327,36 +327,6 @@ class AnsibleJob(AnsibleJobBase):
         self.log.debug("Sending result: %s" % (result_data,))
         self.job.sendWorkComplete(result_data)
 
-    def doMergeChanges(self, merger, items, repo_state):
-        try:
-            ret = merger.mergeChanges(items, repo_state=repo_state)
-        except ValueError:
-            # Return ABORTED so that we'll try again. At this point all of
-            # the refs we're trying to merge should be valid refs. If we
-            # can't fetch them, it should resolve itself.
-            self.log.exception("Could not fetch refs to merge from remote")
-            result = dict(result='ABORTED')
-            self.job.sendWorkComplete(json.dumps(result))
-            return None
-        if not ret:  # merge conflict
-            result = dict(result='MERGER_FAILURE')
-            if self.executor_server.statsd:
-                base_key = "zuul.executor.{hostname}.merger"
-                self.executor_server.statsd.incr(base_key + ".FAILURE")
-            self.job.sendWorkComplete(json.dumps(result))
-            return None
-
-        if self.executor_server.statsd:
-            base_key = "zuul.executor.{hostname}.merger"
-            self.executor_server.statsd.incr(base_key + ".SUCCESS")
-        recent = ret[3]
-        orig_commit = ret[4]
-        for key, commit in recent.items():
-            (connection, project, branch) = key
-            repo = merger.getRepo(connection, project)
-            repo.setRef('refs/heads/' + branch, commit)
-        return orig_commit
-
 
 class ExecutorMergeWorker(gear.TextWorker):
     def __init__(self, executor_server, *args, **kw):
