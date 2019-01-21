@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "9fdfeff1_b48e2f25",
+        "filename": ".zuul.yaml",
+        "patchSetId": 7
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-21T18:39:48Z",
+      "side": 1,
+      "message": "I think you\u0027re missing the targets here.",
+      "revId": "c27d6b4f025c1054a25653a3177eb3d28170cbb3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fdfeff1_541ee30c",
         "filename": ".zuul.yaml",
         "patchSetId": 7
