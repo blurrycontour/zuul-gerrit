@@ -69,6 +69,7 @@ class RunnerConfiguration(object):
         "job-dir": str,
         "git-dir": str,
         'api': str,
+        'depends-on': [str],
         'tenant': str,
         'project': str,
         'pipeline': str,
@@ -109,6 +110,7 @@ class RunnerConfiguration(object):
         self.git_dir = config.get("git-dir", "~/.cache/zuul/git")
         self.nodes = config.get("nodes", [])
         self.secrets = config.get("secrets", {})
+        self.depends_on = config.get("depends-on", [])
         return config
 
 
@@ -310,7 +312,11 @@ class LocalRunnerContextManager(AnsibleJobContextManager):
                 "freeze-job")
         if self.runner_config.job:
             url = os.path.join(url, self.runner_config.job)
-        self.job_params = requests.get(url).json()
+        if self.runner_config.depends_on:
+            self.job_params = requests.put(
+                url, json=self.runner_config.depends_on)
+        else:
+            self.job_params = requests.get(url).json()
 
     def prepareWorkspace(self):
         self.ansible_manager.copyAnsibleFiles()
