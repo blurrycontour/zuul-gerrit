@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_8f2676b7",
+        "filename": "tools/install-js-tools.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-21T19:17:12Z",
+      "side": 1,
+      "message": "There is already the variable $EUID which is the effective uid. This is always there so the call to \u0027id -u\u0027 is not needed.",
+      "range": {
+        "startLine": 17,
+        "startChar": 5,
+        "endLine": 17,
+        "endChar": 9
+      },
+      "revId": "d03a752be56e7bdadf72069ee16dd07f6d604fb0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
