@@ -47,6 +47,7 @@ class RequestHandler(streamer_utils.BaseFingerRequestHandler):
 
         Both IPv4 and IPv6 are supported.
         '''
+        self.log.debug("Connecting to server %s:%s", server, port)
         with socket.create_connection((server, port), timeout=10) as s:
             # timeout only on the connection, let recv() wait forever
             s.settimeout(None)
