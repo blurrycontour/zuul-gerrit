@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "9fdfeff1_8412eab0",
+        "filename": "zuul/lib/ansible.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-21T06:08:14Z",
+      "side": 1,
+      "message": "Extra packages can be defined via environment variables here.\n\nlike ANSIBLE_25_EXTRA_PACKAGES\u003dwinrm",
+      "range": {
+        "startLine": 97,
+        "startChar": 19,
+        "endLine": 97,
+        "endChar": 44
+      },
+      "revId": "21acf49b116dc0535e245a88d2f265c5149c9740",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fdfeff1_dd7c46b7",
         "filename": "zuul/lib/ansible.py",
         "patchSetId": 2
@@ -13,6 +36,24 @@
       "writtenOn": "2019-01-21T02:09:31Z",
       "side": 1,
       "message": "What if we moved this to a requirements file on disk? My thoughts would be if operators wanted to add additional dependencies to ansible, say some site specific callback.",
+      "revId": "21acf49b116dc0535e245a88d2f265c5149c9740",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_a4136eb8",
+        "filename": "zuul/lib/ansible.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-21T06:08:14Z",
+      "side": 1,
+      "message": "I thought about this but this seemed to be more complicated because that requirements file would be part of zuul itself. To add further requirements would require two requirements files (one by zuul and one additional that must be found somewhere else. The reason for this is that I don\u0027t want to need to patch zuul to add further requirements.\n\nThat\u0027s why I implemented this use case via an environment variable that holds additional packages (see above).",
+      "parentUuid": "9fdfeff1_dd7c46b7",
       "revId": "21acf49b116dc0535e245a88d2f265c5149c9740",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
