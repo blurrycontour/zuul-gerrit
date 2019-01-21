@@ -22,6 +22,7 @@ import threading
 import socket
 import sys
 import uuid
+import urllib
 import yaml
 
 import paramiko.transport
@@ -45,6 +46,11 @@ def get_host_key(node):
     t.start_client(timeout=10)
     key = t.get_remote_server_key()
     return "%s %s %s" % (node["hostname"], key.get_name(), key.get_base64())
+
+
+class FakeScheduler:
+    def onChangeUpdated(self, change):
+        pass
 
 
 class Runner(zuul.cmd.ZuulApp):
@@ -74,6 +80,8 @@ class Runner(zuul.cmd.ZuulApp):
                             help='the zuul project\'s branch name')
         parser.add_argument('-g', '--git-dir', default='~/.cache/zuul/git',
                             help='the git merger dir')
+        parser.add_argument('-d', '--depends-on', action='append',
+                            help='reproduce job with speculative depends-on')
         parser.add_argument('-s', '--secrets', help='secrets subsitution map')
         parser.add_argument(
             '-n', '--nodes',
@@ -206,6 +214,7 @@ class Runner(zuul.cmd.ZuulApp):
                     config['driver']].getConnection(config['name'], config)
             connections.connections = conns
 
+        connections.registerScheduler(FakeScheduler(), load=False)
         return connections
 
     def _updateLoop(self):
@@ -263,6 +272,97 @@ class Runner(zuul.cmd.ZuulApp):
     def prep_environment(self):
         self.job_params = self._grab_frozen_job()
         self.connections = self._constructConnections()
+
+        if self.args.dir:
+            root = self.args.dir
+            if root.endswith('/'):
+                root = root[:-1]
+            job_unique = root.split('/')[-1]
+            root = os.path.dirname(root)
+            os.makedirs(root, exist_ok=True)
+        else:
+            root = tempfile.mkdtemp()
+            job_unique = str(uuid.uuid4().hex)
+
+        # Add command line depends' on to the items list
+        merger_items = self.job_params['items']
+        dependencies = []
+        projects = set()
+        if not self.args.depends_on:
+            self.args.depends_on = []
+        for depends_on in self.args.depends_on:
+            url = urllib.parse.urlparse(depends_on)
+            source = self.connections.getSourceByHostname(url.hostname)
+            if not source:
+                self.log.error("Couldn't find the connection of %s", url)
+                exit(1)
+            dep = source.getChangeByURL(depends_on)
+            if dep and (not dep.is_merged) and dep not in dependencies:
+                self.log.debug("  Adding dependency: %s", dep)
+                dependencies.append(dep)
+
+                project = source.getProject(dep.project.name)
+                if project not in projects:
+                    self.job_params['projects'].append(dict(
+                        connection=source.connection.connection_name,
+                        name=project.name,
+                        canonical_name=project.canonical_name,
+                        # TODO: query api to get override?
+                        override_branch=False,
+                        override_checkout=False,
+                        # TODO: query api to get default branch?
+                        default_branch='master'
+                    ))
+                    projects.add(project)
+
+
+                # A copy of the model.QueueItem.makeMergerItem() procedure:
+                # NOTE(tristanC): alternatively, depends-on may be given to
+                # the freeze_job api so that all the job params are returned.
+                number = None
+                patchset = None
+                oldrev = None
+                newrev = None
+                branch = None
+                if hasattr(dep, 'number'):
+                    number = dep.number
+                    patchset = dep.patchset
+                if hasattr(dep, 'newrev'):
+                    oldrev = dep.oldrev
+                    newrev = dep.newrev
+                if hasattr(dep, 'branch'):
+                    branch = dep.branch
+
+                source = dep.project.source
+                connection_name = source.connection.connection_name
+                project = dep.project
+
+                merger_items.append(dict(
+                    project=project.name,
+                    connection=connection_name,
+                    # set this?
+                    merge_mode=1,
+                    ref=dep.ref,
+                    branch=branch,
+                    buildset_uuid=job_unique,
+                    number=number,
+                    patchset=patchset,
+                    oldrev=oldrev,
+                    newrev=newrev))
+        for p in projects:
+            if p.canonical_name in self.job_params:
+                continue
+            self.job_params['zuul']['projects'][p.canonical_name] = (dict(
+                name=p.name,
+                short_name=p.name.split('/')[-1],
+                # Duplicate this into the dict too, so that iterating
+                # project.values() is easier for callers
+                canonical_name=p.canonical_name,
+                canonical_hostname=p.canonical_hostname,
+                src_dir=os.path.join('src', p.canonical_name),
+                required=False,
+            ))
+
         # TODO(tristanC): make this configurable?
         ansible_lib = os.path.realpath(os.path.join(
             __file__, "..", "..", "ansible"))
@@ -274,16 +374,6 @@ class Runner(zuul.cmd.ZuulApp):
         self.action_dir_general = os.path.join(ansible_lib, "actiongeneral")
         self.ansible_dir = ansible_lib
         self.merger_lock = threading.Lock()
-        if self.args.dir:
-            root = self.args.dir
-            if root.endswith('/'):
-                root = root[:-1]
-            job_unique = root.split('/')[-1]
-            root = os.path.dirname(root)
-            os.makedirs(root, exist_ok=True)
-        else:
-            root = tempfile.mkdtemp()
-            job_unique = str(uuid.uuid4().hex)
         job = AnsibleJobBase(self, self.job_params, job_unique)
         self.merge_root = os.path.expanduser(self.args.git_dir)
         self.merger_lock = threading.Lock()
