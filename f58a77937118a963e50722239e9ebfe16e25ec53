@@ -49,6 +49,23 @@
     },
     {
       "key": {
+        "uuid": "9fdfeff1_dea512b7",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-01-21T16:56:02Z",
+      "side": 1,
+      "message": "If we make the default \"true\" then new users have the best experience out of the box -- the program starts up after installation just like any other program.  More advanced users can set the flag if they know they want to manage it exteranlly.",
+      "revId": "f58a77937118a963e50722239e9ebfe16e25ec53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fdfeff1_5d4a9680",
         "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
         "patchSetId": 2
