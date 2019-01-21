@@ -48,6 +48,8 @@ class Runner(zuul.cmd.ZuulApp):
                             help='the zuul project\'s branch name')
         parser.add_argument('-g', '--git-dir',
                             help='the git merger dir')
+        parser.add_argument('-D', '--depends-on', action='append',
+                            help='reproduce job with speculative depends-on')
 
         subparsers = parser.add_subparsers(title='commands',
                                            description='valid commands')
