@@ -60,6 +60,10 @@ class Runner(zuul.cmd.ZuulApp):
         parser.add_argument(
             '--job-dir',
             help='the directory to prepare inside of. Defaults to a temp dir')
+        parser.add_argument(
+            '--depends-on',
+            action='append',
+            help='reproduce job with speculative depends-on')
 
         parser.add_argument(
             '--list-parameters',
