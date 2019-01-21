@@ -75,6 +75,24 @@
       "revId": "21acf49b116dc0535e245a88d2f265c5149c9740",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_20b52132",
+        "filename": "zuul/lib/ansible.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-21T15:16:50Z",
+      "side": 1,
+      "message": "Well, we can move them out from here.  Do you have a suggestion where to move them? I think zuul.conf is the wrong place as it is a runtime configuration while installing ansible should be more treated like a compile time thing. E.g. during container image builds there is no zuul.conf and the script must also work within this environment.\n\nWhen moving this to a different file we need to create either a directory structure holding various requirements.txt for all ansible versions or defining them in a single yaml file that needs to be installable along with zuul (to \u003ctarget\u003e/share/zuul?) and needs to be found during runtime of the script. While this is certainly doable it seems much more complicated compared to storing the ansible version just here.",
+      "parentUuid": "9fdfeff1_ed0952dd",
+      "revId": "21acf49b116dc0535e245a88d2f265c5149c9740",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
