@@ -56,6 +56,8 @@ class Runner(zuul.cmd.ZuulApp):
         parser.add_argument('-n', '--nodes', action='append',
                             help='A node to use, semi-colon separated tuple '
                                  'of connection:label:username:hostname:cwd')
+        parser.add_argument('-d', '--depends-on', action='append',
+                            help='reproduce job with speculative depends-on')
         parser.add_argument('-d', '--directory', default=None,
                             help='the directory to prepare inside of. '
                             'Defaults to a temp dir')
