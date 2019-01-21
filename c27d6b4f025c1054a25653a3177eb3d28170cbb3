@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9fdfeff1_343ebf29",
+        "filename": ".zuul.yaml",
+        "patchSetId": 7
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-01-21T18:48:13Z",
+      "side": 1,
+      "message": "You are correct",
+      "parentUuid": "9fdfeff1_b48e2f25",
+      "revId": "c27d6b4f025c1054a25653a3177eb3d28170cbb3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fdfeff1_541ee30c",
         "filename": ".zuul.yaml",
         "patchSetId": 7
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "9fdfeff1_543b4337",
+        "filename": ".zuul.yaml",
+        "patchSetId": 7
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-01-21T18:48:13Z",
+      "side": 1,
+      "message": "Yup!",
+      "parentUuid": "9fdfeff1_541ee30c",
+      "revId": "c27d6b4f025c1054a25653a3177eb3d28170cbb3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fdfeff1_3421df4e",
         "filename": "Dockerfile",
         "patchSetId": 7
@@ -47,6 +83,24 @@
       "writtenOn": "2019-01-21T18:32:57Z",
       "side": 1,
       "message": "Could we enable stretch-backports and install bubblewrap that way?  https://packages.debian.org/stretch-backports/bubblewrap",
+      "revId": "c27d6b4f025c1054a25653a3177eb3d28170cbb3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_b42aafe4",
+        "filename": "Dockerfile",
+        "patchSetId": 7
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-01-21T18:48:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9fdfeff1_3421df4e",
       "revId": "c27d6b4f025c1054a25653a3177eb3d28170cbb3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
