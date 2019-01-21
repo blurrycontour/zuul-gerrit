@@ -91,7 +91,9 @@
     name: zuul-build-image
     parent: build-docker-image
     description: Build Docker images.
-    allowed-projects: openstack-infra/zuul
+    allowed-projects: &zuul_image_allowed_projects
+      - openstack-infra/zuul
+      - openstack-infra/nodepool
     vars: &zuul_image_vars
       docker_images:
         - context: .
@@ -123,7 +125,7 @@
     name: zuul-upload-image
     parent: upload-docker-image
     description: Build Docker images and upload to Docker Hub.
-    allowed-projects: openstack-infra/zuul
+    allowed-projects: *zuul_image_allowed_projects
     secrets:
       name: docker_credentials
       secret: zuul-dockerhub
@@ -135,7 +137,7 @@
     name: zuul-promote-image
     parent: promote-docker-image
     description: Promote previously uploaded Docker images.
-    allowed-projects: openstack-infra/zuul
+    allowed-projects: *zuul_image_allowed_projects
     secrets:
       name: docker_credentials
       secret: zuul-dockerhub
