@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_c709d4dd",
+        "filename": "zuul/lib/ansible.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-21T07:05:41Z",
+      "side": 1,
+      "message": "That\u0027s broken, comma missing",
+      "range": {
+        "startLine": 122,
+        "startChar": 31,
+        "endLine": 122,
+        "endChar": 47
+      },
+      "revId": "efed7f370f2db9f36687b4c68894d159c12c276b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
