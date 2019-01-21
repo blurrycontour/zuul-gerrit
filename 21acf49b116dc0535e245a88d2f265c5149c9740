@@ -57,6 +57,24 @@
       "revId": "21acf49b116dc0535e245a88d2f265c5149c9740",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_ed0952dd",
+        "filename": "zuul/lib/ansible.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2019-01-21T14:41:40Z",
+      "side": 1,
+      "message": "I\u0027d see it more like what we do with zuul.conf, we can install the default ansible requirements on disk, then if the user wants to override them for some reason, they can.  I do have a little concern hardcoding the values into zuul here, but haven\u0027t really dug too much into how it is all working right yet.",
+      "parentUuid": "9fdfeff1_a4136eb8",
+      "revId": "21acf49b116dc0535e245a88d2f265c5149c9740",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
