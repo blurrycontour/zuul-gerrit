@@ -93,6 +93,30 @@
       "revId": "f58a77937118a963e50722239e9ebfe16e25ec53",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_2dbc3a04",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2019-01-21T14:38:53Z",
+      "side": 1,
+      "message": "+1",
+      "parentUuid": "9fdfeff1_e44e56c0",
+      "range": {
+        "startLine": 95,
+        "startChar": 0,
+        "endLine": 96,
+        "endChar": 74
+      },
+      "revId": "f58a77937118a963e50722239e9ebfe16e25ec53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
