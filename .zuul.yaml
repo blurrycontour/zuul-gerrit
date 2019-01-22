@@ -65,8 +65,42 @@
     post-run: playbooks/quick-start/post.yaml
     roles:
       - zuul: openstack-infra/zuul-jobs
+    vars:
+      docker_images:
+        - context: .
+          repository: zuul/zuul-base
+          target: zuul-base
+        - context: .
+          repository: zuul/zuul
+          target: zuul
+        - context: .
+          repository: zuul/zuul-executor
+          target: zuul-executor
+        - context: .
+          repository: zuul/zuul-fingergw
+          target: zuul-fingergw
+        - context: .
+          repository: zuul/zuul-merger
+          target: zuul-merger
+        - context: .
+          repository: zuul/zuul-scheduler
+          target: zuul-scheduler
+        - context: .
+          repository: zuul/zuul-web
+          target: zuul-web
+        - context: .
+          repository: zuul/nodepool-base
+          target: nodepool-base
+        - context: ../nodepool
+          repository: zuul/nodepool
+          target: nodepool
+        - context: ../nodepool
+          repository: zuul/nodepool-launcher
+          target: nodepool-launcher
+        - context: ../nodepool
+          repository: zuul/nodepool-builder
+          target: nodepool-builder
     required-projects:
-      - openstack/pbrx
       - openstack-infra/nodepool
       - openstack-infra/zuul
 
