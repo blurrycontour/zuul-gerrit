@@ -6,16 +6,15 @@
     - name: install-docker
       use_upstream_docker: false
   tasks:
-    - name: Install pbrx software
-      command: python3 -m pip install src/git.openstack.org/openstack/pbrx
-      become: yes
-    - name: Build container images
-      command: 'pbrx --debug build-images --prefix=zuul'
-      args:
-        chdir: '{{ zuul.projects[item].src_dir }}'
-      loop:
-        - git.openstack.org/openstack-infra/nodepool
-        - git.openstack.org/openstack-infra/zuul
+    - name: Build zuul and nodepool images
+      shell:
+        executable: /bin/bash
+        cmd: |
+          docker build --rm=false {{ ansible_user_dir }}/src/git.openstack.org/openstack-infra/zuul
+          docker build --rm=false {{ ansible_user_dir }}/src/git.openstack.org/openstack-infra/nodepool
+          for f in $(docker image ls | awk '/^(zuul|nodepool)[^\/]/ {print $1}') ; do
+              docker tag $f zuul/$f
+          done
     - name: Install docker-compose and git-review
       package:
         name:
