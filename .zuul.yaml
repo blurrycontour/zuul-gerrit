@@ -65,8 +65,42 @@
     post-run: playbooks/quick-start/post.yaml
     roles:
       - zuul: openstack-infra/zuul-jobs
+    vars:
+      docker_images:
+        - context: /home/zuul/src/git.openstack.org/openstack-infra/zuul
+          repository: zuul/zuul-base
+          target: zuul-base
+        - context: /home/zuul/src/git.openstack.org/openstack-infra/zuul
+          repository: zuul/zuul
+          target: zuul
+        - context: /home/zuul/src/git.openstack.org/openstack-infra/zuul
+          repository: zuul/zuul-executor
+          target: zuul-executor
+        - context: /home/zuul/src/git.openstack.org/openstack-infra/zuul
+          repository: zuul/zuul-fingergw
+          target: zuul-fingergw
+        - context: /home/zuul/src/git.openstack.org/openstack-infra/zuul
+          repository: zuul/zuul-merger
+          target: zuul-merger
+        - context: /home/zuul/src/git.openstack.org/openstack-infra/zuul
+          repository: zuul/zuul-scheduler
+          target: zuul-scheduler
+        - context: /home/zuul/src/git.openstack.org/openstack-infra/zuul
+          repository: zuul/zuul-web
+          target: zuul-web
+        - context: /home/zuul/src/git.openstack.org/openstack-infra/zuul
+          repository: zuul/nodepool-base
+          target: nodepool-base
+        - context: /home/zuul/src/git.openstack.org/openstack-infra/nodepool
+          repository: zuul/nodepool
+          target: nodepool
+        - context: /home/zuul/src/git.openstack.org/openstack-infra/nodepool
+          repository: zuul/nodepool-launcher
+          target: nodepool-launcher
+        - context: /home/zuul/src/git.openstack.org/openstack-infra/nodepool
+          repository: zuul/nodepool-builder
+          target: nodepool-builder
     required-projects:
-      - openstack/pbrx
       - openstack-infra/nodepool
       - openstack-infra/zuul
 
