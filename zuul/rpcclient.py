@@ -49,7 +49,7 @@ class RPCClient(object):
         return job
 
     def autohold(self, tenant, project, job, change, ref, reason, count,
-                 node_hold_expiration=None):
+                 build_results, node_hold_expiration=None):
         data = {'tenant': tenant,
                 'project': project,
                 'job': job,
@@ -57,7 +57,8 @@ class RPCClient(object):
                 'ref': ref,
                 'reason': reason,
                 'count': count,
-                'node_hold_expiration': node_hold_expiration}
+                'node_hold_expiration': node_hold_expiration,
+                'build_results': build_results}
         return not self.submitJob('zuul:autohold', data).failure
 
     def autohold_list(self):
