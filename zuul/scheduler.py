@@ -521,14 +521,15 @@ class Scheduler(threading.Thread):
         # TODOv3(jeblair): reconfigure time should be per-tenant
 
     def autohold(self, tenant_name, project_name, job_name, ref_filter,
-                 reason, count, node_hold_expiration):
+                 reason, count, build_results, node_hold_expiration):
         key = (tenant_name, project_name, job_name, ref_filter)
         if count == 0 and key in self.autohold_requests:
             self.log.debug("Removing autohold for %s", key)
             del self.autohold_requests[key]
         else:
             self.log.debug("Autohold requested for %s", key)
-            self.autohold_requests[key] = (count, reason, node_hold_expiration)
+            self.autohold_requests[key] = (count, reason, node_hold_expiration,
+                                           build_results)
 
     def promote(self, tenant_name, pipeline_name, change_ids):
         event = PromoteEvent(tenant_name, pipeline_name, change_ids)
@@ -1244,16 +1245,16 @@ class Scheduler(threading.Thread):
         return autohold_key
 
     def _processAutohold(self, build):
-        # We explicitly only want to hold nodes for jobs if they have
-        # failed / retry_limit / post_failure and have an autohold request.
-        hold_list = ["FAILURE", "RETRY_LIMIT", "POST_FAILURE", "TIMED_OUT"]
-        if build.result not in hold_list:
-            return
-
         autohold_key = self._getAutoholdRequestKey(build)
         self.log.debug("Got autohold key %s", autohold_key)
+
         if autohold_key is not None:
-            self.nodepool.holdNodeSet(build.nodeset, autohold_key)
+            _, _, _, hold_list = self.autohold_requests[autohold_key]
+            if build.result not in hold_list:
+                return
+
+            self.nodepool.holdNodeSet(build.nodeset, build.result,
+                                      autohold_key)
 
     def _doBuildCompletedEvent(self, event):
         build = event.build

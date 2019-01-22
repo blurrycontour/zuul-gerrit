@@ -2377,7 +2377,8 @@ class TestPrePlaybooks(AnsibleZuulTestCase):
                                           self.gearman_server.port)
         self.addCleanup(client.shutdown)
         r = client.autohold('tenant-one', 'org/project3', 'python27-node-post',
-                            "", "", "reason text", 1)
+                            "", "", "reason text", 1,
+                            "FAILURE,RETRY_LIMIT,POST_FAILURE,TIMED_OUT")
         self.assertTrue(r)
 
         A = self.fake_gerrit.addFakeChange('org/project3', 'master', 'A')
@@ -2407,7 +2408,8 @@ class TestPrePlaybooks(AnsibleZuulTestCase):
                                           self.gearman_server.port)
         self.addCleanup(client.shutdown)
         r = client.autohold('tenant-one', 'org/project2', 'python27-node',
-                            "", "", "reason text", 1)
+                            "", "", "reason text", 1,
+                            "FAILURE,RETRY_LIMIT,POST_FAILURE,TIMED_OUT")
         self.assertTrue(r)
 
         A = self.fake_gerrit.addFakeChange('org/project2', 'master', 'A')

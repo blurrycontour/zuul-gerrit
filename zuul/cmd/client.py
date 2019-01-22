@@ -56,6 +56,14 @@ class Client(zuul.cmd.ZuulApp):
                                   required=False, default='')
         cmd_autohold.add_argument('--ref', help='git ref to hold nodes for',
                                   required=False, default='')
+        default_build_results = ('FAILURE,RETRY_LIMIT,POST_FAILURE,'
+                                 'TIMED_OUT')
+        cmd_autohold.add_argument('--build-results',
+                                  help='comma separated list of build'
+                                  'results on which to autohold the nodes'
+                                  'default={}'.format(default_build_results),
+                                  required=False,
+                                  default=default_build_results)
         cmd_autohold.add_argument('--reason', help='reason for the hold',
                                   required=True)
         cmd_autohold.add_argument('--count',
@@ -218,6 +226,7 @@ class Client(zuul.cmd.ZuulApp):
             return False
 
         node_hold_expiration = self.args.node_hold_expiration
+        build_results = self.args.build_results.split(',')
         r = client.autohold(tenant=self.args.tenant,
                             project=self.args.project,
                             job=self.args.job,
@@ -225,7 +234,8 @@ class Client(zuul.cmd.ZuulApp):
                             ref=self.args.ref,
                             reason=self.args.reason,
                             count=self.args.count,
-                            node_hold_expiration=node_hold_expiration)
+                            node_hold_expiration=node_hold_expiration,
+                            build_results=build_results)
         return r
 
     def autohold_list(self):
@@ -239,17 +249,19 @@ class Client(zuul.cmd.ZuulApp):
 
         table = prettytable.PrettyTable(
             field_names=[
-                'Tenant', 'Project', 'Job', 'Ref Filter', 'Count', 'Reason'
+                'Tenant', 'Project', 'Job', 'Ref Filter', 'Count', 'Reason',
+                'Results'
             ])
 
         for key, value in autohold_requests.items():
             # The key comes to us as a CSV string because json doesn't like
             # non-str keys.
             tenant_name, project_name, job_name, ref_filter = key.split(',')
-            count, reason, node_hold_expiration = value
+            count, reason, node_hold_expiration, build_results = value
 
             table.add_row([
-                tenant_name, project_name, job_name, ref_filter, count, reason
+                tenant_name, project_name, job_name, ref_filter, count, reason,
+                build_results
             ])
         print(table)
         return True

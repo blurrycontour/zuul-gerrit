@@ -1597,7 +1597,8 @@ class TestScheduler(ZuulTestCase):
                                           self.gearman_server.port)
         self.addCleanup(client.shutdown)
         r = client.autohold('tenant-one', 'org/project', 'project-test2',
-                            "", "", "reason text", 1)
+                            "", "", "reason text", 1,
+                            "FAILURE,RETRY_LIMIT,POST_FAILURE,TIMED_OUT")
         self.assertTrue(r)
 
         # First check that successful jobs do not autohold
@@ -1676,7 +1677,8 @@ class TestScheduler(ZuulTestCase):
         )
 
         r = client.autohold('tenant-one', 'org/project', 'project-test2',
-                            str(change), ref, "reason text", 1)
+                            str(change), ref, "reason text", 1,
+                            "FAILURE,RETRY_LIMIT,POST_FAILURE,TIMED_OUT")
         self.assertTrue(r)
 
         # First, check that an unrelated job does not trigger autohold, even
@@ -1759,7 +1761,8 @@ class TestScheduler(ZuulTestCase):
         change = str(A.number)
         ref = A.data['currentPatchSet']['ref']
         r1 = client.autohold('tenant-one', 'org/project', 'project-test2',
-                             "", "", "reason text", 1)
+                             "", "", "reason text", 1,
+                            "FAILURE,RETRY_LIMIT,POST_FAILURE,TIMED_OUT")
         self.assertTrue(r1)
         r2 = client.autohold('tenant-one', 'org/project', 'project-test2',
                              change, "", "reason text", 1)
@@ -1808,7 +1811,8 @@ class TestScheduler(ZuulTestCase):
                                           self.gearman_server.port)
         self.addCleanup(client.shutdown)
         r = client.autohold('tenant-one', 'org/project', 'project-test2',
-                            "", "", "reason text", 1)
+                            "", "", "reason text", 1,
+                            "FAILURE,RETRY_LIMIT,POST_FAILURE,TIMED_OUT")
         self.assertTrue(r)
 
         self.executor_server.hold_jobs_in_build = True
@@ -1851,7 +1855,10 @@ class TestScheduler(ZuulTestCase):
                                           self.gearman_server.port)
         self.addCleanup(client.shutdown)
         r = client.autohold('tenant-one', 'org/project', 'project-test2',
-                            "", "", "reason text", 1, node_hold_expiration=30)
+                            "", "", "reason text",
+                            1,
+                            "FAILURE,RETRY_LIMIT,POST_FAILURE,TIMED_OUT",
+                            node_hold_expiration=30)
         self.assertTrue(r)
 
         # Hold a failed job
@@ -1884,7 +1891,8 @@ class TestScheduler(ZuulTestCase):
         self.addCleanup(client.shutdown)
 
         r = client.autohold('tenant-one', 'org/project', 'project-test2',
-                            "", "", "reason text", 1)
+                            "", "", "reason text", 1,
+                            "FAILURE,RETRY_LIMIT,POST_FAILURE,TIMED_OUT")
         self.assertTrue(r)
 
         autohold_requests = client.autohold_list()
