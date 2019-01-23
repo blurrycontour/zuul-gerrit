@@ -5229,7 +5229,18 @@ For CI problems and help debugging, contact ci@example.org"""
         self.executor_server.release('.*-test*')
         self.waitUntilSettled()
 
+        tenant = self.sched.abide.tenants.get('tenant-one')
+        items = tenant.layout.pipelines['check'].getAllItems()
+        build_set = items[0].current_build_set
+
         for x in range(3):
+            # We should have x+1 retried builds for project-test1
+            retry_builds = build_set.getRetryBuildsForJob('project-test1')
+            self.assertEqual(len(retry_builds), x + 1)
+            for build in retry_builds:
+                self.assertEqual(build.retry, True)
+                self.assertEqual(build.result, None)
+
             self.assertEqual(len(self.builds), 1,
                              'len of builds at x=%d is wrong' % x)
             self.builds[0].requeue = True
