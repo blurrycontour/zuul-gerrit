@@ -457,11 +457,9 @@ class ExecutorClient(object):
             warnings = data.get('warnings', [])
             log.info("Build complete, result %s, warnings %s",
                      result, warnings)
-            # If the build should be retried, don't supply the result
-            # so that elsewhere we don't have to deal with keeping
-            # track of which results are non-final.
+
             if build.retry:
-                result = None
+                result = 'RETRY'
 
             # If the build was canceled, we did actively cancel the job so
             # don't overwrite the result and don't retry.

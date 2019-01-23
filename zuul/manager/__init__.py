@@ -1012,7 +1012,7 @@ class PipelineManager(object):
         self._resumeBuilds(build.build_set)
 
         if (item.project_pipeline_config.fail_fast and
-            build.failed and build.job.voting):
+            build.failed and build.job.voting and not build.retry):
             # If fail-fast is set and the build is not successful
             # cancel all remaining jobs.
             log.debug("Build %s failed and fail-fast enabled, canceling "

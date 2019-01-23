@@ -1981,6 +1981,7 @@ class BuildSet(object):
     def __init__(self, item):
         self.item = item
         self.builds = {}
+        self.retry_builds = {}
         self.result = None
         self.uuid = None
         self.commit = None
@@ -2041,6 +2042,9 @@ class BuildSet(object):
             self.tries[build.job.name] = 1
         build.build_set = self
 
+    def addRetryBuild(self, build):
+        self.retry_builds.setdefault(build.job.name, []).append(build)
+
     def removeBuild(self, build):
         if build.job.name not in self.builds:
             return
@@ -2054,6 +2058,9 @@ class BuildSet(object):
         keys = list(self.builds.keys())
         keys.sort()
         return [self.builds.get(x) for x in keys]
+
+    def getRetryBuildsForJob(self, job_name):
+        return self.retry_builds.get(job_name, [])
 
     def getJobNodeSet(self, job_name: str) -> NodeSet:
         # Return None if not provisioned; empty NodeSet if no nodes
@@ -2172,6 +2179,9 @@ class QueueItem(object):
 
     def addBuild(self, build):
         self.current_build_set.addBuild(build)
+
+    def addRetryBuild(self, build):
+        self.current_build_set.addRetryBuild(build)
 
     def removeBuild(self, build):
         self.current_build_set.removeBuild(build)
@@ -2629,6 +2639,7 @@ class QueueItem(object):
 
     def setResult(self, build):
         if build.retry:
+            self.addRetryBuild(build)
             self.removeBuild(build)
             return
 
@@ -2737,16 +2748,17 @@ class QueueItem(object):
 
         return url
 
-    def formatJobResult(self, job):
+    def formatJobResult(self, job, build=None):
         if (self.pipeline.tenant.report_build_page and
             self.pipeline.tenant.web_root):
-            build = self.current_build_set.getBuild(job.name)
+            if build is None:
+                build = self.current_build_set.getBuild(job.name)
             pattern = urllib.parse.urljoin(self.pipeline.tenant.web_root,
                                            'build/{build.uuid}')
             url = self.formatUrlPattern(pattern, job, build)
             return (build.result, url)
         else:
-            return self.formatProvisionalJobResult(job)
+            return self.formatProvisionalJobResult(job, build)
 
     def formatStatusUrl(self):
         # If we don't have a web root set, we can't format any url
@@ -2772,8 +2784,9 @@ class QueueItem(object):
         )
         return self.formatUrlPattern(pattern)
 
-    def formatProvisionalJobResult(self, job):
-        build = self.current_build_set.getBuild(job.name)
+    def formatProvisionalJobResult(self, job, build=None):
+        if build is None:
+            build = self.current_build_set.getBuild(job.name)
         result = build.result
         pattern = None
         if result == 'SUCCESS':
