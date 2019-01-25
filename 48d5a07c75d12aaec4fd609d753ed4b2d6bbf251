@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_7e460a24",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-01-25T17:29:56Z",
+      "side": 1,
+      "message": "0: Do we want the job name?  Ie, do we expect people to query buildsets by job name?  I\u0027d expect them to look up builds that way, then navigate to buildsets from there.",
+      "revId": "48d5a07c75d12aaec4fd609d753ed4b2d6bbf251",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_5e4b062a",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 511,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-01-25T17:29:56Z",
+      "side": 1,
+      "message": "-1: See comment on PS4.",
+      "revId": "48d5a07c75d12aaec4fd609d753ed4b2d6bbf251",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
