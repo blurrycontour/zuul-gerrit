@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_0a1e9d6f",
+        "filename": "tests/unit/test_merger_repo.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-01-25T17:10:52Z",
+      "side": 1,
+      "message": "Sleeping in tests is problematic: we could sleep for a second and not have any action performed by other threads just because of how busy the CPU is.  What are we waiting for here?  For Zuul to finish its startup and the cat jobs?  You can call self.waitUntilSettled() instead.",
+      "revId": "3ccfec77c9cc63926a5b9b49ac58b7ea931ac400",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
