@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_dec7f611",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-01-25T17:56:33Z",
+      "side": 1,
+      "message": "This seems weird to me. I\u0027d much rather we just have deployment tooling install the supported versions. There\u0027s a bunch of complicated stuff like virtualenvs or containers, etc, that seem way too heavy for deferring to runtime/configload. I\u0027m not suggesting we take the \"that\u0027s what Puppet is for\" stance, but rather that we make the installation of Zuul do this in the way we expect, at install time, rather than executor startup. That way containerized and non-containerized work the same, and we get the hard stuff out of the way earlier.",
+      "revId": "0d6391cb8a4e102770b2c1215c2eed1baecf1eb9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_fecafa17",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-01-25T17:56:33Z",
+      "side": 1,
+      "message": "Could we just start with 2.6 as the default? Kind of bothers me to start in this doomed state, but maybe there\u0027s a complication I haven\u0027t considered.",
+      "revId": "0d6391cb8a4e102770b2c1215c2eed1baecf1eb9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_9ed16ed0",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-01-25T17:56:33Z",
+      "side": 1,
+      "message": "side-note: we had talked about some way to say \"run all the jobs that are children of this one whenever it changes\". What would be great would be to have that mechanism in place, so that folks can test \"changing the default\" by bumping to a new ansible version in their default base job.",
+      "revId": "0d6391cb8a4e102770b2c1215c2eed1baecf1eb9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_bed472be",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-01-25T17:56:33Z",
+      "side": 1,
+      "message": "So, yeah, as above, I\u0027m suggesting we drop the manage-ansible flag, and instead make that script run as part of the normal installation, and that we not use /var/lib, but whatever the installation prefix is set to, under the lib dir. So install at /usr/local/lib/zuul/executor-ansible.",
+      "revId": "0d6391cb8a4e102770b2c1215c2eed1baecf1eb9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_5edb06ec",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-01-25T17:56:33Z",
+      "side": 1,
+      "message": "Note that I do a lot of Dockerfile+pbrx, it\u0027s not necessarily needed to be a switch. pbrx + a Dockerfile that is `FROM zuul-base` works fine too. That said, I think aligning with the usual Dockerfile thing is probably a good idea.",
+      "revId": "0d6391cb8a4e102770b2c1215c2eed1baecf1eb9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_7ed60ac6",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-01-25T17:56:33Z",
+      "side": 1,
+      "message": "+++",
+      "revId": "0d6391cb8a4e102770b2c1215c2eed1baecf1eb9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
