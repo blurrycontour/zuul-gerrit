@@ -1587,38 +1587,44 @@ class TenantParser(object):
         for job in jobs:
             self.log.debug("Waiting for cat job %s" % (job,))
             job.wait()
-            if not job.updated:
+
+            if not hasattr(job, 'updated') and not job.updated:
                 raise Exception("Cat job %s failed" % (job,))
-            self.log.debug("Cat job %s got files %s" %
-                           (job, job.files.keys()))
-            loaded = False
-            files = sorted(job.files.keys())
-            unparsed_config = model.UnparsedConfig()
-            for conf_root in ['zuul.yaml', 'zuul.d', '.zuul.yaml', '.zuul.d']:
-                for fn in files:
-                    fn_root = fn.split('/')[0]
-                    if fn_root != conf_root or not job.files.get(fn):
-                        continue
-                    # Don't load from more than one configuration in a
-                    # project-branch.
-                    if loaded and loaded != conf_root:
-                        self.log.warning(
-                            "Multiple configuration files in %s" %
-                            (job.source_context,))
-                        continue
-                    loaded = conf_root
-                    # Create a new source_context so we have unique filenames.
-                    source_context = job.source_context.copy()
-                    source_context.path = fn
-                    self.log.info(
-                        "Loading configuration from %s" %
-                        (source_context,))
-                    incdata = self.loadProjectYAML(
-                        job.files[fn], source_context, loading_errors)
-                    unparsed_config.extend(incdata)
-            abide.cacheUnparsedConfig(
-                job.source_context.project.canonical_name,
-                job.source_context.branch, unparsed_config)
+            if hasattr(job, 'files'):
+                self.log.debug("Cat job %s got files %s" %
+                               (job, job.files.keys()))
+                loaded = False
+                files = sorted(job.files.keys())
+                unparsed_config = model.UnparsedConfig()
+                for conf_root in ['zuul.yaml', 'zuul.d',
+                                  '.zuul.yaml', '.zuul.d']:
+                    for fn in files:
+                        fn_root = fn.split('/')[0]
+                        if fn_root != conf_root or not job.files.get(fn):
+                            continue
+                        # Don't load from more than one configuration in a
+                        # project-branch.
+                        if loaded and loaded != conf_root:
+                            self.log.warning(
+                                "Multiple configuration files in %s" %
+                                (job.source_context,))
+                            continue
+                        loaded = conf_root
+                        # Create a new source_context so we have
+                        # unique filenames.
+                        source_context = job.source_context.copy()
+                        source_context.path = fn
+                        self.log.info(
+                            "Loading configuration from %s" %
+                            (source_context,))
+                        incdata = self.loadProjectYAML(
+                            job.files[fn], source_context, loading_errors)
+                        unparsed_config.extend(incdata)
+                abide.cacheUnparsedConfig(
+                    job.source_context.project.canonical_name,
+                    job.source_context.branch, unparsed_config)
+            else:
+                self.log.debug("Cat job %s has no new files." % (job,))
 
     def _loadTenantYAML(self, abide, tenant, loading_errors):
         config_projects_config = model.UnparsedConfig()
