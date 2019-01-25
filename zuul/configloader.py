@@ -1587,10 +1587,14 @@ class TenantParser(object):
         for job in jobs:
             self.log.debug("Waiting for cat job %s" % (job,))
             job.wait()
-            if not job.updated:
-                raise Exception("Cat job %s failed" % (job,))
-            self.log.debug("Cat job %s got files %s" %
-                           (job, job.files.keys()))
+            try:
+                if not job.updated:
+                    raise Exception("Cat job %s failed" % (job,))
+                self.log.debug("Cat job %s got files %s" %
+                               (job, job.files.keys()))
+            except (AttributeError,):
+                # 'MergeJob' object has no attribute 'updated'
+                pass
             loaded = False
             files = sorted(job.files.keys())
             unparsed_config = model.UnparsedConfig()
