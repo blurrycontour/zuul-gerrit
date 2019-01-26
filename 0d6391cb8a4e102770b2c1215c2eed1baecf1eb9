@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9fdfeff1_23038711",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-26T07:44:46Z",
+      "side": 1,
+      "message": "Granted, I\u0027ll check how that would work in a setup hook. That way pip install will be sufficient.",
+      "parentUuid": "9fdfeff1_dec7f611",
+      "revId": "0d6391cb8a4e102770b2c1215c2eed1baecf1eb9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fdfeff1_fecafa17",
         "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2019-01-25T17:56:33Z",
       "side": 1,
       "message": "Could we just start with 2.6 as the default? Kind of bothers me to start in this doomed state, but maybe there\u0027s a complication I haven\u0027t considered.",
+      "revId": "0d6391cb8a4e102770b2c1215c2eed1baecf1eb9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_635bcf53",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-26T07:44:46Z",
+      "side": 1,
+      "message": "I wrote this before the idea of configurable default versions. The idea was to be able to land this feature in a backwards compatible manner and then quickly get through the potentially breaking change of the default version afterwards.\n\nHowever configurable ansible versions are now part of the spec so I think we can safely change this to start with the highest default version available and add an upgrade note that the default can be changed back to 2.5 if required.",
+      "parentUuid": "9fdfeff1_fecafa17",
       "revId": "0d6391cb8a4e102770b2c1215c2eed1baecf1eb9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -64,6 +100,24 @@
       "writtenOn": "2019-01-25T17:56:33Z",
       "side": 1,
       "message": "So, yeah, as above, I\u0027m suggesting we drop the manage-ansible flag, and instead make that script run as part of the normal installation, and that we not use /var/lib, but whatever the installation prefix is set to, under the lib dir. So install at /usr/local/lib/zuul/executor-ansible.",
+      "revId": "0d6391cb8a4e102770b2c1215c2eed1baecf1eb9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_df004b04",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-26T07:44:46Z",
+      "side": 1,
+      "message": "If we do that we probably can move the ansible hooks copying which is already done at runtime also to this script.",
+      "parentUuid": "9fdfeff1_bed472be",
       "revId": "0d6391cb8a4e102770b2c1215c2eed1baecf1eb9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
