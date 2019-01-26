@@ -34,6 +34,24 @@
       "revId": "3ccfec77c9cc63926a5b9b49ac58b7ea931ac400",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_5f053b45",
+        "filename": "tests/unit/test_merger_repo.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2019-01-26T10:57:26Z",
+      "side": 1,
+      "message": "And I completely agree with you. Using sleep here makes me cringe, but I haven\u0027t found a different way to reproduce this behavior.",
+      "parentUuid": "9fdfeff1_dff12b6d",
+      "revId": "3ccfec77c9cc63926a5b9b49ac58b7ea931ac400",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
