@@ -16,6 +16,24 @@
       "revId": "3ccfec77c9cc63926a5b9b49ac58b7ea931ac400",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_dff12b6d",
+        "filename": "tests/unit/test_merger_repo.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2019-01-26T10:53:27Z",
+      "side": 1,
+      "message": "We are waiting for 1s to pass so the Git commit timestamp is not the same. Unfortunately this timestamp has no ms precision. This issue can not be reproduced when the commit timestamps are the same.",
+      "parentUuid": "9fdfeff1_0a1e9d6f",
+      "revId": "3ccfec77c9cc63926a5b9b49ac58b7ea931ac400",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
