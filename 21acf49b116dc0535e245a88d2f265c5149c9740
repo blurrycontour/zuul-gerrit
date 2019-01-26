@@ -93,6 +93,24 @@
       "revId": "21acf49b116dc0535e245a88d2f265c5149c9740",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_5fc77b97",
+        "filename": "zuul/lib/ansible.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-26T08:56:31Z",
+      "side": 1,
+      "message": "I\u0027ll try something based on a yaml description of ansible versions.",
+      "parentUuid": "9fdfeff1_20b52132",
+      "revId": "21acf49b116dc0535e245a88d2f265c5149c9740",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
