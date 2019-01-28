@@ -4714,3 +4714,47 @@ class TestContainerJobs(AnsibleZuulTestCase):
             dict(name='container-machine', result='SUCCESS', changes='1,1'),
             dict(name='container-native', result='SUCCESS', changes='1,1'),
         ])
+
+
+class TestForceMergeMissingTemplate(ZuulTestCase):
+    tenant_config_file = "config/force-merge-template/main.yaml"
+
+    def test_force_merge_missing_template(self):
+        """
+        Tests that force merging a change using a non-existent project
+        template triggering a post job doesn't wedge zuul on reporting.
+        """
+
+        # Create change that adds uses a non-existent project template
+        conf = textwrap.dedent(
+            """
+            - project:
+                templates:
+                  - non-existent
+                check:
+                  jobs:
+                    - noop
+                post:
+                  jobs:
+                    - post-job
+            """)
+
+        file_dict = {'zuul.yaml': conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+
+        # Now force merge the change
+        A.setMerged()
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.waitUntilSettled()
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
+        self.waitUntilSettled()
+
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(B.reported, 1)
+        self.assertHistory([
+            dict(name='other-job', result='SUCCESS', changes='2,1'),
+        ])
