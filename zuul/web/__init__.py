@@ -824,6 +824,7 @@ class ZuulWebAPI(object):
             'voting': build.voting,
             'log_url': build.log_url,
             'node_name': build.node_name,
+            'final': build.final,
             'artifacts': [],
             'provides': [],
         }
@@ -875,14 +876,18 @@ class ZuulWebAPI(object):
     def builds(self, tenant, project=None, pipeline=None, change=None,
                branch=None, patchset=None, ref=None, newrev=None,
                uuid=None, job_name=None, voting=None, node_name=None,
-               result=None, limit=50, skip=0):
+               result=None, final=None, limit=50, skip=0):
         connection = self._get_connection(tenant)
+
+        # If final is None, we return all builds, both final and non-final
+        if final is not None:
+            final = final.lower() == "true"
 
         builds = connection.getBuilds(
             tenant=tenant, project=project, pipeline=pipeline, change=change,
             branch=branch, patchset=patchset, ref=ref, newrev=newrev,
             uuid=uuid, job_name=job_name, voting=voting, node_name=node_name,
-            result=result, limit=limit, offset=skip)
+            result=result, final=final, limit=limit, offset=skip)
 
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
