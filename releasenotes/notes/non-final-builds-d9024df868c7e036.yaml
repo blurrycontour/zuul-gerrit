@@ -1,0 +1,9 @@
+---
+features:
+  - |
+    The list of builds returned by the builds/ API endpoint now includes
+    retried builds. They are called non-final as those are all builds that
+    were retried at least once and thus weren't visible to the user so far.
+
+    To exluce those builds from the API result, set ``final=false`` in the API
+    request.
