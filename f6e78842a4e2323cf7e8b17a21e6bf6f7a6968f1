@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_8d4cd042",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1591,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-28T12:23:45Z",
+      "side": 1,
+      "message": "This will still hide that actually the cat job failed. Instead I think we should extend the if clause to check for the existence of the updated attribute. That way the correct exception is caught.\n\nSecondly I think we should change this to handle this case gracefully as this now breaks the whole tenant if one repo is unaccessible or renamed (which happens quite regularly when working with github). But this is something for a different change.",
+      "range": {
+        "startLine": 1590,
+        "startChar": 0,
+        "endLine": 1591,
+        "endChar": 35
+      },
+      "revId": "f6e78842a4e2323cf7e8b17a21e6bf6f7a6968f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
