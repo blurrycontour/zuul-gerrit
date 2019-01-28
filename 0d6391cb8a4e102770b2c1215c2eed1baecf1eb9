@@ -124,6 +124,23 @@
     },
     {
       "key": {
+        "uuid": "9fdfeff1_20dfe60d",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-01-28T17:10:13Z",
+      "side": 1,
+      "message": "The reason that we copy the ansible hooks is so that installation/upgrade actions don\u0027t affect the running system (installing something via pip causes files to be deleted for a few moments before they are replaced).  If one is continuously deploying Zuul, then this happens frequently.  We should not un-do this by moving the hooks copying into installation.",
+      "revId": "0d6391cb8a4e102770b2c1215c2eed1baecf1eb9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fdfeff1_5edb06ec",
         "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
         "patchSetId": 3
@@ -135,6 +152,23 @@
       "writtenOn": "2019-01-25T17:56:33Z",
       "side": 1,
       "message": "Note that I do a lot of Dockerfile+pbrx, it\u0027s not necessarily needed to be a switch. pbrx + a Dockerfile that is `FROM zuul-base` works fine too. That said, I think aligning with the usual Dockerfile thing is probably a good idea.",
+      "revId": "0d6391cb8a4e102770b2c1215c2eed1baecf1eb9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_40e46ae1",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-01-28T17:10:13Z",
+      "side": 1,
+      "message": "The removal of pbrx is already done (for other reasons, but this use case contributed).",
       "revId": "0d6391cb8a4e102770b2c1215c2eed1baecf1eb9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
