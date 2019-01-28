@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_4b356b8e",
+        "filename": "requirements.txt",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2019-01-28T17:43:49Z",
+      "side": 1,
+      "message": "We should add reno note for upgrades section",
+      "revId": "fb4c6402a46f8f96ba09f681bfd5356329d416a9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
