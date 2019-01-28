@@ -104,6 +104,9 @@ class SQLReporter(BaseReporter):
                     node_name=build.node_name,
                 )
 
+                for provides in job.provides:
+                    db_build.createProvides(name=provides)
+
                 if self.validateArtifactSchema(build.result_data):
                     artifacts = build.result_data.get('zuul', {}).get(
                         'artifacts', [])

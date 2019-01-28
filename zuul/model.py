@@ -164,6 +164,11 @@ class TemplateNotFoundError(Exception):
     pass
 
 
+class RequirementsError(Exception):
+    """A job's requirements were not met."""
+    pass
+
+
 class Attributes(object):
     """A class to hold attributes for string formatting."""
 
@@ -1070,6 +1075,8 @@ class Job(ConfigObject):
             file_matcher=None,
             irrelevant_file_matcher=None,  # skip-if
             tags=frozenset(),
+            provides=frozenset(),
+            requires=frozenset(),
             dependencies=frozenset(),
         )
 
@@ -1525,8 +1532,9 @@ class Job(ConfigObject):
                 k not in set(['tags'])):
                 setattr(self, k, other._get(k))
 
-        if other._get('tags') is not None:
-            self.tags = frozenset(self.tags.union(other.tags))
+        for k in ('tags', 'requires', 'provides'):
+            if other._get(k) is not None:
+                setattr(self, k, self._get(k).union(other._get(k)))
 
         self.inheritance_path = self.inheritance_path + (repr(other),)
 
@@ -2169,6 +2177,79 @@ class QueueItem(object):
             return False
         return self.item_ahead.isHoldingFollowingChanges()
 
+    def _getRequirementsResultFromSQL(self, requirements):
+        # This either returns data, None, or raises an exception
+        sql_driver = self.pipeline.manager.sched.connections.drivers['sql']
+        conn = sql_driver.tenant_connections.get(self.pipeline.tenant.name)
+        if not conn:
+            return None
+        builds = conn.getBuilds(
+            tenant=self.pipeline.tenant.name,
+            project=self.change.project.name,
+            pipeline=self.pipeline.name,
+            change=self.change.number,
+            branch=self.change.branch,
+            patchset=self.change.patchset,
+            provides=list(requirements))
+
+        # Just look at the most recent buildset.
+        # TODO: query for a buildset instead of filtering.
+        builds = [b for b in builds if b.buildset.uuid==builds[0].buildset.uuid]
+        if not builds:
+            return None
+
+        for build in builds:
+            if build.result != 'SUCCESS':
+                provides = [x.name for x in build.provides]
+                requirement = list(requirements.intersection(set(provides)))
+                raise RequirementsError("Requirements %s not met by build %s" % (
+                    requirement, build.uuid))
+        return None
+
+    def providesRequirements(self, requirements):
+        if not requirements:
+            return True
+        if not self.live:
+            # Look for this item in other queues in the pipeline.
+            item = None
+            found = False
+            for item in self.pipeline.getAllItems():
+                if item.live and item.change == self.change:
+                    found = True
+                    break
+            if found:
+                if not item.providesRequirements(requirements):
+                    return False
+            else:
+                # Look for this item in the SQL DB.
+                self._getRequirementsResultFromSQL(requirements)
+        if self.hasJobGraph():
+            for job in self.getJobs():
+                if job.provides.intersection(requirements):
+                    build = self.current_build_set.getBuild(job.name)
+                    if not build:
+                        return False
+                    if build.result and build.result != 'SUCCESS':
+                        return False
+                    if not build.paused:
+                        return False
+        if not self.item_ahead:
+            return True
+        return self.item_ahead.providesRequirements(requirements)
+
+    def jobRequirementsReady(self, job):
+        if not self.item_ahead:
+            return True
+        try:
+            ret = self.item_ahead.providesRequirements(job.requires)
+        except RequirementsError as e:
+            self.warning(str(e))
+            fakebuild = Build(job, None)
+            fakebuild.result = 'SKIPPED'
+            self.addBuild(fakebuild)
+            ret = True
+        return ret
+
     def findJobsToRun(self, semaphore_handler):
         torun = []
         if not self.live:
@@ -2195,6 +2276,8 @@ class QueueItem(object):
         # configuration.
         for job in self.job_graph.getJobs():
             if job not in jobs_not_started:
+                continue
+            if not self.jobRequirementsReady(job):
                 continue
             all_parent_jobs_successful = True
             parent_builds_with_data = {}
@@ -2259,6 +2342,8 @@ class QueueItem(object):
         # in configuration.
         for job in self.job_graph.getJobs():
             if job not in jobs_not_requested:
+                continue
+            if not self.jobRequirementsReady(job):
                 continue
             all_parent_jobs_successful = True
             for parent_job in self.job_graph.getParentJobsRecursively(
