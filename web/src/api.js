@@ -127,8 +127,10 @@ function fetchBuild (apiPrefix, buildId) {
 }
 function fetchBuilds (apiPrefix, queryString) {
   let path = 'builds'
+  // We only want to show final builds in the web UI by default
+  path += '?final=true'
   if (queryString) {
-    path += '?' + queryString.slice(1)
+    path += '&' + queryString.slice(1)
   }
   return Axios.get(apiUrl + apiPrefix + path)
 }
