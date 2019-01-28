@@ -16,6 +16,23 @@
       "revId": "fb4c6402a46f8f96ba09f681bfd5356329d416a9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_2b910748",
+        "filename": "requirements.txt",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-01-28T17:50:09Z",
+      "side": 1,
+      "message": "What would the reno upgrade note ask people to do?  I don\u0027t think there are any user actions needed here, and if there aren\u0027t, I don\u0027t think we need a release note.",
+      "revId": "fb4c6402a46f8f96ba09f681bfd5356329d416a9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
