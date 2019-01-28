@@ -134,10 +134,11 @@ class TestSQLConnection(ZuulDBTestCase):
                 sa.sql.select([reporter.connection.zuul_buildset_table]))
 
             buildsets = result.fetchall()
-            self.assertEqual(3, len(buildsets))
+            self.assertEqual(4, len(buildsets))
             buildset0 = buildsets[0]
             buildset1 = buildsets[1]
             buildset2 = buildsets[2]
+            buildset3 = buildsets[3]
 
             self.assertEqual('check', buildset0['pipeline'])
             self.assertEqual('org/project', buildset0['project'])
@@ -194,6 +195,30 @@ class TestSQLConnection(ZuulDBTestCase):
                              buildset2_builds[0]['job_name'])
             self.assertEqual("SUCCESS", buildset2_builds[0]['result'])
 
+            buildset3_builds = conn.execute(
+                sa.sql.select([reporter.connection.zuul_build_table]).where(
+                    reporter.connection.zuul_build_table.c.buildset_id ==
+                    buildset3['id']
+                )
+            ).fetchall()
+
+            # Check the retry results
+            self.assertEqual('project-merge',
+                             buildset3_builds[0]['job_name'])
+            self.assertEqual('SUCCESS', buildset3_builds[0]['result'])
+            self.assertEqual('project-test1',
+                             buildset3_builds[1]['job_name'])
+            self.assertEqual('RETRY', buildset3_builds[1]['result'])
+            self.assertEqual('project-test1',
+                             buildset3_builds[2]['job_name'])
+            self.assertEqual('SUCCESS', buildset3_builds[2]['result'])
+            self.assertEqual('project-test2',
+                             buildset3_builds[3]['job_name'])
+            self.assertEqual('RETRY', buildset3_builds[3]['result'])
+            self.assertEqual('project-test2',
+                             buildset3_builds[4]['job_name'])
+            self.assertEqual('SUCCESS', buildset3_builds[4]['result'])
+
         self.executor_server.hold_jobs_in_build = True
 
         # Add a success result
@@ -219,6 +244,20 @@ class TestSQLConnection(ZuulDBTestCase):
         C = self.fake_gerrit.addFakeTag('org/project', 'master', 'foo')
         self.fake_gerrit.addEvent(C)
         self.waitUntilSettled()
+        self.orderedRelease()
+        self.waitUntilSettled()
+
+        # Add a retry result
+        self.log.debug("Adding retry FakeChange")
+        D = self.fake_gerrit.addFakeChange('org/project', 'master', 'D')
+        self.fake_gerrit.addEvent(D.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        # Release the merge job (which is the dependency for the other jobs)
+        self.executor_server.release('.*-merge')
+        self.waitUntilSettled()
+        # Let both test jobs fail on the first run, so they are both run again.
+        self.builds[0].requeue = True
+        self.builds[1].requeue = True
         self.orderedRelease()
         self.waitUntilSettled()
 
