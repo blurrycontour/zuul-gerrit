@@ -294,6 +294,93 @@ class TestSQLConnection(ZuulDBTestCase):
         check_results('resultsdb_mysql', 'resultsdb_mysql_failures')
         check_results('resultsdb_postgresql', 'resultsdb_postgresql_failures')
 
+    def test_sql_results_retry_builds(self):
+        # Check the results
+        def check_results(connection_name):
+            # Grab the sa tables
+            tenant = self.sched.abide.tenants.get("tenant-one")
+            reporter = _get_reporter_from_connection_name(
+                tenant.layout.pipelines["check"].success_actions,
+                connection_name
+            )
+
+            with self.connections.connections[
+                connection_name].engine.connect() as conn:
+
+                result = conn.execute(
+                    sa.sql.select([reporter.connection.zuul_buildset_table])
+                )
+
+                buildsets = result.fetchall()
+                self.assertEqual(1, len(buildsets))
+                buildset0 = buildsets[0]
+
+                self.assertEqual('check', buildset0['pipeline'])
+                self.assertEqual('org/project', buildset0['project'])
+                self.assertEqual(1, buildset0['change'])
+                self.assertEqual('1', buildset0['patchset'])
+                self.assertEqual('SUCCESS', buildset0['result'])
+                self.assertEqual('Build succeeded.', buildset0['message'])
+                self.assertEqual('tenant-one', buildset0['tenant'])
+                self.assertEqual(
+                    'https://review.example.com/%d' % buildset0['change'],
+                    buildset0['ref_url'])
+
+                buildset0_builds = conn.execute(
+                    sa.sql.select(
+                        [reporter.connection.zuul_build_table]
+                    ).where(
+                        reporter.connection.zuul_build_table.c.buildset_id ==
+                        buildset0["id"]
+                    )
+                ).fetchall()
+
+                buildset0_retry_builds = conn.execute(
+                    sa.sql.select(
+                        [reporter.connection.zuul_retry_build_table]
+                    ).where(
+                        reporter.connection.zuul_retry_build_table.c.buildset_id ==
+                        buildset0["id"]
+                    )
+                ).fetchall()
+
+                # Check the retry results
+                self.assertEqual('project-merge',
+                                 buildset0_builds[0]['job_name'])
+                self.assertEqual('SUCCESS', buildset0_builds[0]['result'])
+                self.assertEqual('project-test1',
+                                 buildset0_builds[1]['job_name'])
+                self.assertEqual('SUCCESS', buildset0_builds[1]['result'])
+                self.assertEqual('project-test2',
+                                 buildset0_builds[2]['job_name'])
+                self.assertEqual('SUCCESS', buildset0_builds[2]['result'])
+
+                self.assertEqual('project-test1',
+                                 buildset0_retry_builds[0]['job_name'])
+                self.assertEqual('RETRY', buildset0_retry_builds[0]['result'])
+                self.assertEqual('project-test2',
+                                 buildset0_retry_builds[1]['job_name'])
+                self.assertEqual('RETRY', buildset0_retry_builds[1]['result'])
+
+        self.executor_server.hold_jobs_in_build = True
+
+        # Add a retry result
+        self.log.debug("Adding retry FakeChange")
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        # Release the merge job (which is the dependency for the other jobs)
+        self.executor_server.release('.*-merge')
+        self.waitUntilSettled()
+        # Let both test jobs fail on the first run, so they are both run again.
+        self.builds[0].requeue = True
+        self.builds[1].requeue = True
+        self.orderedRelease()
+        self.waitUntilSettled()
+
+        check_results('resultsdb_mysql')
+        check_results('resultsdb_postgresql')
+
 
 class TestSQLConnectionPrefix(TestSQLConnection):
     config_file = 'zuul-sql-driver-prefix.conf'

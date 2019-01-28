@@ -18,7 +18,7 @@ import alembic
 import alembic.command
 import alembic.config
 import sqlalchemy as sa
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy import orm
 import sqlalchemy.pool
 
@@ -26,6 +26,7 @@ from zuul.connection import BaseConnection
 
 BUILDSET_TABLE = 'zuul_buildset'
 BUILD_TABLE = 'zuul_build'
+RETRY_BUILD_TABLE = 'zuul_retry_build'
 ARTIFACT_TABLE = 'zuul_artifact'
 PROVIDES_TABLE = 'zuul_provides'
 
@@ -287,11 +288,23 @@ class SQLConnection(BaseConnection):
                 session.flush()
                 return b
 
-        class BuildModel(Base):
-            __tablename__ = self.table_prefix + BUILD_TABLE
+            def createRetryBuild(self, *args, **kw):
+                session = orm.session.Session.object_session(self)
+                b = RetryBuildModel(*args, **kw)
+                b.buildset_id = self.id
+                self.retry_builds.append(b)
+                session.add(b)
+                session.flush()
+                return b
+
+        class BuildMixin:
             id = sa.Column(sa.Integer, primary_key=True)
-            buildset_id = sa.Column(sa.String, sa.ForeignKey(
-                self.table_prefix + BUILDSET_TABLE + ".id"))
+
+            @declared_attr
+            def buildset_id(cls):
+                return sa.Column(sa.String, sa.ForeignKey(
+                    self.table_prefix + BUILDSET_TABLE + ".id"))
+
             uuid = sa.Column(sa.String(36))
             job_name = sa.Column(sa.String(255))
             result = sa.Column(sa.String(255))
@@ -300,6 +313,9 @@ class SQLConnection(BaseConnection):
             voting = sa.Column(sa.Boolean)
             log_url = sa.Column(sa.String(255))
             node_name = sa.Column(sa.String(255))
+
+        class BuildModel(BuildMixin, Base):
+            __tablename__ = self.table_prefix + BUILD_TABLE
             buildset = orm.relationship(BuildSetModel, backref="builds")
 
             def createArtifact(self, *args, **kw):
@@ -328,6 +344,10 @@ class SQLConnection(BaseConnection):
                 session.flush()
                 return p
 
+        class RetryBuildModel(BuildMixin, Base):
+            __tablename__ = self.table_prefix + RETRY_BUILD_TABLE
+            buildset = orm.relationship(BuildSetModel, backref="retry_builds")
+
         class ArtifactModel(Base):
             __tablename__ = self.table_prefix + ARTIFACT_TABLE
             id = sa.Column(sa.Integer, primary_key=True)
@@ -354,6 +374,9 @@ class SQLConnection(BaseConnection):
 
         self.buildModel = BuildModel
         self.zuul_build_table = self.buildModel.__table__
+
+        self.retryBuildModel = RetryBuildModel
+        self.zuul_retry_build_table = self.retryBuildModel.__table__
 
         self.buildSetModel = BuildSetModel
         self.zuul_buildset_table = self.buildSetModel.__table__
