@@ -16,7 +16,7 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Table } from 'patternfly-react'
+import { TreeView } from 'patternfly-react'
 
 
 class JobsList extends React.Component {
@@ -28,53 +28,52 @@ class JobsList extends React.Component {
   render () {
     const { jobs } = this.props
 
-    const headerFormat = value => <Table.Heading>{value}</Table.Heading>
-    const cellFormat = (value) => (
-      <Table.Cell>{value}</Table.Cell>)
-    const cellJobFormat = (value) => (
-      <Table.Cell>
-        <Link to={this.props.tenant.linkPrefix + '/job/' + value}>
-          {value}
-        </Link>
-      </Table.Cell>)
-    const cellBuildFormat = (value) => (
-      <Table.Cell>
-        <Link to={this.props.tenant.linkPrefix + '/builds?job_name=' + value}>
-          builds
-        </Link>
-      </Table.Cell>)
-    const columns = []
-    const myColumns = ['name', 'description', 'Last builds']
-    myColumns.forEach(column => {
-      let formatter = cellFormat
-      let prop = column
-      if (column === 'name') {
-        formatter = cellJobFormat
+    // Create tree data
+    const nodes = []
+    const visited = {}
+    const linkPrefix = this.props.tenant.linkPrefix + '/job/'
+    const getNode = function (job) {
+      if (!visited[job.name]) {
+        if (job.parent) {
+          for (let otherJob of jobs) {
+            if (job.parent === otherJob.name) {
+              getNode(otherJob)
+              break
+            }
+          }
+        }
+        visited[job.name] = {
+          text: (
+            <React.Fragment>
+              <Link to={linkPrefix + job.name}>{job.name}</Link>
+              {job.description && (
+                <span style={{marginLeft: '10px'}}>{job.description}</span>
+              )}
+            </React.Fragment>),
+          icon: 'fa fa-cube',
+        }
       }
-      if (column === 'Last builds') {
-        prop = 'name'
-        formatter = cellBuildFormat
+      return visited[job.name]
+    }
+    for (let job of jobs) {
+      const jobNode = getNode(job)
+      if (job.parent) {
+        const parentNode = visited[job.parent]
+        if (!parentNode.nodes) {
+          parentNode.nodes = []
+          parentNode.state = {
+            expanded: true
+          }
+        }
+        parentNode.nodes.push(jobNode)
+      } else {
+        nodes.push(jobNode)
       }
-      columns.push({
-        header: {label: column,
-          formatters: [headerFormat]},
-        property: prop,
-        cell: {formatters: [formatter]}
-      })
-    })
+    }
     return (
-      <Table.PfProvider
-        striped
-        bordered
-        hover
-        columns={columns}
-        >
-        <Table.Header/>
-        <Table.Body
-          rows={jobs}
-          rowKey="name"
-          />
-      </Table.PfProvider>
+      <div className="tree-view-container">
+        <TreeView nodes={nodes} />
+      </div>
     )
   }
 }
