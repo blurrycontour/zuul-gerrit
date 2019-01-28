@@ -60,7 +60,7 @@ class DatabaseSession(object):
                   change=None, branch=None, patchset=None, ref=None,
                   newrev=None, event_id=None, uuid=None, job_name=None,
                   voting=None, node_name=None, result=None, provides=None,
-                  limit=50, offset=0):
+                  final=None, limit=50, offset=0):
 
         build_table = self.connection.zuul_build_table
         buildset_table = self.connection.zuul_buildset_table
@@ -102,6 +102,7 @@ class DatabaseSession(object):
         q = self.listFilter(q, build_table.c.voting, voting)
         q = self.listFilter(q, build_table.c.node_name, node_name)
         q = self.listFilter(q, build_table.c.result, result)
+        q = self.listFilter(q, build_table.c.final, final)
         q = self.listFilter(q, provides_table.c.name, provides)
 
         q = q.order_by(build_table.c.id.desc()).\
@@ -301,6 +302,7 @@ class SQLConnection(BaseConnection):
             log_url = sa.Column(sa.String(255))
             node_name = sa.Column(sa.String(255))
             error_detail = sa.Column(sa.TEXT())
+            final = sa.Column(sa.Boolean)
             buildset = orm.relationship(BuildSetModel, backref="builds")
 
             def createArtifact(self, *args, **kw):

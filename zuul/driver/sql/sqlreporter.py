@@ -29,6 +29,43 @@ class SQLReporter(BaseReporter):
     name = 'sql'
     log = logging.getLogger("zuul.SQLReporter")
 
+    def _getBuildData(self, item, job, build):
+        (result, url) = item.formatJobResult(job, build)
+        log_url = build.result_data.get('zuul', {}).get('log_url')
+        if log_url and log_url[-1] != '/':
+            log_url = log_url + '/'
+        start = end = None
+        if build.start_time:
+            start = datetime.datetime.fromtimestamp(
+                build.start_time,
+                tz=datetime.timezone.utc)
+        if build.end_time:
+            end = datetime.datetime.fromtimestamp(
+                build.end_time,
+                tz=datetime.timezone.utc)
+        return result, log_url, start, end
+
+    def createBuildEntry(self, item, job, db_buildset, build, final=True):
+        # Ensure end_time is defined
+        if not build.end_time:
+            build.end_time = time.time()
+
+        result, log_url, start, end = self._getBuildData(item, job, build)
+        db_build = db_buildset.createBuild(
+            uuid=build.uuid,
+            job_name=build.job.name,
+            result=result,
+            start_time=start,
+            end_time=end,
+            voting=build.job.voting,
+            log_url=log_url,
+            node_name=build.node_name,
+            error_detail=build.error_detail,
+            final=final,
+        )
+
+        return db_build
+
     def report(self, item):
         """Create an entry into a database."""
         log = get_annotated_logger(self.log, item.event)
@@ -66,35 +103,16 @@ class SQLReporter(BaseReporter):
                     # stats about builds. It doesn't understand how to store
                     # information about the change.
                     continue
-                # Ensure end_time is defined
-                if not build.end_time:
-                    build.end_time = time.time()
 
-                (result, url) = item.formatJobResult(job)
-                log_url = build.result_data.get('zuul', {}).get('log_url')
-                if log_url and log_url[-1] != '/':
-                    log_url = log_url + '/'
-                start = end = None
-                if build.start_time:
-                    start = datetime.datetime.fromtimestamp(
-                        build.start_time,
-                        tz=datetime.timezone.utc)
-                if build.end_time:
-                    end = datetime.datetime.fromtimestamp(
-                        build.end_time,
-                        tz=datetime.timezone.utc)
-
-                db_build = db_buildset.createBuild(
-                    uuid=build.uuid,
-                    job_name=build.job.name,
-                    result=result,
-                    start_time=start,
-                    end_time=end,
-                    voting=build.job.voting,
-                    log_url=log_url,
-                    node_name=build.node_name,
-                    error_detail=build.error_detail,
+                retry_builds = item.current_build_set.getRetryBuildsForJob(
+                    job.name
                 )
+                for retry_build in retry_builds:
+                    self.createBuildEntry(
+                        item, job, db_buildset, retry_build, final=False
+                    )
+
+                db_build = self.createBuildEntry(item, job, db_buildset, build)
 
                 for provides in job.provides:
                     db_build.createProvides(name=provides)
