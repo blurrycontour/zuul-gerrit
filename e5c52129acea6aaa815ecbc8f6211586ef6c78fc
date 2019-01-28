@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_0be0c3f9",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-28T17:43:53Z",
+      "side": 1,
+      "message": "I think the connection name would be even more helpful as theoretical you can add two connections to the same gerrit with different credentials.",
+      "range": {
+        "startLine": 272,
+        "startChar": 0,
+        "endLine": 273,
+        "endChar": 45
+      },
+      "revId": "e5c52129acea6aaa815ecbc8f6211586ef6c78fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
