@@ -47,6 +47,37 @@ class SQLReporter(BaseReporter):
             return False
         return True
 
+    def createBuildEntry(self, item, job, db_buildset, build,
+                         default_result=None):
+        # Ensure end_time is defined
+        if not build.end_time:
+            build.end_time = time.time()
+
+        (result, url) = item.formatJobResult(job)
+        if default_result is not None and result is None:
+            result = default_result
+        start = end = None
+        if build.start_time:
+            start = datetime.datetime.fromtimestamp(
+                build.start_time,
+                tz=datetime.timezone.utc)
+        if build.end_time:
+            end = datetime.datetime.fromtimestamp(
+                build.end_time,
+                tz=datetime.timezone.utc)
+
+        db_build = db_buildset.createBuild(
+            uuid=build.uuid,
+            job_name=build.job.name,
+            result=result,
+            start_time=start,
+            end_time=end,
+            voting=build.job.voting,
+            log_url=url,
+            node_name=build.node_name,
+        )
+        return db_build
+
     def report(self, item):
         """Create an entry into a database."""
 
@@ -78,31 +109,8 @@ class SQLReporter(BaseReporter):
                     # stats about builds. It doesn't understand how to store
                     # information about the change.
                     continue
-                # Ensure end_time is defined
-                if not build.end_time:
-                    build.end_time = time.time()
 
-                (result, url) = item.formatJobResult(job)
-                start = end = None
-                if build.start_time:
-                    start = datetime.datetime.fromtimestamp(
-                        build.start_time,
-                        tz=datetime.timezone.utc)
-                if build.end_time:
-                    end = datetime.datetime.fromtimestamp(
-                        build.end_time,
-                        tz=datetime.timezone.utc)
-
-                db_build = db_buildset.createBuild(
-                    uuid=build.uuid,
-                    job_name=build.job.name,
-                    result=result,
-                    start_time=start,
-                    end_time=end,
-                    voting=build.job.voting,
-                    log_url=url,
-                    node_name=build.node_name,
-                )
+                db_build = self.createBuildEntry(item, job, db_buildset, build)
 
                 if self.validateArtifactSchema(build.result_data):
                     artifacts = build.result_data.get('zuul', {}).get(
@@ -130,6 +138,12 @@ class SQLReporter(BaseReporter):
                 else:
                     self.log.debug("Result data did not pass artifact schema "
                                    "validation: %s", build.result_data)
+
+                retry_builds = item.current_build_set.getRetryBuildsForJob(
+                    job.name)
+                for build in retry_builds:
+                    db_build = self.createBuildEntry(item, job, db_buildset,
+                                                     build, 'RETRY')
 
 
 def getSchema():
