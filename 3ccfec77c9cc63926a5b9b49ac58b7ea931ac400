@@ -70,6 +70,24 @@
       "revId": "3ccfec77c9cc63926a5b9b49ac58b7ea931ac400",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_5e1694f3",
+        "filename": "tests/unit/test_merger_repo.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2019-01-28T07:02:05Z",
+      "side": 1,
+      "message": "Found a better way without sleeping.",
+      "parentUuid": "9fdfeff1_221aa06e",
+      "revId": "3ccfec77c9cc63926a5b9b49ac58b7ea931ac400",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
