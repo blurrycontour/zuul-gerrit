@@ -4714,3 +4714,95 @@ class TestContainerJobs(AnsibleZuulTestCase):
             dict(name='container-machine', result='SUCCESS', changes='1,1'),
             dict(name='container-native', result='SUCCESS', changes='1,1'),
         ])
+
+
+class TestProvidesRequires(ZuulTestCase):
+
+    @simple_layout('layouts/provides-requires.yaml')
+    def test_provides_requires_shared_queue(self):
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 1)
+
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'A')
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 1)
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='image-builder', result='SUCCESS', changes='1,1'),
+            dict(name='image-user', result='SUCCESS', changes='1,1 2,1'),
+        ])
+
+    @simple_layout('layouts/provides-requires-unshared.yaml')
+    def test_provides_requires_unshared_queue(self):
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 1)
+
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'A')
+        B.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
+            B.subject, A.data['id'])
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 1)
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='image-builder', result='SUCCESS', changes='1,1'),
+        ])
+
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='image-builder', result='SUCCESS', changes='1,1'),
+            dict(name='image-user', result='SUCCESS', changes='2,1'),
+        ])
+
+    @simple_layout('layouts/provides-requires.yaml')
+    def test_provides_requires_check_current(self):
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 1)
+
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'A')
+        B.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
+            B.subject, A.data['id'])
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 1)
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='image-builder', result='SUCCESS', changes='1,1'),
+            dict(name='image-user', result='SUCCESS', changes='1,1 2,1'),
+        ])
+
+    #def test_provides_requires_check_old(self):

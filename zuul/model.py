@@ -1070,6 +1070,8 @@ class Job(ConfigObject):
             file_matcher=None,
             irrelevant_file_matcher=None,  # skip-if
             tags=frozenset(),
+            provides=frozenset(),
+            requires=frozenset(),
             dependencies=frozenset(),
         )
 
@@ -1525,8 +1527,9 @@ class Job(ConfigObject):
                 k not in set(['tags'])):
                 setattr(self, k, other._get(k))
 
-        if other._get('tags') is not None:
-            self.tags = frozenset(self.tags.union(other.tags))
+        for k in ('tags', 'requires', 'provides'):
+            if other._get(k) is not None:
+                setattr(self, k, self._get(k).union(other._get(k)))
 
         self.inheritance_path = self.inheritance_path + (repr(other),)
 
@@ -2169,6 +2172,38 @@ class QueueItem(object):
             return False
         return self.item_ahead.isHoldingFollowingChanges()
 
+    def providesRequirements(self, requirements):
+        if not requirements:
+            return True
+        if not self.live:
+            # Look for this item in other queues in the pipeline.
+            item = None
+            found = False
+            for item in self.pipeline.getAllItems():
+                if item.live and item.change == self.change:
+                    found = True
+                    break
+            if found:
+                print("XXX", self, item)
+                if not item.providesRequirements(requirements):
+                    return False
+            else:
+                # Look for this item in the SQL DB.
+                pass
+        if self.hasJobGraph():
+            for job in self.getJobs():
+                if job.provides.intersection(requirements):
+                    build = self.current_build_set.getBuild(job.name)
+                    if not build:
+                        return False
+                    if build.result and build.result != 'SUCCESS':
+                        return False
+                    if not build.paused:
+                        return False
+        if not self.item_ahead:
+            return True
+        return self.item_ahead.providesRequirements(requirements)
+
     def findJobsToRun(self, semaphore_handler):
         torun = []
         if not self.live:
@@ -2184,6 +2219,9 @@ class QueueItem(object):
         successful_job_names = set()
         jobs_not_started = set()
         for job in self.job_graph.getJobs():
+            if (self.item_ahead and
+                not self.item_ahead.providesRequirements(job.requires)):
+                continue
             build = self.current_build_set.getBuild(job.name)
             if build:
                 if build.result == 'SUCCESS' or build.paused:
@@ -2243,6 +2281,9 @@ class QueueItem(object):
         successful_job_names = set()
         jobs_not_requested = set()
         for job in self.job_graph.getJobs():
+            if (self.item_ahead and
+                not self.item_ahead.providesRequirements(job.requires)):
+                continue
             build = build_set.getBuild(job.name)
             if build and (build.result == 'SUCCESS' or build.paused):
                 successful_job_names.add(job.name)
