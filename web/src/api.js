@@ -113,6 +113,9 @@ function fetchOpenApi () {
 function fetchTenants () {
   return Axios.get(apiUrl + 'tenants')
 }
+function fetchConfig (apiPrefix) {
+  return Axios.get(apiUrl + apiPrefix + 'config')
+}
 function fetchConfigErrors (apiPrefix) {
   return Axios.get(apiUrl + apiPrefix + 'config-errors')
 }
@@ -166,6 +169,7 @@ export {
   getHomepageUrl,
   getStreamUrl,
   fetchChangeStatus,
+  fetchConfig,
   fetchConfigErrors,
   fetchStatus,
   fetchBuild,

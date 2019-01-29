@@ -49,7 +49,7 @@ class TenantsPage extends Refreshable {
     const columns = []
     const myColumns = [
       'name', 'status', 'projects', 'jobs', 'builds', 'buildsets',
-      'projects count', 'queue']
+      'config', 'projects count', 'queue']
     myColumns.forEach(column => {
       let prop = column
       if (column === 'projects count') {
@@ -75,6 +75,8 @@ class TenantsPage extends Refreshable {
         <Link to={'/t/' + tenant.name + '/builds'}>Builds</Link>)
       tenant.buildsets = (
         <Link to={'/t/' + tenant.name + '/buildsets'}>Buildsets</Link>)
+      tenant.config = (
+        <Link to={'/t/' + tenant.name + '/config'}>Config</Link>)
     })
     return (
       <React.Fragment>
