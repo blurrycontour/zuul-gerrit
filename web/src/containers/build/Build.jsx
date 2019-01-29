@@ -19,6 +19,7 @@ import { Link } from 'react-router-dom'
 import { Panel } from 'react-bootstrap'
 
 import BuildOutput from './BuildOutput'
+import BuildRoles from './BuildRoles'
 
 
 class Build extends React.Component {
@@ -81,7 +82,10 @@ class Build extends React.Component {
               ))}
             </tbody>
           </table>
-          {build.output && <BuildOutput output={build.output}/>}
+          {build.output &&
+           (<h3>Play summary</h3>) + <BuildOutput output={build.output} />}
+          {build.roles &&
+           (<h3>Roles summary</h3>) + <BuildRoles roles={build.roles} />}
         </Panel.Body>
       </Panel>
     )
