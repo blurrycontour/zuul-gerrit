@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_bbed3bf1",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1592,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-29T06:53:19Z",
+      "side": 1,
+      "message": "A cat job that has no \u0027updated\u0027 should be treated the same as a failed cat job as it\u0027s essentially a failed cat job. So this makes it much more complicated than needed.\n\nFor the start we really should just treat it the same as a regularly failed cat job which should be as easy as modifying this if clause to:\n\n if not hasattr(job, \u0027updated\u0027) or not job.updated:\n     raise...\n\nIn a different change we can think about how we can handle failed cat jobs more gracefully. I think we should log an error and store this as a config error instead of raising an exception. But this might need deeper thoughts and more discussion and should be subject of a follow-up.",
+      "range": {
+        "startLine": 1591,
+        "startChar": 0,
+        "endLine": 1592,
+        "endChar": 61
+      },
+      "revId": "b96242cc10902ea7532c4704fe0df52530da9104",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
