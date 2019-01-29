@@ -17,6 +17,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import {
+  Badge,
   Form,
   FormGroup,
   FormControl,
@@ -87,6 +88,12 @@ class JobsList extends React.Component {
               {job.description && (
                 <span style={{marginLeft: '10px'}}>{job.description}</span>
               )}
+              {job.tags && job.tags.map((tag, idx) => (
+                <Badge
+                  key={idx}
+                  pullRight>
+                  {tag}
+                </Badge>))}
             </React.Fragment>),
           icon: 'fa fa-cube',
           state: {
