@@ -1330,15 +1330,6 @@ class Job(ConfigObject):
             return None
         return m
 
-    def addImpliedBranchMatcher(self, branch):
-        # Add a branch matcher that combines as a boolean *and* with
-        # existing branch matchers, if any.
-        self._implied_branch = branch
-        matchers = [change_matcher.ImpliedBranchMatcher(branch)]
-        if self.branch_matcher:
-            matchers.append(self.branch_matcher)
-        self.branch_matcher = change_matcher.MatchAll(matchers)
-
     def updateVariables(self, other_vars, other_extra_vars, other_host_vars,
                         other_group_vars):
         if other_vars is not None:
