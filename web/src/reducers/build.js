@@ -37,7 +37,8 @@ export default (state = {
       return update(state, {$merge: {isFetching: false}})
     case BUILD_OUTPUT_FETCH_SUCCESS:
       return update(
-        state, {builds: {[action.buildId]: {$merge: {output: action.output}}}})
+        state, {builds: {[action.buildId]: {$merge: {output: action.output,
+                                                     roles: action.roles}}}})
     default:
       return state
   }
