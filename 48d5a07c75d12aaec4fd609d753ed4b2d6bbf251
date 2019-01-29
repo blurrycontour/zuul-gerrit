@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9fdfeff1_50997cc1",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-01-29T23:24:51Z",
+      "side": 1,
+      "message": "Why not supporting buildset query by job name? It seems like something useful.",
+      "parentUuid": "9fdfeff1_7e460a24",
+      "revId": "48d5a07c75d12aaec4fd609d753ed4b2d6bbf251",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fdfeff1_5e4b062a",
         "filename": "zuul/web/__init__.py",
         "patchSetId": 7
