@@ -34,6 +34,8 @@ export const receiveBuild = (buildId, build) => ({
 
 const receiveBuildOutput = (buildId, output) => {
   const hosts = {}
+  const roles = {}
+  const rolesTimeline = []
   // Compute stats
   output.forEach(phase => {
     Object.entries(phase.stats).forEach(([host, stats]) => {
@@ -45,34 +47,52 @@ const receiveBuildOutput = (buildId, output) => {
         hosts[host].failures += stats.failures
         hosts[host].ok += stats.ok
       }
-      if (stats.failures > 0) {
-        // Look for failed tasks
-        phase.plays.forEach(play => {
-          play.tasks.forEach(task => {
-            if (task.hosts[host]) {
-              if (task.hosts[host].results &&
-                  task.hosts[host].results.length > 0) {
-                task.hosts[host].results.forEach(result => {
-                  if (result.failed) {
-                    result.name = task.task.name
-                    hosts[host].failed.push(result)
-                  }
-                })
-              } else if (task.hosts[host].rc || task.hosts[host].failed) {
-                let result = task.hosts[host]
-                result.name = task.task.name
-                hosts[host].failed.push(result)
-              }
+      phase.plays.forEach(play => {
+        play.tasks.forEach(task => {
+          // Look for failed task per host
+          if (task.hosts[host]) {
+            if (task.hosts[host].results &&
+                task.hosts[host].results.length > 0) {
+              // Task generated multiple results (e.g. with loop)
+              task.hosts[host].results.forEach(result => {
+                if (result.failed) {
+                  // Collect failed task
+                  result.name = task.task.name
+                  hosts[host].failed.push(result)
+                }
+              })
+            } else if (task.hosts[host].rc || task.hosts[host].failed) {
+              // Task generated a single failed result
+              let result = task.hosts[host]
+              result.name = task.task.name
+              hosts[host].failed.push(result)
             }
-          })
+          }
+          // Collect roles usage
+          if (task.role && task.role.name) {
+            if (!roles[task.role.name]) {
+              roles[task.role.name] = {
+                name: task.role.name,
+                duration: 0,
+                count: 0,
+              }
+              rolesTimeline.push(roles[task.role.name])
+            }
+            roles[task.role.name].count += 1
+            if (task.task.duration) {
+              roles[task.role.name].duration += new Date(
+                task.task.duration.end) - new Date(task.task.duration.start)
+            }
+          }
         })
-      }
+      })
     })
   })
   return {
     type: BUILD_OUTPUT_FETCH_SUCCESS,
     buildId: buildId,
     output: hosts,
+    roles: rolesTimeline,
     receivedAt: Date.now()
   }
 }

@@ -32,6 +32,7 @@ class BuildOutput extends React.Component {
         {Object.entries(hosts).map(([host, values]) => (
           <ListView.Item
             key={host}
+            leftContent={<ListView.Icon name="server" />}
             heading={host}
             additionalInfo={[
               <ListView.InfoItem key="ok" title="Task OK">
