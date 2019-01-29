@@ -22,6 +22,7 @@ import LabelsPage from './pages/Labels'
 import NodesPage from './pages/Nodes'
 import BuildPage from './pages/Build'
 import BuildsPage from './pages/Builds'
+import ConfigPage from './pages/Config'
 import ConfigErrorsPage from './pages/ConfigErrors'
 import TenantsPage from './pages/Tenants'
 import StreamPage from './pages/Stream'
@@ -60,6 +61,11 @@ const routes = () => [
     title: 'Builds',
     to: '/builds',
     component: BuildsPage
+  },
+  {
+    title: 'Config',
+    to: '/config',
+    component: ConfigPage
   },
   {
     to: '/status/change/:changeId',
