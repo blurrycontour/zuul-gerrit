@@ -58,7 +58,9 @@ class TestGithubDriver(ZuulTestCase):
         self.assertEqual('master', zuulvars['branch'])
         self.assertEquals('https://github.com/org/project/pull/1',
                           zuulvars['items'][0]['change_url'])
-        self.assertEqual(zuulvars["message"], "A\n\n{}".format(body))
+        self.assertEqual(zuulvars["message"], "{{% raw %}}"
+                                              "A\n\n{}"
+                                              "{{% endraw %}}".format(body))
         self.assertEqual(1, len(A.comments))
         self.assertThat(
             A.comments[0],
