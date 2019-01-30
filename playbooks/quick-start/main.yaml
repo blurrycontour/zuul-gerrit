@@ -143,7 +143,7 @@
       git config gitreview.username 'user'
       mv zuul.yaml .zuul.yaml
       git add .zuul.yaml playbooks
-      git commit -m "Add test Zuul job"
+      git commit -m "Add test Zuul job with some {{ jinja2 }} {% stuff %}"
       git review
 - name: Query open changes
   uri:
