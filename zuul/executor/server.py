@@ -1660,7 +1660,8 @@ class AnsibleJob(object):
 
         with open(self.jobdir.inventory, 'w') as inventory_yaml:
             inventory_yaml.write(
-                yaml.safe_dump(inventory, default_flow_style=False))
+                yaml.safe_dump(inventory, default_flow_style=False).replace(
+                    '{{', "{{ '{{' }}").replace('}}', "{{ '}}' }}"))
 
         with open(self.jobdir.known_hosts, 'w') as known_hosts:
             for node in nodes:
