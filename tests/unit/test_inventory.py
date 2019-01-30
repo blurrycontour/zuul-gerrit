@@ -16,6 +16,7 @@ import os
 
 import yaml
 
+from tests.base import AnsibleZuulTestCase
 from tests.base import ZuulTestCase
 
 
@@ -60,7 +61,7 @@ class TestInventory(TestInventoryBase):
         self.assertIn('src_root', z_vars['executor'])
         self.assertIn('job', z_vars)
         self.assertEqual(z_vars['job'], 'single-inventory')
-        self.assertEqual(z_vars['message'], 'A')
+        self.assertEqual(z_vars['message'], '{% raw %}A{% endraw %}')
 
         self.executor_server.release()
         self.waitUntilSettled()
@@ -163,10 +164,51 @@ class TestInventory(TestInventoryBase):
         self.waitUntilSettled()
 
 
+class TestAnsibleInventory(AnsibleZuulTestCase):
+
+    tenant_config_file = 'config/inventory/main.yaml'
+
+    def _get_file(self, build, path):
+        p = os.path.join(build.jobdir.root, path)
+        with open(p) as f:
+            return f.read()
+
+    def test_jinja2_message_inventory(self):
+
+        # This test runs a bit long and needs extra time.
+        self.wait_timeout = 120
+        # Keep the jobdir around to check inventory
+        self.executor_server.keep_jobdir = True
+        # Output extra ansible info so we might see errors.
+        self.executor_server.verbose = True
+        expected_message = "This message has {{ jinja2 }} in it "
+        A = self.fake_gerrit.addFakeChange(
+            'org/project2', 'master', expected_message)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='jinja2-message', result='SUCCESS', changes='1,1')])
+
+        build = self.history[0]
+        inv_path = os.path.join(build.jobdir.root, 'ansible', 'inventory.yaml')
+        inventory = yaml.safe_load(open(inv_path, 'r'))
+
+        self.assertEqual(
+            inventory['all']['vars']['zuul']['message'],
+            "{% raw %}" + expected_message + "{% endraw %}")
+
+
+        obtained_message = (self._get_file(self.history[0],
+                                  'work/logs/commit-message.txt'))
+
+        self.assertEqual(obtained_message, expected_message)
+
+
 class TestWindowsInventory(TestInventoryBase):
     config_file = 'zuul-winrm.conf'
 
     def test_windows_inventory(self):
+
         inventory = self._get_build_inventory('hostvars-inventory')
         windows_host = inventory['all']['hosts']['windows']
         self.assertEqual(windows_host['ansible_connection'], 'winrm')
