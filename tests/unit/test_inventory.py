@@ -16,6 +16,7 @@ import os
 
 import yaml
 
+from tests.base import AnsibleZuulTestCase
 from tests.base import ZuulTestCase
 
 
@@ -23,10 +24,9 @@ class TestInventoryBase(ZuulTestCase):
 
     tenant_config_file = 'config/inventory/main.yaml'
 
-    def setUp(self):
-        super(TestInventoryBase, self).setUp()
+    def _add_change(self, message="A"):
         self.executor_server.hold_jobs_in_build = True
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', message)
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
@@ -46,6 +46,8 @@ class TestInventory(TestInventoryBase):
 
     def test_single_inventory(self):
 
+        self._add_change()
+
         inventory = self._get_build_inventory('single-inventory')
 
         all_nodes = ('ubuntu-xenial',)
@@ -60,12 +62,14 @@ class TestInventory(TestInventoryBase):
         self.assertIn('src_root', z_vars['executor'])
         self.assertIn('job', z_vars)
         self.assertEqual(z_vars['job'], 'single-inventory')
-        self.assertEqual(z_vars['message'], 'A')
+        self.assertEqual(z_vars['message'], '{% raw %}A{% endraw %}')
 
         self.executor_server.release()
         self.waitUntilSettled()
 
     def test_single_inventory_list(self):
+
+        self._add_change()
 
         inventory = self._get_build_inventory('single-inventory-list')
 
@@ -86,6 +90,8 @@ class TestInventory(TestInventoryBase):
         self.waitUntilSettled()
 
     def test_group_inventory(self):
+
+        self._add_change()
 
         inventory = self._get_build_inventory('group-inventory')
 
@@ -112,6 +118,8 @@ class TestInventory(TestInventoryBase):
         self.waitUntilSettled()
 
     def test_hostvars_inventory(self):
+
+        self._add_change()
 
         inventory = self._get_build_inventory('hostvars-inventory')
 
@@ -144,6 +152,8 @@ class TestInventory(TestInventoryBase):
 
     def test_setup_inventory(self):
 
+        self._add_change()
+
         setup_inventory = self._get_setup_inventory('hostvars-inventory')
         inventory = self._get_build_inventory('hostvars-inventory')
 
@@ -163,10 +173,41 @@ class TestInventory(TestInventoryBase):
         self.waitUntilSettled()
 
 
+class TestAnsibleInventory(AnsibleZuulTestCase):
+
+    tenant_config_file = 'config/inventory/main.yaml'
+
+    def test_jinja2_message_inventory(self):
+
+        # This test runs a bit long and needs extra time.
+        self.wait_timeout = 120
+        # Keep the jobdir around to check inventory
+        self.executor_server.keep_jobdir = True
+        # Output extra ansible info so we might see errors.
+        self.executor_server.verbose = True
+
+        A = self.fake_gerrit.addFakeChange(
+            'org/project', 'master', "This message has {{ jinja2 }} in it ")
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        build = self.history[0]
+        inv_path = os.path.join(build.jobdir.root, 'ansible', 'inventory.yaml')
+        inventory = yaml.safe_load(open(inv_path, 'r'))
+
+        self.assertEqual(
+            inventory['all']['vars']['zuul']['message'],
+            "{% raw %}This message has "
+            "{{ jinja2 }} in it {% endraw %}")
+
+
 class TestWindowsInventory(TestInventoryBase):
     config_file = 'zuul-winrm.conf'
 
     def test_windows_inventory(self):
+
+        self._add_change()
+
         inventory = self._get_build_inventory('hostvars-inventory')
         windows_host = inventory['all']['hosts']['windows']
         self.assertEqual(windows_host['ansible_connection'], 'winrm')
