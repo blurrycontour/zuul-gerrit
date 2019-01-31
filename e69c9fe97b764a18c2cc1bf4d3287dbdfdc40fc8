@@ -51,6 +51,23 @@
       "revId": "e69c9fe97b764a18c2cc1bf4d3287dbdfdc40fc8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_23c4903f",
+        "filename": "zuul/merger/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-01-31T16:10:09Z",
+      "side": 1,
+      "message": "Ok, I get it.",
+      "revId": "e69c9fe97b764a18c2cc1bf4d3287dbdfdc40fc8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
