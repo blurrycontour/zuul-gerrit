@@ -663,6 +663,51 @@ class TestWeb(BaseTestWeb):
         job = self.get_url("api/tenant/tenant-one/job/noop").json()
         self.assertEqual("noop", job[0]["name"])
 
+    def test_freeze_jobs(self):
+        # Test can get a list of the jobs for a given project+pipeline+branch.
+        resp = self.get_url(
+            "api/tenant/tenant-one/pipeline/check"
+            "/project/org/project1/branch/master/freeze-jobs")
+
+        freeze_jobs = [{
+            'name': 'project-merge',
+            'dependencies': [],
+        }, {
+            'name': 'project-test1',
+            'dependencies': ['project-merge'],
+        }, {
+            'name': 'project-test2',
+            'dependencies': ['project-merge'],
+        }, {
+            'name': 'project1-project2-integration',
+            'dependencies': ['project-merge'],
+        }]
+        self.assertEqual(freeze_jobs, resp.json())
+
+    def test_freeze_jobs_set_includes_all_jobs(self):
+        # When freezing a job set we want to include all jobs even if they
+        # have certain matcher requirements (such as required files) since we
+        # can't otherwise evaluate them.
+
+        resp = self.get_url(
+            "api/tenant/tenant-one/pipeline/gate"
+            "/project/org/project/branch/master/freeze-jobs")
+        expected = {
+            'name': 'project-testfile',
+            'dependencies': ['project-merge'],
+        }
+        self.assertIn(expected, resp.json())
+
+
+class TestWebSecrets(BaseTestWeb):
+    tenant_config_file = 'config/secrets/main.yaml'
+
+    def test_web_find_job_secret(self):
+        data = self.get_url('api/tenant/tenant-one/job/project1-secret').json()
+        run = data[0]['run']
+        secret = {'name': 'project1_secret', 'alias': 'secret_name'}
+        self.assertEqual([secret], run[0]['secrets'])
+
 
 class TestWebSecrets(BaseTestWeb):
     tenant_config_file = 'config/secrets/main.yaml'
