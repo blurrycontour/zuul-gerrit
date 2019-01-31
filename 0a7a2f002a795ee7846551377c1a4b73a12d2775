@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_0395cc32",
+        "filename": "web/src/actions/build.js",
+        "patchSetId": 3
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-01-31T16:07:46Z",
+      "side": 1,
+      "message": "The removal of stats.failures is showing a problem with checking the return code here.  Previously, we would only look for tasks with non-zero return codes if there was a failure.  Now we always do.  But sometimes there are legitimate non-zero return codes which aren\u0027t failures.  For example:\n\nhttp://logs.openstack.org/97/633697/3/check/zuul-build-dashboard/4460c4a/npm/html/build/ce79c722944448be9ddd739b84af494d\n\nThis makes the play summary very confusing, as it looks like it just pulled out two tasks at random.  Should we just not check the return code, and only test for .failed?",
+      "revId": "0a7a2f002a795ee7846551377c1a4b73a12d2775",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_43719443",
+        "filename": "web/src/containers/build/BuildRoles.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-01-31T16:07:46Z",
+      "side": 1,
+      "message": ".list-view-gp-main-info sets padding-bottom and padding-top to 20px, which, for a long list of items, makes it a bit hard to read.  For this list (not everywhere, I don\u0027t mind it for the play summary) is there a way to reduce that?  2px looks nice.\n\nhttp://logs.openstack.org/97/633697/3/check/zuul-build-dashboard/4460c4a/npm/html/build/ce79c722944448be9ddd739b84af494d  is an example of a long list of roles.",
+      "revId": "0a7a2f002a795ee7846551377c1a4b73a12d2775",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}

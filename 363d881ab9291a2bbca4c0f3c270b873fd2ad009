@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_e391a848",
+        "filename": "web/src/actions/build.js",
+        "patchSetId": 3
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-01-31T16:07:46Z",
+      "side": 0,
+      "message": "The removal of this line is showing a problem with the failure detection (see next comment).",
+      "revId": "363d881ab9291a2bbca4c0f3c270b873fd2ad009",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
