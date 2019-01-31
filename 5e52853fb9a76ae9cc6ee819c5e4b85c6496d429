@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_18069721",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1664,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-01-31T15:51:15Z",
+      "side": 1,
+      "message": "We can\u0027t escape everything.  The vars hierarchy is full of intentional jinja.  Escape only the message in zuul/executor/client.py",
+      "revId": "5e52853fb9a76ae9cc6ee819c5e4b85c6496d429",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
