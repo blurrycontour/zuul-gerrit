@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "9fdfeff1_63437843",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1589,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-31T15:55:01Z",
+      "side": 1,
+      "message": "It\u0027s used here",
+      "revId": "e69c9fe97b764a18c2cc1bf4d3287dbdfdc40fc8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fdfeff1_5862df0b",
         "filename": "zuul/merger/client.py",
         "patchSetId": 2
@@ -13,6 +30,24 @@
       "writtenOn": "2019-01-31T15:49:39Z",
       "side": 1,
       "message": "Where is this used?",
+      "revId": "e69c9fe97b764a18c2cc1bf4d3287dbdfdc40fc8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_83677ce9",
+        "filename": "zuul/merger/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-01-31T15:55:01Z",
+      "side": 1,
+      "message": "See the inline comment in the config loader. But maybe a different place to plumb this through to the config loader is better suited?",
+      "parentUuid": "9fdfeff1_5862df0b",
       "revId": "e69c9fe97b764a18c2cc1bf4d3287dbdfdc40fc8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
