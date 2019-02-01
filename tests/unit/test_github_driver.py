@@ -28,6 +28,8 @@ import zuul.rpcclient
 
 from tests.base import BaseTestCase, ZuulTestCase, simple_layout, random_sha1
 from tests.base import ZuulWebFixture
+from tests.fakegithub import FakeGithubOrganization, FakeGithubTeam,\
+    FakeGithubCollaborator
 
 
 class TestGithubDriver(ZuulTestCase):
@@ -927,6 +929,8 @@ class TestGithubDriver(ZuulTestCase):
         github._data.required_contexts[('org/project', 'master')] = [
             'tenant-one/check',
             'tenant-one/gate']
+        github._data.repos[('org', 'project')]._set_branch_protection(
+            'master', True)
 
         A = self.fake_github.openFakePullRequest('org/project', 'master', 'A')
         self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
@@ -1398,3 +1402,275 @@ class TestGithubShaCache(BaseTestCase):
         }
         cache.update('foo/bar', pr_dict)
         self.assertEqual(cache.get('foo/bar', '123456'), set({1}))
+
+
+class TestCodeownersParsing(ZuulTestCase):
+    config_file = 'zuul-github-driver.conf'
+    tenant_config_file = 'config/codeowners/main.yaml'
+
+    @staticmethod
+    def _generate_team_event(org, team, action, repo, permission):
+        result = ('team', {
+            'action': action,
+            'repository': {
+                'name': repo,
+                'owner': {
+                    'login': org
+                }
+            },
+            'team': {
+                'name': team
+            },
+            'organization': {
+                'login': org
+            }
+        })
+
+        if permission is not None:
+            result[1]['team']['permission'] = permission
+
+        return result
+
+    @staticmethod
+    def _generate_membership_event(org, team, action, user):
+        return ('membership', {
+            'action': action,
+            'member': {
+                'login': user
+            },
+            'team': {
+                'name': team
+            },
+            'organization': {
+                'login': org
+            }
+        })
+
+    def setUp(self):
+        super(TestCodeownersParsing, self).setUp()
+        testteam1 = FakeGithubTeam('team1', {'mhosch'}, permission='push')
+        testteam2 = FakeGithubTeam('team2', {'tobiash'}, permission='push')
+        testteam3 = FakeGithubTeam('team3', {'swestphahl'}, permission='pull')
+        testteam4 = FakeGithubTeam('team4', {'goofy'}, permission='admin')
+        testteam5 = FakeGithubTeam('team5', {'barf'}, permission='pull')
+        teams = [testteam1, testteam2, testteam3, testteam4]
+
+        ghuser = FakeGithubCollaborator('ghuser',
+                                        permissions={
+                                            'pull': True,
+                                            'admin': False,
+                                            'push': True})
+        somebodyelse = FakeGithubCollaborator('somebodyelse',
+                                              permissions={
+                                                  'pull': True,
+                                                  'admin': False,
+                                                  'push': True})
+        reader = FakeGithubCollaborator('reader',
+                                        permissions={'pull': True,
+                                                     'admin': False,
+                                                     'push': False})
+        collaborators = [ghuser, reader, somebodyelse]
+
+        github = self.fake_github
+        testorg = FakeGithubOrganization(teams + [testteam5])
+        github.github_data.organizations['org'] = testorg
+        client = self.fake_github.getGithubClient('org/project1')
+        repo = client.repository('org', 'project1')
+        repo._set_branch_protection('master',
+                                    True,
+                                    require_codeowners=True)
+        repo._teams = teams
+        repo._collaborators = collaborators
+
+    def _test_pipeline_with_codeowners(self, files, reviews, is_gated):
+        github = self.fake_github
+        self.history.clear()
+        A = github.openFakePullRequest(
+            'org/project1', 'master', 'A', files=files)
+        for user in reviews:
+            A.addReview(user, 'APPROVED')
+        github.emitEvent(A.getReviewAddedEvent('approve'))
+        self.waitUntilSettled()
+        self.assertEqual(1 if is_gated else 0, len(self.history))
+
+    def test_review_from_codeowner(self):
+        self._test_pipeline_with_codeowners(
+            {'some_file.cpp': 'int main() {}'}, ['ghuser'], True)
+
+    def test_review_from_codeowner_using_mail(self):
+        self._test_pipeline_with_codeowners(
+            {'test.py': '# just a comment'}, ['ghuser'], True)
+
+    def test_review_from_non_codeowner_using_mail(self):
+        self._test_pipeline_with_codeowners(
+            {'test.py': '# just a comment'}, ['somebodyelse'], False)
+
+    def test_review_from_team_member(self):
+        self._test_pipeline_with_codeowners(
+            {'test.yaml': 'stuff'}, ['tobiash'], True)
+
+    def test_review_from_admin_team_member(self):
+        self._test_pipeline_with_codeowners(
+            {'in/a/subdir/test.js': 'stuff'}, ['goofy'], True)
+
+    def test_review_from_ex_team_member(self):
+        self._test_pipeline_with_codeowners(
+            {'test.yaml': 'stuff'}, ['tobiash'], True)
+
+        self.fake_github.emitEvent(self._generate_membership_event('org',
+                                                                   'team2',
+                                                                   'removed',
+                                                                   'tobiash'))
+        self.waitUntilSettled()
+
+        self._test_pipeline_with_codeowners(
+            {'test.yaml': 'stuff'}, ['tobiash'], False)
+
+    def test_review_from_wrong_team_member(self):
+        self._test_pipeline_with_codeowners(
+            {'test.yaml': 'stuff'}, ['mhosch'], False)
+
+    def test_review_from_team_member_after_granting_access(self):
+        self._test_pipeline_with_codeowners(
+            {'test.yaml': 'stuff'}, ['mhosch'], False)
+
+        self.fake_github.emitEvent(
+            self._generate_membership_event('org', 'team2', 'added', 'mhosch'))
+
+        self.waitUntilSettled()
+
+        self._test_pipeline_with_codeowners(
+            {'test.yaml': 'stuff'}, ['mhosch'], True)
+
+    def test_review_from_team_member_after_removing_repo(self):
+        self._test_pipeline_with_codeowners(
+            {'test.php': 'stuff'}, ['tobiash'], True)
+
+        self.fake_github.emitEvent(
+            self._generate_team_event('org',
+                                      'team2',
+                                      'removed_from_repository',
+                                      'project1',
+                                      'push'))
+        self.waitUntilSettled()
+
+        self._test_pipeline_with_codeowners(
+            {'test.php': 'stuff'}, ['tobiash'], False)
+
+    def test_review_from_team_member_after_deleting_team(self):
+        self._test_pipeline_with_codeowners(
+            {'test.php': 'stuff'}, ['tobiash'], True)
+
+        self.fake_github.emitEvent(
+            self._generate_team_event('org',
+                                      'team2',
+                                      'deleted',
+                                      'project1',
+                                      'push'))
+
+        self.waitUntilSettled()
+
+        self._test_pipeline_with_codeowners(
+            {'test.php': 'stuff'}, ['tobiash'], False)
+
+    def test_review_from_non_codeowner(self):
+        self._test_pipeline_with_codeowners(
+            {'some_file.c': 'int main() {}'}, ['someone'], False)
+
+    def test_review_from_codeowner_without_write_permission(self):
+        """
+        We do have a codeowner. However, this codeowner lacks write
+        permissions, so his verdict isn't actually enforced by GitHub.
+        """
+        self._test_pipeline_with_codeowners(
+            {'some_file.c': 'int main() {}'}, ['reader'], False)
+
+    def test_review_from_team_member_without_write_permission(self):
+        """
+        The team in codeowners doesn't have write permissions, so a verdict
+        should not be considered.
+        """
+        self._test_pipeline_with_codeowners(
+            {'main.rs': 'stuff'}, ['swestphahl'], False)
+
+    def test_review_from_team_member_after_granting_permission(self):
+        self._test_pipeline_with_codeowners(
+            {'main.rs': 'stuff'}, ['swestphahl'], False)
+
+        self.fake_github.emitEvent(self._generate_team_event('org',
+                                                             'team3',
+                                                             'edited',
+                                                             'project1',
+                                                             'push'))
+
+        self.waitUntilSettled()
+
+        self._test_pipeline_with_codeowners(
+            {'main.rs': 'stuff'}, ['swestphahl'], True)
+
+    def test_multiple_codeowners_change(self):
+        self._test_pipeline_with_codeowners(
+            {'main.rs': 'stuff', 'test.yaml': '- project'},
+            ['mhosch', 'tobiash'], True)
+
+    def test_multiple_codeowners_change_one_missing(self):
+        self._test_pipeline_with_codeowners(
+            {'main.rs': 'stuff', 'test.yaml': '- project'}, ['mhosch'], False)
+
+    def test_multiple_codeowners_change_wrong_team(self):
+        self._test_pipeline_with_codeowners(
+            {'main.rs': 'stuff', 'test.yaml': '- project'},
+            ['swestphahl'], False)
+
+    def test_codeowners_matching(self):
+        github = self.fake_github
+        codeowners = github._getCodeowners('org/project1', 'master')
+
+        reviewers = codeowners.getReviewersForFiles({'zuul.yaml'})
+        self.assertEqual(reviewers, [['@org/team2', '@org/team3']])
+
+        reviewers = codeowners.getReviewersForFiles({'somethingelse.txt'})
+        self.assertEqual(reviewers, [['@org/team2', '@ghuser']])
+
+    def test_cache_consistency_after_revoking_repo_access(self):
+        # This will be true as the team that is listed in CODEOWNERS doesn't
+        # have access (yet)
+        self._test_pipeline_with_codeowners(
+            {'test.js': 'stuff'}, ['barf'], True)
+
+        github = self.fake_github.getGithubClient('org/project1')
+        repo = github.repository('org', 'project1')
+        repo._teams.append(FakeGithubTeam('team5', {'barf'},
+                                          permission='push'))
+        self.fake_github.emitEvent(self._generate_team_event(
+            'org', 'team5', 'added_to_repository', 'project1', 'push'))
+
+        self.waitUntilSettled()
+
+        self._test_pipeline_with_codeowners(
+            {'test.js': 'stuff'}, ['barf'], True)
+
+    def test_codeowners_verification(self):
+        github = self.fake_github
+        review1 = [{
+            'by': {
+                'username': 'tobiash',
+                'email': 'tobiash@example.com'
+            },
+            'type': 'APPROVED'
+        }]
+
+        review2 = [{
+            'by': {
+                'username': 'mhosch',
+                'email': 'mhosch@example.com'
+            },
+            'type': 'APPROVED'
+        }]
+
+        self.assertEqual(True,
+                         github._hasCodeownersReview('org/project1', 'master',
+                                                     ['zuul.yaml'], review1))
+        self.assertEqual(False,
+                         github._hasCodeownersReview('org/project1', 'master',
+                                                     ['zuul.yaml'], review2))
