@@ -9,3 +9,4 @@ PyMySQL
 psycopg2-binary
 mypy<0.650
 beautifulsoup4
+graphene
