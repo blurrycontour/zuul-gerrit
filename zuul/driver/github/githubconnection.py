@@ -12,17 +12,25 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import collections
 import concurrent.futures
 import datetime
 import logging
 import hmac
 import hashlib
 import queue
+import textwrap
 import threading
 import time
 import re
 import json
+from collections import defaultdict
+
+import re2
+from pathspec.patterns import GitWildMatchPattern
+from typing import List, Set, Optional, Iterator, AbstractSet, FrozenSet, \
+    Dict, Union, Iterable, Tuple
+from abc import abstractmethod
+import collections.abc
 
 import cherrypy
 import cachecontrol
@@ -45,6 +53,143 @@ from zuul.driver.github.githubmodel import PullRequest, GithubTriggerEvent
 
 GITHUB_BASE_URL = 'https://api.github.com'
 PREVIEW_JSON_ACCEPT = 'application/vnd.github.machine-man-preview+json'
+CODEOWNER_LOCATIONS = ['.github/CODEOWNERS',
+                       'docs/CODEOWNERS',
+                       'CODEOWNERS']
+
+
+def nested_get(d, *keys, default=None):
+    temp = d
+    for key in keys[:-1]:
+        temp = temp.get(key, {})
+    return temp.get(keys[-1], default)
+
+
+class Codeowners(object):
+    """
+    Represents a set of parsed CODEWONERS files.
+
+    GitHub CODEOWNERS are .gitignore lookalikes and follow the same matching
+    rules like .gitignore, adding a list of reviewers that are entitled to
+    give authoritative reviews on a set of files.
+    """
+    log = logging.getLogger("zuul.GithubConnection.Codeowners")
+
+    def __init__(self):
+        self.rules = list()
+
+    def parseFile(self, file: str, event):
+        """
+        Parses one file and appends the rules to the end
+
+        Since the rules are appended to the ruleset, they take precedence over
+        rules that are already present in the ruleset of a Codeowners instance.
+
+        :param file: File contents that shall be parsed
+        """
+        log = get_annotated_logger(self.log, event)
+        for line in file.splitlines():
+            content, _, _ = line.partition('#')
+            content = content.strip()
+            if len(content) == 0:
+                continue
+
+            [glob, *reviewers] = line.split()
+            if len(reviewers) == 0:
+                log.warning('Missing reviewers in CODEOWNERS')
+                continue
+
+            regex, action = GitWildMatchPattern.pattern_to_regex(glob)
+            if action is not None:
+                if not action:
+                    log.warning('Excluding patterns is not supported by '
+                                'CODEOWNERS, dropping that rule')
+                else:
+                    self.rules.append((line, re2.compile(regex), reviewers))
+            else:
+                log.warning('Ignoring CODEOWNERS rule %s', glob)
+
+    def getReviewersForFiles(self, files: Set[str]) \
+            -> List[Tuple[str, List[str]]]:
+        """
+        Returns a list of reviewers for a set of files.
+
+        The method will scan through the rules and check if there are matching
+        files. If yes, it will add the reviewers for the matching file group
+        to the list of reviewer groups and it will remove these files from the
+        list of files that need to be considered for rules to come as only the
+        first rule that matches (== the last matching rule within a CODEOWNERS
+        file) is evaluated. The result is a list of tuples, each entry
+        representing the rule with a list of people that are entitled to review
+        a part of the PR.
+
+        :param files: Files that are under review
+        :return: List of reviewers needed for the set of files
+                 (teams or people)
+        """
+        result = list()
+
+        for line, regex, reviewers in reversed(self.rules):
+            files_matching_rule = list()
+            for file in files:
+                if regex.match(file) is not None:
+                    files_matching_rule.append(file)
+            if len(files_matching_rule) > 0:
+                files = files.difference(files_matching_rule)
+                result.append((line, reviewers))
+            if len(files) == 0:
+                break
+
+        return result
+
+
+class Privileged(collections.abc.Set):
+    """
+    Represents an abstract, lazy-initialized set of entities that are able
+    to give a verdict to a review.
+    """
+
+    def __contains__(self, x: object) -> bool:
+        return x in self.privileged
+
+    def __len__(self) -> int:
+        return len(self.privileged)
+
+    def __iter__(self) -> Iterator[str]:
+        return iter(self.privileged)
+
+    @property
+    @abstractmethod
+    def privileged(self) -> AbstractSet[str]:
+        """
+        Initialized set of names of entities that are allowed to give a review.
+
+        :return: Set of strings that represent the login names.
+        """
+        raise NotImplementedError()
+
+
+class PrivilegedUsers(Privileged):
+    """
+    Lazy-initialized set of privileged users.
+    """
+
+    def __init__(self, connection, org, repo):
+        self._org = org
+        self._repo = repo
+        self._connection = connection  # type: GithubConnection
+        self._privileged_users = None  # type: Optional[FrozenSet[str]]
+
+    @property
+    def privileged(self) -> FrozenSet[str]:
+        collaborators = self._connection.getCollaboratorsForRepo(self._org,
+                                                                 self._repo)
+        if self._privileged_users is None:
+            self._privileged_users = frozenset(
+                user.login for user in collaborators
+                if (user.permissions['push'] or
+                    user.permissions['admin']))
+        return self._privileged_users
 
 
 def _sign_request(body, secret):
@@ -445,6 +590,8 @@ class GithubEventProcessor(object):
         if event.newrev == '0' * 40:
             event.branch_deleted = True
 
+        self._clearCodeownersCache(event)
+
         if event.branch:
             project = self.connection.source.getProject(event.project_name)
             if event.branch_deleted:
@@ -549,6 +696,43 @@ class GithubEventProcessor(object):
         event.status = "%s:%s:%s" % _status_as_tuple(self.body)
         return event
 
+    def _event_team(self):
+        action = self.body['action']
+
+        if action in {'edited', 'added_to_repository',
+                      'removed_from_repository'}:
+            repository = self.body['repository']
+            project = '%s/%s' % (repository['owner']['login'],
+                                 repository['name'])
+
+            # In case of an update just clear out the cache for that repo. It
+            # will be repopulated at the next usage.
+            self.log.debug('Clearing repo access for project %s', project)
+            self.connection.clearRepoAccess(project)
+        elif action == 'deleted':
+            team = '%s/%s' % (self.body['organization']['login'],
+                              self.body['team']['slug'])
+            self.log.debug('Deleting team %s from access cache', team)
+            self.connection.revokeRepoAccess(self.body['team']['slug'])
+
+        # We never schedule such an event since it was already processed inline
+        return None
+
+    def _event_membership(self):
+        action = self.body.get('action')
+        team = '%s/%s' % (self.body['organization']['login'],
+                          self.body['team']['slug'])
+        user = self.body['member']['login']
+        if action == 'added':
+            self.connection.updateTeamMembership(team, user, True)
+        elif action == 'removed':
+            self.connection.updateTeamMembership(team, user, False)
+        else:
+            self.log.warning('Unknown team membership action ' + action)
+
+        # We never schedule such an event since it was already processed inline
+        return None
+
     def _issue_to_pull_request(self, body):
         number = body.get('issue').get('number')
         project_name = body.get('repository').get('full_name')
@@ -588,6 +772,11 @@ class GithubEventProcessor(object):
             user = self.connection.getUser(login, project)
             self.log.debug("Got user %s", user)
             return user
+
+    def _clearCodeownersCache(self, event: GithubTriggerEvent):
+        if event.ref.startswith('refs/heads/'):
+            branch = event.ref[len('refs/heads/'):]
+            self.connection.clearCodeownersCache(event.project_name, branch)
 
 
 class GithubEventConnector:
@@ -686,6 +875,27 @@ class GithubUser(collections.Mapping):
             }
 
 
+class CachedGithubTeam(object):
+    def __init__(self, org: str, slug: str, members: Iterable[str]):
+        self.org = org
+        self.slug = slug
+        self._members = set(members)
+        self.ttl = time.time() + (15 * 60)  # 15 minutes time to live
+
+    def is_member(self, name: str) -> bool:
+        return name in self._members
+
+    def members(self) -> Set[str]:
+        return self._members
+
+    def add_member(self, username: str):
+        self._members.add(username)
+
+    def remove_member(self, username: str):
+        if username in self._members:
+            self._members.remove(username)
+
+
 class GithubConnection(BaseConnection):
     driver_name = 'github'
     log = logging.getLogger("zuul.GithubConnection")
@@ -706,6 +916,12 @@ class GithubConnection(BaseConnection):
         self.source = driver.getSource(self)
         self.event_queue = queue.Queue()
         self._sha_pr_cache = GithubShaCache()
+        self._codeowners_cache = {}
+        self._team_cache = {}  # type: Dict[str, CachedGithubTeam]
+
+        # This caches on a per-project basis which team has what access level
+        # e.g. {'org/project':{'org/team2': 'push'}}
+        self._repo_access_cache = defaultdict(dict)
 
         self._request_locks = {}
         self.max_threads_per_installation = int(self.connection_config.get(
@@ -719,8 +935,10 @@ class GithubConnection(BaseConnection):
             self._log_rate_limit = False
 
         if self.server == 'github.com':
+            self.api_base_url = GITHUB_BASE_URL
             self.base_url = GITHUB_BASE_URL
         else:
+            self.api_base_url = 'https://%s/api' % self.server
             self.base_url = 'https://%s/api/v3' % self.server
 
         # ssl verification must default to true
@@ -1252,6 +1470,263 @@ class GithubConnection(BaseConnection):
 
         return change
 
+    def _fetchFileFromGithub(self,
+                             project: str,
+                             branch: str,
+                             path: str,
+                             event) -> Optional[bytes]:
+        github = self.getGithubClient(project, zuul_event_id=event)
+        owner, project = project.split('/')
+        repo = github.repository(owner, project)
+        try:
+            content = repo.file_contents(path, ref=branch)
+            return content.decoded
+        except github3.exceptions.NotFoundError:
+            return None
+
+    def _loadCodeowners(self, project: str, branch: str, event) -> Codeowners:
+        log = get_annotated_logger(self.log, event)
+        codeowners = Codeowners()
+        for location in CODEOWNER_LOCATIONS:
+            log.debug("Loading CODEOWNERS from %s/%s/%s",
+                      project, branch, location)
+            codeownerdata = self._fetchFileFromGithub(
+                project, branch, location, event)
+            if codeownerdata is not None:
+                log.debug("Parsing CODEOWNERS")
+                codeowners.parseFile(codeownerdata.decode(), event)
+
+        return codeowners
+
+    def _getCodeowners(self, project: str, branch: str, event) -> Codeowners:
+        project_branch = project, branch
+        if project_branch not in self._codeowners_cache:
+            self._codeowners_cache[project_branch] =\
+                self._loadCodeowners(project, branch, event)
+        return self._codeowners_cache[project_branch]
+
+    def _fetchGithubTeam(self, project_name, team_slug, event):
+        org, repo = project_name.split('/')
+        github = self.getGithubClient(project_name, event)
+
+        url = github.session.build_url('graphql', base_url=self.api_base_url)
+        template = textwrap.dedent(
+            """
+            {{
+              organization(login: "{org}") {{
+                team(slug: "{team_slug}") {{
+                  members(first:100, {after}) {{
+                    nodes {{
+                      login
+                    }}
+                    pageInfo {{
+                      endCursor
+                      hasNextPage
+                    }}
+                  }}
+                }}
+              }}
+            }}
+            """)
+        has_next_page = True
+        after = ''
+
+        members = []
+
+        while has_next_page:
+            query = template.format(org=org, team_slug=team_slug, after=after)
+            response = github.session.post(url, json={'query': query})
+            data = response.json()
+
+            members_root = nested_get(
+                data, 'data', 'organization', 'team', 'members')
+
+            has_next_page = nested_get(members_root, 'pageInfo', 'hasNextPage')
+            end_cursor = nested_get(members_root, 'pageInfo', 'endCursor')
+            after = 'after: "%s"' % end_cursor
+
+            members.extend([member['login']
+                            for member in nested_get(members_root, 'nodes')])
+        return CachedGithubTeam(org, team_slug, members)
+
+    def _getCachedGithubTeam(self,
+                             project_name: str,
+                             team_name: str,
+                             event) -> CachedGithubTeam:
+        """
+        Returns the cached team for its full name ('org/team').
+        :param project_name: Project context to use if Github has to be queried
+        :param team_name: Full name of the team
+        :return: Cached Github team
+        """
+
+        # This can happen if a team was added to the repo. During event
+        # processing, we will not fetch the team, so we need to update the
+        # cache here.
+        team_org, team_name = team_name.split('/')
+        cached_team_name = '%s/%s' % (team_org, team_name.lower())
+        if cached_team_name not in self._team_cache or \
+                self._team_cache[cached_team_name].ttl < time.time():
+            self.sched.statsd.incr('zuul.cache.githubteams.miss')
+            self.log.debug("Github team %s cache MISS", cached_team_name)
+            self._team_cache[cached_team_name] = self._fetchGithubTeam(
+                project_name, team_name, event)
+        else:
+            self.sched.statsd.incr('zuul.cache.githubteams.hit')
+            self.log.debug("Github team %s cache HIT", cached_team_name)
+        return self._team_cache[cached_team_name]
+
+    def clearCodeownersCache(self, project: str, branch: str):
+        project_branch = project, branch
+        if project_branch in self._codeowners_cache:
+            del self._codeowners_cache[project_branch]
+
+    def _hasCodeownersReview(self,
+                             project_name: str,
+                             base_branch: str,
+                             files: List[str],
+                             reviews: List,
+                             event) -> bool:
+        """
+        Check whether a list of files was reviewed by all code owners
+
+        This function checks whether a merge is possible by checking the list
+        of changed files against the CODEOWNERS file(s) of the base branch.
+        Matches after other matches take precedence.
+        If more than one CODEOWNERS file exists, the precedence is as follows
+        (most important to least important):
+        - CODEOWNERS
+        - docs/CODEOWNERS
+        - .github/CODEOWNERS
+
+        :param base_branch: Target branch of the check. Has to be a project
+        branch.
+        :param files: List of files that shall be checked against CODEOWNERS.
+        :param reviews: List of users that gave reviews for the file set.
+        :return: True if reviews of all people listed in CODEOWNERS are
+        available, False if not or if CODEOWNERS cannot be found.
+        """
+        log = get_annotated_logger(self.log, event)
+        review_users = set(review['by']['username'] for review in reviews)
+        review_emails = dict((review['by']['email'], review['by']['username'])
+                             for review in reviews)
+
+        log.debug('Checking CODEOWNERS reviews')
+
+        org_name, repo_name = project_name.split('/')
+
+        # Get a list of all teams that have write or admin permissions for
+        # this repo. The team names are 'organization local', so no leading '@'
+        # or organization.
+        privileged_users = PrivilegedUsers(self, org_name, repo_name)
+
+        codeowners = self._getCodeowners(project_name, base_branch, event)
+        required_reviews_list = codeowners.getReviewersForFiles(set(files))
+
+        # Go through the list of reviewer groups. Each member of this list is
+        # again a list of people or teams that are obligated to review a subset
+        # of the files that are going to be reviewed.
+        for rule, required_reviews in required_reviews_list:
+            # We start with 'Unknown': If there is no team or person with
+            # appropriate review rights available, the respective file group is
+            # considered reviewed.
+            log.debug('Processing review rule %s', rule)
+            is_reviewed = None
+            for required_review in required_reviews:
+                if required_review.startswith('@'):
+                    if '/' in required_review:
+                        # Team matching in github is case insensitive
+                        full_team_name = required_review[1:]
+                        team_org, team_name = full_team_name.split('/')
+                        team_name = team_name.lower()
+                        full_team_name = '%s/%s' % (team_org, team_name)
+                        # This is a team, so we need to check if at least one
+                        # member of that team is in the list of reviewers.
+                        # First, find the team on GitHub. If the team doesn't
+                        # exist on the org the repo belongs to or if it doesn't
+                        # have write or admin permissions, GitHub (currently?)
+                        # does not enforce code ownership. If we already know
+                        # that this team doesn't contribute, we continue with
+                        # the next possible reviewer.
+                        permission = self.get_project_team_permission(
+                            project_name, team_name)
+                        if (team_org != org_name or
+                                permission not in ['admin', 'push']):
+                            # This is a team without proper permissions, GitHub
+                            # disregards the team. Emit a warning to ease
+                            # debugging in this case.
+                            log.warning('Team %s/%s is requested by '
+                                        'codeowners file but has no proper '
+                                        'permissions on the repo')
+                            continue
+
+                        # Now query GitHub:
+                        log.debug("Checking reviews for team %s/%s",
+                                  team_org, team_name)
+
+                        team = self._getCachedGithubTeam(
+                            project_name, full_team_name, event)
+
+                        # Now check if one of the reviewers is member of
+                        # that team.
+                        for r in review_users:
+                            self.log.debug("Reviewer %s is%s member of %s", r,
+                                           '' if team.is_member(r) else ' NOT',
+                                           full_team_name)
+                        if any(team.is_member(reviewer)
+                               for reviewer in review_users):
+                            is_reviewed = True
+                            log.debug('Valid review from team %s/%s fulfills '
+                                      'rule "%s"', team_org, team_name, rule)
+                            break
+                        else:
+                            log.debug('No valid review from team %s/%s for '
+                                      'rule "%s"', team_org, team_name, rule)
+                            is_reviewed = False
+                    else:
+                        # This is a single user. Strip the leading '@' for the
+                        # comparison.
+                        user = required_review[1:]
+                        if user in privileged_users:
+                            if user in review_users:
+                                log.debug('Valid review from %s fulfills rule '
+                                          '"%s"', user, rule)
+                                is_reviewed = True
+                                break
+                            else:
+                                log.debug('No valid review from %s for rule '
+                                          '"%s"', user, rule)
+                                is_reviewed = False
+                        else:
+                            is_reviewed = False
+                else:
+                    # This is a mail address. Find a user in the reviewer list
+                    # that owns this e-mail.
+                    mail_user = review_emails.get(required_review)
+                    if mail_user is not None:
+                        if (required_review in review_emails and
+                                mail_user in privileged_users):
+                            log.debug('Valid review from %s fulfills rule '
+                                      '"%s"', mail_user, rule)
+                            is_reviewed = True
+                            break
+                        else:
+                            log.debug('No valid review from %s for rule '
+                                      '"%s"', mail_user, rule)
+                            is_reviewed = False
+                    else:
+                        is_reviewed = False
+
+            # If we did find a relevant team or reviewer...
+            if is_reviewed is not None:
+                # ...and if we were unable to find at least one reviewer for
+                # that file group it's over.
+                if not is_reviewed:
+                    log.debug('Change fails CODEOWNERS merge test')
+                    return False
+
+        return True
+
     def getGitUrl(self, project: Project):
         if self.git_ssh_key:
             return 'ssh://git@%s/%s.git' % (self.server, project.name)
@@ -1408,9 +1883,17 @@ class GithubConnection(BaseConnection):
             'required_pull_request_reviews')
         if required_reviews:
             if required_reviews.get('require_code_owner_reviews'):
-                # we need to process the reviews using code owners
-                # TODO(tobiash): not implemented yet
-                pass
+                if change.files is not None:
+                    # we need to process the reviews using code owners
+                    return self._hasCodeownersReview(change.project.name,
+                                                     change.branch,
+                                                     change.files,
+                                                     change.reviews,
+                                                     event)
+                else:
+                    # TODO(maho): This change has more than 300 files, we can't
+                    #             reliably evaluate CODEOWNERS for now.
+                    pass
             else:
                 # we need to process the review using access rights
                 # TODO(tobiash): not implemented yet
@@ -1504,6 +1987,46 @@ class GithubConnection(BaseConnection):
                         reviews[user] = review
 
         return reviews.values()
+
+    def updateTeamMembership(self, team: str, user: str, member: bool):
+        """
+        Add or delete a member from a team.
+
+        :param team: Name of the team that shall be updated.
+        :param user: Name of the team member to add or remove
+        :param member: Tells if the user is a member. If set to False, it will
+                       be removed. If true, it will be added.
+        """
+        cached_team = self._team_cache.get(team.lower())
+        if cached_team is not None:
+            if member:
+                cached_team.add_member(user)
+            else:
+                cached_team.remove_member(user)
+
+    def clearRepoAccess(self, project: str):
+        """
+        Clear permissions for a team on a repo.
+
+        If a team event was received, we have to delete the team permissions
+        on a repository.
+
+        :param project: The project to update
+        """
+        del self._repo_access_cache[project]
+
+    def revokeRepoAccess(self, slug: str):
+        """
+        Revoke access for a team from all cached repositories
+
+        This is necessary if a team was deleted. In this case, we
+        remove the user from all repositories in the cache.
+
+        :param team: Team that has been deleted
+        """
+        for repo_access in self._repo_access_cache.values():
+            if slug in repo_access:
+                del repo_access[slug]
 
     def _getBranchProtection(self, project_name: str, branch: str,
                              zuul_event_id=None):
@@ -1751,6 +2274,159 @@ class GithubConnection(BaseConnection):
             except KeyError:
                 pass
             return
+
+    def _query_project_team_permission(self,
+                                       project,
+                                       team_slug,
+                                       team_cursor,
+                                       repository_cursor):
+        github = self.getGithubClient(project)
+        organization, repository = project.split('/')
+        url = github.session.build_url('graphql', base_url=self.api_base_url)
+        if team_cursor is None:
+            team_after = ""
+        else:
+            team_after = "after: \"%s\"" % team_cursor
+        if repository_cursor is None:
+            repository_after = ""
+        else:
+            repository_after = "after: \"%s\"" % repository_cursor
+        # Note: We use GraphQL here because the sub team handling using the
+        # REST api is buggy and returns wrong results in some cases.
+        template = textwrap.dedent(
+            """
+                query {{
+                  organization(login: "{org}") {{
+                    teams(query: "{team}", first: 100, {team_after}) {{
+                      totalCount
+                      pageInfo {{
+                        endCursor
+                        hasNextPage
+                      }}
+                      edges {{
+                        node {{
+                          slug
+                          repositories(query: "{repo}", first: 100,
+                                       {repo_after}) {{
+                            totalCount
+                            pageInfo {{
+                              endCursor
+                              hasNextPage
+                            }}
+                            edges {{
+                              node {{
+                                name
+                              }}
+                              permission
+                            }}
+                          }}
+                        }}
+                      }}
+                    }}
+                  }}
+                }}""")
+        query = template.format(org=organization, repo=repository,
+                                team=team_slug, team_after=team_after,
+                                repo_after=repository_after)
+        response = github.session.post(url, json={'query': query})
+        return response.json()
+
+    def _process_project_team_permission(self, project, team_slug, team_cursor,
+                                         repository_cursor):
+        response = self._query_project_team_permission(
+            project, team_slug, team_cursor, repository_cursor)
+
+        teams = nested_get(response, 'data', 'organization', 'teams', 'edges',
+                           default=[])
+
+        for team in teams:
+            team_name = nested_get(team, 'node', 'slug')
+            team_repositories = nested_get(
+                team, 'node', 'repositories', 'edges', default=[])
+
+            if team_name:
+                for team_repository in team_repositories:
+                    repository_name = nested_get(
+                        team_repository, 'node', 'name')
+                    if repository_name is not None:
+                        if team_repository.get('permission') == 'ADMIN':
+                            perm = 'admin'
+                        elif team_repository.get('permission') == 'WRITE':
+                            perm = 'push'
+                        elif team_repository.get('permission') == 'READ':
+                            perm = 'pull'
+                        else:
+                            perm = 'none'
+                        self._repo_access_cache[project][team_name] = perm
+
+                # Since query in "repositories(...)" is matching substrings so
+                # multiple hits may occur. The maximum number of items in a
+                # result is 100. There may be a theoretical case that a
+                # *complete* repository name may be a substring of
+                # more than 100 other repository name.
+                # E.g.:
+                # - repository-name
+                # - repository-name-a
+                # - repository-name-1
+                # - ...
+                # - repository-name-101
+                page_info = nested_get(
+                    team, 'node', 'repositories', 'pageInfo', default={})
+
+                if page_info.get('hasNextPage', False):
+                    cursor = page_info.get('endCursor')
+                    if cursor is not None:
+                        self._process_project_team_permission(
+                            project, team_slug, team_cursor, cursor)
+
+        # Since query in "teams(...)" is matching substrings so multiple hits
+        # may occur. The maximum number of items in a result is 100. There may
+        # be a theoretical case that a *complete* team name may be a substring
+        # of more than 100 other team (or repository respectively) name.
+        # E.g.:
+        # - team-name
+        # - team-name-a
+        # - team-name-1
+        # - ...
+        # - team-name-101
+        page_info = nested_get(response, 'data', 'organization', 'teams',
+                               'pageInfo', default={})
+
+        if page_info.get('hasNextPage', False):
+            cursor = page_info.get('endCursor')
+            if cursor is not None:
+                self._process_project_team_permission(
+                    project, team_slug, cursor, repository_cursor)
+
+    def get_project_team_permission(self, project_name, team_slug):
+        if team_slug not in self._repo_access_cache[project_name]:
+            self._repo_access_cache[project_name][team_slug] = 'none'
+            self._process_project_team_permission(
+                project_name, team_slug, None, None)
+
+        return self._repo_access_cache[project_name][team_slug]
+
+    @cachetools.cached(
+        cache=cachetools.TTLCache(maxsize=256, ttl=300),
+        key=lambda s, o, r: (s.server, o, r))
+    def getCollaboratorsForRepo(self,
+                                org: str,
+                                repo: str) -> List[github3.users.Collaborator]:
+        """
+        Get collaborators for a certain repository.
+
+        Unfortunately GitHub's current event API doesn't seem to send
+        updated access permissions if the repository's setting are modified,
+        see https://developer.github.com/enterprise/2.16/v3/activity/events/\
+        types/#memberevent.
+
+        :param org: Organization of the repository
+        :param repo: Repository name
+        :return: Collaborator information
+        """
+        github = self.getGithubClient('%s/%s' % (org, repo))
+        gh_repo = github.repository(org, repo)
+        return list(gh_repo.collaborators())
 
 
 class GithubWebController(BaseWebController):
