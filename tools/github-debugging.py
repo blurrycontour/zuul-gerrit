@@ -9,14 +9,14 @@ from zuul.model import Change, Project
 # This is a template with boilerplate code for debugging github issues
 
 # TODO: for real use override the following variables
-server = 'github.com'
+server = 'cc-github.bmwgroup.net'
 api_token = 'xxxx'
 appid = 2
 appkey = '/opt/project/appkey'
 
-org = 'example'
-repo = 'sandbox'
-pull_nr = 8
+org = 'codecraft'
+repo = 'tools-internal'
+pull_nr = 108
 
 
 def configure_logging(context):
@@ -27,6 +27,7 @@ def configure_logging(context):
 
 
 # uncomment for more logging
+configure_logging('zuul')
 # configure_logging('urllib3')
 # configure_logging('github3')
 # configure_logging('cachecontrol')
@@ -69,17 +70,20 @@ def get_change(connection: GithubConnection,
 
 
 # create github connection with api token
-conn = create_connection(server, api_token)
+# conn = create_connection(server, api_token)
 
 # create github connection with app key
-# conn = create_connection_app(server, appid, appkey)
+conn = create_connection_app(server, appid, appkey)
 
 
 # Now we can do anything we want with the connection, e.g. check canMerge for
 # a pull request.
 change = get_change(conn, org, repo, pull_nr)
 
-print(conn.canMerge(change, {'cc/gate2'}))
+conn.get_project_team_permission('codecraft/tools-internal', 'test-subteam')
+conn.get_project_team_permission(
+    'codecraft/tools-internal', 'tool-maintainers')
+# print(conn.canMerge(change, {'cc/gate'}))
 
 
 # Or just use the github object.

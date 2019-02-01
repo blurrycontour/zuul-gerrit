@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    CODEOWNERS is now evaluated in the GitHub driver if this feature is
+    activated in the branch protection settings of GitHub. Merges and gate
+    runs will now only be performed if all reviews from all CODEOWNERs of the
+    modified files are available.
