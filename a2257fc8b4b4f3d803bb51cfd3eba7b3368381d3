@@ -16,6 +16,23 @@
       "revId": "a2257fc8b4b4f3d803bb51cfd3eba7b3368381d3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_90a00944",
+        "filename": "tests/unit/test_inventory.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-02-01T18:03:50Z",
+      "side": 1,
+      "message": "If you want to run ansible on this (which I assume is why you were using the quick-start), you could move this test to a class of its own which inherits from AnsibleZuulTest.  Then the test job will actually run ansible.  You can even put in a playbook with an assertion.",
+      "revId": "a2257fc8b4b4f3d803bb51cfd3eba7b3368381d3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
