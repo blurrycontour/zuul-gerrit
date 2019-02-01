@@ -27,6 +27,8 @@ import os
 import queue
 import random
 import re
+from typing import Optional
+
 import requests
 import select
 import shutil
@@ -1288,6 +1290,18 @@ class FakeGithubConnection(githubconnection.GithubConnection):
         self.reports.append((project, pr_number, 'unlabel', label))
         pull_request = self.pull_requests[pr_number]
         pull_request.removeLabel(label)
+
+    def _fetchFileFromGithub(self,
+                             project: str,
+                             branch: str,
+                             path: str) -> Optional[bytes]:
+        repo = self.getGitUrl(project)
+        file_path = os.path.join(repo, path)
+        try:
+            with open(file_path, 'rb') as file:
+                return file.read()
+        except OSError:
+            return None
 
 
 class BuildHistory(object):
