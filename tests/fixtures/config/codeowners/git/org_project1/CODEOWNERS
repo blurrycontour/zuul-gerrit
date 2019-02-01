@@ -1,0 +1,6 @@
+*                   @org/team2 @ghuser
+*.yaml              @org/team2 @org/team3
+*.py                ghuser@derp.com
+*.c                 @reader
+*.rs                @org/team1 @org/team3
+/in/a/subdir/*.js   @org/team4
