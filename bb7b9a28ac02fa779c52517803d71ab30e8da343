@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "9fdfeff1_9ccd8db8",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2019-02-01T07:31:03Z",
+      "side": 1,
+      "message": "As far as I know, claims cannot be overridden, it would break the signature.\n\nGenerally your Auth source provides attributes or roles within the claims that can be consumed. In most cases these are very straight forward and the service would need to translate that (barring building your own auth services as well).",
+      "parentUuid": "3f79a3b5_9f02d40c",
+      "revId": "bb7b9a28ac02fa779c52517803d71ab30e8da343",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_805753cd",
         "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
         "patchSetId": 4
@@ -84,6 +102,47 @@
       "side": 1,
       "message": "it is implicit from the \"zuul.actions\" claim but \"aud\" can be added. I didn\u0027t want to tie it to a URI for a specific instance, reasoning that Zuul might get a distributed architecture; you\u0027d then want the JWT to be consumable by every node of the distributed architecture.",
       "parentUuid": "3f79a3b5_805753cd",
+      "revId": "bb7b9a28ac02fa779c52517803d71ab30e8da343",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_9c426d0e",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2019-02-01T07:31:03Z",
+      "side": 1,
+      "message": "I\u0027d argue the opposite is true. the JWT should not be usable everywhere. Authorization should be as narrow as possible by default. \n\nThis is just my opinion though. I am definitely erring to the side of extra caution. I wouldn\u0027t hold up the spec arguing over this point though.",
+      "parentUuid": "3f79a3b5_3a294e83",
+      "revId": "bb7b9a28ac02fa779c52517803d71ab30e8da343",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_7c58e9f8",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2019-02-01T07:31:03Z",
+      "side": 1,
+      "message": "as a point, this is not really scalable, thus my recommendation to consume external JWT in the grand scheme of things. I know this adds a lot more to the depth of the spec, but if an operator needs to generate a JWT that is either extremely long lived (requires revocation/potentially is at risk for landing in thr wrong hands and giving a lot of power to those wrong hands) or it is almost easier for the operator to just do the task instead of handing over a JWT.",
+      "range": {
+        "startLine": 101,
+        "startChar": 0,
+        "endLine": 103,
+        "endChar": 52
+      },
       "revId": "bb7b9a28ac02fa779c52517803d71ab30e8da343",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
