@@ -91,6 +91,24 @@
     },
     {
       "key": {
+        "uuid": "9fdfeff1_d0ee9120",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2019-02-01T17:32:13Z",
+      "side": 1,
+      "message": "++",
+      "parentUuid": "9fdfeff1_e7ee8620",
+      "revId": "bb7b9a28ac02fa779c52517803d71ab30e8da343",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f79a3b5_805753cd",
         "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
         "patchSetId": 4
@@ -162,6 +180,24 @@
     },
     {
       "key": {
+        "uuid": "9fdfeff1_90f489f2",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2019-02-01T17:32:13Z",
+      "side": 1,
+      "message": "++",
+      "parentUuid": "9fdfeff1_0762aad8",
+      "revId": "bb7b9a28ac02fa779c52517803d71ab30e8da343",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fdfeff1_7c58e9f8",
         "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
         "patchSetId": 4
@@ -197,6 +233,30 @@
       "side": 1,
       "message": "I\u0027d like to keep this as the de facto JWT provider for standalone, test deployments of Zuul. This gives a basic way to play with the admin API without having to worry about user management and authentication in Zuul itself when deployed standalone. It is not as seamless as using an external JWT provider, making it more obvious that it is not advised to use this in production. WDYT?",
       "parentUuid": "9fdfeff1_7c58e9f8",
+      "range": {
+        "startLine": 101,
+        "startChar": 0,
+        "endLine": 103,
+        "endChar": 52
+      },
+      "revId": "bb7b9a28ac02fa779c52517803d71ab30e8da343",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_5095c185",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2019-02-01T17:32:13Z",
+      "side": 1,
+      "message": "I am generally inclined to state that a \"Standalone\" zuul should still rely on an external form of auth, even if it is a simplistic built-in JWT generator, but the workflow hopefully would be the same as an external provider. The CLI tool could be an additional hook into the \"built-in\" external provider.\n\nWith all that said, this CLI is a much simpler/straightforward approach (less code) than a full external provider would be.\n\nMaybe the best middleground is the CLI to generate the JWT but it generates a JWT with claims that could in theory come from the generalized external providers and Zuul leans on a simple (default) role mapping that can be overridden (override capability might be future patch) for more in-depth auth needs (and the general role mapping could be similar to your initial claim setup).\n\nFor the record, I am very excited for zuul to have JWT support for an admin api.",
+      "parentUuid": "9fdfeff1_474192a8",
       "range": {
         "startLine": 101,
         "startChar": 0,
