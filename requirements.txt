@@ -28,5 +28,6 @@ paho-mqtt
 cherrypy
 ws4py
 routes
+pathspec
 jsonpath-rw
 urllib3<=1.25.3  # https://github.com/urllib3/urllib3/pull/1684
