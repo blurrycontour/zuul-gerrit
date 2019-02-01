@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_104979b5",
+        "filename": "playbooks/quick-start/main.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-02-01T18:00:25Z",
+      "side": 1,
+      "message": "Please don\u0027t use the quick-start for a regression test like this.  This playbook is meant to mirror exactly the steps that a human would take when following the documentation.",
+      "revId": "a2257fc8b4b4f3d803bb51cfd3eba7b3368381d3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
