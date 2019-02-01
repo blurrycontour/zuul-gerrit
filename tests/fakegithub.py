@@ -13,12 +13,16 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+from typing import Iterable
 
 import github3.exceptions
 import re
 import time
 
+import graphene
 from requests import HTTPError
+
+from tests.fake_graphql import FakeGithubQuery
 
 FAKE_BASE_URL = 'https://example.com/api/v3/'
 
@@ -35,6 +39,7 @@ class FakeBranch(object):
     def __init__(self, branch='master', protected=False):
         self.name = branch
         self.protected = protected
+        self.require_codeowners = False
 
     def as_dict(self):
         return {
@@ -119,6 +124,8 @@ class FakeRepository(object):
         self._commits = {}
         self.data = data
         self.name = name
+        self._teams = []
+        self._collaborators = []
 
         # fail the next commit requests with 404
         self.fail_not_found = 0
@@ -129,10 +136,14 @@ class FakeRepository(object):
             return [b for b in self._branches if b.protected]
         return self._branches
 
-    def _set_branch_protection(self, branch_name, protected):
+    def _set_branch_protection(self,
+                               branch_name,
+                               protected,
+                               require_codeowners=False):
         for branch in self._branches:
             if branch.name == branch_name:
                 branch.protected = protected
+                branch.require_codeowners = require_codeowners
                 return
 
     def _build_url(self, *args, **kwargs):
@@ -281,17 +292,26 @@ class FakeRepository(object):
             return None
 
     def get_url_protection(self, branch):
-        contexts = self.data.required_contexts.get((self.name, branch), [])
-        if not contexts:
+        fake_branch = next((b for b in self._branches if b.name == branch),
+                           None)
+        if fake_branch is not None and fake_branch.protected:
+            data = {
+                'required_status_checks': {},
+                'required_pull_request_reviews': {
+                    'require_code_owner_reviews':
+                        fake_branch.require_codeowners
+                }
+            }
+
+            contexts = self.data.required_contexts.get((self.name, branch), [])
+            if contexts is not None:
+                data['required_status_checks']['contexts'] = contexts
+
+            return FakeResponse(data)
+        else:
             # Note that GitHub returns 404 if branch protection is off so do
             # the same here as well
             return FakeResponse({}, 404)
-        data = {
-            'required_status_checks': {
-                'contexts': contexts
-            }
-        }
-        return FakeResponse(data)
 
     def pull_requests(self, state=None, sort=None, direction=None):
         # sort and direction are unused currently, but present to match
@@ -304,6 +324,12 @@ class FakeRepository(object):
                 continue
             pulls.append(FakePull(pull))
         return pulls
+
+    def teams(self):
+        return self._teams
+
+    def collaborators(self):
+        return self._collaborators
 
 
 class FakeIssue(object):
@@ -418,8 +444,12 @@ class FakeGithubSession(object):
 
     def __init__(self, data):
         self._data = data
+        self._base_url = None
+        self._prepared_responses = {}
+        self.schema = graphene.Schema(query=FakeGithubQuery)
 
-    def build_url(self, *args):
+    def build_url(self, *args, **kwargs):
+        self._base_url = kwargs.get("base_url")
         fakepath = '/'.join(args)
         return FAKE_BASE_URL + fakepath
 
@@ -436,6 +466,15 @@ class FakeGithubSession(object):
             # unknown entity to process
             return None
 
+    def post(self, url, data=None, headers=None, params=None, json=None):
+
+        if json and json.get('query'):
+            query = json.get('query')
+            result = self.schema.execute(query, context=self._data)
+            return FakeResponse({'data': result.data}, 200)
+
+        return FakeResponse(None, 404)
+
     def get_repo(self, request, params=None):
         org, project, request = request.split('/', 2)
         project_name = '{}/{}'.format(org, project)
@@ -445,12 +484,62 @@ class FakeGithubSession(object):
 
         return repo.get_url(request, params=params)
 
+    def add_fake_response(self, method, url_regex, response):
+        if method not in self._prepared_responses:
+            self._prepared_responses[method] = {}
+        self._prepared_responses[method][url_regex] = response
+
 
 class FakeGithubData(object):
     def __init__(self, pull_requests):
         self.pull_requests = pull_requests
         self.repos = {}
         self.required_contexts = {}
+        self.organizations = {}
+
+
+class FakeGithubTeamMember(object):
+    def __init__(self, name):
+        self.login = name
+
+
+class FakeGithubTeam(object):
+    def __init__(self, name, slug=None, members=None, permission='pull'):
+        if members is not None:
+            self._members = dict((name, FakeGithubTeamMember(name))
+                                 for name in members)
+        else:
+            self._members = dict()
+        self.name = name
+        if slug:
+            self.slug = slug
+        else:
+            self.slug = name
+        self.permission = permission
+
+    def is_member(self, username: str) -> bool:
+        return username in self._members
+
+    def members(self) -> Iterable[FakeGithubTeamMember]:
+        return self._members.values()
+
+
+class FakeGithubCollaborator(object):
+    def __init__(self, login, permissions=None):
+        if permissions is None:
+            permissions = dict()
+        self.login = login
+        self.permissions = permissions
+
+
+class FakeGithubOrganization(object):
+    def __init__(self, fake_teams=None):
+        if fake_teams is None:
+            fake_teams = []
+        self.fake_teams = fake_teams
+
+    def teams(self):
+        return iter(self.fake_teams)
 
 
 class FakeGithubClient(object):
@@ -519,3 +608,6 @@ class FakeGithubClient(object):
                 results.append(FakeIssueSearchResult(issue))
 
         return iter(results)
+
+    def organization(self, org_name):
+        return self._data.organizations.get(org_name, None)
