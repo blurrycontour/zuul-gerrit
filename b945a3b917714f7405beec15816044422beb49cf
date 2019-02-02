@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_7fba09c1",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1146,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-02T18:03:00Z",
+      "side": 1,
+      "message": "I think in case of a failure or timeout we shouldn\u0027t run the next playbook in the list but stop the loop. We also should have a test case with two playbooks where the first fails to verify that the second didn\u0027t run.",
+      "revId": "b945a3b917714f7405beec15816044422beb49cf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
