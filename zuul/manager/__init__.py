@@ -417,6 +417,32 @@ class PipelineManager(object):
         if jobs:
             self._executeJobs(item, jobs)
 
+    def _cancelBuild(self, build_set, build):
+        if build.result:
+            canceled = False
+        else:
+            was_running = False
+            try:
+                was_running = self.sched.executor.cancel(build)
+            except Exception:
+                self.log.exception(
+                    "Exception while canceling build %s for change %s" % (
+                        build, build_set.item.change))
+            tenant = build_set.item.pipeline.tenant
+            tenant.semaphore_handler.release(build_set.item, build.job)
+
+            if not was_running:
+                nodeset = build.build_set.getJobNodeSet(build.job.name)
+                self.sched.nodepool.returnNodeSet(nodeset, build)
+            build.result = 'CANCELED'
+            canceled = True
+
+        nodeset = build_set.nodesets.get(build.job.name)
+        if nodeset:
+            self.sched.nodepool.returnNodeSet(nodeset)
+
+        return canceled
+
     def cancelJobs(self, item, prime=True):
         self.log.debug("Cancel jobs for change %s" % item.change)
         canceled = False
@@ -426,31 +452,8 @@ class PipelineManager(object):
         for req in old_build_set.node_requests.values():
             self.sched.nodepool.cancelRequest(req)
         old_build_set.node_requests = {}
-        canceled_jobs = set()
         for build in old_build_set.getBuilds():
-            if build.result:
-                canceled_jobs.add(build.job.name)
-                continue
-            was_running = False
-            try:
-                was_running = self.sched.executor.cancel(build)
-            except Exception:
-                self.log.exception("Exception while canceling build %s "
-                                   "for change %s" % (build, item.change))
-            tenant = old_build_set.item.pipeline.tenant
-            tenant.semaphore_handler.release(
-                old_build_set.item, build.job)
-
-            if not was_running:
-                nodeset = build.build_set.getJobNodeSet(build.job.name)
-                self.sched.nodepool.returnNodeSet(nodeset, build)
-            build.result = 'CANCELED'
-            canceled = True
-            canceled_jobs.add(build.job.name)
-        for jobname, nodeset in list(old_build_set.nodesets.items()):
-            if jobname in canceled_jobs:
-                continue
-            self.sched.nodepool.returnNodeSet(nodeset)
+            canceled = self._cancelBuild(old_build_set, build)
         for item_behind in item.items_behind:
             self.log.debug("Canceling jobs for change %s, behind change %s" %
                            (item_behind.change, item.change))
@@ -816,6 +819,16 @@ class PipelineManager(object):
                 self.sched.executor.resumeBuild(build)
                 build.paused = False
 
+    def _resetDependentBuilds(self, build_set, build):
+        jobgraph = build_set.item.job_graph
+        child_builds = [build_set.builds.get(x.name) for x in
+                        jobgraph.getDependentJobsRecursively(
+                            build.job.name)]
+        for b in child_builds:
+            self._cancelBuild(build_set, b)
+            build_set.removeJobNodeSet(b.job.name)
+            build_set.removeBuild(b)
+
     def onBuildCompleted(self, build):
         item = build.build_set.item
 
@@ -828,6 +841,9 @@ class PipelineManager(object):
 
         if build.retry:
             build.build_set.removeJobNodeSet(build.job.name)
+
+            # in case this was a paused build we need to retry all child jobs
+            self._resetDependentBuilds(build.build_set, build)
 
         self._resumeBuilds(build.build_set)
         return True

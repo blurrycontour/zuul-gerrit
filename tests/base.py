@@ -1348,6 +1348,7 @@ class FakeBuild(object):
         self.name = self.parameters['job']
         self.wait_condition = threading.Condition()
         self.waiting = False
+        self.paused = False
         self.aborted = False
         self.requeue = False
         self.created = time.time()
@@ -1521,7 +1522,9 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
         if self.executor_server._run_ansible:
             # Call run on the fake build omitting the result so we also can
             # hold real ansible jobs.
-            build.run()
+            if playbook.path:
+                build.run()
+
             result = super(RecordingAnsibleJob, self).runAnsible(
                 cmd, timeout, playbook, wrapped)
         else:
@@ -1544,6 +1547,17 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
                 host_vars=dict(ansible_connection='local'),
                 host_keys=[]))
         return hosts
+
+    def pause(self):
+        build = self.executor_server.job_builds[self.job.unique]
+        build.paused = True
+        super().pause()
+
+    def resume(self):
+        build = self.executor_server.job_builds.get(self.job.unique)
+        if build:
+            build.paused = False
+        super().resume()
 
 
 class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
@@ -3041,7 +3055,7 @@ class ZuulTestCase(BaseTestCase):
             worker_build = self.executor_server.job_builds.get(
                 server_job.unique.decode('utf8'))
             if worker_build:
-                if worker_build.isWaiting():
+                if worker_build.isWaiting() or worker_build.paused:
                     continue
                 else:
                     self.log.debug("%s is running" % worker_build)
