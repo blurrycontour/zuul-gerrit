@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_ae5272dd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-04T20:00:10Z",
+      "side": 1,
+      "message": "Maybe you might want to add a Depends-On to https://review.openstack.org/630035 which adds the needed route?",
+      "revId": "08a5b989970ef76db137750576cead7c975c3e43",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
