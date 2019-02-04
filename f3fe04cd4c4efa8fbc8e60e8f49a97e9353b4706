@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_02afe129",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-02-04T06:01:58Z",
+      "side": 1,
+      "message": "This is much better, thanks! However, while I see that it is simple to support having the executor run the script at startup, I think it\u0027s unnecessary. The quick start case can just run the install script as part of the container build.",
+      "revId": "f3fe04cd4c4efa8fbc8e60e8f49a97e9353b4706",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_a2a93524",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-02-04T06:01:58Z",
+      "side": 1,
+      "message": "s/to be /be /",
+      "revId": "f3fe04cd4c4efa8fbc8e60e8f49a97e9353b4706",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_c2a4794d",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-02-04T06:01:58Z",
+      "side": 1,
+      "message": "looks like maybe this got cut off.",
+      "revId": "f3fe04cd4c4efa8fbc8e60e8f49a97e9353b4706",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
