@@ -16,6 +16,24 @@
       "revId": "f08d66f81fd30db77d0a97a58d115e9237a11ace",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_1b3c1ebe",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2190,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-04T18:59:40Z",
+      "side": 1,
+      "message": "To me it looks pretty random. Also the parallel execution and fighting for io during full test runs can make individual test cases much slower. So we either can spend time and increase it for any individual test case that failed. Or we just increase the overall limit and make the tests successful also on slower test nodes than normal.",
+      "parentUuid": "",
+      "revId": "f08d66f81fd30db77d0a97a58d115e9237a11ace",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
