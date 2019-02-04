@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9fdfeff1_82badfde",
+        "filename": "tests/fixtures/config/ansible/git/common-config/zuul.yaml",
+        "patchSetId": 12
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2019-02-04T23:24:47Z",
+      "side": 1,
+      "message": "We check in multiple-parent post-run, but can also validate post run here.",
+      "parentUuid": "9fdfeff1_47e8897b",
+      "revId": "2d423c249bc72303816e7e5a36c2aa51fcdbdb25",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fdfeff1_67ed8d8a",
         "filename": "zuul/executor/server.py",
         "patchSetId": 12
@@ -30,6 +48,24 @@
       "writtenOn": "2019-02-04T22:43:25Z",
       "side": 1,
       "message": "This is now a bit confusing since there is no single playbook.  This was only used in two places; the first was in runPlaybooks, which you have now removed.  The second (and now only remaining instance) is in the lines below.  I suggest we turn this into a local variable for the use of the clause below, and remove it from JobDir.",
+      "revId": "2d423c249bc72303816e7e5a36c2aa51fcdbdb25",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_42b4f7f2",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 1353,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2019-02-04T23:24:47Z",
+      "side": 1,
+      "message": "ack",
+      "parentUuid": "9fdfeff1_67ed8d8a",
       "revId": "2d423c249bc72303816e7e5a36c2aa51fcdbdb25",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
