@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_fb259a0b",
+        "filename": "zuul/model.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 974,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-04T19:32:09Z",
+      "side": 1,
+      "message": "I don\u0027t see the string \u0027REDACTED\u0027 in the test case test_project_freeze_job_secret. Did I miss something there?",
+      "revId": "32aa4affa9dc43644df3f619294e33f29c277207",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
