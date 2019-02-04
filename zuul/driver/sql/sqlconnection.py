@@ -223,6 +223,8 @@ class SQLConnection(BaseConnection):
 
             def createArtifact(self, *args, **kw):
                 session = orm.session.Session.object_session(self)
+                args['meta'] = args['metadata']
+                del args['metadata']
                 a = ArtifactModel(*args, **kw)
                 a.build_id = self.id
                 self.artifacts.append(a)
@@ -246,6 +248,7 @@ class SQLConnection(BaseConnection):
                 self.table_prefix + BUILD_TABLE + ".id"))
             name = sa.Column(sa.String(255))
             url = sa.Column(sa.TEXT())
+            meta = sa.Column('metadata', sa.TEXT())
             build = orm.relationship(BuildModel, backref="artifacts")
 
         class ProvidesModel(Base):
