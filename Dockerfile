@@ -49,3 +49,4 @@ CMD ["/usr/local/bin/zuul-scheduler"]
 
 FROM zuul as zuul-web
 CMD ["/usr/local/bin/zuul-web"]
+
