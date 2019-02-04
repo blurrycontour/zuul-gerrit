@@ -2199,6 +2199,7 @@ class QueueItem(object):
             else:
                 artifacts = [{'name': a.name,
                               'url': a.url,
+                              'metadata': json.loads(a.metadata) if a.metadata else None,
                               'project': build.buildset.project,
                               'change': str(build.buildset.change),
                               'patchset': build.buildset.patchset,

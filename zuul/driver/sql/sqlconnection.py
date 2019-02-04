@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import json
 import logging
 
 import alembic
@@ -246,6 +247,7 @@ class SQLConnection(BaseConnection):
                 self.table_prefix + BUILD_TABLE + ".id"))
             name = sa.Column(sa.String(255))
             url = sa.Column(sa.TEXT())
+            metadata = sa.Column(sa.TEXT())
             build = orm.relationship(BuildModel, backref="artifacts")
 
         class ProvidesModel(Base):

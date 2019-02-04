@@ -90,6 +90,9 @@ class SQLReporter(BaseReporter):
                 for artifact in get_artifacts_from_result_data(
                     build.result_data,
                     logger=self.log):
+                    new_artifact = artifact.copy()
+                    if 'metadata' in artifact:
+                        artifact['metadata'] = json.dumps(artifact['metadata'])
                     db_build.createArtifact(**artifact)
 
 
