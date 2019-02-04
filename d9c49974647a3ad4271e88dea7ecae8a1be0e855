@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_4e2bc62f",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 565,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-04T20:02:33Z",
+      "side": 1,
+      "message": "That should probably be \u0027Buildset not found\u0027",
+      "revId": "d9c49974647a3ad4271e88dea7ecae8a1be0e855",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
