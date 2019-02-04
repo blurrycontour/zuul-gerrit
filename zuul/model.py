@@ -15,6 +15,7 @@
 import abc
 from collections import OrderedDict
 import copy
+import json
 import logging
 import os
 import re2
@@ -2199,6 +2200,8 @@ class QueueItem(object):
             else:
                 artifacts = [{'name': a.name,
                               'url': a.url,
+                              'metadata': json.loads(a.meta)
+                              if a.metadata else None,
                               'project': build.buildset.project,
                               'change': str(build.buildset.change),
                               'patchset': build.buildset.patchset,
