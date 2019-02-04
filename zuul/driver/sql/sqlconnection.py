@@ -246,6 +246,7 @@ class SQLConnection(BaseConnection):
                 self.table_prefix + BUILD_TABLE + ".id"))
             name = sa.Column(sa.String(255))
             url = sa.Column(sa.TEXT())
+            metadata = sa.Column(sa.TEXT())
             build = orm.relationship(BuildModel, backref="artifacts")
 
         class ProvidesModel(Base):
