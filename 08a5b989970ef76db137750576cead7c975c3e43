@@ -16,6 +16,24 @@
       "revId": "08a5b989970ef76db137750576cead7c975c3e43",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_8e08ced9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-04T20:01:29Z",
+      "side": 1,
+      "message": "Forget this comment, I\u0027ve overlooked the git dependency...",
+      "parentUuid": "9fdfeff1_ae5272dd",
+      "revId": "08a5b989970ef76db137750576cead7c975c3e43",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
