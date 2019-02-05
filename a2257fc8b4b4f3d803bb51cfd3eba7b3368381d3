@@ -33,6 +33,24 @@
       "revId": "a2257fc8b4b4f3d803bb51cfd3eba7b3368381d3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_670d88e7",
+        "filename": "tests/unit/test_inventory.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 27898
+      },
+      "writtenOn": "2019-02-05T06:19:20Z",
+      "side": 1,
+      "message": "thanks, will do I have to find why the test is failing after changing the base class, looks like release is not working and builds are still lingering",
+      "parentUuid": "9fdfeff1_90a00944",
+      "revId": "a2257fc8b4b4f3d803bb51cfd3eba7b3368381d3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
