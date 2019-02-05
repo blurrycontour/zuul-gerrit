@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_b49f0f64",
+        "filename": "releasenotes/notes/artifact-format-2de4b9c038e28115.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-05T17:55:26Z",
+      "side": 1,
+      "message": "nit: without",
+      "range": {
+        "startLine": 10,
+        "startChar": 9,
+        "endLine": 10,
+        "endChar": 16
+      },
+      "revId": "661d063e88d4890484bcece7efded258e4d68564",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_74b447f3",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2204,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-05T17:55:26Z",
+      "side": 1,
+      "message": "There is a mismatch between a.meta and a.metadata. Further I think I\u0027m confused, is this a dict or something else?",
+      "range": {
+        "startLine": 2203,
+        "startChar": 0,
+        "endLine": 2204,
+        "endChar": 54
+      },
+      "revId": "661d063e88d4890484bcece7efded258e4d68564",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
