@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_8bc18983",
+        "filename": "tests/fixtures/config/ansible/git/common-config/playbooks/foobar-post.yaml",
+        "patchSetId": 13
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-02-05T19:40:09Z",
+      "side": 1,
+      "message": "Okay, this confused me on the previous patchset.  I feel like the task name and what it does are at odds.  Can you change this to \"Assert parent.txt does not exist\"?",
+      "revId": "a949b0f584a545089d3db1afe72c5f060c1e0408",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_2bbe5dff",
+        "filename": "tests/fixtures/config/ansible/git/common-config/playbooks/foobar-post.yaml",
+        "patchSetId": 13
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-02-05T19:40:09Z",
+      "side": 1,
+      "message": "And change this to \"Assert foo.txt exists\"",
+      "revId": "a949b0f584a545089d3db1afe72c5f060c1e0408",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_6bc46593",
+        "filename": "tests/fixtures/config/ansible/git/common-config/zuul.yaml",
+        "patchSetId": 13
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-02-05T19:40:09Z",
+      "side": 1,
+      "message": "I would be a little more comfortable if we had a second job that inherited from this, did not update the run method, and asserted that parent.txt did exist.  Because otherwise, a typo in the tests could cause us to incorrectly assume that the file wasn\u0027t created in the case of multiple-child.",
+      "revId": "a949b0f584a545089d3db1afe72c5f060c1e0408",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
