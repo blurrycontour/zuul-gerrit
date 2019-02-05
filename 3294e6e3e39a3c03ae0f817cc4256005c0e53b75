@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_f4e277a0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-05T18:13:18Z",
+      "side": 1,
+      "message": "It\u0027s not that meaningless ;)",
+      "revId": "3294e6e3e39a3c03ae0f817cc4256005c0e53b75",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
