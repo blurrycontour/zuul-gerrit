@@ -1954,7 +1954,8 @@ class AnsibleJob(object):
             # In this case we should treat the host as unreachable and retry
             # the job.
             for line in syntax_buffer:
-                if b'FATAL ERROR DURING FILE TRANSFER' in line:
+                if (b'FATAL ERROR DURING FILE TRANSFER' in line or
+                        b'port=5986): Read timed out' in line):
                     return self.RESULT_UNREACHABLE, None
 
         return (self.RESULT_NORMAL, ret)
