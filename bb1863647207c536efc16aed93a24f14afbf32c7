@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_3755571e",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1967,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-06T09:18:35Z",
+      "side": 1,
+      "message": "Maybe you want to separate this block from the winrm handling by a separate comment? Otherwise it looks like this belongs to the comment above.",
+      "range": {
+        "startLine": 1961,
+        "startChar": 0,
+        "endLine": 1967,
+        "endChar": 60
+      },
+      "revId": "bb1863647207c536efc16aed93a24f14afbf32c7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
