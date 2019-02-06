@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_172606b9",
+        "filename": "zuul/driver/timer/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2019-02-06T20:00:21Z",
+      "side": 1,
+      "message": "It doesn\u0027t look like the ETag is always provided depending on the URL (or server) we are querying. Can we rely on it ?\n\nHas an etag:\n\n    $ curl -I https://zuul.openstack.org\n    HTTP/1.1 200 OK\n    Date: Wed, 06 Feb 2019 19:53:54 GMT\n    Server: Apache/2.4.18 (Ubuntu)\n    Last-Modified: Wed, 06 Feb 2019 13:37:41 GMT\n    ETag: \"241-58139d47d9802\"\n    Accept-Ranges: bytes\n    Content-Length: 577\n    Content-Type: text/html\n\nDoes not have an etag:\n\n    $ curl -I https://google.com\n    HTTP/2 301 \n    location: https://www.google.com/\n    content-type: text/html; charset\u003dUTF-8\n    date: Wed, 06 Feb 2019 19:52:00 GMT\n    expires: Fri, 08 Mar 2019 19:52:00 GMT\n    cache-control: public, max-age\u003d2592000\n    server: gws\n    content-length: 220\n    x-xss-protection: 1; mode\u003dblock\n    x-frame-options: SAMEORIGIN\n    alt-svc: quic\u003d\":443\"; ma\u003d2592000; v\u003d\"44,43,39\"\n\n    $ curl -I https://openstack.org\n    HTTP/1.1 301 Moved Permanently\n    Server: nginx\n    Date: Wed, 06 Feb 2019 19:52:10 GMT\n    Content-Type: text/html\n    Content-Length: 178\n    Connection: keep-alive\n    Keep-Alive: timeout\u003d10\n    Location: https://www.openstack.org/\n    X-Frame-Options: SAMEORIGIN\n    X-Content-Type-Options: nosniff\n    X-XSS-Protection: 1; mode\u003dblock\n\n    $ curl -I https://review.openstack.org\n    HTTP/1.1 200 OK\n    Date: Wed, 06 Feb 2019 19:53:39 GMT\n    Server: Apache/2.4.18 (Ubuntu)\n    Expires: Mon, 01 Jan 1990 00:00:00 GMT\n    X-XRDS-Location: https://review.openstack.org/OpenID.XRDS\n    Cache-Control: no-cache, no-store, max-age\u003d0, must-revalidate\n    Pragma: no-cache\n    Content-Type: text/html; charset\u003dUTF-8\n    Content-Length: 7345\n    Set-Cookie: XSRF_TOKEN\u003d\"\";Version\u003d1;Path\u003d/;Expires\u003dThu, 01-Jan-1970 00:00:00 GMT;Max-Age\u003d0;Secure",
+      "range": {
+        "startLine": 127,
+        "startChar": 15,
+        "endLine": 127,
+        "endChar": 53
+      },
+      "revId": "fa9365d07ce11dd1ca9f0a41d9d2e3f246cbacbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
