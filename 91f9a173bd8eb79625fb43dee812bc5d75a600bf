@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_6cab0975",
+        "filename": "zuul/web/static/.keep",
+        "patchSetId": 12
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-06T19:39:19Z",
+      "side": 1,
+      "message": "This file should not be removed. It\u0027s needed to keep the directory where the static web content will be generated to.",
+      "revId": "91f9a173bd8eb79625fb43dee812bc5d75a600bf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
