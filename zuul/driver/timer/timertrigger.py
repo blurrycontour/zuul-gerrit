@@ -28,7 +28,8 @@ class TimerTrigger(BaseTrigger):
         for trigger in to_list(trigger_conf):
             f = TimerEventFilter(trigger=self,
                                  types=['timer'],
-                                 timespecs=to_list(trigger['time']))
+                                 timespecs=to_list(trigger['time']),
+                                 url=trigger._conf.get('url'))
 
             efilters.append(f)
 
@@ -36,5 +37,8 @@ class TimerTrigger(BaseTrigger):
 
 
 def getSchema():
-    timer_trigger = {v.Required('time'): str}
+    timer_trigger = {
+        v.Required('time'): str,
+        'url': str,
+        }
     return timer_trigger
