@@ -32,6 +32,7 @@ class TimerDriver(Driver, TriggerInterface):
         self.apsched = BackgroundScheduler()
         self.apsched.start()
         self.tenant_jobs = {}
+        self.url_etag_cache = {}
 
     def registerScheduler(self, scheduler):
         self.sched = scheduler
@@ -75,10 +76,10 @@ class TimerDriver(Driver, TriggerInterface):
 
                     job = self.apsched.add_job(
                         self._onTrigger, trigger=trigger,
-                        args=(tenant, pipeline.name, timespec,))
+                        args=(tenant, pipeline.name, timespec, url=ef.url)
                     jobs.append(job)
 
-    def _onTrigger(self, tenant, pipeline_name, timespec):
+    def _onTrigger(self, tenant, pipeline_name, timespec, url):
         for project_name, pcs in tenant.layout.project_configs.items():
             # timer operates on branch heads and doesn't need speculative
             # layouts to decide if it should be enqueued or not.
@@ -86,6 +87,25 @@ class TimerDriver(Driver, TriggerInterface):
             pcst = tenant.layout.getAllProjectConfigs(project_name)
             if not [True for pc in pcst if pipeline_name in pc.pipelines]:
                 continue
+
+            if url:
+                etag = self.fetch_url_etag(event.url)
+                self.log.debug("Got ETag:%s at %s" % (etag, event.url))
+                if event.url not in self.url_etag_cache:
+                    # Only feed the cache
+                    self.log.debug(
+                        "No previous ETag for %s only feed the "
+                        "cache with: %s" % (event.url, etag))
+                    self.url_etag_cache[event.url] = etag
+                    continue
+                if etag == self.url_etag_cache[event.url]:
+                    self.log.debug(
+                        "ETag for %s has not changed" % event.url)
+                    continue
+                self.log.debug("ETag for %s, previous: %s, current: %s" % (
+                    event.url, self.url_etag_cache[event.url], etag))
+                self.log.info("Url content at %s changed" % event.url)
+                self.url_etag_cache[event.url] = etag
 
             (trusted, project) = tenant.getProject(project_name)
             for branch in project.source.getProjectBranches(project, tenant):
@@ -97,8 +117,15 @@ class TimerDriver(Driver, TriggerInterface):
                 event.project_name = project.name
                 event.ref = 'refs/heads/%s' % branch
                 event.branch = branch
+                if url:
+                    event.url = url
                 self.log.debug("Adding event %s" % event)
                 self.sched.addEvent(event)
+
+    def fetch_url_etag(self, url):
+        self.log.debug("Fetching ETag at %s" % event.url)
+        etag = requests.head(url).headers.get('ETag')
+        return etag
 
     def stop(self):
         if self.apsched:

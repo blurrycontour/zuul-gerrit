@@ -18,12 +18,13 @@ from zuul.model import EventFilter, TriggerEvent
 
 
 class TimerEventFilter(EventFilter):
-    def __init__(self, trigger, types=[], timespecs=[]):
+    def __init__(self, trigger, types=[], timespecs=[], url=None):
         EventFilter.__init__(self, trigger)
 
         self._types = types
         self.types = [re.compile(x) for x in types]
         self.timespecs = timespecs
+        self.url = url
 
     def __repr__(self):
         ret = '<TimerEventFilter'
@@ -32,6 +33,8 @@ class TimerEventFilter(EventFilter):
             ret += ' types: %s' % ', '.join(self._types)
         if self.timespecs:
             ret += ' timespecs: %s' % ', '.join(self.timespecs)
+        if self.url:
+            ret += ' url: %s' % self.url
         ret += '>'
 
         return ret
@@ -51,6 +54,9 @@ class TimerEventFilter(EventFilter):
             if (event.timespec == timespec):
                 matches_timespec = True
         if self.timespecs and not matches_timespec:
+            return False
+
+        if self.url and event.url != self.url:
             return False
 
         return True
