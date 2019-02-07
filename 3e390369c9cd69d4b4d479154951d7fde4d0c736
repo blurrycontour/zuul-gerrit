@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_24e1832b",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-07T18:40:47Z",
+      "side": 1,
+      "message": "nit: needed",
+      "revId": "3e390369c9cd69d4b4d479154951d7fde4d0c736",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
