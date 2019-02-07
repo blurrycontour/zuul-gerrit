@@ -120,6 +120,14 @@ class ZuulApp(object):
     def parseArguments(self, args=None):
         parser = self.createParser()
         self.args = parser.parse_args(args)
+
+        # The arguments debug and foreground both lead to nodaemon mode so
+        # set nodaemon if one of them is set.
+        if ((hasattr(self.args, 'debug') and self.args.debug) or
+                (hasattr(self.args, 'foreground') and self.args.foreground)):
+            self.args.nodaemon = True
+        else:
+            self.args.nodaemon = False
         return parser
 
     def readConfig(self):
@@ -148,7 +156,8 @@ class ZuulApp(object):
             # config, leave the config set to emit to stdout.
             if hasattr(self.args, 'nodaemon') and self.args.nodaemon:
                 logging_config = logconfig.ServerLoggingConfig()
-                logging_config.setDebug()
+                if hasattr(self.args, 'debug') and self.args.debug:
+                    logging_config.setDebug()
             else:
                 # Setting a server value updates the defaults to use
                 # WatchedFileHandler on /var/log/zuul/{server}-debug.log
@@ -164,8 +173,10 @@ class ZuulApp(object):
 class ZuulDaemonApp(ZuulApp, metaclass=abc.ABCMeta):
     def createParser(self):
         parser = super(ZuulDaemonApp, self).createParser()
-        parser.add_argument('-d', dest='nodaemon', action='store_true',
-                            help='do not run as a daemon')
+        parser.add_argument('-d', dest='debug', action='store_true',
+                            help='do not run as a daemon with debug log')
+        parser.add_argument('-f', dest='foreground', action='store_true',
+                            help='do not run as a daemon with info log')
         return parser
 
     def getPidFile(self):
