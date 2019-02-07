@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_5fac8e34",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 1627,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-07T19:58:04Z",
+      "side": 1,
+      "message": "nit: to be consistent with the message above I\u0027d suggest \u0027Cat job %s got no files\u0027.",
+      "revId": "19b9f41eb74b3421a25316548f9a370b82719066",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
