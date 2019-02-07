@@ -3553,7 +3553,7 @@ class ZuulTestCase(BaseTestCase):
             repo.create_tag(tag)
         return before
 
-    def commitConfigUpdate(self, project_name, source_name):
+    def commitConfigUpdate(self, project_name, source_name, modifier=None):
         """Commit an update to zuul.yaml
 
         This overwrites the zuul.yaml in the specificed project with
@@ -3565,12 +3565,17 @@ class ZuulTestCase(BaseTestCase):
         :arg str source_name: The path to the file (underneath the
             test fixture directory) whose contents should be used to
             replace zuul.yaml.
+
+        :arg dict modifier:  A dictionnary to be used to fill a
+            templated zuul.yaml.
         """
 
         source_path = os.path.join(FIXTURE_DIR, source_name)
         files = {}
         with open(source_path, 'r') as f:
             data = f.read()
+            if modifier:
+                data = data % modifier
             layout = yaml.safe_load(data)
             files['zuul.yaml'] = data
         for item in layout:
