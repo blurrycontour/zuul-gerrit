@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "9fdfeff1_ec6e19c8",
+        "filename": "zuul/driver/timer/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-02-07T10:08:26Z",
+      "side": 1,
+      "message": "I\u0027d argue you may want to trigger on the first fetch. Maybe that should be an option?",
+      "revId": "fa9365d07ce11dd1ca9f0a41d9d2e3f246cbacbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fdfeff1_172606b9",
         "filename": "zuul/driver/timer/__init__.py",
         "patchSetId": 1
