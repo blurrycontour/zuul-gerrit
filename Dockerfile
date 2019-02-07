@@ -34,6 +34,7 @@ RUN echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/s
   && rm -rf /var/lib/apt/lists/*
 RUN /output/install-from-bindep \
   && pip install --cache-dir=/output/wheels -r /output/zuul_base/requirements.txt \
+  && mkdir /var/lib/zuul \
   && rm -rf /output
 CMD ["/usr/local/bin/zuul"]
 
