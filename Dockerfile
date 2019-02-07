@@ -47,16 +47,16 @@ CMD ["/usr/local/bin/zuul"]
 
 FROM zuul as zuul-executor
 COPY --from=builder /usr/local/lib/zuul/ /usr/local/lib/zuul
-CMD ["/usr/local/bin/zuul-executor"]
+CMD ["/usr/local/bin/zuul-executor", "-f"]
 
 FROM zuul as zuul-fingergw
-CMD ["/usr/local/bin/zuul-fingergw"]
+CMD ["/usr/local/bin/zuul-fingergw", "-f"]
 
 FROM zuul as zuul-merger
-CMD ["/usr/local/bin/zuul-merger"]
+CMD ["/usr/local/bin/zuul-merger", "-f"]
 
 FROM zuul as zuul-scheduler
-CMD ["/usr/local/bin/zuul-scheduler"]
+CMD ["/usr/local/bin/zuul-scheduler", "-f"]
 
 FROM zuul as zuul-web
-CMD ["/usr/local/bin/zuul-web"]
+CMD ["/usr/local/bin/zuul-web", "-f"]
