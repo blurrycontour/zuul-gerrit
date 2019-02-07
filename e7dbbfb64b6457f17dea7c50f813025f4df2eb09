@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9fdfeff1_2d6411e5",
+        "filename": "tests/unit/test_inventory.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 27898
+      },
+      "writtenOn": "2019-02-07T10:20:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9fdfeff1_aa8c6735",
+      "revId": "e7dbbfb64b6457f17dea7c50f813025f4df2eb09",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fdfeff1_0acb3353",
         "filename": "tests/unit/test_inventory.py",
         "patchSetId": 14
