@@ -50,7 +50,6 @@ services:
       - "sshkey:/var/ssh:z"
       - /var/lib/zuul
   web:
-    command: "zuul-web -d"
     depends_on:
       - scheduler
       - mysql
@@ -63,7 +62,6 @@ services:
     privileged: true
     environment:
       no_proxy: "${no_proxy},gerrit"
-    command: "zuul-executor -d"
     depends_on:
       - scheduler
     image: zuul/zuul-executor
@@ -83,7 +81,6 @@ services:
     volumes:
       - "nodessh:/root/.ssh:z"
   launcher:
-    command: "nodepool-launcher -d"
     depends_on:
       - zk
     image: zuul/nodepool-launcher
