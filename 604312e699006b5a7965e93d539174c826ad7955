@@ -16,6 +16,24 @@
       "revId": "604312e699006b5a7965e93d539174c826ad7955",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_2673cb82",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 515,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-07T17:17:06Z",
+      "side": 1,
+      "message": "Ok, will change this to 1*CPUs and later extend to obey cgroups limits (I\u0027ll have to do the cgroups limit for the starting builds sensor as well)",
+      "parentUuid": "9fdfeff1_666f93c5",
+      "revId": "604312e699006b5a7965e93d539174c826ad7955",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
