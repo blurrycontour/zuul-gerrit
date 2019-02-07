@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9fdfeff1_15f82747",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-02-07T21:40:11Z",
+      "side": 1,
+      "message": "Ideally we should have groups support, but we need a way to distinguish groups defined in zuul\u0027s config for convenience and scalability vs groups as claims from the Identity Provider; we don\u0027t necessarily want these to map one-to-one. The spec being complex as it is, I thought we could discuss that later, but I\u0027m okay with adding group support to the scope.",
+      "parentUuid": "9fdfeff1_4424c7c6",
+      "revId": "53a4ca3f00809e86472f8b9b83b8ba6d4f4edd89",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fdfeff1_ff1b0270",
         "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
         "patchSetId": 7
@@ -42,6 +60,30 @@
     },
     {
       "key": {
+        "uuid": "9fdfeff1_157b47be",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-02-07T21:40:11Z",
+      "side": 1,
+      "message": "I\u0027m basing these calls on the existing ones from the command line, not sure buildset id is supported (since AFAICT getting this info from the status json is not possible yet, as you mentioned)",
+      "parentUuid": "9fdfeff1_ff1b0270",
+      "range": {
+        "startLine": 282,
+        "startChar": 0,
+        "endLine": 293,
+        "endChar": 28
+      },
+      "revId": "53a4ca3f00809e86472f8b9b83b8ba6d4f4edd89",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fdfeff1_7f7dd26c",
         "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
         "patchSetId": 7
@@ -53,6 +95,24 @@
       "writtenOn": "2019-02-07T19:28:24Z",
       "side": 1,
       "message": "Do we want to define the logging namespace (e.g. zuul.audit) here? Having a common logging namespace for all audit messages would make it easy to split out a distinct audit log via the log config.",
+      "revId": "53a4ca3f00809e86472f8b9b83b8ba6d4f4edd89",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_35244bc6",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 364,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-02-07T21:40:11Z",
+      "side": 1,
+      "message": "good idea, there doesn\u0027t seem to be audit logs in zuul yet",
+      "parentUuid": "9fdfeff1_7f7dd26c",
       "revId": "53a4ca3f00809e86472f8b9b83b8ba6d4f4edd89",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
