@@ -52,6 +52,27 @@ class TimerDriver(Driver, TriggerInterface):
         for job in jobs:
             job.remove()
 
+    def _build_cron_trigger(self, timespec):
+        parts = timespec.split()
+        if len(parts) < 5 or len(parts) > 7:
+            raise ValueError("Unable to parse time value '%s'" % timespec)
+
+        minute, hour, dom, month, dow = parts[:5]
+
+        # default values
+        second = None
+        jitter = None
+
+        if len(parts) > 5:
+            second = parts[5]
+        if len(parts) > 6:
+            jitter = parts[6]
+
+        jitter = int(jitter) if jitter is not None else None
+        trigger = CronTrigger(day=dom, day_of_week=dow, hour=hour,
+                              minute=minute, second=second, jitter=jitter)
+        return trigger
+
     def _addJobs(self, tenant):
         jobs = []
         self.tenant_jobs[tenant.name] = jobs
@@ -60,31 +81,9 @@ class TimerDriver(Driver, TriggerInterface):
                 if not isinstance(ef.trigger, timertrigger.TimerTrigger):
                     continue
                 for timespec in ef.timespecs:
-                    parts = timespec.split()
-                    if len(parts) < 5 or len(parts) > 7:
-                        self.log.error(
-                            "Unable to parse time value '%s' "
-                            "defined in pipeline %s" % (
-                                timespec,
-                                pipeline.name))
-                        continue
-                    minute, hour, dom, month, dow = parts[:5]
-                    # default values
-                    second = None
-                    jitter = None
-
-                    if len(parts) > 5:
-                        second = parts[5]
-                    if len(parts) > 6:
-                        jitter = parts[6]
-
                     try:
-                        jitter = int(jitter) if jitter is not None else None
-
-                        trigger = CronTrigger(day=dom, day_of_week=dow,
-                                              hour=hour, minute=minute,
-                                              second=second, jitter=jitter)
-                    except ValueError:
+                        trigger = self._build_cron_trigger(timespec)
+                    except Exception:
                         self.log.exception(
                             "Unable to create CronTrigger "
                             "for value '%s' defined in "
