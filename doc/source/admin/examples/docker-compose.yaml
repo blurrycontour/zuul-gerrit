@@ -42,7 +42,7 @@ services:
       - mysql
     environment:
       no_proxy: "${no_proxy},gerrit"
-    command: "sh -c 'ansible-playbook /var/playbooks/wait-to-start.yaml; zuul-scheduler -d'"
+    command: "sh -c 'ansible-playbook /var/playbooks/wait-to-start.yaml; zuul-scheduler -f'"
     image: zuul/zuul-scheduler
     volumes:
       - "./etc_zuul/:/etc/zuul/:z"
@@ -50,7 +50,7 @@ services:
       - "sshkey:/var/ssh:z"
       - /var/lib/zuul
   web:
-    command: "sh -c 'ansible-playbook /var/playbooks/wait-to-start.yaml; zuul-web -d'"
+    command: "sh -c 'ansible-playbook /var/playbooks/wait-to-start.yaml; zuul-web -f'"
     depends_on:
       - scheduler
       - mysql
@@ -63,7 +63,6 @@ services:
     privileged: true
     environment:
       no_proxy: "${no_proxy},gerrit"
-    command: "zuul-executor -d"
     depends_on:
       - scheduler
     image: zuul/zuul-executor
@@ -83,7 +82,6 @@ services:
     volumes:
       - "nodessh:/root/.ssh:z"
   launcher:
-    command: "nodepool-launcher -d"
     depends_on:
       - zk
     image: zuul/nodepool-launcher
