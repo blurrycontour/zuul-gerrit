@@ -511,6 +511,15 @@ The following sections of ``zuul.conf`` are used by the executor:
       the job workspaces, they can be hard-linked to the local git
       cache.
 
+   .. attr:: update_workers
+      :default: 1
+
+      Number of threads processing repository updates. An executor performs
+      a repository update of all required projects before starting a job.
+      Increasing the number of update workers may improve job startup time
+      on systems with many running jobs or that have jobs with many required
+      projects.
+
    .. attr:: job_dir
       :default: /tmp
 
