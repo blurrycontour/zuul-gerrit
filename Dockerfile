@@ -30,11 +30,13 @@ COPY --from=builder /output/ /output
 RUN echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/sources.list \
   && apt-get update \
   && apt-get install -t stretch-backports -y bubblewrap \
+  && apt-get install -y libjemalloc1
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 RUN /output/install-from-bindep \
   && pip install --cache-dir=/output/wheels -r /output/zuul_base/requirements.txt \
   && rm -rf /output
+ENV LD_PRELOAD /usr/lib/x86_64-linux-gnu/libjemalloc.so.1
 CMD ["/usr/local/bin/zuul"]
 
 FROM zuul as zuul-executor
