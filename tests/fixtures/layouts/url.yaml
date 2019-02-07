@@ -1,0 +1,25 @@
+- pipeline:
+    name: urltrigger
+    manager: independent
+    trigger:
+      url:
+        - time: '* * * * * */1'
+          url: '%(path1)s'
+          header_field: 'Last-Modified'
+        - time: '* * * * * */1'
+          url: '%(path2)s'
+          header_field: 'Last-Modified'
+
+- job:
+    name: base
+    parent: null
+
+- job:
+    name: project-test
+    run: playbooks/project-test.yaml
+
+- project:
+    name: org/project
+    urltrigger:
+      jobs:
+        - project-test
