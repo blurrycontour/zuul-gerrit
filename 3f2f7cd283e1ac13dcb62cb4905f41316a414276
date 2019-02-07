@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_bafee802",
+        "filename": "Dockerfile",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-07T20:04:49Z",
+      "side": 1,
+      "message": "As discussed on irc this should changed into a volume.",
+      "range": {
+        "startLine": 37,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 26
+      },
+      "revId": "3f2f7cd283e1ac13dcb62cb4905f41316a414276",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
