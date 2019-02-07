@@ -27,6 +27,7 @@ import zuul.driver.sql
 import zuul.driver.bubblewrap
 import zuul.driver.nullwrap
 import zuul.driver.mqtt
+import zuul.driver.url
 import zuul.driver.pagure
 import zuul.driver.gitlab
 from zuul.connection import BaseConnection
@@ -56,6 +57,7 @@ class ConnectionRegistry(object):
         self.registerDriver(zuul.driver.bubblewrap.BubblewrapDriver())
         self.registerDriver(zuul.driver.nullwrap.NullwrapDriver())
         self.registerDriver(zuul.driver.mqtt.MQTTDriver())
+        self.registerDriver(zuul.driver.url.URLDriver())
         self.registerDriver(zuul.driver.pagure.PagureDriver())
         self.registerDriver(zuul.driver.gitlab.GitlabDriver())
 

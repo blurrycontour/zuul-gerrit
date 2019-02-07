@@ -26,4 +26,5 @@ Zuul includes the following drivers:
    smtp
    sql
    timer
+   url
    zuul
