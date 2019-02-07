@@ -42,16 +42,16 @@ FROM zuul as zuul-executor
 COPY --from=builder /output/ /output
 RUN pip install --cache-dir=/output/wheels -r /output/zuul_executor/requirements.txt \
   && rm -rf /output
-CMD ["/usr/local/bin/zuul-executor"]
+CMD ["/usr/local/bin/zuul-executor", "-d"]
 
 FROM zuul as zuul-fingergw
-CMD ["/usr/local/bin/zuul-fingergw"]
+CMD ["/usr/local/bin/zuul-fingergw", "-d"]
 
 FROM zuul as zuul-merger
-CMD ["/usr/local/bin/zuul-merger"]
+CMD ["/usr/local/bin/zuul-merger", "-d"]
 
 FROM zuul as zuul-scheduler
-CMD ["/usr/local/bin/zuul-scheduler"]
+CMD ["/usr/local/bin/zuul-scheduler", "-d"]
 
 FROM zuul as zuul-web
-CMD ["/usr/local/bin/zuul-web"]
+CMD ["/usr/local/bin/zuul-web", "-d"]
