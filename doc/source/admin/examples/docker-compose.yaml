@@ -42,7 +42,7 @@ services:
       - mysql
     environment:
       no_proxy: "${no_proxy},gerrit"
-    command: "sh -c '/var/playbooks/wait-to-start.sh && zuul-scheduler -d'"
+    command: "sh -c '/var/playbooks/wait-to-start.sh && zuul-scheduler -f'"
     # FIXME: The scheduler has no ansible anymore so use the executor image.
     #        This needs to be changes such that ansible is not required for startup.
     image: zuul/zuul-scheduler
@@ -52,7 +52,7 @@ services:
       - "sshkey:/var/ssh:z"
       - /var/lib/zuul
   web:
-    command: "sh -c '/var/playbooks/wait-to-start-gearman.sh && zuul-web -d'"
+    command: "sh -c '/var/playbooks/wait-to-start-gearman.sh && zuul-web -f'"
     depends_on:
       - scheduler
       - mysql
@@ -66,7 +66,6 @@ services:
     privileged: true
     environment:
       no_proxy: "${no_proxy},gerrit"
-    command: "zuul-executor -d"
     depends_on:
       - scheduler
     image: zuul/zuul-executor
@@ -86,7 +85,6 @@ services:
     volumes:
       - "nodessh:/root/.ssh:z"
   launcher:
-    command: "nodepool-launcher -d"
     depends_on:
       - zk
     image: zuul/nodepool-launcher
