@@ -51,6 +51,22 @@ class TimerDriver(Driver, TriggerInterface):
         for job in jobs:
             job.remove()
 
+    def _build_cron_trigger(self, timespec):
+        parts = timespec.split()
+        if len(parts) < 5 or len(parts) > 6:
+            raise ValueError("Unable to parse time value '%s'" % timespec)
+            self.log.error(
+                "Unable to parse time value '%s' defined in pipeline %s" % (
+                    timespec))
+        minute, hour, dom, month, dow = parts[:5]
+        if len(parts) > 5:
+            second = parts[5]
+        else:
+            second = None
+        trigger = CronTrigger(day=dom, day_of_week=dow, hour=hour,
+                              minute=minute, second=second)
+        return trigger
+
     def _addJobs(self, tenant):
         jobs = []
         self.tenant_jobs[tenant.name] = jobs
@@ -59,22 +75,13 @@ class TimerDriver(Driver, TriggerInterface):
                 if not isinstance(ef.trigger, timertrigger.TimerTrigger):
                     continue
                 for timespec in ef.timespecs:
-                    parts = timespec.split()
-                    if len(parts) < 5 or len(parts) > 6:
+                    try:
+                        trigger = self._build_cron_trigger(timespec)
+                    except Exception as exc:
                         self.log.error(
-                            "Unable to parse time value '%s' "
-                            "defined in pipeline %s" % (
-                                timespec,
-                                pipeline.name))
+                            "Unable to set CronTrigger for pipeline %s: %s" % (
+                                pipeline.name, exc))
                         continue
-                    minute, hour, dom, month, dow = parts[:5]
-                    if len(parts) > 5:
-                        second = parts[5]
-                    else:
-                        second = None
-                    trigger = CronTrigger(day=dom, day_of_week=dow, hour=hour,
-                                          minute=minute, second=second)
-
                     job = self.apsched.add_job(
                         self._onTrigger, trigger=trigger,
                         args=(tenant, pipeline.name, timespec,))
