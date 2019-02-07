@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_666f93c5",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 515,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-02-07T17:09:33Z",
+      "side": 1,
+      "message": "This is one of those options where I\u0027d love to avoid having to ask people to tune.  Can we come up with a reasonable value that will work for everyone?  Perhaps a metric like x*CPUs?  Or at the very least, a sensible default that\u0027s \u003e 1?",
+      "revId": "604312e699006b5a7965e93d539174c826ad7955",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
