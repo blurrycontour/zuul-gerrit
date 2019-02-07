@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_aa8c6735",
+        "filename": "tests/unit/test_inventory.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-07T09:34:54Z",
+      "side": 1,
+      "message": "This refactoring seems no longer necessary as your new test case now uses AnsibleZuulTestCase as base class.",
+      "revId": "e7dbbfb64b6457f17dea7c50f813025f4df2eb09",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_0acb3353",
+        "filename": "tests/unit/test_inventory.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-07T09:34:54Z",
+      "side": 1,
+      "message": "I think this also needs an assertion that the build was successful.\n\nIt also would be beneficial if we\u0027d have a playbook that  writes a file into the job workspace using the copy module and having a check in the jobdir that this file is written as expected. This way we have an end to end testcase that this is working as expected.\n\nTo accomplish that you could easily add a project org/project2 with such a job and playbook to config/inventory/... and add the fake change to \u0027org/project2\u0027.",
+      "revId": "e7dbbfb64b6457f17dea7c50f813025f4df2eb09",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
