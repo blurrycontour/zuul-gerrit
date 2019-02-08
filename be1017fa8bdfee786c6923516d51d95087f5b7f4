@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_7605ef79",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2019-02-08T15:03:16Z",
+      "side": 1,
+      "message": "How will this work with the deprecation policy? If we deprecate the version that contains the module overrides (which is then symlinked to by higher versions), presumably the deprecated modules would (or should) be removed, which would break the symlinks.",
+      "range": {
+        "startLine": 123,
+        "startChar": 0,
+        "endLine": 126,
+        "endChar": 15
+      },
+      "revId": "be1017fa8bdfee786c6923516d51d95087f5b7f4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
