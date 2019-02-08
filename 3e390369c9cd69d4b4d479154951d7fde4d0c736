@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9fdfeff1_784b9e86",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 17
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 27898
+      },
+      "writtenOn": "2019-02-08T13:40:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9fdfeff1_9c767f3e",
+      "range": {
+        "startLine": 7,
+        "startChar": 14,
+        "endLine": 7,
+        "endChar": 34
+      },
+      "revId": "3e390369c9cd69d4b4d479154951d7fde4d0c736",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fdfeff1_24e1832b",
         "filename": "zuul/executor/client.py",
         "patchSetId": 17
@@ -42,6 +66,24 @@
     },
     {
       "key": {
+        "uuid": "9fdfeff1_38451671",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 27898
+      },
+      "writtenOn": "2019-02-08T13:40:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9fdfeff1_24e1832b",
+      "revId": "3e390369c9cd69d4b4d479154951d7fde4d0c736",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fdfeff1_fc9c6b5c",
         "filename": "zuul/executor/client.py",
         "patchSetId": 17
@@ -53,6 +95,24 @@
       "writtenOn": "2019-02-07T23:21:54Z",
       "side": 1,
       "message": "i don\u0027t think that\u0027s enough, what happen if the message contains {% endraw %} ?",
+      "revId": "3e390369c9cd69d4b4d479154951d7fde4d0c736",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_78139eb9",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 27898
+      },
+      "writtenOn": "2019-02-08T13:40:08Z",
+      "side": 1,
+      "message": "Let add a unit test for this and maybe other escaping situations.",
+      "parentUuid": "9fdfeff1_fc9c6b5c",
       "revId": "3e390369c9cd69d4b4d479154951d7fde4d0c736",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
