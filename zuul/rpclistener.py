@@ -364,41 +364,47 @@ class RPCListener(object):
     def handle_job_list(self, job):
         args = json.loads(job.arguments)
         tenant = self.sched.abide.tenants.get(args.get("tenant"))
-        output = []
+        full = args.get("full")
         if not tenant:
             job.sendWorkComplete(json.dumps(None))
-        for job_name in sorted(tenant.layout.jobs):
-            desc = None
-            tags = set()
-            variants = []
-            for variant in tenant.layout.jobs[job_name]:
-                if not desc and variant.description:
-                    desc = variant.description.split('\n')[0]
-                if variant.tags:
-                    tags.update(list(variant.tags))
-                job_variant = {}
-                if not variant.isBase():
-                    if variant.parent:
-                        job_variant['parent'] = str(variant.parent)
-                    else:
-                        job_variant['parent'] = tenant.default_base_job
-                branches = variant.getBranches()
-                if branches:
-                    job_variant['branches'] = branches
-                if job_variant:
-                    variants.append(job_variant)
+        if full:
+            output = {}
+            for job_name, jobs in tenant.layout.jobs.items():
+                output[job_name] = [j.toDict(tenant) for j in jobs]
+        else:
+            output = []
+            for job_name in sorted(tenant.layout.jobs):
+                desc = None
+                tags = set()
+                variants = []
+                for variant in tenant.layout.jobs[job_name]:
+                    if not desc and variant.description:
+                        desc = variant.description.split('\n')[0]
+                    if variant.tags:
+                        tags.update(list(variant.tags))
+                    job_variant = {}
+                    if not variant.isBase():
+                        if variant.parent:
+                            job_variant['parent'] = str(variant.parent)
+                        else:
+                            job_variant['parent'] = tenant.default_base_job
+                    branches = variant.getBranches()
+                    if branches:
+                        job_variant['branches'] = branches
+                    if job_variant:
+                        variants.append(job_variant)
 
-            job_output = {
-                "name": job_name,
-            }
-            if desc:
-                job_output["description"] = desc
-            if variants:
-                job_output["variants"] = variants
-            if tags:
-                job_output["tags"] = list(tags)
-            output.append(job_output)
-        job.sendWorkComplete(json.dumps(output))
+                job_output = {
+                    "name": job_name,
+                }
+                if desc:
+                    job_output["description"] = desc
+                if variants:
+                    job_output["variants"] = variants
+                if tags:
+                    job_output["tags"] = list(tags)
+                output.append(job_output)
+        job.sendWorkComplete(json.dumps(output, cls=MappingProxyEncoder))
 
     def handle_project_get(self, gear_job):
         args = json.loads(gear_job.arguments)
