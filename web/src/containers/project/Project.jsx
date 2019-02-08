@@ -28,6 +28,7 @@ import ProjectVariant from './ProjectVariant'
 class Project extends React.Component {
   static propTypes = {
     project: PropTypes.object.isRequired,
+    pipelines: PropTypes.array.isRequired,
   }
 
   state = {
@@ -43,7 +44,7 @@ class Project extends React.Component {
   }
 
   render () {
-    const { project } = this.props
+    const { pipelines, project } = this.props
     const { variantIdx } = this.state
 
     return (
@@ -65,7 +66,10 @@ class Project extends React.Component {
             <TabContent>
               <TabPane>
                 {project.configs[variantIdx] && (
-                  <ProjectVariant variant={project.configs[variantIdx]} />
+                  <ProjectVariant
+                    projectName={project.name}
+                    pipelines={pipelines}
+                    variant={project.configs[variantIdx]} />
                 )}
               </TabPane>
             </TabContent>

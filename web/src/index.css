@@ -116,3 +116,8 @@ a.refresh {
 div.tree-view-container ul.list-group {
   margin: 0px 0px;
 }
+
+/* Modal dialog */
+.modal-dialog {
+  width: 90%;
+}
