@@ -135,6 +135,9 @@ function fetchBuildsets (apiPrefix, queryString) {
   }
   return Axios.get(apiUrl + apiPrefix + path)
 }
+function fetchPipelines (apiPrefix) {
+  return Axios.get(apiUrl + apiPrefix + 'pipelines')
+}
 function fetchProject (apiPrefix, projectName) {
   return Axios.get(apiUrl + apiPrefix + 'project/' + projectName)
 }
@@ -153,6 +156,11 @@ function fetchLabels (apiPrefix) {
 function fetchNodes (apiPrefix) {
   return Axios.get(apiUrl + apiPrefix + 'nodes')
 }
+function triggerJobs (apiPrefix, projectName, filters) {
+  return Axios.post(
+    apiUrl + apiPrefix + 'trigger/' + projectName,
+    {job_filters: filters})
+}
 
 export {
   getHomepageUrl,
@@ -163,6 +171,7 @@ export {
   fetchBuild,
   fetchBuilds,
   fetchBuildsets,
+  fetchPipelines,
   fetchProject,
   fetchProjects,
   fetchJob,
@@ -170,5 +179,6 @@ export {
   fetchLabels,
   fetchNodes,
   fetchTenants,
-  fetchInfo
+  fetchInfo,
+  triggerJobs,
 }
