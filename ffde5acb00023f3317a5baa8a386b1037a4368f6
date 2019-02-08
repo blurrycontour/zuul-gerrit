@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_2e02b570",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 367,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2019-02-08T10:40:23Z",
+      "side": 1,
+      "message": "Is there any specific reason for sorting this? The output dict will not retain the order unless you use Python \u003e\u003d 3.6 (and only from Python 3.7 on this is guaranteed; before it is considered to be an implementation detail). Since Zuul supports also Python 3.5 you should rather use an OrderedDict here.",
+      "range": {
+        "startLine": 367,
+        "startChar": 34,
+        "endLine": 367,
+        "endChar": 40
+      },
+      "revId": "ffde5acb00023f3317a5baa8a386b1037a4368f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_6e643d4a",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2019-02-08T10:40:23Z",
+      "side": 1,
+      "message": "nit: Using a list comprehension might be faster than appending to an existing list.",
+      "range": {
+        "startLine": 368,
+        "startChar": 16,
+        "endLine": 370,
+        "endChar": 70
+      },
+      "revId": "ffde5acb00023f3317a5baa8a386b1037a4368f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
