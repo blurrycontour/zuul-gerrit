@@ -24,6 +24,7 @@ import jobs from './jobs'
 import labels from './labels'
 import logfile from './logfile'
 import nodes from './nodes'
+import pipelines from './pipelines'
 import project from './project'
 import projects from './projects'
 import status from './status'
@@ -40,6 +41,7 @@ const reducers = {
   labels,
   logfile,
   nodes,
+  pipelines,
   project,
   projects,
   configErrors,
