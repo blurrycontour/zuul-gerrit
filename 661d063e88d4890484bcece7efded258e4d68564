@@ -45,6 +45,23 @@
       "revId": "661d063e88d4890484bcece7efded258e4d68564",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_c38f3a2c",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2204,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-02-08T18:15:55Z",
+      "side": 1,
+      "message": "It\u0027s a dict or None, because it\u0027s a nullable field in the database, but we could do something different.  Actually, I think if the data comes from a running job instead of from the database, it will either be a dict or absent.  So maybe I\u0027ll change this to be dict or absent.",
+      "revId": "661d063e88d4890484bcece7efded258e4d68564",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
