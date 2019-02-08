@@ -359,18 +359,24 @@ class RPCListener(object):
     def handle_job_list(self, job):
         args = json.loads(job.arguments)
         tenant = self.sched.abide.tenants.get(args.get("tenant"))
-        output = []
+        full = args.get("full")
         if not tenant:
             job.sendWorkComplete(json.dumps(None))
-        for job_name in sorted(tenant.layout.jobs):
-            desc = None
-            for tenant_job in tenant.layout.jobs[job_name]:
-                if tenant_job.description:
-                    desc = tenant_job.description.split('\n')[0]
-                    break
-            output.append({"name": job_name,
-                           "description": desc})
-        job.sendWorkComplete(json.dumps(output))
+        if full:
+            output = {}
+            for job_name, jobs in tenant.layout.jobs.items():
+                output[job_name] = [j.toDict(tenant) for j in jobs]
+        else:
+            output = []
+            for job_name in sorted(tenant.layout.jobs):
+                desc = None
+                for tenant_job in tenant.layout.jobs[job_name]:
+                    if tenant_job.description:
+                        desc = tenant_job.description.split('\n')[0]
+                        break
+                output.append({"name": job_name,
+                               "description": desc})
+        job.sendWorkComplete(json.dumps(output, cls=MappingProxyEncoder))
 
     def handle_project_get(self, gear_job):
         args = json.loads(gear_job.arguments)

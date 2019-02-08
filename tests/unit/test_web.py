@@ -593,6 +593,62 @@ class TestWeb(BaseTestWeb):
         resp = self.get_url("api/tenant/non-tenant/jobs")
         self.assertEqual(404, resp.status_code)
 
+    def test_jobs_list_full(self):
+        expected_test_job = [{
+            'name': 'test-job',
+            'branches': [],
+            'files': [],
+            'irrelevant_files': [],
+            'variant_description': '',
+            'implied_branch': None,
+            'source_context': {
+                'project': 'common-config',
+                'branch': 'master',
+                'path': 'zuul.yaml'
+            },
+            'description': None,
+            'required_projects': [{
+                'project_name': 'review.example.com/org/project',
+                'override_branch': None,
+                'override_checkout': None
+            }],
+            'semaphore': None,
+            'variables': {},
+            'final': False,
+            'abstract': False,
+            'protected': None,
+            'voting': True,
+            'timeout': None,
+            'tags': [],
+            'provides': [],
+            'requires': [],
+            'dependencies': [],
+            'attempts': 3,
+            'roles': [{
+                'target_name': 'common-config',
+                'type': 'zuul',
+                'project_canonical_name': 'review.example.com/common-config',
+                'implicit': True
+            }],
+            'post_review': None,
+            'parent': 'base'
+        }]
+
+        # If full==true, we should get a list of jobs with all details
+        jobs = self.get_url("api/tenant/tenant-one/jobs?full=true").json()
+        # The result should be a dictionary with 9 entries
+        self.assertEqual(len(jobs), 9)
+        self.assertEqual(jobs.get("test-job"), expected_test_job)
+
+        # If full!=true, we should get the normal job list (name, description)
+        jobs = self.get_url("api/tenant/tenant-one/jobs?full=false").json()
+        self.assertEqual(len(jobs), 9)
+        jobs = self.get_url("api/tenant/tenant-one/jobs?full=whatever").json()
+        self.assertEqual(len(jobs), 9)
+
+        resp = self.get_url("api/tenant/non-tenant/jobs?full=true")
+        self.assertEqual(404, resp.status_code)
+
     def test_web_job_noop(self):
         job = self.get_url("api/tenant/tenant-one/job/noop").json()
         self.assertEqual("noop", job[0]["name"])
