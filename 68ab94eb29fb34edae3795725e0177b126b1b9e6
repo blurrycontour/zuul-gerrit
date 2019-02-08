@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "9fdfeff1_37319c0c",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1593,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-02-08T23:45:36Z",
+      "side": 1,
+      "message": "-1: This should be an \u0027or\u0027, not an \u0027and\u0027.",
+      "revId": "68ab94eb29fb34edae3795725e0177b126b1b9e6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fdfeff1_0ced6f8a",
         "filename": "zuul/configloader.py",
         "patchSetId": 9
