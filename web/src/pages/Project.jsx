@@ -17,6 +17,7 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 
 import Project from '../containers/project/Project'
+import { fetchPipelinesIfNeeded } from '../actions/pipelines'
 import { fetchProjectIfNeeded } from '../actions/project'
 import Refreshable from '../containers/Refreshable'
 
@@ -26,10 +27,12 @@ class ProjectPage extends Refreshable {
     match: PropTypes.object.isRequired,
     tenant: PropTypes.object,
     remoteData: PropTypes.object,
+    pipelines: PropTypes.object,
     dispatch: PropTypes.func
   }
 
   updateData = (force) => {
+    this.props.dispatch(fetchPipelinesIfNeeded(this.props.tenant, force))
     this.props.dispatch(fetchProjectIfNeeded(
       this.props.tenant, this.props.match.params.projectName, force))
   }
@@ -40,16 +43,20 @@ class ProjectPage extends Refreshable {
   }
 
   render () {
-    const { remoteData } = this.props
+    const { pipelines, remoteData } = this.props
     const tenantProjects = remoteData.projects[this.props.tenant.name]
+    const tenantPipelines = pipelines.pipelines[this.props.tenant.name]
     const projectName = this.props.match.params.projectName
     return (
       <React.Fragment>
         <div style={{float: 'right'}}>
           {this.renderSpinner()}
         </div>
-        {tenantProjects && tenantProjects[projectName] &&
-         <Project project={tenantProjects[projectName]} />}
+        {tenantProjects && tenantPipelines && tenantProjects[projectName] &&
+         <Project
+           project={tenantProjects[projectName]}
+           pipelines={tenantPipelines}
+         />}
       </React.Fragment>
     )
   }
@@ -57,5 +64,6 @@ class ProjectPage extends Refreshable {
 
 export default connect(state => ({
   tenant: state.tenant,
+  pipelines: state.pipelines,
   remoteData: state.project,
 }))(ProjectPage)
