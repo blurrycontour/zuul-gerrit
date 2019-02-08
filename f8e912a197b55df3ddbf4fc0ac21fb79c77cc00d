@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_ff445d1b",
+        "filename": "doc/source/admin/monitoring.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-02-08T00:15:38Z",
+      "side": 1,
+      "message": "Do we need to scope projects by tenant? I think there may be possibility of project collisions between tenants so not scoping projects by tenant could result in data loss/mixups.",
+      "revId": "f8e912a197b55df3ddbf4fc0ac21fb79c77cc00d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_9fbe71fd",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-02-08T00:15:38Z",
+      "side": 1,
+      "message": "Do we want to emitStatResources below if node.resources is not set? Perhaps we want to move this block under the above if node.resources check? Or instead we can remove that block and update this check to be:\n\n  if build_set and node.resources:\n\nThen replace use of the resources dict below with node.resources.",
+      "revId": "f8e912a197b55df3ddbf4fc0ac21fb79c77cc00d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_5f36c9b6",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-02-08T00:15:38Z",
+      "side": 1,
+      "message": "See above comment doe we need to check if node.resources is set here? and if so maybe we can just use node.resources in place of resources dict below?",
+      "revId": "f8e912a197b55df3ddbf4fc0ac21fb79c77cc00d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
