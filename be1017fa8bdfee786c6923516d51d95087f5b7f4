@@ -22,6 +22,30 @@
       "revId": "be1017fa8bdfee786c6923516d51d95087f5b7f4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_a73483df",
+        "filename": "doc/source/developer/specs/multiple-ansible-versions.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-08T17:09:33Z",
+      "side": 1,
+      "message": "My initial thought would be that we would move them to the next higher version and update the symlinks.\n\nHowever after thinking more about it. How about having a small ansible.yaml file beneath each of these modules with this content:\n\n ansible-versions:\n   - 2.5\n   - 2.6\n\nThe executor that prepares the override modules at startup could read that file for each module and add the module to the according override dirs of the correct ansible versions.\nThis would give us flexibility to easily have multiple versions of override modules if needed.",
+      "parentUuid": "9fdfeff1_7605ef79",
+      "range": {
+        "startLine": 123,
+        "startChar": 0,
+        "endLine": 126,
+        "endChar": 15
+      },
+      "revId": "be1017fa8bdfee786c6923516d51d95087f5b7f4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
