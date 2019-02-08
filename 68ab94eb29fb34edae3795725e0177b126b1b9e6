@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_0ced6f8a",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1595,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-02-08T22:30:26Z",
+      "side": 1,
+      "message": "Super minor style nit for next time:\nIf you do:\n  if not hasattr(job, \u0027files\u0027):\n    debug log\n    continue\nThen you can leave the rest of the main part of this loop in its original indentation.",
+      "revId": "68ab94eb29fb34edae3795725e0177b126b1b9e6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
