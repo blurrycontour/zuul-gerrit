@@ -19,6 +19,40 @@
     },
     {
       "key": {
+        "uuid": "9fdfeff1_ac4788bc",
+        "filename": "doc/source/admin/monitoring.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-02-08T16:47:13Z",
+      "side": 1,
+      "message": "Projects can be in multiple tenants.  They are most likely to only trigger jobs in a single tenant, but not necessarily (for example, a project might be gated in one tenant, but be in a third-party-check pipeline in another).\n\nI think these two hierarchies represent the best way of dealing with this.  The tenant hierarchy tells you how much a complete tenant \"costs\", the project hierarchy tells you how much it \"costs\" to have that project in the system, even though it may be incurring usage across multiple tenants.  Either way, these both seem correct.",
+      "revId": "f8e912a197b55df3ddbf4fc0ac21fb79c77cc00d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_cc420cac",
+        "filename": "releasenotes/notes/resource-usage-stats-bfcd6765ef4a9c86.yaml",
+        "patchSetId": 13
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-02-08T16:47:13Z",
+      "side": 1,
+      "message": "Should this say \u0027tenant\u0027 here, or project?",
+      "revId": "f8e912a197b55df3ddbf4fc0ac21fb79c77cc00d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fdfeff1_9fbe71fd",
         "filename": "zuul/nodepool.py",
         "patchSetId": 13
