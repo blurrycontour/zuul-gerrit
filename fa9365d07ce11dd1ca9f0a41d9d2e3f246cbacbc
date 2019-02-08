@@ -39,6 +39,30 @@
       "revId": "fa9365d07ce11dd1ca9f0a41d9d2e3f246cbacbc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_f3fd763b",
+        "filename": "zuul/driver/timer/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1955
+      },
+      "writtenOn": "2019-02-08T09:42:40Z",
+      "side": 1,
+      "message": "IMHO we can make Etag required[*] jobs wouldn\u0027t trigger on any random URL and this feature makes sense only for those URLs which do represent actual content where ETag makes sense.\n\n[*] It\u0027s one config line! https://httpd.apache.org/docs/2.4/mod/core.html#fileetag",
+      "parentUuid": "9fdfeff1_172606b9",
+      "range": {
+        "startLine": 127,
+        "startChar": 15,
+        "endLine": 127,
+        "endChar": 53
+      },
+      "revId": "fa9365d07ce11dd1ca9f0a41d9d2e3f246cbacbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
