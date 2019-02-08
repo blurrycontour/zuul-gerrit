@@ -146,6 +146,10 @@ function fetchLabels (apiPrefix) {
 function fetchNodes (apiPrefix) {
   return Axios.get(apiUrl + apiPrefix + 'nodes')
 }
+function triggerJob (apiPrefix, projectName, jobName, variables) {
+  return Axios.post(
+    apiUrl + apiPrefix + 'trigger/' + projectName + '/' + jobName, variables)
+}
 
 export {
   getHomepageUrl,
@@ -162,5 +166,6 @@ export {
   fetchLabels,
   fetchNodes,
   fetchTenants,
-  fetchInfo
+  fetchInfo,
+  triggerJob,
 }
