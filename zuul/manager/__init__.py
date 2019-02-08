@@ -14,6 +14,9 @@ import logging
 import textwrap
 import urllib
 
+from opentracing.propagation import Format
+from opentracing import follows_from
+
 from zuul import exceptions
 from zuul import model
 from zuul.lib.dependson import find_dependency_headers
@@ -314,6 +317,8 @@ class PipelineManager(object):
             self.log.info("Adding change %s to queue %s in %s" %
                           (change, change_queue, self.pipeline))
             item = change_queue.enqueueChange(change)
+            change.span.set_tag("change-queue", str(change_queue))
+
             if enqueue_time:
                 item.enqueue_time = enqueue_time
             item.live = live
@@ -857,6 +862,7 @@ class PipelineManager(object):
         # TODOv3(jeblair): handle provisioning failure here
         request = event.request
         build_set = request.build_set
+        request.nodeset.request_span = request.span
         build_set.jobNodeRequestComplete(request.job.name, request,
                                          request.nodeset)
         if request.failed or not request.fulfilled:
@@ -866,11 +872,13 @@ class PipelineManager(object):
             self._resumeBuilds(request.build_set)
             tenant = build_set.item.pipeline.tenant
             tenant.semaphore_handler.release(build_set.item, request.job)
-
+            request.span.log_kv({"event": "error", "message": "Node request failed"})
         self.log.info("Completed node request %s for job %s of item %s "
                       "with nodes %s" %
                       (request, request.job, build_set.item,
                        request.nodeset))
+        request.span.set_tag("nodeset", request.nodeset)
+        request.span.finish()
 
     def reportItem(self, item):
         if not item.reported:

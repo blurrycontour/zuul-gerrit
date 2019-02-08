@@ -26,6 +26,8 @@ import sys
 import threading
 import time
 
+from opentracing import follows_from
+
 from zuul import configloader
 from zuul import model
 from zuul import exceptions
@@ -263,8 +265,9 @@ class Scheduler(threading.Thread):
     log = logging.getLogger("zuul.Scheduler")
     _stats_interval = 30
 
-    def __init__(self, config, testonly=False):
+    def __init__(self, config, testonly=False, tracer=None):
         threading.Thread.__init__(self)
+        self.tracer = tracer
         self.daemon = True
         self.hostname = socket.getfqdn()
         self.wake_event = threading.Event()
@@ -985,6 +988,10 @@ class Scheduler(threading.Thread):
             self.log.debug("Statsd enabled")
         else:
             self.log.debug("Statsd not configured")
+        if self.tracer:
+            self.log.debug("Tracing enabled")
+        else:
+            self.log.debug("Tracing not configured")
         while True:
             self.log.debug("Run handler sleeping")
             self.wake_event.wait()
@@ -1056,6 +1063,15 @@ class Scheduler(threading.Thread):
                     continue
                 try:
                     change = project.source.getChange(event)
+                    span_reference = None
+                    if event.span is not None:
+                        span_reference = follows_from(event.span.context)
+                    span = self.tracer.start_span("change",
+                                                  references=span_reference)
+                    span.set_tag("change-id", str(change))
+                    span.set_tag("project", change.project)
+                    span.set_tag("ref", change.ref)
+                    change.span = span
                 except exceptions.ChangeNotFound as e:
                     self.log.debug("Unable to get change %s from "
                                    "source %s",
@@ -1102,6 +1118,8 @@ class Scheduler(threading.Thread):
                     if pipeline.manager.eventMatches(event, change):
                         pipeline.manager.addChange(change)
         finally:
+            if event.span is not None:
+                event.span.finish()
             self.trigger_event_queue.task_done()
 
     def process_management_queue(self):

@@ -102,7 +102,8 @@ class Executor(zuul.cmd.ZuulDaemonApp):
         self.executor = ExecutorServer(self.config, self.connections,
                                        jobdir_root=self.job_dir,
                                        keep_jobdir=self.args.keep_jobdir,
-                                       log_streaming_port=self.finger_port)
+                                       log_streaming_port=self.finger_port,
+                                       tracer=self.tracer)
         self.executor.start()
 
         if self.args.nodaemon:

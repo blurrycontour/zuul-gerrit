@@ -26,6 +26,9 @@ import textwrap
 import types
 import itertools
 
+from opentracing.propagation import Format
+from opentracing import follows_from
+
 from zuul import change_matcher
 from zuul.lib.config import get_default
 from zuul.lib.artifacts import get_artifacts_from_result_data
@@ -424,6 +427,7 @@ class ChangeQueue(object):
     def dequeueItem(self, item):
         if item in self.queue:
             self.queue.remove(item)
+            item.change.span.finish()
         if item.item_ahead:
             item.item_ahead.items_behind.remove(item)
         for item_behind in item.items_behind:
@@ -641,6 +645,7 @@ class NodeSet(ConfigObject):
         self.name = name or ''
         self.nodes = OrderedDict()
         self.groups = OrderedDict()
+        self.request_span = None
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -701,7 +706,8 @@ class NodeSet(ConfigObject):
 class NodeRequest(object):
     """A request for a set of nodes."""
 
-    def __init__(self, requestor, build_set, job, nodeset, relative_priority):
+    def __init__(self, requestor, build_set, job, nodeset, relative_priority,
+                 span):
         self.requestor = requestor
         self.build_set = build_set
         self.job = job
@@ -719,6 +725,10 @@ class NodeRequest(object):
         # overwritten).
         self.failed = False
         self.canceled = False
+
+        span.set_tag("job", job.name)
+        span.set_tag("request-id", self.uid)
+        self.span = span
 
     @property
     def priority(self):
@@ -758,6 +768,9 @@ class NodeRequest(object):
         d['state'] = self.state
         d['state_time'] = self.state_time
         d['relative_priority'] = self.relative_priority
+        # Serialize span
+        d['span'] = {}
+        self.span.tracer.inject(self.span, Format.TEXT_MAP, d['span'])
         return d
 
     def updateFromDict(self, data):
@@ -1706,6 +1719,7 @@ class Build(object):
         self.node_labels = []
         self.node_name = None
         self.nodeset = None
+        self.span = None
 
     def __repr__(self):
         return ('<Build %s of %s voting:%s on %s>' %
@@ -2701,6 +2715,7 @@ class Ref(object):
         self.oldrev = None
         self.newrev = None
         self.files = []
+        self.span = None
 
     def _id(self):
         return self.newrev
@@ -2919,6 +2934,7 @@ class TriggerEvent(object):
         # For events that arrive with a destination pipeline (eg, from
         # an admin command, etc):
         self.forced_pipeline = None
+        self.span = None
 
     @property
     def canonical_project_name(self):

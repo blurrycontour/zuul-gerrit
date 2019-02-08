@@ -18,6 +18,7 @@ import threading
 import traceback
 
 import gear
+from opentracing.propagation import Format
 
 from zuul.lib import commandsocket
 from zuul.lib.config import get_default
@@ -30,7 +31,8 @@ COMMANDS = ['stop']
 class MergeServer(object):
     log = logging.getLogger("zuul.MergeServer")
 
-    def __init__(self, config, connections={}):
+    def __init__(self, config, connections={}, tracer=None):
+        self.tracer = tracer
         self.config = config
 
         merge_root = get_default(self.config, 'merger', 'git_dir',
@@ -111,22 +113,25 @@ class MergeServer(object):
         while self._running:
             try:
                 job = self.worker.getJob()
+                args = json.loads(job.arguments)
+                parent_span = self.tracer.extract(Format.TEXT_MAP, args["span"])
                 try:
-                    if job.name == 'merger:merge':
-                        self.log.debug("Got merge job: %s" % job.unique)
-                        self.merge(job)
-                    elif job.name == 'merger:cat':
-                        self.log.debug("Got cat job: %s" % job.unique)
-                        self.cat(job)
-                    elif job.name == 'merger:refstate':
-                        self.log.debug("Got refstate job: %s" % job.unique)
-                        self.refstate(job)
-                    elif job.name == 'merger:fileschanges':
-                        self.log.debug("Got fileschanges job: %s" % job.unique)
-                        self.fileschanges(job)
-                    else:
-                        self.log.error("Unable to handle job %s" % job.name)
-                        job.sendWorkFail()
+                    with self.tracer.start_span(job.name, child_of=parent_span):
+                        if job.name == 'merger:merge':
+                            self.log.debug("Got merge job: %s" % job.unique)
+                            self.merge(job)
+                        elif job.name == 'merger:cat':
+                            self.log.debug("Got cat job: %s" % job.unique)
+                            self.cat(job)
+                        elif job.name == 'merger:refstate':
+                            self.log.debug("Got refstate job: %s" % job.unique)
+                            self.refstate(job)
+                        elif job.name == 'merger:fileschanges':
+                            self.log.debug("Got fileschanges job: %s" % job.unique)
+                            self.fileschanges(job)
+                        else:
+                            self.log.error("Unable to handle job %s" % job.name)
+                            job.sendWorkFail()
                 except Exception:
                     self.log.exception("Exception while running job")
                     job.sendWorkException(traceback.format_exc())

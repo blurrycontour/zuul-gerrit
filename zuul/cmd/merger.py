@@ -52,7 +52,8 @@ class Merger(zuul.cmd.ZuulDaemonApp):
         self.setup_logging('merger', 'log_config')
 
         self.merger = zuul.merger.server.MergeServer(self.config,
-                                                     self.connections)
+                                                     self.connections,
+                                                     tracer=self.tracer)
         self.merger.start()
 
         if self.args.nodaemon:

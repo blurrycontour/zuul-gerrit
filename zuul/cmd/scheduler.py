@@ -129,7 +129,7 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         self.setup_logging('scheduler', 'log_config')
         self.log = logging.getLogger("zuul.Scheduler")
 
-        self.sched = zuul.scheduler.Scheduler(self.config)
+        self.sched = zuul.scheduler.Scheduler(self.config, tracer=self.tracer)
 
         gearman = zuul.executor.client.ExecutorClient(self.config, self.sched)
         self.sched.setZuulApp(self)

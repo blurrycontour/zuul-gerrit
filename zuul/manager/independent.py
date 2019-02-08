@@ -52,6 +52,13 @@ class IndependentPipelineManager(PipelineManager):
         self.log.debug("  Changes %s must be merged ahead of %s" %
                        (ret, change))
         for needed_change in ret:
+            if needed_change.span is None:
+                span = self.sched.tracer.start_span("change")
+                span.set_tag("change-id", str(needed_change))
+                span.set_tag("project", change.project)
+                span.set_tag("ref", change.ref)
+                needed_change.span = span
+            needed_change.span.set_tag("needed-by", str(change))
             # This differs from the dependent pipeline by enqueuing
             # changes ahead as "not live", that is, not intended to
             # have jobs run.  Also, pipeline requirements are always
@@ -62,6 +69,7 @@ class IndependentPipelineManager(PipelineManager):
                                live=False, change_queue=change_queue,
                                history=history)
             if not r:
+                needed_change.span.finish()
                 return False
         return True
 

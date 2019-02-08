@@ -29,6 +29,8 @@ import sys
 import traceback
 import threading
 
+from jaeger_client import Config
+
 yappi = extras.try_import('yappi')
 objgraph = extras.try_import('objgraph')
 
@@ -134,6 +136,19 @@ class ZuulApp(object):
         raise Exception("Unable to locate config file in %s" % locations)
 
     def setup_logging(self, section, parameter):
+        config = Config(
+            config={  # usually read from some yaml config
+                'sampler': {
+                    'type': 'const',
+                    'param': 1,
+                },
+                'logging': True,
+            },
+            service_name=self.app_name,
+            validate=True,
+        )
+        # this call also sets opentracing.tracer
+        self.tracer = config.initialize_tracer()
         if self.config.has_option(section, parameter):
             fp = os.path.expanduser(self.config.get(section, parameter))
             logging_config = logconfig.load_config(fp)

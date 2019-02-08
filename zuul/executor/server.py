@@ -40,6 +40,9 @@ except ImportError:
     ara_callbacks = None
 import gear
 
+from opentracing import follows_from
+from opentracing.propagation import Format
+
 import zuul.merger.merger
 import zuul.ansible.logconfig
 from zuul.executor.sensors.cpu import CPUSensor
@@ -644,6 +647,10 @@ class AnsibleJob(object):
         self.executor_server = executor_server
         self.job = job
         self.arguments = json.loads(job.arguments)
+
+        self.tracer = self.executor_server.tracer
+        self.span = self.tracer.extract(Format.TEXT_MAP, self.arguments["span"])
+
         self.jobdir = None
         self.proc = None
         self.proc_lock = threading.Lock()
@@ -738,15 +745,17 @@ class AnsibleJob(object):
 
     def execute(self):
         try:
-            self.time_starting_build = time.monotonic()
-            self.ssh_agent.start()
-            self.ssh_agent.add(self.private_key_file)
-            for key in self.arguments.get('ssh_keys', []):
-                self.ssh_agent.addData(key['name'], key['key'])
-            self.jobdir = JobDir(self.executor_server.jobdir_root,
-                                 self.executor_server.keep_jobdir,
-                                 str(self.job.unique))
-            self._execute()
+            with self.tracer.start_span("build-exec",
+                                        child_of=self.span) as span:
+                self.time_starting_build = time.monotonic()
+                self.ssh_agent.start()
+                self.ssh_agent.add(self.private_key_file)
+                for key in self.arguments.get('ssh_keys', []):
+                    self.ssh_agent.addData(key['name'], key['key'])
+                self.jobdir = JobDir(self.executor_server.jobdir_root,
+                                     self.executor_server.keep_jobdir,
+                                     str(self.job.unique))
+                self._execute(span)
         except ExecutorError as e:
             result_data = json.dumps(dict(result='ERROR',
                                           error_detail=e.args[0]))
@@ -772,121 +781,129 @@ class AnsibleJob(object):
             except Exception:
                 self.log.exception("Error finalizing job thread:")
 
-    def _execute(self):
-        args = self.arguments
-        self.log.info(
-            "Beginning job %s for ref %s (change %s)" % (
-                args['zuul']['job'],
-                args['zuul']['ref'],
-                args['zuul']['change_url']))
-        self.log.debug("Job root: %s" % (self.jobdir.root,))
-        tasks = []
-        projects = set()
+    def _execute(self, span):
+        with self.tracer.start_span("build-prep",
+                                    child_of=span) as prep_span:
+            args = self.arguments
+            self.log.info(
+                "Beginning job %s for ref %s (change %s)" % (
+                    args['zuul']['job'],
+                    args['zuul']['ref'],
+                    args['zuul']['change_url']))
+            self.log.debug("Job root: %s" % (self.jobdir.root,))
+            tasks = []
+            projects = set()
 
-        # Make sure all projects used by the job are updated...
-        for project in args['projects']:
-            self.log.debug("Updating project %s" % (project,))
-            tasks.append(self.executor_server.update(
-                project['connection'], project['name']))
-            projects.add((project['connection'], project['name']))
+            # Make sure all projects used by the job are updated...
+            for project in args['projects']:
+                self.log.debug("Updating project %s" % (project,))
+                tasks.append(self.executor_server.update(
+                    project['connection'], project['name']))
+                projects.add((project['connection'], project['name']))
 
-        # ...as well as all playbook and role projects.
-        repos = []
-        playbooks = (args['pre_playbooks'] + args['playbooks'] +
-                     args['post_playbooks'])
-        for playbook in playbooks:
-            repos.append(playbook)
-            repos += playbook['roles']
+            # ...as well as all playbook and role projects.
+            repos = []
+            playbooks = (args['pre_playbooks'] + args['playbooks'] +
+                        args['post_playbooks'])
+            for playbook in playbooks:
+                repos.append(playbook)
+                repos += playbook['roles']
 
-        for repo in repos:
-            self.log.debug("Updating playbook or role %s" % (repo['project'],))
-            key = (repo['connection'], repo['project'])
-            if key not in projects:
-                tasks.append(self.executor_server.update(*key))
-                projects.add(key)
+            for repo in repos:
+                self.log.debug("Updating playbook or role %s" % (repo['project'],))
+                key = (repo['connection'], repo['project'])
+                if key not in projects:
+                    tasks.append(self.executor_server.update(*key))
+                    projects.add(key)
 
-        for task in tasks:
-            task.wait()
+            for task in tasks:
+                task.wait()
 
-            if not task.success:
-                raise ExecutorError(
-                    'Failed to update project %s' % task.canonical_name)
+                if not task.success:
+                    raise ExecutorError(
+                        'Failed to update project %s' % task.canonical_name)
 
-            self.project_info[task.canonical_name] = {
-                'refs': task.refs,
-                'branches': task.branches,
-            }
+                self.project_info[task.canonical_name] = {
+                    'refs': task.refs,
+                    'branches': task.branches,
+                }
 
-        self.log.debug("Git updates complete")
-        merger = self.executor_server._getMerger(
-            self.jobdir.src_root,
-            self.executor_server.merge_root,
-            self.log)
-        repos = {}
-        for project in args['projects']:
-            self.log.debug("Cloning %s/%s" % (project['connection'],
-                                              project['name'],))
-            repo = merger.getRepo(project['connection'],
-                                  project['name'])
-            repos[project['canonical_name']] = repo
+            self.log.debug("Git updates complete")
+            merger = self.executor_server._getMerger(
+                self.jobdir.src_root,
+                self.executor_server.merge_root,
+                self.log)
+            repos = {}
+            for project in args['projects']:
+                self.log.debug("Cloning %s/%s" % (project['connection'],
+                                                project['name'],))
+                repo = merger.getRepo(project['connection'],
+                                    project['name'])
+                repos[project['canonical_name']] = repo
 
-        # The commit ID of the original item (before merging).  Used
-        # later for line mapping.
-        item_commit = None
+            # The commit ID of the original item (before merging).  Used
+            # later for line mapping.
+            item_commit = None
 
-        merge_items = [i for i in args['items'] if i.get('number')]
-        if merge_items:
-            item_commit = self.doMergeChanges(merger, merge_items,
-                                              args['repo_state'])
-            if item_commit is None:
-                # There was a merge conflict and we have already sent
-                # a work complete result, don't run any jobs
-                return
+        with self.tracer.start_span("build-merge", child_of=span,
+                references=[follows_from(prep_span.context)]) as merge_span:
+            merge_items = [i for i in args['items'] if i.get('number')]
+            if merge_items:
+                item_commit = self.doMergeChanges(merger, merge_items,
+                                                args['repo_state'])
+                if item_commit is None:
+                    # There was a merge conflict and we have already sent
+                    # a work complete result, don't run any jobs
+                    return
 
-        state_items = [i for i in args['items'] if not i.get('number')]
-        if state_items:
-            merger.setRepoState(state_items, args['repo_state'])
+            state_items = [i for i in args['items'] if not i.get('number')]
+            if state_items:
+                merger.setRepoState(state_items, args['repo_state'])
 
-        for project in args['projects']:
-            repo = repos[project['canonical_name']]
-            # If this project is the Zuul project and this is a ref
-            # rather than a change, checkout the ref.
-            if (project['canonical_name'] ==
-                args['zuul']['project']['canonical_name'] and
-                (not args['zuul'].get('branch')) and
-                args['zuul'].get('ref')):
-                ref = args['zuul']['ref']
-            else:
-                ref = None
-            selected_ref, selected_desc = self.resolveBranch(
-                project['canonical_name'],
-                ref,
-                args['branch'],
-                args['override_branch'],
-                args['override_checkout'],
-                project['override_branch'],
-                project['override_checkout'],
-                project['default_branch'])
-            self.log.info("Checking out %s %s %s",
-                          project['canonical_name'], selected_desc,
-                          selected_ref)
-            repo.checkout(selected_ref)
+            for project in args['projects']:
+                repo = repos[project['canonical_name']]
+                # If this project is the Zuul project and this is a ref
+                # rather than a change, checkout the ref.
+                if (project['canonical_name'] ==
+                    args['zuul']['project']['canonical_name'] and
+                    (not args['zuul'].get('branch')) and
+                    args['zuul'].get('ref')):
+                    ref = args['zuul']['ref']
+                else:
+                    ref = None
+                selected_ref, selected_desc = self.resolveBranch(
+                    project['canonical_name'],
+                    ref,
+                    args['branch'],
+                    args['override_branch'],
+                    args['override_checkout'],
+                    project['override_branch'],
+                    project['override_checkout'],
+                    project['default_branch'])
+                self.log.info("Checking out %s %s %s",
+                            project['canonical_name'], selected_desc,
+                            selected_ref)
+                repo.checkout(selected_ref)
 
-            # Update the inventory variables to indicate the ref we
-            # checked out
-            p = args['zuul']['projects'][project['canonical_name']]
-            p['checkout'] = selected_ref
+                # Update the inventory variables to indicate the ref we
+                # checked out
+                p = args['zuul']['projects'][project['canonical_name']]
+                p['checkout'] = selected_ref
 
-        # Set the URL of the origin remote for each repo to a bogus
-        # value. Keeping the remote allows tools to use it to determine
-        # which commits are part of the current change.
-        for repo in repos.values():
-            repo.setRemoteUrl('file:///dev/null')
+            # Set the URL of the origin remote for each repo to a bogus
+            # value. Keeping the remote allows tools to use it to determine
+            # which commits are part of the current change.
+            for repo in repos.values():
+                repo.setRemoteUrl('file:///dev/null')
 
-        # This prepares each playbook and the roles needed for each.
-        self.preparePlaybooks(args)
+        with self.tracer.start_span("build-ansible-prep", child_of=span,
+                references=[
+                    follows_from(merge_span.context)
+                ]) as ansible_prep_span:
+            # This prepares each playbook and the roles needed for each.
+            self.preparePlaybooks(args)
 
-        self.prepareAnsibleFiles(args)
+            self.prepareAnsibleFiles(args)
         self.writeLoggingConfig()
 
         data = {
@@ -912,20 +929,29 @@ class AnsibleJob(object):
         self.job.sendWorkData(json.dumps(data))
         self.job.sendWorkStatus(0, 100)
 
-        result = self.runPlaybooks(args)
+        with self.tracer.start_span("build-run", child_of=span,
+                references=[
+                    follows_from(ansible_prep_span.context)
+                ]) as run_span:
+            result = self.runPlaybooks(args)
+            run_span.log_kv({"result": result})
 
-        # Stop the persistent SSH connections.
-        setup_status, setup_code = self.runAnsibleCleanup(
-            self.jobdir.setup_playbook)
+        with self.tracer.start_span("build-cleanup", child_of=span,
+                references=[
+                    follows_from(run_span.context)
+                ]):
+            # Stop the persistent SSH connections.
+            setup_status, setup_code = self.runAnsibleCleanup(
+                self.jobdir.setup_playbook)
 
-        if self.aborted_reason == self.RESULT_DISK_FULL:
-            result = 'DISK_FULL'
-        data = self.getResultData()
-        warnings = []
-        self.mapLines(merger, args, data, item_commit, warnings)
-        result_data = json.dumps(dict(result=result,
-                                      warnings=warnings,
-                                      data=data))
+            if self.aborted_reason == self.RESULT_DISK_FULL:
+                result = 'DISK_FULL'
+            data = self.getResultData()
+            warnings = []
+            self.mapLines(merger, args, data, item_commit, warnings)
+            result_data = json.dumps(dict(result=result,
+                                          warnings=warnings,
+                                          data=data))
         self.log.debug("Sending result: %s" % (result_data,))
         self.job.sendWorkComplete(result_data)
 
@@ -2145,7 +2171,9 @@ class ExecutorServer(object):
     _job_class = AnsibleJob
 
     def __init__(self, config, connections={}, jobdir_root=None,
-                 keep_jobdir=False, log_streaming_port=DEFAULT_FINGER_PORT):
+                 keep_jobdir=False, log_streaming_port=DEFAULT_FINGER_PORT,
+                 tracer=None):
+        self.tracer = tracer
         self.config = config
         self.keep_jobdir = keep_jobdir
         self.jobdir_root = jobdir_root
@@ -2679,10 +2707,12 @@ class ExecutorServer(object):
 
     def merge(self, job):
         args = json.loads(job.arguments)
+        parent_span = self.tracer.extract(Format.TEXT_MAP, args["span"])
         with self.merger_lock:
-            ret = self.merger.mergeChanges(args['items'], args.get('files'),
-                                           args.get('dirs', []),
-                                           args.get('repo_state'))
+            with self.tracer.start_span("merge", child_of=parent_span):
+                ret = self.merger.mergeChanges(args['items'], args.get('files'),
+                                               args.get('dirs', []),
+                                               args.get('repo_state'))
         result = dict(merged=(ret is not None))
         if ret is None:
             result['commit'] = result['files'] = result['repo_state'] = None

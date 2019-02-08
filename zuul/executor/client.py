@@ -20,6 +20,9 @@ import time
 import threading
 from uuid import uuid4
 
+from opentracing.propagation import Format
+from opentracing import follows_from
+
 import zuul.model
 from zuul.lib.config import get_default
 from zuul.lib.gear_utils import getGearmanFunctions
@@ -304,6 +307,12 @@ class ExecutorClient(object):
         build.parameters = params
         build.nodeset = nodeset
 
+        build.span = self.sched.tracer.start_span(
+            "build", child_of=item.change.span,
+            references=follows_from(nodeset.request_span.context))
+        build.span.set_tag("build", uuid)
+        build.span.set_tag("job", job)
+
         self.log.debug("Adding build %s of job %s to item %s" %
                        (build, job, item))
         item.addBuild(build)
@@ -311,7 +320,13 @@ class ExecutorClient(object):
         if job.name == 'noop':
             self.sched.onBuildStarted(build)
             self.sched.onBuildCompleted(build, 'SUCCESS', {}, [])
+            build.span.finish()
             return build
+
+        # Serialize the span
+        span_ctx = {}
+        self.sched.tracer.inject(build.span, Format.TEXT_MAP, span_ctx)
+        params["span"] = span_ctx
 
         functions = getGearmanFunctions(self.gearman)
         function_name = 'executor:execute'
@@ -452,6 +467,7 @@ class ExecutorClient(object):
             # The test suite expects the build to be removed from the
             # internal dict after it's added to the report queue.
             del self.builds[job.unique]
+            build.span.finish()
         else:
             if not job.name.startswith("executor:stop:"):
                 self.log.error("Unable to find build %s" % job.unique)
@@ -498,6 +514,7 @@ class ExecutorClient(object):
         if req.response.startswith(b"OK"):
             try:
                 del self.builds[job.unique]
+                build.span.finish()
             except Exception:
                 pass
             # Since this isn't otherwise going to get a build complete

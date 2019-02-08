@@ -18,6 +18,7 @@ import threading
 from uuid import uuid4
 
 import gear
+from opentracing.propagation import Format
 
 import zuul.model
 from zuul.lib.config import get_default
@@ -101,11 +102,27 @@ class MergeClient(object):
 
     def submitJob(self, name, data, build_set,
                   precedence=zuul.model.PRECEDENCE_NORMAL):
+
+        parent_span = None
+        if build_set is not None:
+            parent_span = build_set.item.change.span
+        span = self.sched.tracer.start_span(name, child_of=parent_span)
+        if build_set is not None:
+            span.set_tag("buildset", build_set.uuid)
+            span.set_tag("change", build_set.item.change)
+
+        # Serialize the span
+        span_ctx = {}
+        self.sched.tracer.inject(span, Format.TEXT_MAP, span_ctx)
+        data['span'] = span_ctx
+
         uuid = str(uuid4().hex)
         job = MergeJob(name,
                        json.dumps(data),
                        unique=uuid)
         job.build_set = build_set
+        job.span = span
+
         self.log.debug("Submitting job %s with data %s" % (job, data))
         self.jobs.add(job)
         self.gearman.submitJob(job, precedence=precedence,
@@ -158,6 +175,7 @@ class MergeClient(object):
                       "commit: %s" %
                       (job, merged, job.updated, commit))
         job.setComplete()
+        job.span.finish()
         if job.build_set:
             if job.name == 'merger:fileschanges':
                 self.sched.onFilesChangesCompleted(job.build_set, files)

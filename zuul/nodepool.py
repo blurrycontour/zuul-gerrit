@@ -60,11 +60,13 @@ class Nodepool(object):
         pipe.send()
 
     def requestNodes(self, build_set, job, relative_priority):
+        span = self.sched.tracer.start_span(
+            "request-nodes", child_of=build_set.item.change.span)
         # Create a copy of the nodeset to represent the actual nodes
         # returned by nodepool.
         nodeset = job.nodeset.copy()
         req = model.NodeRequest(self.sched.hostname, build_set, job,
-                                nodeset, relative_priority)
+                                nodeset, relative_priority, span)
         self.requests[req.uid] = req
 
         if nodeset.nodes:
@@ -228,6 +230,7 @@ class Nodepool(object):
 
         if request.canceled:
             del self.requests[request.uid]
+            request.span.finish()
             self.emitStats(request)
             return False
 

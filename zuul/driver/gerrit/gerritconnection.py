@@ -71,6 +71,8 @@ class GerritEventConnector(threading.Thread):
         now = time.time()
         time.sleep(max((ts + self.delay) - now, 0.0))
         event = GerritTriggerEvent()
+        event.span = self.connection.sched.tracer.start_span(
+            "gerrit-trigger-event")
         event.type = data.get('type')
         # This catches when a change is merged, as it could potentially
         # have merged layout info which will need to be read in.
