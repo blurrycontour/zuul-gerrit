@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "9fdfeff1_cca52c49",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2019-02-08T17:04:24Z",
+      "side": 1,
+      "message": "Could it be defined at project templates level as well ?",
+      "range": {
+        "startLine": 172,
+        "startChar": 4,
+        "endLine": 172,
+        "endChar": 11
+      },
+      "revId": "53a4ca3f00809e86472f8b9b83b8ba6d4f4edd89",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fdfeff1_4424c7c6",
         "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
         "patchSetId": 7
@@ -31,6 +54,23 @@
       "side": 1,
       "message": "Ideally we should have groups support, but we need a way to distinguish groups defined in zuul\u0027s config for convenience and scalability vs groups as claims from the Identity Provider; we don\u0027t necessarily want these to map one-to-one. The spec being complex as it is, I thought we could discuss that later, but I\u0027m okay with adding group support to the scope.",
       "parentUuid": "9fdfeff1_4424c7c6",
+      "revId": "53a4ca3f00809e86472f8b9b83b8ba6d4f4edd89",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_ac2d48a9",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2019-02-08T17:04:24Z",
+      "side": 1,
+      "message": "It would be maybe more convenient to have a new authorization object like:\n\n```\n- authorization:\n    name: auth-name\n    acl:\n      enqueue:\n        - venkman\n      ...\n```\n\nThen use it *only* at tenant level:\n\n```\n- tenant:\n    name: tenantA\n    authorization: auth-name\n    source:\n      gerrit:\n        untrusted-projects:\n          - p1\n          - p2:\n              authorization: alt-auth-name\n```\n\nWhere we can overwrite the default auth for a tenant at project level as well.",
       "revId": "53a4ca3f00809e86472f8b9b83b8ba6d4f4edd89",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
