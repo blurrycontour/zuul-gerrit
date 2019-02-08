@@ -64,7 +64,9 @@ class Project extends React.Component {
             </Nav>
             <TabContent>
               <TabPane>
-                <ProjectVariant variant={project.configs[variantIdx]} />
+                <ProjectVariant
+                  projectName={project.name}
+                  variant={project.configs[variantIdx]} />
               </TabPane>
             </TabContent>
           </div>

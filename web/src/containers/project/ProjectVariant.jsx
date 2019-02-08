@@ -16,16 +16,20 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { Button } from 'patternfly-react'
+
+import BuildModal from '../build/BuildModal'
 
 
 class ProjectVariant extends React.Component {
   static propTypes = {
+    projectName: PropTypes.string,
     tenant: PropTypes.object,
     variant: PropTypes.object.isRequired
   }
 
   render () {
-    const { tenant, variant } = this.props
+    const { projectName, tenant, variant } = this.props
     const rows = []
 
     rows.push({label: 'Merge mode', value: variant.merge_mode})
@@ -40,6 +44,7 @@ class ProjectVariant extends React.Component {
       rows.push({label: 'Templates', value: templateList})
     }
 
+    const modalRefs = {}
     variant.pipelines.forEach(pipeline => {
       // TODO: either adds job link anchor to load the right variant
       // and/or show the job variant config in a modal?
@@ -53,6 +58,18 @@ class ProjectVariant extends React.Component {
                 <Link to={tenant.linkPrefix + '/job/' + item[0].name}>
                   {item[0].name}
                 </Link>
+                <BuildModal
+                  onRef={e => (modalRefs[pipeline.name + item[0].name] = e)}
+                  projectName={projectName}
+                  jobName={item[0].name} />&nbsp;
+                <Button
+                  onClick={() => (
+                    modalRefs[pipeline.name+item[0].name].show()
+                  )}
+                  bsStyle='primary'
+                  title='Trigger this job'>
+                  Build
+                </Button>
               </li>
             ))}
           </ul>
