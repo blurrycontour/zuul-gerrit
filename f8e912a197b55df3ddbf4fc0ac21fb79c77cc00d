@@ -53,6 +53,24 @@
     },
     {
       "key": {
+        "uuid": "9fdfeff1_ac20e8f8",
+        "filename": "releasenotes/notes/resource-usage-stats-bfcd6765ef4a9c86.yaml",
+        "patchSetId": 13
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-08T16:59:00Z",
+      "side": 1,
+      "message": "good catch, of course that should be project",
+      "parentUuid": "9fdfeff1_cc420cac",
+      "revId": "f8e912a197b55df3ddbf4fc0ac21fb79c77cc00d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fdfeff1_9fbe71fd",
         "filename": "zuul/nodepool.py",
         "patchSetId": 13
@@ -64,6 +82,24 @@
       "writtenOn": "2019-02-08T00:15:38Z",
       "side": 1,
       "message": "Do we want to emitStatResources below if node.resources is not set? Perhaps we want to move this block under the above if node.resources check? Or instead we can remove that block and update this check to be:\n\n  if build_set and node.resources:\n\nThen replace use of the resources dict below with node.resources.",
+      "revId": "f8e912a197b55df3ddbf4fc0ac21fb79c77cc00d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_0cac9433",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-08T16:59:00Z",
+      "side": 1,
+      "message": "Will change that to\n\n if build_set and resources:\n\nAs discussed on irc",
+      "parentUuid": "9fdfeff1_9fbe71fd",
       "revId": "f8e912a197b55df3ddbf4fc0ac21fb79c77cc00d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
