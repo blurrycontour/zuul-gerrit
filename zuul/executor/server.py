@@ -915,8 +915,7 @@ class AnsibleJob(object):
         result = self.runPlaybooks(args)
 
         # Stop the persistent SSH connections.
-        setup_status, setup_code = self.runAnsibleCleanup(
-            self.jobdir.setup_playbook)
+        self.runAnsibleCleanup(self.jobdir.setup_playbook)
 
         if self.aborted_reason == self.RESULT_DISK_FULL:
             result = 'DISK_FULL'
@@ -2008,10 +2007,6 @@ class AnsibleJob(object):
         return result, code
 
     def runAnsibleCleanup(self, playbook):
-        # TODO(jeblair): This requires a bugfix in Ansible 2.4
-        # Once this is used, increase the controlpersist timeout.
-        return (self.RESULT_NORMAL, 0)
-
         if self.executor_server.verbose:
             verbose = '-vvv'
         else:
@@ -2029,7 +2024,6 @@ class AnsibleJob(object):
             base_key = "zuul.executor.{hostname}.phase.cleanup"
             self.executor_server.statsd.incr(base_key + ".%s" %
                                              self.RESULT_MAP[result])
-        return result, code
 
     def emitPlaybookBanner(self, playbook, step, phase, result=None):
         # This is used to print a header and a footer, respectively at the
