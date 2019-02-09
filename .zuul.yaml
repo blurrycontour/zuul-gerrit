@@ -30,6 +30,12 @@
       - requirements.txt
 
 - job:
+    name: zuul-stream-functional-2.5
+    parent: zuul-stream-functional
+    vars:
+      zuul_ansible_version: 2.5
+
+- job:
     name: zuul-tox-remote
     parent: tox
     vars:
@@ -192,7 +198,7 @@
             success-url: 'npm/reports/bundle.html'
             files:
               - web/.*
-        - zuul-stream-functional
+        - zuul-stream-functional-2.5
         - zuul-tox-remote
         - zuul-quick-start
         - nodepool-zuul-functional:
@@ -223,7 +229,7 @@
             success-url: 'npm/reports/bundle.html'
             files:
               - web/.*
-        - zuul-stream-functional
+        - zuul-stream-functional-2.5
         - zuul-tox-remote
         - zuul-quick-start
         - zuul-upload-image
