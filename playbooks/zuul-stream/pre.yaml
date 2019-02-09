@@ -14,6 +14,10 @@
       command: python3 -m pip install src/git.openstack.org/openstack-infra/zuul src/git.openstack.org/openstack/ara
       become: yes
 
+    - name: Install managed ansible versions
+      command: /usr/bin/zuul-manage-ansible -v
+      become: yes
+
     - name: Copy inventory
       copy:
         src: "{{ zuul.executor.log_root }}/zuul-info/inventory.yaml"
