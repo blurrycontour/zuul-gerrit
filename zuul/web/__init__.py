@@ -452,7 +452,7 @@ class ZuulWebAPI(object):
             })
         for provides in build.provides:
             ret['provides'].append({
-                'name': artifact.name,
+                'name': provides.name,
             })
         return ret
 
