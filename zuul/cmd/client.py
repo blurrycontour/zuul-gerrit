@@ -17,8 +17,11 @@
 import argparse
 import babel.dates
 import datetime
+import json
+import jwt
 import logging
 import prettytable
+import re
 import sys
 import time
 import textwrap
@@ -27,6 +30,9 @@ import textwrap
 import zuul.rpcclient
 import zuul.cmd
 from zuul.lib.config import get_default
+
+
+ADMIN_ACTIONS = ["enqueue", "dequeue", "autohold"]
 
 
 class Client(zuul.cmd.ZuulApp):
@@ -160,6 +166,50 @@ class Client(zuul.cmd.ZuulApp):
             help='validate the tenant configuration')
         cmd_conf_check.set_defaults(func=self.validate)
 
+        cmd_create_auth_token = subparsers.add_parser(
+            'create-auth-token',
+            help='create an Authentication Token for the web API',
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+            description=textwrap.dedent('''\
+            Create an Authentication Token for the administration web API
+
+            Create a bearer token that can be used to access Zuul's
+            administration web API. This is typically used to delegate
+            privileged actions such as enqueueing and autoholding to
+            third parties, scoped to a single tenant or to specific projects
+            within this tenant.
+            The "zuul_operator" authenticator must be configured.'''))
+        cmd_create_auth_token.add_argument(
+            '--action',
+            help=('action(s) to authorize. '
+                  'Must be one or several of %s' % ', '.join(ADMIN_ACTIONS)),
+            required=True)
+        cmd_create_auth_token.add_argument(
+            '--tenant',
+            help='tenant name',
+            required=True)
+        cmd_create_auth_token.add_argument(
+            '--project',
+            help=('project(s) name(s), omit or "*" '
+                  'to authorize action on all the projects '
+                  'in the tenant'),
+            nargs='+',
+            default='*',
+            required=False)
+        cmd_create_auth_token.add_argument(
+            '--user',
+            help=("The user's name. Used for traceability in logs."),
+            default=None,
+            required=True)
+        cmd_create_auth_token.add_argument(
+            '--expires-in',
+            help=('Token validity duration in seconds '
+                  '(default: %i)' % 600),
+            type=int,
+            default=600,
+            required=False)
+        cmd_create_auth_token.set_defaults(func=self.create_auth_token)
+
         return parser
 
     def parseArguments(self, args=None):
@@ -285,6 +335,57 @@ class Client(zuul.cmd.ZuulApp):
                            change=self.args.change,
                            ref=self.args.ref)
         return r
+
+    def create_auth_token(self):
+        auth_section = ''
+        for section_name in self.config.sections():
+            if re.match(r'^auth ([\'\"]?)zuul_operator(\1)$',
+                        section_name, re.I):
+                auth_section = section_name
+                break
+        if auth_section == '':
+            print('"zuul_operator" authenticator must be configured.')
+            sys.exit(1)
+        token = {'exp': time.time + self.args.expires_in,
+                 'iss': self.config.get_default(auth_section, 'issuer_id'),
+                 'aud': self.config.get_default(auth_section, 'client_id'),
+                 'sub': self.args.user,
+                 'zuul.actions': {}}
+        if self.args.project == '*':
+            projects = '*'
+        else:
+            projects = self.args.project.split(',')
+        actions = self.args.actions.split(',')
+        if any(a not in ADMIN_ACTIONS for a in actions):
+            print('Actions must be any of %s' % ', '.join(ADMIN_ACTIONS))
+            sys.exit(1)
+        for action in actions:
+            zuul.actions[action] = {self.args.tenant: projects}
+        driver = get_default(
+            self.config, auth_section, 'driver')
+        if driver == 'HS256':
+            key = self.config.get_default(auth_section, 'secret')
+        elif driver == 'RS256':
+            public_key = self.config.get_default(auth_section, 'public_key')
+            with open(public_key) as pk:
+                key = pk.read()
+        else:
+            print('Unknown or unsupported authenticator driver "%s"' % driver)
+            sys.exit(1)
+        try:
+            # print("Generating Authentication Token:")
+            # print(json.dumps(token, sort_keys=True, indent=2))
+            auth_token = jwt.encode(token,
+                                    key=key,
+                                    algorithm=driver).decode('utf-8')
+            print("Bearer %s" % auth_token)
+            err_code = 0
+        except Exception as e:
+            print("Error when generating Auth Token")
+            print(e)
+            err_code = 1
+        finally:
+            sys.exit(err_code)
 
     def promote(self):
         client = zuul.rpcclient.RPCClient(
