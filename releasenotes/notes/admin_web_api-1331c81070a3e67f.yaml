@@ -14,6 +14,11 @@ features:
     configuration. Authenticators define ways to validate JWTs issued by a given
     Identity Provider, and sometimes to generate tokens as well if the signing
     secret is known.
+  - |
+    Allow an operator to use Zuul's CLI to generate an authentication token to
+    access protected REST API endpoints. This requires a valid authenticator
+    in Zuul's configuration, with a valid signing secret. It is therefore
+    limited to HS256 and RS256 drivers.
 upgrade:
   - |
     The "autohold", "dequeue" and "enqueue" endpoints are deactivated by default.
