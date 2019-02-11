@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_5b68fd85",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2019-02-11T10:58:58Z",
+      "side": 1,
+      "message": "What is the expectations here? Check every 10 minutes?\n\nOr trigger 10 minutes after something happened? Reading delay this would be my expectation...\n\nUsing a delay with the complete \"crontab\" entry is confusing, I suggest to rework this part of the interface.",
+      "revId": "1473e96190abeea2ce3aefb68fd73e9f0f5491ca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
