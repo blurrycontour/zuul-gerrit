@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_58548321",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 37
+      },
+      "lineNbr": 614,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2019-02-11T10:26:28Z",
+      "side": 1,
+      "message": "Could be extracted in a dedicated method and re-used.",
+      "range": {
+        "startLine": 607,
+        "startChar": 0,
+        "endLine": 614,
+        "endChar": 54
+      },
+      "revId": "0b71f9df8a08fe609afbe3dd9d36859b45a864ad",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
