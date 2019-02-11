@@ -148,6 +148,30 @@
     },
     {
       "key": {
+        "uuid": "9fdfeff1_db806d49",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-02-11T10:48:16Z",
+      "side": 1,
+      "message": "It\u0027s definitely more practical from a user\u0027s point of view, but I feel this can be done independently from this spec, as it is not a blocker or a prerequisite.",
+      "parentUuid": "9fdfeff1_792acd7e",
+      "range": {
+        "startLine": 282,
+        "startChar": 0,
+        "endLine": 293,
+        "endChar": 28
+      },
+      "revId": "53a4ca3f00809e86472f8b9b83b8ba6d4f4edd89",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fdfeff1_7f7dd26c",
         "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
         "patchSetId": 7
@@ -194,6 +218,24 @@
       "writtenOn": "2019-02-11T10:19:30Z",
       "side": 1,
       "message": "This could be extended to list implementation steps. It looks like implementing this will require quite a lot changes but this could be done by step, like: 1/ Token validation, 2/ New endpoints, 3/ Token generation with the CLI, ...",
+      "revId": "53a4ca3f00809e86472f8b9b83b8ba6d4f4edd89",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_1b9ef5b7",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 478,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-02-11T10:48:16Z",
+      "side": 1,
+      "message": "In order to make reasonably sized reviews, my current plan is:\n\n1. New endpoints and token validation mechanism, authN info is expected to be in the token (that PoC). Generating tokens is a manual operation.\n2. Operator-generated tokens with the CLI if the \"zuul_operator\" authenticator is configured (patch TBD)\n3. In-Zuul authorization configuration + authN check in the web API. Zuul handling authN mapping allows for external token providers.",
+      "parentUuid": "9fdfeff1_18c11be5",
       "revId": "53a4ca3f00809e86472f8b9b83b8ba6d4f4edd89",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
