@@ -749,12 +749,20 @@ class GithubConnection(BaseConnection):
                     self.installation_map[project_name] = inst_id
 
     def addEvent(self, data, event=None, delivery=None):
+        if self.sched.statsd:
+            # stats.gauges.zuul.driver.github.event_queue
+            self.sched.statsd.gauge('zuul.driver.github.event_queue',
+                                    self.event_queue.qsize())
         return self.event_queue.put((time.time(), data, event, delivery))
 
     def getEvent(self):
         return self.event_queue.get()
 
     def eventDone(self):
+        if self.sched.statsd:
+            # stats.gauges.zuul.driver.github.event_queue
+            self.sched.statsd.gauge('zuul.driver.github.event_queue',
+                                    self.event_queue.qsize())
         self.event_queue.task_done()
 
     def getGithubClient(self,
