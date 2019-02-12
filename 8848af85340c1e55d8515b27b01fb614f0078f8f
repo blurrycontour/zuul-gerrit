@@ -16,6 +16,24 @@
       "revId": "8848af85340c1e55d8515b27b01fb614f0078f8f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_060bda23",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 6589
+      },
+      "writtenOn": "2019-02-12T19:42:34Z",
+      "side": 1,
+      "message": "Good catch. I think the log adapter can be defined at the class level so that all the functions pick it up. All the code in this class should be able to make use of that data as _handle_event is the main entry into this class, except for perhaps the run() function.",
+      "parentUuid": "9fdfeff1_8b283397",
+      "revId": "8848af85340c1e55d8515b27b01fb614f0078f8f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
