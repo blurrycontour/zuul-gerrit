@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9fdfeff1_3447364f",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 367,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2019-02-12T07:04:24Z",
+      "side": 1,
+      "message": "Good point. I was oriented myself by the loop in the else branch, but that one is sorting just the job names, not the dictionary. As it doesn\u0027t make sense in our case, I will remove it.",
+      "parentUuid": "9fdfeff1_2e02b570",
+      "range": {
+        "startLine": 367,
+        "startChar": 34,
+        "endLine": 367,
+        "endChar": 40
+      },
+      "revId": "ffde5acb00023f3317a5baa8a386b1037a4368f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fdfeff1_6e643d4a",
         "filename": "zuul/rpclistener.py",
         "patchSetId": 3
@@ -36,6 +60,30 @@
       "writtenOn": "2019-02-08T10:40:23Z",
       "side": 1,
       "message": "nit: Using a list comprehension might be faster than appending to an existing list.",
+      "range": {
+        "startLine": 368,
+        "startChar": 16,
+        "endLine": 370,
+        "endChar": 70
+      },
+      "revId": "ffde5acb00023f3317a5baa8a386b1037a4368f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_f4768ea4",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2019-02-12T07:04:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9fdfeff1_6e643d4a",
       "range": {
         "startLine": 368,
         "startChar": 16,
