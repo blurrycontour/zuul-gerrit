@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_3a370e50",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 348,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-12T21:00:15Z",
+      "side": 1,
+      "message": "This needs to be self.body",
+      "range": {
+        "startLine": 348,
+        "startChar": 46,
+        "endLine": 348,
+        "endChar": 50
+      },
+      "revId": "8e3e25eb89490fc7e7c1170d08b4a4c1470be1cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
