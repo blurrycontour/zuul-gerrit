@@ -171,6 +171,13 @@ class GithubGearmanWorker(object):
         self.gearman.shutdown()
 
 
+class GithubEventLogAdapter(logging.LoggerAdapter):
+    def process(self, msg, kwargs):
+        msg, kwargs = super(GithubEventLogAdapter, self).process(msg, kwargs)
+        msg = '[delivery: %s] %s' % (kwargs['extra']['delivery'], msg)
+        return msg, kwargs
+
+
 class GithubEventConnector(threading.Thread):
     """Move events from GitHub into the scheduler"""
 
@@ -188,6 +195,10 @@ class GithubEventConnector(threading.Thread):
 
     def _handleEvent(self):
         ts, json_body, event_type, delivery = self.connection.getEvent()
+        log = GithubEventLogAdapter(self.log, {'delivery': delivery})
+        log.debug("Starting event processing, queue length %s",
+                  self.connection.getEventQueueSize())
+
         if self._stopped:
             return
 
@@ -201,7 +212,7 @@ class GithubEventConnector(threading.Thread):
 
             if old_id and old_id != installation_id:
                 msg = "Unexpected installation_id change for %s. %d -> %d."
-                self.log.warning(msg, project_name, old_id, installation_id)
+                log.warning(msg, project_name, old_id, installation_id)
 
             self.connection.installation_map[project_name] = installation_id
 
@@ -211,14 +222,16 @@ class GithubEventConnector(threading.Thread):
             # TODO(jlk): Gracefully handle event types we don't care about
             # instead of logging an exception.
             message = "Unhandled X-Github-Event: {0}".format(event_type)
-            self.log.debug(message)
+            log.debug(message)
             # Returns empty on unhandled events
             return
+
+        log.debug("Handling %s event", event_type)
 
         try:
             event = method(json_body)
         except Exception:
-            self.log.exception('Exception when handling event:')
+            log.exception('Exception when handling event:')
             event = None
 
         if event:
@@ -250,6 +263,7 @@ class GithubEventConnector(threading.Thread):
             event.project_hostname = self.connection.canonical_hostname
             self.connection.logEvent(event)
             self.connection.sched.addEvent(event)
+        log.debug("Finished event processing")
 
     def _event_push(self, body):
         base_repo = body.get('repository')
@@ -387,8 +401,8 @@ class GithubEventConnector(threading.Thread):
         project_name = body.get('repository').get('full_name')
         pr_body = self.connection.getPull(project_name, number)
         if pr_body is None:
-            self.log.debug('Pull request #%s not found in project %s' %
-                           (number, project_name))
+            log.debug('Pull request #%s not found in project %s' %
+                      (number, project_name))
         return pr_body
 
     def _pull_request_to_event(self, pr_body):
@@ -753,6 +767,9 @@ class GithubConnection(BaseConnection):
 
     def getEvent(self):
         return self.event_queue.get()
+
+    def getEventQueueSize(self):
+        return self.event_queue.qsize()
 
     def eventDone(self):
         self.event_queue.task_done()
