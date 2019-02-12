@@ -16,6 +16,7 @@ configure it to meet your needs.
    config
    jobs
    encryption
+   client-user
    badges
    howtos
    vulnerabilities
