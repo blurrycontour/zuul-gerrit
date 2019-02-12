@@ -19,6 +19,14 @@ features:
     access protected REST API endpoints. This requires a valid authenticator
     in Zuul's configuration, with a valid signing secret. It is therefore
     limited to HS256 and RS256 drivers.
+  - |
+    The Zuul Client can be used with Gearman or the REST API depending on the
+    contents of zuul.conf. The REST API can also be accessed without a config
+    file, by passing Zuul web server's root URL as an argument to the Client.
+  - |
+    Tenant-scoped, protected actions can be performed with the Zuul Client
+    by calling Zuul's REST API. The user needs to provide a valid JWT as
+    authentication/authorization.
 upgrade:
   - |
     The "autohold", "dequeue" and "enqueue" endpoints are deactivated by default.
