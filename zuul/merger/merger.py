@@ -422,8 +422,11 @@ class Repo(object):
             self._git_fetch(repo, 'origin')
         self._git_fetch(repo, 'origin', tags=True)
 
-    def getFiles(self, files, dirs=[], branch=None, commit=None):
+    def getFiles(
+            self, files, dirs=[], branch=None, commit=None, file_exts=None
+    ):
         ret = {}
+        file_exts = file_exts or [".yaml"]
         repo = self.createRepoObject()
         if branch:
             tree = repo.heads[branch].commit.tree
@@ -439,7 +442,7 @@ class Repo(object):
                 if dn not in tree:
                     continue
                 for blob in tree[dn].traverse():
-                    if blob.path.endswith(".yaml"):
+                    if any(blob.path.endswith(ext) for ext in file_exts):
                         ret[blob.path] = blob.data_stream.read().decode(
                             'utf-8')
         return ret
@@ -757,3 +760,22 @@ class Merger(object):
                         tosha=None):
         repo = self.getRepo(connection_name, project_name)
         return repo.getFilesChanges(branch, tosha)
+
+    def getRoles(self, connection_name, project_name, branch):
+        repo = self.getRepo(connection_name, project_name)
+        files = repo.getFiles([], ["roles"], branch=branch,
+                              file_exts=[".yaml", ".rst", ".md", ".txt"])
+        roles = {}
+        for file_path in sorted(files.keys()):
+            _, role_name, rel_path = file_path.split("/", 2)
+            # Create the role entry if it doesn't exist
+            role = roles.setdefault(role_name, {})
+
+            # Add necessary file contents if they match a certain criteria
+            if "readme" in rel_path.lower():
+                role["readme"] = files.get(file_path)
+
+            if "changelog" in rel_path.lower():
+                role["changelog"] = files.get(file_path)
+
+        return roles

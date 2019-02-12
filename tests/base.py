@@ -2962,6 +2962,12 @@ class ZuulTestCase(BaseTestCase):
         files = files or {"README": "creating fake commit\n"}
         for name, content in files.items():
             file_name = os.path.join(path, name)
+            # Create the directory if it doesn' exist. Necessary, to create
+            # files in a repo's subdirectory.
+            directory = os.path.dirname(file_name)
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+            # Create the file
             with open(file_name, 'a') as f:
                 f.write(content)
             repo.index.add([file_name])
