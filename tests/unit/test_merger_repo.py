@@ -270,6 +270,39 @@ class TestMergerRepo(ZuulTestCase):
         self.assertEqual(sorted(['messy1.txt', 'messy2.txt']),
                          sorted(changed_files))
 
+    def test_get_files(self):
+        # First, we create some files that we want to retrieve later on
+        expected_files = {
+            'test.yaml': 'foo: bar\nbar: foo\n',
+            'README.rst': 'Just some rst file\n',
+            'foo/notes.txt': 'Just a text file\n',
+            'foo/bar.yaml': 'text: Just a yaml file\n',
+        }
+        self.create_commit('org/project1', files=expected_files,
+                           message='Add test files')
+
+        # Clone the test repo and check for the files
+        parent_path = os.path.join(self.upstream_root, 'org/project1')
+        work_repo = Repo(parent_path, self.workspace_root,
+                         'none@example.org', 'User Name', '0', '0')
+
+        # In case of a file list, each file is returned with it's content (if found)
+        files = work_repo.getFiles(['test.yaml', 'README.rst', 'non-existing-file'])
+        self.assertEquals(
+            {
+                'test.yaml': 'foo: bar\nbar: foo\n',
+                'README.rst': 'Just some rst file\n',
+                'non-existing-file': None,
+            }, files)
+
+        # In case of a directory list, only .yaml files will be returned by default
+        files = work_repo.getFiles([], ['foo'])
+        self.assertEquals({'foo/bar.yaml': 'text: Just a yaml file\n'}, files)
+
+        # But we could also provide a custom list of extension we want to get
+        files = work_repo.getFiles([], ['foo'], file_exts=['.txt'])
+        self.assertEquals({'foo/notes.txt': 'Just a text file\n'}, files)
+
 
 class TestMergerWithAuthUrl(ZuulTestCase):
     config_file = 'zuul-github-driver.conf'
