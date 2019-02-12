@@ -146,6 +146,14 @@ class MergeClient(object):
                              precedence)
         return job
 
+    def getRoles(self, connection_name, project_name, branch,
+                 precedence=zuul.model.PRECEDENCE_NORMAL):
+        data = dict(connection=connection_name,
+                    project=project_name,
+                    branch=branch)
+        job = self.submitJob('merger:roles', data, None, precedence)
+        return job
+
     def onBuildCompleted(self, job):
         data = getJobData(job)
         merged = data.get('merged', False)
