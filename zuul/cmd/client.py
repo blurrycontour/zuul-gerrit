@@ -24,7 +24,8 @@ import re
 import sys
 import time
 import textwrap
-
+import requests
+import urllib.parse
 
 import zuul.rpcclient
 import zuul.cmd
@@ -34,15 +35,126 @@ from zuul.lib.config import get_default
 ADMIN_ACTIONS = ["enqueue", "dequeue", "autohold"]
 
 
+# todo This should probably live somewhere else
+class ZuulRESTClient(object):
+    """Basic client for Zuul's REST API"""
+    def __init__(self, address, port=None, verify=False, auth_token=None):
+        self.address = address
+        self.port = port
+        self.auth_token = auth_token
+        self.base_url = self.address.rstrip('/')
+        if self.port:
+            self.base_url += ':' + str(self.port)
+        self.base_url += '/api/'
+        self.verify = verify
+
+    def autohold(self, tenant, project, job, change, ref,
+                 reason, count, node_hold_expiration):
+        if not self.auth_token:
+            raise Exception('Auth Token required')
+        args = {"reason": reason,
+                "count": count,
+                "job": job,
+                "change": change,
+                "ref": ref,
+                "node_hold_expiration": node_hold_expiration}
+        url = urllib.parse.urljoin(
+            self.base_url,
+            'tenant/%s/project/%s/autohold' % (tenant, project))
+        req = requests.post(
+            url, json=args, verify=self.verify,
+            headers={'Authorization': 'Bearer %s' % self.auth_token})
+        return req.json()
+
+    def autohold_list(self, tenant):
+        if not tenant:
+            raise Exception('"--tenant" argument required')
+        url = urllib.parse.urljoin(
+            self.base_url,
+            'tenant/%s/autohold' % tenant)
+        resp = requests.get(url, verify=self.verify).json()
+        # reformat the answer to match RPC format
+        ret = {}
+        for d in resp:
+            key = ','.join([d['tenant'],
+                            d['project'],
+                            d['job'],
+                            d['ref_filter']])
+            ret[key] = (d['count'], d['reason'], d['node_hold_expiration'])
+        return ret
+
+    def enqueue(self, tenant, pipeline, project, trigger, change):
+        if not self.auth_token:
+            raise Exception('Auth Token required')
+        args = {"trigger": trigger,
+                "change": change,
+                "pipeline": pipeline}
+        url = urllib.parse.urljoin(
+            self.base_url,
+            'tenant/%s/project/%s/enqueue' % (tenant, project))
+        req = requests.post(
+            url, json=args, verify=self.verify,
+            headers={'Authorization': 'Bearer %s' % self.auth_token})
+        return req.json()
+
+    def enqueue_ref(self, tenant, pipeline, project,
+                    trigger, ref, oldrev, newrev):
+        if not self.auth_token:
+            raise Exception('Auth Token required')
+        args = {"trigger": trigger,
+                "ref": ref,
+                "oldrev": oldrev,
+                "newrev": newrev,
+                "pipeline": pipeline}
+        url = urllib.parse.urljoin(
+            self.base_url,
+            'tenant/%s/project/%s/enqueue' % (tenant, project))
+        req = requests.post(
+            url, json=args, verify=self.verify,
+            headers={'Authorization': 'Bearer %s' % self.auth_token})
+        return req.json()
+
+    def dequeue(self, tenant, pipeline, project, change=None, ref=None):
+        if not self.auth_token:
+            raise Exception('Auth Token required')
+        args = {"pipeline": pipeline}
+        if change and not ref:
+            args['change'] = change
+        elif ref and not change:
+            args['ref'] = ref
+        else:
+            raise Exception('need change OR ref')
+        url = urllib.parse.urljoin(
+            self.base_url,
+            'tenant/%s/project/%s/dequeue' % (tenant, project))
+        req = requests.post(
+            url, json=args, verify=self.verify,
+            headers={'Authorization': 'Bearer %s' % self.auth_token})
+        return req.json()
+
+    def promote(self, *args, **kwargs):
+        raise NotImplementedError(
+            'This action is unsupported by the REST API')
+
+    def get_running_jobs(self, *args, **kwargs):
+        raise NotImplementedError(
+            'This action is unsupported by the REST API')
+
+
 class Client(zuul.cmd.ZuulApp):
     app_name = 'zuul'
-    app_description = 'Zuul RPC client.'
+    app_description = 'Zuul client.'
     log = logging.getLogger("zuul.Client")
 
     def createParser(self):
         parser = super(Client, self).createParser()
         parser.add_argument('-v', dest='verbose', action='store_true',
                             help='verbose output')
+        parser.add_argument('--auth-token', dest='auth_token',
+                            required=False,
+                            default=None,
+                            help='Authentication Token, needed if using the'
+                                 'REST API')
 
         subparsers = parser.add_subparsers(title='commands',
                                            description='valid commands',
@@ -76,6 +188,8 @@ class Client(zuul.cmd.ZuulApp):
 
         cmd_autohold_list = subparsers.add_parser(
             'autohold-list', help='list autohold requests')
+        cmd_autohold_list.add_argument('--tenant', help='tenant name',
+                                       required=False)
         cmd_autohold_list.set_defaults(func=self.autohold_list)
 
         cmd_enqueue = subparsers.add_parser('enqueue', help='enqueue a change')
@@ -246,20 +360,39 @@ class Client(zuul.cmd.ZuulApp):
         self.readConfig()
         self.setup_logging()
 
-        self.server = self.config.get('gearman', 'server')
-        self.port = get_default(self.config, 'gearman', 'port', 4730)
-        self.ssl_key = get_default(self.config, 'gearman', 'ssl_key')
-        self.ssl_cert = get_default(self.config, 'gearman', 'ssl_cert')
-        self.ssl_ca = get_default(self.config, 'gearman', 'ssl_ca')
-
         if self.args.func():
             sys.exit(0)
         else:
             sys.exit(1)
 
+    def get_client(self):
+        conf_sections = self.config.sections()
+        if 'gearman' in conf_sections:
+            self.log.debug('gearman section found in config, using RPC client')
+            server = self.config.get('gearman', 'server')
+            port = get_default(self.config, 'gearman', 'port', 4730)
+            ssl_key = get_default(self.config, 'gearman', 'ssl_key')
+            ssl_cert = get_default(self.config, 'gearman', 'ssl_cert')
+            ssl_ca = get_default(self.config, 'gearman', 'ssl_ca')
+            client = zuul.rpcclient.RPCClient(
+                server, port, ssl_key,
+                ssl_cert, ssl_ca)
+        elif 'web' in conf_sections:
+            self.log.debug('web section found in config, using REST client')
+            server = self.config.get('web', 'listen_address',
+                                     'https://zuul.openstack.org')
+            port = self.config.get('web', 'port', None)
+            # todo this is not an original option in the web section
+            verify = self.config.get('web', 'verify', True)
+            client = ZuulRESTClient(server, port, verify,
+                                    self.args.auth_token)
+        else:
+            print('Unable to find a way to connect to Zuul, add a "gearman" '
+                  'or "web" section to your configuration file')
+            sys.exit(1)
+        return client
+
     def autohold(self):
-        client = zuul.rpcclient.RPCClient(
-            self.server, self.port, self.ssl_key, self.ssl_cert, self.ssl_ca)
         if self.args.change and self.args.ref:
             print("Change and ref can't be both used for the same request")
             return False
@@ -268,20 +401,21 @@ class Client(zuul.cmd.ZuulApp):
             return False
 
         node_hold_expiration = self.args.node_hold_expiration
-        r = client.autohold(tenant=self.args.tenant,
-                            project=self.args.project,
-                            job=self.args.job,
-                            change=self.args.change,
-                            ref=self.args.ref,
-                            reason=self.args.reason,
-                            count=self.args.count,
-                            node_hold_expiration=node_hold_expiration)
+        client = self.get_client()
+        r = client.autohold(
+            tenant=self.args.tenant,
+            project=self.args.project,
+            job=self.args.job,
+            change=self.args.change,
+            ref=self.args.ref,
+            reason=self.args.reason,
+            count=self.args.count,
+            node_hold_expiration=node_hold_expiration)
         return r
 
     def autohold_list(self):
-        client = zuul.rpcclient.RPCClient(
-            self.server, self.port, self.ssl_key, self.ssl_cert, self.ssl_ca)
-        autohold_requests = client.autohold_list()
+        client = self.get_client()
+        autohold_requests = client.autohold_list(tenant=self.args.tenant)
 
         if len(autohold_requests.keys()) == 0:
             print("No autohold requests found")
@@ -305,35 +439,35 @@ class Client(zuul.cmd.ZuulApp):
         return True
 
     def enqueue(self):
-        client = zuul.rpcclient.RPCClient(
-            self.server, self.port, self.ssl_key, self.ssl_cert, self.ssl_ca)
-        r = client.enqueue(tenant=self.args.tenant,
-                           pipeline=self.args.pipeline,
-                           project=self.args.project,
-                           trigger=self.args.trigger,
-                           change=self.args.change)
+        client = self.get_client()
+        r = client.enqueue(
+            tenant=self.args.tenant,
+            pipeline=self.args.pipeline,
+            project=self.args.project,
+            trigger=self.args.trigger,
+            change=self.args.change)
         return r
 
     def enqueue_ref(self):
-        client = zuul.rpcclient.RPCClient(
-            self.server, self.port, self.ssl_key, self.ssl_cert, self.ssl_ca)
-        r = client.enqueue_ref(tenant=self.args.tenant,
-                               pipeline=self.args.pipeline,
-                               project=self.args.project,
-                               trigger=self.args.trigger,
-                               ref=self.args.ref,
-                               oldrev=self.args.oldrev,
-                               newrev=self.args.newrev)
+        client = self.get_client()
+        r = client.enqueue_ref(
+            tenant=self.args.tenant,
+            pipeline=self.args.pipeline,
+            project=self.args.project,
+            trigger=self.args.trigger,
+            ref=self.args.ref,
+            oldrev=self.args.oldrev,
+            newrev=self.args.newrev)
         return r
 
     def dequeue(self):
-        client = zuul.rpcclient.RPCClient(
-            self.server, self.port, self.ssl_key, self.ssl_cert, self.ssl_ca)
-        r = client.dequeue(tenant=self.args.tenant,
-                           pipeline=self.args.pipeline,
-                           project=self.args.project,
-                           change=self.args.change,
-                           ref=self.args.ref)
+        client = self.get_client()
+        r = client.dequeue(
+            tenant=self.args.tenant,
+            pipeline=self.args.pipeline,
+            project=self.args.project,
+            change=self.args.change,
+            ref=self.args.ref)
         return r
 
     def create_auth_token(self):
@@ -384,16 +518,15 @@ class Client(zuul.cmd.ZuulApp):
             sys.exit(err_code)
 
     def promote(self):
-        client = zuul.rpcclient.RPCClient(
-            self.server, self.port, self.ssl_key, self.ssl_cert, self.ssl_ca)
-        r = client.promote(tenant=self.args.tenant,
-                           pipeline=self.args.pipeline,
-                           change_ids=self.args.changes)
+        client = self.get_client()
+        r = client.promote(
+            tenant=self.args.tenant,
+            pipeline=self.args.pipeline,
+            change_ids=self.args.changes)
         return r
 
     def show_running_jobs(self):
-        client = zuul.rpcclient.RPCClient(
-            self.server, self.port, self.ssl_key, self.ssl_cert, self.ssl_ca)
+        client = self.get_client()
         running_items = client.get_running_jobs()
 
         if len(running_items) == 0:
