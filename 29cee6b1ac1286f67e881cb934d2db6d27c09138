@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "9fdfeff1_6b45cfb3",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 752,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-12T19:27:34Z",
+      "side": 1,
+      "message": "We might need to also guard if self.sched is None.",
+      "range": {
+        "startLine": 752,
+        "startChar": 8,
+        "endLine": 752,
+        "endChar": 29
+      },
+      "revId": "29cee6b1ac1286f67e881cb934d2db6d27c09138",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fdfeff1_c5014c3a",
         "filename": "zuul/driver/github/githubconnection.py",
         "patchSetId": 1
@@ -13,6 +36,41 @@
       "writtenOn": "2019-02-12T18:13:56Z",
       "side": 1,
       "message": "I would include the github connection name (self.connection_name) in the gauge path as you could have multiple github connections.",
+      "revId": "29cee6b1ac1286f67e881cb934d2db6d27c09138",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_8bed93b8",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 753,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-12T19:27:34Z",
+      "side": 1,
+      "message": "++",
+      "parentUuid": "9fdfeff1_c5014c3a",
+      "revId": "29cee6b1ac1286f67e881cb934d2db6d27c09138",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_ab3f3723",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 762,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-12T19:27:34Z",
+      "side": 1,
+      "message": "We might need to also guard if self.sched is None.",
       "revId": "29cee6b1ac1286f67e881cb934d2db6d27c09138",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
