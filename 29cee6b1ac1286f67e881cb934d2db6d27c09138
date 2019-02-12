@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_c5014c3a",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 753,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-02-12T18:13:56Z",
+      "side": 1,
+      "message": "I would include the github connection name (self.connection_name) in the gauge path as you could have multiple github connections.",
+      "revId": "29cee6b1ac1286f67e881cb934d2db6d27c09138",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
