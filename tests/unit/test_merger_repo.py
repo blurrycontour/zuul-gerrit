@@ -271,6 +271,42 @@ class TestMergerRepo(ZuulTestCase):
         self.assertEqual(sorted(['messy1.txt', 'messy2.txt']),
                          sorted(changed_files))
 
+    def test_get_files(self):
+        # First, we create some files that we want to retrieve later on
+        expected_files = {
+            'test.yaml': 'foo: bar\nbar: foo\n',
+            'README.rst': 'Just some rst file\n',
+            'foo/notes.txt': 'Just a text file\n',
+            'foo/bar.yaml': 'text: Just a yaml file\n',
+        }
+        self.create_commit('org/project1', files=expected_files,
+                           message='Add test files')
+
+        # Clone the test repo and check for the files
+        parent_path = os.path.join(self.upstream_root, 'org/project1')
+        work_repo = Repo(parent_path, self.workspace_root,
+                         'none@example.org', 'User Name', '0', '0')
+
+        # In case of a file list, each file is returned with
+        # it's content (if found).
+        files = work_repo.getFiles(
+            ['test.yaml', 'README.rst', 'non-existing-file'])
+        self.assertEquals(
+            {
+                'test.yaml': 'foo: bar\nbar: foo\n',
+                'README.rst': 'Just some rst file\n',
+                'non-existing-file': None,
+            }, files)
+
+        # In case of a directory list, only .yaml files will be returned
+        # by default.
+        files = work_repo.getFiles([], ['foo'])
+        self.assertEquals({'foo/bar.yaml': 'text: Just a yaml file\n'}, files)
+
+        # But we could also provide a custom list of extension we want to get
+        files = work_repo.getFiles([], ['foo'], file_exts=['.txt'])
+        self.assertEquals({'foo/notes.txt': 'Just a text file\n'}, files)
+
 
 class TestMergerWithAuthUrl(ZuulTestCase):
     config_file = 'zuul-github-driver.conf'
@@ -443,3 +479,61 @@ class TestMerger(ZuulTestCase):
         self.assertEqual(read_files[3]['branch'], 'master')
         self.assertEqual(read_files[3]['files']['zuul.d/a.yaml'],
                          'a-in-project1')
+
+
+class TestMergerRoles(ZuulTestCase):
+
+    tenant_config_file = "config/roles-api/main.yaml"
+
+    def test_get_roles(self):
+        python_readme = (
+            "Ensure specified python interpreter and development files are "
+            "installed\n\n\n**Role Variables**\n"
+            ".. zuul:rolevar:: python_version\n\n"
+            "  Optional version of python interpreter to install, such as "
+            "``3.7``.\n"
+        )
+
+        python_changelog = (
+            "2019-03-11\n==========\n- Change default python version to "
+            "``3.7``\n\n"
+            "2018-08-07\n==========\n- Change default python version to "
+            "``3.6``\n"
+        )
+
+        expected_roles_common = {
+            'ensure-python': {
+                'project': 'common-config',
+                'changelog': python_changelog,
+                'readme': python_readme,
+            },
+        }
+
+        expected_roles_project = {
+            'foo': {
+                'project': 'org/project',
+                'readme': 'Just a simple test role\n'
+            },
+            'undocumented-role': {
+                'project': 'org/project'
+            }
+        }
+
+        merger = self.executor_server.merger
+
+        roles_common = merger.getRoles(
+            'gerrit', 'common-config', branch='master'
+        )
+        self.assertEquals(expected_roles_common, roles_common)
+
+        roles_project = merger.getRoles(
+            'gerrit', 'org/project', branch='master'
+        )
+        self.assertEquals(expected_roles_project, roles_project)
+
+    def test_get_no_roles(self):
+        merger = self.executor_server.merger
+        # As the repo doesn't have any role files by default,
+        # we should get an empty dict
+        roles = merger.getRoles('gerrit', 'no-roles', branch='master')
+        self.assertEquals({}, roles)
