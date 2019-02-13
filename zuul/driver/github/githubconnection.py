@@ -1111,8 +1111,6 @@ class GithubConnection(BaseConnection):
             self.log.warning("Pull request #%s of %s/%s returned None!" % (
                              number, owner, proj))
             time.sleep(1)
-        # Get the issue obj so we can get the labels (this is silly)
-        issueobj = probj.issue()
         pr = probj.as_dict()
         try:
             pr['files'] = [f.filename for f in probj.files()]
@@ -1124,7 +1122,8 @@ class GithubConnection(BaseConnection):
                              "via the merger: %s", exc)
             pr['files'] = []
 
-        pr['labels'] = [l.name for l in issueobj.labels()]
+        labels = [l.name for l in pr['labels']
+        pr['labels'] = labels
         log.debug('Got PR %s#%s', project_name, number)
         self.log_rate_limit(self.log, github)
         return pr
