@@ -179,10 +179,11 @@ class GithubEventLogAdapter(logging.LoggerAdapter):
 
 
 class GithubEventProcessor(object):
-    def __init__(self, connector, event_tuple):
+    def __init__(self, connector, event_tuple, pr_commit_cache):
         self.connector = connector
         self.connection = connector.connection
         self.ts, self.body, self.event_type, self.delivery = event_tuple
+        self.pr_commit_cache = pr_commit_cache
         logger = logging.getLogger("zuul.GithubEventConnector")
         self.log = GithubEventLogAdapter(logger, {'delivery': self.delivery})
 
@@ -308,6 +309,23 @@ class GithubEventProcessor(object):
 
         return event
 
+    def _maintain_pr_commit_cache(self, event):
+        if event.action != 'closed':
+            if not self.pr_commit_cache.get(event.project_name):
+                self.pr_commit_cache[event.project_name] = {}
+            project_cache = self.pr_commit_cache[event.project_name]
+            if not project_cache.get(event.patch_number):
+                project_cache[event.patch_number] = []
+            project_cache[event.patch_number] += [event.number]
+        else:
+            project_cache = self.pr_commit_cache.get(event.project_name)
+            if project_cache and project_cache.get(event.patch_number):
+                project_cache[event.patch_nmumber].remove(event.number)
+                if not project_cache[event.patch_nmumber]:
+                    del project_cache[event.patch_nmumber]
+                    if not self.pr_commit_cache[event.project_name]:
+                        del self.pr_commit_cache[event.project_name]
+
     def _event_pull_request(self):
         action = self.body.get('action')
         pr_body = self.body.get('pull_request')
@@ -334,6 +352,7 @@ class GithubEventProcessor(object):
             event.action = 'edited'
         else:
             return None
+        self._maintain_pr_commit_cache(event)
 
         return event
 
@@ -378,8 +397,13 @@ class GithubEventProcessor(object):
         if action == 'pending':
             return
         project = self.body.get('name')
-        pr_body = self.connection.getPullBySha(
-            self.body['sha'], project, self.log)
+        sha = self.body.get('sha')
+        cached_pr = self.pr_commit_cache.get(project, {}).get(sha)
+        if cached_pr:
+            pr_body = self.connection.getPull(project, cached_pr[0])
+        else:
+            pr_body = self.connection.getPullBySha(
+                self.body['sha'], project, self.log)
         if pr_body is None:
             return
 
@@ -444,6 +468,7 @@ class GithubEventConnector(threading.Thread):
         self.daemon = True
         self.connection = connection
         self._stopped = False
+        self.pr_commit_cache = {}
 
     def stop(self):
         self._stopped = True
@@ -455,7 +480,7 @@ class GithubEventConnector(threading.Thread):
                 return
             try:
                 data = self.connection.getEvent()
-                GithubEventProcessor(self, data).run()
+                GithubEventProcessor(self, data, self.pr_commit_cache).run()
             except Exception:
                 self.log.exception("Exception moving GitHub event:")
             finally:
@@ -1172,6 +1197,7 @@ class GithubConnection(BaseConnection):
             if pr.as_dict() in pulls:
                 continue
             pulls.append(pr.as_dict())
+            # TODO update self.commit_pr_cache
 
         log.debug('Got PR on project %s for sha %s', project, sha)
         self.log_rate_limit(self.log, github)
