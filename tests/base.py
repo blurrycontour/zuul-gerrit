@@ -1229,10 +1229,6 @@ class FakeGithubConnection(githubconnection.GithubConnection):
         super(FakeGithubConnection, self).addProject(project)
         self.getGithubClient(project).addProject(project)
 
-    def _getPullReviews(self, owner, project, number):
-        pr = self.pull_requests[int(number)]
-        return pr.reviews
-
     def getGitUrl(self, project):
         if self.git_url_with_auth:
             auth_token = ''.join(
