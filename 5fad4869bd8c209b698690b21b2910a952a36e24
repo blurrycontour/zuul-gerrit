@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_de702d43",
+        "filename": "zuul/lib/yamlutil.py",
+        "patchSetId": 24
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-13T07:02:48Z",
+      "side": 1,
+      "message": "We conditionally import The loaders and dumpers from cyaml or yaml.",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 20
+      },
+      "revId": "5fad4869bd8c209b698690b21b2910a952a36e24",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_7e8fc122",
+        "filename": "zuul/lib/yamlutil.py",
+        "patchSetId": 24
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-13T07:02:48Z",
+      "side": 1,
+      "message": "This will only work if we use yaml.SafeDumper/Loader. This probably should be\n\n SafeLoader.add_constructor(UnsafeTag.yaml_tag, UnsafeTag.from_yaml)\n SafeDumper.add_multi_representer(UnsafeTag, UnsafeTag.to_yaml)",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 47,
+        "endChar": 67
+      },
+      "revId": "5fad4869bd8c209b698690b21b2910a952a36e24",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
