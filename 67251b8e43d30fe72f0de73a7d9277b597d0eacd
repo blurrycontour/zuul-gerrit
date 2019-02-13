@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_1c4eab37",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-02-13T22:11:26Z",
+      "side": 1,
+      "message": "Do we need locks around update and get? I think we do if getPullBySha and getPull can be called from different threads.",
+      "revId": "67251b8e43d30fe72f0de73a7d9277b597d0eacd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_5c48b32b",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-02-13T22:11:26Z",
+      "side": 1,
+      "message": "Oh good you fixed this bug I had with mine (I used lists).",
+      "range": {
+        "startLine": 83,
+        "startChar": 51,
+        "endLine": 83,
+        "endChar": 54
+      },
+      "revId": "67251b8e43d30fe72f0de73a7d9277b597d0eacd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_dc3ca394",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-02-13T22:11:26Z",
+      "side": 1,
+      "message": "You may want to delete self.projects[project_name] if empty {} at this point to delete old idle projects.",
+      "revId": "67251b8e43d30fe72f0de73a7d9277b597d0eacd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_bce99f1a",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1215,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-02-13T22:11:26Z",
+      "side": 1,
+      "message": "Note that we always took the first pull found before anyway. I think we can do the same above instead of raising an exception.\n\nOne difference is that the sets are unordered so we\u0027ll lose the order information.",
+      "revId": "67251b8e43d30fe72f0de73a7d9277b597d0eacd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
