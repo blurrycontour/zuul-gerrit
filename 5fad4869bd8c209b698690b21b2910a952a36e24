@@ -45,6 +45,30 @@
       "revId": "5fad4869bd8c209b698690b21b2910a952a36e24",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_5e475d78",
+        "filename": "zuul/lib/yamlutil.py",
+        "patchSetId": 24
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 27898
+      },
+      "writtenOn": "2019-02-13T07:50:25Z",
+      "side": 1,
+      "message": "Fixed, looks like whe have to call the parent SafeRepresenter from here [1]\n\n[1] https://github.com/yaml/pyyaml/blob/4c2e993321ad29a02a61c4818f3cef9229219003/lib/yaml/cyaml.py#L66",
+      "parentUuid": "9fdfeff1_7e8fc122",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 47,
+        "endChar": 67
+      },
+      "revId": "5fad4869bd8c209b698690b21b2910a952a36e24",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
