@@ -397,7 +397,8 @@ class GithubEventProcessor(object):
     def _issue_to_pull_request(self, body):
         number = body.get('issue').get('number')
         project_name = body.get('repository').get('full_name')
-        pr_body = self.connection.getPull(project_name, number, self.log)
+        pr_body, pr_obj = self.connection.getPull(
+            project_name, number, self.log)
         if pr_body is None:
             self.log.debug('Pull request #%s not found in project %s' %
                            (number, project_name))
@@ -942,7 +943,7 @@ class GithubConnection(BaseConnection):
 
     def _updateChange(self, change):
         self.log.info("Updating %s" % (change,))
-        change.pr = self.getPull(change.project.name, change.number)
+        change.pr, pr_obj = self.getPull(change.project.name, change.number)
         change.ref = "refs/pull/%s/head" % change.number
         change.branch = change.pr.get('base').get('ref')
 
@@ -968,7 +969,7 @@ class GithubConnection(BaseConnection):
         change.is_merged = change.pr.get('merged')
         change.status = self._get_statuses(change.project,
                                            change.patchset)
-        change.reviews = self.getPullReviews(change.project,
+        change.reviews = self.getPullReviews(pr_obj, change.project,
                                              change.number)
         change.labels = change.pr.get('labels')
         # ensure message is at least an empty string
@@ -1127,7 +1128,7 @@ class GithubConnection(BaseConnection):
         pr['labels'] = [l.name for l in issueobj.labels()]
         log.debug('Got PR %s#%s', project_name, number)
         self.log_rate_limit(self.log, github)
-        return pr
+        return (pr, probj)
 
     def canMerge(self, change, allow_needs):
         # NOTE: The mergeable call may get a false (null) while GitHub is
@@ -1182,10 +1183,11 @@ class GithubConnection(BaseConnection):
             return None
         return pulls.pop()
 
-    def getPullReviews(self, project, number):
-        owner, proj = project.name.split('/')
-
-        revs = self._getPullReviews(owner, proj, number)
+    def getPullReviews(self, pr_obj, project, number):
+        # make a list out of the reviews so that we complete our
+        # API transaction
+        revs = [review.as_dict() for review in pr_obj.reviews()]
+        self.log.debug('Got reviews for PR %s#%s', project, number)
 
         permissions = {}
         reviews = {}
@@ -1290,17 +1292,6 @@ class GithubConnection(BaseConnection):
         # Required contexts must be a subset of the successful contexts as
         # we allow additional successful status contexts we don't care about.
         return required_contexts.issubset(successful)
-
-    def _getPullReviews(self, owner, project, number):
-        # make a list out of the reviews so that we complete our
-        # API transaction
-        github = self.getGithubClient("%s/%s" % (owner, project))
-        reviews = [review.as_dict() for review in
-                   github.pull_request(owner, project, number).reviews()]
-
-        self.log.debug('Got reviews for PR %s/%s#%s', owner, project, number)
-        self.log_rate_limit(self.log, github)
-        return reviews
 
     def getUser(self, login, project):
         return GithubUser(login, self, project)
