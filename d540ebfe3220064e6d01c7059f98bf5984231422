@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_47db00ec",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1234,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-02-13T23:44:47Z",
+      "side": 0,
+      "message": "Now that this is removed the fake review objects need an as_dict method. http://logs.openstack.org/05/636705/2/check/tox-py35/5b37808/job-output.txt.gz#_2019-02-13_22_12_59_220946",
+      "revId": "d540ebfe3220064e6d01c7059f98bf5984231422",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}

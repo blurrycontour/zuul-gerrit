@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_e768f4f5",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1053,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-02-13T23:44:47Z",
+      "side": 1,
+      "message": "Probably want to append a fakeReview object here that has an as_dict method.",
+      "revId": "61065931200594216f209a98236339ee2e717b96",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
