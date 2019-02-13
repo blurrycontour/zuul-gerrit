@@ -228,7 +228,12 @@ class RPCListener(object):
         if not errors:
             event.change_number, event.patch_number = args['change'].split(',')
             try:
-                project.source.getChange(event, project)
+                ch = project.source.getChange(event, refresh=True)
+                if ch.project.name != project.name:
+                    errors += ('Change %s belongs to project "%s", '
+                               'not project "%s"' % (args['change'],
+                                                     ch.project.name,
+                                                     project.name))
             except Exception:
                 errors += 'Invalid change: %s\n' % (args['change'],)
 
