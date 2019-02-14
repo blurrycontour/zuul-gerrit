@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_36be19d5",
+        "filename": "zuul/lib/yamlutil.py",
+        "patchSetId": 28
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-02-14T18:00:34Z",
+      "side": 1,
+      "message": "If you add these lines:\n    yaml_loader \u003d yaml.SafeLoader\n    yaml_dumper \u003d yaml.SafeDumper\nyou can omit lines 49 and 50, which means we avoid executing statements during module import (even though I suspect those statements are okay to execute).",
+      "revId": "c7ec1490b0d0e6be9072a9c6741caa2643e5457e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
