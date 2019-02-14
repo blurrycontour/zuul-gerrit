@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_f996423e",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1200,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-14T18:55:36Z",
+      "side": 1,
+      "message": "What do you think about updating the cache in this loop? I think this could improve the hit rate dramatically. We even could completely clean that project beforehand and would have an up to date cache.",
+      "revId": "8b036b456730617c01e8c8fdf244e9ff72dc4e0b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
