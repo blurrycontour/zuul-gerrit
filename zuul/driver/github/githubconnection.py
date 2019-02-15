@@ -1185,17 +1185,16 @@ class GithubConnection(BaseConnection):
 
         return True
 
-    def getPullBySha(self, sha, project, log):
-        cached_pr_numbers = self._sha_pr_cache.get(project, sha)
+    def getPullBySha(self, sha, project_name, log):
+        cached_pr_numbers = self._sha_pr_cache.get(project_name, sha)
         if len(cached_pr_numbers) > 1:
             raise Exception('Multiple pulls found with head sha %s' % sha)
         if len(cached_pr_numbers) == 1:
             for pr in cached_pr_numbers:
-                return self.getPull(project, pr, log)
+                return self.getPull(project_name, pr, log)
 
         pulls = []
-        project_name = project
-        owner, project = project.split('/')
+        owner, project = project_name.split('/')
         github = self.getGithubClient("%s/%s" % (owner, project))
         repo = github.repository(owner, project)
         for pr in repo.pull_requests(state='open'):
