@@ -34,6 +34,24 @@
       "revId": "3d528cfbe65ea290523ba0e7cdb63c0c2dc31c56",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_3d410da7",
+        "filename": "tools/test-setup-docker.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-15T06:56:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9fdfeff1_af14ece9",
+      "revId": "3d528cfbe65ea290523ba0e7cdb63c0c2dc31c56",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
