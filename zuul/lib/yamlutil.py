@@ -17,10 +17,10 @@ try:
     from yaml import cyaml  # type: ignore
     import _yaml
     SafeLoader = cyaml.CSafeLoader
-    SafeDumper = cyaml.CSafeDumper
+    SafeDumper = cyaml.CSafeDumper  # type: ignore
     Mark = _yaml.Mark
 except ImportError:
-    SafeLoader = yaml.SafeLoader
+    SafeLoader = yaml.SafeLoader  # type: ignore
     SafeDumper = yaml.SafeDumper
     Mark = yaml.Mark
 
