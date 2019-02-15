@@ -25,11 +25,14 @@ from uuid import uuid4
 import urllib.parse
 import textwrap
 import types
+from typing import Optional, Any, List, Dict, Tuple, Mapping, Union
 import itertools
 
 from zuul import change_matcher
 from zuul.lib.config import get_default
 from zuul.lib.artifacts import get_artifacts_from_result_data
+from zuul.lib.yamlutil import Mark
+from zuul.source import BaseSource
 
 MERGER_MERGE = 1          # "git merge"
 MERGER_MERGE_RESOLVE = 2  # "git merge -s resolve"
@@ -89,7 +92,7 @@ class ConfigurationErrorKey(object):
     sufficient to determine whether we should show an error to a user.
     """
 
-    def __init__(self, context, mark, error_text):
+    def __init__(self, context: 'SourceContext', mark: Mark, error_text: str):
         self.context = context
         self.mark = mark
         self.error_text = error_text
@@ -130,7 +133,11 @@ class ConfigurationErrorKey(object):
 class ConfigurationError(object):
 
     """A configuration error"""
-    def __init__(self, context, mark, error, short_error=None):
+    def __init__(self,
+                 context: 'SourceContext',
+                 mark: Mark,
+                 error: str,
+                 short_error: Optional[str]=None):
         self.error = str(error)
         self.short_error = short_error
         self.key = ConfigurationErrorKey(context, mark, self.error)
@@ -140,10 +147,14 @@ class LoadingErrors(object):
     """A configuration errors accumalator attached to a layout object
     """
     def __init__(self):
-        self.errors = []
+        self.errors = []  # type: List[ConfigurationError]
         self.error_keys = set()
 
-    def addError(self, context, mark, error, short_error=None):
+    def addError(self,
+                 context: 'SourceContext',
+                 mark: Mark,
+                 error: str,
+                 short_error: Optional[str]=None):
         e = ConfigurationError(context, mark, error, short_error)
         self.errors.append(e)
         self.error_keys.add(e.key)
@@ -186,7 +197,7 @@ class Freezable(object):
 
     def freeze(self):
         """Make this object immutable"""
-        def _freezelist(l):
+        def _freezelist(l: List[Any]) -> Tuple[List[Any], ...]:
             for i, v in enumerate(l):
                 if isinstance(v, Freezable):
                     if not v._frozen:
@@ -197,7 +208,7 @@ class Freezable(object):
                     l[i] = _freezelist(v)
             return tuple(l)
 
-        def _freezedict(d):
+        def _freezedict(d: Dict[Any, Any]) -> Mapping[str, Any]:
             for k, v in list(d.items()):
                 if isinstance(v, Freezable):
                     if not v._frozen:
@@ -223,8 +234,8 @@ class Freezable(object):
 class ConfigObject(Freezable):
     def __init__(self):
         super().__init__()
-        self.source_context = None
-        self.start_mark = None
+        self.source_context = None  # type: Optional[SourceContext]
+        self.start_mark = None  # type: Optional[Mark]
 
 
 class Pipeline(object):
@@ -239,7 +250,7 @@ class Pipeline(object):
     Reporter
         Communicates success and failure results somewhere
     """
-    def __init__(self, name, tenant):
+    def __init__(self, name: str, tenant: str):
         self.name = name
         # Note that pipelines are not portable across tenants (new
         # pipeline objects must be made when a tenant is
@@ -257,15 +268,15 @@ class Pipeline(object):
         self.dequeue_on_new_patchset = True
         self.ignore_dependencies = False
         self.manager = None
-        self.queues = []
-        self.relative_priority_queues = {}
+        self.queues = []                     # type: List[ChangeQueue]
+        self.relative_priority_queues = {}   # type: Dict[str, List[str]]
         self.precedence = PRECEDENCE_NORMAL
-        self.triggers = []
-        self.start_actions = []
-        self.success_actions = []
-        self.failure_actions = []
-        self.merge_failure_actions = []
-        self.disabled_actions = []
+        self.triggers = []                   # type: List[Any]
+        self.start_actions = []              # type: List[Any]
+        self.success_actions = []            # type: List[Any]
+        self.failure_actions = []            # type: List[Any]
+        self.merge_failure_actions = []      # type: List[Any]
+        self.disabled_actions = []           # type: List[Any]
         self.disable_at = None
         self._consecutive_failures = 0
         self._disabled = False
@@ -289,28 +300,28 @@ class Pipeline(object):
     def __repr__(self):
         return '<Pipeline %s>' % self.name
 
-    def getSafeAttributes(self):
+    def getSafeAttributes(self) -> 'Attributes':
         return Attributes(name=self.name)
 
     def setManager(self, manager):
         self.manager = manager
 
-    def addQueue(self, queue):
+    def addQueue(self, queue: 'ChangeQueue'):
         self.queues.append(queue)
 
-    def getQueue(self, project):
+    def getQueue(self, project: str) -> Optional['ChangeQueue']:
         for queue in self.queues:
             if project in queue.projects:
                 return queue
         return None
 
-    def getRelativePriorityQueue(self, project):
+    def getRelativePriorityQueue(self, project: 'str') -> List[str]:
         for queue in self.relative_priority_queues.values():
             if project in queue:
                 return queue
         return [project]
 
-    def removeQueue(self, queue):
+    def removeQueue(self, queue: 'ChangeQueue'):
         if queue in self.queues:
             self.queues.remove(queue)
 
@@ -386,7 +397,7 @@ class ChangeQueue(object):
             self.name = ''
         self.projects = []
         self._jobs = set()
-        self.queue = []
+        self.queue = []  # type: List[QueueItem]
         self.window = window
         self.window_floor = window_floor
         self.window_increase_type = window_increase_type
@@ -408,13 +419,13 @@ class ChangeQueue(object):
             if not self.name:
                 self.name = project.name
 
-    def enqueueChange(self, change):
+    def enqueueChange(self, change: 'Change') -> 'QueueItem':
         item = QueueItem(self, change)
         self.enqueueItem(item)
         item.enqueue_time = time.time()
         return item
 
-    def enqueueItem(self, item):
+    def enqueueItem(self, item: 'QueueItem'):
         item.pipeline = self.pipeline
         item.queue = self
         if self.queue:
@@ -422,7 +433,7 @@ class ChangeQueue(object):
             item.item_ahead.items_behind.append(item)
         self.queue.append(item)
 
-    def dequeueItem(self, item):
+    def dequeueItem(self, item: 'QueueItem'):
         if item in self.queue:
             self.queue.remove(item)
         if item.item_ahead:
@@ -435,7 +446,7 @@ class ChangeQueue(object):
         item.items_behind = []
         item.dequeue_time = time.time()
 
-    def moveItem(self, item, item_ahead):
+    def moveItem(self, item: 'QueueItem', item_ahead: 'QueueItem') -> bool:
         if item.item_ahead == item_ahead:
             return False
         # Remove from current location
@@ -452,7 +463,7 @@ class ChangeQueue(object):
             item.item_ahead.items_behind.append(item)
         return True
 
-    def isActionable(self, item):
+    def isActionable(self, item: 'QueueItem') -> bool:
         if self.window:
             return item in self.queue[:self.window]
         else:
@@ -485,7 +496,7 @@ class Project(object):
     # This makes a Project instance a unique identifier for a given
     # project from a given source.
 
-    def __init__(self, name, source, foreign=False):
+    def __init__(self, name: str, source: BaseSource, foreign: bool=False):
         self.name = name
         self.source = source
         self.connection_name = source.connection.connection_name
@@ -503,10 +514,10 @@ class Project(object):
     def __repr__(self):
         return '<Project %s>' % (self.name)
 
-    def getSafeAttributes(self):
+    def getSafeAttributes(self) -> Attributes:
         return Attributes(name=self.name)
 
-    def toDict(self):
+    def toDict(self) -> Dict[str, str]:
         d = {}
         d['name'] = self.name
         d['connection_name'] = self.connection_name
@@ -521,7 +532,7 @@ class Node(ConfigObject):
     provided by Nodepool.
     """
 
-    def __init__(self, name, label):
+    def __init__(self, name: str, label: str):
         super(Node, self).__init__()
         self.name = name
         self.label = label
@@ -539,7 +550,7 @@ class Node(ConfigObject):
         self.public_ipv6 = None
         self.connection_port = 22
         self.connection_type = None
-        self._keys = []
+        self._keys = []               # type: List[str]
         self.az = None
         self.provider = None
         self.region = None
@@ -551,7 +562,7 @@ class Node(ConfigObject):
         return self._state
 
     @state.setter
-    def state(self, value):
+    def state(self, value: str):
         if value not in NODE_STATES:
             raise TypeError("'%s' is not a valid state" % value)
         self._state = value
@@ -563,14 +574,14 @@ class Node(ConfigObject):
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    def __eq__(self, other):
+    def __eq__(self, other: Union['Node', Any]):
         if not isinstance(other, Node):
             return False
         return (self.name == other.name and
                 self.label == other.label and
                 self.id == other.id)
 
-    def toDict(self, internal_attributes=False):
+    def toDict(self, internal_attributes: bool=False) -> Dict[str, Any]:
         d = {}
         d['state'] = self.state
         d['hold_job'] = self.hold_job
@@ -584,7 +595,7 @@ class Node(ConfigObject):
             d['label'] = self.label
         return d
 
-    def updateFromDict(self, data):
+    def updateFromDict(self, data: Dict[str, str]):
         self._state = data['state']
         keys = []
         for k, v in data.items():
@@ -603,7 +614,7 @@ class Group(ConfigObject):
     run.
     """
 
-    def __init__(self, name, nodes):
+    def __init__(self, name: str, nodes: List[str]):
         super(Group, self).__init__()
         self.name = name
         self.nodes = nodes
@@ -614,13 +625,13 @@ class Group(ConfigObject):
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    def __eq__(self, other):
+    def __eq__(self, other: Union['Group', Any]):
         if not isinstance(other, Group):
             return False
         return (self.name == other.name and
                 self.nodes == other.nodes)
 
-    def toDict(self):
+    def toDict(self) -> Dict[str, Union[str, List[str]]]:
         return {
             'name': self.name,
             'nodes': self.nodes
@@ -637,16 +648,16 @@ class NodeSet(ConfigObject):
     or they may appears anonymously in in-line job definitions.
     """
 
-    def __init__(self, name=None):
+    def __init__(self, name: Optional[str]=None):
         super(NodeSet, self).__init__()
         self.name = name or ''
-        self.nodes = OrderedDict()
-        self.groups = OrderedDict()
+        self.nodes = OrderedDict()   # type: Dict[Tuple[Any, ...], Node]
+        self.groups = OrderedDict()  # type: Dict[str, Any]
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    def __eq__(self, other):
+    def __eq__(self, other: Union['NodeSet', Any]):
         if not isinstance(other, NodeSet):
             return False
         return (self.name == other.name and
@@ -671,21 +682,21 @@ class NodeSet(ConfigObject):
             n.addGroup(Group(group.name, group.nodes[:]))
         return n
 
-    def addNode(self, node):
+    def addNode(self, node: 'Node'):
         for name in node.name:
             if name in self.nodes:
                 raise Exception("Duplicate node in %s" % (self,))
         self.nodes[tuple(node.name)] = node
 
-    def getNodes(self):
+    def getNodes(self) -> List['Node']:
         return list(self.nodes.values())
 
-    def addGroup(self, group):
+    def addGroup(self, group: Group):
         if group.name in self.groups:
             raise Exception("Duplicate group in %s" % (self,))
         self.groups[group.name] = group
 
-    def getGroups(self):
+    def getGroups(self) -> List[str]:
         return list(self.groups.values())
 
     def __repr__(self):
