@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_fec05b52",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-15T09:48:21Z",
+      "side": 1,
+      "message": "If you rebase on top of https://review.openstack.org/637158 and use get_default instead, you could just remove these two lines.",
+      "range": {
+        "startLine": 320,
+        "startChar": 0,
+        "endLine": 321,
+        "endChar": 36
+      },
+      "revId": "127d8536d92916488bc865ba0cb7ff1b42308f3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
